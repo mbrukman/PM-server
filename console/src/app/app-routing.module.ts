@@ -21,6 +21,7 @@ import { AgentsListComponent } from './agents/agents-list/agents-list.component'
 import { MapSettingComponent } from './maps/map-detail/map-setting/map-setting.component';
 import { CalendarContainerComponent } from './calendar/calendar-container/calendar-container.component';
 import { UnsavedGuard } from './shared/guards/unsaved.guard';
+import { NotFoundComponent } from './core/not-found/not-found.component';
 
 const appRoutes: Routes = [
   // maps
@@ -38,7 +39,8 @@ const appRoutes: Routes = [
   {
     path: 'admin',
     loadChildren: './admin/admin.module#AdminModule'
-  }
+  },
+  { path: '**', component: NotFoundComponent }
 
 ];
 

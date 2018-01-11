@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { BsModalService } from 'ngx-bootstrap/modal';
 
@@ -22,16 +22,23 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   filterTerm: string;
   featuredMaps: Map[];
 
-  constructor(private route: ActivatedRoute, private projectsService: ProjectsService, private modalService: BsModalService) {
+  constructor(private route: ActivatedRoute, private router: Router, private projectsService: ProjectsService, private modalService: BsModalService) {
   }
 
   ngOnInit() {
     this.routeReq = this.route.params.subscribe(params => {
       this.id = params['id'];
       this.projectReq = this.projectsService.detail(this.id).subscribe(project => {
-        this.project = project;
-        this.featureMaps(project.maps);
-      });
+          if (!project) {
+            this.router.navigate(['NotFound'])
+          }
+          this.project = project;
+          this.featureMaps(project.maps);
+        },
+        error => {
+          this.router.navigate(['NotFound'])
+        }
+      );
     });
   }
 

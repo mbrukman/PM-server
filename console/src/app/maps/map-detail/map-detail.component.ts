@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Subscription } from 'rxjs/Subscription';
 import * as _ from 'lodash';
@@ -34,13 +34,17 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   structureEdited: boolean = false;
   initiated: boolean = false;
 
-  constructor(private route: ActivatedRoute, private mapsService: MapsService, private modalService: BsModalService) {
+  constructor(private route: ActivatedRoute, private router: Router, private mapsService: MapsService, private modalService: BsModalService) {
   }
 
   ngOnInit() {
     this.routeReq = this.route.params.subscribe(params => {
       this.id = params['id'];
       this.mapReq = this.mapsService.getMap(this.id).subscribe(map => {
+        if (!map) {
+          this.router.navigate(['NotFound']);
+        }
+        console.log(map);
         this.map = map;
         this.originalMap = _.cloneDeep(map);
         this.mapsService.setCurrentMap(map);
@@ -63,6 +67,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         });
       }, () => {
         console.log('Couldn\'t get map model');
+        this.router.navigate(['NotFound']);
       });
     });
     this.mapsService.getCurrentMap().subscribe(map => {
@@ -98,7 +103,9 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.routeReq.unsubscribe();
     this.mapReq.unsubscribe();
-    this.mapStructureReq.unsubscribe();
+    if (this.mapStructureReq) {
+      this.mapStructureReq.unsubscribe();
+    }
     if (this.mapExecReq) {
       this.mapExecReq.unsubscribe();
     }

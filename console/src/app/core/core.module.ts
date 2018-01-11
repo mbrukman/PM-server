@@ -9,6 +9,7 @@ import { RouterModule } from '@angular/router';
 import { SharedModule } from '../shared/shared.module';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 @NgModule({
   imports: [
@@ -22,7 +23,8 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
   ],
   declarations: [
     AppComponent,
-    SearchComponent
+    SearchComponent,
+    NotFoundComponent
   ]
 })
 export class CoreModule { }
