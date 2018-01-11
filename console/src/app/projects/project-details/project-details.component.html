@@ -2,8 +2,10 @@
   <div class="row">
     <div class="col-12">
       <h1 class="section-title">{{project?.name}} <span *ngIf="project?.archived  ">(archived)</span></h1>
-      <a routerLink="/projects/update" [queryParams]="{'project': project?.id}" class="btn-primary btn">Edit <i class="fa fa-pencil" aria-hidden="true"></i></a>
-      <button class="btn-success btn" (click)="archiveProject()" [disabled]="project?.archived">Archive <i class="fa fa-archive" aria-hidden="true"></i>
+      <a routerLink="/projects/update" [queryParams]="{'project': project?.id}" class="btn-primary btn">Edit <i class="material-icons">mode_edit</i></a>
+      <button class="btn-success btn" (click)="archiveProject()" [disabled]="project?.archived">
+        Archive
+        <i class="material-icons">archive</i>
       </button>
       <p class="lead">{{project?.description}}</p>
     </div>
@@ -15,8 +17,7 @@
   <div class="filter d-flex justify-content-between align-items-end">
     <h5 class="section-sub-title">All projects</h5>
     <div>
-      <i class="fa fa-search" aria-hidden="true" *ngIf="!filterTerm"></i>
-      <i class="fa fa-times" aria-hidden="true" *ngIf="filterTerm" (click)="filterTerm = null"></i>
+      <i class="material-icons">search</i>
       <input #gb class="form-control" type="text" placeholder="Filter"
             />
     </div>
@@ -37,7 +38,7 @@
       *ngIf="project?.maps && project?.maps?.length > 0">
       <p-column field="name" header="Name" [sortable]="true">
         <ng-template let-col let-map="rowData" pTemplate="body">
-          <i class="fa fa-archive" aria-hidden="true" *ngIf="map.archived"> </i>
+          <i class="material-icons" *ngIf="map.archived">archive</i>
           <a [routerLink]="['/maps', map.id]">{{ map.name }}</a>
         </ng-template>
       </p-column>

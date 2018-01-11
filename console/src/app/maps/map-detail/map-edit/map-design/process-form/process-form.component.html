@@ -13,12 +13,12 @@
       </ul>
     </div>
     <button type="button" class="btn btn-link" (click)="closePane()">
-      <i class="fa fa-times text-light" aria-hidden="true"></i>
+      <i class="material-icons text-light">close</i>
     </button>
   </div>
   <div *ngIf="action">
     <button type="button" class="btn btn-link" (click)="backToProcessView()">
-      <i class="fa fa-arrow-right text-light" aria-hidden="true"></i>
+      <i class="material-icons text-light">arrow_forward</i>
     </button>
 
   </div>
@@ -30,7 +30,7 @@
       <accordion-group>
         <div accordion-heading class="clearfix">
           Details
-          <span class="float-right pull-right"><i class="fa fa-chevron-down" aria-hidden="true"></i></span>
+          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
         </div>
         <div class="form-group">
           <label for="uuid">uuid</label>
@@ -52,7 +52,7 @@
       <accordion-group>
         <div accordion-heading class="clearfix">
           Conditions
-          <span class="float-right pull-right"><i class="fa fa-chevron-down" aria-hidden="true"></i></span>
+          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
         </div>
         <div class="form-check">
           <label class="form-check-label">
@@ -85,7 +85,7 @@
       <accordion-group>
         <div accordion-heading class="clearfix">
           Hooks
-          <span class="float-right pull-right"><i class="fa fa-chevron-down" aria-hidden="true"></i></span>
+          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
         </div>
 
         <div class="form-group">
@@ -108,7 +108,7 @@
       <accordion-group>
         <div accordion-heading class="clearfix">
           Actions
-          <span class="float-right pull-right"><i class="fa fa-chevron-down" aria-hidden="true"></i></span>
+          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
         </div>
         <button type="button" class="btn btn-sm btn-block pm" (click)="addNewAction()">Add action
         </button>
@@ -118,10 +118,8 @@
               <span *ngIf="processForm.get('actions').at(i).get('name').value">{{processForm.get('actions').at(i).get('name').value}} (#{{i + 1}})</span>
               <span *ngIf="!processForm.get('actions').at(i).get('name').value">Action #{{i + 1}}</span>
               <span>
-            <button type="button" class="btn btn-link" (click)="editAction(i)"><i class="fa fa-pencil-square-o"
-                                                                                  aria-hidden="true"></i></button>
-            <button type="button" class="btn btn-link" (click)="removeAction(i)"><i class="fa fa-trash-o"
-                                                                                    aria-hidden="true"></i></button>
+            <button type="button" class="btn btn-link" (click)="editAction(i)"><i class="material-icons">mode_edit</i></button>
+            <button type="button" class="btn btn-link" (click)="removeAction(i)"><i class="material-icons">delete</i></button>
           </span>
             </div>
           </div>
