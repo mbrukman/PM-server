@@ -74,6 +74,15 @@ function buildMapGraph(map) {
     return map_graph;
 }
 
+function getMapPlugins(mapStructure) {
+    let plugins = [];
+    mapStructure.processes.forEach(process => {
+        plugins.push(process.plugin);
+    });
+    return plugins;
+}
+
+
 function executeMap(mapId, versionIndex, cleanWorkspace, req) {
     const socket = req.io;
 
@@ -127,6 +136,10 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
             structure: structure._id
         };
 
+        let plugins = getMapPlugins(structure);
+        pluginsService.filterPlugins({ _id: { $in: plugins } }).then(plugins => {
+            executionContext.plugins = plugins;
+        });
         let mapGraph = buildMapGraph(mapStructure); // builds a graph from the map
         let startNodes = mapGraph.sources(); // return all the nodes that dont have an in-link
         let sortedNodes = graphlib.alg.topsort(mapGraph);
