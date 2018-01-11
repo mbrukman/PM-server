@@ -68,6 +68,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.mapsService.getCurrentMap().subscribe(map => {
       if (map) {
         this.map = map;
+        this.originalMap.archived = map.archived;
         if (!_.isEqual(map, this.originalMap)) {
           this.edited = true;
         } else {

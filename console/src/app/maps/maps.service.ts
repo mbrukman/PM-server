@@ -26,6 +26,10 @@ export class MapsService {
     return this.http.get<[Map]>(serverUrl + 'api/maps')
   }
 
+  archive(mapId) {
+    return this.http.get(`${serverUrl}api/maps/${mapId}/archive`);
+  }
+
   clearCurrentMap() {
     this.currentMap.next(null);
   }
