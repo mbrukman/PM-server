@@ -48,15 +48,23 @@ let Hook = {
         posthooks[name].push(fn);
     },
     hookPre: function (name, context) {
-        console.log("Pre hook");
         return new Promise(function (resolve, reject) {
+            if (!prehooks[name]) {
+                return resolve();
+            }
             const fn = [...prehooks[name]];
+            if (!fn) {
+                return resolve();
+            }
             runHooks(fn, { obj: context }, resolve);
         });
     },
     hookPost: function (name) {
         return new Promise(function (resolve, reject) {
             const fn = [...posthooks[name]];
+            if (!fn) {
+                return resolve();
+            }
             runHooks(fn, { obj: context }, resolve);
         });
     }
