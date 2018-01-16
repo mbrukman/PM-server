@@ -21,4 +21,11 @@ export class MapPropertiesComponent implements OnInit {
     });
   }
 
+  archiveMap() {
+    this.mapsService.archive(this.map.id).subscribe(() => {
+      this.map.archived = true;
+      this.mapsService.setCurrentMap(this.map);
+    });
+  }
+
 }

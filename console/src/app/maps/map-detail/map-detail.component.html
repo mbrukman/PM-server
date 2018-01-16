@@ -3,7 +3,9 @@
   <h1>
     {{map?.name}}
     <span *ngIf="map?.archived">(archived)</span>
-    <span *ngIf="structuresList[0] && mapStructure?.id !== structuresList[0].id">(<i class="fa fa-history" aria-hidden="true"></i> {{ structureIndex }}/{{ structuresList.length }})</span>
+    <span *ngIf="structuresList[0] && mapStructure?.id !== structuresList[0].id">
+      (<i class="material-icons">history</i> {{ structureIndex }}/{{ structuresList.length }})
+    </span>
   </h1>
 </div>
 

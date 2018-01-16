@@ -15,8 +15,8 @@
   <div class="filter d-flex justify-content-between align-items-end">
     <h5 class="section-sub-title">All projects</h5>
     <div>
-      <i class="fa fa-search" aria-hidden="true" *ngIf="!filterTerm"></i>
-      <i class="fa fa-times" aria-hidden="true" *ngIf="filterTerm" (click)="filterTerm = null"></i>
+      <i class="material-icons" *ngIf="!filterTerm">search</i>
+      <i class="material-icons" *ngIf="filterTerm" (click)="filterTerm = null">close</i>
       <input class="form-control" [(ngModel)]="filterTerm" type="text" placeholder="Filter"
              (keyup)="loadProjectLazy(filterTerm)"/>
     </div>
@@ -26,7 +26,7 @@
                (onLazyLoad)="loadProjectLazy($event)" [globalFilter]="filterTerm">
     <p-column field="name" header="Name" [sortable]="true">
       <ng-template let-col let-project="rowData" pTemplate="body">
-        <i class="fa fa-archive" aria-hidden="true" *ngIf="project.archived"> </i>
+        <i class="material-icons" *ngIf="project.archived">archive</i>
         <a [routerLink]="project.id">{{ project.name }}</a>
       </ng-template>
     </p-column>

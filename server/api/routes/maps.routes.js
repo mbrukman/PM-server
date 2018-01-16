@@ -14,6 +14,7 @@ router.get("/:id/execute", mapController.execute);
 router.get("/:id/results", mapController.results);
 router.get("/:id/results/logs", mapController.logs);
 router.put("/:id/update", mapController.update);
+router.get("/:id/archive", mapController.archive);
 
 /* map structure */
 router.get("/:id/structure", mapController.getMapStructure);

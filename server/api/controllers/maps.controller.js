@@ -6,6 +6,20 @@ let scheduledJobsService = require("../services/scheduled-job.service");
 
 
 module.exports = {
+    /* archive a map */
+    archive: (req, res) => {
+        mapsService.archive([req.params.id]).then(map => {
+            return res.status(204).send();
+        }).catch(error => {
+            console.log("Error archiving map", error);
+            req.io.emit('notification', {
+                title: 'Error',
+                message: `Error creating map. Please try again`,
+                type: 'error'
+            });
+            return res.status(500).send(error);
+        });
+    },
     create: (req, res) => {
         // create the map object.
         if (!req.body || Object.keys(req.body).length === 0 || !req.body.name) {

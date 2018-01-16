@@ -9,9 +9,9 @@
         </p-column>
         <p-column field="" header="Actions">
           <ng-template let-col let-structure="rowData" pTemplate="body">
-            <span><button class="btn-inline-action" (click)="previewStructure(structure.id)"><i class="fa fa-eye" aria-hidden="true"></i></button></span>
-            <span><button class="btn-inline-action" (click)="duplicateMap(structure.id)"><i class="fa fa-clone" aria-hidden="true"></i></button></span>
-            <span><button class="btn-inline-action" (click)="changeStructure(structure.id)"><i class="fa fa-external-link" aria-hidden="true"></i></button></span>
+            <span><button class="btn-inline-action" (click)="previewStructure(structure.id)"><i class="material-icons">remove_red_eye</i></button></span>
+            <span><button class="btn-inline-action" (click)="duplicateMap(structure.id)"><i class="material-icons">content_copy</i></button></span>
+            <span><button class="btn-inline-action" (click)="changeStructure(structure.id)"><i class="material-icons">open_in_new</i></button></span>
           </ng-template>
         </p-column>
       </p-dataTable>
