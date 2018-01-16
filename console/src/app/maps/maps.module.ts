@@ -38,7 +38,7 @@ import { ActionResultComponent } from './map-detail/map-results/action-result/ac
     CommonModule,
     MapsRoutingModule,
     SharedModule,
-    MonacoEditorModule,
+    MonacoEditorModule.forRoot(),
     NgxChartsModule,
     BsDropdownModule,
     ModalModule,
