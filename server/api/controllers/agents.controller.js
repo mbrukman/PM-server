@@ -4,14 +4,15 @@ const async = require("async");
 
 const env = require("../../env/enviroment");
 
-let agentsService = require("../services/agents.service");
-let snodeService = require("../services/snode.service");
-
+const agentsService = require("../services/agents.service");
+const hooks = require("../../libs/hooks/hooks");
 
 module.exports = {
     /* The function will be called every time an agent is registering to the server (agent startup) */
     add: (req, res) => {
-        agentsService.add(req.body).then(agent => {
+        hooks.hookPre('agent-create', req).then(() => {
+            return agentsService.add(req.body);
+        }).then(agent => {
             // add agent to follow list
             agentsService.followAgent(agent);
             // deploy all plugins on agents
@@ -37,7 +38,9 @@ module.exports = {
     },
     /* Delete an agent */
     delete: (req, res) => {
-        agentsService.delete(req.params.id).then(() => {
+        hooks.hookPre('agent-delete').then(() => {
+            return agentsService.delete(req.params.id)
+        }).then(() => {
             res.status(200).send('OK');
             req.io.emit('notification', { title: 'Agent deleted', message: ``, type: 'success' });
         }).catch(error => {
@@ -49,7 +52,9 @@ module.exports = {
     },
     /* Get all agents list */
     list: (req, res) => {
-        agentsService.filter({}).then(agents => {
+        hooks.hookPre('agent-list').then(() => {
+            return agentsService.filter({})
+        }).then(agents => {
             res.json(agents);
         }).catch(error => {
             req.io.emit('notification', { title: 'Whoops...', message: `Error finding agents`, type: 'error' });
@@ -59,21 +64,32 @@ module.exports = {
     },
     /* Get agents status */
     status: (req, res) => {
-        let status = agentsService.agentsStatus();
-        if (status) {
-            for (let i in status) {
-                delete status[i].intervalId;
-                return res.json(status);
+        hooks.hookPre('agent-status-list', req).then(() => {
+            let status = agentsService.agentsStatus();
+            if (status) {
+                for (let i in status) {
+                    delete status[i].intervalId;
+                    return res.json(status);
+                }
             }
-        }
-        return res.send('');
+            return res.send('');
+        }).catch(error => {
+            console.log("Error getting agents status", error);
+            return res.status(500).send();
+        })
     },
     /* update an agent */
     update: (req, res) => {
         let agent = req.body;
         delete agent._id;
-        agentsService.update(req.params.id, agent).then((agent) => {
-            req.io.emit('notification', { title: 'Update success', message: `${agent.name} updated successfully`, type: 'success' });
+        hooks.hookPre('agent-update', req).then(() => {
+            return agentsService.update(req.params.id, agent);
+        }).then((agent) => {
+            req.io.emit('notification', {
+                title: 'Update success',
+                message: `${agent.name} updated successfully`,
+                type: 'success'
+            });
             return res.json(agent);
         }).catch(error => {
             req.io.emit('notification', { title: 'Whoops...', message: `Error updating agent`, type: 'error' });
