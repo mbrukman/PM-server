@@ -116,9 +116,7 @@ export class ProcessFormComponent implements OnInit {
     console.log('Selected method');
     let methodId = this.processForm.value.actions[this.index].method;
     let action = this.processForm.controls['actions']['controls'][this.index];
-    for (let i = 0; i < action.controls.params.length; i++) {
-      action.controls.params.removeAt(i);
-    }
+    action.controls.params = new FormArray([]);
 
     const method = this.plugin.methods.find((o) => {
       return o._id === methodId
