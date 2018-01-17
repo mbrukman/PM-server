@@ -1,0 +1,54 @@
+<div class="container-fluid">
+  <span class="mode">
+    <i class="material-icons" [ngClass]="{'active': mode==='list'}" (click)="mode = 'list'">view_list</i>
+    <i class="material-icons" [ngClass]="{'active': mode==='grid'}" (click)="mode = 'grid'">view_module</i>
+  </span>
+  <div [ngSwitch]="mode" *ngIf="executions">
+    <div class="row" *ngSwitchCase="'grid'">
+      <div class="col-4" *ngFor="let item of executions.slice(0,9)">
+        <div class="card dashboard-card" [routerLink]="['/maps',item.map.id, 'results']">
+          <div class="card-body">
+            <h5 class="card-title">{{ item.map.name }}</h5>
+            <div class="row">
+              <div class="col">
+                <p>Last run: {{ item.startTime | date: 'short' }}</p>
+              </div>
+              <div class="col">
+                <ngx-charts-pie-chart
+                  [results]="item.status"
+                  [labels]="showLabels"
+                  [scheme]="colorScheme"
+                  [doughnut]="true">
+                </ngx-charts-pie-chart>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row list-view" *ngSwitchCase="'list'">
+      <p-dataTable [value]="executions.slice(0,20)" expandableRows="true" #dt (onRowClick)="dt.toggleRow($event.data)">
+        <p-column field="map.name" header="Map"></p-column>
+        <p-column field="startTime" header="Last executed">
+          <ng-template let-col let-item="rowData" pTemplate="body">
+            {{ item.startTime | date: 'short' }}
+
+          </ng-template>
+        </p-column>
+        <ng-template let-item pTemplate="rowexpansion">
+          <div class="row" [routerLink]="['/maps',item.map.id, 'results']">
+            <div class="col-4">
+              <ngx-charts-pie-chart
+                [results]="item.status"
+                [labels]="false"
+                [scheme]="colorScheme"
+                [doughnut]="true">
+              </ngx-charts-pie-chart>
+            </div>
+          </div>
+        </ng-template>
+      </p-dataTable>
+    </div>
+  </div>
+</div>
