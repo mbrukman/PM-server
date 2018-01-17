@@ -1,0 +1,28 @@
+@import "~assets/sass/variables";
+
+.container-fluid {
+  height: 100%;
+  .mode {
+    margin-bottom: 15px;
+    color: $greyish-text;
+    i {
+      &:hover {
+        color: #fff;
+      }
+      &.active {
+        color: $turquoise-blue;
+      }
+    }
+  }
+}
+
+.list-view {
+  padding: 30px;
+}
+
+.dashboard-card {
+  height: 190px;
+  overflow-y: scroll;
+  margin-top: 15px;
+  cursor: pointer;
+}

@@ -10,12 +10,17 @@ import { MapPropertiesComponent } from './map-detail/map-properties/map-properti
 import { UnsavedGuard } from '../shared/guards/unsaved.guard';
 import { MapCreateComponent } from './map-create/map-create.component';
 import { MapResultComponent } from './map-detail/map-result/map-result.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 const routes: Routes = [
   {
     path: '',
     component: MapsListComponent,
     pathMatch: 'full'
+  },
+  {
+    path: 'dashboard',
+    component: DashboardComponent
   },
   {
     path: 'create',
