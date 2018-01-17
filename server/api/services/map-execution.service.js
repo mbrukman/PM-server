@@ -481,8 +481,12 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
 
                     for (let i in availableAgents) {
                         // check if availble passed all processes.
-                        if (Object.keys(availableAgents[i].processes).length !== (mapGraph.nodes().length - 1)) {
+                        let prStatus = Object.keys(availableAgents[i].processes).map((key) => {
+                            return availableAgents[i].processes[key].status;
+                        });
+                        if ((Object.keys(availableAgents[i].processes).length !== (mapGraph.nodes().length - 1)) || prStatus.indexOf('executing') > -1) {
                             flag = false;
+                            break;
                         }
                     }
                     if (flag && executionContext.status !== "done") {
@@ -681,7 +685,7 @@ module.exports = {
     execute: executeMap,
 
     logs: (mapId, resultId) => {
-        let q = resultId? {runId: resultId} : {map: mapId};
+        let q = resultId ? { runId: resultId } : { map: mapId };
         return MapExecutionLog.find(q)
     },
 
