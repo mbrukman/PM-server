@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
-import { TreeTableModule, SharedModule as PrimeSharedModule, DataTableModule } from 'primeng/primeng';
+import { TreeTableModule, SharedModule as PrimeSharedModule, DataTableModule, DropdownModule } from 'primeng/primeng';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
@@ -27,7 +27,8 @@ import { ConfirmComponent } from './confirm/confirm.component';
     BsDropdownModule.forRoot(),
     ModalModule.forRoot(),
     AccordionModule.forRoot(),
-    TooltipModule.forRoot()
+    TooltipModule.forRoot(),
+    DropdownModule
   ],
   declarations: [
     FilterPipe,
@@ -44,6 +45,7 @@ import { ConfirmComponent } from './confirm/confirm.component';
     TreeTableModule,
     PrimeSharedModule,
     DataTableModule,
+    DropdownModule,
     ConfirmComponent
   ],
   entryComponents: [ConfirmComponent]

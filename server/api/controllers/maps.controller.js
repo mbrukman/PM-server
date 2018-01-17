@@ -220,7 +220,9 @@ module.exports = {
     },
 
     resultDetail: (req, res) => {
-        mapsExecutionService.detail(req.params.resultId).then(result => {
+        hooks.hookPre('map-results-detail').then(() => {
+            return mapsExecutionService.detail(req.params.resultId);
+        }).then(result => {
             if (!result) {
                 res.status(204);
             }

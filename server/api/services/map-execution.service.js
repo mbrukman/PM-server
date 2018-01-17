@@ -702,6 +702,6 @@ module.exports = {
     },
 
     detail: (resultId) => {
-        return MapResult.findById(resultId).populate('structure');
+        return MapResult.findById(resultId).populate('structure agentsResults.agent');
     }
 };

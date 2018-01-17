@@ -18,12 +18,11 @@
             <div class="card bg-dark">
               <div class="card-body">
                 <h5 class="card-title">Display data</h5>
-                <select class="form-control" [(ngModel)]="selectedAgent" (change)="changeAgent()">
-                  <option value="aggregated">Aggregate</option>
-                  <option *ngFor="let item of selectedExecution.agentsResults; let i = index" [ngValue]="item.agent">
-                    {{ i }}
-                  </option>
-                </select>
+                <p-dropdown [options]="agents" [(ngModel)]="selectedAgent" [filter]="true" [style]="{'width': '100%'}">
+                  <ng-template let-item pTemplate="item">
+                    <span style="vertical-align:middle">{{item.label}}</span>
+                  </ng-template>
+                </p-dropdown>
               </div>
             </div>
           </div>

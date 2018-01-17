@@ -5,6 +5,7 @@ import { MapsService } from '../../maps.service';
 import { Map } from '../../models/map.model';
 import { MapResult } from '../../models/execution-result.model';
 import { SocketService } from '../../../shared/socket.service';
+import { Agent } from '../../../agents/models/agent.model';
 
 @Component({
   selector: 'app-map-result',
@@ -24,6 +25,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   selectedProcess: any;
   agProcessesStatus: [{ name: string, value: number }];
   result: any;
+  agents: any;
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936']
   };
@@ -42,8 +44,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.mapSubscription.unsubscribe();
-    this.executionListReq.unsubscribe();
+    if (this.mapSubscription) {
+      this.mapSubscription.unsubscribe();
+    }
+    if (this.executionListReq) {
+      this.executionListReq.unsubscribe();
+    }
   }
 
   changeAgent() {
@@ -67,6 +73,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
     this.selectedProcess = null;
     this.selectedExecutionReq = this.mapsService.executionResultDetail(this.map.id, executionId).subscribe(result => {
       this.selectedExecution = result;
+      this.agents = result.agentsResults.map(o => {
+        return { label: (<Agent>o.agent).name, value: o }
+      });
+      if (this.agents.length > 1 ) {
+        this.agents.unshift({label: 'Aggregate', value: 'default'})
+      }
       this.changeAgent();
       this.executionLogsReq = this.mapsService.logsList(this.map.id, this.selectedExecution.runId).subscribe(logs => {
         this.selectedExecutionLogs = logs;
