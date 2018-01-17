@@ -408,10 +408,11 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
                                 executionAgents[agent.key].status = "available";
                             }
                         } else {
-                            let actionStatuses = Object.keys(executionAgents[agent.key].processes[node].actions).map((actionKey) => {
-                                return executionAgents[agent.key].processes[node].actions[actionKey].status;
-                            });
-
+                            if (executionAgents[agent.key].processes[node].actions) {
+                                let actionStatuses = Object.keys(executionAgents[agent.key].processes[node].actions).map((actionKey) => {
+                                    return executionAgents[agent.key].processes[node].actions[actionKey].status;
+                                });
+                            }
                             executionAgents[agent.key].processes[node].status = (actionStatuses.indexOf('error') === -1) ? "success" : "partial";
                             executionAgents[agent.key].status = "available";
                         }
