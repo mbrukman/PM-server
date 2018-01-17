@@ -193,7 +193,7 @@ module.exports = {
 
     logs: (req, res) => {
         hooks.hookPre('map-logs-list', req).then(() => {
-            return mapsExecutionService.logs(req.params.id);
+            return mapsExecutionService.logs(req.params.id, req.params.resultId);
         }).then((results) => {
             res.json(results);
         }).catch(error => {
@@ -212,6 +212,24 @@ module.exports = {
             req.io.emit('notification', {
                 title: 'Whoops...',
                 message: `Error getting execution results`,
+                type: 'error'
+            });
+
+            return res.status(500).json(error);
+        });
+    },
+
+    resultDetail: (req, res) => {
+        mapsExecutionService.detail(req.params.resultId).then(result => {
+            if (!result) {
+                res.status(204);
+            }
+            return res.json(result);
+        }).catch(error => {
+            console.log("Error getting execution result: ", error);
+            req.io.emit('notification', {
+                title: 'Whoops...',
+                message: `Error getting execution result`,
                 type: 'error'
             });
 

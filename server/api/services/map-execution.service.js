@@ -13,6 +13,7 @@ const agentsService = require("./agents.service");
 const mapsService = require("./maps.service");
 const pluginsService = require("../services/plugins.service");
 
+const winston = require("winston");
 
 let libpm = '';
 fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 'utf8', function (err, data) {
@@ -108,10 +109,8 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
         return mapsService.getMapStructure(mapId)
     }).then(structure => {
         mapStructure = structure;
-        if (!structure) {
+        if (!structure)
             throw new Error("No structure found");
-        }
-
         executionContext = {
             map: {
                 name: map.name,
@@ -128,7 +127,6 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
             startTime: new Date(),
             structure: structure._id
         };
-
 
         let mapGraph = buildMapGraph(mapStructure); // builds a graph from the map
         let startNodes = mapGraph.sources(); // return all the nodes that dont have an in-link
@@ -218,296 +216,305 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
     let plugin = executionContext.plugins.find((o) => {
         return o._id.toString() === process.plugin.toString();
     });
-
-    async.each(agents,
-        (agent, agentCb) => {
-            if (!executionAgents[agent.key].startTime)
-                executionAgents[agent.key].startTime = new Date();
-            if (executionAgents[agent.key].processes) {
-                if (!executionAgents[agent.key].processes[node])
-                    executionAgents[agent.key].processes[node] = { name: process.name };
-                // check if this process is executing or was executed.
-                if (executionAgents[agent.key].processes[node].status === "executing" || executionAgents[agent.key].processes[node].status === "error" || executionAgents[agent.key].processes[node].status === "success") {
-                    agentCb();
-                    return;
-                }
-            } else {
-                executionAgents[agent.key].processes = {};
-            }
-
-            executionAgents[agent.key].processes[node] = {
-                status: "executing",
-                result: '',
-                startTime: new Date(),
-                plugin: { name: plugin.name, _id: plugin._id },
-                _id: process.id
-            };
-
-            MapExecutionLog.create({
-                map: map._id,
-                runId: executionContext.runId,
-                message: `'${process.name}': executing process (${agent.name})`,
-                status: "info"
-            }).then((log) => {
-                socket.emit('update', log);
-            });
-
-            executionAgents[agent.key].agent = agent._id;
-            let agentStr = 'var currentAgent = ' + JSON.stringify(agent);
-            vm.runInNewContext(agentStr, executionAgents[agent.key].executionContext);
-            executionAgents[agent.key].status = "executing";
-            if (process.condition) {
-                console.log("process has condition");
-                let res;
-                try {
-                    res = vm.runInNewContext(process.condition, executionAgents[agent.key].executionContext);
-                } catch (e) {
-                    console.log("Error running process condition", e);
-                    MapExecutionLog.create({
-                        map: map._id,
-                        runId: executionContext.runId,
-                        message: `'${process.name}': Error running process condition: ${JSON.stringify(e)}`,
-                        status: "error"
-                    }).then((log) => {
-                        socket.emit('update', log);
-                    });
-                    agentCb();
-                    executionAgents[agent.key].finishTime = new Date();
-                    executionAgents[agent.key].processes[node].status = "error";
-                    executionAgents[agent.key].processes[node].result = "Error running process condition" + e;
-                    if (process.mandatory) {
-                        executionAgents[agent.key].status = "error";
-                    } else {
-                        executionAgents[agent.key].status = "available";
+    pluginsService.getPlugin(process.plugin).then((plugin) => { // get the process plugin
+        async.each(agents,
+            (agent, agentCb) => {
+                if (!executionAgents[agent.key].startTime)
+                    executionAgents[agent.key].startTime = new Date();
+                if (executionAgents[agent.key].processes) {
+                    if (!executionAgents[agent.key].processes[node])
+                        executionAgents[agent.key].processes[node] = { name: process.name };
+                    // check if this process is executing or was executed.
+                    if (executionAgents[agent.key].processes[node].status === "executing" || executionAgents[agent.key].processes[node].status === "error" || executionAgents[agent.key].processes[node].status === "success") {
+                        agentCb();
+                        return;
                     }
-                    return;
+                } else {
+                    executionAgents[agent.key].processes = {};
                 }
 
-                if (!res) {
-                    // if res isnot true
-                    executionAgents[agent.key].processes[node].status = "error";
-                    executionAgents[agent.key].processes[node].result = "Didn't passed condition";
-                    console.log("Process didn't pass condition");
-                    MapExecutionLog.create({
-                        map: map._id,
-                        runId: executionContext.runId,
-                        message: `'${process.name}': Process didn't pass condition`,
-                        status: "error"
-                    }).then((log) => {
-                        socket.emit('update', log);
-                    });
-                    executionAgents[agent.key].finishTime = new Date();
-                    agentCb();
-                    if (process.mandatory) {
-                        executionAgents[agent.key].status = "error";
-                    } else {
-                        executionAgents[agent.key].status = "available";
-                    }
-                    return;
-                }
+                executionAgents[agent.key].processes[node] = {
+                    status: "executing",
+                    result: '',
+                    startTime: new Date(),
+                    plugin: { name: plugin.name, _id: plugin._id },
+                    _id: process.id
+                };
 
+                MapExecutionLog.create({
+                    map: map._id,
+                    runId: executionContext.runId,
+                    message: `'${process.name}': executing process (${agent.name})`,
+                    status: "info"
+                }).then((log) => {
+                    socket.emit('update', log);
+                });
 
-            }
-
-            if (process.filterAgents) {
-                let res;
-                try {
-                    res = vm.runInNewContext(process.filterAgents, executionAgents[agent.key].executionContext);
-
-                } catch (e) {
-                    console.log("Error trying to run filter agent function", e);
-                    MapExecutionLog.create({
-                        map: map._id,
-                        runId: executionContext.runId,
-                        message: `'${process.name}': Error running agent filter function: ${JSON.stringify(e)}`,
-                        status: "error"
-                    }).then((log) => {
-                        socket.emit('update', log);
-                    });
-
-                    executionAgents[agent.key].processes[node].status = "error";
-                    executionAgents[agent.key].processes[node].result = "Error running filter agent function" + e;
-                    if (process.mandatory) {
-                        executionAgents[agent.key].status = "error";
-                    } else {
-                        executionAgents[agent.key].status = "available";
-                    }
-                    executionAgents[agent.key].finishTime = new Date();
-                    agentCb();
-                    return;
-                }
-
-                if (!res) {
-                    console.log("Agent didn't pass filter agent condition");
-                    MapExecutionLog.create({
-                        map: map._id,
-                        runId: executionContext.runId,
-                        message: `'${process.name}': agent '${agent.name}' didn't pass filter function`,
-                        status: "error"
-                    }).then((log) => {
-                        socket.emit('update', log);
-                    });
-                    executionAgents[agent.key].processes[node].status = "error";
-                    executionAgents[agent.key].processes[node].result = "Agent didn't pass filter condition";
-                    if (process.mandatory) {
-                        executionAgents[agent.key].status = "error";
-                    } else {
-                        executionAgents[agent.key].status = "available";
-                    }
-                    executionAgents[agent.key].finishTime = new Date();
-                    agentCb();
-                    return;
-                }
-
-            }
-
-            if (process.preRun) {
-                // pre run hook for link (enables user to change context)
-                let res;
-                try {
-                    res = vm.runInNewContext(process.preRun, executionAgents[agent.key].executionContext);
-                    executionAgents[agent.key].processes[node].preRun = res; // storing the result so user can use it later...
-                } catch (e) {
-                    console.log("Error running pre process function");
-                    MapExecutionLog.create({
-                        map: map._id,
-                        runId: executionContext.runId,
-                        message: `'${process.name}': error running pre-process function`,
-                        status: "error"
-                    }).then((log) => {
-                        socket.emit('update', log);
-                    });
-                }
-            }
-
-            let actionExecutionFunctions = {};
-            process.actions.forEach(action => {
-                actionExecutionFunctions[action.name + "(" + action.id + ")"] = executeAction(map, process, _.cloneDeep(action), plugin, agent, executionContext, executionAgents, socket);
-                // actionExecutionFunctions.push(executeAction(map, link, selectedProcess, _.cloneDeep(action), agent, executionAgents[agent.key].executionContext, executionAgents)); //other option is to pass it as an array, but result would be massy.
-            });
-            async.series(actionExecutionFunctions,
-                (error, actionsResults) => {
-                    executionAgents[agent.key].finishTime = new Date();
-                    executionAgents[agent.key].processes[node].result = actionsResults;
-                    executionAgents[agent.key].processes[node].finishTime = new Date();
-
-                    if (error) { // a mandatory action failed
-
-                        console.log("Fatal error: ", error);
+                executionAgents[agent.key].agent = agent._id;
+                let agentStr = 'var currentAgent = ' + JSON.stringify(agent);
+                vm.runInNewContext(agentStr, executionAgents[agent.key].executionContext);
+                executionAgents[agent.key].status = "executing";
+                if (process.condition) {
+                    console.log("process has condition");
+                    let res;
+                    try {
+                        res = vm.runInNewContext(process.condition, executionAgents[agent.key].executionContext);
+                    } catch (e) {
+                        console.log("Error running process condition", e);
                         MapExecutionLog.create({
                             map: map._id,
                             runId: executionContext.runId,
-                            message: `'${process.name}': A mandatory action failed`,
+                            message: `'${process.name}': Error running process condition: ${JSON.stringify(e)}`,
+                            status: "error"
+                        }).then((log) => {
+                            socket.emit('update', log);
+                        });
+                        agentCb();
+                        executionAgents[agent.key].finishTime = new Date();
+                        executionAgents[agent.key].processes[node].status = "error";
+                        executionAgents[agent.key].processes[node].result = "Error running process condition" + e;
+                        if (process.mandatory) {
+                            executionAgents[agent.key].status = "error";
+                        } else {
+                            executionAgents[agent.key].status = "available";
+                        }
+                        return;
+                    }
+
+                    if (!res) {
+                        // if res isnot true
+                        executionAgents[agent.key].processes[node].status = "error";
+                        executionAgents[agent.key].processes[node].result = "Didn't passed condition";
+                        console.log("Process didn't pass condition");
+                        MapExecutionLog.create({
+                            map: map._id,
+                            runId: executionContext.runId,
+                            message: `'${process.name}': Process didn't pass condition`,
+                            status: "error"
+                        }).then((log) => {
+                            socket.emit('update', log);
+                        });
+                        executionAgents[agent.key].finishTime = new Date();
+                        agentCb();
+                        if (process.mandatory) {
+                            executionAgents[agent.key].status = "error";
+                        } else {
+                            executionAgents[agent.key].status = "available";
+                        }
+                        return;
+                    }
+
+
+                }
+
+                if (process.filterAgents) {
+                    let res;
+                    try {
+                        res = vm.runInNewContext(process.filterAgents, executionAgents[agent.key].executionContext);
+
+                    } catch (e) {
+                        console.log("Error trying to run filter agent function", e);
+                        MapExecutionLog.create({
+                            map: map._id,
+                            runId: executionContext.runId,
+                            message: `'${process.name}': Error running agent filter function: ${JSON.stringify(e)}`,
+                            status: "error"
+                        }).then((log) => {
+                            socket.emit('update', log);
+                        });
+
+                        executionAgents[agent.key].processes[node].status = "error";
+                        executionAgents[agent.key].processes[node].result = "Error running filter agent function" + e;
+                        if (process.mandatory) {
+                            executionAgents[agent.key].status = "error";
+                        } else {
+                            executionAgents[agent.key].status = "available";
+                        }
+                        executionAgents[agent.key].finishTime = new Date();
+                        agentCb();
+                        return;
+                    }
+
+                    if (!res) {
+                        console.log("Agent didn't pass filter agent condition");
+                        MapExecutionLog.create({
+                            map: map._id,
+                            runId: executionContext.runId,
+                            message: `'${process.name}': agent '${agent.name}' didn't pass filter function`,
                             status: "error"
                         }).then((log) => {
                             socket.emit('update', log);
                         });
                         executionAgents[agent.key].processes[node].status = "error";
-                        executionAgents[agent.key].status = "error"; // stopping agent
-                        if (process.mandatory) { // if the process is mandatory, should stop agent..
+                        executionAgents[agent.key].processes[node].result = "Agent didn't pass filter condition";
+                        if (process.mandatory) {
                             executionAgents[agent.key].status = "error";
                         } else {
                             executionAgents[agent.key].status = "available";
                         }
-                    } else {
-                        executionAgents[agent.key].processes[node].status = "success";
-                        executionAgents[agent.key].status = "available";
-                    }
-                    MapExecutionLog.create({
-                        map: map._id,
-                        runId: executionContext.runId,
-                        message: `'${process.name}' results: ${JSON.stringify(actionsResults)}`,
-                        status: executionAgents[agent.key].processes[node].status
-                    }).then((log) => {
-                        socket.emit('update', log);
-                    });
-                    if (!process.correlateAgents) {
-                        console.log("Dont have to correlate");
-                        successors.forEach(successor => {
-                            console.log("next node", successor);
-                            executeProcess(map, mapGraph, successor, executionContext, executionAgents, socket);
-                        })
+                        executionAgents[agent.key].finishTime = new Date();
+                        agentCb();
+                        return;
                     }
 
-                    if (process.postRun) {
-                        // post run hook for link (enables user to change context)
-                        let res;
-                        try {
-                            res = vm.runInNewContext(process.postRun, executionAgents[agent.key].executionContext);
-                            executionAgents[agent.key].processes[node].postRun = res; // storing the result so user can use it later...
-                        } catch (e) {
-                            console.log("Error running post process function");
+                }
+
+                if (process.preRun) {
+                    // pre run hook for link (enables user to change context)
+                    let res;
+                    try {
+                        res = vm.runInNewContext(process.preRun, executionAgents[agent.key].executionContext);
+                        executionAgents[agent.key].processes[node].preRun = res; // storing the result so user can use it later...
+                    } catch (e) {
+                        console.log("Error running pre process function");
+                        MapExecutionLog.create({
+                            map: map._id,
+                            runId: executionContext.runId,
+                            message: `'${process.name}': error running pre-process function`,
+                            status: "error"
+                        }).then((log) => {
+                            socket.emit('update', log);
+                        });
+                    }
+                }
+
+                let actionExecutionFunctions = {};
+                process.actions.forEach(action => {
+                    actionExecutionFunctions[action.name + "(" + action.id + ")"] = executeAction(map, process, _.cloneDeep(action), plugin, agent, executionContext, executionAgents, socket);
+                    // actionExecutionFunctions.push(executeAction(map, link, selectedProcess, _.cloneDeep(action), agent, executionAgents[agent.key].executionContext, executionAgents)); //other option is to pass it as an array, but result would be massy.
+                });
+                async.series(actionExecutionFunctions,
+                    (error, actionsResults) => {
+                        executionAgents[agent.key].finishTime = new Date();
+                        executionAgents[agent.key].processes[node].result = actionsResults;
+                        executionAgents[agent.key].processes[node].finishTime = new Date();
+
+                        if (error) { // a mandatory action failed
+
+                            console.log("Fatal error: ", error);
                             MapExecutionLog.create({
                                 map: map._id,
                                 runId: executionContext.runId,
-                                message: `'${process.name}': Error running post process function`,
+                                message: `'${process.name}': A mandatory action failed`,
                                 status: "error"
                             }).then((log) => {
                                 socket.emit('update', log);
                             });
+                            executionAgents[agent.key].processes[node].status = "error";
+                            executionAgents[agent.key].status = "error"; // stopping agent
+                            if (process.mandatory) { // if the process is mandatory, should stop agent..
+                                executionAgents[agent.key].status = "error";
+                            } else {
+                                executionAgents[agent.key].status = "available";
+                            }
+                        } else {
+                            let actionStatuses = Object.keys(executionAgents[agent.key].processes[node].actions).map((actionKey) => {
+                                return executionAgents[agent.key].processes[node].actions[actionKey].status;
+                            });
+
+                            executionAgents[agent.key].processes[node].status = (actionStatuses.indexOf('error') === -1) ? "success" : "partial";
+                            executionAgents[agent.key].status = "available";
+                        }
+                        MapExecutionLog.create({
+                            map: map._id,
+                            runId: executionContext.runId,
+                            message: `'${process.name}' results: ${JSON.stringify(actionsResults)}`,
+                            status: executionAgents[agent.key].processes[node].status
+                        }).then((log) => {
+                            socket.emit('update', log);
+                        });
+                        if (!process.correlateAgents) {
+                            console.log("Dont have to correlate");
+                            successors.forEach(successor => {
+                                console.log("next node", successor);
+                                executeProcess(map, mapGraph, successor, executionContext, executionAgents, socket);
+                            })
+                        }
+
+                        if (process.postRun) {
+                            // post run hook for link (enables user to change context)
+                            let res;
+                            try {
+                                res = vm.runInNewContext(process.postRun, executionAgents[agent.key].executionContext);
+                                executionAgents[agent.key].processes[node].postRun = res; // storing the result so user can use it later...
+                            } catch (e) {
+                                console.log("Error running post process function");
+                                MapExecutionLog.create({
+                                    map: map._id,
+                                    runId: executionContext.runId,
+                                    message: `'${process.name}': Error running post process function`,
+                                    status: "error"
+                                }).then((log) => {
+                                    socket.emit('update', log);
+                                });
+                            }
+                        }
+
+                        agentCb();
+                        return;
+
+                    });
+
+
+            }, (error) => { //agentCb
+                console.log("All agents finish");
+                if (error) {
+                    console.log("There was an error while running agents: ", error);
+                }
+
+                if (process.correlateAgents) {
+                    console.log("Agents should be correlated");
+                    // if need to correlate agents, the next node will be called only after all agents are done;
+                    // due to the way we get live agents, we must check in the execution agents if this link finish in all agents that are still available.
+
+                    let agentsStats = _.filter(executionAgents, (o) => {
+                        return o.status === 'executing';
+                    });
+
+                    if (agentsStats.length === 0) { // if there is an agent that is still executing, we shouldn't pass to the next node
+                        successors.forEach(s => {
+                            executeProcess(map, mapGraph, s, executionContext, executionAgents);
+                        });
+                    }
+                }
+
+                let doneAgents = _.filter(executionAgents, (o) => {
+                    return o.status !== "executing" // return all the agents which are not executing
+                });
+                if (doneAgents.length === Object.keys(executionAgents).length) {
+                    let flag = true;
+                    let availableAgents = filterAgents(executionAgents);
+
+
+                    for (let i in availableAgents) {
+                        // check if availble passed all processes.
+                        let prStatus = Object.keys(availableAgents[i].processes).map((key) => {
+                            return availableAgents[i].processes[key].status;
+                        });
+                        if ((Object.keys(availableAgents[i].processes).length !== (mapGraph.nodes().length - 1)) || prStatus.indexOf('executing') > -1) {
+                            flag = false;
+                            break;
                         }
                     }
-
-                    agentCb();
-                    return;
-
-                });
-
-
-        }, (error) => { //agentCb
-            console.log("All agents finish");
-            if (error) {
-                console.log("There was an error while running agents: ", error);
-            }
-
-            if (process.correlateAgents) {
-                console.log("Agents should be correlated");
-                // if need to correlate agents, the next node will be called only after all agents are done;
-                // due to the way we get live agents, we must check in the execution agents if this link finish in all agents that are still available.
-
-                let agentsStats = _.filter(executionAgents, (o) => {
-                    return o.status === 'executing';
-                });
-
-                if (agentsStats.length === 0) { // if there is an agent that is still executing, we shouldn't pass to the next node
-                    successors.forEach(s => {
-                        executeProcess(map, mapGraph, s, executionContext, executionAgents);
-                    });
-                }
-            }
-
-            let doneAgents = _.filter(executionAgents, (o) => {
-                return o.status !== "executing" // return all the agents which are not executing
-            });
-            if (doneAgents.length === Object.keys(executionAgents).length) {
-                let flag = true;
-                let availableAgents = filterAgents(executionAgents);
-
-
-                for (let i in availableAgents) {
-                    // check if availble passed all processes.
-                    if (Object.keys(availableAgents[i].processes).length !== (mapGraph.nodes().length - 1)) {
-                        flag = false;
+                    if (flag && executionContext.status !== "done") {
+                        console.log(": map done :");
+                        MapExecutionLog.create({
+                            map: map._id,
+                            runId: executionContext.runId,
+                            message: `Finish running map`,
+                            status: 'success'
+                        }).then((log) => {
+                            socket.emit('update', log);
+                        });
+                        executionContext.status = "done";
+                        executionContext.agents = executionAgents;
+                        executionContext.finishTime = new Date();
+                        summarizeExecution(_.cloneDeep(executionContext));
                     }
                 }
-                if (flag && executionContext.status !== "done") {
-                    console.log(": map done :");
-                    MapExecutionLog.create({
-                        map: map._id,
-                        runId: executionContext.runId,
-                        message: `Finish running map`,
-                        status: 'success'
-                    }).then((log) => {
-                        socket.emit('update', log);
-                    });
-                    executionContext.status = "done";
-                    executionContext.agents = executionAgents;
-                    executionContext.finishTime = new Date();
-                    summarizeExecution(_.cloneDeep(executionContext));
-                }
             }
-        }
-    )
+        )
+    })
 }
 
 function evaluateParam(param, context) {
@@ -683,10 +690,17 @@ function summarizeExecution(executionContext) {
 
 module.exports = {
     execute: executeMap,
-    logs: (mapId) => {
-        return MapExecutionLog.find({ map: mapId }, null, { sort: { createdAt: -1 } })
+
+    logs: (mapId, resultId) => {
+        let q = resultId ? { runId: resultId } : { map: mapId };
+        return MapExecutionLog.find(q)
     },
+
     results: (mapId) => {
-        return MapResult.find({ map: mapId }, null, { sort: { startTime: -1 } })
+        return MapResult.find({ map: mapId }, null, { sort: { startTime: -1 } }).select("-agentsResults")
+    },
+
+    detail: (resultId) => {
+        return MapResult.findById(resultId).populate('structure');
     }
-}
+};

@@ -83,12 +83,16 @@ export class MapsService {
     return this.http.get(serverUrl + 'api/maps/' + mapId + '/execute')
   }
 
-  logsList(mapId) {
-    return this.http.get<MapExecutionLogs[]>(serverUrl + 'api/maps/' + mapId + '/results/logs')
+  logsList(mapId: string, runId?: string) {
+    return this.http.get<MapExecutionLogs[]>(serverUrl + 'api/maps/' + mapId + '/results/' + (runId ? runId + '/' : '') + 'logs')
+  }
+
+  executionResultDetail(mapId, resultId) {
+    return this.http.get<MapResult>(`${serverUrl}api/maps/${mapId}/results/${resultId}`);
   }
 
   executionResults(mapId) {
-    return this.http.get<MapResult[]>(serverUrl + 'api/maps/' + mapId + '/results')
+    return this.http.get<MapResult[]>(`${serverUrl}api/maps/${mapId}/results`);
   }
 
   /* map structure */

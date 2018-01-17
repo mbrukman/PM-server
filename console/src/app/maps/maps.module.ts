@@ -22,15 +22,14 @@ import { MapEditComponent } from './map-detail/map-edit/map-edit.component';
 import { MapAgentsComponent } from './map-detail/map-edit/map-enviroment-pane/map-agents/map-agents.component';
 import { MapAttributesComponent } from './map-detail/map-edit/map-enviroment-pane/map-attributes/map-attributes.component';
 import { MapCodeComponent } from './map-detail/map-edit/map-code/map-code.component';
-import { ProcessResultComponent } from './map-detail/map-results/process-result/process-result.component';
 import { MapSettingComponent } from './map-detail/map-setting/map-setting.component';
 import { ProcessFormComponent } from './map-detail/map-edit/map-design/process-form/process-form.component';
 import { MapPropertiesComponent } from './map-detail/map-properties/map-properties.component';
-import { MapResultsComponent } from './map-detail/map-results/map-results.component';
 import { PluginToolboxComponent } from './map-detail/map-edit/map-enviroment-pane/plugin-toolbox/plugin-toolbox.component';
 import { MapCreateComponent } from './map-create/map-create.component';
 import { MapEnvironmentPaneComponent } from './map-detail/map-edit/map-enviroment-pane/map-environment-pane.component';
-import { ActionResultComponent } from './map-detail/map-results/action-result/action-result.component';
+import { MapResultComponent } from './map-detail/map-result/map-result.component';
+import { ProcessResultComponent } from './map-detail/map-result/process-result/process-result.component';
 
 
 @NgModule({
@@ -49,7 +48,6 @@ import { ActionResultComponent } from './map-detail/map-results/action-result/ac
     MapDetailComponent,
     MapPropertiesComponent,
     MapDesignComponent,
-    MapResultsComponent,
     MapCodeComponent,
     MapEditComponent,
     MapsListComponent,
@@ -61,12 +59,11 @@ import { ActionResultComponent } from './map-detail/map-results/action-result/ac
     MapAttributesComponent,
     AddAttributeComponent,
     MapTriggersComponent,
-    ProcessResultComponent,
     TriggerFormComponent,
     ProcessFormComponent,
     PluginToolboxComponent,
-    ActionResultComponent,
-
+    MapResultComponent,
+    ProcessResultComponent,
   ],
   entryComponents: [SelectAgentComponent, AddAttributeComponent, TriggerFormComponent]
 })
