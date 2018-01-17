@@ -702,5 +702,9 @@ module.exports = {
 
     detail: (resultId) => {
         return MapResult.findById(resultId).populate('structure');
+    },
+
+    list: () => {
+        return MapResult.find().populate({ path: 'map', select: 'name' });
     }
 };
