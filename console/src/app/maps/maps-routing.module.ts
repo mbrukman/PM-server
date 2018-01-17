@@ -8,8 +8,8 @@ import { MapsListComponent } from './maps-list/maps-list.component';
 import { MapSettingComponent } from './map-detail/map-setting/map-setting.component';
 import { MapPropertiesComponent } from './map-detail/map-properties/map-properties.component';
 import { UnsavedGuard } from '../shared/guards/unsaved.guard';
-import { MapResultsComponent } from './map-detail/map-results/map-results.component';
 import { MapCreateComponent } from './map-create/map-create.component';
+import { MapResultComponent } from './map-detail/map-result/map-result.component';
 
 const routes: Routes = [
   {
@@ -58,7 +58,7 @@ const routes: Routes = [
       },
       {
         path: 'results',
-        component: MapResultsComponent
+        component: MapResultComponent
       }
     ]
   }
