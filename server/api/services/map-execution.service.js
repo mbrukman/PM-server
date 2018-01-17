@@ -13,7 +13,6 @@ const agentsService = require("./agents.service");
 const mapsService = require("./maps.service");
 const pluginsService = require("../services/plugins.service");
 
-const winston = require("winston");
 
 let libpm = '';
 fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 'utf8', function (err, data) {
@@ -95,6 +94,7 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
     }).then((log) => {
         socket.emit('update', log);
     });
+
     let map;
     let mapStructure;
     let mapAgents;
@@ -165,9 +165,18 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
             throw new Error("Error running map code", res);
         }
         const startNode = findStartNode(mapStructure);
-        pluginsService.filterPlugins({ _id: { $in: structure.plugins } }).then(plugins => {
+
+        let mapResult;
+        MapResult.create({
+            map: mapId,
+            runId: runId,
+            startTime: new Date()
+        }).then(result => {
+            mapResult = result;
+            return pluginsService.filterPlugins({ _id: { $in: structure.plugins } })
+        }).then(plugins => {
             executionContext.plugins = plugins;
-            executeProcess(map, mapGraph, startNode, Object.assign({}, executionContext), executionAgents, socket);
+            executeProcess(map, mapGraph, startNode, Object.assign({}, executionContext), executionAgents, socket, mapResult);
 
         });
 
@@ -192,7 +201,7 @@ function filterAgents(executionAgents) {
     return agents;
 }
 
-function executeProcess(map, mapGraph, node, executionContext, executionAgents, socket) {
+function executeProcess(map, mapGraph, node, executionContext, executionAgents, socket, mapResult) {
     if (!node) {
         console.log("No node provided");
         return;
@@ -206,7 +215,7 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
         successors.forEach(successor => {
             let n = mapGraph.node(successor);
             console.log("next node", successor);
-            executeProcess(map, mapGraph, successor, executionContext, executionAgents, socket);
+            executeProcess(map, mapGraph, successor, executionContext, executionAgents, socket, mapResult);
         });
         return;
     }
@@ -427,7 +436,7 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
                             console.log("Dont have to correlate");
                             successors.forEach(successor => {
                                 console.log("next node", successor);
-                                executeProcess(map, mapGraph, successor, executionContext, executionAgents, socket);
+                                executeProcess(map, mapGraph, successor, executionContext, executionAgents, socket, mapResult);
                             })
                         }
 
@@ -473,7 +482,7 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
 
                     if (agentsStats.length === 0) { // if there is an agent that is still executing, we shouldn't pass to the next node
                         successors.forEach(s => {
-                            executeProcess(map, mapGraph, s, executionContext, executionAgents);
+                            executeProcess(map, mapGraph, successor, executionContext, executionAgents, socket, mapResult);
                         });
                     }
                 }
@@ -509,7 +518,7 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
                         executionContext.status = "done";
                         executionContext.agents = executionAgents;
                         executionContext.finishTime = new Date();
-                        summarizeExecution(_.cloneDeep(executionContext));
+                        summarizeExecution(_.cloneDeep(executionContext), mapResult);
                     }
                 }
             }
@@ -631,7 +640,7 @@ function executeAction(map, process, action, plugin, agent, executionContext, ex
     }
 }
 
-function summarizeExecution(executionContext) {
+function summarizeExecution(executionContext, resultObj) {
     delete executionContext.currentAction;
 
     let result = {};
@@ -683,7 +692,7 @@ function summarizeExecution(executionContext) {
         result.agentsResults.push(agentsResult);
     }
 
-    MapResult.create(result).then((mapresult) => {
+    MapResult.findByIdAndUpdate(resultObj._id, result).then((mapresult) => {
     })
 
 }
@@ -705,6 +714,6 @@ module.exports = {
     },
 
     list: () => {
-        return MapResult.find().populate({ path: 'map', select: 'name' });
+        return MapResult.find({}, null, {sort: {startTime: -1}}).populate({ path: 'map', select: 'name' });
     }
 };
