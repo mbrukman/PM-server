@@ -1,8 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
+
 import { MapsService } from '../../maps.service';
 import { Map } from '../../models/map.model';
-import { Subscription } from 'rxjs/Subscription';
 import { MapResult } from '../../models/execution-result.model';
+import { SocketService } from '../../../shared/socket.service';
 
 @Component({
   selector: 'app-map-result',
@@ -26,7 +28,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     domain: ['#42bc76', '#f85555', '#ebb936']
   };
 
-  constructor(private mapsService: MapsService) {
+  constructor(private mapsService: MapsService, private socketService: SocketService) {
   }
 
   ngOnInit() {
@@ -74,12 +76,17 @@ export class MapResultComponent implements OnInit, OnDestroy {
         processes = [...processes, ...agent.processes];
       });
       this.aggregateProcessesStatus(processes);
+    }, error => {
+      this.socketService.setNotification({ title: 'Connection error', message: 'couldn\'t connect to server' });
     });
 
   }
 
   aggregateProcessesStatus(processes) {
     let ag = processes.reduce((total, current) => {
+      if (!total[current.status]) {
+        return total
+      }
       total[current.status].value = (total[current.status].value || 0) + 1;
       return total;
     }, {
