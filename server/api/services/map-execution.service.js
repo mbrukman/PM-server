@@ -165,11 +165,11 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
             throw new Error("Error running map code", res);
         }
         const startNode = findStartNode(mapStructure);
+        pluginsService.filterPlugins({ _id: { $in: structure.plugins } }).then(plugins => {
+            executionContext.plugins = plugins;
+            executeProcess(map, mapGraph, startNode, Object.assign({}, executionContext), executionAgents, socket);
 
-        executeProcess(map, mapGraph, startNode, _.cloneDeep(executionContext), executionAgents, socket);
-        // startNodes.forEach(node => {
-        //     executeProcess(map, mapGraph, node, _.cloneDeep(executionContext), executionAgents, socket);
-        // });
+        });
 
         return startNode
     }).catch(error => {
@@ -213,6 +213,9 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
 
     let process = mapGraph.node(node);
     let agents = filterAgents(executionAgents); // get all available agents (not running or stopped);
+    let plugin = executionContext.plugins.find((o) => {
+        return o._id.toString() === process.plugin.toString();
+    });
     pluginsService.getPlugin(process.plugin).then((plugin) => { // get the process plugin
         async.each(agents,
             (agent, agentCb) => {

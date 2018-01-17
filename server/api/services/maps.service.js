@@ -4,6 +4,16 @@ const env = require("../../env/enviroment");
 
 const PAGE_SIZE = env.page_size;
 
+
+function getMapPlugins(mapStructure) {
+    let plugins = new Set();
+    mapStructure.processes.forEach(process => {
+        plugins.add(process.plugin);
+    });
+    return Array.from(plugins);
+}
+
+
 module.exports = {
     /* archiving maps in ids array */
     archive: (mapsIds) => {
@@ -19,6 +29,7 @@ module.exports = {
     },
     /* Create a map structure*/
     createStructure: (structure) => {
+        structure.plugins = getMapPlugins(structure);
         return MapStructure.create(structure)
     },
     filter: (query = {}) => {

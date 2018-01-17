@@ -37,7 +37,7 @@ import { ProcessResultComponent } from './map-detail/map-result/process-result/p
     CommonModule,
     MapsRoutingModule,
     SharedModule,
-    MonacoEditorModule,
+    MonacoEditorModule.forRoot(),
     NgxChartsModule,
     BsDropdownModule,
     ModalModule,

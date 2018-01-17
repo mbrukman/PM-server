@@ -65,7 +65,8 @@ let mapStructureSchema = new Schema({
     links: [linkSchema],
     processes: [processSchema],
     code: String,
-    attributes: [attributeSchema]
+    attributes: [attributeSchema],
+    plugins: [{ type: Schema.Types.ObjectId, ref: 'Plugin' }]
 });
 
 mapStructureSchema.set('toJSON', {

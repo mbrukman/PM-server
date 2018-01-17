@@ -3,22 +3,38 @@ let projectsService = require("../services/projects.service");
 let mapsExecutionService = require("../services/map-execution.service");
 let triggersService = require("../services/triggers.service");
 let scheduledJobsService = require("../services/scheduled-job.service");
-
+let hooks = require("../../libs/hooks/hooks");
 
 module.exports = {
+    /* archive a map */
+    archive: (req, res) => {
+        mapsService.archive([req.params.id]).then(map => {
+            return res.status(204).send();
+        }).catch(error => {
+            console.log("Error archiving map", error);
+            req.io.emit('notification', {
+                title: 'Error',
+                message: `Error creating map. Please try again`,
+                type: 'error'
+            });
+            return res.status(500).send(error);
+        });
+    },
     create: (req, res) => {
-        // create the map object.
         if (!req.body || Object.keys(req.body).length === 0 || !req.body.name) {
             return res.status(400).send("Bad request: No map was sent.");
         }
-        mapsService.create(req.body).then((map) => {
-            projectsService.addMap(req.body.project, map._id).then(() => {
-                req.io.emit('notification', {
-                    title: 'Map created',
-                    message: `Map ${map.name} was created`,
-                    type: 'success'
+
+        hooks.hookPre('map-create', req).then(() => {
+            mapsService.create(req.body).then((map) => {
+                projectsService.addMap(req.body.project, map._id).then(() => {
+                    req.io.emit('notification', {
+                        title: 'Map created',
+                        message: `Map ${map.name} was created`,
+                        type: 'success'
+                    });
+                    res.json(map);
                 });
-                res.json(map);
             });
         }).catch((error) => {
             console.log("Error creating map: ", error);
@@ -27,13 +43,14 @@ module.exports = {
                 message: `Error creating map. Please try again`,
                 type: 'error'
             });
-
             res.status(500).send(error);
         })
     },
 
     detail: (req, res) => {
-        mapsService.get(req.params.id).then((map) => {
+        hooks.hookPre('map-detail', req).then(() => {
+            return mapsService.get(req.params.id)
+        }).then((map) => {
             return res.status(200).json(map);
         }).catch((error) => {
             console.log("Error finding map: ", error);
@@ -45,7 +62,9 @@ module.exports = {
     duplicateMap: (req, res) => {
         let dupMap;
         // find the map
-        mapsService.filterByQuery({ _id: req.params.id }).then((map) => {
+        hooks.hookPre('map-duplicate', req).then(() => {
+            return mapsService.filterByQuery({ _id: req.params.id });
+        }).then((map) => {
             map = map[0];
             // copy the descriptive fields (not including archive) and create a new map.
             const newMap = {
@@ -83,7 +102,9 @@ module.exports = {
     },
     filter: (req, res) => {
         let query = req.query;
-        mapsService.filter(query).then(data => {
+        hooks.hookPre('map-filter', req).then(() => {
+            return mapsService.filter(query);
+        }).then(data => {
             if (!data || data.totalCount === 0) {
                 return res.status(204).send();
             }
@@ -96,7 +117,9 @@ module.exports = {
         });
     },
     getMapStructure: (req, res) => {
-        mapsService.getMapStructure(req.params.id, req.params.structureId).then((structure) => {
+        hooks.hookPre('map-get-structure', req).then(() => {
+            return mapsService.getMapStructure(req.params.id, req.params.structureId)
+        }).then((structure) => {
             if (structure)
                 return res.json(structure);
             return res.status(204).send();
@@ -110,7 +133,9 @@ module.exports = {
      * */
     update: (req, res) => {
         const mapId = req.params.id;
-        mapsService.update(mapId, req.body).then((map) => {
+        hooks.hookPre('map-update', req).then(() => {
+            return mapsService.update(mapId, req.body);
+        }).then((map) => {
             console.log(map);
             return projectsService.updateMap(mapId, req.body.project);
         }).then(() => {
@@ -128,7 +153,9 @@ module.exports = {
     createStructure: (req, res) => {
         let mapId = req.params.id;
         req.body.map = mapId;
-        mapsService.createStructure(req.body).then(structure => {
+        hooks.hookPre('map-create-structure', req).then(() => {
+            return mapsService.createStructure(req.body)
+        }).then(structure => {
             req.io.emit('notification', { title: 'Saved', message: `Map saved successfully`, type: 'success' });
             res.json(structure)
         }).catch((error) => {
@@ -139,7 +166,9 @@ module.exports = {
         })
     },
     getStructureList: (req, res) => {
-        mapsService.structureList(req.params.id).then(structures => {
+        hooks.hookPre('map-list-structures', req).then(() => {
+            return mapsService.structureList(req.params.id);
+        }).then(structures => {
             res.json(structures)
         }).catch((error) => {
             console.log("Error finding map structures: ", error);
@@ -150,7 +179,9 @@ module.exports = {
     /* execution */
     /* execute a map */
     execute: (req, res) => {
-        mapsExecutionService.execute(req.params.id, null, null, req).then((r) => {
+        hooks.hookPre('map-execute', req).then(() => {
+            return mapsExecutionService.execute(req.params.id, null, null, req);
+        }).then((r) => {
             res.json(r);
         }).catch(error => {
             console.log("Error executing map: ", error);
@@ -161,7 +192,9 @@ module.exports = {
     },
 
     logs: (req, res) => {
-        mapsExecutionService.logs(req.params.id, req.params.resultId).then((results) => {
+        hooks.hookPre('map-logs-list', req).then(() => {
+            return mapsExecutionService.logs(req.params.id, req.params.resultId);
+        }).then((results) => {
             res.json(results);
         }).catch(error => {
             console.log("Error getting execution results: ", error);
@@ -170,7 +203,9 @@ module.exports = {
     },
 
     results: (req, res) => {
-        mapsExecutionService.results(req.params.id).then((results) => {
+        hooks.hookPre('map-results-list', req).then(() => {
+            return mapsExecutionService.results(req.params.id)
+        }).then((results) => {
             res.json(results);
         }).catch(error => {
             console.log("Error getting execution results: ", error);
@@ -205,7 +240,9 @@ module.exports = {
     /* triggers */
     /* create trigger */
     triggerCreate: (req, res) => {
-        triggersService.create(req.params.id, req.body).then(trigger => {
+        hooks.hookPre('trigger-create', req).then(() => {
+            return triggersService.create(req.params.id, req.body)
+        }).then(trigger => {
             req.io.emit('notification', {
                 title: 'Trigger saved',
                 message: `${trigger.name} saved successfully`,
@@ -220,7 +257,9 @@ module.exports = {
     },
     /* delete a trigger */
     triggerDelete: (req, res) => {
-        triggersService.delete(req.params.triggerId).then(() => {
+        hooks.hookPre('trigger-delete', req).then(() => {
+            return triggersService.delete(req.params.triggerId);
+        }).then(() => {
             req.io.emit('notification', {
                 title: 'Trigger deleted',
                 message: `${trigger.name} saved successfully`,
@@ -240,7 +279,9 @@ module.exports = {
     },
     /* get triggers list for given map */
     triggersList: (req, res) => {
-        triggersService.list(req.params.id).then(triggers => {
+        hooks.hookPre('trigger-list', req).then(() => {
+            return triggersService.list(req.params.id)
+        }).then(triggers => {
             return res.json(triggers);
         }).catch((error) => {
             console.log("Error getting map's triggers: ", error);
@@ -249,7 +290,9 @@ module.exports = {
     },
     /* update a trigger */
     triggerUpdate: (req, res) => {
-        triggersService.update(req.params.triggerId, req.body).then(trigger => {
+        hooks.hookPre('trigger-update', req).then(() => {
+            return triggersService.update(req.params.triggerId, req.body)
+        }).then(trigger => {
             req.io.emit('notification', {
                 title: 'Trigger saved',
                 message: `${trigger.name} saved successfully`,
@@ -267,7 +310,9 @@ module.exports = {
      * TODO: change to standalone plugin (that is old implantation)
      * */
     createJob: (req, res) => {
-        scheduledJobsService.create(req.body).then((job) => {
+        hooks.hookPre('scheduledJob-create', req).then(() => {
+            return scheduledJobsService.create(req.body)
+        }).then((job) => {
             return res.json(job);
         }).catch((error) => {
             console.log("Error creating a new job ", error);
@@ -275,14 +320,18 @@ module.exports = {
         });
     },
     deleteJob: (req, res) => {
-        scheduledJobsService.delete(req.params.jobId).then(() => {
+        hooks.hookPre('scheduledJob-delete', req).then(() => {
+            return scheduledJobsService.delete(req.params.jobId)
+        }).then(() => {
             return res.status(200).send('OK');
         }).catch((error) => {
             return res.status(500).send(error);
         });
     },
     filterJobs: (req, res) => {
-        scheduledJobsService.filter().then(jobs => {
+        hooks.hookPre('scheduledJob-list', req).then(() => {
+            return scheduledJobsService.filter();
+        }).then(jobs => {
             return res.json(jobs)
         }).catch((error) => {
             console.log("Error finding jobs ", error);
@@ -290,14 +339,18 @@ module.exports = {
         });
     },
     getFutureJobs: (req, res) => {
-        scheduledJobsService.getFutureJobs().then((jobs) => {
+        hooks.hookPre('scheduledJob-list', req).then(() => {
+            return scheduledJobsService.getFutureJobs();
+        }).then((jobs) => {
             res.send(jobs);
         }).catch((error) => {
             return res.status(500).send(error);
         });
     },
     updateJob: function (req, res) {
-        scheduledJobsService.update(req.body).then((job) => {
+        hooks.hookPre('scheduledJob-update', req).then(() => {
+            return scheduledJobsService.update(req.body);
+        }).then((job) => {
             return res.json(job[0]);
         }).catch((error) => {
             return res.status(500).send(error);
