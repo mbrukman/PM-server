@@ -18,7 +18,11 @@
     </div>
     <div class="row">
       <p-dataTable [value]="process.actions" expandableRows="true"  #dt (onRowClick)="dt.toggleRow($event.data)">
-        <p-column field="name" header="Action"></p-column>
+        <p-column field="name" header="Action">
+          <ng-template let-col let-i="rowIndex" let-action="rowData" pTemplate="body">
+            {{action.name || 'Action #' + (i+1)}}
+          </ng-template>
+        </p-column>
         <p-column field="name" header="Result" >
           <ng-template let-col let-action="rowData" pTemplate="body">
             <span *ngIf="agActionsStatus">{{agActionsStatus[action._id]?.total}}</span>
