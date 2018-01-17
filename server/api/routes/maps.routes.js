@@ -13,6 +13,8 @@ router.get("/:id", mapController.detail);
 router.get("/:id/execute", mapController.execute);
 router.get("/:id/results", mapController.results);
 router.get("/:id/results/logs", mapController.logs);
+router.get("/:id/results/:resultId", mapController.resultDetail);
+router.get("/:id/results/:resultId/logs", mapController.logs);
 router.put("/:id/update", mapController.update);
 
 /* map structure */

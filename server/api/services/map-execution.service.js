@@ -13,6 +13,7 @@ const agentsService = require("./agents.service");
 const mapsService = require("./maps.service");
 const pluginsService = require("../services/plugins.service");
 
+const winston = require("winston");
 
 let libpm = '';
 fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 'utf8', function (err, data) {
@@ -678,10 +679,17 @@ function summarizeExecution(executionContext) {
 
 module.exports = {
     execute: executeMap,
-    logs: (mapId) => {
-        return MapExecutionLog.find({ map: mapId }, null, { sort: { createdAt: -1 } })
+
+    logs: (mapId, resultId) => {
+        let q = resultId? {runId: resultId} : {map: mapId};
+        return MapExecutionLog.find(q)
     },
+
     results: (mapId) => {
-        return MapResult.find({ map: mapId }, null, { sort: { startTime: -1 } })
+        return MapResult.find({ map: mapId }, null, { sort: { startTime: -1 } }).select("-agentsResults")
+    },
+
+    detail: (resultId) => {
+        return MapResult.findById(resultId).populate('structure');
     }
-}
+};
