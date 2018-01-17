@@ -26,7 +26,6 @@ export class DashboardComponent implements OnInit {
         });
         execution.status = this.aggregateProcessesStatus(processes);
       });
-      console.log(executions);
     });
 
   }
