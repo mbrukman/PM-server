@@ -5,7 +5,7 @@ let mapExecutionLogSchema = new Schema({
     map: { type: Schema.Types.ObjectId, ref: 'Map' },
     runId: { type: String, required: true },
     message: { type: String, required: true },
-    status: { type: String, enum: ['success', 'info', 'error', 'fail'] },
+    status: { type: String, enum: ['success', 'info', 'error', 'fail', 'partial'] },
 }, { timestamps: true });
 
 mapExecutionLogSchema.set('toJSON', {
