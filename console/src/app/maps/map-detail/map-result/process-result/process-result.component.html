@@ -1,0 +1,49 @@
+<div class="card bg-dark">
+  <div class="card-body">
+
+    <h5 class="card-title">{{ process.name }}</h5>
+    <div class="row">
+      <div class="col-8">
+        <p>{{ process.description }}</p>
+        <p>Status: </p>
+
+      </div>
+      <div class="col-4">
+        <ngx-charts-pie-chart
+          [results]="agProcessActionsStatus"
+          [labels]="false"
+          [scheme]="colorScheme"
+          [doughnut]="true">
+        </ngx-charts-pie-chart>
+      </div>
+    </div>
+    <div class="row">
+      <p-dataTable [value]="process.actions" expandableRows="true"  #dt (onRowClick)="dt.toggleRow($event.data)">
+        <p-column field="name" header="Action"></p-column>
+        <p-column field="name" header="Result" >
+          <ng-template let-col let-action="rowData" pTemplate="body">
+            <span *ngIf="agActionsStatus">{{agActionsStatus[action._id]?.total}}</span>
+          </ng-template>
+        </p-column>
+        <ng-template let-action pTemplate="rowexpansion">
+          <div class="row">
+            <div class="col-8">
+              <h5>Output:</h5>
+              <div class="raw-output">
+                {{ agActionsStatus[action._id].results | json }}
+              </div>
+            </div>
+            <div class="col-4">
+              <ngx-charts-pie-chart
+                [results]="agActionsStatus[action._id].status"
+                [labels]="false"
+                [scheme]="colorScheme"
+                [doughnut]="true">
+              </ngx-charts-pie-chart>
+            </div>
+          </div>
+        </ng-template>
+      </p-dataTable>
+    </div>
+  </div>
+</div>
