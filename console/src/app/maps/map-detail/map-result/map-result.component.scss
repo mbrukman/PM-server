@@ -15,6 +15,8 @@
     flex: 0 0 176px;
     border-right: 1px solid $cool-grey;
     .execution-list {
+      height: 100%;
+      overflow-y: scroll;
       ul {
         padding-left: 0;
         list-style: none;
