@@ -6,6 +6,7 @@ const mapController = require("../controllers/maps.controller");
 router.get("/", mapController.filter);
 router.post("/create", mapController.create);
 router.get("/jobs", mapController.filterJobs); // scheduled jobs route
+router.get("/results", mapController.dashboard);
 
 router.get("/:id", mapController.detail);
 

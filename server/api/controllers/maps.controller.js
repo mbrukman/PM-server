@@ -46,6 +46,20 @@ module.exports = {
             res.status(500).send(error);
         })
     },
+    dashboard: (req, res) => {
+        hooks.hookPre('map-dashboard', req).then(() => {
+            return mapsExecutionService.list()
+        }).then(executions => {
+            executions = JSON.parse(JSON.stringify(executions));
+            let filteredExecutions = executions.filter((o, index) => {
+                let i = executions.findIndex((k) => {
+                    return k.map.id === o.map.id;
+                });
+                return i === index;
+            });
+            return res.json(filteredExecutions);
+        })
+    },
 
     detail: (req, res) => {
         hooks.hookPre('map-detail', req).then(() => {

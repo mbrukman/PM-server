@@ -4,6 +4,11 @@ import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
 import { NotFoundComponent } from './core/not-found/not-found.component';
 
 const appRoutes: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'maps/dashboard'
+  },
   // maps
   {
     path: 'maps',

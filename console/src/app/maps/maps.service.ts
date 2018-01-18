@@ -83,6 +83,10 @@ export class MapsService {
     return this.http.get(serverUrl + 'api/maps/' + mapId + '/execute')
   }
 
+  getDistinctMapExecutionsResult() {
+    return this.http.get<any>(`${serverUrl}api/maps/results`);
+  }
+
   logsList(mapId: string, runId?: string) {
     return this.http.get<MapExecutionLogs[]>(serverUrl + 'api/maps/' + mapId + '/results/' + (runId ? runId + '/' : '') + 'logs')
   }
