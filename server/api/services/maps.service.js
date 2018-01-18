@@ -79,8 +79,11 @@ module.exports = {
             return structures.pop();
         })
     },
-    structureList: (mapId) => {
-        return MapStructure.find({ map: mapId }, '_id createdAt', { sort: { createdAt: -1 } })
+    structureList: (mapId, page) => {
+        if (!page) {
+            return MapStructure.find({ map: mapId }, '_id createdAt', { sort: { createdAt: -1 } })
+        }
+        return MapStructure.find({ map: mapId }, '_id createdAt', { sort: { createdAt: -1 } }).limit(20).skip((page - 1) * 20)
     },
     update: (mapId, map) => {
         return Map.findByIdAndUpdate(mapId, map, { new: true }).populate('agents')

@@ -13,7 +13,9 @@ import { TruncatecharsPipe } from './truncatechars.pipe';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FeatureComponent } from './feature/feature.component';
 import { ConfirmComponent } from './confirm/confirm.component';
+import { InfiniteScrollDirective } from './infinite-scroll.directive';
 import { LinebreakPipe } from './linebreak.pipe';
+
 
 
 @NgModule({
@@ -36,6 +38,7 @@ import { LinebreakPipe } from './linebreak.pipe';
     TruncatecharsPipe,
     FeatureComponent,
     ConfirmComponent,
+    InfiniteScrollDirective,
     LinebreakPipe
   ],
   exports: [
@@ -47,6 +50,7 @@ import { LinebreakPipe } from './linebreak.pipe';
     TreeTableModule,
     PrimeSharedModule,
     DataTableModule,
+    InfiniteScrollDirective,
     DropdownModule,
     ConfirmComponent,
     LinebreakPipe

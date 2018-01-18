@@ -121,12 +121,15 @@ export class MapsService {
     this.currentMapStructure.next(structure);
   }
 
-  structuresList(mapId) {
-    return this.http.get<MapStructure[]>(`${serverUrl}api/maps/${mapId}/structures`)
+  structuresList(mapId, page?) {
+    let params = new HttpParams();
+    if (page) {
+      params = params.set('page', page.toString());
+    }
+    return this.http.get<MapStructure[]>(`${serverUrl}api/maps/${mapId}/structures`, { params: params })
   }
 
   /* map triggers */
-
   createTrigger(mapId, trigger) {
     return this.http.post<MapTrigger>(serverUrl + 'api/maps/' + mapId + '/triggers/create', trigger);
   }
