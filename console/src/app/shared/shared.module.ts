@@ -13,6 +13,7 @@ import { TruncatecharsPipe } from './truncatechars.pipe';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FeatureComponent } from './feature/feature.component';
 import { ConfirmComponent } from './confirm/confirm.component';
+import { InfiniteScrollDirective } from './infinite-scroll.directive';
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import { ConfirmComponent } from './confirm/confirm.component';
     FilterPipe,
     TruncatecharsPipe,
     FeatureComponent,
-    ConfirmComponent
+    ConfirmComponent,
+    InfiniteScrollDirective
   ],
   exports: [
     ReactiveFormsModule,
@@ -44,7 +46,8 @@ import { ConfirmComponent } from './confirm/confirm.component';
     TreeTableModule,
     PrimeSharedModule,
     DataTableModule,
-    ConfirmComponent
+    ConfirmComponent,
+    InfiniteScrollDirective
   ],
   entryComponents: [ConfirmComponent]
 })
