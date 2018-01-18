@@ -37,6 +37,9 @@ export class ProcessResultComponent implements OnChanges {
       let process = agent.processes.find((o) => {
         return o.process === this.process._id;
       });
+      if (!process) {
+        return ;
+      }
       processes.push(process);
       actions = [...actions, ...process.actions];
     });
@@ -53,7 +56,7 @@ export class ProcessResultComponent implements OnChanges {
       return { name: o, value: agActionsStatus[o] };
     });
 
-// aggregating status for each action
+    // aggregating status for each action
     let agActions = actions.reduce((total, current) => {
       if (!total[current.action]) {
         total[current.action] = { status: { success: 0, error: 0 }, results: {result: [], stderr: [], stdout: []} };
@@ -80,5 +83,9 @@ export class ProcessResultComponent implements OnChanges {
       return 'partial';
     }
     return agStatus.success ? 'success' : 'error';
+  }
+
+  showProcessResult(result) {
+    return typeof result === 'string';
   }
 }

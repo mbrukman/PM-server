@@ -3,7 +3,7 @@
     <div class="pane-header">Executions</div>
     <div class="execution-list">
       <ul>
-        <li *ngFor="let execution of executionsList; let i = index" (click)="selectExecution(execution._id)" [ngClass]="{'active': selectedExecution?.id === execution.id}">{{ i + 1 }}
+        <li *ngFor="let execution of executionsList; let i = index" (click)="selectExecution(execution._id)" [ngClass]="{'active': selectedExecution?.id === execution.id}">
           {{ execution.startTime | date: 'short' }}
         </li>
       </ul>
@@ -55,7 +55,6 @@
                 <h5 class="card-title">Raw output</h5>
                 <ul>
                   <li *ngFor="let item of selectedExecutionLogs" [innerHTML]="item.message | linebreak">
-                    <!--{{ item.createdAt | date: 'mediumTime' }} - {{ item.message | linebreak}}-->
                   </li>
                 </ul>
               </div>

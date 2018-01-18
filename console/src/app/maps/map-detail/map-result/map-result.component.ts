@@ -73,7 +73,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
   }
 
   getExecutionProcessesArray(agentsResults) {
-    console.log(agentsResults);
     let processes = [];
     agentsResults.forEach(agent => {
       processes = [...processes, ...agent.processes];
