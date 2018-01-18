@@ -39,7 +39,9 @@
             <div class="col-8">
               <h5>Output:</h5>
               <div class="raw-output">
-                {{ agActionsStatus[action._id].results | json }}
+                <span *ngFor="let item of agActionsStatus[action._id].results?.stdout">{{ item }} <br></span>
+                <span *ngFor="let item of agActionsStatus[action._id].results?.stderr">{{ item }} <br></span>
+                <span *ngFor="let item of agActionsStatus[action._id].results?.result">{{ item }} <br></span>
               </div>
             </div>
             <div class="col-4">

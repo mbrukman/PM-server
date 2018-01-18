@@ -408,8 +408,9 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
                                 executionAgents[agent.key].status = "available";
                             }
                         } else {
+                            let actionStatuses = [];
                             if (executionAgents[agent.key].processes[node].actions) {
-                                let actionStatuses = Object.keys(executionAgents[agent.key].processes[node].actions).map((actionKey) => {
+                                actionStatuses = Object.keys(executionAgents[agent.key].processes[node].actions).map((actionKey) => {
                                     return executionAgents[agent.key].processes[node].actions[actionKey].status;
                                 });
                             }
@@ -587,19 +588,55 @@ function executeAction(map, process, action, plugin, agent, executionContext, ex
                 }
                 executionAgents[agent.key].processes[process.uuid].actions[key].finishTime = new Date();
                 if (!error && response.statusCode === 200) {
+                    let actionString = `+ ${plugin.name} - ${method.name}: `;
+                    for (let i in action.params) {
+                        actionString += `${i}: ${action.params[i]}`;
+                    }
+                    body.stdout = actionString + '\n' + body.stdout;
                     executionAgents[agent.key].processes[process.uuid].actions[key].status = "success";
                     executionAgents[agent.key].processes[process.uuid].actions[key].result = body;
                     executionAgents[agent.key].processes[process.uuid].actions[key].startTime = sTime;
                     callback(null, body);
-                    MapExecutionLog.create({
+
+                    let actionExecutionLogs = [];
+                    actionExecutionLogs.push({
                         map: map._id,
                         runId: executionContext.runId,
-                        message: `'${action.name}' result: ${JSON.stringify(body)} (${agent.name})`,
-                        status: 'success'
-                    }).then((log) => {
+                        message: actionString,
+                        status: 'info'
+                    });
+                    if (body.stdout) {
+                        actionExecutionLogs.push(
+                            {
+                                map: map._id,
+                                runId: executionContext.runId,
+                                message: `'${action.name}' output: ${JSON.stringify(body.stdout)} (${agent.name})`,
+                                status: 'success'
+                            }
+                        );
+                    }
+                    if (body.stderr) {
+                        actionExecutionLogs.push(
+                            {
+                                map: map._id,
+                                runId: executionContext.runId,
+                                message: `'${action.name}' errors: ${JSON.stringify(body.stderr)} (${agent.name})`,
+                                status: 'success'
+                            }
+                        );
+                    }
+                    actionExecutionLogs.push(
+                        {
+                            map: map._id,
+                            runId: executionContext.runId,
+                            message: `'${action.name}' result: ${JSON.stringify(body.result)} (${agent.name})`,
+                            status: 'success'
+                        }
+                    );
+
+                    MapExecutionLog.create(actionExecutionLogs).then(log => {
                         socket.emit('update', log);
                     });
-                    return;
                 }
                 else {
                     let res = body.error;
