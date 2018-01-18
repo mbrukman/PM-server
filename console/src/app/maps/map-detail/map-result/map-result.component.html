@@ -54,8 +54,8 @@
               <div class="card-body">
                 <h5 class="card-title">Raw output</h5>
                 <ul>
-                  <li *ngFor="let item of selectedExecutionLogs">
-                    {{ item.createdAt | date: 'mediumTime' }} - {{ item.message }}
+                  <li *ngFor="let item of selectedExecutionLogs" [innerHTML]="item.message | linebreak">
+                    <!--{{ item.createdAt | date: 'mediumTime' }} - {{ item.message | linebreak}}-->
                   </li>
                 </ul>
               </div>
