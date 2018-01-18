@@ -62,6 +62,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     } else {
       this.result = [agentResult];
     }
+    this.aggregateProcessesStatus(this.getExecutionProcessesArray(this.result));
   }
 
   getExecutionList() {
@@ -69,6 +70,15 @@ export class MapResultComponent implements OnInit, OnDestroy {
       this.executionsList = executions;
       this.selectExecution(executions[0].id);
     });
+  }
+
+  getExecutionProcessesArray(agentsResults) {
+    console.log(agentsResults);
+    let processes = [];
+    agentsResults.forEach(agent => {
+      processes = [...processes, ...agent.processes];
+    });
+    return processes;
   }
 
   selectExecution(executionId) {
@@ -85,10 +95,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       this.executionLogsReq = this.mapsService.logsList(this.map.id, this.selectedExecution.runId).subscribe(logs => {
         this.selectedExecutionLogs = logs;
       });
-      let processes = [];
-      result.agentsResults.forEach(agent => {
-        processes = [...processes, ...agent.processes];
-      });
+      const processes = this.getExecutionProcessesArray(result.agentsResults);
       this.aggregateProcessesStatus(processes);
     }, error => {
       this.socketService.setNotification({ title: 'Connection error', message: 'couldn\'t connect to server' });
