@@ -9,14 +9,30 @@
         </p-column>
         <p-column field="" header="Actions">
           <ng-template let-col let-structure="rowData" pTemplate="body">
-            <span><button class="btn-inline-action" (click)="previewStructure(structure.id)"><i class="material-icons">remove_red_eye</i></button></span>
-            <span><button class="btn-inline-action" (click)="duplicateMap(structure.id)"><i class="material-icons">content_copy</i></button></span>
-            <span><button class="btn-inline-action" (click)="changeStructure(structure.id)"><i class="material-icons">open_in_new</i></button></span>
+            <span>
+              <button class="btn-inline-action" (click)="previewStructure(structure.id)"
+                          tooltip="Preview"
+                          placement="right">
+                <i class="material-icons">remove_red_eye</i>
+              </button>
+            </span>
+            <span>
+              <button class="btn-inline-action" (click)="duplicateMap(structure.id)"
+                      tooltip="Duplicate"
+                      placement="right">
+                <i class="material-icons">content_copy</i></button>
+            </span>
+            <span>
+              <button class="btn-inline-action" (click)="changeStructure(structure.id)"
+                      tooltip="Open"
+                      placement="right">
+                <i class="material-icons">open_in_new</i></button>
+            </span>
           </ng-template>
         </p-column>
       </p-dataTable>
     </div>
-    <div class="col-9" #wrapper (window:resize)="onResize($event)" >
+    <div class="col-9" #wrapper (window:resize)="onResize($event)">
       <div id="graph"></div>
     </div>
   </div>
