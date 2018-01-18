@@ -1,36 +1,32 @@
 <div class="main">
   <div class="row">
     <div class="col-3">
-      <p-dataTable [value]="structures" [rows]="10" [paginator]="true" [pageLinks]="3">
-        <p-column field="createdAt" header="Date">
-          <ng-template let-col let-structure="rowData" pTemplate="body">
-            <span>{{ (structure.createdAt | date: 'dd/MM/yyyy') + ' ' +  (structure.createdAt | date: 'HH:mm') }}</span>
-          </ng-template>
-        </p-column>
-        <p-column field="" header="Actions">
-          <ng-template let-col let-structure="rowData" pTemplate="body">
+      <div class='versions' style="height: 100%; overflow-y: scroll" infiniteScroll [onScroll]="scrollCallback">
+        <ul>
+          <li *ngFor="let item of structures">
+            <span>{{ (item.createdAt | date: 'dd/MM/yyyy') + ' ' +  (item.createdAt | date: 'HH:mm') }}</span>
             <span>
-              <button class="btn-inline-action" (click)="previewStructure(structure.id)"
-                          tooltip="Preview"
-                          placement="right">
-                <i class="material-icons">remove_red_eye</i>
-              </button>
+            <button class="btn-inline-action" (click)="previewStructure(item.id)"
+                    tooltip="Preview"
+                    placement="right">
+            <i class="material-icons">remove_red_eye</i>
+            </button>
             </span>
             <span>
-              <button class="btn-inline-action" (click)="duplicateMap(structure.id)"
-                      tooltip="Duplicate"
-                      placement="right">
-                <i class="material-icons">content_copy</i></button>
+            <button class="btn-inline-action" (click)="duplicateMap(item.id)"
+                    tooltip="Duplicate"
+                    placement="right">
+            <i class="material-icons">content_copy</i></button>
             </span>
             <span>
-              <button class="btn-inline-action" (click)="changeStructure(structure.id)"
-                      tooltip="Open"
-                      placement="right">
-                <i class="material-icons">open_in_new</i></button>
+            <button class="btn-inline-action" (click)="changeStructure(item.id)"
+                    tooltip="Open"
+                    placement="right">
+            <i class="material-icons">open_in_new</i></button>
             </span>
-          </ng-template>
-        </p-column>
-      </p-dataTable>
+          </li>
+        </ul>
+      </div>
     </div>
     <div class="col-9" #wrapper (window:resize)="onResize($event)">
       <div id="graph"></div>

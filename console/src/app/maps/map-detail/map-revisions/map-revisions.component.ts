@@ -16,25 +16,27 @@ import { Project } from '../../../projects/models/project.model';
   styleUrls: ['./map-revisions.component.scss']
 })
 export class MapRevisionsComponent implements OnInit {
-  structures: MapStructure[];
+  structures: MapStructure[] = [];
   structureId: string;
   mapId: string;
   graph: joint.dia.Graph;
   paper: joint.dia.Paper;
   projectsReq: any;
   project: Project;
+  scrollCallback: any;
+  page: number = 1;
+  morePages: boolean = true;
   @ViewChild('wrapper') wrapper: ElementRef;
 
   constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketServiec: SocketService) {
+    this.scrollCallback = this.loadRevisions.bind(this);
   }
 
   ngOnInit() {
     this.route.parent.params.subscribe(params => {
       this.mapId = params.id;
       this.getMapProject();
-      this.mapsService.structuresList(params.id).subscribe(structures => {
-        this.structures = structures
-      });
+      this.getMapStructures(1);
     });
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
     this.graph = new joint.dia.Graph;
@@ -48,15 +50,22 @@ export class MapRevisionsComponent implements OnInit {
     });
     this.defineShape();
     this.paper.scale(0.75, 0.75);
+  }
 
-
-
+  getMapStructures(page: number) {
+    this.mapsService.structuresList(this.mapId, page).subscribe(structures => {
+      if (structures && structures.length > 0) {
+        this.structures = [...this.structures, ...structures]
+      } else {
+        this.morePages = false;
+      }
+    });
   }
 
   getMapProject() {
     this.projectsReq = this.projectsService.filter().subscribe(data => {
       data.items.forEach(project => {
-        if ((<string[]>project.maps).indexOf(this.mapId) > -1 ) {
+        if ((<string[]>project.maps).indexOf(this.mapId) > -1) {
           this.project = project;
         }
       });
@@ -140,6 +149,21 @@ export class MapRevisionsComponent implements OnInit {
   onResize(event) {
     // when resizing window paper size should be updated
     this.paper.setDimensions(this.wrapper.nativeElement.offsetWidth, this.wrapper.nativeElement.offsetHeight);
+  }
+
+  onVersionScroll(event) {
+    console.log(event);
+    console.log(event.target.scrollHeight,
+      event.target.scrollTop,
+      event.target.clientHeight)
+  }
+
+  loadRevisions() {
+    if (!this.morePages) {
+      return ;
+    }
+    this.page++;
+    this.getMapStructures(this.page);
   }
 
 }
