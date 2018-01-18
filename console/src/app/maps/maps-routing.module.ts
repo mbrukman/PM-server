@@ -5,7 +5,7 @@ import { MapDesignComponent } from './map-detail/map-edit/map-design/map-design.
 import { MapDetailComponent } from './map-detail/map-detail.component';
 import { MapCodeComponent } from './map-detail/map-edit/map-code/map-code.component';
 import { MapsListComponent } from './maps-list/maps-list.component';
-import { MapSettingComponent } from './map-detail/map-setting/map-setting.component';
+import { MapRevisionsComponent } from './map-detail/map-revisions/map-revisions.component';
 import { MapPropertiesComponent } from './map-detail/map-properties/map-properties.component';
 import { UnsavedGuard } from '../shared/guards/unsaved.guard';
 import { MapCreateComponent } from './map-create/map-create.component';
@@ -44,8 +44,8 @@ const routes: Routes = [
         component: MapPropertiesComponent
       },
       {
-        path: 'settings',
-        component: MapSettingComponent
+        path: 'revisions',
+        component: MapRevisionsComponent
       },
       {
         path: 'edit',

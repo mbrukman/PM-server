@@ -11,11 +11,11 @@ import { ProjectsService } from '../../../projects/projects.service';
 import { Project } from '../../../projects/models/project.model';
 
 @Component({
-  selector: 'app-map-setting',
-  templateUrl: './map-setting.component.html',
-  styleUrls: ['./map-setting.component.scss']
+  selector: 'app-map-revisions',
+  templateUrl: './map-revisions.component.html',
+  styleUrls: ['./map-revisions.component.scss']
 })
-export class MapSettingComponent implements OnInit {
+export class MapRevisionsComponent implements OnInit {
   structures: MapStructure[];
   structureId: string;
   mapId: string;
