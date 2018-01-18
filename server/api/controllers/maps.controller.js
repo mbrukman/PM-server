@@ -181,9 +181,9 @@ module.exports = {
     },
     getStructureList: (req, res) => {
         hooks.hookPre('map-list-structures', req).then(() => {
-            return mapsService.structureList(req.params.id);
+            return mapsService.structureList(req.params.id, req.query.page);
         }).then(structures => {
-            res.json(structures)
+            res.json(structures);
         }).catch((error) => {
             console.log("Error finding map structures: ", error);
             res.status(500).send(error);
