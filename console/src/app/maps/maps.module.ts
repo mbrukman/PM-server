@@ -22,7 +22,7 @@ import { MapEditComponent } from './map-detail/map-edit/map-edit.component';
 import { MapAgentsComponent } from './map-detail/map-edit/map-enviroment-pane/map-agents/map-agents.component';
 import { MapAttributesComponent } from './map-detail/map-edit/map-enviroment-pane/map-attributes/map-attributes.component';
 import { MapCodeComponent } from './map-detail/map-edit/map-code/map-code.component';
-import { MapSettingComponent } from './map-detail/map-setting/map-setting.component';
+import { MapRevisionsComponent } from './map-detail/map-revisions/map-revisions.component';
 import { ProcessFormComponent } from './map-detail/map-edit/map-design/process-form/process-form.component';
 import { MapPropertiesComponent } from './map-detail/map-properties/map-properties.component';
 import { PluginToolboxComponent } from './map-detail/map-edit/map-enviroment-pane/plugin-toolbox/plugin-toolbox.component';
@@ -55,7 +55,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     MapCreateComponent,
     MapEnvironmentPaneComponent,
     MapAgentsComponent,
-    MapSettingComponent,
+    MapRevisionsComponent,
     SelectAgentComponent,
     MapAttributesComponent,
     AddAttributeComponent,
