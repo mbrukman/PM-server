@@ -13,6 +13,7 @@ import { TruncatecharsPipe } from './truncatechars.pipe';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FeatureComponent } from './feature/feature.component';
 import { ConfirmComponent } from './confirm/confirm.component';
+import { LinebreakPipe } from './linebreak.pipe';
 
 
 @NgModule({
@@ -34,7 +35,8 @@ import { ConfirmComponent } from './confirm/confirm.component';
     FilterPipe,
     TruncatecharsPipe,
     FeatureComponent,
-    ConfirmComponent
+    ConfirmComponent,
+    LinebreakPipe
   ],
   exports: [
     ReactiveFormsModule,
@@ -46,7 +48,8 @@ import { ConfirmComponent } from './confirm/confirm.component';
     PrimeSharedModule,
     DataTableModule,
     DropdownModule,
-    ConfirmComponent
+    ConfirmComponent,
+    LinebreakPipe
   ],
   entryComponents: [ConfirmComponent]
 })
