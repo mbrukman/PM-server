@@ -6,6 +6,7 @@ import { Map } from '../../models/map.model';
 import { MapResult } from '../../models/execution-result.model';
 import { SocketService } from '../../../shared/socket.service';
 import { Agent } from '../../../agents/models/agent.model';
+import { MapStructure } from '../../models/map-structure.model';
 
 @Component({
   selector: 'app-map-result',
@@ -110,7 +111,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       return ag[key];
     });
     this.agProcessesStatus = <[{ name: string, value: number }]>result;
-    console.log(this.agProcessesStatus);
+    this.selectProcess((<MapStructure>this.selectedExecution.structure).processes[0]);
   }
 
   selectProcess(process) {

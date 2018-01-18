@@ -9,6 +9,7 @@ export class ProcessResultComponent implements OnChanges {
   @Input('process') process: any;
   @Input('result') result: any;
   processResult: any;
+  selectedProcess: any;
   agProcessActionsStatus: any;
   agActionsStatus: any;
   colorScheme = {
@@ -22,6 +23,11 @@ export class ProcessResultComponent implements OnChanges {
     this.agProcessActionsStatus = null;
     this.agActionsStatus = null;
     this.aggregateProcessActionResults(this.result);
+    if (this.result.length === 1) {
+      this.selectedProcess = this.result[0].processes.find((o) => {
+        return o.process === this.process._id;
+      });
+    }
   }
 
   aggregateProcessActionResults(result) {

@@ -1,11 +1,12 @@
 <div class="card bg-dark">
   <div class="card-body">
 
-    <h5 class="card-title">{{ process.name }}</h5>
+    <h5 class="card-title">{{ process.name || 'Process' }}</h5>
     <div class="row">
       <div class="col-8">
         <p>{{ process.description }}</p>
-
+        <p *ngIf="selectedProcess">Start time: {{ selectedProcess.startTime | date: 'short' }}</p>
+        <p *ngIf="selectedProcess">Finish time: {{ selectedProcess.finishTime | date: 'short' }}</p>
       </div>
       <div class="col-4">
         <ngx-charts-pie-chart
