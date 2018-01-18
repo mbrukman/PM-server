@@ -19,7 +19,7 @@ let processResultSchema = new Schema({
     actions: [actionResultSchema],
     status: String,
     startTime: Date,
-    finish: Date,
+    finishTime: Date,
     result: Schema.Types.Mixed
 });
 

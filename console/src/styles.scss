@@ -164,7 +164,7 @@ tr.ui-widget-content.ui-datatable-odd {
 
 /* primeng checkbox */
 
-.ui-chkbox-box{
+.ui-chkbox-box {
   border: 1px solid $greyish-text;
   border-radius: 2px;
   background-color: #dedede;
@@ -175,6 +175,7 @@ tr.ui-widget-content.ui-datatable-odd {
     color: black;
   }
 }
+
 /*------*/
 
 table, .table {
@@ -367,5 +368,14 @@ rect.body {
       border-bottom: 1px solid $cool-grey;
 
     }
+  }
+}
+
+.ui-dropdown-label {
+  &.ui-inputtext {
+    background-color: $input-bg;
+    border: 1px solid $input-border !important;
+    background-color: $input-bg !important;
+    color: $greyish-text;
   }
 }

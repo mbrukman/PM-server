@@ -3,7 +3,7 @@
     <div class="pane-header">Executions</div>
     <div class="execution-list">
       <ul>
-        <li *ngFor="let execution of executionsList; let i = index" (click)="selectExecution(execution._id)" [ngClass]="{'active': selectedExecution?.id === execution.id}">{{ i + 1 }}
+        <li *ngFor="let execution of executionsList; let i = index" (click)="selectExecution(execution._id)" [ngClass]="{'active': selectedExecution?.id === execution.id}">
           {{ execution.startTime | date: 'short' }}
         </li>
       </ul>
@@ -18,12 +18,11 @@
             <div class="card bg-dark">
               <div class="card-body">
                 <h5 class="card-title">Display data</h5>
-                <select class="form-control" [(ngModel)]="selectedAgent" (change)="changeAgent()">
-                  <option value="aggregated">Aggregate</option>
-                  <option *ngFor="let item of selectedExecution.agentsResults; let i = index" [ngValue]="item.agent">
-                    {{ i }}
-                  </option>
-                </select>
+                <p-dropdown [options]="agents" [(ngModel)]="selectedAgent" [filter]="true" [style]="{'width': '100%'}">
+                  <ng-template let-item pTemplate="item">
+                    <span style="vertical-align:middle">{{item.label}}</span>
+                  </ng-template>
+                </p-dropdown>
               </div>
             </div>
           </div>
@@ -51,12 +50,11 @@
             </div>
           </div>
           <div class="col-5">
-            <div class="card">
+            <div class="card raw-output">
               <div class="card-body">
                 <h5 class="card-title">Raw output</h5>
                 <ul>
-                  <li *ngFor="let item of selectedExecutionLogs">
-                    {{ item.createdAt | date: 'mediumTime' }} - {{ item.message }}
+                  <li *ngFor="let item of selectedExecutionLogs" [innerHTML]="item.message | linebreak">
                   </li>
                 </ul>
               </div>
@@ -71,7 +69,7 @@
                   <li *ngFor="let item of selectedExecution.structure?.processes; let i = index"
                       (click)="selectProcess(item)"
                       [ngClass]="{'active': selectedProcess?._id === item._id }">
-                    {{ item.name }}
+                    {{ (item.name) || ('Process #' + (i+1) ) }}
                   </li>
                 </ul>
               </div>

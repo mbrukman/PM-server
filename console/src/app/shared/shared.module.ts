@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
-import { TreeTableModule, SharedModule as PrimeSharedModule, DataTableModule } from 'primeng/primeng';
+import { TreeTableModule, SharedModule as PrimeSharedModule, DataTableModule, DropdownModule } from 'primeng/primeng';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
@@ -13,6 +13,7 @@ import { TruncatecharsPipe } from './truncatechars.pipe';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FeatureComponent } from './feature/feature.component';
 import { ConfirmComponent } from './confirm/confirm.component';
+import { LinebreakPipe } from './linebreak.pipe';
 
 
 @NgModule({
@@ -27,13 +28,15 @@ import { ConfirmComponent } from './confirm/confirm.component';
     BsDropdownModule.forRoot(),
     ModalModule.forRoot(),
     AccordionModule.forRoot(),
-    TooltipModule.forRoot()
+    TooltipModule.forRoot(),
+    DropdownModule
   ],
   declarations: [
     FilterPipe,
     TruncatecharsPipe,
     FeatureComponent,
-    ConfirmComponent
+    ConfirmComponent,
+    LinebreakPipe
   ],
   exports: [
     ReactiveFormsModule,
@@ -44,7 +47,9 @@ import { ConfirmComponent } from './confirm/confirm.component';
     TreeTableModule,
     PrimeSharedModule,
     DataTableModule,
-    ConfirmComponent
+    DropdownModule,
+    ConfirmComponent,
+    LinebreakPipe
   ],
   entryComponents: [ConfirmComponent]
 })
