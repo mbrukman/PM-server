@@ -5,6 +5,8 @@ import { MapsService } from '../../maps.service';
 import { Map } from '../../models/map.model';
 import { MapResult } from '../../models/execution-result.model';
 import { SocketService } from '../../../shared/socket.service';
+import { Agent } from '../../../agents/models/agent.model';
+import { MapStructure } from '../../models/map-structure.model';
 
 @Component({
   selector: 'app-map-result',
@@ -24,6 +26,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   selectedProcess: any;
   agProcessesStatus: [{ name: string, value: number }];
   result: any;
+  agents: any;
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936']
   };
@@ -42,8 +45,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.mapSubscription.unsubscribe();
-    this.executionListReq.unsubscribe();
+    if (this.mapSubscription) {
+      this.mapSubscription.unsubscribe();
+    }
+    if (this.executionListReq) {
+      this.executionListReq.unsubscribe();
+    }
   }
 
   changeAgent() {
@@ -55,26 +62,39 @@ export class MapResultComponent implements OnInit, OnDestroy {
     } else {
       this.result = [agentResult];
     }
+    this.aggregateProcessesStatus(this.getExecutionProcessesArray(this.result));
   }
 
   getExecutionList() {
     this.executionListReq = this.mapsService.executionResults(this.map.id).subscribe(executions => {
       this.executionsList = executions;
+      this.selectExecution(executions[0].id);
     });
+  }
+
+  getExecutionProcessesArray(agentsResults) {
+    let processes = [];
+    agentsResults.forEach(agent => {
+      processes = [...processes, ...agent.processes];
+    });
+    return processes;
   }
 
   selectExecution(executionId) {
     this.selectedProcess = null;
     this.selectedExecutionReq = this.mapsService.executionResultDetail(this.map.id, executionId).subscribe(result => {
       this.selectedExecution = result;
+      this.agents = result.agentsResults.map(o => {
+        return { label: (<Agent>o.agent).name, value: o }
+      });
+      if (this.agents.length > 1 ) {
+        this.agents.unshift({label: 'Aggregate', value: 'default'})
+      }
       this.changeAgent();
       this.executionLogsReq = this.mapsService.logsList(this.map.id, this.selectedExecution.runId).subscribe(logs => {
         this.selectedExecutionLogs = logs;
       });
-      let processes = [];
-      result.agentsResults.forEach(agent => {
-        processes = [...processes, ...agent.processes];
-      });
+      const processes = this.getExecutionProcessesArray(result.agentsResults);
       this.aggregateProcessesStatus(processes);
     }, error => {
       this.socketService.setNotification({ title: 'Connection error', message: 'couldn\'t connect to server' });
@@ -98,7 +118,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       return ag[key];
     });
     this.agProcessesStatus = <[{ name: string, value: number }]>result;
-    console.log(this.agProcessesStatus);
+    this.selectProcess((<MapStructure>this.selectedExecution.structure).processes[0]);
   }
 
   selectProcess(process) {

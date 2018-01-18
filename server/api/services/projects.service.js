@@ -27,7 +27,11 @@ module.exports = {
 
     /* get project details */
     detail: (projectId) => {
-        return Project.findById(projectId).populate('maps')
+        return Project.findById(projectId).populate(
+            {
+                path: 'maps',
+                match: { archived: false }
+            })
     },
 
     /* delete a project */

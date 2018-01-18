@@ -48,7 +48,7 @@
   height: 200px;
   .card {
     height: 100%;
-    overflow-y: scroll;
+    overflow-y: hidden;
   }
 }
 
@@ -79,4 +79,13 @@
 
 .card-row {
   margin-top: 15px;
+}
+
+.raw-output {
+  .card-body {
+    ul {
+      max-height: 135px;
+      overflow-y: scroll;
+    }
+  }
 }

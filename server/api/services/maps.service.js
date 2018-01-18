@@ -47,7 +47,7 @@ module.exports = {
                 ]
             }
         }
-        let m = Map.find(q);
+        let m = Map.find(q).where({ archived: false });
         if (query.sort) {
             // apply sorting by field name. for reverse, should pass with '-'.
             m.sort(query.sort);

@@ -9,6 +9,7 @@ export class ProcessResultComponent implements OnChanges {
   @Input('process') process: any;
   @Input('result') result: any;
   processResult: any;
+  selectedProcess: any;
   agProcessActionsStatus: any;
   agActionsStatus: any;
   colorScheme = {
@@ -22,6 +23,11 @@ export class ProcessResultComponent implements OnChanges {
     this.agProcessActionsStatus = null;
     this.agActionsStatus = null;
     this.aggregateProcessActionResults(this.result);
+    if (this.result.length === 1) {
+      this.selectedProcess = this.result[0].processes.find((o) => {
+        return o.process === this.process._id;
+      });
+    }
   }
 
   aggregateProcessActionResults(result) {
@@ -31,6 +37,9 @@ export class ProcessResultComponent implements OnChanges {
       let process = agent.processes.find((o) => {
         return o.process === this.process._id;
       });
+      if (!process) {
+        return ;
+      }
       processes.push(process);
       actions = [...actions, ...process.actions];
     });
@@ -47,13 +56,15 @@ export class ProcessResultComponent implements OnChanges {
       return { name: o, value: agActionsStatus[o] };
     });
 
-// aggregating status for each action
+    // aggregating status for each action
     let agActions = actions.reduce((total, current) => {
       if (!total[current.action]) {
-        total[current.action] = { status: { success: 0, error: 0 }, results: [] };
+        total[current.action] = { status: { success: 0, error: 0 }, results: {result: [], stderr: [], stdout: []} };
       }
       total[current.action]['status'][current.status] = (total[current.action][current.status] || 0) + 1;
-      total[current.action]['results'].push(current.result);
+      total[current.action]['results']['result'].push(current.result.result);
+      total[current.action]['results']['stderr'].push(current.result.stderr);
+      total[current.action]['results']['stdout'].push(current.result.stdout);
       return total;
     }, {});
 
@@ -72,5 +83,9 @@ export class ProcessResultComponent implements OnChanges {
       return 'partial';
     }
     return agStatus.success ? 'success' : 'error';
+  }
+
+  showProcessResult(result) {
+    return typeof result === 'string';
   }
 }
