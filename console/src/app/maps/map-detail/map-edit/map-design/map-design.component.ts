@@ -444,7 +444,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.mapStructure.processes[index].actions = process.actions;
     this.mapStructure.processes[index].correlateAgents = process.correlateAgents;
     this.mapStructure.processes[index].filterAgents = process.filterAgents;
-    console.log(process);
     this.mapsService.setCurrentMapStructure(this.mapStructure);
   }
 
