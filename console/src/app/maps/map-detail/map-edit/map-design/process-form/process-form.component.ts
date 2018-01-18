@@ -27,7 +27,6 @@ export class ProcessFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this.process);
     if (!this.process) {
       this.closePane();
       return;
@@ -47,18 +46,18 @@ export class ProcessFormComponent implements OnInit {
     });
 
     if (this.process.actions) {
-      console.log(this.process.actions);
       this.process.actions.forEach((action, actionIndex) => {
         let actionControl = <FormArray>this.processForm.controls['actions'];
         actionControl.push(this.initActionController(action.id, action.name, action.timeout, action.timeunit, action.retries, action.mandatory, action.method));
-        if (action.params) {
+        if (action.params && action.params.length > 0) {
           action.params.forEach((param, index) => {
             actionControl.controls[actionIndex]['controls'].params.push(this.initActionParamController(param.code, param.value, param._id ? param._id : param.param, param.viewName, param.name));
           })
+        } else {
+          console.log("no params!");
         }
       });
     }
-
     this.plugin = _.cloneDeep(this.process.plugin);
   }
 
@@ -70,8 +69,6 @@ export class ProcessFormComponent implements OnInit {
   }
 
   backToProcessView() {
-    // this.action.controls['method'].setValue(this.selectedMethod);
-    // this.processForm.controls['actions']['controls'][this.index] = this.action;
     this.action = false;
     this.index = null;
     this.selectedMethod = null;
@@ -113,7 +110,6 @@ export class ProcessFormComponent implements OnInit {
 
   onSelectMethod() {
     /* when a method selected - change the form params*/
-    console.log('Selected method');
     let methodId = this.processForm.value.actions[this.index].method;
     let action = this.processForm.controls['actions']['controls'][this.index];
     action.controls.params = new FormArray([]);
@@ -135,9 +131,14 @@ export class ProcessFormComponent implements OnInit {
   }
 
   saveProcess(form) {
-    if (this.action)
+    this.processForm.controls['actions']['controls'].forEach(control => {
+      // have to update the form because of change detection bug.
+      control['controls']['name'].setValue(this.processForm.controls['actions']['controls'][0]['controls']['name'].value)
+    });
+    if (this.action) {
       this.backToProcessView();
-    this.saved.emit(form);
+    }
+    this.saved.emit(this.processForm.value);
   }
 
 }
