@@ -1,0 +1,60 @@
+<h3 class="section-sub-title">Schedule a job</h3>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit(form.value)">
+  <div class="form-group">
+    <label for="project">Project</label>
+    <select class="form-control" formControlName="project" id="project" (change)="onSelectProject()">
+      <option disabled>Select a project</option>
+      <option *ngFor="let project of projects" [ngValue]="project._id">{{project.name}}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="project">Map</label>
+    <select class="form-control" formControlName="map" id="map">
+      <option disabled>Select a map</option>
+      <option *ngFor="let map of selectedProject?.maps" [ngValue]="map._id" [disabled]="!selectedProject">{{map.name}}
+      </option>
+    </select>
+  </div>
+
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" formControlName="type" name="type" id="type1" value="once">
+
+    <label class="form-check-label">Once</label>
+  </div>
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" formControlName="type" name="type" id="type2" value="repeated">
+    <label class="form-check-label">Repeated</label>
+  </div>
+
+
+
+  <div [ngSwitch]="form.controls.type.value">
+    <div *ngSwitchDefault>
+
+      <div class="form-group">
+        <label>Date & Time:</label>
+        <p-calendar formControlName="datetime" showTime="true" hourFormat="24"></p-calendar>
+      </div>
+    </div>
+
+    <div *ngSwitchCase="'repeated'">
+        <label>Cron:</label>
+      <div class="input-group mb-2 mb-sm-0">
+
+        <input type="text" class="form-control" formControlName="cron" />
+        <button type="button" class="input-group-addon"
+                [popover]="popTemplate"
+                placement="right"
+                [outsideClick]="true">
+          <i class="material-icons">event</i></button>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="btn pm btn-block" [disabled]="form.invalid">Create</button>
+</form>
+
+<ng-template #popTemplate>
+  <cron-jobs [(ngModel)]="cron" (change)="updateCron()" [config]="cronConfig"></cron-jobs>
+</ng-template>

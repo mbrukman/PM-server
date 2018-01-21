@@ -1,0 +1,64 @@
+<div class="card bg-dark">
+  <div class="card-body">
+    <h5 class="card-title">{{ process.name || 'Process' }}</h5>
+    <div class="row">
+      <div class="col-8">
+        <p>{{ process.description }}</p>
+        <p *ngIf="selectedProcess && !showProcessResult(selectedProcess?.result)">Start time: {{ selectedProcess?.startTime | date: 'short' }}</p>
+        <p *ngIf="selectedProcess && !showProcessResult(selectedProcess?.result)">Finish time: {{ selectedProcess?.finishTime | date: 'short' }}</p>
+        <p *ngIf="!selectedProcess">This process wasn't executed</p>
+        <p *ngIf="showProcessResult(selectedProcess?.result)">{{ selectedProcess.result }}</p>
+      </div>
+      <div class="col-4">
+        <ngx-charts-pie-chart
+          [results]="agProcessActionsStatus"
+          [labels]="false"
+          [scheme]="colorScheme"
+          [doughnut]="true">
+        </ngx-charts-pie-chart>
+      </div>
+    </div>
+    <div class="row">
+      <p-dataTable [value]="process.actions" expandableRows="true" #dt (onRowClick)="dt.toggleRow($event.data)">
+        <p-column field="name" header="Action">
+          <ng-template let-col let-i="rowIndex" let-action="rowData" pTemplate="body">
+            {{action.name || 'Action #' + (i+1)}}
+          </ng-template>
+        </p-column>
+        <p-column field="name" header="Result">
+          <ng-template let-col let-action="rowData" pTemplate="body">
+            <div *ngIf="agActionsStatus">
+              <i class="material-icons text-success" *ngIf="agActionsStatus[action._id]?.total === 'success'">done</i>
+              <i class="material-icons text-danger" *ngIf="agActionsStatus[action._id]?.total === 'error'">change_history</i>
+              <i class="material-icons text-warning"
+                 *ngIf="agActionsStatus[action._id]?.total === 'partial'">tonality</i>
+              {{agActionsStatus[action._id]?.total}}
+            </div>
+          </ng-template>
+        </p-column>
+        <ng-template let-action pTemplate="rowexpansion">
+          <div *ngIf="agActionsStatus[action._id]">
+            <div class="row">
+              <div class="col-8">
+                <h5>Output:</h5>
+                <div class="raw-output">
+                  <span *ngFor="let item of agActionsStatus[action._id]?.results?.stdout">{{ item }} <br></span>
+                  <span *ngFor="let item of agActionsStatus[action._id]?.results?.stderr">{{ item }} <br></span>
+                  <span *ngFor="let item of agActionsStatus[action._id]?.results?.result">{{ item }} <br></span>
+                </div>
+              </div>
+              <div class="col-4">
+                <ngx-charts-pie-chart
+                  [results]="agActionsStatus[action._id].status"
+                  [labels]="false"
+                  [scheme]="colorScheme"
+                  [doughnut]="true">
+                </ngx-charts-pie-chart>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </p-dataTable>
+    </div>
+  </div>
+</div>

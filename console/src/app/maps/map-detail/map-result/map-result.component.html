@@ -1,0 +1,86 @@
+<div class="main">
+  <div class="execution-select-pane">
+    <div class="pane-header">Executions</div>
+    <div class="execution-list">
+      <ul>
+        <li *ngFor="let execution of executionsList; let i = index" (click)="selectExecution(execution._id)" [ngClass]="{'active': selectedExecution?.id === execution.id}">
+          {{ execution.startTime | date: 'short' }}
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="result">
+    <div class="pane-header">Results</div>
+    <div class="result-content" *ngIf="selectedExecution">
+      <div class="container-fluid">
+        <div class="row card-row result-header-deck">
+          <div class="col-2">
+            <div class="card bg-dark">
+              <div class="card-body">
+                <h5 class="card-title">Display data</h5>
+                <p-dropdown [options]="agents" [(ngModel)]="selectedAgent" [filter]="true" [style]="{'width': '100%'}">
+                  <ng-template let-item pTemplate="item">
+                    <span style="vertical-align:middle">{{item.label}}</span>
+                  </ng-template>
+                </p-dropdown>
+              </div>
+            </div>
+          </div>
+          <div class="col-5">
+            <div class="card">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-6">
+                    <h5 class="card-title">Execution {{ selectedExecution.runId }}</h5>
+                    <p>Start time: {{ selectedExecution.startTime | date: 'short' }}</p>
+                    <p>Finish time: {{ selectedExecution.finishTime | date: 'short' }}</p>
+                    <p>Structure: {{ selectedExecution.structure.id }}</p>
+                  </div>
+                  <div class="col-6">
+
+                    <ngx-charts-pie-chart
+                      [results]="agProcessesStatus"
+                      [labels]="showLabels"
+                      [scheme]="colorScheme"
+                      [doughnut]="true">
+                    </ngx-charts-pie-chart>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-5">
+            <div class="card raw-output">
+              <div class="card-body">
+                <h5 class="card-title">Raw output</h5>
+                <ul>
+                  <li *ngFor="let item of selectedExecutionLogs" [innerHTML]="item.message | linebreak">
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row card-row">
+          <div class="col-2">
+            <div class="card process-select bg-dark">
+              <div class="card-body">
+                <ul class="process-list">
+                  <li *ngFor="let item of selectedExecution.structure?.processes; let i = index"
+                      (click)="selectProcess(item)"
+                      [ngClass]="{'active': selectedProcess?._id === item._id }">
+                    {{ (item.name) || ('Process #' + (i+1) ) }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-10" *ngIf="selectedProcess">
+            <app-process-result [process]="selectedProcess"
+                                [result]="result"></app-process-result>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

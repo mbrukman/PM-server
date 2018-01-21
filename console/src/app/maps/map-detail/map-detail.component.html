@@ -1,0 +1,42 @@
+<div class="header">
+
+  <h1>
+    {{map?.name}}
+    <span *ngIf="map?.archived">(archived)</span>
+    <span *ngIf="structuresList[0] && mapStructure?.id !== structuresList[0].id">
+      (<i class="material-icons">history</i> {{ structureIndex }}/{{ structuresList.length }})
+    </span>
+  </h1>
+</div>
+
+<div class="map-nav">
+  <ul class="nav justify-content-center">
+    <li class="nav-item" routerLinkActive="active">
+      <a class="nav-link" [routerLink]="['properties']">Properties</a>
+    </li>
+    <li class="nav-item" routerLinkActive="active">
+      <a class="nav-link" [routerLink]="['edit', 'design']">Design</a>
+    </li>
+    <li class="nav-item" routerLinkActive="active">
+      <a class="nav-link" [routerLink]="['edit', 'code']">Code</a>
+    </li>
+    <li class="nav-item" routerLinkActive="active">
+      <a class="nav-link" [routerLink]="['results']">Execution Results</a>
+    </li>
+    <li class="nav-item" routerLinkActive="active">
+      <a class="nav-link" [routerLink]="['revisions']">Revisions</a>
+    </li>
+
+  </ul>
+</div>
+
+<div class="action-buttons">
+  <button type="button" class="btn" (click)="discardChanges()" *ngIf="edited || structureEdited" disabled>Discard</button>
+  <button type="button" class="btn" (click)="saveMap()" *ngIf="!edited && !structureEdited" disabled>Saved</button>
+  <button type="button" class="btn" (click)="saveMap()" *ngIf="edited || structureEdited">Save</button>
+  <button class="btn" (click)="executeMap()">Execute</button>
+</div>
+
+<div class="router-wrapper">
+  <router-outlet></router-outlet>
+</div>

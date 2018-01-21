@@ -1,0 +1,16 @@
+@import "~assets/sass/variables";
+
+.bottom {
+  position: absolute;
+  bottom: 35px;
+  left: 200px;
+  button {
+    border-radius: 25px;
+    background: transparent;
+    border: 4px solid $turquoise-blue;
+    &:hover {
+      background: $turquoise-blue;
+      color: #000;
+    }
+  }
+}

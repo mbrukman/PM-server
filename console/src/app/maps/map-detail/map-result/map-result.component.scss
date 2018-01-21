@@ -1,0 +1,91 @@
+@import "~assets/sass/variables";
+
+.bg-dark {
+  background: $dark-background !important;
+}
+
+.bg-grey {
+  background: $cool-grey !important;
+}
+
+.main {
+  display: flex;
+  height: 100%;
+  .execution-select-pane {
+    flex: 0 0 176px;
+    border-right: 1px solid $cool-grey;
+    .execution-list {
+      height: 100%;
+      overflow-y: scroll;
+      ul {
+        padding-left: 0;
+        list-style: none;
+        font-size: 14px;
+        li {
+          padding-left: 15px;
+          height: 41px;
+          line-height: 41px;
+
+          &:hover {
+            cursor: pointer;
+            background: $dark-background;
+          }
+
+          &.active {
+            background: $turquoise-blue;
+          }
+
+        }
+      }
+    }
+  }
+  .result {
+    flex: 1;
+  }
+}
+
+.result-header-deck {
+  height: 200px;
+  .card {
+    height: 100%;
+    overflow-y: hidden;
+  }
+}
+
+.process-select {
+  padding: 0;
+  .card-body {
+    padding: 0;
+    ul {
+      padding-left: 0;
+      list-style: none;
+      font-size: 14px;
+      li {
+        padding-left: 15px;
+        height: 41px;
+        line-height: 41px;
+        &:hover {
+          cursor: pointer;
+          background: $cool-grey;
+        }
+
+        &.active {
+          background: $turquoise-blue;
+        }
+      }
+    }
+  }
+}
+
+.card-row {
+  margin-top: 15px;
+}
+
+.raw-output {
+  .card-body {
+    ul {
+      max-height: 135px;
+      overflow-y: scroll;
+    }
+  }
+}

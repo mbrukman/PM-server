@@ -1,0 +1,66 @@
+<div class="main">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="section-title">{{project?.name}} <span *ngIf="project?.archived  ">(archived)</span></h1>
+      <a routerLink="/projects/update" [queryParams]="{'project': project?.id}" class="btn-primary btn">Edit <i class="material-icons">mode_edit</i></a>
+      <button class="btn-success btn" (click)="archiveProject()" [disabled]="project?.archived">
+        Archive
+        <i class="material-icons">archive</i>
+      </button>
+      <p class="lead">{{project?.description}}</p>
+    </div>
+    <div class="featured">
+      <app-feature [items]="featuredMaps" prefix="maps"></app-feature>
+    </div>
+  </div>
+
+  <div class="filter d-flex justify-content-between align-items-end">
+    <h5 class="section-sub-title">All projects</h5>
+    <div>
+      <i class="material-icons">search</i>
+      <input #gb class="form-control" type="text" placeholder="Filter"
+            />
+    </div>
+  </div>
+
+  <div class="row">
+    <p class="lead" *ngIf="!project?.maps || project?.maps?.length === 0">
+      No maps yet.
+      Go ahead and <a routerLink="/maps/create" [queryParams]="{'project': project?.id}">add a new map</a>.
+    </p>
+
+    <p-dataTable
+      [value]="project?.maps"
+      [rows]="15"
+      [paginator]="true"
+      [pageLinks]="4"
+      [globalFilter]="gb"
+      *ngIf="project?.maps && project?.maps?.length > 0">
+      <p-column field="name" header="Name" [sortable]="true">
+        <ng-template let-col let-map="rowData" pTemplate="body">
+          <i class="material-icons" *ngIf="map.archived">archive</i>
+          <a [routerLink]="['/maps', map.id]">{{ map.name }}</a>
+        </ng-template>
+      </p-column>
+      <p-column field="description" header="Description" [sortable]="true">
+        <ng-template let-col let-map="rowData" pTemplate="body">
+          <span>{{ map.description | truncatechars : 70 : '' }}<span class="etc" *ngIf="map?.description?.length > 70"> ... </span></span>
+        </ng-template>
+      </p-column>
+      <p-column field="createdAt" header="Created" [sortable]="true">
+        <ng-template let-col let-map="rowData" pTemplate="body">
+          <span>{{ (map.createdAt | date: 'dd/MM/yyyy') + ' ' +  (map.createdAt | date: 'HH:mm') }}</span>
+        </ng-template>
+      </p-column>
+      <p-column field="updatedAt" header="Updated" [sortable]="true">
+        <ng-template let-col let-map="rowData" pTemplate="body">
+          <span>{{ ((map.updatedAt | date: 'dd/MM/yyyy') || '') + ' ' +  ((map.updatedAt | date: 'HH:mm') || '' )}}</span>
+        </ng-template>
+      </p-column>
+    </p-dataTable>
+
+    <a routerLink="/maps/create" class="btn pm create" [queryParams]="{'project': project?.id}" *ngIf="project?.maps && project?.maps?.length > 0">Add map</a>
+  </div>
+</div>
+
+

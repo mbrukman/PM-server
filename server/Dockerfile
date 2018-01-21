@@ -1,16 +1,13 @@
- FROM readytalk/nodejs
+FROM node:carbon
 
-  WORKDIR /app
-  ADD package.json /app/
-  RUN npm install
-  RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
-  RUN echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list
-  RUN apt-get update
-  RUN apt-get install -y mongodb-org-*
-  RUN apt-get install -y mongodb-org
+# Create app directory
+WORKDIR /app
+COPY package*.json ./
 
-  RUN service mongod start
-  ADD . /app
+RUN npm install
 
-  CMD []
-  ENTRYPOINT ["/nodejs/bin/npm", "start"]
+COPY . .
+
+EXPOSE 3000
+
+CMD ["node", "app.js"]

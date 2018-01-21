@@ -1,0 +1,28 @@
+<div class="main">
+  <button class="btn btn-light back" (click)="onClose()"><i class="material-icons">arrow_back</i></button>
+  <div class="form-group">
+    <input type="text" class="form-control" [(ngModel)]="query" (keyup)="onKeyUp()" aria-describedby="searchQuery"
+           placeholder="Search">
+    <small class="form-text text-muted">You can search maps and projects from here.</small>
+  </div>
+  <i class="fa fa-spinner fa-spin fa-3x fa-fw" *ngIf="loading"></i>
+  <div class="results" *ngIf="maps || projects">
+
+    <h6>Maps</h6>
+    <p class="lead" *ngIf="!maps || maps.length === 0">No maps found</p>
+    <div class="list-group">
+      <a class="list-group-item list-group-item-action" *ngFor="let map of maps" [routerLink]="['/maps', map.id]" (click)="onClose()">
+        {{map.name}}
+      </a>
+    </div>
+    <h6>Projects</h6>
+    <p class="lead" *ngIf="!project || projects.length === 0">No projects found</p>
+
+    <div class="list-group">
+      <a class="list-group-item list-group-item-action" *ngFor="let project of projects" [routerLink]="['/projects', project.id]" (click)="onClose()">
+        {{project.name}}
+      </a>
+    </div>
+  </div>
+</div>
+

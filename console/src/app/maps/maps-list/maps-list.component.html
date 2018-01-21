@@ -1,0 +1,41 @@
+<div class="main">
+  <h1 class="section-title">Maps</h1>
+  <div class="featured">
+    <app-feature [items]="featuredMaps"></app-feature>
+  </div>
+  <div class="filter d-flex justify-content-between align-items-end">
+    <h5 class="section-sub-title">All maps</h5>
+    <div>
+      <i class="material-icons" *ngIf="!filterTerm">search</i>
+      <i class="material-icons text-light" *ngIf="filterTerm" (click)="filterTerm = null">close</i>
+      <input class="form-control" [(ngModel)]="filterTerm" type="text" placeholder="Filter" (keyup)="loadProjectLazy(filterTerm)" />
+    </div>
+  </div>
+
+  <p-dataTable [value]="maps" [lazy]="true" [rows]="15" [paginator]="true" [totalRecords]="resultCount"
+               (onLazyLoad)="loadProjectLazy($event)"  [globalFilter]="filterTerm">
+    <p-column field="name" header="Name" [sortable]="true">
+      <ng-template let-col let-map="rowData" pTemplate="body">
+        <i class="material-icons" *ngIf="map.archived">archive</i>
+        <a [routerLink]="map.id">{{ map.name }}</a>
+      </ng-template>
+    </p-column>
+    <p-column field="description" header="Description" [sortable]="true">
+      <ng-template let-col let-map="rowData" pTemplate="body">
+        <span>{{ map.description | truncatechars : 70 : '' }}<span class="etc" *ngIf="map?.description?.length > 70"> ... </span></span>
+      </ng-template>
+    </p-column>
+    <p-column field="createdAt" header="Created" [sortable]="true">
+      <ng-template let-col let-map="rowData" pTemplate="body">
+        <span>{{ (map.createdAt | date: 'dd/MM/yyyy') + ' ' +  (map.createdAt | date: 'HH:mm') }}</span>
+      </ng-template>
+    </p-column>
+    <p-column field="updatedAt" header="Updated" [sortable]="true">
+      <ng-template let-col let-map="rowData" pTemplate="body">
+        <span>{{ ((map.updatedAt | date: 'dd/MM/yyyy') || '') + ' ' +  ((map.updatedAt | date: 'HH:mm') || '' )}}</span>
+      </ng-template>
+    </p-column>
+  </p-dataTable>
+</div>
+
+

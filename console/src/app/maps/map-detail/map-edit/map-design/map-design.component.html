@@ -1,0 +1,15 @@
+<div class="wrapper row" #wrapper (window:resize)="onResize($event)">
+  <div class="main" [ngClass]="{'col-12': !editing, 'col-8': editing}">
+    <h3 class="pane-header">Design</h3>
+    <div class="map-controllers">
+      <button class="btn" (click)="onScale(0.1)"><i class="icon-zoom1" aria-hidden="true"></i></button>
+      <button class="btn" (click)="onScale(-0.1)"><i class="icon-zoom2" aria-hidden="true"></i></button>
+    </div>
+    <div id="graph" class="graph"></div>
+  </div>
+  <div class="map-management col-4" *ngIf="editing">
+    <app-process-form [process]="process" (saved)="onSave($event)" (close)="onClose($event)"
+                      (delete)="onDelete($event)"></app-process-form>
+  </div>
+
+</div>

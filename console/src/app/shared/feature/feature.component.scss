@@ -1,0 +1,22 @@
+.featured {
+  width: 100%;
+  display: flex;
+  .col {
+    flex-grow: 1;
+    max-width: 450px;
+    padding-left: 0;
+    .card {
+      height: 150px;
+      overflow-y: hidden;
+      .card-body {
+        padding: 16px 18px 18px 16px;
+        .card-text {
+          height: 75px;
+          overflow-y: hidden;
+          margin: 0;
+          line-height: 18px;
+        }
+      }
+    }
+  }
+}

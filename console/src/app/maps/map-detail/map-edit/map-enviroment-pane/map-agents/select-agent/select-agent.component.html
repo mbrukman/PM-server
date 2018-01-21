@@ -1,0 +1,33 @@
+<div class="row pm-modal">
+  <div class="col-12">
+    <div class="modal-header">
+      <h4>Select Agents</h4>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true" (click)="onClose()">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <p-dataTable [value]="agents"  [responsive]="true" [(selection)]="selectedAgents" dataKey="name">
+        <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+        <p-column field="name" header="name" [sortable]="true">
+          <ng-template let-col let-agent="rowData" pTemplate="body">
+            <span>
+              <span
+                [ngClass]="{'text-success': agent.status?.alive, 'text-danger': !agent.status?.alive}">
+                  <i class="fa fa-circle" aria-hidden="true"></i>
+                </span>
+              {{agent.name}}
+            </span>
+          </ng-template>
+        </p-column>
+        <p-column field="url" header="url" [sortable]="true"></p-column>
+      </p-dataTable>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-primary" (click)="onClose()">Cancel</button>
+      <button class="btn-primary btn" (click)="onConfirm()">Confirm</button>
+    </div>
+  </div>
+</div>

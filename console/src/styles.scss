@@ -1,0 +1,381 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~assets/sass/variables";
+@import "~assets/sass/base";
+
+@font-face {
+  font-family: "OpenSans";
+  src: url("./assets/fonts/OpenSans-Regular.ttf");
+}
+
+html, body {
+  font-family: "OpenSans";
+  height: 100%;
+  @extend .main-background;
+}
+
+.section-title {
+  @extend .section-title;
+}
+
+.section-sub-title {
+  @extend .section-sub-title;
+}
+
+.pane-title {
+  @extend .pane-header;
+}
+
+.bg-black {
+  color: $light-color;
+  background: $dark-color;
+}
+
+input, textarea, select {
+  @extend .dark-input;
+}
+
+input, textarea, select {
+  border: 1px solid $input-border !important;
+  background-color: $input-bg !important;
+  outline: none !important;
+  &.ng-invalid.ng-touched {
+    border: 1px solid $error;
+  }
+  &:focus {
+    outline-style: none;
+    outline-width: 0px;
+    box-shadow: none !important;
+    border: 1px solid $turquoise-blue !important;
+  }
+  &:disabled {
+    background-color: $selected-tab-environment !important;
+  }
+}
+
+textarea {
+  overflow: hidden;
+}
+
+.main {
+  overflow-y: scroll;
+
+  ::-webkit-scrollbar {
+    width: 0px; /* remove scrollbar space */
+    background: transparent; /* make scrollbar invisible */
+  }
+}
+
+.card {
+  @extend .card;
+}
+
+.list-group-item.active {
+  background-color: $blue-dark-2;
+  border-color: $blue-dark-2;
+}
+
+.bs-datepicker-body, bs-datepicker-head {
+  background: $grey-dark-1;
+  border: 1px solid $grey-light-1;
+  border-radius: 5px;
+}
+
+a {
+  color: $turquoise-blue;
+}
+
+/* prime ng table*/
+.ui-state-default {
+  color: inherit;
+}
+
+.ui-widget-content {
+  a {
+    color: $turquoise-blue;
+  }
+}
+
+.ui-datatable tbody > tr.ui-widget-content.ui-state-highlight {
+  background-color: inherit;
+}
+
+.ui-datatable thead tr {
+  background: none;
+  border: none;
+  border-bottom: 1px solid $cool-grey;
+}
+
+.ui-datatable th.ui-state-default, .ui-datatable .ui-datatable-thead > tr > th {
+  border: none;
+  background: none;
+  color: $greyish-text;
+}
+
+.ui-datatable thead th {
+  text-align: left;
+  font-size: 18px;
+  font-weight: bolder;
+  padding: 5px;
+}
+
+.ui-widget-content, .ui-datatable tbody > tr.ui-widget-content.ui-datatable-odd {
+  border: none;
+  background: none;
+  color: $greyish-text;
+  border-bottom: 1px solid $cool-grey;
+
+}
+
+tr.ui-widget-content.ui-datatable-odd {
+  &:hover {
+    background-color: $hover-color;
+    box-shadow: -4px 0px 0px 0px $turquoise-blue;
+  }
+}
+
+.ui-datatable .ui-datatable-data > tr > td {
+  border: none;
+  border-bottom: 1px solid $cool-grey;
+}
+
+.ui-datatable tbody > tr.ui-widget-content {
+  border: none;
+}
+
+.ui-widget-header {
+  background: none;
+  border: none;
+  border-bottom: 1px solid $cool-grey;
+  text-align: left;
+}
+
+.ui-paginator .ui-paginator-page, .ui-state-default {
+  background: none;
+  border: 0;
+  &.ui-state-active {
+    background: none;
+    border: 1px solid $turquoise-blue;
+    border-radius: 0;
+  }
+  &:hover {
+    background: none;
+  }
+}
+
+/* primeng checkbox */
+
+.ui-chkbox-box {
+  border: 1px solid $greyish-text;
+  border-radius: 2px;
+  background-color: #dedede;
+  &.ui-state-active {
+    border: 1px solid $greyish-text;
+    border-radius: 2px;
+    background-color: #dedede;
+    color: black;
+  }
+}
+
+/*------*/
+
+table, .table {
+  color: #dddddd;
+  font-size: 14px;
+  thead {
+    th {
+      border-bottom: 1px solid $cool-grey;
+      &:hover {
+        background: none !important;
+        color: inherit !important;
+      }
+    }
+  }
+  tbody {
+    tr {
+      height: 48px;
+      &:hover {
+        background-color: $hover-color !important;
+        box-shadow: -4px 0px 0px 0px $turquoise-blue;
+      }
+    }
+  }
+  th, td {
+    border-top: 0px;
+    border-bottom: 1px solid $cool-grey;
+    a {
+      text-decoration: underline;
+    }
+
+  }
+}
+
+//
+.btn-link {
+  color: $turquoise-blue;
+  cursor: pointer;
+}
+
+// accordion
+.panel {
+  .panel.card {
+    background: transparent !important;
+  }
+
+}
+
+// dropdown
+.dropdown-item {
+  color: $text-color !important;
+  &:hover {
+    color: #000 !important;
+    background: $turquoise-blue !important;
+
+  }
+}
+
+.dropdown-menu {
+  background: $selected-tab-environment;
+  color: $text-color;
+}
+
+.menuitem {
+  color: $text-color;
+  &:hover {
+    background: $turquoise-blue !important;
+    color: #000 !important;
+
+  }
+}
+
+rect.body {
+  stroke: #bbbbbb;
+  &:hover {
+    fill: #3f4247;
+  }
+}
+
+.port-body {
+  fill: $selected-tab-environment;
+  stroke: #7f7f7f;
+}
+
+.btn {
+  &.pm {
+    padding: 5px 29px 5px 29px;
+    color: $text-color;
+    background: transparent;
+    border-radius: 20px;
+    border: 2px solid $turquoise-blue;
+    &:hover {
+      cursor: pointer;
+      background: $turquoise-blue;
+      color: $background;
+      font-weight: bolder;
+    }
+  }
+}
+
+.pm-modal {
+  background: $background;
+  box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.75);
+  .modal-header {
+    border-bottom: 0;
+    button.close {
+      color: $text-color;
+      cursor: pointer;
+    }
+  }
+  .modal-body {
+    border-bottom: 0;
+  }
+  .modal-footer {
+    border-top: 0;
+  }
+}
+
+.ui-datepicker {
+  background: $background;
+  .ui-datepicker-header {
+    color: $text-color;
+    .ui-corner-all {
+      color: $text-color;
+    }
+  }
+  table.ui-datepicker-calendar {
+    thead {
+      color: $turquoise-blue;
+      border-bottom: 1px solid $cool-grey;
+      th {
+        background: transparent !important;
+      }
+    }
+  }
+  .ui-timepicker {
+    text-align: center;
+    color: $turquoise-blue;
+  }
+}
+
+.popover {
+  max-width: 100%;
+  min-width: 750px;
+  background: $background;
+  .arrow {
+    &:after {
+      border-right-color: $background !important;
+    }
+  }
+  .popover-body {
+    color: $text-color;
+  }
+}
+
+.cal-month-view {
+  .cal-day-badge {
+    background-color: $turquoise-blue;
+  }
+  .cal-cell-row {
+    &:hover {
+      background-color: transparent;
+    }
+    .cal-cell {
+      &:hover {
+        background: transparent;
+      }
+      &.cal-open {
+        background: transparent;
+        border: 3px solid $turquoise-blue;
+      }
+    }
+
+  }
+  .cal-day-cell {
+    &:not(:last-child) {
+      border-right: 1px solid $cool-grey;
+    }
+    &.cal-today {
+      background-color: $dark-background;
+    }
+    &.cal-weekend {
+      .cal-day-number {
+        color: $greyish-text;
+      }
+    }
+  }
+  .cal-days {
+    border: 1px solid $cool-grey;
+    .cal-cell-row {
+      border-bottom: 1px solid $cool-grey;
+
+    }
+  }
+}
+
+.ui-dropdown-label {
+  &.ui-inputtext {
+    background-color: $input-bg;
+    border: 1px solid $input-border !important;
+    background-color: $input-bg !important;
+    color: $greyish-text;
+  }
+}

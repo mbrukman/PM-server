@@ -1,0 +1,62 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('../fonts/custom/pm.eot');
+  src:  url('../fonts/custom/pm.eot') format('embedded-opentype'),
+    url('../fonts/custom/pm.ttf') format('truetype'),
+    url('../fonts/custom/pm.woff') format('woff'),
+    url('../fonts/custom/pm.svg') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-zoom1:before {
+  content: "\e905";
+}
+.icon-zoom2:before {
+  content: "\e906";
+}
+.icon-dashboard:before {
+  content: "\e90b";
+}
+.icon-plugins:before {
+  content: "\e907";
+}
+.icon-attribute:before {
+  content: "\e908";
+}
+.icon-trigger:before {
+  content: "\e909";
+}
+.icon-agent:before {
+  content: "\e90a";
+}
+.icon-add-new:before {
+  content: "\e904";
+}
+.icon-search1:before {
+  content: "\e900";
+}
+.icon-map:before {
+  content: "\e901";
+}
+.icon-folder1:before {
+  content: "\e902";
+}
+.icon-admin:before {
+  content: "\e903";
+}

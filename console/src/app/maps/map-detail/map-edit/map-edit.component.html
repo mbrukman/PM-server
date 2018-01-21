@@ -1,0 +1,60 @@
+<div class="row">
+  <div class="environment-pane">
+    <!--<app-map-environment-pane></app-map-environment-pane>-->
+    <div class="nav">
+      <ul class="nav flex-column">
+        <li class="nav-item" (click)="tab='agents'; designService.tabOpen = true" [ngClass]="{'active': tab==='agents'}">
+          <a class="nav-link"
+             tooltip="Agents"
+             placement="right"><i class="icon-agent" aria-hidden="true"></i></a>
+        </li>
+        <li class="nav-item" (click)="tab='attributes'; designService.tabOpen = true" [ngClass]="{'active': tab==='attributes'}">
+          <a class="nav-link"
+             tooltip="Attributes"
+             placement="right"><i class="icon-attribute" aria-hidden="true"></i></a>
+        </li>
+
+        <li class="nav-item" (click)="tab='triggers'; designService.tabOpen = true" [ngClass]="{'active': tab==='triggers'}">
+          <a class="nav-link"
+             tooltip="Triggers"
+             placement="right"> <i class="icon-trigger" aria-hidden="true"></i></a>
+        </li>
+
+        <li class="nav-item" (click)="tab='plugins'; designService.tabOpen = true" [ngClass]="{'active': tab==='plugins'}">
+          <a class="nav-link"
+             tooltip="Plugins"
+             placement="right"><i class="icon-plugins" aria-hidden="true"></i></a>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="environment" [ngSwitch]="tab" *ngIf="tab">
+    <div class="pane-header">Environment <span (click)="tab=''; designService.tabOpen = false;">
+      <i class="material-icons">chevron_left</i>
+    </span>
+    </div>
+    <div *ngSwitchCase="'agents'">
+      <app-map-agents></app-map-agents>
+    </div>
+
+    <div *ngSwitchCase="'attributes'">
+      <app-map-attributes></app-map-attributes>
+    </div>
+
+    <div *ngSwitchCase="'triggers'">
+      <app-map-triggers></app-map-triggers>
+    </div>
+
+    <div *ngSwitchCase="'plugins'">
+      <app-plugin-toolbox></app-plugin-toolbox>
+    </div>
+  </div>
+
+  <div class="designer">
+    <div class="router-wrapper" #wrapper>
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
+

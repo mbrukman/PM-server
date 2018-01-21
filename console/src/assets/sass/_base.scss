@@ -1,0 +1,99 @@
+@import "variables";
+
+
+.section-title {
+  font-size: 28px;
+  line-height: 18px;
+  color: $text-color;
+  margin-bottom: 20px;
+  font-weight: normal;
+}
+
+.section-sub-title {
+  font-size: 18px;
+  line-height: 18px;
+  color: $text-color;
+  padding-bottom: 26px;
+}
+
+.btn-clock-bottom {
+  position: absolute;
+  bottom: 5px;
+  width: 100%;
+  padding-right: 20px;
+}
+
+.base-shadow {
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.55);
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.55);
+}
+
+.pane-title {
+  background: $dark-color;
+  color: $light-color;
+  padding-left: 10px;
+}
+
+.focus-shadow {
+  -webkit-box-shadow: 0px 0px 20px 0px rgba(230,230,230,0.50);
+  -moz-box-shadow: 0px 0px 20px 0px rgba(230,230,230,0.50);
+  box-shadow: 0px 0px 20px 0px rgba(230,230,230,0.50);
+}
+
+.side-bar {
+  padding: 0;
+  background: $grey-dark-3;
+}
+
+
+.pane-header {
+  padding-left: 13px;
+  font-size: 18px;
+  line-height: 40px;
+  height: 43px;
+  background-color: $pane-header-background;
+  border-left: 1px solid $cool-grey;
+}
+
+.main-background {
+  background-color: $background;
+  color: $greyish-text;
+}
+
+.reset-padding {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.dark-input {
+  background-color: $grey-dark-2 !important;
+  color: $grey-light-1 !important;
+}
+
+.card {
+  background-color: $card-background;
+  color: $text-color;
+  .card-body {
+    font-size: 14px;
+    line-height: 24px;
+    .card-title {
+      color: $turquoise-blue;
+      font-size: 18px;
+      line-height: 18px;
+    }
+  }
+  &:hover {
+    background-color: $hover-card;
+    box-shadow: 0px 4px 1px 0 rgba(0, 0, 0, 0.11);
+  }
+}
+
+.bg-primary {
+  background-color: $turquoise-blue;
+}
+
+.etc {
+  font-size: 18px;
+  font-weight: bolder;
+  color: $turquoise-blue;
+}

@@ -1,0 +1,12 @@
+<div class="main">
+  <div class="row">
+    <div class="col-12">
+      <h3>{{ map?.description }}</h3>
+      <a routerLink="/maps/update" [queryParams]="{'map': map?.id}" class="btn btn-primary">Edit <i class="material-icons">mode_edit</i></a>
+      <button class="btn btn-success" (click)="archiveMap()">Archive <i class="material-icons">archive</i></button>
+      <hr class="my-4">
+      <p>Created at: {{ map?.createdAt | date: 'short'}}</p>
+      <p>Licence: {{ map?.licence? map.licence: 'Not provided' }}</p>
+    </div>
+  </div>
+</div>

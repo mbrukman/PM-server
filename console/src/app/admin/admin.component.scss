@@ -1,0 +1,44 @@
+@import "~assets/sass/variables";
+
+.row {
+  height: 100%;
+  margin-left: 0;
+  .side-nav {
+    background: $dark-background;
+    border-right: 1px solid $cool-grey;
+    flex: 0 0 60px;
+  }
+  .main-content {
+    flex: 1;
+    padding-left: 39px;
+    padding-right: 39px;
+    margin-top: 39px;
+  }
+}
+
+ul.nav {
+  align-items: center;
+  li.nav-item {
+    margin-bottom: 15px;
+    a.nav-link {
+      color: $unselected-env-nav;
+      font-size: 24px;
+      i {
+        width: 24px;
+        height: 24px;
+      }
+      &:hover {
+        color: $turquoise-blue;
+        cursor: pointer;
+      }
+
+    }
+
+    &.active {
+      background: $selected-tab-environment;
+      a.nav-link {
+        color: $turquoise-blue
+      }
+    }
+  }
+}

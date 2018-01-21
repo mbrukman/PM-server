@@ -1,0 +1,22 @@
+<div class="container">
+  <table class="table">
+    <tbody>
+    <tr *ngFor="let attr of mapStructure?.attributes; let i = index;">
+      <td>{{attr.name}} = "{{attr.value}}"</td>
+      <td>
+        <button type="button" class="btn btn-link" (click)="openAddAttributeModal(i)">
+          <i class="material-icons">mode_edit</i>
+        </button>
+        <button type="button" class="btn btn-link" (click)="removeAttribute(i)">
+          <i class="material-icons">delete</i>
+        </button>
+      </td>
+    </tr>
+
+    </tbody>
+  </table>
+
+  <div class="bottom">
+    <button type="button" class="btn btn-primary btn-block" (click)="openAddAttributeModal()">Add attribute</button>
+  </div>
+</div>

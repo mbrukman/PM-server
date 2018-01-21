@@ -1,0 +1,63 @@
+@import "~assets/sass/variables";
+@import "~assets/sass/base";
+
+.bottom-section {
+  @extend .btn-clock-bottom;
+}
+
+h3 {
+  @extend .pane-header;
+  border: none;
+}
+
+div {
+  button.btn.dropdown-toggle {
+    width: 61px;
+    height: 21px;
+    border-radius: 10.5px;
+    background: none;
+    border: solid 2px #97999b;
+    color: #97999b;
+  }
+}
+
+.clearfix {
+  color: $greyish-text;
+  &:hover {
+    box-shadow: none;
+  }
+}
+
+.process-form {
+  margin-bottom: 55px;
+  .action-form {
+    font-size: 13px;
+    padding-right: 10px;
+    padding-left: 10px;
+    .action-params {
+      margin-bottom: 5px;
+    }
+  }
+  .pane-bottom {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+}
+
+.dropdown-pm {
+  border: 2px solid #97999b;
+  border-radius: 25px;
+  height: 21px;
+  width: 60px;
+  text-align: center;
+  line-height: initial;
+  cursor: pointer;
+  font-size: 13px;
+  &:hover {
+    border-color: $turquoise-blue;
+  }
+  &[aria-expanded="true"] {
+    border-color: $turquoise-blue;
+  }
+}

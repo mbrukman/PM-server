@@ -1,65 +1,97 @@
-#!/usr/bin/env node
+const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
+const http = require('http');
+const morgan = require('morgan');
+const mongoose = require('mongoose');
+const bootstrap = require("./helpers/bootstrap").bootstrap;
+const socket = require('socket.io');
 
-/**
- * app.js
- *
- * Use `app.js` to run your app without `sails lift`.
- * To start the server, run: `node app.js`.
- *
- * This is handy in situations where the sails CLI is not relevant or useful.
- *
- * For example:
- *   => `node app.js`
- *   => `forever start app.js`
- *   => `node debug app.js`
- *   => `modulus deploy`
- *   => `heroku scale`
- *
- *
- * The same command-line arguments are supported, e.g.:
- * `node app.js --silent --port=80 --prod`
- */
+const app = express();
 
-// Ensure we're in the project directory, so relative paths work as expected
-// no matter where we actually lift from.
-process.chdir(__dirname);
+/////////////////////
+// configurations //
+///////////////////
 
-// Ensure a "sails" can be located:
-(function() {
-  var sails;
-  try {
-    sails = require('sails');
-  } catch (e) {
-    console.error('To run an app using `node app.js`, you usually need to have a version of `sails` installed in the same directory as your app.');
-    console.error('To do that, run `npm install sails`');
-    console.error('');
-    console.error('Alternatively, if you have sails installed globally (i.e. you did `npm install -g sails`), you can use `sails lift`.');
-    console.error('When you run `sails lift`, your app will still use a local `./node_modules/sails` dependency if it exists,');
-    console.error('but if it doesn\'t, the app will run with the global sails instead!');
-    return;
-  }
-
-  // Try to get `rc` dependency
-  var rc;
-  try {
-    rc = require('rc');
-  } catch (e0) {
-    try {
-      rc = require('sails/node_modules/rc');
-    } catch (e1) {
-      console.error('Could not find dependency: `rc`.');
-      console.error('Your `.sailsrc` file(s) will be ignored.');
-      console.error('To resolve this, run:');
-      console.error('npm install rc --save');
-      rc = function () { return {}; };
-    }
-  }
+// morgan logger
+app.use(morgan('dev'));
 
 
-  // Start server
-  sails.lift(rc('sails'));
+// enable cors
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
 
-  process.on('uncaughtException', err => {
-    sails.log.error("Uncaught Exception: " + err);
-  });
-})();
+
+const server = http.createServer(app);
+io = socket(server);
+io.on('connection', function (socket) {
+    console.log('a user connected');
+});
+
+
+const db = (process.env.MONGO_HOST || 'localhost') + ":" + (process.env.MONGO_PORT || 27017) + "/" + (process.env.DB_NAME || 'refactor');
+/* Connect to db */
+mongoose.connect(`mongodb://${db}`, {
+    useMongoClient: true
+}).then(() => {
+    console.log(`Succesfully Connected to the Mongodb Database  at URL : mongodb://127.0.0.1:27017/refactor`);
+}).catch(() => {
+    console.log(`Error Connecting to the Mongodb`);
+});
+mongoose.Promise = require('bluebird');
+
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
+app.use(bodyParser.json());
+
+app.use((req, res, next) => {
+    req.io = io;
+    next();
+});
+
+// Angular dist output folder
+app.use(express.static(path.join(__dirname, 'dist')));
+app.use('/plugins', express.static(path.join(__dirname, 'libs', 'plugins')));
+app.use('/media', express.static(path.join(__dirname, 'media_cdn')));
+
+
+//////////////////////
+/////// routes //////
+////////////////////
+
+/* api references */
+const mapsApi = require("./api/routes/maps.routes");
+const pluginsApi = require("./api/routes/plugins.routes");
+const agentsApi = require("./api/routes/agents.routes");
+const projectsApi = require("./api/routes/projects.routes");
+
+app.use('/api/maps', mapsApi);
+app.use('/api/plugins', pluginsApi);
+app.use('/api/agents', agentsApi);
+app.use('/api/projects', projectsApi);
+
+
+// Send all other requests to the Angular app
+app.all('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+
+//Set Port
+const port = process.env.PORT || '3000';
+app.set('port', port);
+app.io = io;
+
+server.listen(port, () => {
+    console.log(`Running on localhost:${port}`);
+    bootstrap(app);
+});
+
+
+

@@ -1,0 +1,25 @@
+<div class="row full-height">
+  <div class="side-nav">
+    <ul class="nav flex-column">
+      <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <a class="nav-link" routerLink="plugins"
+           tooltip="Plugins"
+           placement="right"><i class="fa fa-plug" aria-hidden="true"></i></a>
+      </li>
+      <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <a class="nav-link" routerLink="agents"
+           tooltip="Agents"
+           placement="right"><i class="icon-agent" aria-hidden="true"></i></a>
+      </li>
+      <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <a class="nav-link" routerLink="calendar"
+           tooltip="Calendar"
+           placement="right"><i class="material-icons">event</i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="main-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

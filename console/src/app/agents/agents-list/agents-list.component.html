@@ -1,0 +1,24 @@
+<div class="main">
+  <h1 class="section-title">Agents</h1>
+  <div class="row">
+    <p-dataTable [value]="agents" [editable]="true" (onEditComplete)="onUpdateAgent($event)">
+      <p-column field="name" header="Name" [filter]="true" filterPlaceholder="Search" filterMatchMode="contains" [sortable]="true" [editable]="true">
+        <ng-template let-col let-agent="rowData" pTemplate="agent">
+          <input type="text" class="form-control" [(ngModel)]="agent[col.field]" (click)="onSelectAgent(agent)">
+        </ng-template>
+      </p-column>
+      <p-column field="url" header="URL" [filter]="true" filterPlaceholder="Search" [sortable]="true"></p-column>
+      <p-column field="attributes" header="Attributes" [filter]="true" filterPlaceholder="Search" [sortable]="true" [editable]="true">
+        <ng-template let-col let-agent="rowData" pTemplate="attr">
+          <input type="text" class="form-control" [(ngModel)]="agent[col.field]" (click)="onSelectAgent(agent)">
+        </ng-template>
+      </p-column>
+      <p-column header="Actions">
+        <ng-template let-col let-agent="rowData" pTemplate="actions">
+          <button class="btn btn-danger" (click)="deleteAgent(agent._id)"><i class="material-icons">delete</i></button>
+
+        </ng-template>
+      </p-column>
+    </p-dataTable>
+  </div>
+</div>

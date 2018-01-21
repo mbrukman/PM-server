@@ -1,0 +1,28 @@
+@import "~assets/sass/variables";
+
+form {
+  padding: 20px;
+  background: $dark-background;
+  border: 1px solid $cool-grey;
+  button.pm {
+    margin-top: 10px;
+  }
+  .form-check.form-check-inline {
+    .form-check-input {
+      margin-left: 0;
+      margin-top: 8px;
+    }
+  }
+  .input-group {
+    .form-control {
+      border-radius: 0.25rem;
+      margin-right: 10px;
+    }
+    .input-group-addon {
+      font-size: 2rem;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+  }
+}

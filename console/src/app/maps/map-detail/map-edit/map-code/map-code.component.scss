@@ -1,0 +1,13 @@
+@import "~assets/sass/base";
+
+.main {
+  height: 100%;
+}
+.pane-title {
+  @extend .pane-header;
+}
+
+.code-editor {
+  height: 95%;
+  width: 100%;
+}

@@ -1,0 +1,29 @@
+.main {
+  padding: 15px;
+}
+
+.thumbnail {
+  width: 35px;
+  max-height: 45px;
+  margin-right: 8px;
+}
+
+.filter {
+  h5 {
+    padding-bottom: 15px;
+  }
+  div {
+    padding-bottom: 10px;
+    i {
+      color: #97999B;
+      position: relative;
+      top: 30px;
+      left: 195px;
+    }
+    input {
+      width: 220px;
+      height: 34px;
+    }
+  }
+
+}

@@ -1,0 +1,188 @@
+<div class="d-flex justify-content-between pane-header">
+  <h3>Edit
+    <span *ngIf="!action">{{process?.name? process.name: 'process'}}</span>
+    <span *ngIf="action">action</span>
+  </h3>
+  <div *ngIf="!action">
+    <div class="btn-group" dropdown placement="bottom right">
+      <span class="dropdown-pm" dropdownToggle><i class="fa fa-ellipsis-h" aria-hidden="true"></i> <i
+        class="fa fa-chevron-down" aria-hidden="true"></i></span>
+      <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+        <li role="menuitem"><a class="dropdown-item" (click)="deleteProcess()">Delete</a></li>
+      </ul>
+    </div>
+    <button type="button" class="btn btn-link" (click)="closePane()">
+      <i class="material-icons text-light">close</i>
+    </button>
+  </div>
+  <div *ngIf="action">
+    <button type="button" class="btn btn-link" (click)="backToProcessView()">
+      <i class="material-icons text-light">arrow_forward</i>
+    </button>
+
+  </div>
+</div>
+
+<div class="process-form">
+  <form [formGroup]="processForm" (ngSubmit)="saveProcess(processForm.value)">
+    <accordion [closeOthers]="true" [hidden]="action">
+      <accordion-group>
+        <div accordion-heading class="clearfix">
+          Details
+          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
+        </div>
+        <div class="form-group">
+          <label for="uuid">uuid</label>
+          <input type="text" class="form-control" id="uuid" disabled formControlName="uuid">
+        </div>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" class="form-control" id="name" formControlName="name">
+        </div>
+        <div class="form-group">
+          <label for="description">Details</label>
+          <textarea type="text" class="form-control" id="description" formControlName="description"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="type">Type</label>
+          <input type="text" class="form-control" id="type" [value]="process?.plugin?.name" disabled>
+        </div>
+      </accordion-group>
+      <accordion-group>
+        <div accordion-heading class="clearfix">
+          Conditions
+          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
+        </div>
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" formControlName="mandatory">
+            Mandatory
+          </label>
+          <small class="form-text text-muted">If the process fails the execution will stop.</small>
+        </div>
+        <div class="form-group">
+          <label for="condition">Condition</label>
+          <input type="text" class="form-control" id="condition" formControlName="condition">
+          <small class="form-text text-muted">Returns a boolean - determine if the process should run. You can refer to
+            map code here.
+          </small>
+        </div>
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" formControlName="correlateAgents">
+            Correlate agents
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="condition">Filter agents condition</label>
+          <input type="text" class="form-control" id="filterAgents" formControlName="filterAgents">
+          <small class="form-text text-muted">Returns a boolean - determine if the process should run. You can refer to
+            map code here.
+          </small>
+        </div>
+      </accordion-group>
+      <accordion-group>
+        <div accordion-heading class="clearfix">
+          Hooks
+          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
+        </div>
+
+        <div class="form-group">
+          <label for="preRun">Pre-run function</label>
+          <input type="text" class="form-control" id="preRun" formControlName="preRun">
+          <small class="form-text text-muted">This function will run with agent context before the process executes. The
+            result will be added to the context. Code reference available.
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="postRun">Post-run function</label>
+          <input type="text" class="form-control" id="postRun"
+                 formControlName="postRun">
+          <small class="form-text text-muted">This function will run with agent context after the process finish
+            execution. The
+            result will be added to the context. Code reference available.
+          </small>
+        </div>
+      </accordion-group>
+      <accordion-group>
+        <div accordion-heading class="clearfix">
+          Actions
+          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
+        </div>
+        <button type="button" class="btn btn-sm btn-block pm" (click)="addNewAction()">Add action
+        </button>
+        <div formArrayName="actions">
+          <div *ngFor="let action of processForm.controls.actions['controls']; let i=index">
+            <div class="d-flex justify-content-between">
+              <span *ngIf="processForm.get('actions').at(i).get('name').value">{{processForm.get('actions').at(i).get('name').value}} (#{{i + 1}})</span>
+              <span *ngIf="!processForm.get('actions').at(i).get('name').value">Action #{{i + 1}}</span>
+              <span>
+            <button type="button" class="btn btn-link" (click)="editAction(i)"><i
+              class="material-icons">mode_edit</i></button>
+            <button type="button" class="btn btn-link" (click)="removeAction(i)"><i
+              class="material-icons">delete</i></button>
+          </span>
+            </div>
+          </div>
+        </div>
+      </accordion-group>
+    </accordion>
+
+
+    <div *ngIf="action" [formGroup]="processForm.controls.actions.at(index)" class="action-form">
+      <div class="form-group">
+        <label for="actionName">Name</label>
+        <input type="text" class="form-control" id="actionName" formControlName="name">
+      </div>
+      <div class="row">
+        <div class="col">
+          <input type="text" class="form-control" placeholder="Timeout" formControlName="timeout">
+        </div>
+        <div class="col">
+          <input type="text" class="form-control" placeholder="Timeunit" formControlName="timeunit">
+        </div>
+        <div class="col">
+          <input type="text" class="form-control" placeholder="Retries" formControlName="retries">
+        </div>
+      </div>
+      <hr>
+      <div class="form-check">
+        <label class="form-check-label">
+          <input type="checkbox" class="form-check-input" formControlName="mandatory">
+          Mandatory
+        </label>
+        <small class="form-text text-muted">If the action fails the process will stop (with failure).</small>
+      </div>
+      <p class="lead">Method</p>
+      <select id="inputState" class="form-control" formControlName="method" (change)="onSelectMethod()">-->
+        <option selected disabled>Select a method</option>
+        <option *ngFor="let method of process.plugin.methods" id="method._id" [ngValue]="method._id">{{method.viewName}}
+        </option>
+      </select>
+
+      <div formArrayName="params">
+        <div class="row">
+          <div class="col-4">Name</div>
+          <div class="col-2">Code?</div>
+          <div class="col-6">Value</div>
+        </div>
+        <hr>
+        <div *ngFor="let param of processForm.controls.actions.at(index).controls.params.controls; let k = index">
+          <div [formGroupName]="k">
+            <div class="row action-params">
+              <div class="col-4">{{param.value.viewName}}</div>
+              <hr>
+              <div class="col-2"><input formControlName="code" type="checkbox" class="form-control"></div>
+              <hr>
+              <div class="col-6"><input formControlName="value" type="text" class="form-control"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pane-bottom">
+      <button type="submit" class="btn pm">Save</button>
+    </div>
+  </form>
+</div>
+

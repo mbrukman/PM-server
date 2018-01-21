@@ -1,0 +1,16 @@
+@import "~assets/sass/variables";
+
+div.main {
+  .well {
+    width: 100%;
+    height: 50px;
+    border: 6px dashed $dark-color;
+    border-radius: 5px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 50px;
+  }
+  .well.file-hover {
+    border: 6px dashed #108884;
+  }
+}

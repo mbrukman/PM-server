@@ -1,0 +1,53 @@
+@import '~assets/sass/variables';
+
+.root {
+  margin-left: 0;
+  margin-right: 0;
+  height: 100%;
+  .pm-sidebar {
+    max-width: 80px;
+    flex: 0 0 80px;
+    background-color: $turquoise-blue;
+    img {
+      margin-top: 23px;
+      margin-left: 15px;
+    }
+
+  }
+  .main {
+    padding: 0px;
+    //padding-right: 35px;
+    flex: 0 0 calc(100% - 80px);
+    max-width: calc(100% - 80px);
+  }
+}
+
+.nav {
+  align-items: center;
+  li.nav-item {
+    margin-bottom: 15px;
+    border-radius: 5px;
+    &.active, &:hover {
+      background: $selected-nav;
+    }
+    &:first-child {
+      margin-top: 47px;
+    }
+    a.nav-link {
+      color: $text-color;
+      font-size: 24px;
+      i {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+}
+
+.search {
+  position: fixed;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+

@@ -1,0 +1,20 @@
+<div class="container">
+  <span *ngIf="map?.agents?.length === 0">No agents selected for this map</span>
+  <table class="table" *ngIf="map?.agents?.length > 0">
+    <tbody>
+    <tr *ngFor="let agent of map.agents; let i = index;">
+      <td>{{ agent?.name }}</td>
+      <td><span
+        [ngClass]="{'text-success': statuses[agent?.key]?.alive, 'text-danger': !statuses[agent?.key]?.alive}"
+        *ngIf="statuses">
+          <i class="material-icons">cloud_circle</i>
+        </span></td>
+    </tr>
+
+    </tbody>
+  </table>
+
+  <div class="bottom">
+    <button type="button" class="btn btn-primary btn-block" (click)="openSelectAgentsModal()">Select agents</button>
+  </div>
+</div>

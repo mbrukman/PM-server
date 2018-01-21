@@ -1,0 +1,55 @@
+@import "~assets/sass/base";
+@import "~assets/sass/variables";
+
+.main {
+  padding: 0;
+  border-left: 1px solid $cool-grey;
+}
+
+.wrapper {
+  height: 100%;
+  width: 100%;
+  overflow-y: scroll;
+  margin-left: 0;
+  margin-right: 0;
+  .map-management {
+    padding: 0;
+    background: $selected-tab-environment;
+    height: 100%;
+    overflow-y: scroll;
+  }
+}
+
+.map-controllers {
+  background: $dark-background;
+  text-align: right;
+  padding-right: 25px;
+  .btn {
+    color: $greyish-text;
+    background: transparent;
+    padding: 5px;
+    &:hover {
+      background: rgba(254, 234, 255, 0.3);
+      cursor: pointer;
+    }
+  }
+}
+
+.graph {
+  background: $dark-background;
+}
+
+.pane-header {
+  @extend .pane-header;
+  margin-bottom: 0;
+}
+
+/* port styling */
+.available-magnet {
+  fill: green;
+}
+
+/* element styling */
+.available-cell rect {
+  stroke-dasharray: 5, 2;
+}
