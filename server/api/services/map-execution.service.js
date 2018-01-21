@@ -423,7 +423,13 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
                                     return executionAgents[agent.key].processes[node].actions[actionKey].status;
                                 });
                             }
-                            executionAgents[agent.key].processes[node].status = (actionStatuses.indexOf('error') === -1) ? "success" : "partial";
+                            if (actionStatuses.indexOf('error') > -1 && actionStatuses.indexOf('success') === -1) { // if only errors - process status is error
+                                executionAgents[agent.key].processes[node].status = 'error';
+                            } else if (actionStatuses.indexOf('error') > -1 && actionStatuses.indexOf('success') > -1) { // if error and success - process status is partial
+                                executionAgents[agent.key].processes[node].status = 'partial';
+                            } else { // if only success - process status is success
+                                executionAgents[agent.key].processes[node].status = 'success';
+                            }
                             executionAgents[agent.key].status = "available";
                         }
                         MapExecutionLog.create({
