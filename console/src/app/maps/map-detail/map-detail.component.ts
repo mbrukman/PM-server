@@ -44,7 +44,6 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         if (!map) {
           this.router.navigate(['NotFound']);
         }
-        console.log(map);
         this.map = map;
         this.originalMap = _.cloneDeep(map);
         this.mapsService.setCurrentMap(map);
@@ -136,12 +135,13 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       delete this.mapStructure._id;
       delete this.mapStructure.id;
       delete this.mapStructure.createdAt;
-      this.mapsService.createMapStructure(this.map.id, this.mapStructure).subscribe(() => {
-        this.originalMapStructure = _.cloneDeep(this.mapStructure);
+      this.mapsService.createMapStructure(this.map.id, this.mapStructure).subscribe((structure) => {
+        this.originalMapStructure = Object.assign({}, this.mapStructure);
         this.structureEdited = false;
-        this.structuresList.push(this.mapStructure);
+        this.structuresList.unshift(structure);
+        this.mapStructure.id = structure.id;
       }, error => {
-        console.log(error);
+        console.log('Error saving map', error);
       });
     }
 
