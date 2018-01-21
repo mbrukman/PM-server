@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { MapsService } from '../maps.service';
-import { MapResult } from '../models/execution-result.model';
+import { MapsService } from '../../maps/maps.service';
+import { MapResult } from '../../maps/models/execution-result.model';
 
 @Component({
   selector: 'app-dashboard',

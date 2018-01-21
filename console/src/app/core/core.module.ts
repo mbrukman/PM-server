@@ -10,6 +10,7 @@ import { SharedModule } from '../shared/shared.module';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 @NgModule({
   imports: [
@@ -24,7 +25,11 @@ import { NotFoundComponent } from './not-found/not-found.component';
   declarations: [
     AppComponent,
     SearchComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    DashboardComponent
+  ],
+  exports: [
+    DashboardComponent
   ]
 })
 export class CoreModule { }

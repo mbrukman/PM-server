@@ -10,7 +10,7 @@ import { MapPropertiesComponent } from './map-detail/map-properties/map-properti
 import { UnsavedGuard } from '../shared/guards/unsaved.guard';
 import { MapCreateComponent } from './map-create/map-create.component';
 import { MapResultComponent } from './map-detail/map-result/map-result.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { DashboardComponent } from '../core/dashboard/dashboard.component';
 
 const routes: Routes = [
   {
@@ -18,10 +18,7 @@ const routes: Routes = [
     component: MapsListComponent,
     pathMatch: 'full'
   },
-  {
-    path: 'dashboard',
-    component: DashboardComponent
-  },
+
   {
     path: 'create',
     component: MapCreateComponent
