@@ -68,6 +68,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
   getExecutionList() {
     this.executionListReq = this.mapsService.executionResults(this.map.id).subscribe(executions => {
       this.executionsList = executions;
+      if (!executions) {
+        return ;
+      }
       this.selectExecution(executions[0].id);
     });
   }

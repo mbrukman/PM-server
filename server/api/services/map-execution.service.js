@@ -602,11 +602,12 @@ function executeAction(map, process, action, plugin, agent, executionContext, ex
                     };
                 }
                 executionAgents[agent.key].processes[process.uuid].actions[key].finishTime = new Date();
+
+                let actionString = `+ ${plugin.name} - ${method.name}: `;
+                for (let i in action.params) {
+                    actionString += `${i}: ${action.params[i]}`;
+                }
                 if (!error && response.statusCode === 200) {
-                    let actionString = `+ ${plugin.name} - ${method.name}: `;
-                    for (let i in action.params) {
-                        actionString += `${i}: ${action.params[i]}`;
-                    }
                     body.stdout = actionString + '\n' + body.stdout;
                     executionAgents[agent.key].processes[process.uuid].actions[key].status = "success";
                     executionAgents[agent.key].processes[process.uuid].actions[key].result = body;
@@ -654,10 +655,13 @@ function executeAction(map, process, action, plugin, agent, executionContext, ex
                     });
                 }
                 else {
-                    let res = body.error;
+                    let res = body;
                     if (!res) {
-                        res = error;
+                        res = { stdout: actionString, result: error };
+                    } else {
+                        res.stdout = actionString + '\n' + body.stdout;
                     }
+
                     MapExecutionLog.create({
                         map: map._id,
                         runId: executionContext.runId,
@@ -667,7 +671,8 @@ function executeAction(map, process, action, plugin, agent, executionContext, ex
                         socket.emit('update', log);
                     });
                     executionAgents[agent.key].processes[process.uuid].actions[key].status = "error";
-                    executionAgents[agent.key].processes[process.uuid].actions[key].result = "Error " + res;
+                    executionAgents[agent.key].processes[process.uuid].actions[key].result = res;
+
 
                     if (action.mandatory) {
                         console.log("The action was mandatory, its a fatal error");
@@ -758,6 +763,6 @@ module.exports = {
     },
 
     list: () => {
-        return MapResult.find({}, null, {sort: {startTime: -1}}).populate({ path: 'map', select: 'name' });
+        return MapResult.find({}, null, { sort: { startTime: -1 } }).populate({ path: 'map', select: 'name' });
     }
 };
