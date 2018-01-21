@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { SocketService } from '../shared/socket.service';
-import { Subscription } from 'rxjs/Subscription';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
+import { Subscription } from 'rxjs/Subscription';
+import 'rxjs/operators/filter'
 import { ToastyService, ToastyConfig, ToastOptions, ToastData } from 'ng2-toasty';
+
+import { SocketService } from '../shared/socket.service';
+
 
 @Component({
   selector: 'app-root',
@@ -13,13 +17,16 @@ export class AppComponent implements OnInit {
   title = 'app';
   search: boolean = false;
   notificationSubscription: Subscription;
+  subRoute: any;
+  isMapsActive: boolean;
 
-  constructor(private socketService: SocketService, private toastyService: ToastyService, private toastyConfig: ToastyConfig) {
+  constructor(private router: Router, private socketService: SocketService, private toastyService: ToastyService, private toastyConfig: ToastyConfig) {
     this.toastyConfig.theme = 'material';
-    this.toastyConfig.position = "bottom-center";
+    this.toastyConfig.position = 'bottom-center';
   }
 
   ngOnInit() {
+    
     this.notificationSubscription = this.socketService.getNotificationAsObservable().subscribe(notification => {
       const toastOptions: ToastOptions = {
         title: notification.title,
@@ -42,6 +49,12 @@ export class AppComponent implements OnInit {
           return this.toastyService.warning(toastOptions);
       }
     });
+
+    this.subRoute = this.router.events
+      .filter(val => val instanceof NavigationEnd)
+      .subscribe(val => {
+        this.isMapsActive = (<NavigationEnd>val).urlAfterRedirects.startsWith('/maps') && !(<NavigationEnd>val).urlAfterRedirects.endsWith('dashboard');
+      });
   }
 
   toggleSearch() {
