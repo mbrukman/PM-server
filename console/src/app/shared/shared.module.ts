@@ -7,6 +7,8 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+
 
 import { FilterPipe } from './filter.pipe';
 import { TruncatecharsPipe } from './truncatechars.pipe';
@@ -31,7 +33,8 @@ import { LinebreakPipe } from './linebreak.pipe';
     ModalModule.forRoot(),
     AccordionModule.forRoot(),
     TooltipModule.forRoot(),
-    DropdownModule
+    DropdownModule,
+    NgxChartsModule
   ],
   declarations: [
     FilterPipe,
@@ -50,8 +53,9 @@ import { LinebreakPipe } from './linebreak.pipe';
     TreeTableModule,
     PrimeSharedModule,
     DataTableModule,
-    InfiniteScrollDirective,
+    NgxChartsModule,
     DropdownModule,
+    InfiniteScrollDirective,
     ConfirmComponent,
     LinebreakPipe
   ],

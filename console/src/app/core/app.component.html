@@ -2,10 +2,10 @@
   <div class="pm-sidebar">
     <img src="/assets/images/pm.png" alt=""/>
     <ul class="nav flex-column">
-      <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" routerLink="/maps/dashboard"
+      <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <a class="nav-link" routerLink=""
            tooltip="Dashboard"
-           placement="right"><i class="material-icons">dashboard</i></a>
+           placement="right"><i class="icon-dashboard" aria-hidden="true"></i></a>
       </li>
 
       <li class="nav-item" routerLinkActive="active">

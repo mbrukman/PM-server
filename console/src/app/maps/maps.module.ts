@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { MonacoEditorModule } from 'ngx-monaco-editor';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
@@ -30,7 +29,6 @@ import { MapCreateComponent } from './map-create/map-create.component';
 import { MapEnvironmentPaneComponent } from './map-detail/map-edit/map-enviroment-pane/map-environment-pane.component';
 import { MapResultComponent } from './map-detail/map-result/map-result.component';
 import { ProcessResultComponent } from './map-detail/map-result/process-result/process-result.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 
 
 @NgModule({
@@ -39,7 +37,6 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     MapsRoutingModule,
     SharedModule,
     MonacoEditorModule.forRoot(),
-    NgxChartsModule,
     BsDropdownModule,
     ModalModule,
     AccordionModule,
@@ -65,7 +62,6 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     PluginToolboxComponent,
     MapResultComponent,
     ProcessResultComponent,
-    DashboardComponent,
   ],
   entryComponents: [SelectAgentComponent, AddAttributeComponent, TriggerFormComponent]
 })
