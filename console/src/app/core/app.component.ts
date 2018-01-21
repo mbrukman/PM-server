@@ -17,8 +17,6 @@ export class AppComponent implements OnInit {
   title = 'app';
   search: boolean = false;
   notificationSubscription: Subscription;
-  subRoute: any;
-  isMapsActive: boolean;
 
   constructor(private router: Router, private socketService: SocketService, private toastyService: ToastyService, private toastyConfig: ToastyConfig) {
     this.toastyConfig.theme = 'material';
@@ -26,7 +24,6 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    
     this.notificationSubscription = this.socketService.getNotificationAsObservable().subscribe(notification => {
       const toastOptions: ToastOptions = {
         title: notification.title,
@@ -49,12 +46,6 @@ export class AppComponent implements OnInit {
           return this.toastyService.warning(toastOptions);
       }
     });
-
-    this.subRoute = this.router.events
-      .filter(val => val instanceof NavigationEnd)
-      .subscribe(val => {
-        this.isMapsActive = (<NavigationEnd>val).urlAfterRedirects.startsWith('/maps') && !(<NavigationEnd>val).urlAfterRedirects.endsWith('dashboard');
-      });
   }
 
   toggleSearch() {
