@@ -38,11 +38,10 @@ div {
       margin-bottom: 5px;
     }
   }
-  button[type="submit"] {
-    width: 90%;
-    margin-left: 20px;
-    position: absolute;
-    bottom: 0;
+  .pane-bottom {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
   }
 }
 
