@@ -30,6 +30,9 @@
 .icon-zoom2:before {
   content: "\e906";
 }
+.icon-dashboard:before {
+  content: "\e90b";
+}
 .icon-plugins:before {
   content: "\e907";
 }
