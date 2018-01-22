@@ -50,6 +50,25 @@ export class MapRevisionsComponent implements OnInit {
     });
     this.defineShape();
     this.paper.scale(0.75, 0.75);
+    this.addPaperDrag();
+  }
+
+  addPaperDrag() {
+    let initialPosition = { x: 0, y: 0 };
+    let move = false;
+    this.paper.on('blank:pointerdown', (event, x, y) => {
+      initialPosition = { x: x * 0.75, y: y * 0.75 };
+      move = true;
+    });
+
+    $('#graph').mousemove((event) => {
+      if (move)
+        this.paper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
+    });
+
+    this.paper.on('blank:pointerup', (event, x, y) => {
+      move = false;
+    });
   }
 
   getMapStructures(page: number) {
@@ -160,7 +179,7 @@ export class MapRevisionsComponent implements OnInit {
 
   loadRevisions() {
     if (!this.morePages) {
-      return ;
+      return;
     }
     this.page++;
     this.getMapStructures(this.page);
