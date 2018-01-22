@@ -1,12 +1,14 @@
 <div class="main">
   <div class="row">
     <div class="col-12">
-      <h3>{{ map?.description }}</h3>
+      <p [(inlineEdit)]="map.description" (valueChanged)="onMapUpdate()" *ngIf="map"></p>
       <a routerLink="/maps/update" [queryParams]="{'map': map?.id}" class="btn btn-primary">Edit <i class="material-icons">mode_edit</i></a>
       <button class="btn btn-success" (click)="archiveMap()">Archive <i class="material-icons">archive</i></button>
       <hr class="my-4">
       <p>Created at: {{ map?.createdAt | date: 'short'}}</p>
-      <p>Licence: {{ map?.licence? map.licence: 'Not provided' }}</p>
+      <p >Licence:
+        <span [(inlineEdit)]="map.licence" (valueChanged)="onMapUpdate()" *ngIf="map">{{ map?.licence? map.licence: 'Not provided' }}</span>
+      </p>
     </div>
   </div>
 </div>
