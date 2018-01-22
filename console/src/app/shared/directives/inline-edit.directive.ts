@@ -26,6 +26,7 @@ export class InlineEditDirective implements AfterViewInit, OnChanges {
 
   constructor(private elm: ElementRef, private renderer: Renderer2) {
     this.renderer.setAttribute(this.elm.nativeElement, 'contenteditable', 'true')
+    this.renderer.addClass(this.elm.nativeElement, 'pm-inline-edit')
   }
 
   ngAfterViewInit() {
