@@ -1,0 +1,14 @@
+Source: production-map
+Section: net
+Priority: optional
+Maintainer: Lior Kaplan <lior@kaplanopensource.co.il>
+Build-Depends: nodejs
+Standards-Version: 4.0.0
+Homepage: http://www.productionmap
+Vcs-Browser: https://github.com/ProductionMap/PM-server.git
+
+Package: production-map-server
+Architecture: all
+Depends: nodejs, mongodb | mongodb-orig
+Description: platform for developing and executing DevOps automations
+ https://github.com/ProductionMap/PM-server
