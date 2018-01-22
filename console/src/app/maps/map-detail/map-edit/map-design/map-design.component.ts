@@ -65,7 +65,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.paper = new joint.dia.Paper({
       el: $('#graph'),
       width: this.wrapper.nativeElement.offsetWidth,
-      height: this.wrapper.nativeElement.offsetHeight,
+      height: this.wrapper.nativeElement.offsetHeight - 80,
       gridSize: this.scale,
       model: this.graph,
       snapLinks: { radius: 75 },
