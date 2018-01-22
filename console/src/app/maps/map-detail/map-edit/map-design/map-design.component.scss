@@ -12,6 +12,9 @@
   overflow-y: scroll;
   margin-left: 0;
   margin-right: 0;
+  .main {
+    overflow-y: hidden;
+  }
   .map-management {
     padding: 0;
     background: $selected-tab-environment;
