@@ -10,14 +10,14 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 
-import { FilterPipe } from './filter.pipe';
+import { FilterPipe } from './pipes/filter.pipe';
 import { TruncatecharsPipe } from './truncatechars.pipe';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FeatureComponent } from './feature/feature.component';
 import { ConfirmComponent } from './confirm/confirm.component';
-import { InfiniteScrollDirective } from './infinite-scroll.directive';
-import { LinebreakPipe } from './linebreak.pipe';
-
+import { InfiniteScrollDirective } from './directives/infinite-scroll.directive';
+import { LinebreakPipe } from './pipes/linebreak.pipe';
+import { InlineEditDirective } from './directives/inline-edit.directive';
 
 
 @NgModule({
@@ -42,6 +42,7 @@ import { LinebreakPipe } from './linebreak.pipe';
     FeatureComponent,
     ConfirmComponent,
     InfiniteScrollDirective,
+    InlineEditDirective,
     LinebreakPipe
   ],
   exports: [
@@ -56,6 +57,7 @@ import { LinebreakPipe } from './linebreak.pipe';
     NgxChartsModule,
     DropdownModule,
     InfiniteScrollDirective,
+    InlineEditDirective,
     ConfirmComponent,
     LinebreakPipe
   ],
