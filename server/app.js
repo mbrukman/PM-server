@@ -34,15 +34,29 @@ io.on('connection', function (socket) {
 });
 
 
-const db = (process.env.MONGO_HOST || 'localhost') + ":" + (process.env.MONGO_PORT || 27017) + "/" + (process.env.DB_NAME || 'refactor');
-/* Connect to db */
-mongoose.connect(`mongodb://${db}`, {
-    useMongoClient: true
-}).then(() => {
-    console.log(`Succesfully Connected to the Mongodb Database  at URL : mongodb://127.0.0.1:27017/refactor`);
-}).catch(() => {
-    console.log(`Error Connecting to the Mongodb`);
-});
+let dbconfig;
+try {
+    dbconfig = require("./env/dbconfig");
+} catch (e) {
+    dbconfig = null;
+}
+
+if (dbconfig) {
+    if (dbconfig.username && dbconfig.password) {
+        connectionString = `mongodb://${dbconfig.username}:${dbconfig.password}@${dbconfig.url}:${dbconfig.port}/${dbconfig.name}`;
+    } else {
+        connectionString = `mongodb://${dbconfig.url}:${dbconfig.port}/${dbconfig.name}`;
+    }
+
+    mongoose.connect((dbconfig.uri || connectionString), {
+        useMongoClient: true
+    }).then(() => {
+        console.log(`Succesfully Connected to the Mongodb Database`);
+    }).catch((error) => {
+        return res.status(500).send((error || `Error Connecting to the Mongodb`));
+    });
+}
+
 mongoose.Promise = require('bluebird');
 
 app.use(bodyParser.urlencoded({

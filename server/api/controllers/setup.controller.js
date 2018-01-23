@@ -18,7 +18,6 @@ module.exports = {
     },
 
     setupDbConnectionString: (req, res) => {
-
         const dbDetails = req.body;
         let connectionString;
         if (!dbDetails.uri && !(dbDetails.url && dbDetails.port && dbDetails.name)) {
@@ -39,7 +38,7 @@ module.exports = {
                     throw new Error(err);
                 }
                 dbconfig = require("../../env/dbconfig");
-                return res.send("OK");
+                return res.status(204).send();
             });
         }).catch((error) => {
             return res.status(500).send((error || `Error Connecting to the Mongodb`));
