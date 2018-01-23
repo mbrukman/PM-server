@@ -14,6 +14,7 @@ import { AgentsService } from './agents/agents.service';
 import { ProjectsService } from './projects/projects.service';
 import { CalendarService } from './calendar/calendar.service';
 import { CoreModule } from './core/core.module';
+import { SetupService } from './core/setup/setup.service';
 
 
 @NgModule({
@@ -28,7 +29,7 @@ import { CoreModule } from './core/core.module';
 
     AppRoutingModule,
   ],
-  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard],
+  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SetupService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
