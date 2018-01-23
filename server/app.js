@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const bootstrap = require("./helpers/bootstrap").bootstrap;
 const socket = require('socket.io');
-
+const env = require('./env/enviroment');
 const app = express();
 
 /////////////////////
@@ -66,11 +66,13 @@ app.use('/media', express.static(path.join(__dirname, 'media_cdn')));
 ////////////////////
 
 /* api references */
+const setupApi = require("./api/routes/setup.routes");
 const mapsApi = require("./api/routes/maps.routes");
 const pluginsApi = require("./api/routes/plugins.routes");
 const agentsApi = require("./api/routes/agents.routes");
 const projectsApi = require("./api/routes/projects.routes");
 
+app.use('/api/setup', setupApi);
 app.use('/api/maps', mapsApi);
 app.use('/api/plugins', pluginsApi);
 app.use('/api/agents', agentsApi);
