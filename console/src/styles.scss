@@ -36,7 +36,7 @@ input, textarea, select {
   outline: none !important;
   color: $greyish-text !important;
   &.ng-invalid.ng-touched {
-    border: 1px solid $error;
+    border: 1px solid $error !important;
   }
   &:focus {
     outline-style: none;
