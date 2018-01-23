@@ -41,6 +41,7 @@ module.exports = {
                 return res.status(204).send();
             });
         }).catch((error) => {
+            req.io.emit('notification', { title: 'Error configuring db', message: `${error}`, type: 'error' });
             return res.status(500).send((error || `Error Connecting to the Mongodb`));
         });
 
