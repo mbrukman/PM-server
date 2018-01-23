@@ -46,7 +46,7 @@ export class MapTriggersComponent implements OnInit, OnDestroy {
 
   openTriggerFormModal(index?) {
     let edit = false;
-    if (index !== null) {
+    if (index || index===0) {
       edit = true;
     }
     let modal: BsModalRef;
@@ -61,7 +61,6 @@ export class MapTriggersComponent implements OnInit, OnDestroy {
         result._id = this.triggers[index]._id;
         this.triggers[index] = result;
         this.mapsService.updateTrigger(this.map.id, result).subscribe(trigger => {
-          console.log(trigger);
           this.triggers[index] = trigger;
         });
       }

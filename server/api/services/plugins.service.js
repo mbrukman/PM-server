@@ -31,29 +31,39 @@ function installPluginOnAgent(pluginDir, obj) {
 }
 
 /*
-* load plugin module.
-* the function get a plugin (db model) and the express app (can be found in req.app).
-* then it will load and map the routing of the plugin.
-* this enables dynamic loading of plugin routes.
-* */
+ * load plugin module.
+ * the function get a plugin (db model) and the express app (can be found in req.app).
+ * then it will load and map the routing of the plugin.
+ * this enables dynamic loading of plugin routes.
+ * */
 function loadModule(plugin, app) {
-    let fullPath = path.join(pluginsPath, plugin.name, plugin.main);
-    plugin.dir = path.dirname(fullPath);
-    let pluginModule = require("../../libs/plugins/GithubTrigger/app");
-    plugin.methods.forEach(method => {
-        if (method.route) {
-            let route = method.route.split(" ");
-            if (route[0] === "post" || route[0] === "*") {
-                app.post(route[1], pluginModule[method.name]);
-            } else if (route[0] === "get" || route[0] === "*") {
-                app.get(route[1], pluginModule[method.name]);
-            } else if (route[0] === "put" || route[0] === "*") {
-                app.put(route[1], pluginModule[method.name]);
-            } else if (route[0] === "delete" || route[0] === "*") {
-                app.delete(route[1], pluginModule[method.name]);
+    const wildcard = app._router.stack.pop(); // the wildcard point to the angular app and it should always be the last route in the router stack
+
+    try {
+        let fullPath = path.join(pluginsPath, plugin.name, plugin.main);
+        plugin.dir = path.dirname(fullPath);
+        let pluginModule = require(path.join(path.dirname(fullPath), path.basename(fullPath, path.extname(fullPath))));
+        plugin.methods.forEach(method => {
+            if (method.route) {
+                let route = method.route.split(" ");
+                if (route.length === 2) {
+                    if (route[0] === "post" || route[0] === "*") {
+                        app.post(route[1], pluginModule[method.name]);
+                    } else if (route[0] === "get" || route[0] === "*") {
+                        app.get(route[1], pluginModule[method.name]);
+                    } else if (route[0] === "put" || route[0] === "*") {
+                        app.put(route[1], pluginModule[method.name]);
+                    } else if (route[0] === "delete" || route[0] === "*") {
+                        app.delete(route[1], pluginModule[method.name]);
+                    }
+                }
             }
-        }
-    });
+        });
+    } catch (e) {
+        console.log("Error binding new routes", e);
+    }
+
+    app._router.stack.push(wildcard);
 }
 
 function installPluginOnServer(pluginDir, obj) {
@@ -67,10 +77,12 @@ function installPluginOnServer(pluginDir, obj) {
         fs.createReadStream(pluginDir)
             .pipe(unzip.Parse())
             .on('entry', (entry) => {
+                console.log("Entry", entry);
                 let fileName = entry.path;
                 entry.pipe(fs.createWriteStream(path.join(outputPath, fileName)));
             }).on('close', (data) => {
             // when done unzipping, install the packages.
+            console.log("Close");
             let cmd = 'cd ' + outputPath + ' &&' + ' npm install ' + " && cd " + outputPath;
             child_process.exec(cmd, function (error, stdout, stderr) {
                 if (error) {
@@ -118,6 +130,7 @@ function deployPluginFile(pluginPath, req) {
 
                             }
                             else if (obj.type === "trigger" || obj.type === "module" || obj.type === "server") {
+                                console.log("REALLY?");
                                 installPluginOnServer(pluginPath, obj).then(() => {
                                     loadModule(plugin, req.app);
                                     resolve(plugin);
@@ -170,8 +183,7 @@ module.exports = {
     },
     /* load server plugins modules */
     loadModules: (app) => {
-        console.log("load modules");
-        Plugin.find({ type: { $in: ['module', 'trigger', 'server'] } }).then(plugins=> {
+        Plugin.find({ type: { $in: ['module', 'trigger', 'server'] } }).then(plugins => {
             plugins.forEach(plugin => {
                 loadModule(plugin, app);
             })
