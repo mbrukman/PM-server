@@ -1,0 +1,50 @@
+<div class="container-fluid">
+  <p class="lead">Hi! great to have you here.</p>
+  <p>Let us help you setup your db.</p>
+  <div class="col-6">
+    <p>How do you want to provide database login information?</p>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="type" id="type1" value="uri" [(ngModel)]="type">
+      <label class="form-check-label">URI</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="type" id="type2" value="details" [(ngModel)]="type">
+      <label class="form-check-label">Details</label>
+    </div>
+
+    <div [ngSwitch]="type">
+
+      <form [formGroup]="detailsForm" (ngSubmit)="onSubmitForm(detailsForm.value)" *ngSwitchCase="'details'">
+        <div class="form-group">
+          <label>URL</label>
+          <input type="text" class="form-control" formControlName="url">
+        </div>
+        <div class="form-group">
+          <label>port</label>
+          <input type="text" class="form-control" formControlName="port">
+        </div>
+        <div class="form-group">
+          <label>DB name</label>
+          <input type="text" class="form-control" formControlName="name">
+        </div>
+        <div class="form-group">
+          <label>username</label>
+          <input type="text" class="form-control" formControlName="username">
+        </div>
+        <div class="form-group">
+          <label>password</label>
+          <input type="password" class="form-control" formControlName="password">
+        </div>
+        <button class="btn pm" [disabled]="detailsForm.invalid">Set up</button>
+      </form>
+
+      <form [formGroup]="URIForm" (ngSubmit)="onSubmitForm(URIForm.value)" *ngSwitchCase="'uri'">
+        <div class="form-group">
+          <label>URI</label>
+          <input type="text" class="form-control" formControlName="uri">
+        </div>
+        <button class="btn pm" [disabled]="URIForm.invalid">Set up</button>
+      </form>
+    </div>
+  </div>
+</div>
