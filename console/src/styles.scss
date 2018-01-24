@@ -31,13 +31,10 @@ html, body {
 }
 
 input, textarea, select {
-  @extend .dark-input;
-}
-
-input, textarea, select {
   border: 1px solid $input-border !important;
   background-color: $input-bg !important;
   outline: none !important;
+  color: $greyish-text !important;
   &.ng-invalid.ng-touched {
     border: 1px solid $error;
   }
@@ -377,5 +374,15 @@ rect.body {
     border: 1px solid $input-border !important;
     background-color: $input-bg !important;
     color: $greyish-text;
+  }
+}
+
+.pm-inline-edit {
+  &:hover, &:focus {
+    background: $input-bg;
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid $input-border;
+    outline: none !important;
   }
 }

@@ -74,7 +74,7 @@ export class MapsService {
   }
 
   updateMap(mapId: string, map: Map) {
-    return this.http.put<Map>(`${serverUrl}api/maps/${mapId}/update`, map, { responseType: 'text' as 'json' });
+    return this.http.put<string>(`${serverUrl}api/maps/${mapId}/update`, map, { responseType: 'text' as 'json' });
   }
 
   /* map execution */
