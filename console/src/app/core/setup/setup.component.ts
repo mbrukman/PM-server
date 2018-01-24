@@ -11,8 +11,6 @@ import { Router } from '@angular/router';
 })
 export class SetupComponent implements OnInit, OnDestroy {
   URIForm: FormGroup;
-  detailsForm: FormGroup;
-  type: string;
   setupReq: any;
 
   constructor(private router: Router, private setupService: SetupService, private notificationService: SocketService) {
@@ -32,13 +30,6 @@ export class SetupComponent implements OnInit, OnDestroy {
     this.URIForm = new FormGroup({
       uri: new FormControl(null, Validators.required)
     });
-    this.detailsForm = new FormGroup({
-      url: new FormControl(null, Validators.required),
-      port: new FormControl(null, Validators.required),
-      username: new FormControl(),
-      password: new FormControl(),
-      name: new FormControl(null, Validators.required)
-    });
   }
 
   onSubmitForm(form) {
@@ -51,6 +42,10 @@ export class SetupComponent implements OnInit, OnDestroy {
         this.router.navigate(['/']);
       }, error => {
         console.log(error);
+        this.notificationService.setNotification({
+          title: 'No connection',
+          msg: `We ran to an error trying to connect to the db: ${error}`
+        });
       });
   }
 

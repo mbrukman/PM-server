@@ -19,31 +19,29 @@ module.exports = {
 
     setupDbConnectionString: (req, res) => {
         const dbDetails = req.body;
-        let connectionString;
-        if (!dbDetails.uri && !(dbDetails.url && dbDetails.port && dbDetails.name)) {
+        if (!dbDetails.uri) {
             return res.status(500).send('Missing parameters')
         }
-        if (dbDetails.username && dbDetails.password) {
-            connectionString = `mongodb://${dbDetails.username}:${dbDetails.password}@${dbDetails.url}:${dbDetails.port}/${dbDetails.name}`;
-        } else {
-            connectionString = `mongodb://${dbDetails.url}:${dbDetails.port}/${dbDetails.name}`;
-        }
-
-        mongoose.connect((dbDetails.uri || connectionString), {
+        mongoose.connect(dbDetails.uri, {
             useMongoClient: true
-        }).then(() => {
-            console.log(`Succesfully Connected to the Mongodb Database  at URL : mongodb://127.0.0.1:27017/refactor`);
-            fs.writeFile('./env/dbconfig.json', JSON.stringify(dbDetails), (err) => {
-                if (err) {
-                    throw new Error(err);
-                }
-                dbconfig = require("../../env/dbconfig");
-                return res.status(204).send();
+        }, function (err) { if (err) { throw new Error(err)}})
+            .then(
+                () => {
+                    fs.writeFile('./env/dbconfig.json', JSON.stringify(dbDetails), (err) => {
+                        if (err) {
+                            throw new Error(err);
+                        }
+                        dbconfig = require("../../env/dbconfig");
+                        return res.status(204).send();
+                    });
+                },
+                err => {
+                    throw new Error(err)
+                })
+            .catch((error) => {
+                req.io.emit('notification', { title: 'Error configuring db', message: `${error}`, type: 'error' });
+                return res.status(500).send((error || `Error Connecting to the Mongodb`));
             });
-        }).catch((error) => {
-            req.io.emit('notification', { title: 'Error configuring db', message: `${error}`, type: 'error' });
-            return res.status(500).send((error || `Error Connecting to the Mongodb`));
-        });
 
     }
 };
