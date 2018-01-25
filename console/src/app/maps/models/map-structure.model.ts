@@ -30,7 +30,7 @@ export class Action implements IAction {
   retries?: number;
   order: number;
   mandatory: boolean;
-  method: PluginMethod;
+  method: PluginMethod | string;
   params?: ActionParam[];
 }
 
@@ -45,7 +45,8 @@ export class Process implements IProcess {
   postRun?: string;
   filterAgents?: string;
   actions: Action[];
-  plugin: Plugin;
+  plugin_name: string;
+  plugin?: Plugin;
   createdAt: Date;
   correlateAgents: boolean;
   uuid: string;
@@ -76,6 +77,8 @@ export class MapStructure implements IMapStructure {
   attributes?: Attribute[];
   processes?: Process[];
   links?: Link[];
+  plugins_names?: string[];
+  plugins?: Plugin[];
 
   constructor() {
     this.processes = [];

@@ -15,7 +15,7 @@ let actionSchema = new Schema({
     timeunit: Number,
     retries: Number,
     mandatory: { type: Boolean, default: false },
-    method: { type: Schema.Types.ObjectId, ref: 'Plugin.methods' },
+    method: String,
     params: [actionParamsSchema]
 });
 
@@ -31,7 +31,7 @@ let processSchema = new Schema({
     mandatory: { type: Boolean, default: false },
     condition: String,
     createdAt: { type: Date, default: Date.now },
-    plugin: { type: Schema.Types.ObjectId, ref: 'Plugin' },
+    plugin_name: { type: String, required: true },
     actions: [actionSchema],
     uuid: String
 });
@@ -66,7 +66,7 @@ let mapStructureSchema = new Schema({
     processes: [processSchema],
     code: String,
     attributes: [attributeSchema],
-    plugins: [{ type: Schema.Types.ObjectId, ref: 'Plugin' }]
+    plugins_names: [String]
 });
 
 mapStructureSchema.set('toJSON', {
