@@ -35,13 +35,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.mapSubscription = this.mapsService.getCurrentMap().subscribe(map => {
-      if (!map) {
-        return;
-      }
-      this.map = map;
-      this.getExecutionList();
-    });
+    this.mapSubscription = this.mapsService.getCurrentMap()
+      .filter(map => map)
+      .subscribe(map => {
+        this.map = map;
+        this.getExecutionList();
+      });
   }
 
   ngOnDestroy() {
@@ -66,13 +65,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
   }
 
   getExecutionList() {
-    this.executionListReq = this.mapsService.executionResults(this.map.id).subscribe(executions => {
-      this.executionsList = executions;
-      if (!executions) {
-        return ;
-      }
-      this.selectExecution(executions[0].id);
-    });
+    this.executionListReq = this.mapsService.executionResults(this.map.id)
+      .filter(executions => executions && executions.length > 0)
+      .subscribe(executions => {
+        this.executionsList = executions;
+        this.selectExecution(executions[0].id);
+      });
   }
 
   getExecutionProcessesArray(agentsResults) {
@@ -90,8 +88,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
       this.agents = result.agentsResults.map(o => {
         return { label: (<Agent>o.agent).name, value: o }
       });
-      if (this.agents.length > 1 ) {
-        this.agents.unshift({label: 'Aggregate', value: 'default'})
+      if (this.agents.length > 1) {
+        this.agents.unshift({ label: 'Aggregate', value: 'default' })
       }
       this.changeAgent();
       this.executionLogsReq = this.mapsService.logsList(this.map.id, this.selectedExecution.runId).subscribe(logs => {
@@ -121,7 +119,10 @@ export class MapResultComponent implements OnInit, OnDestroy {
       return ag[key];
     });
     this.agProcessesStatus = <[{ name: string, value: number }]>result;
-    this.selectProcess((<MapStructure>this.selectedExecution.structure).processes[0]);
+    let structure = this.selectedExecution.structure;
+    if (structure) {
+      this.selectProcess((<MapStructure>structure).processes[0])
+    }
   }
 
   selectProcess(process) {

@@ -31,13 +31,12 @@
               <div class="card-body">
                 <div class="row">
                   <div class="col-6">
-                    <h5 class="card-title">Execution {{ selectedExecution.runId }}</h5>
-                    <p>Start time: {{ selectedExecution.startTime | date: 'short' }}</p>
-                    <p>Finish time: {{ selectedExecution.finishTime | date: 'short' }}</p>
-                    <p>Structure: {{ selectedExecution.structure.id }}</p>
+                    <h5 class="card-title">Execution {{ selectedExecution?.runId }}</h5>
+                    <p>Start time: {{ selectedExecution?.startTime | date: 'short' }}</p>
+                    <p>Finish time: {{ selectedExecution?.finishTime | date: 'short' }}</p>
+                    <p>Structure: {{ selectedExecution?.structure?._id }}</p>
                   </div>
                   <div class="col-6">
-
                     <ngx-charts-pie-chart
                       [results]="agProcessesStatus"
                       [labels]="showLabels"
