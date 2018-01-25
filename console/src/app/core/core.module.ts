@@ -11,12 +11,16 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { SetupComponent } from './setup/setup.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 @NgModule({
   imports: [
     CommonModule,
     HttpClientModule,
     RouterModule,
+    FormsModule,
+    ReactiveFormsModule,
     ToastyModule.forRoot(),
     BsDropdownModule,
     TooltipModule,
@@ -26,10 +30,12 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     AppComponent,
     SearchComponent,
     NotFoundComponent,
-    DashboardComponent
+    DashboardComponent,
+    SetupComponent
   ],
   exports: [
-    DashboardComponent
+    DashboardComponent,
+    SetupComponent
   ]
 })
 export class CoreModule { }
