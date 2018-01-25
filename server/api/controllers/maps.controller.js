@@ -151,7 +151,7 @@ module.exports = {
             return mapsService.update(mapId, req.body);
         }).then((map) => {
             console.log(map);
-            return projectsService.updateMap(mapId, req.body.project);
+            return req.body.project ? projectsService.updateMap(mapId, req.body.project) : null;
         }).then(() => {
             return res.send('OK');
         }).catch((error) => {

@@ -1,34 +1,55 @@
-import { Component, OnInit, OnChanges, SimpleChanges, DoCheck } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { Subscription } from 'rxjs/Subscription';
-
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/filter';
 import { MapsService } from '../../maps.service';
 import { Map } from '../../models/map.model';
+import { ProjectsService } from '../../../projects/projects.service';
+import { Project } from '../../../projects/models/project.model';
 
 @Component({
   selector: 'app-map-metadata',
   templateUrl: './map-properties.component.html',
   styleUrls: ['./map-properties.component.scss']
 })
-export class MapPropertiesComponent implements OnInit, OnChanges {
+export class MapPropertiesComponent implements OnInit, OnDestroy {
   map: Map;
+  projects: Project[];
   mapSubscription: Subscription;
+  projectsReq: any;
+  selectedProject: string;
 
-  constructor(private mapsService: MapsService) {
+  constructor(private mapsService: MapsService, private projectsService: ProjectsService) {
   }
 
   ngOnInit() {
-    this.mapSubscription = this.mapsService.getCurrentMap().subscribe(map => {
-      this.map = map;
-    });
+    this.mapSubscription = this.mapsService.getCurrentMap()
+      .filter(map => map) // filtering empty map result
+      .do(map => this.map = map)
+      .do(map => this.selectedProject = map.project)
+      .filter(map => !this.projects)
+      .flatMap(() => this.projectsService.list())
+      .subscribe(data => {
+        this.projects = data.items;
+        let project = this.projects.find((o) => (<string[]>o.maps).indexOf(this.map.id) > -1);
+        if (project && !this.map.project) {
+          this.selectedProject = project._id;
+        }
+      });
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    console.log(changes)
+  ngOnDestroy() {
+    this.mapSubscription.unsubscribe();
   }
 
   onMapUpdate() {
     this.mapsService.setCurrentMap(this.map);
+  }
+
+  onChangeProject() {
+    let mapObj = Object.assign({}, this.map, { project: this.selectedProject });
+    this.mapsService.setCurrentMap(mapObj);
   }
 
   archiveMap() {

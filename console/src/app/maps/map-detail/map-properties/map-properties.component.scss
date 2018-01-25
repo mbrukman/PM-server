@@ -4,3 +4,10 @@
 .main {
   @extend .reset-padding;
 }
+
+.btn {
+  &.pm {
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+}

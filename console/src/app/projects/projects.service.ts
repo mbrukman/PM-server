@@ -45,7 +45,7 @@ export class ProjectsService {
   }
 
   list() {
-    return this.http.get<[Project]>(serverUrl + 'api/projects');
+    return this.http.get<{ totalCount: number, items: Project[] }>(serverUrl + 'api/projects');
   }
 
   update(projectId, project) {
