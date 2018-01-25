@@ -1,6 +1,15 @@
 <div class="main">
   <div class="row">
     <div class="col-12">
+      <div class="form-row">
+        <p class="col-4">
+          Project:
+          <select class="form-control" [(ngModel)]="selectedProject" id="project" (change)="onChangeProject()">
+            <option disabled>Select a project</option>
+            <option *ngFor="let project of projects" [ngValue]="project._id">{{project.name}}</option>
+          </select>
+        </p>
+      </div>
       <p>
         Description: <span [(inlineEdit)]="map.description" (valueChanged)="onMapUpdate()" *ngIf="map"></span>
       </p>

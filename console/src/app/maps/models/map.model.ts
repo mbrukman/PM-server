@@ -10,4 +10,5 @@ export class Map implements IMap {
   licence?: string;
   archived: boolean;
   agents?: [Agent];
+  project?: string;
 }
