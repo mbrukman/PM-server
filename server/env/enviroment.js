@@ -1,10 +1,7 @@
 const path = require("path");
+const config = require("./config");
 
+let static_cdn = {static_cdn: path.join(path.dirname(path.dirname(__dirname)), "static_cdn")}
+let env = Object.assign({}, static_cdn, config);
 
-module.exports = {
-    static_cdn: path.join(path.dirname(path.dirname(__dirname)), "static_cdn"),
-    upload_path: "uploads",
-    interval_time: 5000,
-    retries: 3,
-    page_size: 15
-};
+module.exports = env;
