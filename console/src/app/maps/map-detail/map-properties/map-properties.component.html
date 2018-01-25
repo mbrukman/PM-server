@@ -1,6 +1,8 @@
 <div class="main">
   <div class="row">
     <div class="col-12">
+      <button class="btn pm" (click)="archiveMap()">Archive <i class="material-icons">archive</i></button>
+
       <div class="form-row">
         <p class="col-4">
           Project:
@@ -11,9 +13,8 @@
         </p>
       </div>
       <p>
-        Description: <span [(inlineEdit)]="map.description" (valueChanged)="onMapUpdate()" *ngIf="map"></span>
+        Description: <span [(inlineEdit)]="map.description" (valueChanged)="onMapUpdate()" *ngIf="map">    </span>
       </p>
-      <button class="btn btn-success" (click)="archiveMap()">Archive <i class="material-icons">archive</i></button>
       <hr class="my-4">
       <p>Created at: {{ map?.createdAt | date: 'short'}}</p>
       <p>
