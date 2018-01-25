@@ -1,17 +1,13 @@
 const fs = require('fs');
 const hooks = require('../../libs/hooks/hooks');
 const mongoose = require('mongoose');
-let dbconfig;
-try {
-    dbconfig = require("../../env/dbconfig");
-} catch (e) {
-    dbconfig = null;
-}
-
+const env = require('../../env/enviroment');
+let config = require('../../env/config');
 
 module.exports = {
     isSetUp: (req, res) => {
-        if (dbconfig) {
+        console.log(config.dbURI);
+        if (config.dbURI) {
             return res.send(true);
         }
         return res.send(false)
@@ -22,16 +18,16 @@ module.exports = {
         if (!dbDetails.uri) {
             return res.status(500).send('Missing parameters')
         }
-        mongoose.connect(dbDetails.uri, {
-            useMongoClient: true
-        }, function (err) { if (err) { throw new Error(err)}})
+
+        mongoose.connect(dbDetails.uri, { useMongoClient: true })
             .then(
                 () => {
-                    fs.writeFile('./env/dbconfig.json', JSON.stringify(dbDetails), (err) => {
+
+                    config = Object.assign({}, config, { dbURI: dbDetails.uri });
+                    fs.writeFile('./env/config.json', JSON.stringify(config), (err) => {
                         if (err) {
                             throw new Error(err);
                         }
-                        dbconfig = require("../../env/dbconfig");
                         return res.status(204).send();
                     });
                 },

@@ -33,27 +33,12 @@ io.on('connection', function (socket) {
     console.log('a user connected');
 });
 
-
-let dbconfig;
-try {
-    dbconfig = require("./env/dbconfig");
-} catch (e) {
-    dbconfig = null;
-}
-
-if (dbconfig) {
-    if (dbconfig.username && dbconfig.password) {
-        connectionString = `mongodb://${dbconfig.username}:${dbconfig.password}@${dbconfig.url}:${dbconfig.port}/${dbconfig.name}`;
-    } else {
-        connectionString = `mongodb://${dbconfig.url}:${dbconfig.port}/${dbconfig.name}`;
-    }
-
-    mongoose.connect((dbconfig.uri || connectionString), {
+if (env.dbURI) {
+    console.log('--', env.dbURI);
+    mongoose.connect(env.dbURI, {
         useMongoClient: true
     }).then(() => {
         console.log(`Succesfully Connected to the Mongodb Database`);
-    }).catch((error) => {
-        return res.status(500).send((error || `Error Connecting to the Mongodb`));
     });
 }
 
