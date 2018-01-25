@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 export class SetupComponent implements OnInit, OnDestroy {
   URIForm: FormGroup;
   setupReq: any;
+  error: string;
 
   constructor(private router: Router, private setupService: SetupService, private notificationService: SocketService) {
   }
@@ -41,10 +42,12 @@ export class SetupComponent implements OnInit, OnDestroy {
         });
         this.router.navigate(['/']);
       }, error => {
-        console.log(error);
+        error = typeof error === 'object' ? JSON.stringify(error) : error;
+        this.error = 'Error trying to connect to db';
+
         this.notificationService.setNotification({
           title: 'No connection',
-          msg: `We ran to an error trying to connect to the db: ${error}`
+          msg: `There was an error connecting to db: ${error}`
         });
       });
   }

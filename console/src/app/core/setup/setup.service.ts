@@ -15,7 +15,6 @@ export class SetupService {
   }
 
   setupDbConnectionString(data) {
-    console.log(data);
     return this.http.post(`${serverUrl}api/setup/db`, data);
   }
 }
