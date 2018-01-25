@@ -170,6 +170,7 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
         MapResult.create({
             map: mapId,
             runId: runId,
+            structure: structure._id,
             startTime: new Date()
         }).then(result => {
             mapResult = result;
