@@ -2,6 +2,7 @@ import { IPluginMethodParam } from "../../plugins/interfaces/plugin-method-param
 import { IPluginMethod } from "../../plugins/interfaces/plugin-method.interface";
 import { IPlugin } from "../../plugins/interfaces/plugin.interface";
 import { IAttribute } from "./attribute.interface";
+import { Plugin } from '../../plugins/models/plugin.model';
 
 export interface IActionParam {
   id?: string;
@@ -22,7 +23,7 @@ export interface IAction {
   retries?: number,
   order: number,
   mandatory: boolean,
-  method: IPluginMethod,
+  method: IPluginMethod | string,
   params?: IActionParam[]
 }
 
@@ -37,7 +38,8 @@ export interface IProcess {
   postRun?: string,
   filterAgents?: string,
   actions: IAction[],
-  plugin: IPlugin,
+  plugin_name: string,
+  plugin?: IPlugin,
   createdAt: Date,
   correlateAgents: boolean,
   uuid: string
@@ -62,6 +64,7 @@ export interface IMapStructure {
   attributes?: IAttribute[],
   processes?: IProcess[],
   links?: ILink[]
-
+  plugins_names?: string[];
+  plugins?: Plugin[];
 }
 

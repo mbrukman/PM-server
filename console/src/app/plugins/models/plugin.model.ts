@@ -10,7 +10,7 @@ export class Plugin implements IPlugin {
   description?: string;
   execProgram: string;
   active: boolean;
-  version?: string;
+  version: string;
   imgUrl?: string;
   methods?: [PluginMethod]
 }

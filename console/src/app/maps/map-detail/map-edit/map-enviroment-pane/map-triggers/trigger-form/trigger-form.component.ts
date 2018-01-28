@@ -38,9 +38,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
         this.initTriggerForm();
         if (this.trigger) {
           this.onSelectTrigger();
-          this.method = _.find(this.plugin.methods, (o) => {
-            return o._id === this.triggerForm.value.method
-          });
+          this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method);
           let paramsControl = <FormArray>this.triggerForm.controls['params'];
           this.trigger.params.forEach(param => {
             paramsControl.push(this.initParamsForm(param.value, param.param, param.viewName, param.name));
@@ -83,15 +81,11 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
   }
 
   onSelectTrigger() {
-    this.plugin = _.find(this.triggers, (o) => {
-      return o._id === this.triggerForm.value.plugin
-    });
+    this.plugin = _.find(this.triggers, (o) => o.name === this.triggerForm.value.plugin);
   }
 
   onSelectMethod() {
-    this.method = _.find(this.plugin.methods, (o) => {
-      return o._id === this.triggerForm.value.method
-    });
+    this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method);
     let paramsControl = <FormArray>this.triggerForm.controls['params'];
     this.method.params.forEach(param => {
       paramsControl.push(this.initParamsForm(param.value, param._id, param.viewName, param.name));

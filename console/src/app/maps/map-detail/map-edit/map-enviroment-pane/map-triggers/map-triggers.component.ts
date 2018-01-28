@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from "@angular/router";
 
 import { MapsService } from "../../../../maps.service";
 import { MapTrigger } from "../../../../models/map-trigger.model";
@@ -19,7 +18,6 @@ export class MapTriggersComponent implements OnInit, OnDestroy {
   id: string;
   map: Map;
   triggerReq: any;
-  triggerCreateReq: any;
   deleteReq: any;
   resultSubscription: Subscription;
 
