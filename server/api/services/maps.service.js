@@ -8,7 +8,7 @@ const PAGE_SIZE = env.page_size;
 function getMapPlugins(mapStructure) {
     let plugins = new Set();
     mapStructure.processes.forEach(process => {
-        plugins.add(process.plugin);
+        plugins.add(process.plugin_name);
     });
     return Array.from(plugins);
 }
@@ -29,7 +29,7 @@ module.exports = {
     },
     /* Create a map structure*/
     createStructure: (structure) => {
-        structure.plugins = getMapPlugins(structure);
+        structure.plugins_names = getMapPlugins(structure);
         return MapStructure.create(structure)
     },
     filter: (query = {}) => {
