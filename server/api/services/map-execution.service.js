@@ -174,7 +174,8 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
             startTime: new Date()
         }).then(result => {
             mapResult = result;
-            return pluginsService.filterPlugins({ name: { $in: structure.plugins_names } })
+            const names = structure.used_plugins.map(plugin => plugin.name);
+            return pluginsService.filterPlugins({ name: { $in: names } })
         }).then(plugins => {
             executionContext.plugins = plugins;
             executeProcess(map, mapGraph, startNode, Object.assign({}, executionContext), executionAgents, socket, mapResult);
@@ -222,7 +223,17 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
 
     let process = mapGraph.node(node);
     let agents = filterAgents(executionAgents); // get all available agents (not running or stopped);
-    let plugin = executionContext.plugins.find((o) => (o.name.toString() === process.plugin_name) || (o.name === process.plugin_name));
+    let plugin = executionContext.plugins.find((o) => (o.name.toString() === process.used_plugin.name) || (o.name === process.used_plugin.name));
+    if (plugin.version !== process.used_plugin.version) {
+        MapExecutionLog.create({
+            map: map._id,
+            runId: executionContext.runId,
+            message: `'${process.name}': Deprecated warning: Process used plugin version ${process.used_plugin.version} while ${plugin.version} is installed.`,
+            status: 'info'
+        }).then((log) => {
+            socket.emit('update', log);
+        });
+    }
     async.each(agents,
         (agent, agentCb) => {
             if (!executionAgents[agent.key].startTime)
