@@ -222,7 +222,7 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
 
     let process = mapGraph.node(node);
     let agents = filterAgents(executionAgents); // get all available agents (not running or stopped);
-    let plugin = executionContext.plugins.find((o) => o.name.toString() === process.plugin_name);
+    let plugin = executionContext.plugins.find((o) => (o.name.toString() === process.plugin_name) || (o.name === process.plugin_name));
     async.each(agents,
         (agent, agentCb) => {
             if (!executionAgents[agent.key].startTime)
