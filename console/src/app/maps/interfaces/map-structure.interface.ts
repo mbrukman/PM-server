@@ -46,12 +46,12 @@ export interface IProcess {
 }
 
 export interface ILink {
-  name?: string,
-  correlateAgents?: boolean,
-  condition?: string,
+  id?: string,
+  _id?: string,
   sourceId: string,
   targetId: string,
-  uuid?: string
+  uuid?: string,
+  createdAt?: Date
 }
 
 export interface IMapStructure {
