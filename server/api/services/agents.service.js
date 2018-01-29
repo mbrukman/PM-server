@@ -36,6 +36,7 @@ let followAgentStatus = (agent) => {
                     agents[agent.key].url = agent.url;
                     agents[agent.key].id = agent.id;
                     agents[agent.key].key = agent.key;
+                    agents[agent.key].installed_plugins = body.info.installed_plugins;
                     agents[agent.key].liveCounter = LIVE_COUNTER;
                 } else if ((--agents[agent.key].liveCounter) === 0) {
                     agents[agent.key].alive = false;
