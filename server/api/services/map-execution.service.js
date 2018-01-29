@@ -178,6 +178,33 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
             return pluginsService.filterPlugins({ name: { $in: names } })
         }).then(plugins => {
             executionContext.plugins = plugins;
+            Object.keys(agents).forEach(key => {
+                // check if agents has the right version of the plugins.
+                const filesPaths = plugins.reduce((total, current) => {
+                    if (current.version !== agents[key].installed_plugins[current.name]) {
+                        total.push(current.file);
+                    }
+                    return total;
+                }, []);
+
+                if (filesPaths && filesPaths.length > 0) {
+                    async.each(filesPaths,
+                        function (filePath, callback) {
+                            agentsService.installPluginOnAgent(filePath, agent).then(() => {
+                            }).catch((e) => {
+                                console.log("Error installing on agent", e);
+                            });
+                            callback();
+                        },
+                        function (error) {
+                            if (error) {
+                                console.log("Error installing plugins on agent", error);
+                            }
+                            console.log("DONE");
+                        });
+                }
+            });
+            
             executeProcess(map, mapGraph, startNode, Object.assign({}, executionContext), executionAgents, socket, mapResult);
         });
 
