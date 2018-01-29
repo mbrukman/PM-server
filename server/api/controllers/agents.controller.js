@@ -32,9 +32,10 @@ module.exports = {
                 if (current.version !== agentsPlugin[current.name]) {
                     total.push(current.file);
                 }
+                return total;
             }, []);
 
-            if (!filesPaths) {
+            if (!filesPaths || filesPaths.length === 0) {
                 return res.status(204).send();
             }
             async.each(filesPaths,
