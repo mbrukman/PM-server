@@ -36,6 +36,7 @@ let followAgentStatus = (agent) => {
                     agents[agent.key].url = agent.url;
                     agents[agent.key].id = agent.id;
                     agents[agent.key].key = agent.key;
+                    agents[agent.key].installed_plugins = body.info.installed_plugins;
                     agents[agent.key].liveCounter = LIVE_COUNTER;
                 } else if ((--agents[agent.key].liveCounter) === 0) {
                     agents[agent.key].alive = false;
@@ -82,6 +83,18 @@ module.exports = {
             }
             return Agent.findByIdAndUpdate(agentObj._id, agent)
         })
+    },
+    // get an object of installed plugins and versions on certain agent.
+    checkPluginsOnAgent: (agent) => {
+        return new Promise((res, rej) => {
+
+            request.post(agent.url + '/plugins/list', { form: { key: agent.key } }, function (error, response, body) {
+                if (error || response.statusCode !== 200) {
+                    res([]);
+                }
+                res(body);
+            });
+        });
     },
     delete: (agentId) => {
         return Agent.remove({ _id: agentId })
