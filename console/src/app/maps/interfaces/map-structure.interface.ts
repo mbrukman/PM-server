@@ -27,6 +27,10 @@ export interface IAction {
   params?: IActionParam[]
 }
 
+export interface IUsedPlugin {
+  name: string,
+  version: string
+}
 export interface IProcess {
   id: string;
   _id?: string;
@@ -38,7 +42,7 @@ export interface IProcess {
   postRun?: string,
   filterAgents?: string,
   actions: IAction[],
-  plugin_name: string,
+  used_plugin: IUsedPlugin,
   plugin?: IPlugin,
   createdAt: Date,
   correlateAgents: boolean,

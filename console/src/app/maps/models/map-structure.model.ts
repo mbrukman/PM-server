@@ -3,7 +3,7 @@ import {
   IActionParam,
   ILink,
   IMapStructure,
-  IProcess
+  IProcess, IUsedPlugin
 } from '../interfaces/map-structure.interface';
 import { PluginMethodParam } from '../../plugins/models/plugin-method-param.model';
 import { PluginMethod } from '../../plugins/models/plugin-method.model';
@@ -34,6 +34,11 @@ export class Action implements IAction {
   params?: ActionParam[];
 }
 
+export class UsedPlugin implements IUsedPlugin{
+  name: string;
+  version: string;
+}
+
 export class Process implements IProcess {
   id: string;
   _id?: string;
@@ -45,7 +50,7 @@ export class Process implements IProcess {
   postRun?: string;
   filterAgents?: string;
   actions: Action[];
-  plugin_name: string;
+  used_plugin: UsedPlugin;
   plugin?: Plugin;
   createdAt: Date;
   correlateAgents: boolean;

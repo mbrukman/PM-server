@@ -287,7 +287,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.graph.addCell(imageModel);
     let p = new Process();
     p.plugin = plugin;
-    p.plugin_name = pluginName;
+    p.used_plugin = { name: pluginName, version: plugin.version };
     p.uuid = <string>imageModel.id;
 
     if (!this.mapStructure.processes) {
@@ -317,7 +317,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   editProcess(process) {
     if (!process.plugin) {
-      process.plugin = this.plugins.find((o) => o.name === process.plugin_name);
+      process.plugin = this.plugins.find((o) => o.name === process.used_plugin.name);
     }
     const cell = this.graph.get('cells');
     let model = cell.models.find((o) => {

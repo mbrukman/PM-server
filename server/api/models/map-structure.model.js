@@ -19,6 +19,12 @@ let actionSchema = new Schema({
     params: [actionParamsSchema]
 });
 
+
+let usedPluginsSchema = new Schema({
+    name: { type: String, required: true },
+    version: { type: String, required: true }
+});
+
 let processSchema = new Schema({
     name: String,
     description: String,
@@ -31,7 +37,7 @@ let processSchema = new Schema({
     mandatory: { type: Boolean, default: false },
     condition: String,
     createdAt: { type: Date, default: Date.now },
-    plugin_name: { type: String, required: true },
+    used_plugin: usedPluginsSchema,
     actions: [actionSchema],
     uuid: String
 });
@@ -64,7 +70,7 @@ let mapStructureSchema = new Schema({
     processes: [processSchema],
     code: String,
     attributes: [attributeSchema],
-    plugins_names: [String]
+    used_plugins: [usedPluginsSchema]
 });
 
 mapStructureSchema.set('toJSON', {

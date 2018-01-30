@@ -174,9 +174,37 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
             startTime: new Date()
         }).then(result => {
             mapResult = result;
-            return pluginsService.filterPlugins({ name: { $in: structure.plugins_names } })
+            const names = structure.used_plugins.map(plugin => plugin.name);
+            return pluginsService.filterPlugins({ name: { $in: names } })
         }).then(plugins => {
             executionContext.plugins = plugins;
+            Object.keys(agents).forEach(key => {
+                // check if agents has the right version of the plugins.
+                const filesPaths = plugins.reduce((total, current) => {
+                    if (current.version !== agents[key].installed_plugins[current.name]) {
+                        total.push(current.file);
+                    }
+                    return total;
+                }, []);
+
+                if (filesPaths && filesPaths.length > 0) {
+                    async.each(filesPaths,
+                        function (filePath, callback) {
+                            agentsService.installPluginOnAgent(filePath, agent).then(() => {
+                            }).catch((e) => {
+                                console.log("Error installing on agent", e);
+                            });
+                            callback();
+                        },
+                        function (error) {
+                            if (error) {
+                                console.log("Error installing plugins on agent", error);
+                            }
+                            console.log("DONE");
+                        });
+                }
+            });
+            
             executeProcess(map, mapGraph, startNode, Object.assign({}, executionContext), executionAgents, socket, mapResult);
         });
 
@@ -222,7 +250,17 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
 
     let process = mapGraph.node(node);
     let agents = filterAgents(executionAgents); // get all available agents (not running or stopped);
-    let plugin = executionContext.plugins.find((o) => o.name.toString() === process.plugin_name);
+    let plugin = executionContext.plugins.find((o) => (o.name.toString() === process.used_plugin.name) || (o.name === process.used_plugin.name));
+    if (plugin.version !== process.used_plugin.version) {
+        MapExecutionLog.create({
+            map: map._id,
+            runId: executionContext.runId,
+            message: `'${process.name}': Deprecated warning: Process used plugin version ${process.used_plugin.version} while ${plugin.version} is installed.`,
+            status: 'info'
+        }).then((log) => {
+            socket.emit('update', log);
+        });
+    }
     async.each(agents,
         (agent, agentCb) => {
             if (!executionAgents[agent.key].startTime)
