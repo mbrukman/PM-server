@@ -16,7 +16,7 @@ let followAgentStatus = (agent) => {
     let start = new Date();
     let listenInterval = setInterval(() => {
         request.post(
-            agent.url + '/isalive', {
+            agent.url + '/api/status', {
                 form: {
                     key: agent.key
                 }
@@ -29,14 +29,14 @@ let followAgentStatus = (agent) => {
                 if (!error && response.statusCode === 200) {
                     agents[agent.key] = {};
                     agents[agent.key].alive = true;
-                    agents[agent.key].hostname = body.info.hostname;
-                    agents[agent.key].arch = body.info.arch;
-                    agents[agent.key].freeSpace = humanize.bytes(body.info.freeSpace);
+                    agents[agent.key].hostname = body.hostname;
+                    agents[agent.key].arch = body.arch;
+                    agents[agent.key].freeSpace = humanize.bytes(body.freeSpace);
                     agents[agent.key].respTime = new Date() - start;
                     agents[agent.key].url = agent.url;
                     agents[agent.key].id = agent.id;
                     agents[agent.key].key = agent.key;
-                    agents[agent.key].installed_plugins = body.info.installed_plugins;
+                    agents[agent.key].installed_plugins = body.installed_plugins;
                     agents[agent.key].liveCounter = LIVE_COUNTER;
                 } else if ((--agents[agent.key].liveCounter) === 0) {
                     agents[agent.key].alive = false;
