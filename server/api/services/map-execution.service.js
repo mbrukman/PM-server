@@ -668,8 +668,10 @@ function executeAction(map, process, action, plugin, agent, executionContext, ex
                         }
                     );
 
-                    MapExecutionLog.create(actionExecutionLogs).then(log => {
-                        socket.emit('update', log);
+                    MapExecutionLog.create(actionExecutionLogs).then(logs => {
+                        logs.forEach(log => {
+                            socket.emit('update', log);
+                        });
                     });
                 }
                 else {
