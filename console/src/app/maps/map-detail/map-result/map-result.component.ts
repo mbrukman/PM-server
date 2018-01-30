@@ -29,6 +29,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   agents: any;
   mapExecutionSubscription: Subscription;
   mapExecutionResultSubscription: Subscription;
+  mapExecutionMessagesSubscription: Subscription;
   executing: string[] = [];
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936']
@@ -62,6 +63,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
           this.selectExecution(result._id);
         }
       });
+
+    this.mapExecutionMessagesSubscription = this.socketService.getMessagesAsObservable()
+      .filter(message => this.selectedExecution && (message.runId === this.selectedExecution.runId))
+      .subscribe(message => {
+        this.selectedExecutionLogs.push(message);
+      })
   }
 
   ngOnDestroy() {
@@ -76,6 +83,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
     }
     if (this.mapExecutionResultSubscription) {
       this.mapExecutionResultSubscription.unsubscribe();
+    }
+    if (this.mapExecutionMessagesSubscription) {
+      this.mapExecutionMessagesSubscription.unsubscribe();
     }
   }
 
