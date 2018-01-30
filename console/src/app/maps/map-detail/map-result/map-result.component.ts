@@ -27,6 +27,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
   agProcessesStatus: [{ name: string, value: number }];
   result: any;
   agents: any;
+  mapExecutionSubscription: Subscription;
+  mapExecutionResultSubscription: Subscription;
+  executing: string[] = [];
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936']
   };
@@ -41,6 +44,24 @@ export class MapResultComponent implements OnInit, OnDestroy {
         this.map = map;
         this.getExecutionList();
       });
+
+    this.mapExecutionSubscription = this.socketService.getCurrentExecutionsAsObservable().subscribe(executions => {
+      this.executing = Object.keys(executions);
+    });
+
+    this.mapExecutionResultSubscription = this.socketService.getMapExecutionResultAsObservable()
+      .filter(result => (<string>result.map) === this.map.id)
+      .subscribe(result => {
+        let execution = this.executionsList.find((o) => o.runId === result.runId);
+        if (!execution) {
+          delete result.agentsResults;
+          this.executionsList.unshift(result);
+        }
+
+        if (this.selectedExecution.runId === result.runId) {
+          this.selectExecution(result._id);
+        }
+      });
   }
 
   ngOnDestroy() {
@@ -49,6 +70,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
     }
     if (this.executionListReq) {
       this.executionListReq.unsubscribe();
+    }
+    if (this.mapExecutionSubscription) {
+      this.mapExecutionSubscription.unsubscribe();
+    }
+    if (this.mapExecutionResultSubscription) {
+      this.mapExecutionResultSubscription.unsubscribe();
     }
   }
 
