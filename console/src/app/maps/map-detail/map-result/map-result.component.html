@@ -5,8 +5,7 @@
       <ul>
         <li *ngFor="let execution of executionsList; let i = index" (click)="selectExecution(execution._id)" [ngClass]="{'active': selectedExecution?.id === execution.id}">
           <span>
-          <!--{{ execution.startTime | date: 'short' }}-->
-            {{ execution.runId }}
+          {{ execution.startTime | date: 'short' }}
           </span>
           <span *ngIf="executing?.indexOf(execution.runId) > -1">
             <i class="fa fa-spinner fa-pulse fa-fw"></i>
