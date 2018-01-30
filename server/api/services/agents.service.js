@@ -107,6 +107,7 @@ module.exports = {
     installPluginOnAgent: (pluginPath, agent) => {
         return new Promise((resolve, reject) => {
             let formData = {
+                key: agent.key,
                 file: {
                     value: fs.createReadStream(pluginPath),
                     options: {
@@ -121,13 +122,13 @@ module.exports = {
                         continue;
                     }
                     request.post({
-                        url: agents[i].url + "/registeragent",
+                        url: agents[i].url + "/api/plugins/install",
                         formData: formData
                     });
                 }
             } else {
                 request.post({
-                    url: agent.url + "/registeragent",
+                    url: agent.url + "/api/plugins/install",
                     formData: formData
                 });
                 resolve();
