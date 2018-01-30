@@ -13,6 +13,8 @@ const agentsService = require("./agents.service");
 const mapsService = require("./maps.service");
 const pluginsService = require("../services/plugins.service");
 
+let executions = {};
+
 
 let libpm = '';
 fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 'utf8', function (err, data) {
@@ -100,6 +102,9 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
     let mapAgents;
     let executionContext;
 
+    // adding to execution object
+    executions[runId] = mapId;
+    socket.emit('executions', executions);
     return mapsService.get(mapId).then(mapobj => {
         map = mapobj;
         mapAgents = map.agents;
@@ -173,6 +178,7 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
             structure: structure._id,
             startTime: new Date()
         }).then(result => {
+            socket.emit('map-execution-result', result);
             mapResult = result;
             const names = structure.used_plugins.map(plugin => plugin.name);
             return pluginsService.filterPlugins({ name: { $in: names } })
@@ -549,6 +555,8 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
                     }
                 }
                 if (flag && executionContext.status !== "done") {
+                    delete executions[executionContext.runId]; // removing the run from executions
+                    socket.emit('executions', executions);
                     console.log(": map done :");
                     MapExecutionLog.create({
                         map: map._id,
@@ -561,7 +569,10 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
                     executionContext.status = "done";
                     executionContext.agents = executionAgents;
                     executionContext.finishTime = new Date();
-                    summarizeExecution(_.cloneDeep(executionContext), mapResult);
+                    summarizeExecution(_.cloneDeep(executionContext), mapResult).then(mapResult => {
+                        socket.emit('map-execution-result', mapResult);
+
+                    });
                 }
             }
         }
@@ -684,8 +695,10 @@ function executeAction(map, process, action, plugin, agent, executionContext, ex
                         }
                     );
 
-                    MapExecutionLog.create(actionExecutionLogs).then(log => {
-                        socket.emit('update', log);
+                    MapExecutionLog.create(actionExecutionLogs).then(logs => {
+                        logs.forEach(log => {
+                            socket.emit('update', log);
+                        });
                     });
                 }
                 else {
@@ -775,9 +788,7 @@ function summarizeExecution(executionContext, resultObj) {
         result.agentsResults.push(agentsResult);
     }
 
-    MapResult.findByIdAndUpdate(resultObj._id, result).then((mapresult) => {
-    })
-
+    return MapResult.findByIdAndUpdate(resultObj._id, result, { new: true });
 }
 
 module.exports = {
@@ -798,5 +809,7 @@ module.exports = {
 
     list: () => {
         return MapResult.find({}, null, { sort: { startTime: -1 } }).populate({ path: 'map', select: 'name' });
-    }
+    },
+
+    executions: executions
 };

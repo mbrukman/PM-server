@@ -9,6 +9,7 @@ import { MapsService } from '../maps.service';
 import { Map } from '../models/map.model';
 import { MapStructure } from '../models/map-structure.model';
 import { ConfirmComponent } from '../../shared/confirm/confirm.component';
+import { SocketService } from '../../shared/socket.service';
 
 
 @Component({
@@ -33,8 +34,10 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   edited: boolean = false;
   structureEdited: boolean = false;
   initiated: boolean = false;
+  mapExecutionSubscription: Subscription;
+  executing: boolean;
 
-  constructor(private route: ActivatedRoute, private router: Router, private mapsService: MapsService, private modalService: BsModalService) {
+  constructor(private route: ActivatedRoute, private router: Router, private mapsService: MapsService, private socketService: SocketService, private modalService: BsModalService) {
   }
 
   ngOnInit() {
@@ -98,6 +101,10 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         return o.id === structure.id;
       })
     });
+    this.mapExecutionSubscription = this.socketService.getCurrentExecutionsAsObservable().subscribe(executions => {
+      const maps = Object.keys(executions).map(key => executions[key]);
+      this.executing = maps.indexOf(this.id) > -1;
+    });
   }
 
   ngOnDestroy() {
@@ -111,7 +118,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     }
     this.mapsService.clearCurrentMap();
     this.mapsService.clearCurrentMapStructure();
-
+    this.mapExecutionSubscription.unsubscribe();
   }
 
   discardChanges() {
