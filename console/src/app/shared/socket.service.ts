@@ -4,11 +4,15 @@ import { environment } from '../../environments/environment';
 import * as io from 'socket.io-client';
 import { Subject } from 'rxjs/Subject';
 
+import { MapResult } from '../maps/models/execution-result.model';
+
 @Injectable()
 export class SocketService {
   socket: any;
   message: Subject<any> = new Subject<any>();
   notification: Subject<any> = new Subject<any>();
+  executions: Subject<object> = new Subject<object>();
+  mapExecution: Subject<MapResult> = new Subject<MapResult>();
 
   constructor() {
     this.socket = io(environment.serverUrl);
@@ -27,6 +31,14 @@ export class SocketService {
     this.socket.on('notification', (data) => {
       this.setNotification(data);
     });
+
+    this.socket.on('executions', (data: object) => {
+      this.setCurrentExecutions(data);
+    });
+
+    this.socket.on('map-execution-result', (data) => {
+      this.updateExecutionResult(data);
+    });
   }
 
   getMessagesAsObservable() {
@@ -44,5 +56,23 @@ export class SocketService {
   setNotification(message) {
     this.notification.next(message);
   }
+
+  getCurrentExecutionsAsObservable() {
+    return this.executions.asObservable();
+  }
+
+  setCurrentExecutions(data) {
+    this.executions.next(data);
+  }
+
+  getMapExecutionResultAsObservable() {
+    return this.mapExecution.asObservable();
+  }
+
+  updateExecutionResult(data) {
+    this.mapExecution.next(data);
+  }
+
+
 
 }
