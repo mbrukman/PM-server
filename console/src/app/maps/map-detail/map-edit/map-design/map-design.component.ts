@@ -115,13 +115,17 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.resizePaper();
 
     this.listeners();
-    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().subscribe(structure => {
-      this.mapStructure = structure;
-      if (structure && !this.init) {
-        this.init = true;
-        this.drawGraph();
-      }
-    });
+    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure()
+      .do(structure => this.mapStructure = structure)
+      .filter(structure => structure ? true : false)
+      .subscribe(structure => {
+        if (!this.init || (this.init && (<any>structure).imported)) {
+          console.log('Drawing');
+          this.init = true;
+          this.drawGraph();
+          this.mapsService.setCurrentMapStructure(Object.assign(structure, { imported: false }));
+        }
+      });
   }
 
   addNewLink(cell) {

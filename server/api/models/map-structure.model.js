@@ -44,8 +44,6 @@ let processSchema = new Schema({
 
 let linkSchema = new Schema({
     name: String,
-    correlateAgents: { type: Boolean, default: false },
-    condition: String,
     sourceId: String,
     targetId: String,
     uuid: String,

@@ -58,12 +58,12 @@ export class Process implements IProcess {
 }
 
 export class Link implements ILink {
-  name?: string;
-  correlateAgents?: boolean;
-  condition?: string;
+  id?: string;
+  _id?: string;
   sourceId: string;
   targetId: string;
   uuid?: string;
+  createdAt?: Date;
 }
 
 export class Attribute implements IAttribute {

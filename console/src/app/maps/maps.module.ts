@@ -29,6 +29,7 @@ import { MapCreateComponent } from './map-create/map-create.component';
 import { MapEnvironmentPaneComponent } from './map-detail/map-edit/map-enviroment-pane/map-environment-pane.component';
 import { MapResultComponent } from './map-detail/map-result/map-result.component';
 import { ProcessResultComponent } from './map-detail/map-result/process-result/process-result.component';
+import { ImportExportComponent } from './map-detail/map-edit/import-export/import-export.component';
 
 
 @NgModule({
@@ -40,7 +41,7 @@ import { ProcessResultComponent } from './map-detail/map-result/process-result/p
     BsDropdownModule,
     ModalModule,
     AccordionModule,
-    TooltipModule,
+    TooltipModule
   ],
   declarations: [
     MapDetailComponent,
@@ -62,7 +63,8 @@ import { ProcessResultComponent } from './map-detail/map-result/process-result/p
     PluginToolboxComponent,
     MapResultComponent,
     ProcessResultComponent,
+    ImportExportComponent
   ],
-  entryComponents: [SelectAgentComponent, AddAttributeComponent, TriggerFormComponent]
+  entryComponents: [SelectAgentComponent, AddAttributeComponent, TriggerFormComponent, ImportExportComponent]
 })
 export class MapsModule { }
