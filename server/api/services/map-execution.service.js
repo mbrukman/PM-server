@@ -162,7 +162,11 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
         }
         executionContext.agents = executionAgents;
         executions[runId] = { map: mapId, executionContext: executionContext, executionAgents: executionAgents };
-        socket.emit('executions', executions);
+        let emitv = Object.keys(executions).reduce((total, current) => {
+            total[current] = executions[current].map;
+            return total;
+        }, {});
+        socket.emit('executions', emitv);
         let res = createContext(mapStructure, executionContext);
         if (res !== 0) {
             throw new Error("Error running map code", res);
@@ -591,7 +595,7 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
                 }
                 if (flag && executions[runId].executionContext.status !== "done") {
                     // delete executions[runId]; // removing the run from executions
-                    socket.emit('executions', executions);
+
                     console.log(": map done :");
                     MapExecutionLog.create({
                         map: map._id,
@@ -608,6 +612,15 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
                         socket.emit('map-execution-result', mapResult);
 
                     });
+                    delete executions[runId];
+                    let emitv = Object.keys(executions).reduce((total, current) => {
+                        if (current === runId) {
+                            return total;
+                        }
+                        total[current] = executions[current].map;
+                        return total;
+                    }, {});
+                    socket.emit('executions', emitv);
                 }
             }
         }
