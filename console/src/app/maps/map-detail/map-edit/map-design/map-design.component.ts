@@ -119,11 +119,11 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       .do(structure => this.mapStructure = structure)
       .filter(structure => structure ? true : false)
       .subscribe(structure => {
-        if (!this.init || (this.init && (<any>structure).imported)) {
-          console.log('Drawing');
+        if (!this.init || (<any>structure).imported) {
+          delete (<any>structure).imported;
           this.init = true;
           this.drawGraph();
-          this.mapsService.setCurrentMapStructure(Object.assign(structure, { imported: false }));
+          this.mapsService.setCurrentMapStructure(structure);
         }
       });
   }
