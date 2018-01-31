@@ -196,7 +196,7 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
                 if (filesPaths && filesPaths.length > 0) {
                     async.each(filesPaths,
                         function (filePath, callback) {
-                            agentsService.installPluginOnAgent(filePath, agent).then(() => {
+                            agentsService.installPluginOnAgent(filePath, agents[key]).then(() => {
                             }).catch((e) => {
                                 console.log("Error installing on agent", e);
                             });
@@ -204,9 +204,9 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
                         },
                         function (error) {
                             if (error) {
-                                console.log("Error installing plugins on agent", error);
+                                console.log("Error installing plugins on agent, it may be a fatal error", error);
                             }
-                            console.log("DONE");
+                            console.log("Done installing plugins");
                         });
                 }
             });
@@ -627,7 +627,7 @@ function executeAction(map, process, action, plugin, agent, executionContext, ex
             socket.emit('update', log);
         });
         request.post(
-            agent.url + '/task/register',
+            agent.url + '/api/task/add',
             {
                 form: {
                     mapId: map.id,
