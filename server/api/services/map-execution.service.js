@@ -42,7 +42,7 @@ function findStartNode(structure) {
     for (let i = 0; i < links.length; i++) {
         let source = links[i].sourceId;
         let index = structure.processes.findIndex((o) => {
-            o.uuid === source;
+            return o.uuid === source;
         });
         if (index === -1) {
             node = { type: 'start_node', uuid: source };
@@ -103,7 +103,7 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
     let executionContext;
 
     // adding to execution object
-    executions[runId] = mapId;
+    executions[runId] = { map: mapId };
     socket.emit('executions', executions);
     return mapsService.get(mapId).then(mapobj => {
         map = mapobj;
@@ -132,7 +132,6 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
             startTime: new Date(),
             structure: structure._id
         };
-
         let mapGraph = buildMapGraph(mapStructure); // builds a graph from the map
         let startNodes = mapGraph.sources(); // return all the nodes that dont have an in-link
         let sortedNodes = graphlib.alg.topsort(mapGraph);
@@ -164,6 +163,8 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
         }
 
         executionContext.agents = executionAgents;
+        executions[runId].executionContext = executionContext;
+        executions[runId].executionAgents = executionAgents;
 
         let res = createContext(mapStructure, executionContext);
         if (res !== 0) {
@@ -210,8 +211,8 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
                         });
                 }
             });
-            
-            executeProcess(map, mapGraph, startNode, Object.assign({}, executionContext), executionAgents, socket, mapResult);
+
+            executeProcess(map, mapGraph, startNode, runId, Object.assign({}, executionContext), executionAgents, socket, mapResult);
         });
 
         return startNode
@@ -235,7 +236,7 @@ function filterAgents(executionAgents) {
     return agents;
 }
 
-function executeProcess(map, mapGraph, node, executionContext, executionAgents, socket, mapResult) {
+function executeProcess(map, mapGraph, node, runId, executionContext, executionAgents, socket, mapResult) {
     if (!node) {
         console.log("No node provided");
         return;
@@ -249,7 +250,7 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
         successors.forEach(successor => {
             let n = mapGraph.node(successor);
             console.log("next node", successor);
-            executeProcess(map, mapGraph, successor, executionContext, executionAgents, socket, mapResult);
+            executeProcess(map, mapGraph, successor, runId, executionContext, executionAgents, socket, mapResult);
         });
         return;
     }
@@ -485,7 +486,7 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
                         console.log("Dont have to correlate");
                         successors.forEach(successor => {
                             console.log("next node", successor);
-                            executeProcess(map, mapGraph, successor, executionContext, executionAgents, socket, mapResult);
+                            executeProcess(map, mapGraph, successor, runId, executionContext, executionAgents, socket, mapResult);
                         })
                     }
 
@@ -530,8 +531,8 @@ function executeProcess(map, mapGraph, node, executionContext, executionAgents, 
                 });
 
                 if (agentsStats.length === 0) { // if there is an agent that is still executing, we shouldn't pass to the next node
-                    successors.forEach(s => {
-                        executeProcess(map, mapGraph, successor, executionContext, executionAgents, socket, mapResult);
+                    successors.forEach(successor => {
+                        executeProcess(map, mapGraph, successor, runId, executionContext, executionAgents, socket, mapResult);
                     });
                 }
             }
