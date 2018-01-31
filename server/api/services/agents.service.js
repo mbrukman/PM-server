@@ -88,7 +88,7 @@ module.exports = {
     checkPluginsOnAgent: (agent) => {
         return new Promise((res, rej) => {
 
-            request.post(agent.url + '/plugins/list', { form: { key: agent.key } }, function (error, response, body) {
+            request.post(agent.url + '/api/plugins', { form: { key: agent.key } }, function (error, response, body) {
                 if (error || response.statusCode !== 200) {
                     res([]);
                 }
