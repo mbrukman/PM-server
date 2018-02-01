@@ -58,7 +58,7 @@
             <div class="card raw-output">
               <div class="card-body">
                 <h5 class="card-title">Raw output</h5>
-                <ul>
+                <ul #rawOutput>
                   <li *ngFor="let item of selectedExecutionLogs" [innerHTML]="item.message | linebreak">
                   </li>
                 </ul>
@@ -66,7 +66,7 @@
             </div>
           </div>
         </div>
-        <div class="row card-row">
+        <div class="row card-row" *ngIf="selectedExecution && executing?.indexOf(selectedExecution.runId) === -1">
           <div class="col-2">
             <div class="card process-select bg-dark">
               <div class="card-body">
@@ -82,7 +82,8 @@
           </div>
           <div class="col-10" *ngIf="selectedProcess">
             <app-process-result [process]="selectedProcess"
-                                [result]="result"></app-process-result>
+                                [result]="result"
+                                [count]="result?.length"></app-process-result>
           </div>
         </div>
       </div>
