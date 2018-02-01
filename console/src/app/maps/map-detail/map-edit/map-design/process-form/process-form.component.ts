@@ -32,7 +32,6 @@ export class ProcessFormComponent implements OnInit {
       this.closePane();
       return;
     }
-    console.log(this.process);
     this.processForm = new FormGroup({
       name: new FormControl(this.process.name),
       uuid: new FormControl(this.process.uuid),
@@ -45,7 +44,6 @@ export class ProcessFormComponent implements OnInit {
       filterAgents: new FormControl(this.process.filterAgents),
       actions: new FormArray([])
     });
-
     if (this.process.actions) {
       this.process.actions.forEach((action, actionIndex) => {
         let actionControl = <FormArray>this.processForm.controls['actions'];
@@ -113,8 +111,7 @@ export class ProcessFormComponent implements OnInit {
     /* when a method selected - change the form params*/
     let methodName = this.processForm.value.actions[this.index].method;
     let action = this.processForm.controls['actions']['controls'][this.index];
-    action.controls.params = new FormArray([]);
-
+    action.controls.params.setControl([]);
     const method = this.plugin.methods.find((o) => o.name === methodName);
     if (!method) {
       this.socketService.setNotification({ title: 'OH OH', message: 'Unexpected error, please try again.' });
@@ -134,10 +131,6 @@ export class ProcessFormComponent implements OnInit {
   }
 
   saveProcess(form) {
-    this.processForm.controls['actions']['controls'].forEach(control => {
-      // have to update the form because of change detection bug.
-      control['controls']['name'].setValue(this.processForm.controls['actions']['controls'][0]['controls']['name'].value)
-    });
     if (this.action) {
       this.backToProcessView();
     }
