@@ -24,7 +24,7 @@ let followAgentStatus = (agent) => {
                 try {
                     body = JSON.parse(body);
                 } catch (e) {
-                    body = { res: e };
+                    body = {res: e};
                 }
                 if (!error && response.statusCode === 200) {
                     agents[agent.key] = {};
@@ -54,7 +54,7 @@ let followAgentStatus = (agent) => {
             })
     }, INTERVAL_TIME);
     if (!agents[agent.key]) {
-        agents[agent.key] = { alive: false, following: true };
+        agents[agent.key] = {alive: false, following: true};
         // agents[agent.key] = { intervalId: listenInterval, alive: false, following: true };
     }
 };
@@ -77,7 +77,7 @@ function getAgentStatus() {
 
 module.exports = {
     add: (agent) => {
-        return Agent.findOne({ key: agent.key }).then(agentObj => {
+        return Agent.findOne({key: agent.key}).then(agentObj => {
             if (!agentObj) {
                 return Agent.create(agent)
             }
@@ -88,7 +88,7 @@ module.exports = {
     checkPluginsOnAgent: (agent) => {
         return new Promise((res, rej) => {
 
-            request.post(agent.url + '/api/plugins', { form: { key: agent.key } }, function (error, response, body) {
+            request.post(agent.url + '/api/plugins', {form: {key: agent.key}}, function (error, response, body) {
                 if (error || response.statusCode !== 200) {
                     res([]);
                 }
@@ -97,7 +97,7 @@ module.exports = {
         });
     },
     delete: (agentId) => {
-        return Agent.remove({ _id: agentId })
+        return Agent.remove({_id: agentId})
     },
     /* filter the agents. if no query is passed, will return all agents */
     filter: (query = {}) => {
@@ -107,7 +107,6 @@ module.exports = {
     installPluginOnAgent: (pluginPath, agent) => {
         return new Promise((resolve, reject) => {
             let formData = {
-                key: agent.key,
                 file: {
                     value: fs.createReadStream(pluginPath),
                     options: {
@@ -121,15 +120,19 @@ module.exports = {
                     if (!agents[i].alive) {
                         continue;
                     }
+
                     request.post({
                         url: agents[i].url + "/api/plugins/install",
-                        formData: formData
+                        formData: Object.assign(formData, {key: i})
                     });
                 }
             } else {
+                console.log("Sending request");
                 request.post({
                     url: agent.url + "/api/plugins/install",
-                    formData: formData
+                    formData: Object.assign(formData, {key: agent.key})
+                }, function (err, res, body) {
+                    console.log(err, res, body);
                 });
                 resolve();
             }
@@ -148,7 +151,7 @@ module.exports = {
     unfollowAgent: unfollowAgentStatus,
     /* update an agent */
     update: (agentId, agent) => {
-        return Agent.findByIdAndUpdate(agentId, agent, { new: true });
+        return Agent.findByIdAndUpdate(agentId, agent, {new: true});
     },
     /* exporting the agents status */
     agentsStatus: getAgentStatus
