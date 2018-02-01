@@ -14,7 +14,24 @@
     height: 100%;
   }
 }
-
+.export {
+  position: absolute;
+  left: 105px;
+  top: 65px;
+  .btn {
+    padding: 5px 29px 5px 29px;
+    color: $text-color;
+    background: transparent;
+    border-radius: 20px;
+    border: 2px solid $turquoise-blue;
+    &:hover {
+      cursor: pointer;
+      background: $turquoise-blue;
+      color: $background;
+      font-weight: bolder;
+    }
+  }
+}
 .action-buttons {
   position: absolute;
   right: 55px;

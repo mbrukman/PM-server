@@ -9,8 +9,15 @@
   </h1>
 </div>
 
+<div class="export">
+  <a [href]="downloadJson" download="{{map.name}}.json" class="btn pm">Export</a>
+</div>
+
 <div class="map-nav">
   <ul class="nav justify-content-center">
+    <li class="nav-item" routerLinkActive="active">
+      <a class="nav-link" [routerLink]="['properties']">Properties</a>
+    </li>
     <li class="nav-item" routerLinkActive="active">
       <a class="nav-link" [routerLink]="['properties']">Properties</a>
     </li>
