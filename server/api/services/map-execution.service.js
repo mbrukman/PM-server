@@ -78,10 +78,11 @@ function buildMapGraph(map) {
 
 
 let notify = function (socket) {
-    return function(title, message, status) {
-        socket.emit('notification', {title: title, message: message, status: (status || 'info')});
+    return function (title, message, status) {
+        socket.emit('notification', { title: title, message: message, status: (status || 'info') });
     };
 };
+
 function executeMap(mapId, versionIndex, cleanWorkspace, req) {
     const socket = req.io;
 
@@ -730,11 +731,19 @@ function executeAction(map, runId, process, action, plugin, agent, socket) {
                 for (let i in action.params) {
                     actionString += `${i}: ${action.params[i]}`;
                 }
+
+                MapExecutionLog.create({
+                    map: map._id,
+                    runId: runId,
+                    message: actionString,
+                    status: 'info'
+                }).then(log => {
+                    socket.emit('update', log);
+                });
+
                 if (!error && response.statusCode === 200) {
                     body.stdout = actionString + '\n' + body.stdout;
-                    // executionAgents[agent.key].processes[process.uuid].actions[key].status = "success";
-                    // executionAgents[agent.key].processes[process.uuid].actions[key].result = body;
-                    // executionAgents[agent.key].processes[process.uuid].actions[key].startTime = sTime;
+
                     updateActionContext(runId, agent.key, process.uuid, key, {
                         status: "success",
                         result: body,
@@ -744,12 +753,6 @@ function executeAction(map, runId, process, action, plugin, agent, socket) {
                     callback(null, body);
 
                     let actionExecutionLogs = [];
-                    actionExecutionLogs.push({
-                        map: map._id,
-                        runId: runId,
-                        message: actionString,
-                        status: 'info'
-                    });
                     if (body.stdout) {
                         actionExecutionLogs.push(
                             {
