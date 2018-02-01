@@ -8,9 +8,23 @@
     width: 100%;
   }
   .row {
-    a.create {
-      margin-top: 15px;
+    a, button {
+      &.create {
+        margin-top: 15px;
+        margin-right: 10px;
+      }
     }
+  }
+}
+
+.lead {
+  .btn-link {
+    font-size: inherit;
+    outline: none;
+    padding: 0px;
+    border: 0px;
+    box-sizing: none;
+    background-color: transparent;
   }
 }
 
