@@ -1,12 +1,12 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
-import { MapsService } from '../../maps.service';
-import { Map } from '../../models/map.model';
-import { MapResult } from '../../models/execution-result.model';
-import { SocketService } from '../../../shared/socket.service';
-import { Agent } from '../../../agents/models/agent.model';
-import { MapStructure } from '../../models/map-structure.model';
+import { MapsService } from '@maps/maps.service';
+import { Map } from '@maps/models/map.model';
+import { MapResult } from '@maps/models/execution-result.model';
+import { SocketService } from '@shared/socket.service';
+import { Agent } from '@agents/models/agent.model';
+import { MapStructure } from '@maps/models/map-structure.model';
 
 @Component({
   selector: 'app-map-result',
@@ -15,7 +15,6 @@ import { MapStructure } from '../../models/map-structure.model';
 })
 export class MapResultComponent implements OnInit, OnDestroy {
   map: Map;
-  mapSubscription: Subscription;
   executionListReq: any;
   executionsList: MapResult[];
   selectedExecution: MapResult;
@@ -27,6 +26,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
   agProcessesStatus: [{ name: string, value: number }];
   result: any;
   agents: any;
+  @ViewChild('rawOutput') rawOutputElm: ElementRef;
+  mapSubscription: Subscription;
   mapExecutionSubscription: Subscription;
   mapExecutionResultSubscription: Subscription;
   mapExecutionMessagesSubscription: Subscription;
@@ -68,7 +69,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
       .filter(message => this.selectedExecution && (message.runId === this.selectedExecution.runId))
       .subscribe(message => {
         this.selectedExecutionLogs.push(message);
-      })
+        this.scrollOutputToBottom();
+      });
   }
 
   ngOnDestroy() {
@@ -164,6 +166,10 @@ export class MapResultComponent implements OnInit, OnDestroy {
 
   selectProcess(process) {
     this.selectedProcess = process;
+  }
+
+  scrollOutputToBottom() {
+    this.rawOutputElm.nativeElement.scrollTop = this.rawOutputElm.nativeElement.scrollHeight;
   }
 
 }
