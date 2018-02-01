@@ -2,6 +2,7 @@ import { IPluginMethodParam } from "../../plugins/interfaces/plugin-method-param
 import { IPluginMethod } from "../../plugins/interfaces/plugin-method.interface";
 import { IPlugin } from "../../plugins/interfaces/plugin.interface";
 import { IAttribute } from "./attribute.interface";
+import { Plugin } from '../../plugins/models/plugin.model';
 
 export interface IActionParam {
   id?: string;
@@ -22,10 +23,15 @@ export interface IAction {
   retries?: number,
   order: number,
   mandatory: boolean,
-  method: IPluginMethod,
+  method: IPluginMethod | string,
   params?: IActionParam[]
 }
 
+export interface IUsedPlugin {
+  _id?: string
+  name: string,
+  version: string,
+}
 export interface IProcess {
   id: string;
   _id?: string;
@@ -37,31 +43,37 @@ export interface IProcess {
   postRun?: string,
   filterAgents?: string,
   actions: IAction[],
-  plugin: IPlugin,
+  used_plugin: IUsedPlugin,
+  plugin?: IPlugin,
   createdAt: Date,
+  updatedAt: Date,
   correlateAgents: boolean,
   uuid: string
 }
 
 export interface ILink {
-  name?: string,
-  correlateAgents?: boolean,
-  condition?: string,
+  id?: string,
+  _id?: string,
   sourceId: string,
   targetId: string,
-  uuid?: string
+  uuid?: string,
+  createdAt?: Date
 }
 
 export interface IMapStructure {
   id?: string,
   _id?: string,
   createdAt: Date,
+  updatedAt: Date,
   content: any,
   map: string,
   code?: string,
   attributes?: IAttribute[],
   processes?: IProcess[],
   links?: ILink[]
+  plugins_names?: string[];
+  plugins?: Plugin[];
+  used_plugins: [IUsedPlugin];
 
 }
 

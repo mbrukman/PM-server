@@ -3,14 +3,19 @@
   <h1>
     <span [(inlineEdit)]="map.name" (valueChanged)="edited=true" *ngIf="map">{{map.name}}</span>
     <span *ngIf="map?.archived">(archived)</span>
-    <span *ngIf="structuresList[0] && mapStructure?.id !== structuresList[0].id">
+    <span *ngIf="structuresList[0] && mapStructure?.id !== structuresList[0].id && structureIndex < structuresList.length">
       (<i class="material-icons">history</i> {{ structureIndex }}/{{ structuresList.length }})
     </span>
   </h1>
 </div>
 
+<div class="export" *ngIf="map && downloadJson">
+  <a [href]="downloadJson" download="{{map.name}}.json" class="btn pm">Export</a>
+</div>
+
 <div class="map-nav">
   <ul class="nav justify-content-center">
+
     <li class="nav-item" routerLinkActive="active">
       <a class="nav-link" [routerLink]="['properties']">Properties</a>
     </li>
@@ -34,7 +39,7 @@
   <button type="button" class="btn" (click)="discardChanges()" *ngIf="edited || structureEdited" disabled>Discard</button>
   <button type="button" class="btn" (click)="saveMap()" *ngIf="!edited && !structureEdited" disabled>Saved</button>
   <button type="button" class="btn" (click)="saveMap()" *ngIf="edited || structureEdited">Save</button>
-  <button class="btn" (click)="executeMap()">Execute</button>
+  <button class="btn" (click)="executeMap()">Execute <span *ngIf="executing"><i class="fa fa-spinner fa-pulse fa-fw"></i></span> </button>
 </div>
 
 <div class="router-wrapper">

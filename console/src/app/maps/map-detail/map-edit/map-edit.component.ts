@@ -1,9 +1,12 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MapsService } from "../../maps.service";
-import { Subscription } from "rxjs/Subscription";
-import { Map } from "../../models/map.model";
-import { MapStructure } from "../../models/map-structure.model";
-import { MapDesignService } from "./map-design.service";
+
+import { BsModalService } from 'ngx-bootstrap';
+import { Subscription } from 'rxjs/Subscription';
+
+import { MapsService } from '../../maps.service';
+import { Map } from '../../models/map.model';
+import { MapStructure } from '../../models/map-structure.model';
+import { MapDesignService } from './map-design.service';
 
 @Component({
   selector: 'app-map-edit',
@@ -19,7 +22,7 @@ export class MapEditComponent implements OnInit, OnDestroy {
   tab: string;
   @ViewChild('wrapper') wrapper: ElementRef;
 
-  constructor(private mapsService: MapsService, public designService: MapDesignService) {
+  constructor(private mapsService: MapsService, public designService: MapDesignService, private modalService: BsModalService) {
   }
 
   ngOnInit() {

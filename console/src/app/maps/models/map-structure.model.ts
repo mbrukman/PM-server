@@ -3,7 +3,7 @@ import {
   IActionParam,
   ILink,
   IMapStructure,
-  IProcess
+  IProcess, IUsedPlugin
 } from '../interfaces/map-structure.interface';
 import { PluginMethodParam } from '../../plugins/models/plugin-method-param.model';
 import { PluginMethod } from '../../plugins/models/plugin-method.model';
@@ -30,8 +30,14 @@ export class Action implements IAction {
   retries?: number;
   order: number;
   mandatory: boolean;
-  method: PluginMethod;
+  method: PluginMethod | string;
   params?: ActionParam[];
+}
+
+export class UsedPlugin implements IUsedPlugin{
+  _id?: string;
+  name: string;
+  version: string;
 }
 
 export class Process implements IProcess {
@@ -45,19 +51,21 @@ export class Process implements IProcess {
   postRun?: string;
   filterAgents?: string;
   actions: Action[];
-  plugin: Plugin;
+  used_plugin: UsedPlugin;
+  plugin?: Plugin;
   createdAt: Date;
+  updatedAt: Date;
   correlateAgents: boolean;
   uuid: string;
 }
 
 export class Link implements ILink {
-  name?: string;
-  correlateAgents?: boolean;
-  condition?: string;
+  id?: string;
+  _id?: string;
   sourceId: string;
   targetId: string;
   uuid?: string;
+  createdAt?: Date;
 }
 
 export class Attribute implements IAttribute {
@@ -70,12 +78,15 @@ export class MapStructure implements IMapStructure {
   id?: string;
   _id?: string;
   createdAt: Date;
+  updatedAt: Date;
   map: string;
   content: any;
   code?: string;
   attributes?: Attribute[];
   processes?: Process[];
   links?: Link[];
+  plugins?: Plugin[];
+  used_plugins: [UsedPlugin];
 
   constructor() {
     this.processes = [];

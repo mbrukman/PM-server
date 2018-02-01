@@ -40,7 +40,7 @@ import { ProcessResultComponent } from './map-detail/map-result/process-result/p
     BsDropdownModule,
     ModalModule,
     AccordionModule,
-    TooltipModule,
+    TooltipModule
   ],
   declarations: [
     MapDetailComponent,
@@ -61,7 +61,7 @@ import { ProcessResultComponent } from './map-detail/map-result/process-result/p
     ProcessFormComponent,
     PluginToolboxComponent,
     MapResultComponent,
-    ProcessResultComponent,
+    ProcessResultComponent
   ],
   entryComponents: [SelectAgentComponent, AddAttributeComponent, TriggerFormComponent]
 })

@@ -151,7 +151,7 @@ module.exports = {
             return mapsService.update(mapId, req.body);
         }).then((map) => {
             console.log(map);
-            return projectsService.updateMap(mapId, req.body.project);
+            return req.body.project ? projectsService.updateMap(mapId, req.body.project) : null;
         }).then(() => {
             return res.send('OK');
         }).catch((error) => {
@@ -191,6 +191,12 @@ module.exports = {
     },
 
     /* execution */
+    /* get a list of ongoing executions */
+    currentRuns: (req, res) => {
+        hooks.hookPre('map-currentruns', req).then(() => {
+            return res.json(mapsExecutionService.executions);
+        });
+    },
     /* execute a map */
     execute: (req, res) => {
         hooks.hookPre('map-execute', req).then(() => {

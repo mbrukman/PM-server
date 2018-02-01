@@ -112,7 +112,7 @@ function deployPluginFile(pluginPath, req) {
                     entry.on('end', () => {
                         let obj;
                         try {
-                            obj = JSON.parse(body);
+                            obj = Object.assign({}, JSON.parse(body), { file: pluginPath });
                         } catch (e) {
                             return reject("Error parsing config file: ", e);
                         }
@@ -122,15 +122,20 @@ function deployPluginFile(pluginPath, req) {
                             if (!plugin) {
                                 return Plugin.create(obj)
                             }
+                            fs.unlink(plugin.file, function (error) {
+                                if (error) {
+                                    console.log("Error unlinking old file");
+                                } else {
+                                    console.log("Deleted old plugin file");
+                                }
+                            });
                             return Plugin.findByIdAndUpdate(plugin._id, obj)
                         }).then((plugin) => {
                             if (obj.type === "executer") {
                                 installPluginOnAgent(pluginPath, obj);
                                 resolve(plugin);
-
                             }
                             else if (obj.type === "trigger" || obj.type === "module" || obj.type === "server") {
-                                console.log("REALLY?");
                                 installPluginOnServer(pluginPath, obj).then(() => {
                                     loadModule(plugin, req.app);
                                     resolve(plugin);

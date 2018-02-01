@@ -6,6 +6,7 @@ import { Process } from '../../../../models/map-structure.model';
 import { Plugin } from '../../../../../plugins/models/plugin.model';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { PluginMethod } from '../../../../../plugins/models/plugin-method.model';
+import { SocketService } from '../../../../../shared/socket.service';
 
 @Component({
   selector: 'app-process-form',
@@ -23,7 +24,7 @@ export class ProcessFormComponent implements OnInit {
   plugin: Plugin;
   selectedMethod: PluginMethod;
 
-  constructor() {
+  constructor(private socketService: SocketService) {
   }
 
   ngOnInit() {
@@ -31,7 +32,6 @@ export class ProcessFormComponent implements OnInit {
       this.closePane();
       return;
     }
-
     this.processForm = new FormGroup({
       name: new FormControl(this.process.name),
       uuid: new FormControl(this.process.uuid),
@@ -44,7 +44,6 @@ export class ProcessFormComponent implements OnInit {
       filterAgents: new FormControl(this.process.filterAgents),
       actions: new FormArray([])
     });
-
     if (this.process.actions) {
       this.process.actions.forEach((action, actionIndex) => {
         let actionControl = <FormArray>this.processForm.controls['actions'];
@@ -54,7 +53,7 @@ export class ProcessFormComponent implements OnInit {
             actionControl.controls[actionIndex]['controls'].params.push(this.initActionParamController(param.code, param.value, param._id ? param._id : param.param, param.viewName, param.name));
           })
         } else {
-          console.log("no params!");
+          console.log('no params!');
         }
       });
     }
@@ -110,13 +109,14 @@ export class ProcessFormComponent implements OnInit {
 
   onSelectMethod() {
     /* when a method selected - change the form params*/
-    let methodId = this.processForm.value.actions[this.index].method;
+    let methodName = this.processForm.value.actions[this.index].method;
     let action = this.processForm.controls['actions']['controls'][this.index];
-    action.controls.params = new FormArray([]);
-
-    const method = this.plugin.methods.find((o) => {
-      return o._id === methodId
-    });
+    action.controls.params.setControl([]);
+    const method = this.plugin.methods.find((o) => o.name === methodName);
+    if (!method) {
+      this.socketService.setNotification({ title: 'OH OH', message: 'Unexpected error, please try again.' });
+      return;
+    }
     method.params.forEach(param => {
       action.controls.params.push(this.initActionParamController(null, null, param._id, param.viewName, param.name))
     });
@@ -131,10 +131,6 @@ export class ProcessFormComponent implements OnInit {
   }
 
   saveProcess(form) {
-    this.processForm.controls['actions']['controls'].forEach(control => {
-      // have to update the form because of change detection bug.
-      control['controls']['name'].setValue(this.processForm.controls['actions']['controls'][0]['controls']['name'].value)
-    });
     if (this.action) {
       this.backToProcessView();
     }

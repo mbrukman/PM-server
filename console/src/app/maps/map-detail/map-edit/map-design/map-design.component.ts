@@ -115,13 +115,17 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.resizePaper();
 
     this.listeners();
-    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().subscribe(structure => {
-      this.mapStructure = structure;
-      if (structure && !this.init) {
-        this.init = true;
-        this.drawGraph();
-      }
-    });
+    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure()
+      .do(structure => this.mapStructure = structure)
+      .filter(structure => structure ? true : false)
+      .subscribe(structure => {
+        if (!this.init || (<any>structure).imported) {
+          delete (<any>structure).imported;
+          this.init = true;
+          this.drawGraph();
+          this.mapsService.setCurrentMapStructure(structure);
+        }
+      });
   }
 
   addNewLink(cell) {
@@ -283,6 +287,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.graph.addCell(imageModel);
     let p = new Process();
     p.plugin = plugin;
+    p.used_plugin = { name: pluginName, version: plugin.version };
     p.uuid = <string>imageModel.id;
 
     if (!this.mapStructure.processes) {
@@ -311,10 +316,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   editProcess(process) {
-    if (typeof process.plugin === 'string') {
-      process.plugin = this.plugins.find((o) => {
-        return o._id === <string>(process.plugin)
-      });
+    if (!process.plugin) {
+      process.plugin = this.plugins.find((o) => o.name === process.used_plugin.name);
     }
     const cell = this.graph.get('cells');
     let model = cell.models.find((o) => {
@@ -372,6 +375,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           return o.uuid === id;
         });
         if (process) {
+          this.mapStructure.content = JSON.stringify(this.graph.toJSON());
+          this.mapsService.setCurrentMapStructure(this.mapStructure);
           this.editProcess(process);
         }
       }

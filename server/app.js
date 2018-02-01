@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const bootstrap = require("./helpers/bootstrap").bootstrap;
 const socket = require('socket.io');
-
+const env = require('./env/enviroment');
 const app = express();
 
 /////////////////////
@@ -33,16 +33,15 @@ io.on('connection', function (socket) {
     console.log('a user connected');
 });
 
+if (env.dbURI) {
+    console.log('--', env.dbURI);
+    mongoose.connect(env.dbURI, {
+        useMongoClient: true
+    }).then(() => {
+        console.log(`Succesfully Connected to the Mongodb Database`);
+    });
+}
 
-const db = (process.env.MONGO_HOST || 'localhost') + ":" + (process.env.MONGO_PORT || 27017) + "/" + (process.env.DB_NAME || 'refactor');
-/* Connect to db */
-mongoose.connect(`mongodb://${db}`, {
-    useMongoClient: true
-}).then(() => {
-    console.log(`Succesfully Connected to the Mongodb Database  at URL : mongodb://127.0.0.1:27017/refactor`);
-}).catch(() => {
-    console.log(`Error Connecting to the Mongodb`);
-});
 mongoose.Promise = require('bluebird');
 
 app.use(bodyParser.urlencoded({
@@ -66,11 +65,13 @@ app.use('/media', express.static(path.join(__dirname, 'media_cdn')));
 ////////////////////
 
 /* api references */
+const setupApi = require("./api/routes/setup.routes");
 const mapsApi = require("./api/routes/maps.routes");
 const pluginsApi = require("./api/routes/plugins.routes");
 const agentsApi = require("./api/routes/agents.routes");
 const projectsApi = require("./api/routes/projects.routes");
 
+app.use('/api/setup', setupApi);
 app.use('/api/maps', mapsApi);
 app.use('/api/plugins', pluginsApi);
 app.use('/api/agents', agentsApi);

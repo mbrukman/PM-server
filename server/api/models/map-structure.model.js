@@ -15,8 +15,14 @@ let actionSchema = new Schema({
     timeunit: Number,
     retries: Number,
     mandatory: { type: Boolean, default: false },
-    method: { type: Schema.Types.ObjectId, ref: 'Plugin.methods' },
+    method: String,
     params: [actionParamsSchema]
+});
+
+
+let usedPluginsSchema = new Schema({
+    name: { type: String, required: true },
+    version: { type: String, required: true }
 });
 
 let processSchema = new Schema({
@@ -31,15 +37,13 @@ let processSchema = new Schema({
     mandatory: { type: Boolean, default: false },
     condition: String,
     createdAt: { type: Date, default: Date.now },
-    plugin: { type: Schema.Types.ObjectId, ref: 'Plugin' },
+    used_plugin: usedPluginsSchema,
     actions: [actionSchema],
     uuid: String
 });
 
 let linkSchema = new Schema({
     name: String,
-    correlateAgents: { type: Boolean, default: false },
-    condition: String,
     sourceId: String,
     targetId: String,
     uuid: String,
@@ -66,7 +70,7 @@ let mapStructureSchema = new Schema({
     processes: [processSchema],
     code: String,
     attributes: [attributeSchema],
-    plugins: [{ type: Schema.Types.ObjectId, ref: 'Plugin' }]
+    used_plugins: [usedPluginsSchema]
 });
 
 mapStructureSchema.set('toJSON', {

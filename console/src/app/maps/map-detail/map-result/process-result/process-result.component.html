@@ -40,6 +40,10 @@
           <div *ngIf="agActionsStatus[action._id]">
             <div class="row">
               <div class="col-8">
+                <div *ngIf="count === 1">
+                  <p>Start time: {{ agActionsStatus[action._id]?.startTime | date: 'medium' }}</p>
+                  <p>Finish time: {{ agActionsStatus[action._id]?.finishTime | date: 'medium'}}</p>
+                </div>
                 <h5>Output:</h5>
                 <div class="raw-output">
                   <span *ngFor="let item of agActionsStatus[action._id]?.results?.stdout">{{ item }} <br></span>

@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 import { Subscription } from 'rxjs/Subscription';
 import * as _ from 'lodash';
@@ -9,6 +10,7 @@ import { MapsService } from '../maps.service';
 import { Map } from '../models/map.model';
 import { MapStructure } from '../models/map-structure.model';
 import { ConfirmComponent } from '../../shared/confirm/confirm.component';
+import { SocketService } from '../../shared/socket.service';
 
 
 @Component({
@@ -33,8 +35,16 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   edited: boolean = false;
   structureEdited: boolean = false;
   initiated: boolean = false;
+  mapExecutionSubscription: Subscription;
+  executing: boolean;
+  downloadJson: SafeUrl;
 
-  constructor(private route: ActivatedRoute, private router: Router, private mapsService: MapsService, private modalService: BsModalService) {
+  constructor(private route: ActivatedRoute,
+              private router: Router,
+              private sanitizer: DomSanitizer,
+              private mapsService: MapsService,
+              private socketService: SocketService,
+              private modalService: BsModalService) {
   }
 
   ngOnInit() {
@@ -96,7 +106,12 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       this.initiated = true;
       this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
         return o.id === structure.id;
-      })
+      });
+      this.generateDownloadJsonUri();
+    });
+    this.mapExecutionSubscription = this.socketService.getCurrentExecutionsAsObservable().subscribe(executions => {
+      const maps = Object.keys(executions).map(key => executions[key]);
+      this.executing = maps.indexOf(this.id) > -1;
     });
   }
 
@@ -111,7 +126,42 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     }
     this.mapsService.clearCurrentMap();
     this.mapsService.clearCurrentMapStructure();
+    this.mapExecutionSubscription.unsubscribe();
+  }
 
+  generateDownloadJsonUri() {
+    let structure = Object.assign({}, this.mapStructure);
+    delete structure._id;
+    delete structure.id;
+    delete structure.map;
+    delete structure.map;
+    delete structure._id;
+    delete structure.id;
+    if (structure.used_plugins) {
+      structure.used_plugins.forEach(plugin => {
+        delete plugin._id
+      });
+    }
+    structure.processes.forEach((process, i) => {
+      delete structure.processes[i]._id;
+      delete structure.processes[i].plugin;
+      delete structure.processes[i].used_plugin._id;
+      delete structure.processes[i].createdAt;
+      delete structure.createdAt;
+      delete structure.updatedAt;
+      if (process.actions) {
+        process.actions.forEach((action, j) => {
+          delete structure.processes[i].actions[j]._id;
+          delete structure.processes[i].actions[j].id;
+        });
+      }
+    });
+    structure.links.forEach((link, i) => {
+      delete structure.links[i]._id;
+      delete structure.links[i].createdAt;
+    });
+
+    this.downloadJson = this.sanitizer.bypassSecurityTrustUrl('data:text/json;charset=UTF-8,' + encodeURIComponent(JSON.stringify(structure)));
   }
 
   discardChanges() {

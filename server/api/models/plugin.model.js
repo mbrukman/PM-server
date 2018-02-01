@@ -25,9 +25,10 @@ let pluginSchema = new Schema({
     main: { type: String, required: true },
     execProgram: { type: String, required: true },
     active: { type: Boolean, default: true },
-    version: String,
+    version: { type: String, required: true },
     imgUrl: String,
-    methods: [pluginMethodSchema]
+    methods: [pluginMethodSchema],
+    file: { type: String, required: true }
 });
 
 pluginSchema.set('toJSON', {

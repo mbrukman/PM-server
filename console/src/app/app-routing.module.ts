@@ -3,27 +3,37 @@ import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
 
 import { NotFoundComponent } from './core/not-found/not-found.component';
 import { DashboardComponent } from './core/dashboard/dashboard.component';
+import { SetupComponent } from './core/setup/setup.component';
+import { IsSetUpGuard } from './core/setup/issetup.guard';
 
 const appRoutes: Routes = [
   {
     path: '',
-    component: DashboardComponent
+    component: DashboardComponent,
+    canActivate: [IsSetUpGuard]
+  },
+  {
+    path: 'setup',
+    component: SetupComponent
   },
   // maps
   {
     path: 'maps',
-    loadChildren: './maps/maps.module#MapsModule'
+    loadChildren: './maps/maps.module#MapsModule',
+    canActivate: [IsSetUpGuard]
   },
-//  projects
+  // projects
   {
     path: 'projects',
-    loadChildren: './projects/projects.module#ProjectsModule'
-  },
+    loadChildren: './projects/projects.module#ProjectsModule',
+    canActivate: [IsSetUpGuard]
 
-//  admin
+  },
+  // admin
   {
     path: 'admin',
-    loadChildren: './admin/admin.module#AdminModule'
+    loadChildren: './admin/admin.module#AdminModule',
+    canActivate: [IsSetUpGuard]
   },
   { path: '**', component: NotFoundComponent }
 
