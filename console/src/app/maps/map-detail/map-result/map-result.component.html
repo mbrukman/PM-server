@@ -82,7 +82,8 @@
           </div>
           <div class="col-10" *ngIf="selectedProcess">
             <app-process-result [process]="selectedProcess"
-                                [result]="result"></app-process-result>
+                                [result]="result"
+                                [count]="result?.length"></app-process-result>
           </div>
         </div>
       </div>

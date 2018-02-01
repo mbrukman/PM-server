@@ -8,6 +8,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 export class ProcessResultComponent implements OnChanges {
   @Input('process') process: any;
   @Input('result') result: any;
+  @Input('count') count: number;
   processResult: any;
   selectedProcess: any;
   agProcessActionsStatus: any;
@@ -38,7 +39,7 @@ export class ProcessResultComponent implements OnChanges {
         return o.process === this.process._id;
       });
       if (!process) {
-        return ;
+        return;
       }
       processes.push(process);
       actions = [...actions, ...process.actions];
@@ -59,12 +60,19 @@ export class ProcessResultComponent implements OnChanges {
     // aggregating status for each action
     let agActions = actions.reduce((total, current) => {
       if (!total[current.action]) {
-        total[current.action] = { status: { success: 0, error: 0 }, results: {result: [], stderr: [], stdout: []} };
+        total[current.action] = {
+          status: { success: 0, error: 0 },
+          results: { result: [], stderr: [], stdout: [] },
+          startTime: new Date(),
+          finishTime: new Date('1994-12-17T03:24:00')
+        };
       }
       total[current.action]['status'][current.status] = (total[current.action][current.status] || 0) + 1;
       total[current.action]['results']['result'].push(current.result.result);
       total[current.action]['results']['stderr'].push(current.result.stderr);
       total[current.action]['results']['stdout'].push(current.result.stdout);
+      total[current.action]['startTime'] = new Date(current.startTime) < total[current.action]['startTime'] ? current.startTime : total[current.action]['startTime'];
+      total[current.action]['finishTime'] = new Date(current.finishTime) > total[current.action]['finishTime'] ? current.startTime : total[current.action]['finishTime'];
       return total;
     }, {});
 

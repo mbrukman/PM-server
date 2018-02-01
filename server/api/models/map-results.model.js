@@ -7,7 +7,7 @@ let actionResultSchema = new Schema({
     method: { name: String, _id: {type: Schema.Types.ObjectId, ref: 'Plugin.method' }},
     status: String,
     startTime: Date,
-    finish: Date,
+    finishTime: Date,
     result: Schema.Types.Mixed
 });
 
