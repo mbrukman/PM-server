@@ -137,9 +137,11 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     delete structure.map;
     delete structure._id;
     delete structure.id;
-    structure.used_plugins.forEach(plugin => {
-      delete plugin._id
-    });
+    if (structure.used_plugins) {
+      structure.used_plugins.forEach(plugin => {
+        delete plugin._id
+      });
+    }
     structure.processes.forEach((process, i) => {
       delete structure.processes[i]._id;
       delete structure.processes[i].plugin;
@@ -159,9 +161,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       delete structure.links[i].createdAt;
     });
 
-
     this.downloadJson = this.sanitizer.bypassSecurityTrustUrl('data:text/json;charset=UTF-8,' + encodeURIComponent(JSON.stringify(structure)));
-    console.log(this.downloadJson);
   }
 
   discardChanges() {
