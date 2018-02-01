@@ -14,6 +14,15 @@
     "lib": [
       "es2017",
       "dom"
-    ]
+    ],
+    "baseUrl": "src",
+    "paths": {
+      "@maps/*": ["app/maps/*"],
+      "@projects/*": ["app/projects/*"],
+      "@agents/*": ["app/agents/*"],
+      "@plugins/*": ["app/plugins/*"],
+      "@shared/*": ["app/shared/*"],
+      "@core/*": ["app/core/*"]
+    }
   }
 }

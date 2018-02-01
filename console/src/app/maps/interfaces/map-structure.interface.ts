@@ -28,8 +28,9 @@ export interface IAction {
 }
 
 export interface IUsedPlugin {
+  _id?: string
   name: string,
-  version: string
+  version: string,
 }
 export interface IProcess {
   id: string;
@@ -45,6 +46,7 @@ export interface IProcess {
   used_plugin: IUsedPlugin,
   plugin?: IPlugin,
   createdAt: Date,
+  updatedAt: Date,
   correlateAgents: boolean,
   uuid: string
 }
@@ -62,6 +64,7 @@ export interface IMapStructure {
   id?: string,
   _id?: string,
   createdAt: Date,
+  updatedAt: Date,
   content: any,
   map: string,
   code?: string,
@@ -70,5 +73,7 @@ export interface IMapStructure {
   links?: ILink[]
   plugins_names?: string[];
   plugins?: Plugin[];
+  used_plugins: [IUsedPlugin];
+
 }
 

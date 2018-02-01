@@ -26,7 +26,10 @@
   <div class="row">
     <p class="lead" *ngIf="!project?.maps || project?.maps?.length === 0">
       No maps yet.
-      Go ahead and <a routerLink="/maps/create" [queryParams]="{'project': project?.id}">add a new map</a>.
+      Go ahead and <a routerLink="/maps/create" [queryParams]="{'project': project?.id}">add a new map</a> or
+
+      <button class="btn btn-link" (click)="openImportModal()">import map</button>.
+
     </p>
 
     <p-dataTable
@@ -60,6 +63,7 @@
     </p-dataTable>
 
     <a routerLink="/maps/create" class="btn pm create" [queryParams]="{'project': project?.id}" *ngIf="project?.maps && project?.maps?.length > 0">Add map</a>
+    <button class="btn pm create" (click)="openImportModal()" *ngIf="project?.maps && project?.maps?.length > 0">Import map</button>
   </div>
 </div>
 

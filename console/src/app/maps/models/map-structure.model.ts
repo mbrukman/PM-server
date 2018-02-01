@@ -35,6 +35,7 @@ export class Action implements IAction {
 }
 
 export class UsedPlugin implements IUsedPlugin{
+  _id?: string;
   name: string;
   version: string;
 }
@@ -53,6 +54,7 @@ export class Process implements IProcess {
   used_plugin: UsedPlugin;
   plugin?: Plugin;
   createdAt: Date;
+  updatedAt: Date;
   correlateAgents: boolean;
   uuid: string;
 }
@@ -76,14 +78,15 @@ export class MapStructure implements IMapStructure {
   id?: string;
   _id?: string;
   createdAt: Date;
+  updatedAt: Date;
   map: string;
   content: any;
   code?: string;
   attributes?: Attribute[];
   processes?: Process[];
   links?: Link[];
-  plugins_names?: string[];
   plugins?: Plugin[];
+  used_plugins: [UsedPlugin];
 
   constructor() {
     this.processes = [];

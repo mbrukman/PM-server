@@ -7,6 +7,7 @@ import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
 import { Map } from '../../maps/models/map.model';
 import { ConfirmComponent } from '../../shared/confirm/confirm.component';
+import { ImportModalComponent } from './import-modal/import-modal.component';
 
 @Component({
   selector: 'app-project-details',
@@ -22,8 +23,10 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   filterTerm: string;
   featuredMaps: Map[];
 
-  constructor(private route: ActivatedRoute, private router: Router, private projectsService: ProjectsService, private modalService: BsModalService) {
-  }
+  constructor(private route: ActivatedRoute,
+              private router: Router,
+              private projectsService: ProjectsService,
+              private modalService: BsModalService) {}
 
   ngOnInit() {
     this.routeReq = this.route.params.subscribe(params => {
@@ -71,6 +74,11 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       return dateB.getTime() - dateA.getTime();
     });
     this.featuredMaps = maps.slice(0, 4);
+  }
+
+  openImportModal() {
+    const modal = this.modalService.show(ImportModalComponent);
+    modal.content.projectId = this.id;
   }
 
 }

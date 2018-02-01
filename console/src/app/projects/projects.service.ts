@@ -3,6 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { environment } from '../../environments/environment';
 import { Project } from './models/project.model';
+import { Map } from '@maps/models/map.model';
+import { MapStructure } from '@maps/models/map-structure.model';
 
 
 const serverUrl = environment.serverUrl;
@@ -50,5 +52,13 @@ export class ProjectsService {
 
   update(projectId, project) {
     return this.http.put<Project>(serverUrl + 'api/projects/' + projectId + '/update', project);
+  }
+
+  createMap(map) {
+    return this.http.post<Map>(serverUrl + 'api/maps/create', map);
+  }
+
+  createMapStructure(mapId: string, structure: MapStructure) {
+    return this.http.post<MapStructure>(serverUrl + 'api/maps/' + mapId + '/structure/create', structure);
   }
 }
