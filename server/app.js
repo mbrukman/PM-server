@@ -2,7 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const http = require('http');
-const morgan = require('morgan');
+const winston = require('winston');
+const expressWinston = require('express-winston');
 const mongoose = require('mongoose');
 const bootstrap = require("./helpers/bootstrap").bootstrap;
 const socket = require('socket.io');
@@ -13,10 +14,6 @@ const app = express();
 // configurations //
 ///////////////////
 
-// morgan logger
-app.use(morgan('dev'));
-
-
 // enable cors
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -25,6 +22,19 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Credentials', true);
     next();
 });
+
+// winston logger
+app.use(expressWinston.logger({
+    transports: [
+        new winston.transports.Console({
+            json: false,
+            colorize: true
+        })
+    ],
+    meta: false, // optional: control whether you want to log the meta data about the request (default to true)
+    expressFormat: true, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
+    colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
+}));
 
 
 const server = http.createServer(app);
