@@ -111,7 +111,7 @@ app.set('port', port);
 app.io = io;
 
 server.listen(port, () => {
-    console.log(`Running on localhost:${port}`);
+    winston.log('info', `Running on localhost:${port}`);
     bootstrap(app);
 });
 

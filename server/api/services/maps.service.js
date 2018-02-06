@@ -10,7 +10,6 @@ function getMapPlugins(mapStructure) {
     mapStructure.processes.forEach(process => {
         plugins.add(process.used_plugin);
     });
-    console.log(plugins);
     return Array.from(plugins);
 }
 
@@ -68,7 +67,6 @@ module.exports = {
         return Map.find(query);
     },
     get: (id) => {
-        console.log(id);
         return Map.findOne({ _id: id }).populate('agents')
     },
     /* get map structure. if structure id is not defined, get the latest */

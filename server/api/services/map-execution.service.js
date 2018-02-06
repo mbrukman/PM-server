@@ -2,6 +2,7 @@ const vm = require("vm");
 const fs = require("fs");
 const path = require("path");
 
+const winston = require("winston");
 const graphlib = require('graphlib');
 const _ = require("lodash");
 const async = require("async");
@@ -20,7 +21,7 @@ let libpm = '';
 fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 'utf8', function (err, data) {
     // opens the lib_production file. this file is used for user to use overwrite custom function at map code
     if (err) {
-        return console.log(err);
+        return winston.log('error', err);
     }
     libpm = data;
 });
@@ -56,7 +57,6 @@ function buildMapGraph(map) {
     const startNode = findStartNode(map);
     // creating a directed graph from the map.
     let map_graph = new graphlib.Graph({ directed: true });
-    console.log(map.processes.length, " processes");
     map_graph.setNode(startNode.uuid, startNode);
 
     map.processes.forEach(node => {
@@ -156,7 +156,7 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
             }
         }
         if (Object.keys(executionAgents).length === 0) {
-            console.log("No agents selected or no live agents");
+            winston.log('error', "No agents selected or no live agents");
             MapExecutionLog.create({
                 map: mapId,
                 runId: runId,
@@ -212,15 +212,15 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
                         function (filePath, callback) {
                             agentsService.installPluginOnAgent(filePath, agents[key]).then(() => {
                             }).catch((e) => {
-                                console.log("Error installing on agent", e);
+                                winston.log('error', "Error installing on agent", e);
                             });
                             callback();
                         },
                         function (error) {
                             if (error) {
-                                console.log("Error installing plugins on agent, it may be a fatal error", error);
+                                winston.log('error', "Error installing plugins on agent, it may be a fatal error", error);
                             }
-                            console.log("Done installing plugins");
+                            winston.log('success', "Done installing plugins");
                         });
                 }
             });
@@ -230,7 +230,7 @@ function executeMap(mapId, versionIndex, cleanWorkspace, req) {
 
         return startNode
     }).catch(error => {
-        console.log("Error: ", error);
+        winston.log('error', "Error: ", error);
         MapExecutionLog.create({
             map: mapId,
             runId: runId,
@@ -272,7 +272,7 @@ function updateExecutionContext(runId, agentKey) {
 
 function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
     if (!node) {
-        console.log("No node provided");
+        winston.log('error', "No node provided");
         return;
     }
 
@@ -283,7 +283,6 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
     if (node.type && node.type === 'start_node') {
         successors = mapGraph.successors(node.uuid);
         successors.forEach(successor => {
-            console.log("Execute process - ", successor);
             executeProcess(map, mapGraph, successor, runId, socket, mapResult);
         });
         return;
@@ -309,21 +308,18 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
                 executions[runId].executionAgents[agent.key].startTime = new Date();
 
             if (executions[runId].executionAgents[agent.key].processes) {
-                console.log("There are processes");
+                winston.log('error', "There are processes");
                 if (!executions[runId].executionAgents[agent.key].processes[node]) {
-                    console.log("Creating ref for: ", process.name);
                     updateProcessContext(runId, agent.key, node, { name: process.name });
-                    console.log(executions[runId].executionAgents[agent.key].processes[node])
                 }
                 // check if this process is executing or was executed.
                 if (executions[runId].executionAgents[agent.key].processes[node].status === "executing" || executions[runId].executionAgents[agent.key].processes[node].status === "error" || executions[runId].executionAgents[agent.key].processes[node].status === "success") {
                     agentCb();
                     return;
                 } else {
-                    console.log("not one of statuses: ", executions[runId].executionAgents[agent.key].processes[node].status);
+                    winston.log('error', "not one of statuses: ", executions[runId].executionAgents[agent.key].processes[node].status);
                 }
             } else {
-                console.log("There was no process at all so im creating it");
                 executions[runId].executionAgents[agent.key].processes = {};
             }
             updateProcessContext(runId, agent.key, node, {
@@ -351,12 +347,11 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
             vm.runInNewContext(agentStr, executions[runId].executionAgents[agent.key].executionContext);
             executions[runId].executionAgents[agent.key].status = "executing";
             if (process.condition) {
-                console.log("process has condition");
                 let res;
                 try {
                     res = vm.runInNewContext(process.condition, executions[runId].executionAgents[agent.key].executionContext);
                 } catch (e) {
-                    console.log("Error running process condition", e);
+                    winston.log('error', "Error running process condition", e);
                     MapExecutionLog.create({
                         map: map._id,
                         runId: runId,
@@ -382,7 +377,7 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
 
                 if (!res) {
                     // if res is not true
-                    console.log("Process didn't pass condition");
+                    winston.log('info', "Process didn't pass condition");
                     updateProcessContext(runId, agent.key, node, {
                         status: "error",
                         result: "Didn't passed condition"
@@ -415,7 +410,7 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
                     res = vm.runInNewContext(process.filterAgents, executions[runId].executionAgents[agent.key].executionContext);
 
                 } catch (e) {
-                    console.log("Error trying to run filter agent function", e);
+                    winston.log('error', "Error trying to run filter agent function", e);
                     MapExecutionLog.create({
                         map: map._id,
                         runId: runId,
@@ -441,7 +436,7 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
                 }
 
                 if (!res) {
-                    console.log("Agent didn't pass filter agent condition");
+                    winston.log('info', "Agent didn't pass filter agent condition");
                     MapExecutionLog.create({
                         map: map._id,
                         runId: runId,
@@ -476,7 +471,7 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
                     updateProcessContext(runId, agent.key, node, { preRun: res });
                     updateExecutionContext(runId, agent.key);
                 } catch (e) {
-                    console.log("Error running pre process function");
+                    winston.log('error', "Error running pre process function");
                     MapExecutionLog.create({
                         map: map._id,
                         runId: executionContext.runId,
@@ -501,7 +496,7 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
 
                     if (error) { // a mandatory action failed
 
-                        console.log("Fatal error: ", error);
+                        winston.log('error', "Fatal error: ", error);
                         MapExecutionLog.create({
                             map: map._id,
                             runId: runId,
@@ -550,9 +545,7 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
                         socket.emit('update', log);
                     });
                     if (!process.correlateAgents) {
-                        console.log("Dont have to correlate");
                         successors.forEach(successor => {
-                            console.log("next node", successor);
                             executeProcess(map, mapGraph, successor, runId, socket, mapResult);
                         })
                     }
@@ -566,7 +559,7 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
                             updateExecutionContext(runId, agent.key);
 
                         } catch (e) {
-                            console.log("Error running post process function");
+                            winston.log('error', "Error running post process function");
                             MapExecutionLog.create({
                                 map: map._id,
                                 runId: runId,
@@ -584,13 +577,11 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
 
 
         }, (error) => { //agentCb
-            console.log("All agents finish");
             if (error) {
-                console.log("There was an error while running agents: ", error);
+                winston.log('error',"There was an error while running agents: ", error);
             }
 
             if (process.correlateAgents) {
-                console.log("Agents should be correlated");
                 // if need to correlate agents, the next node will be called only after all agents are done;
                 // due to the way we get live agents, we must check in the execution agents if this link finish in all agents that are still available.
 
@@ -625,7 +616,7 @@ function executeProcess(map, mapGraph, node, runId, socket, mapResult) {
                 if (flag && executions[runId].executionContext.status !== "done") {
                     // delete executions[runId]; // removing the run from executions
 
-                    console.log(": map done :");
+                    winston.log('info', ": map done :");
                     MapExecutionLog.create({
                         map: map._id,
                         runId: runId,
@@ -812,7 +803,6 @@ function executeAction(map, runId, process, action, plugin, agent, socket) {
                     });
 
                     if (action.mandatory) {
-                        console.log("The action was mandatory, its a fatal error");
                         callback("Action '" + action.name + "' failed: " + res);
                         return;
                     }

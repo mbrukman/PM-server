@@ -21,7 +21,6 @@ module.exports = {
 
     /* add a map to project */
     addMap: (projectId, mapId) => {
-        console.log(projectId, mapId);
         return Project.update({ _id: projectId }, { $push: { maps: mapId } });
     },
 
