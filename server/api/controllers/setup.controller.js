@@ -27,13 +27,11 @@ module.exports = {
         mongoose.connect(dbDetails.uri, { useMongoClient: true })
             .then(
                 () => {
-
                     let expressWinstonTranports = [
                         new winston.transports.Console({
                             json: false,
                             colorize: true
                         })];
-
                     expressWinstonTranports.push(new winston.transports.MongoDB({ db: dbDetails.uri }));
                     req.app.use(expressWinston.logger({
                         transports: expressWinstonTranports,
@@ -42,12 +40,11 @@ module.exports = {
                         expressFormat: false, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
                         colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
                     }));
-
                     let tmpRoute = req.app._router.stack.pop();
                     req.app._router.stack.splice(3, 0, tmpRoute); // adding to router stack
                     // adding mongo transporter to winston
                     winston.add(winstonMongo.MongoDB, {
-                        db: env.dbURI
+                        db: dbDetails.uri
                     });
                     config = Object.assign({}, config, { dbURI: dbDetails.uri });
                     fs.writeFileSync('./env/config.json', JSON.stringify(config));
