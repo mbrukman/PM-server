@@ -26,32 +26,27 @@ app.use((req, res, next) => {
 });
 
 // winston logger
-
-
 const server = http.createServer(app);
-io = socket(server);
-io.on('connection', function (socket) {
-    console.log('a user connected');
-});
 
 let expressWinstonTranports = [
     new winston.transports.Console({
         json: false,
         colorize: true
     })];
+
 if (env.dbURI) {
     mongoose.connect(env.dbURI, {
         useMongoClient: true
     }).then(() => {
         winston.add(winstonMongo.MongoDB, {
             db: env.dbURI,
-
         });
         winston.log('info', `Succesfully Connected to the Mongodb at ${env.dbURI}`);
     });
-    expressWinstonTranports.push(new winston.transports.MongoDB({db: env.dbURI}));
+    expressWinstonTranports.push(new winston.transports.MongoDB({ db: env.dbURI }));
 }
 
+// add express winston to router stack
 app.use(expressWinston.logger({
     transports: expressWinstonTranports,
     meta: true, // optional: control whether you want to log the meta data about the request (default to true)
@@ -61,6 +56,13 @@ app.use(expressWinston.logger({
 }));
 
 mongoose.Promise = require('bluebird');
+
+// socket.io
+io = socket(server);
+io.on('connection', function (socket) {
+    winston.log('info', 'a user connected');
+});
+
 
 app.use(bodyParser.urlencoded({
     extended: false
