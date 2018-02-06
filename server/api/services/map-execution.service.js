@@ -705,7 +705,7 @@ function executeAction(map, runId, process, action, plugin, agent, socket) {
             socket.emit('update', log);
         });
         request.post(
-            agent.url + '/api/task/add',
+            agentsService.agentsStatus()[agent.key].defaultUrl + '/api/task/add',
             {
                 form: {
                     mapId: map.id,
