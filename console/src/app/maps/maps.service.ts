@@ -83,6 +83,10 @@ export class MapsService {
     return this.http.get(serverUrl + 'api/maps/' + mapId + '/execute')
   }
 
+  stopExecutions(mapId: string, runId='') {
+    return this.http.get(`${serverUrl}api/maps/${mapId}/stop-execution/${runId}`);
+  }
+
   getDistinctMapExecutionsResult() {
     return this.http.get<any>(`${serverUrl}api/maps/results`);
   }

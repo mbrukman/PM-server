@@ -33,7 +33,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   mapExecutionMessagesSubscription: Subscription;
   executing: string[] = [];
   colorScheme = {
-    domain: ['#42bc76', '#f85555', '#ebb936']
+    domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
 
   constructor(private mapsService: MapsService, private socketService: SocketService) {
@@ -143,6 +143,10 @@ export class MapResultComponent implements OnInit, OnDestroy {
 
   }
 
+  stopRun(runId: string) {
+    this.mapsService.stopExecutions(this.map.id, runId).subscribe();
+  }
+
   aggregateProcessesStatus(processes) {
     let ag = processes.reduce((total, current) => {
       if (!total[current.status]) {
@@ -153,6 +157,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     }, {
       success: { name: 'success', value: 0 },
       error: { name: 'error', value: 0 },
+      stopped: { name: 'stopped', value: 0 },
       partial: { name: 'partial', value: 0 }
     });
     let result = Object.keys(ag).map((key) => {
