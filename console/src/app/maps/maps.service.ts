@@ -95,6 +95,10 @@ export class MapsService {
     return this.http.get<MapExecutionLogs[]>(serverUrl + 'api/maps/' + mapId + '/results/' + (runId ? runId + '/' : '') + 'logs')
   }
 
+  currentExecutionList() {
+    return this.http.get(`${serverUrl}api/maps/currentruns`);
+  }
+
   executionResultDetail(mapId, resultId) {
     return this.http.get<MapResult>(`${serverUrl}api/maps/${mapId}/results/${resultId}`);
   }

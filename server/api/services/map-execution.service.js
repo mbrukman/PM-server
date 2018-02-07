@@ -728,7 +728,7 @@ function executeAction(map, runId, process, action, plugin, agent, socket) {
             return;
         }
         request.post(
-            agent.url + '/api/task/add',
+            agentsService.agentsStatus()[agent.key].defaultUrl + '/api/task/add',
             {
                 form: {
                     mapId: map.id,
@@ -906,7 +906,7 @@ function summarizeExecution(executionContext, resultObj) {
 function sendKillRequest(mapId, actionId, agentKey) {
     return new Promise((resolve, reject) => {
         request.post(
-            agentsService.agentsStatus()[agentKey].url + '/api/task/cancel',
+            agentsService.agentsStatus()[agentKey].defaultUrl + '/api/task/cancel',
             {
                 form: {
                     mapId: mapId,

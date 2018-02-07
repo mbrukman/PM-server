@@ -47,6 +47,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
         this.getExecutionList();
       });
 
+    this.mapsService.currentExecutionList().take(1).subscribe(executions => this.executing = Object.keys(executions));
     this.mapExecutionSubscription = this.socketService.getCurrentExecutionsAsObservable().subscribe(executions => {
       this.executing = Object.keys(executions);
     });
