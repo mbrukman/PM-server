@@ -14,7 +14,7 @@ export class ProcessResultComponent implements OnChanges {
   agProcessActionsStatus: any;
   agActionsStatus: any;
   colorScheme = {
-    domain: ['#42bc76', '#f85555', '#ebb936']
+    domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
 
   constructor() {
@@ -50,7 +50,7 @@ export class ProcessResultComponent implements OnChanges {
     let agActionsStatus = actions.reduce((total, current) => {
       total[current.status] = (total[current.status] || 0) + 1;
       return total;
-    }, { success: 0, error: 0 });
+    }, { success: 0, error: 0, stopped: 0, partial: 0 });
 
     // formatting for chart
     this.agProcessActionsStatus = Object.keys(agActionsStatus).map((o) => {
@@ -61,7 +61,7 @@ export class ProcessResultComponent implements OnChanges {
     let agActions = actions.reduce((total, current) => {
       if (!total[current.action]) {
         total[current.action] = {
-          status: { success: 0, error: 0 },
+          status: { success: 0, error: 0, stopped: 0 },
           results: { result: [], stderr: [], stdout: [] },
           startTime: new Date(),
           finishTime: new Date('1994-12-17T03:24:00')
