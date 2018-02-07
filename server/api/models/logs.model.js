@@ -13,4 +13,4 @@ let logSchema = new Schema({
 let Log = mongoose.model('Log', logSchema, 'log');
 
 
-module.exports = Map;
+module.exports = Log;
