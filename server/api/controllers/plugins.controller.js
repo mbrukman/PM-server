@@ -1,4 +1,5 @@
 const path = require("path");
+const winston = require("winston");
 const _ = require("lodash");
 
 
@@ -14,7 +15,7 @@ module.exports = {
             return res.json(plugins);
         }).catch(error => {
             req.io.emit('notification', { title: 'Whoops', message: `We couldn't get plugins list`, type: 'error' });
-            console.log("Error filtering plugins", error);
+            winston.log('error', "Error filtering plugins", error);
             return res.status(500).send(error);
         })
 
@@ -37,7 +38,7 @@ module.exports = {
             return res.json(obj);
         }).catch(error => {
             req.io.emit('notification', { title: 'Whoops', message: `Error while installing plugin`, type: 'error' });
-            console.log("Error uploading plugin", error);
+            winston.log('error', "Error uploading plugin", error);
             return res.status(500).send(error);
         })
     },
@@ -50,7 +51,7 @@ module.exports = {
             return res.status(200).send();
         }).catch(error => {
             req.io.emit('notification', { title: 'Whoops', message: `Error deleting plugin`, type: 'error' });
-            console.log("Error deleting plugin", error);
+            winston.log('error', "Error deleting plugin", error);
             return res.status(500).send(error);
         });
         req.params.id

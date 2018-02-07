@@ -1,14 +1,15 @@
+const winston = require("winston");
 const agentsService = require("../api/services/agents.service");
 const pluginsService = require("../api/services/plugins.service");
 const scheduledJobsService = require("../api/services/scheduled-job.service");
 
 module.exports = {
     bootstrap: (app) => {
-        console.log("Restarting agents status");
+        winston.log('info', "Restarting agents status");
         agentsService.restartAgentsStatus();
-        console.log("Reloading plugins");
+        winston.log('info', "Reloading plugins");
         pluginsService.loadModules(app);
-        console.log("Loading scheduled jobs");
+        winston.log('info', "Loading scheduled jobs");
         scheduledJobsService.loadJobs(app);
         // setTimeout(() => {
         //     pluginsService.loadPlugins();

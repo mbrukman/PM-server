@@ -1,9 +1,11 @@
-let mapsService = require("../services/maps.service");
-let projectsService = require("../services/projects.service");
-let mapsExecutionService = require("../services/map-execution.service");
-let triggersService = require("../services/triggers.service");
-let scheduledJobsService = require("../services/scheduled-job.service");
-let hooks = require("../../libs/hooks/hooks");
+const winston = require("winston");
+
+const mapsService = require("../services/maps.service");
+const projectsService = require("../services/projects.service");
+const mapsExecutionService = require("../services/map-execution.service");
+const triggersService = require("../services/triggers.service");
+const scheduledJobsService = require("../services/scheduled-job.service");
+const hooks = require("../../libs/hooks/hooks");
 
 module.exports = {
     /* archive a map */
@@ -11,7 +13,7 @@ module.exports = {
         mapsService.archive([req.params.id]).then(map => {
             return res.status(204).send();
         }).catch(error => {
-            console.log("Error archiving map", error);
+            winston.log('error', "Error archiving map", error);
             req.io.emit('notification', {
                 title: 'Error',
                 message: `Error creating map. Please try again`,
@@ -37,7 +39,7 @@ module.exports = {
                 });
             });
         }).catch((error) => {
-            console.log("Error creating map: ", error);
+            winston.log('error', "Error creating map", error);
             req.io.emit('notification', {
                 title: 'Error',
                 message: `Error creating map. Please try again`,
@@ -67,7 +69,7 @@ module.exports = {
         }).then((map) => {
             return res.status(200).json(map);
         }).catch((error) => {
-            console.log("Error finding map: ", error);
+            winston.log('error', "Error finding map", error);
             req.io.emit('notification', { title: 'Whoops...', message: `Error finding map`, type: 'error' });
             return res.status(500).json(error);
         });
@@ -110,7 +112,7 @@ module.exports = {
                 return res.json(dupMap);
             });
         }).catch(error => {
-            console.log(error);
+            winston.log('error', 'Error duplicating map', error);
             return res.status(500).send(error);
         });
     },
@@ -124,7 +126,7 @@ module.exports = {
             }
             return res.json(data);
         }).catch((error) => {
-            console.log("Error filtering maps: ", error);
+            winston.log('error', "Error filtering maps", error);
             req.io.emit('notification', { title: 'Whoops...', message: `Error filtering maps`, type: 'error' });
 
             return res.status(500).json(error);
@@ -138,7 +140,7 @@ module.exports = {
                 return res.json(structure);
             return res.status(204).send();
         }).catch((error) => {
-            console.log("Error finding map version: ", error);
+            winston.log('error', "Error finding map version", error);
             return res.status(500).json(error);
         });
     },
@@ -155,7 +157,7 @@ module.exports = {
         }).then(() => {
             return res.send('OK');
         }).catch((error) => {
-            console.log("Error updating map: ", error);
+            winston.log('error', "Error updating map", error);
             req.io.emit('notification', { title: 'Whoops...', message: `Error updating map`, type: 'error' });
 
             return res.status(500).json(error);
@@ -171,22 +173,22 @@ module.exports = {
             return mapsService.createStructure(req.body)
         }).then(structure => {
             req.io.emit('notification', { title: 'Saved', message: `Map saved successfully`, type: 'success' });
-            res.json(structure)
+            return res.json(structure)
         }).catch((error) => {
-            console.log("Error creating map structure: ", error);
+            winston.log('error', "Error creating map structure", error);
             req.io.emit('notification', { title: 'Whoops...', message: `Error saving map structure`, type: 'error' });
 
-            res.status(500).send(error);
+            return res.status(500).send(error);
         })
     },
     getStructureList: (req, res) => {
         hooks.hookPre('map-list-structures', req).then(() => {
             return mapsService.structureList(req.params.id, req.query.page);
         }).then(structures => {
-            res.json(structures);
+            return res.json(structures);
         }).catch((error) => {
-            console.log("Error finding map structures: ", error);
-            res.status(500).send(error);
+            winston.log('error', "Error finding map structures", error);
+            return res.status(500).send(error);
         })
     },
 
@@ -204,7 +206,7 @@ module.exports = {
         }).then((r) => {
             res.json(r);
         }).catch(error => {
-            console.log("Error executing map: ", error);
+            winston.log('error', "Error executing map", error);
             req.io.emit('notification', { title: 'Whoops...', message: `Error executing map`, type: 'error' });
 
             return res.status(500).json(error);
@@ -222,7 +224,7 @@ module.exports = {
         }).then((results) => {
             res.json(results);
         }).catch(error => {
-            console.log("Error getting execution results: ", error);
+            winston.log('error', "Error getting execution results", error);
             return res.status(500).json(error);
         });
     },
@@ -233,7 +235,7 @@ module.exports = {
         }).then((results) => {
             res.json(results);
         }).catch(error => {
-            console.log("Error getting execution results: ", error);
+            winston.log('error', "Error getting execution results", error);
             req.io.emit('notification', {
                 title: 'Whoops...',
                 message: `Error getting execution results`,
@@ -253,7 +255,7 @@ module.exports = {
             }
             return res.json(result);
         }).catch(error => {
-            console.log("Error getting execution result: ", error);
+            winston.log('error', "Error getting execution result", error);
             req.io.emit('notification', {
                 title: 'Whoops...',
                 message: `Error getting execution result`,
@@ -278,7 +280,7 @@ module.exports = {
 
             return res.json(trigger);
         }).catch((error) => {
-            console.log("Error getting map's triggers: ", error);
+            winston.log('error', "Error getting map's triggers", error);
             return res.status(500).json(error);
         });
     },
@@ -300,7 +302,7 @@ module.exports = {
                 message: `We couldn't delete this trigger`,
                 type: 'error'
             });
-            console.log("Error getting map's triggers: ", error);
+            winston.log('error', "Error getting map's triggers", error);
             return res.status(500).json(error);
         });
     },
@@ -311,7 +313,7 @@ module.exports = {
         }).then(triggers => {
             return res.json(triggers);
         }).catch((error) => {
-            console.log("Error getting map's triggers: ", error);
+            winston.log('error', "Error getting map's triggers", error);
             return res.status(500).json(error);
         });
     },
@@ -328,7 +330,7 @@ module.exports = {
 
             return res.json(trigger);
         }).catch((error) => {
-            console.log("Error updating triggers: ", error);
+            winston.log('error', "Error updating triggers", error);
             return res.status(500).json(error);
         });
     },
@@ -342,7 +344,7 @@ module.exports = {
         }).then((job) => {
             return res.json(job);
         }).catch((error) => {
-            console.log("Error creating a new job ", error);
+            winston.log('error', "Error creating a new job ", error);
             return res.status(500).send(error);
         });
     },
@@ -361,7 +363,7 @@ module.exports = {
         }).then(jobs => {
             return res.json(jobs)
         }).catch((error) => {
-            console.log("Error finding jobs ", error);
+            winston.log('error', "Error finding jobs ", error);
             return res.status(500).send(error);
         });
     },

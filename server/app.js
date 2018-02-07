@@ -2,20 +2,19 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const http = require('http');
-const morgan = require('morgan');
+const winston = require('winston');
+const expressWinston = require('express-winston');
 const mongoose = require('mongoose');
 const bootstrap = require("./helpers/bootstrap").bootstrap;
 const socket = require('socket.io');
+const winstonMongo = require('winston-mongodb');
+
 const env = require('./env/enviroment');
 const app = express();
 
 /////////////////////
 // configurations //
 ///////////////////
-
-// morgan logger
-app.use(morgan('dev'));
-
 
 // enable cors
 app.use((req, res, next) => {
@@ -26,23 +25,44 @@ app.use((req, res, next) => {
     next();
 });
 
-
+// winston logger
 const server = http.createServer(app);
-io = socket(server);
-io.on('connection', function (socket) {
-    console.log('a user connected');
-});
+
+let expressWinstonTranports = [
+    new winston.transports.Console({
+        json: false,
+        colorize: true
+    })];
 
 if (env.dbURI) {
-    console.log('--', env.dbURI);
     mongoose.connect(env.dbURI, {
         useMongoClient: true
     }).then(() => {
-        console.log(`Succesfully Connected to the Mongodb Database`);
+        winston.add(winstonMongo.MongoDB, {
+            db: env.dbURI,
+        });
+        winston.log('info', `Succesfully Connected to the Mongodb at ${env.dbURI}`);
     });
+    expressWinstonTranports.push(new winston.transports.MongoDB({ db: env.dbURI }));
 }
 
+// add express winston to router stack
+app.use(expressWinston.logger({
+    transports: expressWinstonTranports,
+    meta: true, // optional: control whether you want to log the meta data about the request (default to true)
+    msg: "HTTP {{req.method}} {{req.url}} {{req.statusCode}}",
+    expressFormat: false, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
+    colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
+}));
+
 mongoose.Promise = require('bluebird');
+
+// socket.io
+io = socket(server);
+io.on('connection', function (socket) {
+    winston.log('info', 'a user connected');
+});
+
 
 app.use(bodyParser.urlencoded({
     extended: false
@@ -51,6 +71,7 @@ app.use(bodyParser.json());
 
 app.use((req, res, next) => {
     req.io = io;
+    req.app = app;
     next();
 });
 
@@ -90,7 +111,7 @@ app.set('port', port);
 app.io = io;
 
 server.listen(port, () => {
-    console.log(`Running on localhost:${port}`);
+    winston.log('info', `Running on localhost:${port}`);
     bootstrap(app);
 });
 

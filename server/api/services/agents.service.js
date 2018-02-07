@@ -1,6 +1,8 @@
 const request = require("request");
 const fs = require("fs");
 const path = require("path");
+
+const winston = require("winston");
 const _ = require("lodash");
 const humanize = require("../../helpers/humanize");
 const env = require("../../env/enviroment");
@@ -147,12 +149,12 @@ module.exports = {
                     });
                 }
             } else {
-                console.log("Sending request", agents[agent.key].defaultUrl);
+                winston.log('info', "Sending request to agent");
                 request.post({
                     url: agents[agent.key].defaultUrl + "/api/plugins/install",
                     formData: Object.assign(formData, { key: agent.key })
                 }, function (err, res, body) {
-                    console.log(err, res, body);
+                    winston.log('info', res, body);
                 });
                 resolve();
             }
