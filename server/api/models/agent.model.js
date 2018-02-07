@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 let agentSchema = new Schema({
     name: String,
     url: { type: String, required: true },
+    publicUrl: {type: String, required: true},
     key: { type: String, required: true },
     sshKey: String,
     attributes: []

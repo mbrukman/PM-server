@@ -5,8 +5,8 @@ export class Agent implements IAgent {
   id: string;
   name?: string;
   url: string;
+  publicUrl: string;
   key: string;
   sshKey?: string;
   attributes: any[] | string;
-  // status?: any;
 }
