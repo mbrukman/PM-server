@@ -21,6 +21,8 @@ module.exports = {
             return pluginsService.filterPlugins({ active: true, type: 'executer' });
         }).then(activePlugins => {
             plugins = activePlugins;
+            return agentsService.setDefaultUrl(agent);
+        }).then(() => {
             return agentsService.checkPluginsOnAgent(agent);
         }).then(agentsPlugin => {
             agentsPlugin = JSON.parse(agentsPlugin);
