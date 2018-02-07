@@ -211,6 +211,11 @@ module.exports = {
         });
     },
 
+    /* stop map execution */
+    stopExecution: (req, res) => {
+      return res.json(mapsExecutionService.stop(req.io, req.params.id, req.params.runId));
+    },
+
     logs: (req, res) => {
         hooks.hookPre('map-logs-list', req).then(() => {
             return mapsExecutionService.logs(req.params.id, req.params.resultId);
