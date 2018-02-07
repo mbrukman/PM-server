@@ -4,6 +4,7 @@ const unzip = require('unzip');
 const streams = require('memory-streams');
 const child_process = require("child_process");
 const async = require("async");
+const winston = require("winston");
 
 const env = require("../../env/enviroment");
 const agentsService = require("./agents.service");
@@ -15,7 +16,6 @@ let pluginsPath = path.join(path.dirname(path.dirname(__dirname)), "libs", "plug
 function installPluginOnAgent(pluginDir, obj) {
     let outputPath = path.join(pluginsPath, obj.name);
     if (!fs.existsSync(outputPath)) {
-        console.log("Creating directory");
         fs.mkdirSync(outputPath);
     }
     // unzipping the img
@@ -77,7 +77,6 @@ function installPluginOnServer(pluginDir, obj) {
         fs.createReadStream(pluginDir)
             .pipe(unzip.Parse())
             .on('entry', (entry) => {
-                console.log("Entry", entry);
                 let fileName = entry.path;
                 entry.pipe(fs.createWriteStream(path.join(outputPath, fileName)));
             }).on('close', (data) => {
@@ -86,7 +85,7 @@ function installPluginOnServer(pluginDir, obj) {
             let cmd = 'cd ' + outputPath + ' &&' + ' npm install ' + " && cd " + outputPath;
             child_process.exec(cmd, function (error, stdout, stderr) {
                 if (error) {
-                    console.log("ERROR", error, stderr);
+                    winston.log('error',"ERROR", error, stderr);
                 }
                 return resolve();
             });
@@ -124,9 +123,9 @@ function deployPluginFile(pluginPath, req) {
                             }
                             fs.unlink(plugin.file, function (error) {
                                 if (error) {
-                                    console.log("Error unlinking old file");
+                                    winston.log('error', "Error unlinking old file");
                                 } else {
-                                    console.log("Deleted old plugin file");
+                                    winston.log('info', "Deleted old plugin file");
                                 }
                             });
                             return Plugin.findByIdAndUpdate(plugin._id, obj)
@@ -144,7 +143,7 @@ function deployPluginFile(pluginPath, req) {
                             else
                                 return reject("No type was provided for this plugin");
                         }).catch((error) => {
-                            console.log("Error creating plugin", error);
+                            winston.log('error', "Error creating plugin", error);
                             reject(error);
                         });
 
@@ -172,7 +171,7 @@ module.exports = {
                     let filePath = path.join(env.static_cdn, env.upload_path, plugin);
                     deployPluginFile(filePath).then(() => {
                     }).catch(error => {
-                        console.log("Error installing plugin: ", error);
+                        winston.log('error', "Error installing plugin: ", error);
                     });
                     callback();
                 },

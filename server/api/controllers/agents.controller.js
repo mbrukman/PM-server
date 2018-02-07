@@ -1,9 +1,5 @@
-const fs = require("fs");
-const path = require('path');
 const async = require("async");
-const request = require("request");
-
-const env = require("../../env/enviroment");
+const winston = require("winston");
 
 const agentsService = require("../services/agents.service");
 const pluginsService = require("../services/plugins.service");
@@ -12,7 +8,7 @@ const hooks = require("../../libs/hooks/hooks");
 module.exports = {
     /* The function will be called every time an agent is registering to the server (agent startup) */
     add: (req, res) => {
-        console.log("Add new agent");
+        winston.log('info', "Add new agent");
         let agent;
         let plugins;
         hooks.hookPre('agent-create', req).then(() => {
@@ -45,15 +41,14 @@ module.exports = {
                 function (filePath, callback) {
                     agentsService.installPluginOnAgent(filePath, agent).then(() => {
                     }).catch((e) => {
-                        console.log("Error installing on agent", e);
+                        winston.log('error', "Error installing on agent", e);
                     });
                     callback();
                 },
                 function (error) {
                     if (error) {
-                        console.log("Error installing plugins on agent", error);
+                        winston.log('error', "Error installing plugins on agent", error);
                     }
-                    console.log("DONE");
                     return res.status(204).send();
                 });
         });
@@ -64,12 +59,12 @@ module.exports = {
             hooks.hookPre('agent-delete').then(() => {
                 return agentsService.delete(req.params.id)
             }).then(() => {
-                res.status(200).send('OK');
                 req.io.emit('notification', { title: 'Agent deleted', message: ``, type: 'success' });
+                return res.status(200).send('OK');
             }).catch(error => {
                 req.io.emit('notification', { title: 'Whoops...', message: `Error deleting agent`, type: 'error' });
-                console.log("Error deleting agent", error);
-                res.status(500).send(error);
+                winston.log('error', "Error deleting agent", error);
+                return res.status(500).send(error);
             });
             agentsService.unfollowAgent(req.params.id);
         },
@@ -82,8 +77,8 @@ module.exports = {
                 res.json(agents);
             }).catch(error => {
                 req.io.emit('notification', { title: 'Whoops...', message: `Error finding agents`, type: 'error' });
-                console.log("Error filtering agents", error);
-                res.status(500).send(error);
+                winston.log('error', "Error filtering agents", error);
+                return res.status(500).send(error);
             });
         },
     /* Get agents status */
@@ -99,7 +94,7 @@ module.exports = {
                 }
                 return res.send('');
             }).catch(error => {
-                console.log("Error getting agents status", error);
+                winston.log('error', "Error getting agents status", error);
                 return res.status(500).send();
             })
         },
@@ -119,7 +114,7 @@ module.exports = {
                 return res.json(agent);
             }).catch(error => {
                 req.io.emit('notification', { title: 'Whoops...', message: `Error updating agent`, type: 'error' });
-                console.log("Error updating agent", error);
+                winston.log('error', "Error updating agent", error);
                 res.status(500).send(error);
             });
         }
