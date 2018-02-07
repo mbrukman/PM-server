@@ -903,13 +903,30 @@ function summarizeExecution(executionContext, resultObj) {
     return MapResult.findByIdAndUpdate(executions[executionContext.runId].resultObj, result, { new: true });
 }
 
+function sendKillRequest(mapId, actionId, agentKey) {
+    return new Promise((resolve, reject) => {
+        request.post(
+            agentsService.agentsStatus()[agentKey].url + '/api/task/cancel',
+            {
+                form: {
+                    mapId: mapId,
+                    actionId: actionId,
+                    key: agentKey
+                }
+            },
+            function (error, response, body) {
+                resolve();
+            });
+    });
+}
+
 module.exports = {
     /**
      * starting a map execution
      * @param mapId {string}
      * @param versionIndex {string}
      * @param cleanWorkspace {boolean}
-     * @param req {object | express request}
+     * @param req {request}
      * @returns {Promise|*|Promise<T>} return an error or a runId if run started
      */
     execute: executeMap,
@@ -974,6 +991,14 @@ module.exports = {
         /* clean data */
         const d = new Date();
         stoppedRuns.forEach(runId => {
+            MapExecutionLog.create({
+                map: mapId,
+                runId: runId,
+                message: "Got stop signal. Stopping execution",
+                status: "info"
+            }).then((log) => {
+               socket.emit('update', log);
+            });
             executions[runId].executionContext.finishTime = d;
             Object.keys(executions[runId].executionContext.agents).map(agentKey => {
                 if (executions[runId].executionContext.agents[agentKey].status !== 'error') {
@@ -998,6 +1023,7 @@ module.exports = {
                                     status: 'stopped',
                                     result: 'The action was stopped'
                                 };
+                                sendKillRequest(executions[runId].executionContext.map.id, actionId, agentKey);
                             }
                         });
                     })
