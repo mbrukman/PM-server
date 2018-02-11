@@ -213,6 +213,12 @@ function updateExecutionContext(runId, agentKey) {
     });
 }
 
+/**
+ * Returns if agent should continue execution
+ * @param runId
+ * @param agentKey
+ * @returns {boolean}
+ */
 function shouldContinueExecution(runId, agentKey) {
     return (!executions[runId].stop) && executions[runId].executionAgents[agentKey].continue;
 }
@@ -332,6 +338,21 @@ function findProcessByUuid(uuid, structure) {
 }
 
 /**
+ * return ancestors for a certain node
+ * @param nodeUuid
+ * @param structure
+ * @returns {Array} - uuid of ancestors
+ */
+function findAncestors(nodeUuid, structure) {
+    let links = structure.links.filter((o) => o.targetId === nodeUuid);
+    let ancestors = links.reduce((total, current) => {
+        total.push(current.sourceId);
+        return total;
+    }, []);
+    return ancestors;
+}
+
+/**
  * returns successors uuids for certain node
  * @param nodeUuid
  * @param structure
@@ -361,7 +382,7 @@ function runMapFromAgent(map, structure, runId, node, socket) {
 }
 
 /**
- * finds all successors for node and run them in parallel.
+ * finds all successors for node and run them in parallel if meeting coordination criteria.
  * @param map
  * @param structure
  * @param runId
@@ -372,10 +393,34 @@ function runMapFromAgent(map, structure, runId, node, socket) {
 function runNodeSuccessors(map, structure, runId, agent, node, socket) {
     if (!shouldContinueExecution(runId, agent.key)) {
         console.log("Should not continue");
-        return ;
+        return;
     }
     const successors = findSuccessors(node, structure);
-    async.each(successors, runProcess(map, structure, runId, agent, socket), (error) => {
+    let nodesToRun = [];
+    successors.forEach(successor => {
+        let ancestors = findAncestors(successor, structure);
+        if (ancestors.length > 1) {
+            let process = findProcessByUuid(successor, structure);
+            if (process.coordination === 'wait') {
+                let flag = true;
+                ancestors.forEach(ancestor => {
+                    if (!executions[runId].executionAgents[agent.key].processes.hasOwnProperty(ancestor) ||
+                        ['error', 'success', 'partial'].indexOf(executions[runId].executionAgents[agent.key].processes[ancestor][0].status) === -1) {
+                        flag = false;
+                    }
+                });
+                if (!flag) {
+                    return;
+                }
+            } else if (process.coordination === 'race') {
+                if (executions[runId].executionAgents[agent.key].processes.hasOwnProperty(process.uuid)) {
+                    return;
+                }
+            }
+        }
+        nodesToRun.push(successor);
+    });
+    async.each(nodesToRun, runProcess(map, structure, runId, agent, socket), (error) => {
         console.log("all successors finished");
     });
 }
@@ -473,7 +518,8 @@ function runProcess(map, structure, runId, agent, socket) {
         let actionExecutionFunctions = {};
 
         process.actions.forEach((action, i) => {
-            actionExecutionFunctions[(action.name || `Action #${i + 1} `) + "(" + action.id + ")"] =
+            action.name = (action.name || `Action #${i + 1} `);
+            actionExecutionFunctions[`${action.name} ("${action.id}")`] =
                 executeAction(
                     map,
                     structure,
