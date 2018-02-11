@@ -9,6 +9,7 @@
           </span>
           <span *ngIf="executing?.indexOf(execution.runId) > -1">
             <i class="fa fa-spinner fa-pulse fa-fw"></i>
+            <i class="fa fa-stop text-danger" (click)="stopRun(execution.runId)"></i>
           </span>
 
         </li>

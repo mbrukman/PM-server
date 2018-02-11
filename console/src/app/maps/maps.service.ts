@@ -83,12 +83,20 @@ export class MapsService {
     return this.http.get(serverUrl + 'api/maps/' + mapId + '/execute')
   }
 
+  stopExecutions(mapId: string, runId='') {
+    return this.http.get(`${serverUrl}api/maps/${mapId}/stop-execution/${runId}`);
+  }
+
   getDistinctMapExecutionsResult() {
     return this.http.get<any>(`${serverUrl}api/maps/results`);
   }
 
   logsList(mapId: string, runId?: string) {
     return this.http.get<MapExecutionLogs[]>(serverUrl + 'api/maps/' + mapId + '/results/' + (runId ? runId + '/' : '') + 'logs')
+  }
+
+  currentExecutionList() {
+    return this.http.get(`${serverUrl}api/maps/currentruns`);
   }
 
   executionResultDetail(mapId, resultId) {
