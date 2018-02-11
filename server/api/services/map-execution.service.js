@@ -715,6 +715,21 @@ function executeAction(map, runId, process, action, plugin, agent, socket) {
         }).then((log) => {
             socket.emit('update', log);
         });
+
+        let actionString = `+ ${plugin.name} - ${method.name}: `;
+        for (let i in action.params) {
+            actionString += `${i}: ${action.params[i]}`;
+        }
+
+        MapExecutionLog.create({
+            map: map._id,
+            runId: runId,
+            message: actionString,
+            status: 'info'
+        }).then(log => {
+            socket.emit('update', log);
+        });
+
         if (!executions.hasOwnProperty(runId) || executions[runId].stop) {
             callback('Map stopped');
             return;
@@ -742,20 +757,6 @@ function executeAction(map, runId, process, action, plugin, agent, socket) {
                 // executionAgents[agent.key].processes[process.uuid].actions[key].finishTime = new Date();
                 updateActionContext(runId, agent.key, process.uuid, key, { finishTime: new Date() });
 
-                let actionString = `+ ${plugin.name} - ${method.name}: `;
-                for (let i in action.params) {
-                    actionString += `${i}: ${action.params[i]}`;
-                }
-
-                MapExecutionLog.create({
-                    map: map._id,
-                    runId: runId,
-                    message: actionString,
-                    status: 'info'
-                }).then(log => {
-                    socket.emit('update', log);
-                });
-
                 if (!error && response.statusCode === 200) {
                     body.stdout = actionString + '\n' + body.stdout;
 
@@ -764,8 +765,6 @@ function executeAction(map, runId, process, action, plugin, agent, socket) {
                         result: body,
                         startTime: sTime
                     });
-
-                    callback(null, body);
 
                     let actionExecutionLogs = [];
                     if (body.stdout) {
@@ -802,6 +801,10 @@ function executeAction(map, runId, process, action, plugin, agent, socket) {
                             socket.emit('update', log);
                         });
                     });
+
+                    callback(null, body);
+                    return ;
+
                 }
                 else {
                     let res = body;
