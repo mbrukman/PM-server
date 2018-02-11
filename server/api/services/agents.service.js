@@ -84,7 +84,7 @@ function getAgentStatus() {
 function setDefaultUrl(agent) {
     return new Promise((resolve, reject) => {
         request.post(agent.publicUrl + '/api/status', { form: { key: agent.key } }, function (error, response, body) {
-            if (error && error.code === 'ECONNREFUSED') {
+            if (error && (error.code === 'ECONNREFUSED' || error.code === 'EHOSTUNREACH')) {
                 agents[agent.key].defaultUrl = agent.url;
             } else {
                 agents[agent.key].defaultUrl = agent.publicUrl;
