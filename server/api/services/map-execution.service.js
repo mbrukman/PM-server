@@ -45,6 +45,11 @@ function createContext(mapObj, context) {
     }
 }
 
+/**
+ * returning start node for a structure
+ * @param structure
+ * @returns {*}
+ */
 function findStartNode(structure) {
     let node;
     const links = structure.links;
@@ -61,63 +66,11 @@ function findStartNode(structure) {
     return node
 }
 
-function buildMapGraph(map) {
-    const startNode = findStartNode(map);
-    // creating a directed graph from the map.
-    let map_graph = new graphlib.Graph({ directed: true });
-    map_graph.setNode(startNode.uuid, startNode);
-
-    map.processes.forEach(node => {
-        // for each process, check if there is a link who's targeted to it. if no, it isn't part of the flow and shouldn't be in the graph.
-        let linkIndex = map.links.findIndex((o) => {
-            return o.targetId === node.uuid;
-        });
-        if (linkIndex > -1) {
-            map_graph.setNode(node.uuid, node);
-        }
-    });
-    for (let i = map.links.length - 1; i >= 0; i--) {
-        let link = map.links[i];
-        link.linkIndex = i;
-        map_graph.setEdge(link.sourceId, link.targetId, link);
-    }
-
-    return map_graph;
-}
-
-function buildMapGraphFromStructure(structure) {
-    const startNode = findStartNode(structure);
-    let mapGraph = new graphlib.Graph({ directed: false });
-    mapGraph.setNode(startNode.uuid, startNode);
-    structure.processes.forEach(node => {
-        if (!node.uuid) {
-            return;
-        }
-        // for each process, check if there is a link who's targeted to it. if no, it isn't part of the flow and shouldn't be in the graph.
-        let linkIndex = structure.links.findIndex((o) => {
-            return o.targetId === node.uuid;
-        });
-        if (linkIndex > -1) {
-            mapGraph.setNode(node.uuid, node);
-        }
-    });
-
-    structure.links.forEach((link, i) => {
-        if (link.hasOwnProperty("sourceId") || link.hasOwnProperty('targetId')) {
-            return;
-        }
-        mapGraph.setEdge(link.sourceId, link.targetId, link);
-    });
-    return mapGraph;
-
-}
-
-let notify = function (socket) {
-    return function (title, message, status) {
-        socket.emit('notification', { title: title, message: message, status: (status || 'info') });
-    };
-};
-
+/**
+ * Creating log and emitting it.
+ * @param log
+ * @param socket
+ */
 function createLog(log, socket) {
     MapExecutionLog.create(log).then((newLog) => {
         socket.emit('notification', newLog);
@@ -125,6 +78,10 @@ function createLog(log, socket) {
     });
 }
 
+/**
+ * Emitting executions values.
+ * @param socket
+ */
 function updateExecutions(socket) {
     let emitv = Object.keys(executions).reduce((total, current) => {
         total[current] = executions[current].map;
@@ -425,7 +382,6 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
     });
 }
 
-
 function runProcess(map, structure, runId, agent, socket) {
     return (processUUID, callback) => {
         if (!shouldContinueExecution(runId, agent.key)) {
@@ -576,18 +532,44 @@ function runProcess(map, structure, runId, agent, socket) {
                 }
             }
 
+
+            if (process.postRun) {
+                createLog({
+                    map: map._id,
+                    runId: runId,
+                    message: `'${process.name}': Running post process function`,
+                    status: "error"
+                }, socket);
+                // post run hook for link (enables user to change context)
+                let res;
+                try {
+                    res = vm.runInNewContext(process.postRun, executions[runId].executionAgents[agent.key].executionContext);
+                    updateProcessContext(runId, agent.key, processUUID, processIndex, { postRun: res });
+                    updateExecutionContext(runId, agent.key);
+
+                } catch (e) {
+                    winston.log('error', "Error running post process function");
+                    createLog({
+                        map: map._id,
+                        runId: runId,
+                        message: `'${process.name}': Error running post process function`,
+                        status: "error"
+                    }, socket);
+                }
+            }
+
             // updating context
-            updateProcessContext(runId, agent.key, processUUID, {
+            updateProcessContext(runId, agent.key, processUUID, processIndex, {
                 status: status,
                 result: actionsResults,
                 finishTime: new Date()
             });
-            updateExecutionContext(runId, agent.key);
 
             if (!(error && process.mandatory)) { // if the process was mandatory agent should not call other process.
-                executions[runId].executionAgents[agent.key].status = 'error';
+                executions[runId].executionAgents[agent.key].status = 'available';
                 runNodeSuccessors(map, structure, runId, agent, processUUID, socket);
             }
+            updateExecutionContext(runId, agent.key);
             callback();
         });
     }
