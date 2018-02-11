@@ -1,6 +1,8 @@
 const request = require("request");
 const fs = require("fs");
 const path = require("path");
+
+const winston = require("winston");
 const _ = require("lodash");
 const humanize = require("../../helpers/humanize");
 const env = require("../../env/enviroment");
@@ -14,9 +16,11 @@ let agents = {}; // store the agents status.
 /* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
 let followAgentStatus = (agent) => {
     let start = new Date();
+    agents[agent.key] = {};
+    setDefaultUrl(agent);
     let listenInterval = setInterval(() => {
         request.post(
-            agent.url + '/api/status', {
+            agents[agent.key].defaultUrl + '/api/status', {
                 form: {
                     key: agent.key
                 }
@@ -24,16 +28,17 @@ let followAgentStatus = (agent) => {
                 try {
                     body = JSON.parse(body);
                 } catch (e) {
-                    body = {res: e};
+                    body = { res: e };
                 }
                 if (!error && response.statusCode === 200) {
-                    agents[agent.key] = {};
                     agents[agent.key].alive = true;
                     agents[agent.key].hostname = body.hostname;
                     agents[agent.key].arch = body.arch;
                     agents[agent.key].freeSpace = humanize.bytes(body.freeSpace);
                     agents[agent.key].respTime = new Date() - start;
                     agents[agent.key].url = agent.url;
+                    agents[agent.key].publicUrl = agent.publicUrl;
+                    agents[agent.key].defaultUrl = agents[agent.key].defaultUrl || '';
                     agents[agent.key].id = agent.id;
                     agents[agent.key].key = agent.key;
                     agents[agent.key].installed_plugins = body.installed_plugins;
@@ -54,7 +59,7 @@ let followAgentStatus = (agent) => {
             })
     }, INTERVAL_TIME);
     if (!agents[agent.key]) {
-        agents[agent.key] = {alive: false, following: true};
+        agents[agent.key] = { alive: false, following: true };
         // agents[agent.key] = { intervalId: listenInterval, alive: false, following: true };
     }
 };
@@ -75,9 +80,25 @@ function getAgentStatus() {
     return agents;
 }
 
+
+function setDefaultUrl(agent) {
+    return new Promise((resolve, reject) => {
+        request.post(agent.publicUrl + '/api/status', { form: { key: agent.key } }, function (error, response, body) {
+            if (error && error.code === 'ECONNREFUSED') {
+                agents[agent.key].defaultUrl = agent.url;
+            } else {
+                agents[agent.key].defaultUrl = agent.publicUrl;
+            }
+            resolve();
+        });
+    });
+
+
+}
+
 module.exports = {
     add: (agent) => {
-        return Agent.findOne({key: agent.key}).then(agentObj => {
+        return Agent.findOne({ key: agent.key }).then(agentObj => {
             if (!agentObj) {
                 return Agent.create(agent)
             }
@@ -86,18 +107,19 @@ module.exports = {
     },
     // get an object of installed plugins and versions on certain agent.
     checkPluginsOnAgent: (agent) => {
-        return new Promise((res, rej) => {
-
-            request.post(agent.url + '/api/plugins', {form: {key: agent.key}}, function (error, response, body) {
+        return new Promise((resolve, reject) => {
+            console.log(agents[agent.key].defaultUrl);
+            request.post(agents[agent.key].defaultUrl + '/api/plugins', { form: { key: agent.key } }, function (error, response, body) {
                 if (error || response.statusCode !== 200) {
-                    res([]);
+                    resolve('{}');
                 }
-                res(body);
+                resolve(body);
+
             });
         });
     },
     delete: (agentId) => {
-        return Agent.remove({_id: agentId})
+        return Agent.remove({ _id: agentId })
     },
     /* filter the agents. if no query is passed, will return all agents */
     filter: (query = {}) => {
@@ -122,17 +144,17 @@ module.exports = {
                     }
 
                     request.post({
-                        url: agents[i].url + "/api/plugins/install",
-                        formData: Object.assign(formData, {key: i})
+                        url: agents[agent.key].defaultUrl + "/api/plugins/install",
+                        formData: Object.assign(formData, { key: i })
                     });
                 }
             } else {
-                console.log("Sending request");
+                winston.log('info', "Sending request to agent");
                 request.post({
-                    url: agent.url + "/api/plugins/install",
-                    formData: Object.assign(formData, {key: agent.key})
+                    url: agents[agent.key].defaultUrl + "/api/plugins/install",
+                    formData: Object.assign(formData, { key: agent.key })
                 }, function (err, res, body) {
-                    console.log(err, res, body);
+                    winston.log('info', res, body);
                 });
                 resolve();
             }
@@ -147,11 +169,12 @@ module.exports = {
             })
         })
     },
+    setDefaultUrl: setDefaultUrl,
     followAgent: followAgentStatus,
     unfollowAgent: unfollowAgentStatus,
     /* update an agent */
     update: (agentId, agent) => {
-        return Agent.findByIdAndUpdate(agentId, agent, {new: true});
+        return Agent.findByIdAndUpdate(agentId, agent, { new: true });
     },
     /* exporting the agents status */
     agentsStatus: getAgentStatus

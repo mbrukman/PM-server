@@ -1,3 +1,5 @@
+const winston = require("winston");
+
 const projectsService = require("../services/projects.service");
 const hooks = require("../../libs/hooks/hooks");
 
@@ -19,7 +21,7 @@ module.exports = {
                 message: `Error archiving project`,
                 type: 'error'
             });
-            console.log("Error archiving project: ", error);
+            winston.log('error', "Error archiving project", error);
             res.status(500).send(error);
         });
     },
@@ -40,7 +42,7 @@ module.exports = {
                 message: `There was an error creating this project`,
                 type: 'error'
             });
-            console.log("Error creating new project: ", error);
+            winston.log('error', "Error creating new project", error);
             res.status(500).send(error);
         });
     },
@@ -54,7 +56,7 @@ module.exports = {
         }).then(project => {
             res.json(project);
         }).catch((error) => {
-            console.log("Error adding map to project: ", error);
+            winston.log('error', "Error adding map to project", error);
             res.status(500).send(error);
         });
     },
@@ -67,7 +69,7 @@ module.exports = {
             res.json(project);
         }).catch((error) => {
             req.io.emit('notification', { title: 'Whoops..', message: `Error getting project details`, type: 'error' });
-            console.log("Error getting project's details: ", error);
+            winston.log('error', "Error getting project's details", error);
             res.status(500).send(error);
         });
     },
@@ -87,7 +89,7 @@ module.exports = {
         }).catch((error) => {
             req.io.emit('notification', { title: 'Whoops..', message: `Error deleting project`, type: 'error' });
 
-            console.log("Error deleting map to project: ", error);
+            winston.log('error', "Error deleting map to project", error);
             res.status(500).send(error);
         });
     },
@@ -104,7 +106,7 @@ module.exports = {
         }).catch((error) => {
             req.io.emit('notification', { title: 'Whoops..', message: `Error getting projects list`, type: 'error' });
 
-            console.log("Error creating new project: ", error);
+            winston.log('error', "Error creating new project", error);
             res.status(500).send(error);
         })
     },
@@ -129,7 +131,7 @@ module.exports = {
                 message: `We couldn't update the project`,
                 type: 'error'
             });
-            console.log("Error updating project: ", error);
+            winston.log('error', "Error updating project", error);
             res.status(500).send(error);
         })
     }
