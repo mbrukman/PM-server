@@ -23,6 +23,11 @@ export class ProcessFormComponent implements OnInit {
   index: number;
   plugin: Plugin;
   selectedMethod: PluginMethod;
+  COORDINATION_TYPES = {
+    'wait': 'Wait for all',
+    'race': 'Run once for first',
+    'each': 'Run for each in link'
+  };
 
   constructor(private socketService: SocketService) {
   }
@@ -38,6 +43,7 @@ export class ProcessFormComponent implements OnInit {
       description: new FormControl(this.process.description),
       mandatory: new FormControl(this.process.mandatory),
       condition: new FormControl(this.process.condition),
+      coordination: new FormControl(this.process.coordination),
       preRun: new FormControl(this.process.preRun),
       postRun: new FormControl(this.process.postRun),
       correlateAgents: new FormControl(this.process.correlateAgents),
