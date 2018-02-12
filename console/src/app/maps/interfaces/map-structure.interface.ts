@@ -42,6 +42,7 @@ export interface IProcess {
   preRun?: string,
   postRun?: string,
   filterAgents?: string,
+  coordination?: 'wait' | 'race' | 'each',
   actions: IAction[],
   used_plugin: IUsedPlugin,
   plugin?: IPlugin,

@@ -1,9 +1,8 @@
 import { Map } from "./map.model";
 import { Action, MapStructure, Process } from "./map-structure.model";
 import { IActionResult, IAgentResult, IMapResult, IProcessResult } from "../interfaces/execution-result.interface";
-import { PluginMethod } from "../../plugins/models/plugin-method.model";
-import { Agent } from "../../agents/models/agent.model";
-import { Plugin } from "../../plugins/models/plugin.model";
+import { PluginMethod } from "@plugins/models/plugin-method.model";
+import { Agent } from "@agents/models/agent.model";
 
 
 export class ActionResult implements IActionResult {
@@ -12,20 +11,21 @@ export class ActionResult implements IActionResult {
   method?: { name: string; _id: string | PluginMethod };
   status: string;
   startTime: Date;
-  finish: Date;
+  finishTime: Date;
   result: any;
 }
 
 
 export class ProcessResult implements IProcessResult {
   name?: string;
+  index: number;
   process: string | Process;
   uuid: string;
-  plugin: { name?: string; _id: string | Plugin };
+  plugin: string;
   actions?: [ActionResult];
   status: string;
   startTime: Date;
-  finish: Date;
+  finishTime: Date;
   result: any;
 }
 
@@ -35,7 +35,7 @@ export class AgentResult implements IAgentResult {
   agent: string | Agent;
   status: string;
   startTime: Date;
-  finish: Date;
+  finishTime: Date;
   result: any;
 }
 

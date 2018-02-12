@@ -33,6 +33,7 @@ let processSchema = new Schema({
     preRun: String,
     postRun: String,
     filterAgents: String,
+    coordination: String,
     correlateAgents: { type: Boolean, default: false },
     mandatory: { type: Boolean, default: false },
     condition: String,

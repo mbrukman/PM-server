@@ -145,11 +145,16 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       return;
     }
 
+
     this.link.uuid = cell.model.id;
-    if (!this.mapStructure.links) {
-      this.mapStructure.links = [this.link];
-    } else {
-      this.mapStructure.links.push(this.link);
+
+    this.mapStructure.links.push(this.link);
+
+
+    const ancestors = this.mapStructure.links.filter(link => link.targetId === this.link.targetId);
+    if (ancestors.length > 1) {
+      const processIndex = this.mapStructure.processes.findIndex(process => process.uuid === this.link.targetId);
+      this.mapStructure.processes[processIndex].coordination = 'wait';
     }
     this.mapStructure.content = JSON.stringify(this.graph.toJSON());
     this.mapsService.setCurrentMapStructure(this.mapStructure);
@@ -448,6 +453,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.mapStructure.processes[index].description = process.description;
     this.mapStructure.processes[index].mandatory = process.mandatory;
     this.mapStructure.processes[index].condition = process.condition;
+    this.mapStructure.processes[index].coordination = process.coordination;
     this.mapStructure.processes[index].actions = process.actions;
     this.mapStructure.processes[index].correlateAgents = process.correlateAgents;
     this.mapStructure.processes[index].filterAgents = process.filterAgents;
