@@ -12,6 +12,7 @@ export class ConfirmComponent {
   title: string = '';
   confirm: string = 'Yes';
   cancel: string = 'Cancel';
+  third: string;
   message: string = 'Are you sure?';
 
   public result: Subject<boolean> = new Subject();
@@ -19,13 +20,8 @@ export class ConfirmComponent {
   constructor(public bsModalRef: BsModalRef) {
   }
 
-  onCancel() {
-    this.result.next(false);
-    this.closeModal();
-  }
-
-  onConfirm() {
-    this.result.next(true);
+  onAction(action) {
+    this.result.next(action);
     this.closeModal();
   }
 
