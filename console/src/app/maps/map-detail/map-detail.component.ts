@@ -79,8 +79,9 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         this.router.navigate(['NotFound']);
       });
     });
-    this.mapsService.getCurrentMap().subscribe(map => {
-      if (map) {
+    this.mapsService.getCurrentMap()
+      .filter(map => map)
+      .subscribe(map => {
         this.map = map;
         this.originalMap.archived = map.archived;
         if (!_.isEqual(map, this.originalMap)) {
@@ -88,27 +89,22 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         } else {
           this.edited = false;
         }
-      }
-    });
-    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().subscribe(structure => {
-      if (!structure) {
-        return;
-      }
-      if (!this.initiated) {
-        this.originalMapStructure = _.cloneDeep(structure);
-      }
-      if (this.initiated && !_.isEqual(structure, this.originalMapStructure)) {
-        this.structureEdited = true;
-      } else {
-        this.structureEdited = false;
-      }
-      this.mapStructure = structure;
-      this.initiated = true;
-      this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
-        return o.id === structure.id;
       });
-      this.generateDownloadJsonUri();
-    });
+    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure()
+      .filter(structure => !!structure)
+      .subscribe(structure => {
+        if (!this.initiated) {
+          this.originalMapStructure = _.cloneDeep(structure);
+        }
+
+        this.structureEdited = this.initiated && !_.isEqual(structure, this.originalMapStructure);
+        this.mapStructure = structure;
+        this.initiated = true;
+        this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
+          return o.id === structure.id;
+        });
+        this.generateDownloadJsonUri();
+      });
     this.mapExecutionSubscription = this.socketService.getCurrentExecutionsAsObservable().subscribe(executions => {
       const maps = Object.keys(executions).map(key => executions[key]);
       this.executing = maps.indexOf(this.id) > -1;
