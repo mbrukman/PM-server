@@ -291,7 +291,7 @@ module.exports = {
         }).then(() => {
             req.io.emit('notification', {
                 title: 'Trigger deleted',
-                message: `${trigger.name} saved successfully`,
+                message: ``,
                 type: 'success'
             });
 
