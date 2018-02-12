@@ -5,9 +5,9 @@ import {
   IMapStructure,
   IProcess, IUsedPlugin
 } from '../interfaces/map-structure.interface';
-import { PluginMethodParam } from '../../plugins/models/plugin-method-param.model';
-import { PluginMethod } from '../../plugins/models/plugin-method.model';
-import { Plugin } from '../../plugins/models/plugin.model';
+import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
+import { PluginMethod } from '@plugins/models/plugin-method.model';
+import { Plugin } from '@plugins/models/plugin.model';
 import { IAttribute } from '../interfaces/attribute.interface';
 
 
@@ -50,6 +50,7 @@ export class Process implements IProcess {
   preRun?: string;
   postRun?: string;
   filterAgents?: string;
+  coordination?: 'wait' | 'race' | 'each';
   actions: Action[];
   used_plugin: UsedPlugin;
   plugin?: Plugin;

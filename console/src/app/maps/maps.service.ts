@@ -110,6 +110,7 @@ export class MapsService {
   /* map structure */
 
   createMapStructure(mapId: string, structure: MapStructure) {
+    console.log(structure);
     return this.http.post<MapStructure>(serverUrl + 'api/maps/' + mapId + '/structure/create', structure)
   }
 

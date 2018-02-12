@@ -12,10 +12,11 @@ let actionResultSchema = new Schema({
 });
 
 let processResultSchema = new Schema({
+    index: Number,
     name: String,
     process: { type: Schema.Types.ObjectId, ref: 'MapStructure.processes' },
     uuid: String,
-    plugin: { name: String, _id: { type: Schema.Types.ObjectId, ref: 'Plugin' } },
+    plugin: String,
     actions: [actionResultSchema],
     status: String,
     startTime: Date,

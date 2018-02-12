@@ -109,6 +109,16 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       });
       this.generateDownloadJsonUri();
     });
+
+    // get the current executing maps
+    this.mapsService.currentExecutionList()
+      .take(1)
+      .subscribe(executions => {
+        const maps = Object.keys(executions).map(key => executions[key]);
+        this.executing = maps.indexOf(this.id) > -1;
+      });
+
+    // subscribing to executions updates
     this.mapExecutionSubscription = this.socketService.getCurrentExecutionsAsObservable().subscribe(executions => {
       const maps = Object.keys(executions).map(key => executions[key]);
       this.executing = maps.indexOf(this.id) > -1;
