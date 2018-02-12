@@ -660,6 +660,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             return callback();
         }
 
+
         request.post(
             agentsService.agentsStatus()[agent.key].defaultUrl + '/api/task/add',
             {
@@ -703,6 +704,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                         status: "success",
                         result: body
                     });
+
                     let actionExecutionLogs = [];
                     if (body.stdout) {
                         actionExecutionLogs.push(
