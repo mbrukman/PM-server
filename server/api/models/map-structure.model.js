@@ -33,7 +33,7 @@ let processSchema = new Schema({
     preRun: String,
     postRun: String,
     filterAgents: String,
-    coordination: { type: String, enum: ['wait', 'race', 'each'] },
+    coordination: String,
     correlateAgents: { type: Boolean, default: false },
     mandatory: { type: Boolean, default: false },
     condition: String,
