@@ -44,7 +44,7 @@ module.exports = {
     },
 
     pluginDelete: (req, res) => {
-        hooks.pre('plugin-delete', req).then(() => {
+        hooks.hookPre('plugin-delete', req).then(() => {
             return pluginsService.pluginDelete(req.params.id)
         }).then(() => {
             req.io.emit('notification', { title: 'Plugin deleted', message: ``, type: 'success' });
