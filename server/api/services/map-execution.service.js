@@ -368,7 +368,7 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
     if (!shouldContinueExecution(runId, agent.key)) {
         return;
     }
-    const successors = findSuccessors(node, structure);
+    const successors = node ? findSuccessors(node, structure) : [];
     if (successors.length === 0) {
         if (!isThereProcessExecuting(runId, agent.key)) {
             executions[runId].executionContext.finishTime = new Date();
@@ -497,7 +497,7 @@ function runProcess(map, structure, runId, agent, socket) {
                     return callback('Mandatory process failed');
                 }
                 updateExecutionContext(runId, agent.key);
-                runNodeSuccessors(map, structure, runId, agent, processUUID, socket);
+                runNodeSuccessors(map, structure, runId, agent, false, socket); // by passing false, no successors would be called
                 return callback();
             }
         }
