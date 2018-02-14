@@ -19,6 +19,7 @@ export class ActionParam implements IActionParam {
   viewName?: string;
   name?: string;
   param: PluginMethodParam | string;
+  type: 'string' | 'text';
 }
 
 export class Action implements IAction {

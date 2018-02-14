@@ -69,7 +69,8 @@ export class ProcessFormComponent implements OnInit {
               param.value,
               param._id ? param._id : param.param,
               param.viewName,
-              param.name
+              param.name,
+              param.type
             ));
           });
         } else {
