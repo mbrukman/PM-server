@@ -215,7 +215,7 @@ module.exports = {
 
     /* stop map execution */
     stopExecution: (req, res) => {
-      return res.json(mapsExecutionService.stop(req.io, req.params.id, req.params.runId));
+        return res.json(mapsExecutionService.stop(req.params.id, req.params.runId, req.io));
     },
 
     logs: (req, res) => {

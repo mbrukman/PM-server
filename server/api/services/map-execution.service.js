@@ -457,6 +457,7 @@ function runProcess(map, structure, runId, agent, socket) {
                 if (process.mandatory) {
                     executions[runId].executionAgents[agent.key].status = "error";
                     executions[runId].executionAgents[agent.key].continue = false;
+                    stopExecution(map._id, runId, socket);
                 }
 
                 executions[runId].executionAgents[agent.key].finishTime = new Date();
@@ -491,6 +492,7 @@ function runProcess(map, structure, runId, agent, socket) {
                 if (process.mandatory) { // mandatory process failed, agent should not execute more processes
                     executions[runId].executionAgents[agent.key].continue = false;
                     executions[runId].executionAgents[agent.key].status = 'error';
+                    stopExecution(map._id, runId, socket);
                     updateExecutionContext(runId, agent.key);
                     return callback('Mandatory process failed');
                 }
@@ -869,6 +871,80 @@ function summarizeExecution(map, runId, executionContext, agentsResults) {
     return MapResult.findByIdAndUpdate(executions[executionContext.runId].resultObj, result, { new: true });
 }
 
+/**
+ * get a map id and optional runId and removes the runId or all the execution of the map.
+ * @param mapId {string}
+ * @param runId {string}, optional
+ * @returns {string[]} array of stopped runs.
+ */
+function stopExecution(mapId, runId, socket) {
+    /* putting stop sign on executions */
+    let stoppedRuns = [];
+    if (runId) {
+        if (executions.hasOwnProperty(runId)) {
+            executions[runId].stop = true;
+            stoppedRuns.push(runId);
+        }
+
+    } else {
+        Object.keys(executions).map(key => {
+            if (executions[key].map === mapId) {
+                executions[key].stop = true;
+                stoppedRuns.push(key);
+            }
+        });
+    }
+
+    /* clean data */
+    const d = new Date();
+    stoppedRuns.forEach(runId => {
+        createLog({
+            map: mapId,
+            runId: runId,
+            message: "Got stop signal. Stopping execution",
+            status: "info"
+        }, socket);
+        executions[runId].executionContext.finishTime = d;
+        Object.keys(executions[runId].executionContext.agents).map(agentKey => {
+            if (executions[runId].executionContext.agents[agentKey].status !== 'error') {
+                executions[runId].executionContext.agents[agentKey].status = 'stopped';
+                executions[runId].executionContext.agents[agentKey].finishTime = d;
+                Object.keys(executions[runId].executionContext.agents[agentKey].processes).map(processId => {
+                    if (
+                        !executions[runId].executionContext.agents[agentKey].processes[processId].status ||
+                        executions[runId].executionContext.agents[agentKey].processes[processId].status === 'executing'
+                    ) {
+                        executions[runId].executionContext.agents[agentKey].processes[processId].status = 'stopped';
+                        executions[runId].executionContext.agents[agentKey].processes[processId].finishTime = d;
+                    }
+                    Object.keys(executions[runId].executionContext.agents[agentKey].processes[processId].actions).map(actionId => {
+                        if (
+                            !executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].status ||
+                            executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].status === 'executing'
+                        ) {
+                            executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].status = 'stopped';
+                            executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].finishTime = d;
+                            executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].result = {
+                                status: 'stopped',
+                                result: 'The action was stopped'
+                            };
+                            sendKillRequest(executions[runId].executionContext.map.id, actionId, agentKey);
+                        }
+                    });
+                })
+            }
+        });
+        summarizeExecution(map, runId, Object.assign({}, executions[runId].executionContext), Object.assign({}, executions[runId].executionAgents))
+            .then(mapResult => {
+                socket.emit('map-execution-result', mapResult);
+            });
+        delete executions[runId];
+        updateExecutions(socket);
+    });
+    return stoppedRuns;
+}
+
+
 module.exports = {
     /**
      * starting a map execution
@@ -918,75 +994,7 @@ module.exports = {
      * @param runId {string}, optional
      * @returns {string[]} array of stopped runs.
      */
-    stop: (socket, mapId, runId) => {
-
-        /* putting stop sign on executions */
-        let stoppedRuns = [];
-        if (runId) {
-            if (executions.hasOwnProperty(runId)) {
-                executions[runId].stop = true;
-                stoppedRuns.push(runId);
-            }
-
-        } else {
-            Object.keys(executions).map(key => {
-                if (executions[key].map === mapId) {
-                    executions[key].stop = true;
-                    stoppedRuns.push(key);
-                }
-            });
-        }
-
-        /* clean data */
-        const d = new Date();
-        stoppedRuns.forEach(runId => {
-            MapExecutionLog.create({
-                map: mapId,
-                runId: runId,
-                message: "Got stop signal. Stopping execution",
-                status: "info"
-            }).then((log) => {
-                socket.emit('update', log);
-            });
-            executions[runId].executionContext.finishTime = d;
-            Object.keys(executions[runId].executionContext.agents).map(agentKey => {
-                if (executions[runId].executionContext.agents[agentKey].status !== 'error') {
-                    executions[runId].executionContext.agents[agentKey].status = 'stopped';
-                    executions[runId].executionContext.agents[agentKey].finishTime = d;
-                    Object.keys(executions[runId].executionContext.agents[agentKey].processes).map(processId => {
-                        if (
-                            !executions[runId].executionContext.agents[agentKey].processes[processId].status ||
-                            executions[runId].executionContext.agents[agentKey].processes[processId].status === 'executing'
-                        ) {
-                            executions[runId].executionContext.agents[agentKey].processes[processId].status = 'stopped';
-                            executions[runId].executionContext.agents[agentKey].processes[processId].finishTime = d;
-                        }
-                        Object.keys(executions[runId].executionContext.agents[agentKey].processes[processId].actions).map(actionId => {
-                            if (
-                                !executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].status ||
-                                executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].status === 'executing'
-                            ) {
-                                executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].status = 'stopped';
-                                executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].finishTime = d;
-                                executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].result = {
-                                    status: 'stopped',
-                                    result: 'The action was stopped'
-                                };
-                                sendKillRequest(executions[runId].executionContext.map.id, actionId, agentKey);
-                            }
-                        });
-                    })
-                }
-            });
-            summarizeExecution(map, runId, Object.assign({}, executions[runId].executionContext), Object.assign({}, executions[runId].executionAgents))
-                .then(mapResult => {
-                    socket.emit('map-execution-result', mapResult);
-                });
-            delete executions[runId];
-            updateExecutions(socket);
-        });
-        return stoppedRuns;
-    },
+    stop: stopExecution,
 
     executions: executions
 };
