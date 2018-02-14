@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
 import * as _ from 'lodash';
 
-import { Process } from '../../../../models/map-structure.model';
-import { Plugin } from '../../../../../plugins/models/plugin.model';
-import { FormArray, FormControl, FormGroup } from '@angular/forms';
-import { PluginMethod } from '../../../../../plugins/models/plugin-method.model';
-import { SocketService } from '../../../../../shared/socket.service';
+import { Process } from '@maps/models/map-structure.model';
+import { Plugin } from '@plugins/models/plugin.model';
+import { PluginMethod } from '@plugins/models/plugin-method.model';
+import { SocketService } from '@shared/socket.service';
 
 @Component({
   selector: 'app-process-form',
@@ -52,12 +52,26 @@ export class ProcessFormComponent implements OnInit {
     });
     if (this.process.actions) {
       this.process.actions.forEach((action, actionIndex) => {
-        let actionControl = <FormArray>this.processForm.controls['actions'];
-        actionControl.push(this.initActionController(action.id, action.name, action.timeout, action.timeunit, action.retries, action.mandatory, action.method));
+        const actionControl = <FormArray>this.processForm.controls['actions'];
+        actionControl.push(this.initActionController(
+          action.id,
+          action.name,
+          action.timeout,
+          action.timeunit,
+          action.retries,
+          action.mandatory,
+          action.method
+        ));
         if (action.params && action.params.length > 0) {
-          action.params.forEach((param, index) => {
-            actionControl.controls[actionIndex]['controls'].params.push(this.initActionParamController(param.code, param.value, param._id ? param._id : param.param, param.viewName, param.name));
-          })
+          action.params.forEach((param) => {
+            actionControl.controls[actionIndex]['controls'].params.push(this.initActionParamController(
+              param.code,
+              param.value,
+              param._id ? param._id : param.param,
+              param.viewName,
+              param.name
+            ));
+          });
         } else {
           console.log('no params!');
         }
@@ -68,7 +82,7 @@ export class ProcessFormComponent implements OnInit {
 
   /* add a new action to the process*/
   addNewAction() {
-    let actionControl = <FormArray>this.processForm.controls['actions'];
+    const actionControl = <FormArray>this.processForm.controls['actions'];
     actionControl.push(this.initActionController());
     this.editAction(actionControl.length - 1); // switch to edit the new action
   }
@@ -81,7 +95,7 @@ export class ProcessFormComponent implements OnInit {
 
   /* adding a new action to the form */
   removeAction(index: number) {
-    let actionControl = <FormArray>this.processForm.controls['actions'];
+    const actionControl = <FormArray>this.processForm.controls['actions'];
     actionControl.removeAt(index);
   }
 
@@ -100,23 +114,24 @@ export class ProcessFormComponent implements OnInit {
       mandatory: new FormControl(mandatory),
       method: new FormControl(method),
       params: new FormArray([])
-    })
+    });
   }
 
-  initActionParamController(code?, value?, id?, viewName?, name?) {
+  initActionParamController(code?, value?, id?, viewName?, name?, type?) {
     return new FormGroup({
       code: new FormControl(code),
       value: new FormControl(value),
       param: new FormControl(id),
       viewName: new FormControl(viewName),
-      name: new FormControl(name)
+      name: new FormControl(name),
+      type: new FormControl(type)
     });
   }
 
   onSelectMethod() {
     /* when a method selected - change the form params*/
-    let methodName = this.processForm.value.actions[this.index].method;
-    let action = this.processForm.controls['actions']['controls'][this.index];
+    const methodName = this.processForm.value.actions[this.index].method;
+    const action = this.processForm.controls['actions']['controls'][this.index];
     action.controls.params.setControl([]);
     const method = this.plugin.methods.find((o) => o.name === methodName);
     if (!method) {
@@ -124,7 +139,8 @@ export class ProcessFormComponent implements OnInit {
       return;
     }
     method.params.forEach(param => {
-      action.controls.params.push(this.initActionParamController(null, null, param._id, param.viewName, param.name))
+      console.log(param);
+      action.controls.params.push(this.initActionParamController(null, null, param._id, param.viewName, param.name, param.type));
     });
   }
 
