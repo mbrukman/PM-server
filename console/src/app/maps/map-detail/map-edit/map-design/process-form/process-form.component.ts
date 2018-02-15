@@ -2,10 +2,14 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
 import * as _ from 'lodash';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/observable/of';
 
 import { Process } from '@maps/models/map-structure.model';
 import { Plugin } from '@plugins/models/plugin.model';
 import { PluginMethod } from '@plugins/models/plugin-method.model';
+import { PluginsService } from '@plugins/plugins.service';
 import { SocketService } from '@shared/socket.service';
 
 @Component({
@@ -22,6 +26,7 @@ export class ProcessFormComponent implements OnInit {
   action: boolean = false;
   index: number;
   plugin: Plugin;
+  methods: object = {};
   selectedMethod: PluginMethod;
   COORDINATION_TYPES = {
     'wait': 'Wait for all',
@@ -29,7 +34,7 @@ export class ProcessFormComponent implements OnInit {
     'each': 'Run for each in link'
   };
 
-  constructor(private socketService: SocketService) {
+  constructor(private socketService: SocketService, private pluginsService: PluginsService) {
   }
 
   ngOnInit() {
@@ -37,19 +42,20 @@ export class ProcessFormComponent implements OnInit {
       this.closePane();
       return;
     }
-    this.processForm = new FormGroup({
-      name: new FormControl(this.process.name),
-      uuid: new FormControl(this.process.uuid),
-      description: new FormControl(this.process.description),
-      mandatory: new FormControl(this.process.mandatory),
-      condition: new FormControl(this.process.condition),
-      coordination: new FormControl(this.process.coordination),
-      preRun: new FormControl(this.process.preRun),
-      postRun: new FormControl(this.process.postRun),
-      correlateAgents: new FormControl(this.process.correlateAgents),
-      filterAgents: new FormControl(this.process.filterAgents),
-      actions: new FormArray([])
-    });
+
+    this.processForm = this.initProcessForm(
+      this.process.name,
+      this.process.uuid,
+      this.process.description,
+      this.process.mandatory,
+      this.process.condition,
+      this.process.coordination,
+      this.process.preRun,
+      this.process.postRun,
+      this.process.correlateAgents,
+      this.process.filterAgents
+    );
+
     if (this.process.actions) {
       this.process.actions.forEach((action, actionIndex) => {
         const actionControl = <FormArray>this.processForm.controls['actions'];
@@ -73,12 +79,74 @@ export class ProcessFormComponent implements OnInit {
               param.type
             ));
           });
-        } else {
-          console.log('no params!');
         }
       });
     }
+
     this.plugin = _.cloneDeep(this.process.plugin);
+    this.generateAutocompleteParams();
+  }
+
+  /**
+   * if the plugin has autocomplete method it generates them
+   */
+  generateAutocompleteParams() {
+    Observable.from(this.plugin.methods)
+      .filter(method => this.hasAutocompleteParam(method)) // check if has autocomplete
+      .flatMap(method => {
+        return Observable.forkJoin(
+          Observable.of(method), // the method
+          this.pluginsService.generatePluginParams(this.plugin._id, method.name) // generated params
+        );
+      }).map(data => { // data: [method, [generated params]]
+        data[1].forEach(param => {
+          data[0].params[data[0].params.findIndex(o => o.name === param.name)] = param;
+        });
+        return data[0];
+      })
+      .subscribe(method => {
+        this.plugin.methods[this.plugin.methods.findIndex(o => o.name === method.name)] = method;
+        this.addToMethodContext(method);
+      });
+  }
+
+  addToMethodContext(method) {
+    this.methods[method.name] = method;
+  }
+
+
+  hasAutocompleteParam(method): boolean {
+    return method.params.findIndex(p => p.type === 'autocomplete') > -1
+  }
+
+  /**
+   * Initiating the process form with values, returning a form group object
+   * @param name
+   * @param uuid
+   * @param description
+   * @param mandatory
+   * @param condition
+   * @param coordination
+   * @param preRun
+   * @param postRun
+   * @param correlateAgents
+   * @param filterAgents
+   * @returns {FormGroup}
+   */
+  initProcessForm(name, uuid, description, mandatory, condition, coordination, preRun, postRun, correlateAgents, filterAgents) {
+    return new FormGroup({
+      name: new FormControl(name),
+      uuid: new FormControl(uuid),
+      description: new FormControl(description),
+      mandatory: new FormControl(mandatory),
+      condition: new FormControl(condition),
+      coordination: new FormControl(coordination),
+      preRun: new FormControl(preRun),
+      postRun: new FormControl(postRun),
+      correlateAgents: new FormControl(correlateAgents),
+      filterAgents: new FormControl(filterAgents),
+      actions: new FormArray([])
+    })
   }
 
   /* add a new action to the process*/
@@ -129,7 +197,11 @@ export class ProcessFormComponent implements OnInit {
     });
   }
 
+  /**
+   * Called from the template once user changes a method
+   */
   onSelectMethod() {
+    this.selectedMethod = this.processForm.value.actions[this.index].method;
     /* when a method selected - change the form params*/
     const methodName = this.processForm.value.actions[this.index].method;
     const action = this.processForm.controls['actions']['controls'][this.index];
@@ -140,7 +212,6 @@ export class ProcessFormComponent implements OnInit {
       return;
     }
     method.params.forEach(param => {
-      console.log(param);
       action.controls.params.push(this.initActionParamController(null, null, param._id, param.viewName, param.name, param.type));
     });
   }
