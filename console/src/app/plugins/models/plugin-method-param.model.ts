@@ -6,7 +6,10 @@ export class PluginMethodParam implements IPluginMethodParam {
   name: string;
   type: string;
   viewName?: string;
-  options?: [{ id: string, name: string }];
-  value?: string | { id: string, name: string };
+  options?: [{ id: string, value: string }];
+  value?: string | { id: string, value: string };
   code?: boolean;
+  query?: object;
+  model?: string
+
 }
