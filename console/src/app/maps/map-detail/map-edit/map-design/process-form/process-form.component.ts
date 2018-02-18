@@ -29,6 +29,12 @@ export class ProcessFormComponent implements OnInit {
     'each': 'Run for each in link'
   };
 
+  FLOW_CONTROL_TYPES = {
+    'wait': 'Wait for all agents and then run',
+    'race': 'Run only for first agent',
+    'each': 'Run for each agent'
+  };
+
   constructor(private socketService: SocketService) {
   }
 
@@ -44,6 +50,7 @@ export class ProcessFormComponent implements OnInit {
       mandatory: new FormControl(this.process.mandatory),
       condition: new FormControl(this.process.condition),
       coordination: new FormControl(this.process.coordination),
+      flowControl: new FormControl(this.process.flowControl),
       preRun: new FormControl(this.process.preRun),
       postRun: new FormControl(this.process.postRun),
       correlateAgents: new FormControl(this.process.correlateAgents),
