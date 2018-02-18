@@ -43,6 +43,7 @@ export interface IProcess {
   postRun?: string,
   filterAgents?: string,
   coordination?: 'wait' | 'race' | 'each',
+  flowControl?: 'wait' | 'race' | 'each',
   actions: IAction[],
   used_plugin: IUsedPlugin,
   plugin?: IPlugin,
