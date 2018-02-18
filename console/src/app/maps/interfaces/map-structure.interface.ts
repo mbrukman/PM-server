@@ -5,18 +5,19 @@ import { IAttribute } from "./attribute.interface";
 import { Plugin } from '../../plugins/models/plugin.model';
 
 export interface IActionParam {
-  id?: string;
-  _id?: string;
-  value: string;
-  code: boolean;
-  viewName?: string;
-  name?: string;
-  param: IPluginMethodParam | string;
+  id?: string,
+  _id?: string,
+  value: string,
+  code: boolean,
+  viewName?: string,
+  name?: string,
+  param: IPluginMethodParam | string,
+  type: 'string' | 'text'
 }
 
 export interface IAction {
-  id?: string;
-  _id?: string;
+  id?: string,
+  _id?: string,
   name: string,
   timeout?: number,
   timeunit?: number,
@@ -28,7 +29,7 @@ export interface IAction {
 }
 
 export interface IUsedPlugin {
-  _id?: string
+  _id?: string,
   name: string,
   version: string,
 }
@@ -77,4 +78,3 @@ export interface IMapStructure {
   used_plugins: [IUsedPlugin];
 
 }
-
