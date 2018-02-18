@@ -262,7 +262,6 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
 
         executionContext.agents = executionAgents;
         executions[runId] = { map: mapId, executionContext: executionContext, executionAgents: executionAgents };
-        updateExecutions(socket);
         let res = createContext(mapStructure, executionContext);
         if (res !== 0) {
             throw new Error("Error running map code" + res);
@@ -283,6 +282,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
     }).then((plugins) => {
         executionContext.plugins = plugins;
         startMapExecution(map, mapStructure, runId, socket);
+        updateExecutions(socket);
         return runId;
     });
 }

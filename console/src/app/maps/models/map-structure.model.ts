@@ -1,14 +1,15 @@
+import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
+import { PluginMethod } from '@plugins/models/plugin-method.model';
+import { Plugin } from '@plugins/models/plugin.model';
+import { IAttribute } from '../interfaces/attribute.interface';
 import {
   IAction,
   IActionParam,
   ILink,
   IMapStructure,
-  IProcess, IUsedPlugin
+  IProcess,
+  IUsedPlugin
 } from '../interfaces/map-structure.interface';
-import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
-import { PluginMethod } from '@plugins/models/plugin-method.model';
-import { Plugin } from '@plugins/models/plugin.model';
-import { IAttribute } from '../interfaces/attribute.interface';
 
 
 export class ActionParam implements IActionParam {
@@ -19,6 +20,7 @@ export class ActionParam implements IActionParam {
   viewName?: string;
   name?: string;
   param: PluginMethodParam | string;
+  type: 'string' | 'text';
 }
 
 export class Action implements IAction {

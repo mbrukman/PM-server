@@ -6,10 +6,12 @@ const child_process = require("child_process");
 const async = require("async");
 const winston = require("winston");
 
+
 const env = require("../../env/enviroment");
 const agentsService = require("./agents.service");
-let Plugin = require("../models/plugin.model");
-
+// let Plugin = require("../models/plugin.model");
+const models = require("../models");
+const Plugin = models.Plugin;
 
 let pluginsPath = path.join(path.dirname(path.dirname(__dirname)), "libs", "plugins");
 
@@ -85,7 +87,7 @@ function installPluginOnServer(pluginDir, obj) {
             let cmd = 'cd ' + outputPath + ' &&' + ' npm install ' + " && cd " + outputPath;
             child_process.exec(cmd, function (error, stdout, stderr) {
                 if (error) {
-                    winston.log('error',"ERROR", error, stderr);
+                    winston.log('error', "ERROR", error, stderr);
                 }
                 return resolve();
             });
@@ -144,13 +146,12 @@ function deployPluginFile(pluginPath, req) {
                                 return reject("No type was provided for this plugin");
                         }).catch((error) => {
                             winston.log('error', "Error creating plugin", error);
-                            reject(error);
+                            return reject(error);
                         });
 
                     });
                 } else {
                     entry.autodrain();
-                    resolve();
                 }
             });
     });
@@ -192,5 +193,25 @@ module.exports = {
                 loadModule(plugin, app);
             })
         })
+    },
+    /**
+     * Generating autocomplete plugin options
+     * @param pluginId
+     * @param methodName
+     */
+    generatePluginParams: (pluginId, methodName) => {
+        return module.exports.getPlugin(pluginId).then((plugin) => new Promise((resolve, reject) => {
+            plugin = JSON.parse(JSON.stringify(plugin));
+            let method = plugin.methods.find((o) => o.name === methodName);
+            let paramsToGenerate = method.params.filter((o) => o.type === 'autocomplete');
+            async.each(paramsToGenerate, (param, callback) => {
+                models[param.model].find((param.query || {})).select(param.propertyName).then((options) => {
+                    param.options = options.map((o) => ({ id: o._id, value: o[param.propertyName] }));
+                    return callback();
+                });
+            }, (error) => {
+                resolve(paramsToGenerate);
+            })
+        }));
     }
 };

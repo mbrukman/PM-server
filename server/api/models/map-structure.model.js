@@ -6,7 +6,8 @@ let actionParamsSchema = new Schema({
     viewName: String,
     param: { type: Schema.Types.ObjectId, ref: 'Plugin.methods.params' },
     name: String,
-    code: Boolean
+    code: Boolean,
+    type: String
 });
 
 let actionSchema = new Schema({
