@@ -1,4 +1,5 @@
 const Agent         = require('./agent.model');
+const Group = require('./group.model');
 const Log           = require('./logs.model');
 const Map           = require('./map.model');
 const ExecutionLog  = require('./map-execution-log.model');
@@ -12,6 +13,7 @@ const ScheduledJob  = require('./scheduled-job.model');
 
 module.exports = {
     Agent,
+    Group,
     Log,
     Map,
     ExecutionLog,
