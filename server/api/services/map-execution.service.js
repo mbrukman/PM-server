@@ -744,7 +744,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                             socket.emit('update', log);
                         });
                     });
-                    retucallback(null, body);
+                    callback(null, body);
                     return;
 
                 }
