@@ -3,7 +3,6 @@ const fs = require("fs");
 const path = require("path");
 
 const winston = require("winston");
-const graphlib = require('graphlib');
 const _ = require("lodash");
 const async = require("async");
 const request = require("request");
@@ -124,13 +123,13 @@ function addProcessToContext(runId, agentKey, processKey, process) {
  * @param runId
  * @param agentKey
  * @param processKey
+ * @param processIndex
  * @param processData
  */
 function updateProcessContext(runId, agentKey, processKey, processIndex, processData) {
     if (!executions.hasOwnProperty(runId) || executions[runId].stop) {
         return;
     }
-
     executions[runId].executionAgents[agentKey].processes[processKey][processIndex] = Object.assign(
         (executions[runId].executionAgents[agentKey].processes[processKey][processIndex] || {}),
         processData
@@ -142,6 +141,7 @@ function updateProcessContext(runId, agentKey, processKey, processIndex, process
  * @param runId
  * @param agentKey
  * @param processKey
+ * @param processIndex
  * @param actionKey
  * @param actionData
  */
@@ -302,11 +302,10 @@ function findProcessByUuid(uuid, structure) {
  */
 function findAncestors(nodeUuid, structure) {
     let links = structure.links.filter((o) => o.targetId === nodeUuid);
-    let ancestors = links.reduce((total, current) => {
+    return links.reduce((total, current) => {
         total.push(current.sourceId);
         return total;
     }, []);
-    return ancestors;
 }
 
 /**
@@ -317,11 +316,10 @@ function findAncestors(nodeUuid, structure) {
  */
 function findSuccessors(nodeUuid, structure) {
     let links = structure.links.filter((o) => o.sourceId === nodeUuid);
-    let successors = links.reduce((total, current) => {
+    return links.reduce((total, current) => {
         total.push(current.targetId);
         return total;
     }, []);
-    return successors;
 }
 
 function startMapExecution(map, structure, runId, socket) {
@@ -471,9 +469,11 @@ function runProcess(map, structure, runId, agent, socket) {
         // testing process condition
         if (process.condition) {
             let res;
+            let errMsg;
             try {
                 res = vm.runInNewContext(process.condition, executions[runId].executionAgents[agent.key].executionContext);
             } catch (e) {
+                errMsg = `Error running process condition: ${e.message}`;
                 createLog({
                     map: map._id,
                     runId: runId,
@@ -481,24 +481,26 @@ function runProcess(map, structure, runId, agent, socket) {
                     status: "error"
                 }, socket);
             }
-
-            if (!res) { // process didn't pass condition
-                winston.log('info', "Process didn't pass condition");
+            if (!res) { // process didn't pass condition or failed run condition function
+                winston.log('info', errMsg || "Process didn't pass condition");
                 executions[runId].executionAgents[agent.key].finishTime = new Date();
-                updateProcessContext(runId, agent.key, processUUID, {
+                updateProcessContext(runId, agent.key, processUUID, processIndex, {
                     status: "error",
-                    result: "Process didn't passed condition"
+                    result: errMsg || "Process didn't pass condition",
+                    finishTime: new Date()
                 });
                 if (process.mandatory) { // mandatory process failed, agent should not execute more processes
                     executions[runId].executionAgents[agent.key].continue = false;
                     executions[runId].executionAgents[agent.key].status = 'error';
                     stopExecution(map._id, runId, socket);
                     updateExecutionContext(runId, agent.key);
-                    return callback('Mandatory process failed');
+                    callback('Mandatory process failed');
+                    return;
                 }
                 updateExecutionContext(runId, agent.key);
                 runNodeSuccessors(map, structure, runId, agent, false, socket); // by passing false, no successors would be called
-                return callback();
+                callback();
+                return;
             }
         }
 
@@ -875,6 +877,7 @@ function summarizeExecution(map, runId, executionContext, agentsResults) {
  * get a map id and optional runId and removes the runId or all the execution of the map.
  * @param mapId {string}
  * @param runId {string}, optional
+ * @param socket
  * @returns {string[]} array of stopped runs.
  */
 function stopExecution(mapId, runId, socket) {
