@@ -8,6 +8,11 @@ const hooks = require("../../libs/hooks/hooks");
 
 
 module.exports = {
+    /**
+     * Get a list of all plugins
+     * @param req
+     * @param res
+     */
     pluginsList: (req, res) => {
         hooks.hookPre('plugin-list', req).then(() => {
             return pluginsService.filterPlugins({});
@@ -21,6 +26,12 @@ module.exports = {
 
     },
 
+    /**
+     * Creating a new plugin
+     * @param req
+     * @param res
+     * @returns {*|undefined|void|boolean}
+     */
     pluginUpload: (req, res) => {
         let file = req.file;
         let extension = path.extname(file.originalname);
@@ -43,8 +54,13 @@ module.exports = {
         })
     },
 
+    /**
+     * Deleting a plugin
+     * @param req
+     * @param res
+     */
     pluginDelete: (req, res) => {
-        hooks.pre('plugin-delete', req).then(() => {
+        hooks.hookPre('plugin-delete', req).then(() => {
             return pluginsService.pluginDelete(req.params.id)
         }).then(() => {
             req.io.emit('notification', { title: 'Plugin deleted', message: ``, type: 'success' });
@@ -54,6 +70,22 @@ module.exports = {
             winston.log('error', "Error deleting plugin", error);
             return res.status(500).send(error);
         });
-        req.params.id
+    },
+
+    /**
+     * Generating plugin autocomplete params
+     * @param req
+     * @param res
+     */
+    generatePluginParams: (req, res) => {
+        hooks.hookPre('plugin-generate-params').then(() => {
+            return pluginsService.generatePluginParams(req.params.id, req.params.name)
+        }).then((generated) => {
+            return res.json(generated);
+        }).catch(error => {
+            req.io.emit('notification', { title: 'Whoops', message: `Error deleting plugin`, type: 'error' });
+            winston.log('error', "Error generating plugin params", error);
+            return res.status(500).send(error);
+        });
     }
 };

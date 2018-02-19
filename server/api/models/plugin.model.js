@@ -5,9 +5,19 @@ const Schema = mongoose.Schema;
 let pluginMethodParamsSchema = new Schema({
     name: { type: String, required: true },
     viewName: String,
-    type: { type: String, enum: ['string', 'int', 'float', 'collection', 'file', 'text'], required: true },
+    type: { type: String, enum: ['string', 'int', 'float', 'options', 'autocomplete', 'file', 'text'], required: true },
     options: [{ id: String, name: Date }],
-
+    model: {
+        type: String, required: function () {
+            return this.type === 'autocomplete'
+        }
+    },
+    propertyName: {
+        type: String, required: function () {
+            return this.type === 'autocomplete'
+        }
+    },
+    query: Schema.Types.Mixed
 });
 
 let pluginMethodSchema = new Schema({
