@@ -60,11 +60,6 @@
           </label>
           <small class="form-text text-muted">If the process fails the execution will stop.</small>
         </div>
-        <select class="form-control" formControlName="coordination" *ngIf="process.coordination">
-          <option value="wait">{{COORDINATION_TYPES['wait']}}</option>
-          <option value="race">{{COORDINATION_TYPES['race']}}</option>
-          <option value="each">{{COORDINATION_TYPES['each']}}</option>
-        </select>
         <small class="form-text text-muted" *ngIf="process.coordination">Control process execution with multiple inbound
           links.
         </small>
@@ -88,6 +83,33 @@
         <!--map code here.-->
         <!--</small>-->
         <!--</div>-->
+      </accordion-group>
+
+      <accordion-group>
+        <div accordion-heading class="clearfix">
+          Flow Control
+          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
+        </div>
+
+        <div class="form-group">
+          <label>Agents flow control</label>
+          <select class="form-control" formControlName="flowControl">
+            <option value="each">{{FLOW_CONTROL_TYPES['each']}}</option>
+            <option value="wait">{{FLOW_CONTROL_TYPES['wait']}}</option>
+            <option value="race">{{FLOW_CONTROL_TYPES['race']}}</option>
+          </select>
+          <small class="form-text text-muted">Controlling syncing between agents.</small>
+        </div>
+
+        <div class="form-group" *ngIf="process.coordination">
+          <label>Process coordination</label>
+          <select class="form-control" formControlName="coordination">
+            <option value="wait">{{COORDINATION_TYPES['wait']}}</option>
+            <option value="race">{{COORDINATION_TYPES['race']}}</option>
+            <option value="each">{{COORDINATION_TYPES['each']}}</option>
+          </select>
+          <small class="form-text text-muted">Controlling process sync.</small>
+        </div>
       </accordion-group>
       <accordion-group>
         <div accordion-heading class="clearfix">
@@ -185,7 +207,9 @@
               <div class="col-6" [ngSwitch]="param.value.type">
                 <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
                 <select formControlName="value" class="form-control" *ngSwitchCase="'autocomplete'">
-                  <option *ngFor="let opt of methods[processForm.value.actions[index].method].params[k].options" id="opt._id" [ngValue]="opt.id">{{ opt.value }}</option>
+                  <option *ngFor="let opt of methods[processForm.value.actions[index].method].params[k].options"
+                          id="opt._id" [ngValue]="opt.id">{{ opt.value }}
+                  </option>
                 </select>
                 <input formControlName="value" type="text" class="form-control" *ngSwitchDefault>
               </div>

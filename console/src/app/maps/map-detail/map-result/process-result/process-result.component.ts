@@ -59,9 +59,12 @@ export class ProcessResultComponent implements OnChanges {
         };
       }
       total[current.action]['status'][current.status] = (total[current.action][current.status] || 0) + 1;
-      total[current.action]['results']['result'].push(current.result.result);
-      total[current.action]['results']['stderr'].push(current.result.stderr);
-      total[current.action]['results']['stdout'].push(current.result.stdout);
+      if (current.result) {
+
+        total[current.action]['results']['result'].push(current.result.result);
+        total[current.action]['results']['stderr'].push(current.result.stderr);
+        total[current.action]['results']['stdout'].push(current.result.stdout);
+      }
       total[current.action]['startTime'] = new Date(current.startTime) < total[current.action]['startTime'] ? current.startTime : total[current.action]['startTime'];
       total[current.action]['finishTime'] = new Date(current.finishTime) > total[current.action]['finishTime'] ? current.startTime : total[current.action]['finishTime'];
       return total;
