@@ -22,7 +22,12 @@
       "@agents/*": ["app/agents/*"],
       "@plugins/*": ["app/plugins/*"],
       "@shared/*": ["app/shared/*"],
-      "@core/*": ["app/core/*"]
+      "@core/*": [
+        "app/core/*"
+      ],
+      "@env/*": [
+        "environments/*"
+      ]
     }
   }
 }

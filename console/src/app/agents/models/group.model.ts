@@ -12,11 +12,23 @@ export enum FILTER_TYPES {
   lt = 'lt'
 }
 
+export enum FILTER_FIELDS {
+  hostname = 'hostname',
+  arch = 'arch',
+  alive = 'alive',
+  freeSpace = 'freeSpace',
+  respTime = 'respTime',
+  ip = 'ip',
+  createdAt = 'createdAt'
+
+}
+
 /**
  * Filter param model
  */
 export class FilterParam {
-  constructor(private value?: string | boolean, private filterType?: FILTER_TYPES) {
+  constructor(public field: FILTER_FIELDS, public value?: string | boolean, public filterType?: FILTER_TYPES) {
+    this.field = field;
     this.value = value;
     this.filterType = this.filterType || FILTER_TYPES.equal;
   }
@@ -27,32 +39,14 @@ export class Group {
   _id?: string;
   name: string;
   agents?: string[] | Agent[];
-  filter?: {
-    hostname?: FilterParam[],
-    arch?: FilterParam[],
-    alive?: FilterParam,
-    freeSpace?: FilterParam[],
-    respTime?: FilterParam[],
-    ip?: FilterParam[],
-    created?: FilterParam[],
-  };
+  filters?: [FilterParam];
 
-  constructor() {
-    this.filter = {
-      hostname: [],
-      arch: [],
-      freeSpace: [],
-      respTime: [],
-      ip: [],
-      created: []
-    };
-  }
 
-  isPopulated() {
+  isPopulated?() {
     return !!(this.agents && typeof this.agents[0] === 'object');
   }
 
-  hasAgents() {
+  hasAgents?() {
     return !!(this.agents && this.agents.length > 0);
 
   }
