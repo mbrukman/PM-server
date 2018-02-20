@@ -1,10 +1,10 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
 import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
-import { environment } from "../../environments/environment";
+import { Observable } from 'rxjs/Observable';
+import { environment } from '../../environments/environment';
 
-import { Plugin } from "./models/plugin.model";
-import { Observable } from "rxjs/Observable";
+import { Plugin } from './models/plugin.model';
 
 
 const serverUrl = environment.serverUrl;

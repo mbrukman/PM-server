@@ -1,14 +1,15 @@
+import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
+import { PluginMethod } from '@plugins/models/plugin-method.model';
+import { Plugin } from '@plugins/models/plugin.model';
+import { IAttribute } from '../interfaces/attribute.interface';
 import {
   IAction,
   IActionParam,
   ILink,
   IMapStructure,
-  IProcess, IUsedPlugin
+  IProcess,
+  IUsedPlugin
 } from '../interfaces/map-structure.interface';
-import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
-import { PluginMethod } from '@plugins/models/plugin-method.model';
-import { Plugin } from '@plugins/models/plugin.model';
-import { IAttribute } from '../interfaces/attribute.interface';
 
 
 export class ActionParam implements IActionParam {
@@ -52,6 +53,7 @@ export class Process implements IProcess {
   postRun?: string;
   filterAgents?: string;
   coordination?: 'wait' | 'race' | 'each';
+  flowControl: 'wait' | 'race' | 'each';
   actions: Action[];
   used_plugin: UsedPlugin;
   plugin?: Plugin;
@@ -59,6 +61,10 @@ export class Process implements IProcess {
   updatedAt: Date;
   correlateAgents: boolean;
   uuid: string;
+
+  constructor() {
+    this.flowControl = 'each';
+  }
 }
 
 export class Link implements ILink {
@@ -94,5 +100,6 @@ export class MapStructure implements IMapStructure {
     this.processes = [];
     this.attributes = [];
     this.links = [];
+
   }
 }

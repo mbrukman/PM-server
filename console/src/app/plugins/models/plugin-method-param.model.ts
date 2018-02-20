@@ -1,4 +1,4 @@
-import { IPluginMethodParam } from "../interfaces/plugin-method-param.interface";
+import { IPluginMethodParam } from '../interfaces/plugin-method-param.interface';
 
 export class PluginMethodParam implements IPluginMethodParam {
   id?: string;

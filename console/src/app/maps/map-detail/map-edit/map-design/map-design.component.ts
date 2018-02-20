@@ -154,7 +154,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     const ancestors = this.mapStructure.links.filter(link => link.targetId === this.link.targetId);
     if (ancestors.length > 1) {
       const processIndex = this.mapStructure.processes.findIndex(process => process.uuid === this.link.targetId);
-      this.mapStructure.processes[processIndex].coordination = 'wait';
+      if (!this.mapStructure.processes[processIndex].coordination) {
+        this.mapStructure.processes[processIndex].coordination = 'wait';
+      }
     }
     this.mapStructure.content = JSON.stringify(this.graph.toJSON());
     this.mapsService.setCurrentMapStructure(this.mapStructure);
@@ -456,6 +458,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.mapStructure.processes[index].coordination = process.coordination;
     this.mapStructure.processes[index].actions = process.actions;
     this.mapStructure.processes[index].correlateAgents = process.correlateAgents;
+    this.mapStructure.processes[index].flowControl = process.flowControl;
     this.mapStructure.processes[index].filterAgents = process.filterAgents;
     this.mapsService.setCurrentMapStructure(this.mapStructure);
   }

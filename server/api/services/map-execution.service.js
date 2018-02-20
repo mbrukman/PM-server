@@ -98,6 +98,7 @@ function updateExecutions(socket) {
  * @returns {number}
  */
 function addProcessToContext(runId, agentKey, processKey, process) {
+    executions[runId].executionContext.visitedProcesses.add(processKey);
     const processData = {
         startTime: new Date(),
         status: '',
@@ -177,7 +178,7 @@ function updateExecutionContext(runId, agentKey) {
  * @returns {boolean}
  */
 function shouldContinueExecution(runId, agentKey) {
-    return (!executions[runId].stop) && executions[runId].executionAgents[agentKey].continue;
+    return executions.hasOwnProperty(runId) && !executions[runId].stop && executions[runId].executionAgents[agentKey].continue;
 }
 
 function executeMap(mapId, structureId, cleanWorkspace, req) {
@@ -232,6 +233,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
             runId: runId,
             startTime: new Date(),
             structure: structure._id,
+            visitedProcesses: new Set() // saving uuid of process ran by all the agents (used in flow control)
         };
 
         let groupsAgents = {};
@@ -256,6 +258,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
             if (mapAgent.key && agents.hasOwnProperty(mapAgent.key) && agents[mapAgent.key].alive) {
                 mapAgent.status = "available";
                 mapAgent.continue = true;
+                mapAgent.pendingProcesses = {};
                 mapAgent.executionContext = vm.createContext(Object.assign({}, executionContext)); // cloning the execution context for each agent
                 vm.runInNewContext(libpm + "\n" + mapStructure.code, mapAgent.executionContext);
                 executionAgents[mapAgent.key] = mapAgent;
@@ -347,7 +350,6 @@ function startMapExecution(map, structure, runId, socket) {
 
 function runMapFromAgent(map, structure, runId, node, socket) {
     return (agent, callback) => {
-        console.log("run map from agent");
         runNodeSuccessors(map, structure, runId, agent, node, socket);
         callback();
     }
@@ -359,8 +361,13 @@ function runMapFromAgent(map, structure, runId, node, socket) {
  * @param agentKey
  * @returns {boolean}
  */
-function isThereProcessExecuting(runId, agentKey) {
-    let processes = Object.keys(executions[runId].executionAgents[agentKey].processes);
+function isThereProcessExecutingOnAgent(runId, agentKey) {
+    let processes;
+    try {
+        processes = Object.keys(executions[runId].executionAgents[agentKey].processes);
+    } catch (e) {
+        return false;
+    }
     for (let i = processes.length - 1; i >= 0; i--) {
         if (executions[runId].executionAgents[agentKey].processes[processes[i]].findIndex(p => p.status === 'executing') > -1) {
             return true;
@@ -370,7 +377,89 @@ function isThereProcessExecuting(runId, agentKey) {
 }
 
 /**
- * finds all successors for node and run them in parallel if meeting coordination criteria.
+ * Check if there is an agent that isn't labeled as done
+ * @param runId
+ * @returns {boolean}
+ */
+function areAllAgentsDone(runId) {
+    const executionAgents = executions[runId].executionAgents;
+
+    for (let i in executionAgents) {
+        if (!executionAgents[i].done) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+/**
+ * resuming pending agents
+ * @param map
+ * @param structure
+ * @param runId
+ * @param processKey
+ * @param socket
+ */
+function resumePendingAgents(map, structure, runId, processKey, socket) {
+    const executionAgents = executions[runId].executionAgents;
+    for (let i in executionAgents) {
+        runProcess(map, structure, runId, executionAgents[i], socket);
+    }
+}
+
+/**
+ *
+ * @param runId
+ * @param processKey
+ * @returns {boolean}
+ */
+function isThisTheFirstAgentToGetToTheProcess(runId, processKey) {
+    if (executions.hasOwnProperty(runId) && executions[runId].executionContext.visitedProcesses.has(processKey)) {
+        return false;
+    }
+    executions[runId].executionContext.visitedProcesses.add(process.uuid);
+    return true;
+}
+
+/**
+ * Check if there is an agent that stopped
+ * @param runId
+ * @returns {boolean}
+ */
+function areAllAgentsAlive(runId) {
+    const executionAgents = executions[runId].executionAgents;
+    for (let i in executionAgents) {
+        if (!executionAgents[i].continue) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * Checking if all agents has this process pending
+ * @param runId
+ * @param processKey
+ * @param agentKey
+ * @returns {boolean}
+ */
+function areAllAgentsWaitingToStartThis(runId, processKey, agentKey) {
+    const executionAgents = executions[runId].executionAgents;
+
+    executionAgents[agentKey].pendingProcesses[processKey] = new Date();
+
+    for (let i in executionAgents) {
+        if (!executionAgents[i].pendingProcesses.hasOwnProperty(processKey)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * Finds all successors for node and run them in parallel if meeting coordination criteria.
+ * Also check flow control condition and correlating agents.
  * @param map
  * @param structure
  * @param runId
@@ -384,21 +473,26 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
     }
     const successors = node ? findSuccessors(node, structure) : [];
     if (successors.length === 0) {
-        if (!isThereProcessExecuting(runId, agent.key)) {
-            executions[runId].executionContext.finishTime = new Date();
-            summarizeExecution(map, runId, Object.assign({}, executions[runId].executionContext), Object.assign({}, executions[runId].executionAgents))
-                .then(mapResult => {
-                    socket.emit('map-execution-result', mapResult);
-                });
-            delete executions[runId];
-            updateExecutions(socket);
+        if (!isThereProcessExecutingOnAgent(runId, agent.key)) {
+            executions[runId].executionAgents[agent.key].done = true;
+            if (areAllAgentsDone(runId)) {
+                executions[runId].executionContext.finishTime = new Date();
+                summarizeExecution(map, runId, Object.assign({}, executions[runId].executionContext), Object.assign({}, executions[runId].executionAgents))
+                    .then(mapResult => {
+                        socket.emit('map-execution-result', mapResult);
+                    });
+                delete executions[runId];
+                updateExecutions(socket);
+            }
         }
+
     }
     let nodesToRun = [];
     successors.forEach(successor => {
         let ancestors = findAncestors(successor, structure);
+        const process = findProcessByUuid(successor, structure);
         if (ancestors.length > 1) {
-            let process = findProcessByUuid(successor, structure);
+            // checking merge conditions
             if (process.coordination === 'wait') {
                 let flag = true;
                 ancestors.forEach(ancestor => {
@@ -416,9 +510,55 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
                 }
             }
         }
+
+        // checking agent flow condition
+        if (process.flowControl === 'race') {
+            // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
+            if (!isThisTheFirstAgentToGetToTheProcess(runId, successor)) {
+                return runNodeSuccessors(map, structure, runId, agent, successor, socket);
+            }
+        } else if (process.flowControl === 'wait') {
+            // if not all agents are still alive, the wait condition will never be met, should stop the map execution
+            if (!areAllAgentsAlive) {
+                return stopExecution(map.id, runId, socket);
+            }
+            // if there is a wait condition, checking if it is the last agent that got here and than run all the agents
+            if (areAllAgentsWaitingToStartThis(runId, successor, agent.key)) {
+                const executionAgents = executions[runId].executionAgents;
+                for (let i in executionAgents) {
+                    if (i === agent.key) {
+                        continue;
+                    }
+                    runNode(map, structure, runId, executionAgents[i], successor, socket);
+                    delete executionAgents[i].pendingProcesses[successor] // Remove the pending process from the object.
+                }
+            }
+        }
         nodesToRun.push(successor);
     });
     async.each(nodesToRun, runProcess(map, structure, runId, agent, socket), (error) => {
+        if (error) {
+            winston.log("error", error);
+        }
+    });
+}
+
+/**
+ * running a certain node (without condition)
+ * @param map
+ * @param structure
+ * @param runId
+ * @param agent
+ * @param node
+ * @param socket
+ */
+function runNode(map, structure, runId, agent, node, socket) {
+    if (!shouldContinueExecution(runId, agent.key)) {
+        return;
+    }
+
+
+    async.each([node], runProcess(map, structure, runId, agent, socket), (error) => {
         if (error) {
             winston.log("error", error);
         }
@@ -760,7 +900,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                             socket.emit('update', log);
                         });
                     });
-                    retucallback(null, body);
+                    callback(null, body);
                     return;
 
                 }

@@ -1,16 +1,16 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
-import * as _ from 'lodash';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/observable/of';
-
 import { Process } from '@maps/models/map-structure.model';
-import { Plugin } from '@plugins/models/plugin.model';
 import { PluginMethod } from '@plugins/models/plugin-method.model';
+import { Plugin } from '@plugins/models/plugin.model';
 import { PluginsService } from '@plugins/plugins.service';
 import { SocketService } from '@shared/socket.service';
+
+import * as _ from 'lodash';
+import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/observable/of';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-process-form',
@@ -28,13 +28,23 @@ export class ProcessFormComponent implements OnInit {
   plugin: Plugin;
   methods: object = {};
   selectedMethod: PluginMethod;
+
   COORDINATION_TYPES = {
     'wait': 'Wait for all',
     'race': 'Run once for first',
     'each': 'Run for each in link'
   };
 
+
+  FLOW_CONTROL_TYPES = {
+    'wait': 'Wait for all agents and then run',
+    'race': 'Run only for first agent',
+    'each': 'Run for each agent'
+  };
+
+
   constructor(private socketService: SocketService, private pluginsService: PluginsService) {
+
   }
 
   ngOnInit() {
@@ -50,6 +60,7 @@ export class ProcessFormComponent implements OnInit {
       this.process.mandatory,
       this.process.condition,
       this.process.coordination,
+      this.process.flowControl,
       this.process.preRun,
       this.process.postRun,
       this.process.correlateAgents,
@@ -133,7 +144,7 @@ export class ProcessFormComponent implements OnInit {
    * @param filterAgents
    * @returns {FormGroup}
    */
-  initProcessForm(name, uuid, description, mandatory, condition, coordination, preRun, postRun, correlateAgents, filterAgents) {
+  initProcessForm(name, uuid, description, mandatory, condition, coordination, flowControl, preRun, postRun, correlateAgents, filterAgents) {
     return new FormGroup({
       name: new FormControl(name),
       uuid: new FormControl(uuid),
@@ -141,6 +152,7 @@ export class ProcessFormComponent implements OnInit {
       mandatory: new FormControl(mandatory),
       condition: new FormControl(condition),
       coordination: new FormControl(coordination),
+      flowControl: new FormControl(flowControl),
       preRun: new FormControl(preRun),
       postRun: new FormControl(postRun),
       correlateAgents: new FormControl(correlateAgents),
