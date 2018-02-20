@@ -50,7 +50,6 @@ export class EvaluateGroupAgentComponent implements OnInit {
             return o[filter.field].toString() === filter.value;
           }
           case FILTER_TYPES.contains: {
-            console.log(o[filter.field].includes(filter.value));
             return o[filter.field].includes(filter.value);
           }
 

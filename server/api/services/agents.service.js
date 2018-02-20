@@ -15,6 +15,25 @@ const INTERVAL_TIME = env.interval_time;
 let agents = {}; // store the agents status.
 
 
+const FILTER_TYPES = Object.freeze({
+    gte: 'gte',
+    gt: 'gt',
+    equal: 'equal',
+    contains: 'contains',
+    lte: 'lte',
+    lt: 'lt'
+});
+
+const FILTER_FIELDS = Object.freeze({
+    hostname: 'hostname',
+    arch: 'arch',
+    alive: 'alive',
+    freeSpace: 'freeSpace',
+    respTime: 'respTime',
+    url: 'url',
+    createdAt: 'createdAt'
+});
+
 /* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
 let followAgentStatus = (agent) => {
     let start = new Date();
@@ -94,8 +113,97 @@ function setDefaultUrl(agent) {
             resolve();
         });
     });
+}
+
+/**
+ * Evaluates group dynamic agents and constant agents.
+ * @param group
+ * @returns {any}
+ */
+function evaluateGroupAgents(group) {
+    let filteredAgents = Object.keys(agents).map(key => agents[key]);
+    group.filters.forEach(filter => {
+        filteredAgents = evaluateFilter(filter, filteredAgents);
+    });
+
+    // array of the constant agents attached to the group
+    const constAgents = group.agents.reduce((total, current) => {
+        const agent = Object.keys(agents).find(key => {
+            return agents[key].id === current.toString();
+        });
+        if (agent) {
+            total.push(agents[agent]);
+        }
+        return total;
+    }, []);
 
 
+    filteredAgents = [...filteredAgents, ...constAgents];
+    return filteredAgents.reduce((total, current) => {
+        total[current.key] = current;
+        return total;
+    }, {});
+}
+
+/**
+ * Evaluates group's filter on given agents
+ * @param filter
+ * @param agents
+ * @returns array of filtered agents
+ */
+function evaluateFilter(filter, agents) {
+    return agents.filter(o => {
+        if (!o[filter.field]) {
+            return false;
+        }
+        switch (filter.filterType) {
+            case FILTER_TYPES.equal: {
+                if (!o[filter.field]) {
+                    return false;
+                }
+                return o[filter.field].toString() === filter.value;
+            }
+            case FILTER_TYPES.contains: {
+                return o[filter.field].includes(filter.value);
+            }
+
+            case FILTER_TYPES.gt: {
+                try {
+                    return parseFloat(o[filter.field]) > parseFloat(filter.value);
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            case FILTER_TYPES.gte: {
+                try {
+                    return parseFloat(o[filter.field]) >= parseFloat(filter.value);
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            case FILTER_TYPES.lt: {
+                try {
+                    return parseFloat(o[filter.field]) < parseFloat(filter.value);
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            case FILTER_TYPES.lte: {
+                try {
+                    return parseFloat(o[filter.field]) <= parseFloat(filter.value);
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            default: {
+                return false;
+            }
+        }
+    });
 }
 
 
@@ -232,5 +340,7 @@ module.exports = {
      */
     groupDetail: (groupId) => {
         return Group.findById(groupId);
-    }
+    },
+
+    evaluateGroupAgents: evaluateGroupAgents
 };
