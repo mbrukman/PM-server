@@ -18,7 +18,7 @@ export enum FILTER_FIELDS {
   alive = 'alive',
   freeSpace = 'freeSpace',
   respTime = 'respTime',
-  ip = 'ip',
+  url = 'url',
   createdAt = 'createdAt'
 
 }
@@ -27,7 +27,7 @@ export enum FILTER_FIELDS {
  * Filter param model
  */
 export class FilterParam {
-  constructor(public field: FILTER_FIELDS, public value?: string | boolean, public filterType?: FILTER_TYPES) {
+  constructor(public field: FILTER_FIELDS, public value?: string, public filterType?: FILTER_TYPES) {
     this.field = field;
     this.value = value;
     this.filterType = this.filterType || FILTER_TYPES.equal;

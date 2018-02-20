@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 
 import { retry } from 'rxjs/operators';
 import { Subscription } from 'rxjs/Subscription';
@@ -7,6 +7,7 @@ import { AgentsService } from '@agents/agents.service';
 import { Group } from '@agents/models/group.model';
 import { BsModalService } from 'ngx-bootstrap';
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
+import { Agent } from '@agents/models/agent.model';
 
 @Component({
   selector: 'app-groups',
@@ -14,6 +15,7 @@ import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.comp
   styleUrls: ['./groups.component.scss']
 })
 export class GroupsComponent implements OnInit, OnDestroy {
+  @Input('agents') agents: Agent[];
   groupsReq: any;
   groups: Group[];
   draggedItem: any;

@@ -17,6 +17,10 @@
       <div>
         <button class="btn btn-pm" (click)="deleteGroup(i, item.id)">Delete group</button>
       </div>
+      <div>
+        Constant agents: <span class="badge badge-pill badge-light">{{item?.agents?.length}}</span>
+      </div>
+      <app-evaluate-group-agent [group]="item" [agents]="agents" *ngIf="agents?.length > 0"></app-evaluate-group-agent>
       <hr/>
       <br>
       <app-group-dynamic-condition-filter [group]="item"></app-group-dynamic-condition-filter>

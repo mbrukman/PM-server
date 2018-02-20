@@ -15,6 +15,7 @@ export class AgentsService {
   draggedItem: any;
   private dragSubject: Subject<any> = new Subject<any>();
   private selectedGroupSubject: Subject<Group> = new Subject<Group>();
+  private reEvaluateFilterSubject: Subject<Group> = new Subject<Group>();
 
   constructor(private http: HttpClient) {
   }
@@ -108,12 +109,36 @@ export class AgentsService {
     return this.dragSubject.asObservable();
   }
 
+  /**
+   * Passing next group to observer
+   * @param {Group} group
+   */
   selectGroup(group: Group) {
     this.selectedGroupSubject.next(group);
   }
 
-  getSelectedGroupAsObservable() {
+  /**
+   * Returns observable of selected group
+   * @returns {Observable<Group>}
+   */
+  getSelectedGroupAsObservable(): Observable<Group> {
     return this.selectedGroupSubject.asObservable();
+  }
+
+  /**
+   * Passing next group to the reevabluate subject
+   * @param group
+   */
+  reEvaluateGroupFilters(group) {
+    this.reEvaluateFilterSubject.next(group);
+  }
+
+  /**
+   * Returns a group to reevavluate the filter as observable
+   * @returns {Observable<Group>}
+   */
+  getGroupToReEvalueateAsObservable(): Observable<Group> {
+    return this.reEvaluateFilterSubject.asObservable()
   }
 
 }

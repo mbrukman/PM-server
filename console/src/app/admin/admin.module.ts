@@ -15,6 +15,7 @@ import { AdminRoutingModule } from './admin-routing.module';
 import { AdminComponent } from './admin.component';
 import { GroupDynamicConditionFilterComponent } from '@agents/groups/group-dynamic-condition-filter/group-dynamic-condition-filter.component';
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
+import { EvaluateGroupAgentComponent } from '@agents/groups/evaluate-group-agent/evaluate-group-agent.component';
 
 
 @NgModule({
@@ -34,7 +35,8 @@ import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.comp
     AgentsComponent,
     GroupsComponent,
     GroupDynamicConditionFilterComponent,
-    InputPopupComponent
+    InputPopupComponent,
+    EvaluateGroupAgentComponent
   ],
   entryComponents: [PluginUploadComponent, AddFolderComponent, InputPopupComponent]
 })

@@ -39,7 +39,8 @@ export class GroupDynamicConditionFilterComponent implements OnInit {
         retry(3)
       )
       .subscribe(group => {
-        console.log(group);
+        this.group = group;
+        this.agentsService.reEvaluateGroupFilters(group);
       });
   }
 

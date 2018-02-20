@@ -11,6 +11,8 @@ import { Subscription } from 'rxjs/Subscription';
   styleUrls: ['./agents-list.component.scss']
 })
 export class AgentsListComponent implements OnInit, OnDestroy {
+  agentsStatus: any;
+  agentsStatusReq: any;
   agents: [Agent];
   selectedAgent: Agent;
   agentsReq: any;
@@ -28,6 +30,12 @@ export class AgentsListComponent implements OnInit, OnDestroy {
       this.agents = agents;
     });
 
+    // get agents status to pass to filters
+    this.agentsStatusReq = this.agentsService.status()
+      .subscribe(agents => {
+        this.agentsStatus = Object.keys(agents).map(o => agents[o]);
+      });
+
     this.selectedGroupSubscription = this.agentsService
       .getSelectedGroupAsObservable()
       .subscribe(group => this.selectedGroup = group);
@@ -39,9 +47,15 @@ export class AgentsListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.agentsReq.unsubscribe();
-    if (this.updateReq)
+    if (this.agentsReq) {
+      this.agentsReq.unsubscribe();
+    }
+    if (this.updateReq) {
       this.updateReq.unsubscribe();
+    }
+    if (this.agentsStatusReq) {
+      this.agentsStatusReq.unsubscribe();
+    }
   }
 
   deleteAgent(agentId) {
