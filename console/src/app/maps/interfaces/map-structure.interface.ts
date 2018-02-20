@@ -1,8 +1,8 @@
-import { IPluginMethodParam } from "../../plugins/interfaces/plugin-method-param.interface";
-import { IPluginMethod } from "../../plugins/interfaces/plugin-method.interface";
-import { IPlugin } from "../../plugins/interfaces/plugin.interface";
-import { IAttribute } from "./attribute.interface";
+import { IPluginMethodParam } from '../../plugins/interfaces/plugin-method-param.interface';
+import { IPluginMethod } from '../../plugins/interfaces/plugin-method.interface';
+import { IPlugin } from '../../plugins/interfaces/plugin.interface';
 import { Plugin } from '../../plugins/models/plugin.model';
+import { IAttribute } from './attribute.interface';
 
 export interface IActionParam {
   id?: string,
@@ -44,6 +44,7 @@ export interface IProcess {
   postRun?: string,
   filterAgents?: string,
   coordination?: 'wait' | 'race' | 'each',
+  flowControl?: 'wait' | 'race' | 'each',
   actions: IAction[],
   used_plugin: IUsedPlugin,
   plugin?: IPlugin,
@@ -78,4 +79,3 @@ export interface IMapStructure {
   used_plugins: [IUsedPlugin];
 
 }
-
