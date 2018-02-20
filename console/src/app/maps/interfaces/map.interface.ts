@@ -1,4 +1,5 @@
-import { IAgent } from "../../agents/interfaces/agent.interface";
+import { IAgent } from '@agents/interfaces/agent.interface';
+import { Group } from '@agents/models';
 
 export interface IMap {
   id?: string,
@@ -9,4 +10,5 @@ export interface IMap {
   licence?: string,
   archived: boolean,
   agents?: [IAgent]
+  groups?: Group[];
 }

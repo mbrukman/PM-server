@@ -8,7 +8,7 @@
     </div>
     <div class="modal-body">
 
-      <p-dataTable [value]="agents"  [responsive]="true" [(selection)]="selectedAgents" dataKey="name">
+      <p-dataTable [value]="agents" [responsive]="true" [(selection)]="selectedAgents" dataKey="id">
         <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
         <p-column field="name" header="name" [sortable]="true">
           <ng-template let-col let-agent="rowData" pTemplate="body">

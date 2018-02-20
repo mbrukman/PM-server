@@ -1,21 +1,29 @@
-import { NgModule } from '@angular/core';
+import { AgentsComponent } from '@agents/agents/agents.component';
+import { GroupsComponent } from '@agents/groups/groups.component';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { AccordionModule } from 'ngx-bootstrap/accordion';
 
+import { AddFolderComponent } from '@agents/agents-list/add-folder/add-folder.component';
+import { AgentsListComponent } from '@agents/agents-list/agents-list.component';
+import { PluginUploadComponent } from '@plugins/plugin-upload/plugin-upload.component';
+import { PluginsListComponent } from '@plugins/plugins-list/plugins-list.component';
+import { SharedModule } from '@shared/shared.module';
 import { AdminRoutingModule } from './admin-routing.module';
 import { AdminComponent } from './admin.component';
-import { AgentsListComponent } from '../agents/agents-list/agents-list.component';
-import { PluginUploadComponent } from '../plugins/plugin-upload/plugin-upload.component';
-import { PluginsListComponent } from '../plugins/plugins-list/plugins-list.component';
-import { AddFolderComponent } from '../agents/agents-list/add-folder/add-folder.component';
-import { SharedModule } from '../shared/shared.module';
+import { GroupDynamicConditionFilterComponent } from '@agents/groups/group-dynamic-condition-filter/group-dynamic-condition-filter.component';
+import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
+import { EvaluateGroupAgentComponent } from '@agents/groups/evaluate-group-agent/evaluate-group-agent.component';
+
 
 @NgModule({
   imports: [
     CommonModule,
     AdminRoutingModule,
     TooltipModule,
+    AccordionModule,
     SharedModule
   ],
   declarations: [
@@ -24,7 +32,12 @@ import { SharedModule } from '../shared/shared.module';
     PluginsListComponent,
     AgentsListComponent,
     AddFolderComponent,
+    AgentsComponent,
+    GroupsComponent,
+    GroupDynamicConditionFilterComponent,
+    InputPopupComponent,
+    EvaluateGroupAgentComponent
   ],
-  entryComponents: [PluginUploadComponent, AddFolderComponent],
+  entryComponents: [PluginUploadComponent, AddFolderComponent, InputPopupComponent]
 })
 export class AdminModule { }

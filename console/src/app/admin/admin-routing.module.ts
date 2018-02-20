@@ -1,9 +1,10 @@
+import { AgentsListComponent } from '@agents/agents-list/agents-list.component';
+import { GroupsComponent } from '@agents/groups/groups.component';
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
+import { AgentsComponent } from '@agents/agents/agents.component';
+import { PluginsListComponent } from '@plugins/plugins-list/plugins-list.component';
 import { AdminComponent } from './admin.component';
-import { AgentsListComponent } from '../agents/agents-list/agents-list.component';
-import { CalendarContainerComponent } from '../calendar/calendar-container/calendar-container.component';
-import { PluginsListComponent } from '../plugins/plugins-list/plugins-list.component';
 
 const routes: Routes = [
   {
@@ -21,7 +22,11 @@ const routes: Routes = [
       },
       {
         path: 'agents',
-        component: AgentsListComponent
+        component: AgentsComponent,
+        children: [
+          { path: '', component: AgentsListComponent },
+          { path: 'groups', component: GroupsComponent }
+        ]
       },
       {
         path: 'calendar',

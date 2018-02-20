@@ -205,6 +205,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
     let mapStructure;
     let mapAgents;
     let executionContext;
+
     return mapsService.get(mapId).then(mapobj => {
         if (mapobj.archived) {
             throw new Error('Can\'t execute archived map');
@@ -235,10 +236,25 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
             visitedProcesses: new Set() // saving uuid of process ran by all the agents (used in flow control)
         };
 
+        let groupsAgents = {};
+        return new Promise((resolve, reject) => {
+            async.each(map.groups, (group, callback) => {
+                agentsService.groupDetail(group)
+                    .then((groupObj) => {
+                        groupsAgents = Object.assign(groupsAgents, agentsService.evaluateGroupAgents(groupObj));
+                        callback();
+                    }).catch(() => {
+                    callback();
+                });
+            }, (error) => {
+                resolve(Object.keys(groupsAgents).map(key => groupsAgents[key]));
+            })
+        });
+    }).then((groupsAgents) => {
         let agents = agentsService.agentsStatus();
         let executionAgents = {};
-
-        for (let mapAgent of map.agents) { // filtering only the live agents of the map.
+        let totalMaps = [...JSON.parse(JSON.stringify(map.agents)), ...groupsAgents];
+        for (let mapAgent of totalMaps) { // filtering only the live agents of the map.
             if (mapAgent.key && agents.hasOwnProperty(mapAgent.key) && agents[mapAgent.key].alive) {
                 mapAgent.status = 'available';
                 mapAgent.continue = true;

@@ -14,6 +14,7 @@
 .environment {
   max-width: 250px;
   flex: 0 0 250px;
+  overflow-y: hidden;
   .pane-header {
     i {
       &:hover {
@@ -23,6 +24,10 @@
       float: right;
       padding: 9px;
     }
+  }
+
+  .pane-content {
+    height: 100%;
   }
 }
 

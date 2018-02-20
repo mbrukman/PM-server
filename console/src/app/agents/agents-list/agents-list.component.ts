@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { AgentsService } from "../agents.service";
-import { Agent } from "../models/agent.model";
+import { AgentsService } from '../agents.service';
+import { Agent } from '../models/agent.model';
+import { Group } from '../models/group.model';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-agents-list',
@@ -9,29 +11,51 @@ import { Agent } from "../models/agent.model";
   styleUrls: ['./agents-list.component.scss']
 })
 export class AgentsListComponent implements OnInit, OnDestroy {
+  agentsStatus: any;
+  agentsStatusReq: any;
   agents: [Agent];
   selectedAgent: Agent;
   agentsReq: any;
   updateReq: any;
   items: any[];
+  selectedGroupSubscription: Subscription;
+  selectedGroup: Group;
 
   constructor(private agentsService: AgentsService) {
   }
 
   ngOnInit() {
+
     this.agentsReq = this.agentsService.list().subscribe(agents => {
       this.agents = agents;
     });
+
+    // get agents status to pass to filters
+    this.agentsStatusReq = this.agentsService.status()
+      .subscribe(agents => {
+        this.agentsStatus = Object.keys(agents).map(o => agents[o]);
+      });
+
+    this.selectedGroupSubscription = this.agentsService
+      .getSelectedGroupAsObservable()
+      .subscribe(group => this.selectedGroup = group);
+
     this.items = [
-      { label: 'View', icon: 'fa-search', command: (event) => console.log("!") },
-      { label: 'Delete', icon: 'fa-close', command: (event) => console.log("@") }
+      { label: 'View', icon: 'fa-search', command: (event) => console.log('!') },
+      { label: 'Delete', icon: 'fa-close', command: (event) => console.log('@') }
     ];
   }
 
   ngOnDestroy() {
-    this.agentsReq.unsubscribe();
-    if (this.updateReq)
+    if (this.agentsReq) {
+      this.agentsReq.unsubscribe();
+    }
+    if (this.updateReq) {
       this.updateReq.unsubscribe();
+    }
+    if (this.agentsStatusReq) {
+      this.agentsStatusReq.unsubscribe();
+    }
   }
 
   deleteAgent(agentId) {
@@ -53,6 +77,11 @@ export class AgentsListComponent implements OnInit, OnDestroy {
     this.updateReq = this.agentsService.update(this.selectedAgent).subscribe(agent => {
       console.log(agent);
     });
+  }
+
+  dragStart($event, agent) {
+    this.agentsService.dragStart(agent);
+
   }
 
 }
