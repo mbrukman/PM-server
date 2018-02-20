@@ -1,17 +1,17 @@
-const vm = require("vm");
-const fs = require("fs");
-const path = require("path");
+const vm = require('vm');
+const fs = require('fs');
+const path = require('path');
 
-const winston = require("winston");
+const winston = require('winston');
+const async = require('async');
+const request = require('request');
 const _ = require("lodash");
-const async = require("async");
-const request = require("request");
 
-const MapResult = require("../models/map-results.model");
-const MapExecutionLog = require("../models/map-execution-log.model");
-const agentsService = require("./agents.service");
-const mapsService = require("./maps.service");
-const pluginsService = require("../services/plugins.service");
+const MapResult = require('../models/map-results.model');
+const MapExecutionLog = require('../models/map-execution-log.model');
+const agentsService = require('./agents.service');
+const mapsService = require('./maps.service');
+const pluginsService = require('../services/plugins.service');
 
 let executions = {};
 
@@ -37,7 +37,7 @@ function evaluateParam(param, context) {
 function createContext(mapObj, context) {
     try {
         vm.createContext(context);
-        vm.runInNewContext(libpm + "\n" + mapObj.code, context);
+        vm.runInNewContext(libpm + '\n' + mapObj.code, context);
         return 0;
     } catch (error) {
         return error;
@@ -167,7 +167,7 @@ function updateExecutionContext(runId, agentKey) {
     }
     executions[runId].executionAgents[agentKey].executionContext['processes'] = executions[runId].executionAgents[agentKey].processes;
     Object.keys(executions[runId].executionAgents).forEach(agentK => {
-        executions[runId].executionAgents[agentK].executionContext["globalContext"] = executions[runId].executionAgents;
+        executions[runId].executionAgents[agentK].executionContext['globalContext'] = executions[runId].executionAgents;
     });
 }
 
@@ -188,7 +188,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
         let S4 = function () {
             return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
         };
-        return (S4() + "-" + S4());
+        return (S4() + '-' + S4());
     }
 
     // TODO: add execution by sourceID
@@ -196,8 +196,8 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
     createLog({
         map: mapId,
         runId: runId,
-        message: "Starting map execution",
-        status: "info"
+        message: 'Starting map execution',
+        status: 'info'
     }, socket);
 
     let map;
@@ -207,14 +207,14 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
     let executionContext;
     return mapsService.get(mapId).then(mapobj => {
         if (mapobj.archived) {
-            throw new Error("Can't execute archived map");
+            throw new Error('Can\'t execute archived map');
         }
         map = mapobj;
         mapAgents = map.agents;
         return mapsService.getMapStructure(mapId, structureId);
     }).then(structure => {
         if (!structure) {
-            throw new Error("No structure found.");
+            throw new Error('No structure found.');
         }
         mapStructure = structure;
         executionContext = {
@@ -240,31 +240,31 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
 
         for (let mapAgent of map.agents) { // filtering only the live agents of the map.
             if (mapAgent.key && agents.hasOwnProperty(mapAgent.key) && agents[mapAgent.key].alive) {
-                mapAgent.status = "available";
+                mapAgent.status = 'available';
                 mapAgent.continue = true;
                 mapAgent.pendingProcesses = {};
                 mapAgent.executionContext = vm.createContext(Object.assign({}, executionContext)); // cloning the execution context for each agent
-                vm.runInNewContext(libpm + "\n" + mapStructure.code, mapAgent.executionContext);
+                vm.runInNewContext(libpm + '\n' + mapStructure.code, mapAgent.executionContext);
                 executionAgents[mapAgent.key] = mapAgent;
             }
         }
 
         if (Object.keys(executionAgents).length === 0) { // exit if no live agents for this map
-            winston.log('error', "No agents selected or no live agents");
+            winston.log('error', 'No agents selected or no live agents');
             createLog({
                 map: mapId,
                 runId: runId,
-                message: "No agents selected or no live agents",
-                status: "error"
+                message: 'No agents selected or no live agents',
+                status: 'error'
             }, socket);
-            throw new Error("No agents selected or no live agents");
+            throw new Error('No agents selected or no live agents');
         }
 
         executionContext.agents = executionAgents;
         executions[runId] = { map: mapId, executionContext: executionContext, executionAgents: executionAgents };
         let res = createContext(mapStructure, executionContext);
         if (res !== 0) {
-            throw new Error("Error running map code" + res);
+            throw new Error('Error running map code' + res);
         }
 
         return MapResult.create({
@@ -325,6 +325,47 @@ function findSuccessors(nodeUuid, structure) {
     }, []);
 }
 
+/**
+ * Checks if agents have correct plugins versions, if not install them
+ * @param map
+ * @param structure
+ * @param runId
+ * @param agentKey
+ */
+function validate_plugin_installation(map, structure, runId, agentKey) {
+    const agents = agentsService.agentsStatus();
+    return new Promise((resolve, reject) => {
+        let plugins = executions[runId].executionContext.plugins;
+        // check if agents has the right version of the plugins.
+        const filesPaths = plugins.reduce((total, current) => {
+            if (current.version !== agents[agentKey].installed_plugins[current.name]) {
+                total.push(current.file);
+            }
+            return total;
+        }, []);
+
+        if (filesPaths && filesPaths.length > 0) {
+            async.each(filesPaths,
+                function (filePath, callback) {
+                    agentsService.installPluginOnAgent(filePath, agents[key]).then(() => {
+                    }).catch((e) => {
+                        winston.log('error', 'Error installing on agent', e);
+                    });
+                    callback();
+                },
+                function (error) {
+                    if (error) {
+                        winston.log('error', 'Error installing plugins on agent, it may be a fatal error', error);
+                    }
+                    winston.log('success', 'Done installing plugins');
+                    resolve();
+                });
+        } else {
+            resolve();
+        }
+    });
+}
+
 function startMapExecution(map, structure, runId, socket) {
     let agents = executions[runId].executionAgents;
     const startNode = findStartNode(structure);
@@ -334,8 +375,10 @@ function startMapExecution(map, structure, runId, socket) {
 
 function runMapFromAgent(map, structure, runId, node, socket) {
     return (agent, callback) => {
-        runNodeSuccessors(map, structure, runId, agent, node, socket);
-        callback();
+        validate_plugin_installation(map, structure, runId, agent.key).then(() => {
+            runNodeSuccessors(map, structure, runId, agent, node, socket);
+            callback();
+        });
     }
 }
 
@@ -522,7 +565,7 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
     });
     async.each(nodesToRun, runProcess(map, structure, runId, agent, socket), (error) => {
         if (error) {
-            winston.log("error", error);
+            winston.log('error', error);
         }
     });
 }
@@ -580,20 +623,20 @@ function runProcess(map, structure, runId, agent, socket) {
             }
 
             if (!res) {
-                winston.log('error', (errorMsg || "Agent didn't pass filter agent condition"));
+                winston.log('error', (errorMsg || 'Agent didn\'t pass filter agent condition'));
                 createLog({
                     map: map._id,
                     runId: runId,
                     message: (errorMsg || `'${process.name}': agent '${agent.name}' didn't pass filter function`),
-                    status: "error"
+                    status: 'error'
                 }, socket);
 
                 updateProcessContext(runId, agent.key, processUUID, processIndex, {
-                    status: "error",
-                    result: "Agent didn't pass filter condition"
+                    status: 'error',
+                    result: 'Agent didn\'t pass filter condition'
                 });
                 if (process.mandatory) {
-                    executions[runId].executionAgents[agent.key].status = "error";
+                    executions[runId].executionAgents[agent.key].status = 'error';
                     executions[runId].executionAgents[agent.key].continue = false;
                     stopExecution(map._id, runId, socket);
                 }
@@ -618,9 +661,10 @@ function runProcess(map, structure, runId, agent, socket) {
                     map: map._id,
                     runId: runId,
                     message: `'${process.name}': Error running process condition: ${JSON.stringify(e)}`,
-                    status: "error"
+                    status: 'error'
                 }, socket);
             }
+
             if (!res) { // process didn't pass condition or failed run condition function
                 winston.log('info', errMsg || "Process didn't pass condition");
                 executions[runId].executionAgents[agent.key].finishTime = new Date();
@@ -628,6 +672,7 @@ function runProcess(map, structure, runId, agent, socket) {
                     status: "error",
                     result: errMsg || "Process didn't pass condition",
                     finishTime: new Date()
+
                 });
                 if (process.mandatory) { // mandatory process failed, agent should not execute more processes
                     executions[runId].executionAgents[agent.key].continue = false;
@@ -652,12 +697,12 @@ function runProcess(map, structure, runId, agent, socket) {
                 updateProcessContext(runId, agent.key, processUUID, { preRun: res });
                 updateExecutionContext(runId, agent.key);
             } catch (e) {
-                winston.log('error', "Error running pre process function");
+                winston.log('error', 'Error running pre process function');
                 createLog({
                     map: map._id,
                     runId: runId,
                     message: `'${process.name}': error running pre-process function`,
-                    status: "error"
+                    status: 'error'
                 }, socket);
             }
         }
@@ -684,7 +729,7 @@ function runProcess(map, structure, runId, agent, socket) {
         // updating context
         updateProcessContext(runId, agent.key, processUUID, processIndex, {
             startTime: new Date(),
-            status: "executing"
+            status: 'executing'
         });
 
         // executing actions
@@ -695,15 +740,15 @@ function runProcess(map, structure, runId, agent, socket) {
             let status;
 
             if (error) {
-                winston.log('error', "Fatal error: ", error);
+                winston.log('error', 'Fatal error: ', error);
                 createLog({
                     map: map._id,
                     runId: runId,
                     message: `'${process.name}': A mandatory action failed`,
-                    status: "error"
+                    status: 'error'
                 });
                 status = 'error';
-                executions[runId].executionAgents["continue"] = (error && process.mandatory);
+                executions[runId].executionAgents['continue'] = (error && process.mandatory);
                 updateExecutionContext(runId, agent.key);
 
             } else {
@@ -729,7 +774,7 @@ function runProcess(map, structure, runId, agent, socket) {
                     map: map._id,
                     runId: runId,
                     message: `'${process.name}': Running post process function`,
-                    status: "error"
+                    status: 'error'
                 }, socket);
                 // post run hook for link (enables user to change context)
                 let res;
@@ -739,12 +784,12 @@ function runProcess(map, structure, runId, agent, socket) {
                     updateExecutionContext(runId, agent.key);
 
                 } catch (e) {
-                    winston.log('error', "Error running post process function");
+                    winston.log('error', 'Error running post process function');
                     createLog({
                         map: map._id,
                         runId: runId,
                         message: `'${process.name}': Error running post process function`,
-                        status: "error"
+                        status: 'error'
                     }, socket);
                 }
             }
@@ -800,7 +845,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
         }, socket);
 
         if (!shouldContinueExecution(runId, agent.key)) {
-            console.log("Should not continue");
+            console.log('Should not continue');
             return callback();
         }
 
@@ -845,7 +890,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                     body.stdout = actionString + '\n' + body.stdout;
 
                     updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
-                        status: "success",
+                        status: 'success',
                         result: body
                     });
 
@@ -897,7 +942,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                     }
 
                     updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
-                        status: "error",
+                        status: 'error',
                         result: res
                     });
 
@@ -910,11 +955,11 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
 
 
                     if (action.mandatory) {
-                        callback("Action '" + action.name + "' failed: " + res);
+                        callback('Action \'' + action.name + '\' failed: ' + res);
                         return;
                     }
                     else {
-                        callback(null, "Action '" + action.name + "' failed: " + res); // Action failed but it doesn't mater
+                        callback(null, 'Action \'' + action.name + '\' failed: ' + res); // Action failed but it doesn't mater
                         return;
                     }
                 }
@@ -969,7 +1014,7 @@ function summarizeExecution(map, runId, executionContext, agentsResults) {
         let agentResult = {
             processes: [],
             agent: agent._id,
-            status: agent.status === "available" ? 'success' : agent.status,
+            status: agent.status === 'available' ? 'success' : agent.status,
             startTime: agent.startTime,
             finishTime: agent.finishTime
         };
@@ -987,7 +1032,7 @@ function summarizeExecution(map, runId, executionContext, agentsResults) {
                     actions: [],
                     status: instance.status,
                     startTime: instance.startTime,
-                    finishTime: instance.finishTime,
+                    finishTime: instance.finishTime
                 };
 
                 for (let k in instance.actions) {
@@ -1112,7 +1157,7 @@ module.exports = {
      * @param mapId {string}
      */
     results: (mapId) => {
-        return MapResult.find({ map: mapId }, null, { sort: { startTime: -1 } }).select("-agentsResults")
+        return MapResult.find({ map: mapId }, null, { sort: { startTime: -1 } }).select('-agentsResults')
     },
     /**
      * get an id of specific result and return populated object

@@ -1,16 +1,17 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
-import { Process } from '@maps/models/map-structure.model';
-import { PluginMethod } from '@plugins/models/plugin-method.model';
-import { Plugin } from '@plugins/models/plugin.model';
-import { PluginsService } from '@plugins/plugins.service';
-import { SocketService } from '@shared/socket.service';
-
 import * as _ from 'lodash';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/observable/of';
 import { Observable } from 'rxjs/Observable';
+
+import { Process } from '@maps/models/map-structure.model';
+import { Plugin } from '@plugins/models/plugin.model';
+import { PluginMethod } from '@plugins/models/plugin-method.model';
+import { SocketService } from '@shared/socket.service';
+import { PluginsService } from '@plugins/plugins.service';
+
 
 @Component({
   selector: 'app-process-form',
@@ -90,6 +91,7 @@ export class ProcessFormComponent implements OnInit {
               param.type
             ));
           });
+        } else {
         }
       });
     }
@@ -138,6 +140,7 @@ export class ProcessFormComponent implements OnInit {
    * @param mandatory
    * @param condition
    * @param coordination
+   * @param flowControl
    * @param preRun
    * @param postRun
    * @param correlateAgents
