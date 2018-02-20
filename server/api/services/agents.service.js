@@ -6,7 +6,9 @@ const winston = require("winston");
 const _ = require("lodash");
 const humanize = require("../../helpers/humanize");
 const env = require("../../env/enviroment");
-const Agent = require("../models/agent.model");
+
+const Agent = require("../models").Agent;
+const Group = require("../models").Group;
 
 const LIVE_COUNTER = env.retries; // attempts before agent will be considered dead
 const INTERVAL_TIME = env.interval_time;
@@ -96,6 +98,7 @@ function setDefaultUrl(agent) {
 
 }
 
+
 module.exports = {
     add: (agent) => {
         return Agent.findOne({ key: agent.key }).then(agentObj => {
@@ -177,5 +180,57 @@ module.exports = {
         return Agent.findByIdAndUpdate(agentId, agent, { new: true });
     },
     /* exporting the agents status */
-    agentsStatus: getAgentStatus
+    agentsStatus: getAgentStatus,
+
+    /* Groups */
+    /**
+     * Creaqting new group object
+     * @param group
+     * @returns {group}
+     */
+    createGroup: (group) => {
+        return Group.create(group);
+    },
+
+    groupsList: (query = {}) => {
+        return Group.find(query);
+    },
+
+    /**
+     * Adding agents to group
+     * @param groupId
+     * @param agentsId
+     * @returns {Query}
+     */
+    addAgentToGroup: (groupId, agentsId) => {
+        return Group.findByIdAndUpdate(groupId, { $addToSet: { agents: { $each: agentsId } } }, { new: true });
+    },
+
+    /**
+     * Adding filters to group
+     * @param groupId
+     * @param filters
+     * @returns {Query}
+     */
+    addGroupFilters: (groupId, filters) => {
+        return Group.findByIdAndUpdate(groupId, { '$set': { 'filters': filters } }, { new: true });
+    },
+
+    /**
+     * Delete a group.
+     * @param groupId
+     * @returns {Query}
+     */
+    deleteGroup: (groupId) => {
+        return Group.findByIdAndRemove(groupId);
+    },
+
+    /**
+     * Returning a group by it's id
+     * @param groupId
+     * @returns {Query}
+     */
+    groupDetail: (groupId) => {
+        return Group.findById(groupId);
+    }
 };

@@ -4,7 +4,9 @@ const Schema = mongoose.Schema;
 
 const COMPARISON = ['gte', 'gt', 'contains', 'lte', 'lt', 'equal'];
 
-const filterSchema = new Schema({
+
+const filterParamSchema = new Schema({
+    field: String,
     value: String,
     filterType: { type: String, enum: COMPARISON }
 }, { _id: false });
@@ -12,17 +14,7 @@ const filterSchema = new Schema({
 const groupSchema = new Schema({
     name: { type: String, required: true },
     agents: [{ type: Schema.Types.ObjectId, ref: 'Agent' }],
-    filter: {
-        hostname: [filterSchema],
-        arch: [filterSchema],
-        alive: [{
-            value: Boolean,
-            filterType: { type: String, enum: ['equal'] }
-        }],
-        freeSpace: [filterSchema],
-        respTime: [filterSchema],
-        ip: [filterSchema]
-    }
+    filters: [filterParamSchema]
 });
 
 groupSchema.set('toJSON', {
