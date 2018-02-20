@@ -1,11 +1,13 @@
 <div class="card">
   <div class="card-body">
-    <h5 class="card-title">Groups</h5>
+    <h5 class="">Groups</h5>
   </div>
+
   <div class="card-body" pDraggable="dd">
     <a (click)="createGroup()" class="card-link">Create group</a>
     <a (click)="onTabOpen()" class="card-link">All agents</a>
   </div>
+
   <p-accordion
     (onOpen)="onTabOpen($event)"
     *ngIf="groups">

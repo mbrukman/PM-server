@@ -173,6 +173,18 @@ tr.ui-widget-content.ui-datatable-odd {
   }
 }
 
+/* primeng accordion */
+.ui-accordion .ui-accordion-header {
+  background: none !important;
+  border-top: 1px solid $cool-grey;
+  &:hover {
+    border-top: 1px solid $cool-grey !important;
+  }
+  a {
+    color: $turquoise-blue !important;
+  }
+}
+
 /*------*/
 
 table, .table {
