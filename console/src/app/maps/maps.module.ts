@@ -7,7 +7,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
-import { SharedModule } from '../shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 
 import { MapsRoutingModule } from './maps-routing.module';
 import { MapTriggersComponent } from './map-detail/map-edit/map-enviroment-pane/map-triggers/map-triggers.component';
@@ -29,6 +29,7 @@ import { MapCreateComponent } from './map-create/map-create.component';
 import { MapEnvironmentPaneComponent } from './map-detail/map-edit/map-enviroment-pane/map-environment-pane.component';
 import { MapResultComponent } from './map-detail/map-result/map-result.component';
 import { ProcessResultComponent } from './map-detail/map-result/process-result/process-result.component';
+import { SelectGroupsComponent } from './map-detail/map-edit/map-enviroment-pane/map-agents/select-groups/select-groups.component';
 
 
 @NgModule({
@@ -61,8 +62,9 @@ import { ProcessResultComponent } from './map-detail/map-result/process-result/p
     ProcessFormComponent,
     PluginToolboxComponent,
     MapResultComponent,
-    ProcessResultComponent
+    ProcessResultComponent,
+    SelectGroupsComponent
   ],
-  entryComponents: [SelectAgentComponent, AddAttributeComponent, TriggerFormComponent]
+  entryComponents: [SelectAgentComponent, AddAttributeComponent, TriggerFormComponent, SelectGroupsComponent]
 })
 export class MapsModule { }

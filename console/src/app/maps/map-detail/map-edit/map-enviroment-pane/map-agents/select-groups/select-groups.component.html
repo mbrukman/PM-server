@@ -1,0 +1,35 @@
+<div class="row pm-modal">
+  <div class="col-12">
+    <div class="modal-header">
+      <h4>Select Agents</h4>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true" (click)="onClose()">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <p-dataTable [value]="groups" [responsive]="true" expandableRows="true" [(selection)]="selectedGroups"
+                   dataKey="id">
+        <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+
+        <p-column [style]="{'width':'38px'}" expander="true"></p-column>
+        <p-column field="name" header="name" [sortable]="true"></p-column>
+        <ng-template let-group pTemplate="rowexpansion">
+          Constant agents: {{ group.agents?.length }}
+          <br/>
+          Filters:
+          <ul>
+            <li *ngFor="let item of group.filters"><abbr title="Field">{{ item.field }}</abbr> <abbr
+              title="Filter Type">
+              {{ item.filterType }}</abbr> <abbr title="Value">'{{ item.value }}'</abbr></li>
+          </ul>
+        </ng-template>
+      </p-dataTable>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-primary" (click)="onClose()">Cancel</button>
+      <button class="btn-primary btn" (click)="onConfirm()">Confirm</button>
+    </div>
+  </div>
+</div>

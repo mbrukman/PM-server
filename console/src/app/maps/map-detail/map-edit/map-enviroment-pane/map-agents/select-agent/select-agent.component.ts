@@ -1,11 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AgentsService } from '../../../../../../agents/agents.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { BsModalRef } from 'ngx-bootstrap';
-import { TreeNode } from 'primeng/primeng';
-
-import { Agent } from '../../../../../../agents/models/agent.model';
 import { Subject } from 'rxjs/Subject';
+import { BsModalRef } from 'ngx-bootstrap';
+
+import { AgentsService } from '@agents/agents.service';
+import { Agent } from '@agents/models';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-select-agent',
@@ -16,31 +16,33 @@ export class SelectAgentComponent implements OnInit, OnDestroy {
   agents: Agent[];
   agentsReq: any;
   selectedAgents: Agent[];
-  statusReq: any;
 
   public result: Subject<any> = new Subject();
 
 
-  constructor(public bsModalRef: BsModalRef, private agentsService: AgentsService) {
-  }
+  constructor(public bsModalRef: BsModalRef, private agentsService: AgentsService) { }
 
   ngOnInit() {
-    this.agentsReq = this.agentsService.list().subscribe(agents => {
-      this.statusReq = this.agentsService.status().subscribe(agentsStatus => {
-        console.log(agentsStatus);
+    this.agentsReq = this.agentsService
+      .list()
+      .flatMap(agents => {
+        return Observable.forkJoin(
+          Observable.of(agents),
+          this.agentsService.status()
+        )
+      })
+      .subscribe(data => {
+        let [agents, agentsStatus] = data;
         agents.map(agent => Object.assign(agent, { status: agentsStatus[agent.key] }));
         this.agents = agents;
         console.log(this.agents);
       });
-    });
-
 
   }
 
   ngOnDestroy() {
-    this.agentsReq.unsubscribe();
-    if (this.statusReq) {
-      this.statusReq.unsubscribe();
+    if (this.agentsReq) {
+      this.agentsReq.unsubscribe();
     }
   }
 

@@ -10,6 +10,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { Subscription } from 'rxjs/Subscription';
 import { SelectAgentComponent } from './select-agent/select-agent.component';
+import { SelectGroupsComponent } from '@maps/map-detail/map-edit/map-enviroment-pane/map-agents/select-groups/select-groups.component';
 
 
 @Component({
@@ -61,6 +62,17 @@ export class MapAgentsComponent implements OnInit, OnDestroy {
       this.mapsService.setCurrentMap(this.map);
     })
 
+  }
+
+  openSelectGroupsModal() {
+    const modal = this.modalService.show(SelectGroupsComponent);
+    modal.content.selectedGroups = this.map.groups;
+    modal.content.result
+      .take(1)
+      .subscribe(result => {
+        this.map.groups = result;
+        this.mapsService.setCurrentMap(this.map);
+      });
   }
 
 }

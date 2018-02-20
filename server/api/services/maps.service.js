@@ -67,7 +67,7 @@ module.exports = {
         return Map.find(query);
     },
     get: (id) => {
-        return Map.findOne({ _id: id }).populate('agents')
+        return Map.findOne({ _id: id }).populate('agents groups')
     },
     /* get map structure. if structure id is not defined, get the latest */
     getMapStructure: (mapId, structureId) => {
