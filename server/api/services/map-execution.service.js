@@ -180,7 +180,7 @@ function shouldContinueExecution(runId, agentKey) {
     return executions.hasOwnProperty(runId) && !executions[runId].stop && executions[runId].executionAgents[agentKey].continue;
 }
 
-function executeMap(mapId, structureId, cleanWorkspace, req) {
+function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) {
     const socket = req.io;
 
     function guidGenerator() {
@@ -204,6 +204,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
     let mapStructure;
     let mapAgents;
     let executionContext;
+    let selectedConfiguration;
 
     return mapsService.get(mapId).then(mapobj => {
         if (mapobj.archived) {
@@ -217,6 +218,11 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
             throw new Error('No structure found.');
         }
         mapStructure = structure;
+
+        if (mapStructure.configurations) {
+            selectedConfiguration = configurationName ? mapStructure.configurations.find(o => o.name === configurationName) : mapStructure.configurations.find(o => o.selected);
+        }
+
         executionContext = {
             map: {
                 name: map.name,
@@ -224,7 +230,6 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
                 id: map.id,
                 nodes: mapStructure.processes,
                 links: mapStructure.links,
-                attributes: mapStructure.attributes,
                 code: mapStructure.code,
                 version: 0,
                 structure: structure._id
@@ -232,6 +237,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
             runId: runId,
             startTime: new Date(),
             structure: structure._id,
+            configuration: selectedConfiguration.value,
             visitedProcesses: new Set() // saving uuid of process ran by all the agents (used in flow control)
         };
 
@@ -286,7 +292,8 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
             map: mapId,
             runId: runId,
             structure: mapStructure._id,
-            startTime: new Date()
+            startTime: new Date(),
+            configuration: selectedConfiguration
         });
     }).then(result => {
         socket.emit('map-execution-result', result);

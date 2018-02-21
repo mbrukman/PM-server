@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-let actionParamsSchema = new Schema({
+const actionParamsSchema = new Schema({
     value: String,
     viewName: String,
     param: { type: Schema.Types.ObjectId, ref: 'Plugin.methods.params' },
@@ -10,7 +10,7 @@ let actionParamsSchema = new Schema({
     type: String
 });
 
-let actionSchema = new Schema({
+const actionSchema = new Schema({
     name: String,
     timeout: Number,
     timeunit: Number,
@@ -21,12 +21,12 @@ let actionSchema = new Schema({
 });
 
 
-let usedPluginsSchema = new Schema({
+const usedPluginsSchema = new Schema({
     name: { type: String, required: true },
     version: { type: String, required: true }
 });
 
-let processSchema = new Schema({
+const processSchema = new Schema({
     name: String,
     description: String,
     order: Number,
@@ -45,7 +45,7 @@ let processSchema = new Schema({
     uuid: String
 });
 
-let linkSchema = new Schema({
+const linkSchema = new Schema({
     name: String,
     sourceId: String,
     targetId: String,
@@ -53,26 +53,20 @@ let linkSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
 });
 
-
-let attributeSchema = new Schema({
+const configurationSchema = new Schema({
     name: { type: String, require: true },
-    type: { type: String, require: true, enum: ['string', 'array', 'object'] },
     value: { type: Schema.Types.Mixed, require: true },
-});
+    selected: Boolean
+}, { _id: false });
 
-let mapCodeSchema = new Schema({
-    createdAt: { type: Date, default: Date.now },
-    code: String
-});
-
-let mapStructureSchema = new Schema({
+const mapStructureSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
     map: { type: Schema.Types.ObjectId, ref: 'Map', required: true },
     content: Schema.Types.Mixed,
     links: [linkSchema],
     processes: [processSchema],
     code: String,
-    attributes: [attributeSchema],
+    configurations: [configurationSchema],
     used_plugins: [usedPluginsSchema]
 });
 
@@ -82,7 +76,7 @@ mapStructureSchema.set('toJSON', {
     }
 });
 
-let MapStructure = mongoose.model('MapStructure', mapStructureSchema, 'mapstructure');
+const MapStructure = mongoose.model('MapStructure', mapStructureSchema, 'mapstructure');
 
 
 module.exports = MapStructure;

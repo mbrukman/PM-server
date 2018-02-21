@@ -1,7 +1,7 @@
-import { IPluginMethodParam } from '../../plugins/interfaces/plugin-method-param.interface';
-import { IPluginMethod } from '../../plugins/interfaces/plugin-method.interface';
-import { IPlugin } from '../../plugins/interfaces/plugin.interface';
-import { Plugin } from '../../plugins/models/plugin.model';
+import { IPluginMethodParam } from '@plugins/interfaces/plugin-method-param.interface';
+import { IPluginMethod } from '@plugins/interfaces/plugin-method.interface';
+import { IPlugin } from '@plugins/interfaces/plugin.interface';
+import { Plugin } from '@plugins/models/plugin.model';
 import { IAttribute } from './attribute.interface';
 
 export interface IActionParam {
@@ -76,6 +76,5 @@ export interface IMapStructure {
   links?: ILink[]
   plugins_names?: string[];
   plugins?: Plugin[];
-  used_plugins: [IUsedPlugin];
-
+  used_plugins: IUsedPlugin[];
 }

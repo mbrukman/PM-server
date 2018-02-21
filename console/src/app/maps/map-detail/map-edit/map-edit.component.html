@@ -8,9 +8,10 @@
              tooltip="Agents"
              placement="right"><i class="icon-agent" aria-hidden="true"></i></a>
         </li>
-        <li class="nav-item" (click)="tab='attributes'; designService.tabOpen = true" [ngClass]="{'active': tab==='attributes'}">
+        <li class="nav-item" (click)="tab='configurations'; designService.tabOpen = true"
+            [ngClass]="{'active': tab==='configurations'}">
           <a class="nav-link"
-             tooltip="Attributes"
+             tooltip="Configurations"
              placement="right"><i class="icon-attribute" aria-hidden="true"></i></a>
         </li>
 
@@ -39,8 +40,8 @@
       <app-map-agents></app-map-agents>
     </div>
 
-    <div *ngSwitchCase="'attributes'">
-      <app-map-attributes></app-map-attributes>
+    <div *ngSwitchCase="'configurations'">
+      <app-map-configurations></app-map-configurations>
     </div>
 
     <div *ngSwitchCase="'triggers'">

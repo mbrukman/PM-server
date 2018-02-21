@@ -1,8 +1,8 @@
-import { Map } from "./map.model";
-import { Action, MapStructure, Process } from "./map-structure.model";
-import { IActionResult, IAgentResult, IMapResult, IProcessResult } from "../interfaces/execution-result.interface";
-import { PluginMethod } from "@plugins/models/plugin-method.model";
-import { Agent } from "@agents/models/agent.model";
+import { Map } from './map.model';
+import { Action, Configuration, MapStructure, Process } from '.';
+import { IActionResult, IAgentResult, IMapResult, IProcessResult } from '../interfaces/execution-result.interface';
+import { PluginMethod } from '@plugins/models/plugin-method.model';
+import { Agent } from '@agents/models/agent.model';
 
 
 export class ActionResult implements IActionResult {
@@ -46,6 +46,7 @@ export class MapResult implements IMapResult {
   runId: string;
   structure: string | MapStructure;
   agentsResults?: [AgentResult];
+  configuration: Configuration;
   startAgentsNumber: number;
   startTime: Date;
   finishTime: Date;

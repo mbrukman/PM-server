@@ -1,7 +1,8 @@
-import { IPluginMethod } from "@plugins/interfaces/plugin-method.interface";
-import { IAction, IMapStructure, IProcess } from "./map-structure.interface";
-import { IAgent } from "@agents/interfaces/agent.interface";
-import { IMap } from "./map.interface";
+import { IPluginMethod } from '@plugins/interfaces/plugin-method.interface';
+import { IAction, IMapStructure, IProcess } from './map-structure.interface';
+import { IAgent } from '@agents/interfaces/agent.interface';
+import { IMap } from './map.interface';
+import { Configuration } from '@maps/models';
 
 
 export interface IActionResult {
@@ -43,6 +44,7 @@ export interface IMapResult {
   runId: string,
   structure: string | IMapStructure,
   agentsResults?: [IAgentResult],
+  configuration: Configuration,
   startAgentsNumber: number,
   startTime: Date,
   finishTime: Date,

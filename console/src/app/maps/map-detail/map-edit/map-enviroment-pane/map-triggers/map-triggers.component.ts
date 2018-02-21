@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { MapsService } from "../../../../maps.service";
-import { MapTrigger } from "../../../../models/map-trigger.model";
-import { Subscription } from "rxjs/Subscription";
-import { Map } from "../../../../models/map.model";
-import { BsModalRef, BsModalService } from "ngx-bootstrap";
-import { TriggerFormComponent } from "./trigger-form/trigger-form.component";
+import { Subscription } from 'rxjs/Subscription';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap';
+
+import { MapsService } from '@maps/maps.service';
+import { Map, MapStructure, MapTrigger } from '@maps/models';
+import { TriggerFormComponent } from './trigger-form/trigger-form.component';
 
 @Component({
   selector: 'app-map-triggers',
@@ -13,6 +13,8 @@ import { TriggerFormComponent } from "./trigger-form/trigger-form.component";
   styleUrls: ['./map-triggers.component.scss']
 })
 export class MapTriggersComponent implements OnInit, OnDestroy {
+  mapStructure: MapStructure;
+  mapStructureSubscription: Subscription;
   triggers: MapTrigger[];
   mapSubscription: Subscription;
   id: string;
@@ -21,8 +23,7 @@ export class MapTriggersComponent implements OnInit, OnDestroy {
   deleteReq: any;
   resultSubscription: Subscription;
 
-  constructor(private modalService: BsModalService, private mapsService: MapsService) {
-  }
+  constructor(private modalService: BsModalService, private mapsService: MapsService) { }
 
   ngOnInit() {
     this.mapSubscription = this.mapsService.getCurrentMap().subscribe(map => {
@@ -31,6 +32,11 @@ export class MapTriggersComponent implements OnInit, OnDestroy {
         this.triggers = triggers;
       });
     });
+
+    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure()
+      .subscribe(structure => {
+        this.mapStructure = structure;
+      })
   }
 
   ngOnDestroy() {
@@ -50,6 +56,7 @@ export class MapTriggersComponent implements OnInit, OnDestroy {
     let modal: BsModalRef;
     modal = this.modalService.show(TriggerFormComponent);
     modal.content.trigger = this.triggers[index];
+    modal.content.configurations = this.mapStructure.configurations.map(o => o.name);
     this.resultSubscription = modal.content.result.subscribe(result => {
       if (!edit) {
         this.mapsService.createTrigger(this.map.id, result).subscribe(trigger => {

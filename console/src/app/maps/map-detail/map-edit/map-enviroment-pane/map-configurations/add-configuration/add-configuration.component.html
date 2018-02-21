@@ -1,0 +1,39 @@
+
+<div class="container pm-modal">
+  <div class="modal-header">
+    <h1>Add configuration</h1>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true" (click)="onClose()">&times;</span>
+    </button>
+  </div>
+  <form [formGroup]="configurationForm" (ngSubmit)="onConfirm(configurationForm.value)">
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" class="form-control" id="name" formControlName="name">
+        <small
+          *ngIf="configurationForm.get('name').invalid && (configurationForm.get('name').dirty || configurationForm.get('name').touched) && configurationForm.get('name').errors.forbiddenName"
+          class="form-text text-danger">A configuration with this name already exists
+        </small>
+      </div>
+      <div class="form-group">
+        <label for="value">Value</label>
+        <textarea class="form-control" id="value" formControlName="value"></textarea>
+
+        <small
+          *ngIf="configurationForm.get('value').invalid && (configurationForm.get('value').dirty || configurationForm.get('value').touched) && configurationForm.get('value').errors?.invalidJSON"
+          class="form-text text-danger">
+          Invalid JSON: {{ configurationForm.get('value').errors.invalidJSON.value }}
+        </small>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" (click)="onClose()">Cancel</button>
+        <button type="submit" class="btn-primary btn" [disabled]="configurationForm.invalid">{{ configuration? 'Save':
+          'Add' }}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
