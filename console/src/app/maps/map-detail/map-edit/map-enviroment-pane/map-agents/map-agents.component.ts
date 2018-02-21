@@ -50,7 +50,7 @@ export class MapAgentsComponent implements OnInit, OnDestroy {
       .switchMap(() => this.agentsService.status())
       .subscribe(statuses => {
         this.statuses = statuses;
-      })
+      });
   }
 
   openSelectAgentsModal() {
