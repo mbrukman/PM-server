@@ -181,7 +181,7 @@ function shouldContinueExecution(runId, agentKey) {
     return executions.hasOwnProperty(runId) && !executions[runId].stop && executions[runId].executionAgents[agentKey].continue;
 }
 
-function executeMap(mapId, structureId, cleanWorkspace, req) {
+function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) {
     const socket = req.io;
 
     function guidGenerator() {
@@ -221,7 +221,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
         mapStructure = structure;
 
         if (mapStructure.configurations) {
-            selectedConfiguration = mapStructure.configurations.find(o => o.selected);
+            selectedConfiguration = configurationName ? mapStructure.configurations.find(o => o.name === configurationName) : mapStructure.configurations.find(o => o.selected);
         }
 
         executionContext = {
@@ -231,7 +231,6 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
                 id: map.id,
                 nodes: mapStructure.processes,
                 links: mapStructure.links,
-                attributes: mapStructure.attributes,
                 code: mapStructure.code,
                 version: 0,
                 structure: structure._id
