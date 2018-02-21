@@ -35,7 +35,6 @@ export class SelectAgentComponent implements OnInit, OnDestroy {
         let [agents, agentsStatus] = data;
         agents.map(agent => Object.assign(agent, { status: agentsStatus[agent.key] }));
         this.agents = agents;
-        console.log(this.agents);
       });
 
   }

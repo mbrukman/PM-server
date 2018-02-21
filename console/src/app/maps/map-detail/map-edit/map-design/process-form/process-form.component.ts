@@ -1,16 +1,18 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
 import * as _ from 'lodash';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/observable/of';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 
 import { Process } from '@maps/models/map-structure.model';
 import { Plugin } from '@plugins/models/plugin.model';
 import { PluginMethod } from '@plugins/models/plugin-method.model';
 import { SocketService } from '@shared/socket.service';
 import { PluginsService } from '@plugins/plugins.service';
+import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
 
 
 @Component({
@@ -18,11 +20,13 @@ import { PluginsService } from '@plugins/plugins.service';
   templateUrl: './process-form.component.html',
   styleUrls: ['./process-form.component.scss']
 })
-export class ProcessFormComponent implements OnInit {
+export class ProcessFormComponent implements OnInit, OnDestroy {
+
   @Input('process') process: Process;
   @Output() saved: EventEmitter<any> = new EventEmitter<any>();
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
+  processUpdateSubscription: Subscription;
   processForm: FormGroup;
   action: boolean = false;
   index: number;
@@ -44,15 +48,23 @@ export class ProcessFormComponent implements OnInit {
   };
 
 
-  constructor(private socketService: SocketService, private pluginsService: PluginsService) {
-
-  }
+  constructor(private socketService: SocketService,
+              private pluginsService: PluginsService,
+              private mapDesignService: MapDesignService) { }
 
   ngOnInit() {
     if (!this.process) {
       this.closePane();
       return;
     }
+
+    this.processUpdateSubscription = this.mapDesignService.getUpdateProcessAsObservable()
+      .filter(process => process.uuid === this.process.uuid)
+      .subscribe(process => {
+        console.log('aba');
+        this.process = process;
+        this.processForm.get('coordination').setValue(process.coordination);
+      });
 
     this.processForm = this.initProcessForm(
       this.process.name,
@@ -98,6 +110,12 @@ export class ProcessFormComponent implements OnInit {
 
     this.plugin = _.cloneDeep(this.process.plugin);
     this.generateAutocompleteParams();
+  }
+
+  ngOnDestroy(): void {
+    if (this.processUpdateSubscription) {
+      this.processUpdateSubscription.unsubscribe();
+    }
   }
 
   /**
@@ -164,7 +182,9 @@ export class ProcessFormComponent implements OnInit {
     })
   }
 
-  /* add a new action to the process*/
+  /**
+   * Add a new action to process
+   */
   addNewAction() {
     const actionControl = <FormArray>this.processForm.controls['actions'];
     actionControl.push(this.initActionController());
@@ -177,17 +197,35 @@ export class ProcessFormComponent implements OnInit {
     this.selectedMethod = null;
   }
 
-  /* adding a new action to the form */
+  /**
+   * Removing an action at index
+   * @param {number} index
+   */
   removeAction(index: number) {
     const actionControl = <FormArray>this.processForm.controls['actions'];
     actionControl.removeAt(index);
   }
 
+  /**
+   * Setting editing as action
+   * @param {number} index
+   */
   editAction(index: number) {
     this.index = index;
     this.action = true;
   }
 
+  /**
+   * Returning a FormGroup with process action fields
+   * @param id
+   * @param name
+   * @param timeout
+   * @param timeunit
+   * @param retries
+   * @param mandatory
+   * @param method
+   * @returns {FormGroup}
+   */
   initActionController(id?, name?, timeout?, timeunit?, retries?, mandatory?, method?): FormGroup {
     return new FormGroup({
       id: new FormControl(id),
@@ -201,6 +239,16 @@ export class ProcessFormComponent implements OnInit {
     });
   }
 
+  /**
+   * Returning a FormGroup with action params fields
+   * @param code
+   * @param value
+   * @param id
+   * @param viewName
+   * @param name
+   * @param type
+   * @returns {FormGroup}
+   */
   initActionParamController(code?, value?, id?, viewName?, name?, type?) {
     return new FormGroup({
       code: new FormControl(code),
