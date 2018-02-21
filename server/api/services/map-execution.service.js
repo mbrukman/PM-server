@@ -1142,7 +1142,7 @@ function stopExecution(mapId, runId, socket) {
                                         status: 'stopped',
                                         result: 'Action stopped'
                                     };
-                                    sendKillRequest(executions[runId].executionContext.map.id, actionId, agentKey);
+                                    sendKillRequest(executions[runId].executionContext.map.id, actionKey, agentKey);
                                 }
                             });
                         }
