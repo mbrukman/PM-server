@@ -101,13 +101,12 @@ function addProcessToContext(runId, agentKey, processKey, process) {
     executions[runId].executionContext.visitedProcesses.add(processKey);
     const processData = {
         startTime: new Date(),
-        status: '',
+        status: 'executing',
         uuid: processKey,
         name: process.name,
         actions: {},
         plugin: process.used_plugin.name
     };
-
     if (!executions[runId].executionAgents[agentKey].processes) {
         executions[runId].executionAgents[agentKey].processes = {};
     }
@@ -286,7 +285,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
         return MapResult.create({
             map: mapId,
             runId: runId,
-            structure: structure._id,
+            structure: mapStructure._id,
             startTime: new Date()
         });
     }).then(result => {
@@ -577,8 +576,13 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
                 }
             }
         }
-        nodesToRun.push(successor);
+        nodesToRun.push({
+            index: addProcessToContext(runId, agent.key, successor, process),
+            uuid: successor,
+            process: process
+        });
     });
+
     async.each(nodesToRun, runProcess(map, structure, runId, agent, socket), (error) => {
         if (error) {
             winston.log('error', error);
@@ -619,13 +623,14 @@ function runNode(map, structure, runId, agent, node, socket) {
  * @returns {function(*=, *)}
  */
 function runProcess(map, structure, runId, agent, socket) {
-    return (processUUID, callback) => {
+    return (execProcess, callback) => {
+        const processUUID = execProcess.uuid;
         if (!shouldContinueExecution(runId, agent.key)) {
             return callback();
         }
-        let process = findProcessByUuid(processUUID, structure);
+        let process = execProcess.process;
 
-        const processIndex = addProcessToContext(runId, agent.key, processUUID, process); // adding the process to execution context and storing index in the execution context.
+        const processIndex = execProcess.index; // adding the process to execution context and storing index in the execution context.
 
         // testing filter agents condition.
         if (process.filterAgents) {
@@ -691,16 +696,18 @@ function runProcess(map, structure, runId, agent, socket) {
 
                 });
                 if (process.mandatory) { // mandatory process failed, agent should not execute more processes
+                    winston.log('info', "Mandatory process failed");
                     executions[runId].executionAgents[agent.key].continue = false;
                     executions[runId].executionAgents[agent.key].status = 'error';
                     stopExecution(map._id, runId, socket);
                     updateExecutionContext(runId, agent.key);
-                    callback('Mandatory process failed');
+                    callback();
                     return;
                 }
                 updateExecutionContext(runId, agent.key);
                 runNodeSuccessors(map, structure, runId, agent, false, socket); // by passing false, no successors would be called
                 callback();
+                console.log("STOP STOP");
                 return;
             }
         }
@@ -1041,7 +1048,7 @@ function summarizeExecution(map, runId, executionContext, agentsResults) {
             process.forEach((instance, index) => {
                 let processResult = {
                     index: index,
-                    name: process.name,
+                    name: instance.name,
                     result: instance.result,
                     uuid: instance.uuid,
                     plugin: instance.plugin,
