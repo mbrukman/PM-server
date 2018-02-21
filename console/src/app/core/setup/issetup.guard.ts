@@ -22,6 +22,7 @@ export class IsSetUpGuard implements CanActivate {
         if (!isSetup) {
           this.router.navigate(['/', 'setup']);
         }
+        this.setupService.setup = isSetup;
         return isSetup
       });
   }

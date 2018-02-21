@@ -1,5 +1,5 @@
 <div class="row root">
-  <div class="pm-sidebar">
+  <div class="pm-sidebar" *ngIf="setupService.setup">
     <img src="/assets/images/pm.png" alt=""/>
     <ul class="nav flex-column">
       <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
