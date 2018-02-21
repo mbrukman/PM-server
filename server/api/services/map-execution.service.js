@@ -205,6 +205,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
     let mapStructure;
     let mapAgents;
     let executionContext;
+    let selectedConfiguration;
 
     return mapsService.get(mapId).then(mapobj => {
         if (mapobj.archived) {
@@ -219,7 +220,6 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
         }
         mapStructure = structure;
 
-        let selectedConfiguration;
         if (mapStructure.configurations) {
             selectedConfiguration = mapStructure.configurations.find(o => o.selected);
         }
@@ -294,7 +294,8 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
             map: mapId,
             runId: runId,
             structure: mapStructure._id,
-            startTime: new Date()
+            startTime: new Date(),
+            configuration: selectedConfiguration
         });
     }).then(result => {
         socket.emit('map-execution-result', result);
