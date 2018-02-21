@@ -96,7 +96,7 @@ module.exports = {
             const newStructure = {
                 links: structure.links,
                 processes: structure.processes,
-                attributes: structure.attributes,
+                configurations: structure.configurations,
                 content: structure.content,
                 code: structure.code,
                 map: dupMap._id

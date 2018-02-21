@@ -35,28 +35,6 @@ var getActionByIndex = function (actionIndex, processId) {
 };
 
 /**
- * Return attribute's value
- * @param {string} attributeName the attribute's name
- * @returns {string | json | array} attribute value
- */
-var getAttribute = function (attributeName) {
-    return (map.attributes.find((o) => o.name === attributeName)).value;
-};
-
-/**
- * Set a a value of an attribute. If the attribute already exists it will override the value, if not it will
- * @param {string} attributeName
- * @param {any} value
- */
-var setAttribute = function (attributeName, value) {
-    var atrIndex = map.attributes.findIndex((o) => o.name === attributeName);
-    if (atrIndex > -1) {
-        map.attributes.splice(atrIndex, 1);
-    }
-    map.attributes.push({ name: attributeName, value: value });
-};
-
-/**
  * Returns an object containing the process from all the running agent.
  * @param {string} processId
  * @returns {object} all the process. the keys are the agents urls.
