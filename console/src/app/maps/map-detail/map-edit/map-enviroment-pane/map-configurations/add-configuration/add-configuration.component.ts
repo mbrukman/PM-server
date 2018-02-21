@@ -33,7 +33,7 @@ export class AddConfigurationComponent implements AfterContentInit, OnChanges {
       if (this.configuration) {
         this.setFormValue({
           name: this.configuration.name,
-          value: this.configuration.value
+          value: typeof (this.configuration.value) === 'string' ? this.configuration.value : JSON.stringify(this.configuration.value)
         });
       }
     }, 0);
@@ -59,12 +59,16 @@ export class AddConfigurationComponent implements AfterContentInit, OnChanges {
     }
   }
 
-  setFormValue(attribute: { name: string, value: object }) {
+  setFormValue(attribute: { name: string, value: string }) {
     this.configurationForm.setValue(attribute);
   }
 
   onConfirm(form: { name: string, value: string }): void {
-    this.result.next({ name: form.name, value: JSON.parse(form.value), selected: this.configuration.selected });
+    this.result.next({
+      name: form.name,
+      value: JSON.parse(form.value),
+      selected: this.configuration ? this.configuration.selected : false
+    });
     this.bsModalRef.hide();
   }
 

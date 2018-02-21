@@ -7,8 +7,7 @@ import * as _ from 'lodash';
 import { BsModalService } from 'ngx-bootstrap/modal';
 
 import { MapsService } from '../maps.service';
-import { Map } from '../models/map.model';
-import { MapStructure } from '../models/map-structure.model';
+import { Map, MapStructure } from '@maps/models';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { SocketService } from '@shared/socket.service';
 
@@ -38,6 +37,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   mapExecutionSubscription: Subscription;
   executing: boolean;
   downloadJson: SafeUrl;
+  selected: string;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -91,7 +91,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
           this.edited = false;
         }
       });
-    
+
     this.mapStructureSubscription = this.mapsService.getCurrentMapStructure()
       .filter(structure => !!structure)
       .subscribe(structure => {
@@ -106,6 +106,11 @@ export class MapDetailComponent implements OnInit, OnDestroy {
           return o.id === structure.id;
         });
         this.generateDownloadJsonUri();
+
+        if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0) {
+          const selected = this.mapStructure.configurations.find(o => o.selected);
+          this.selected = selected ? selected.name : this.mapStructure.configurations[0].name;
+        }
       });
 
 
@@ -232,5 +237,19 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     }
     return true;
   }
+
+  /**
+   * Updating selected configuration
+   * @param {number} index
+   */
+  changeSelected(index: number) {
+    this.mapStructure.configurations.forEach((configuration) => {
+      configuration.selected = false;
+    });
+    this.mapStructure.configurations[index].selected = true;
+    this.mapsService.setCurrentMapStructure(this.mapStructure);
+  }
+
+
 
 }

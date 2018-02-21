@@ -36,10 +36,16 @@
 </div>
 
 <div class="action-buttons">
-  <button type="button" class="btn" (click)="discardChanges()" *ngIf="edited || structureEdited" disabled>Discard</button>
+  <!--<button type="button" class="btn" (click)="discardChanges()" *ngIf="edited || structureEdited" disabled>Discard</button>-->
   <button type="button" class="btn" (click)="saveMap()" *ngIf="!edited && !structureEdited" disabled>Saved</button>
   <button type="button" class="btn" (click)="saveMap()" *ngIf="edited || structureEdited">Save</button>
   <button class="btn" (click)="executeMap()">Execute <span *ngIf="executing"><i class="fa fa-spinner fa-pulse fa-fw"></i></span> </button>
+  <select [(ngModel)]="selected">
+    <option *ngIf="mapStructure?.configurations?.length === 0">No configs</option>
+    <option (change)="changeSelected(i)" [value]="item.name" *ngFor="let item of mapStructure?.configurations">
+      {{item.name | truncatechars: 8}}
+    </option>
+  </select>
 </div>
 
 <div class="router-wrapper">
