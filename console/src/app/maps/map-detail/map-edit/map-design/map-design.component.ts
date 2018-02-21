@@ -6,10 +6,10 @@ import * as _ from 'lodash';
 import { Subscription } from 'rxjs/Subscription';
 
 import { MapDesignService } from '../map-design.service';
-import { Link, MapStructure, Process } from '../../../models/map-structure.model';
-import { MapsService } from '../../../maps.service';
-import { PluginsService } from '../../../../plugins/plugins.service';
-import { Plugin } from '../../../../plugins/models/plugin.model';
+import { Link, MapStructure, Process } from '@maps/models/map-structure.model';
+import { MapsService } from '@maps/maps.service';
+import { PluginsService } from '@plugins/plugins.service';
+import { Plugin } from '@plugins/models/plugin.model';
 
 
 @Component({
@@ -33,8 +33,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   @ViewChild('wrapper') wrapper: ElementRef;
 
-  constructor(private designService: MapDesignService, private mapsService: MapsService, private pluginsService: PluginsService) {
-  }
+  constructor(private designService: MapDesignService,
+              private mapsService: MapsService,
+              private pluginsService: PluginsService,
+              private mapDesignService: MapDesignService) { }
 
   ngOnInit() {
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
@@ -156,6 +158,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       const processIndex = this.mapStructure.processes.findIndex(process => process.uuid === this.link.targetId);
       if (!this.mapStructure.processes[processIndex].coordination) {
         this.mapStructure.processes[processIndex].coordination = 'wait';
+        this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
+
       }
     }
     this.mapStructure.content = JSON.stringify(this.graph.toJSON());
@@ -404,12 +408,22 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       }
     });
 
+    // remove a link
     this.graph.on('remove', function (cell, collection, opt) {
       if (cell.isLink()) {
         let linkIndex = _.findIndex(self.mapStructure.links, (o) => {
           return o.uuid === cell.id
         });
+        const targetUuid = cell.get('target').id;
         self.mapStructure.links.splice(linkIndex, 1);
+        const siblingLinks = self.mapStructure.links.filter(o => o.targetId === targetUuid);
+        if (siblingLinks && siblingLinks.length <= 1) {
+
+          let p = self.mapStructure.processes.find(o => o.uuid = targetUuid);
+          p.coordination = null;
+          delete p.coordination;
+          self.mapDesignService.updateProcess(p);
+        }
         self.mapsService.setCurrentMapStructure(self.mapStructure);
       }
     })
