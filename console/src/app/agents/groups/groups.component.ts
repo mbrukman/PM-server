@@ -64,7 +64,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
    * Fired when a group tab is opened
    * @param event
    */
-  onTabOpen(event) {
+  onTabOpen(event?) {
     this.agentsService.selectGroup(event ? this.groups[event.index] : null);
   }
 
