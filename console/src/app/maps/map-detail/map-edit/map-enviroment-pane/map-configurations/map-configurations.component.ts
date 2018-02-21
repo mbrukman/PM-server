@@ -15,6 +15,7 @@ import { MapStructure } from '@maps/models';
 export class MapConfigurationsComponent implements OnInit {
   mapStructureSubscription: Subscription;
   mapStructure: MapStructure;
+  selected: string;
 
   constructor(private modalService: BsModalService, private mapsService: MapsService) { }
 
@@ -23,6 +24,11 @@ export class MapConfigurationsComponent implements OnInit {
       .getCurrentMapStructure()
       .subscribe(structure => {
         this.mapStructure = structure;
+        if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0) {
+          const selected = this.mapStructure.configurations.find(o => o.selected);
+          this.selected = selected ? selected.name : this.mapStructure.configurations[0].name;
+
+        }
       });
   }
 
@@ -51,13 +57,34 @@ export class MapConfigurationsComponent implements OnInit {
         } else {
           this.mapStructure.configurations.push(config);
         }
-        this.mapsService.setCurrentMapStructure(this.mapStructure);
 
+        if (this.mapStructure.configurations.length === 1) {
+          this.mapStructure.configurations[0].selected = true;
+        }
+
+        this.mapsService.setCurrentMapStructure(this.mapStructure);
       });
   }
 
+
+  /**
+   * Removing a configuration at {index} from structure
+   * @param index
+   */
   removeConfiguration(index) {
     this.mapStructure.configurations.splice(index, 1);
+    this.mapsService.setCurrentMapStructure(this.mapStructure);
+  }
+
+  /**
+   * Updating selected configuration
+   * @param {number} index
+   */
+  changeSelected(index: number) {
+    this.mapStructure.configurations.forEach((configuration) => {
+      configuration.selected = false;
+    });
+    this.mapStructure.configurations[index].selected = true;
     this.mapsService.setCurrentMapStructure(this.mapStructure);
   }
 

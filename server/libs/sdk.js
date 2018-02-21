@@ -69,6 +69,14 @@ var getProcessCrossAgent = function (processId) {
     return processes;
 };
 
+/**
+ * Return the selected configuration or undefined
+ * @returns {object | undefined}
+ */
+var getConfiguration = function () {
+    return configuration;
+};
+
 /* represents the previous action that was running in this process
  when the action is the first one to run will be undefined */
 var previousAction = {

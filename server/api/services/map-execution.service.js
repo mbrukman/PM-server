@@ -218,6 +218,12 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
             throw new Error('No structure found.');
         }
         mapStructure = structure;
+
+        let selectedConfiguration;
+        if (mapStructure.configurations) {
+            selectedConfiguration = mapStructure.configurations.find(o => o.selected);
+        }
+
         executionContext = {
             map: {
                 name: map.name,
@@ -233,6 +239,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
             runId: runId,
             startTime: new Date(),
             structure: structure._id,
+            configuration: selectedConfiguration.value,
             visitedProcesses: new Set() // saving uuid of process ran by all the agents (used in flow control)
         };
 
@@ -286,7 +293,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req) {
         return MapResult.create({
             map: mapId,
             runId: runId,
-            structure: structure._id,
+            structure: mapStructure._id,
             startTime: new Date()
         });
     }).then(result => {

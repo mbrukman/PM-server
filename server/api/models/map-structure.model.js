@@ -57,7 +57,7 @@ const configurationSchema = new Schema({
     name: { type: String, require: true },
     value: { type: Schema.Types.Mixed, require: true },
     selected: Boolean
-});
+}, { _id: false });
 
 const mapStructureSchema = new Schema({
     createdAt: { type: Date, default: Date.now },

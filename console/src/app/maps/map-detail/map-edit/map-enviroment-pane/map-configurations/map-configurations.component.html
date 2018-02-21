@@ -2,6 +2,8 @@
   <table class="table">
     <tbody>
     <tr *ngFor="let item of mapStructure?.configurations; let i = index;">
+      <td><input type="radio" [(ngModel)]="selected" (change)="changeSelected(i)" [value]="item.name" name="selected"/>
+      </td>
       <td>{{item.name}}</td>
       <td>
         <button type="button" class="btn btn-link" (click)="openAddConfigurationModal(i)">

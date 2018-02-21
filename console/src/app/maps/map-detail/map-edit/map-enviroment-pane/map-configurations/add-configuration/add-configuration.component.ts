@@ -64,8 +64,7 @@ export class AddConfigurationComponent implements AfterContentInit, OnChanges {
   }
 
   onConfirm(form: { name: string, value: string }): void {
-    // TODO: add custom validator to check the json while user type it
-    this.result.next(form);
+    this.result.next({ name: form.name, value: JSON.parse(form.value), selected: this.configuration.selected });
     this.bsModalRef.hide();
   }
 
