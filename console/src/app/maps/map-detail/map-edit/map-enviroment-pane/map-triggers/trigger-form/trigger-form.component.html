@@ -7,14 +7,24 @@
   </div>
   <form [formGroup]="triggerForm" (ngSubmit)="onConfirm(triggerForm.value)" *ngIf="triggerForm">
     <div class="modal-body">
+
       <div class="form-group">
         <label for="name">Name</label>
         <input type="text" class="form-control" id="name" formControlName="name">
       </div>
+
       <div class="form-group">
         <label for="description">Description</label>
         <textarea class="form-control" id="description" formControlName="description"></textarea>
       </div>
+
+      <div class="form-group">
+        <label for="configuration">Configuration</label>
+        <select class="form-control" id="configuration" formControlName="configuration">
+          <option *ngFor="let item of configurations" [ngValue]="item">{{ item }}</option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label for="plugin">Plugin</label>
         <select class="form-control" formControlName="plugin" id="plugin" (change)="onSelectTrigger()">
@@ -22,6 +32,7 @@
           <option *ngFor="let trigger of triggers" [ngValue]="trigger.name">{{trigger.name}}</option>
         </select>
       </div>
+
       <div class="form-group" *ngIf="triggerForm.controls.plugin.value">
         <label for="method">Method</label>
         <select class="form-control" formControlName="method" id="method" (change)="onSelectMethod()">
@@ -37,7 +48,9 @@
           <div class="col-4">Name</div>
           <div class="col-8">Value</div>
         </div>
+
         <hr>
+
         <div *ngFor="let param of triggerForm.controls.params.controls; let i = index">
           <div [formGroupName]="i">
             <div class="row">
@@ -45,8 +58,11 @@
               <div class="col-8"><input formControlName="value" type="text" class="form-control"></div>
             </div>
           </div>
+
           <hr>
+
         </div>
+
       </div>
 
       <div class="modal-footer">
