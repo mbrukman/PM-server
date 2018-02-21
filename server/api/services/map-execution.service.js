@@ -15,8 +15,8 @@ const pluginsService = require('../services/plugins.service');
 
 let executions = {};
 
-
 let libpm = '';
+
 fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 'utf8', function (err, data) {
     // opens the lib_production file. this file is used for user to use overwrite custom function at map code
     if (err) {
@@ -1098,7 +1098,7 @@ function stopExecution(mapId, runId, socket) {
         }
 
     } else {
-        Object.keys(executions).map(key => {
+        Object.keys(executions).forEach(key => {
             if (executions[key].map === mapId) {
                 executions[key].stop = true;
                 stoppedRuns.push(key);
@@ -1109,49 +1109,55 @@ function stopExecution(mapId, runId, socket) {
     /* clean data */
     const d = new Date();
     stoppedRuns.forEach(runId => {
-        createLog({
-            map: mapId,
-            runId: runId,
-            message: "Got stop signal. Stopping execution",
-            status: "info"
-        }, socket);
-        executions[runId].executionContext.finishTime = d;
-        Object.keys(executions[runId].executionContext.agents).map(agentKey => {
-            if (executions[runId].executionContext.agents[agentKey].status !== 'error') {
-                executions[runId].executionContext.agents[agentKey].status = 'stopped';
-                executions[runId].executionContext.agents[agentKey].finishTime = d;
-                Object.keys(executions[runId].executionContext.agents[agentKey].processes).map(processId => {
-                    if (
-                        !executions[runId].executionContext.agents[agentKey].processes[processId].status ||
-                        executions[runId].executionContext.agents[agentKey].processes[processId].status === 'executing'
-                    ) {
-                        executions[runId].executionContext.agents[agentKey].processes[processId].status = 'stopped';
-                        executions[runId].executionContext.agents[agentKey].processes[processId].finishTime = d;
-                    }
-                    Object.keys(executions[runId].executionContext.agents[agentKey].processes[processId].actions).map(actionId => {
-                        if (
-                            !executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].status ||
-                            executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].status === 'executing'
-                        ) {
-                            executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].status = 'stopped';
-                            executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].finishTime = d;
-                            executions[runId].executionContext.agents[agentKey].processes[processId].actions[actionId].result = {
-                                status: 'stopped',
-                                result: 'The action was stopped'
-                            };
-                            sendKillRequest(executions[runId].executionContext.map.id, actionId, agentKey);
+            createLog({
+                map: mapId,
+                runId: runId,
+                message: "Got stop signal. Stopping execution",
+                status: "info"
+            }, socket);
+            let executionAgents = executions[runId].executionAgents;
+            executions[runId].executionContext.finishTime = d;
+
+            Object.keys(executionAgents).forEach(agentKey => {
+                let agent = executionAgents[agentKey];
+                if (agent.status !== 'error') {
+                    agent.status = 'stopped';
+                    agent.finishTime = d;
+                }
+                Object.keys(agent.processes).forEach(processKey => {
+                    let processArray = agent.processes[processKey];
+                    processArray.forEach(process => {
+                        if (!process.status || process.status === 'executing') {
+                            process.status = 'stopped';
+                            process.result = 'Process stopped';
+                            process.finishTime = d;
+                        }
+                        if (process.actions) {
+                            Object.keys(process.actions).forEach(actionKey => {
+                                let action = process.actions[actionKey];
+                                if (!action.status || action.status === 'executing') {
+                                    action.status = 'stopped';
+                                    action.finishTime = d;
+                                    action.result = {
+                                        status: 'stopped',
+                                        result: 'Action stopped'
+                                    };
+                                    sendKillRequest(executions[runId].executionContext.map.id, actionId, agentKey);
+                                }
+                            });
                         }
                     });
                 })
-            }
-        });
-        summarizeExecution(map, runId, Object.assign({}, executions[runId].executionContext), Object.assign({}, executions[runId].executionAgents))
-            .then(mapResult => {
-                socket.emit('map-execution-result', mapResult);
             });
-        delete executions[runId];
-        updateExecutions(socket);
-    });
+
+            summarizeExecution(executions[runId].map, runId, Object.assign({}, executions[runId].executionContext), Object.assign({}, executions[runId].executionAgents))
+                .then(mapResult => {
+                    socket.emit('map-execution-result', mapResult);
+                });
+            delete executions[runId];
+            updateExecutions(socket);
+        }
+    );
     return stoppedRuns;
 }
 
