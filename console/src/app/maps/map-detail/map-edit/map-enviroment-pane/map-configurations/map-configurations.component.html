@@ -1,0 +1,23 @@
+<div class="container">
+  <table class="table">
+    <tbody>
+    <tr *ngFor="let item of mapStructure?.configurations; let i = index;">
+      <td>{{item.name}}</td>
+      <td>
+        <button type="button" class="btn btn-link" (click)="openAddConfigurationModal(i)">
+          <i class="material-icons">mode_edit</i>
+        </button>
+        <button type="button" class="btn btn-link" (click)="removeConfiguration(i)">
+          <i class="material-icons">delete</i>
+        </button>
+      </td>
+    </tr>
+
+    </tbody>
+  </table>
+
+  <div class="bottom">
+    <button type="button" class="btn btn-primary btn-block" (click)="openAddConfigurationModal()">Add configuration
+    </button>
+  </div>
+</div>

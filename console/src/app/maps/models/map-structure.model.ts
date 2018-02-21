@@ -1,7 +1,6 @@
 import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
 import { PluginMethod } from '@plugins/models/plugin-method.model';
 import { Plugin } from '@plugins/models/plugin.model';
-import { IAttribute } from '../interfaces/attribute.interface';
 import {
   IAction,
   IActionParam,
@@ -76,10 +75,10 @@ export class Link implements ILink {
   createdAt?: Date;
 }
 
-export class Attribute implements IAttribute {
+export class Configuration {
   name: string;
-  type: string;
-  value: any;
+  value: object;
+  selected?: boolean;
 }
 
 export class MapStructure implements IMapStructure {
@@ -90,15 +89,15 @@ export class MapStructure implements IMapStructure {
   map: string;
   content: any;
   code?: string;
-  attributes?: Attribute[];
+  configurations?: Configuration[];
   processes?: Process[];
   links?: Link[];
   plugins?: Plugin[];
-  used_plugins: [UsedPlugin];
+  used_plugins: UsedPlugin[];
 
   constructor() {
     this.processes = [];
-    this.attributes = [];
+    this.configurations = [];
     this.links = [];
 
   }

@@ -11,7 +11,7 @@ import { SharedModule } from '@shared/shared.module';
 
 import { MapsRoutingModule } from './maps-routing.module';
 import { MapTriggersComponent } from './map-detail/map-edit/map-enviroment-pane/map-triggers/map-triggers.component';
-import { AddAttributeComponent } from './map-detail/map-edit/map-enviroment-pane/map-attributes/add-attribute/add-attribute.component';
+import { AddConfigurationComponent } from './map-detail/map-edit/map-enviroment-pane/map-configurations/add-configuration/add-configuration.component';
 import { MapDesignComponent } from './map-detail/map-edit/map-design/map-design.component';
 import { MapDetailComponent } from './map-detail/map-detail.component';
 import { MapsListComponent } from './maps-list/maps-list.component';
@@ -19,7 +19,7 @@ import { SelectAgentComponent } from './map-detail/map-edit/map-enviroment-pane/
 import { TriggerFormComponent } from './map-detail/map-edit/map-enviroment-pane/map-triggers/trigger-form/trigger-form.component';
 import { MapEditComponent } from './map-detail/map-edit/map-edit.component';
 import { MapAgentsComponent } from './map-detail/map-edit/map-enviroment-pane/map-agents/map-agents.component';
-import { MapAttributesComponent } from './map-detail/map-edit/map-enviroment-pane/map-attributes/map-attributes.component';
+import { MapConfigurationsComponent } from './map-detail/map-edit/map-enviroment-pane/map-configurations/map-configurations.component';
 import { MapCodeComponent } from './map-detail/map-edit/map-code/map-code.component';
 import { MapRevisionsComponent } from './map-detail/map-revisions/map-revisions.component';
 import { ProcessFormComponent } from './map-detail/map-edit/map-design/process-form/process-form.component';
@@ -55,8 +55,8 @@ import { SelectGroupsComponent } from './map-detail/map-edit/map-enviroment-pane
     MapAgentsComponent,
     MapRevisionsComponent,
     SelectAgentComponent,
-    MapAttributesComponent,
-    AddAttributeComponent,
+    AddConfigurationComponent,
+    MapConfigurationsComponent,
     MapTriggersComponent,
     TriggerFormComponent,
     ProcessFormComponent,
@@ -65,6 +65,6 @@ import { SelectGroupsComponent } from './map-detail/map-edit/map-enviroment-pane
     ProcessResultComponent,
     SelectGroupsComponent
   ],
-  entryComponents: [SelectAgentComponent, AddAttributeComponent, TriggerFormComponent, SelectGroupsComponent]
+  entryComponents: [SelectAgentComponent, AddConfigurationComponent, TriggerFormComponent, SelectGroupsComponent]
 })
 export class MapsModule { }
