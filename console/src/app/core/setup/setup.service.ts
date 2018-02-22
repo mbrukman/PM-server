@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+import { environment } from '@env/environment';
 
 
 const serverUrl = environment.serverUrl;
@@ -8,6 +8,7 @@ const serverUrl = environment.serverUrl;
 
 @Injectable()
 export class SetupService {
+  public setup: boolean;
   constructor(private http: HttpClient) {}
 
   isSetup() {

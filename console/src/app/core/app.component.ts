@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/operators/filter'
-import { ToastyService, ToastyConfig, ToastOptions, ToastData } from 'ng2-toasty';
+import { ToastOptions, ToastyConfig, ToastyService } from 'ng2-toasty';
 
 import { SocketService } from '../shared/socket.service';
+import { SetupService } from '@core/setup/setup.service';
 
 
 @Component({
@@ -18,7 +19,11 @@ export class AppComponent implements OnInit {
   search: boolean = false;
   notificationSubscription: Subscription;
 
-  constructor(private router: Router, private socketService: SocketService, private toastyService: ToastyService, private toastyConfig: ToastyConfig) {
+  constructor(private router: Router,
+              private socketService: SocketService,
+              public setupService: SetupService,
+              private toastyService: ToastyService,
+              private toastyConfig: ToastyConfig) {
     this.toastyConfig.theme = 'material';
     this.toastyConfig.position = 'bottom-center';
   }
