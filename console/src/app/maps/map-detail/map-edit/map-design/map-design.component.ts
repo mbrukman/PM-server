@@ -254,8 +254,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
     let imageModel = new joint.shapes.devs['MyImageModel']({
       position: {
-        x: obj.x - (300 * this.scale),
-        y: obj.y - (270 * this.scale)
+        x: obj.x - (430 * this.scale),
+        y: obj.y - (240 * this.scale)
       },
       size: {
         width: 110,
