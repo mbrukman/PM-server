@@ -7,8 +7,10 @@
       </button>
     </div>
     <div class="modal-body">
-
-      <p-dataTable [value]="agents" [responsive]="true" [(selection)]="selectedAgents" dataKey="id">
+      <div class="ui-widget-header" style="padding:4px 10px;border-bottom: 0 none">
+        <input #gb type="text" pInputText size="50" class="form-control" placeholder="Filter">
+      </div>
+      <p-dataTable [value]="agents" [globalFilter]="gb" [responsive]="true" [(selection)]="selectedAgents" dataKey="id">
         <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
         <p-column field="name" header="name" [sortable]="true">
           <ng-template let-col let-agent="rowData" pTemplate="body">
