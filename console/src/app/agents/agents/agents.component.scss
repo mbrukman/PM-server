@@ -1,0 +1,9 @@
+.agents-wrapper{
+    display: flex;
+    flex-grow: 1;
+
+    ::ng-deep > *:not(router-outlet){
+        display: flex;
+        flex-grow: 1;
+    }  
+} 

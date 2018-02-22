@@ -35,7 +35,7 @@
     </p-column>
     <p-column field="" header="Actions" [sortable]="true">
       <ng-template let-col let-plugin="rowData" pTemplate="body">
-        <button class="btn btn-danger" (click)="deletePlugin(plugin.id, i)"><i class="material-icons">arrow_back</i></button>
+        <button class="btn btn-danger" (click)="deletePlugin(plugin.id, i)"><i class="material-icons">delete</i></button>
       </ng-template>
     </p-column>
   </p-dataTable>

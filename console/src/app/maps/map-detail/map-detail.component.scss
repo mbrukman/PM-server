@@ -2,6 +2,7 @@
 @import "~assets/sass/mixins";
 @import "~assets/sass/variables";
 
+
 .map-nav {
   //@include border-box($dark-color, 1px, 0, 1px, 0);
   height: 70px;
@@ -69,5 +70,11 @@
 }
 
 .router-wrapper {
-  height: calc(100% - 145px);
+  display: flex;
+  flex-grow: 1;
+
+  ::ng-deep > *:not(router-outlet) {
+    display: flex;
+    flex-grow: 1;
+  }
 }

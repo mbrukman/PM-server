@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row map-edit-wrapper">
   <div class="environment-pane">
     <!--<app-map-environment-pane></app-map-environment-pane>-->
     <div class="nav">
@@ -36,19 +36,19 @@
       <i class="material-icons">chevron_left</i>
     </span>
     </div>
-    <div *ngSwitchCase="'agents'" class="pane-content">
+    <div *ngSwitchCase="'agents'" class="pane-content pane-content-agents">
       <app-map-agents></app-map-agents>
     </div>
 
-    <div *ngSwitchCase="'configurations'">
+    <div *ngSwitchCase="'configurations'" class="pane-content">
       <app-map-configurations></app-map-configurations>
     </div>
 
-    <div *ngSwitchCase="'triggers'">
+    <div *ngSwitchCase="'triggers'" class="pane-content">
       <app-map-triggers></app-map-triggers>
     </div>
 
-    <div *ngSwitchCase="'plugins'">
+    <div *ngSwitchCase="'plugins'" class="pane-content">
       <app-plugin-toolbox></app-plugin-toolbox>
     </div>
   </div>
