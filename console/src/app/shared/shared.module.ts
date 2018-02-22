@@ -11,6 +11,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { TagInputModule } from 'ngx-chips';
 
 import { FilterPipe } from './pipes/filter.pipe';
 import { TruncatecharsPipe } from './truncatechars.pipe';
@@ -38,7 +39,8 @@ import { InPipe } from '@shared/pipes/filterIn.pipe';
     AccordionModule.forRoot(),
     TooltipModule.forRoot(),
     DropdownModule,
-    NgxChartsModule
+    NgxChartsModule,
+    TagInputModule
   ],
   declarations: [
     FilterPipe,
@@ -53,6 +55,7 @@ import { InPipe } from '@shared/pipes/filterIn.pipe';
   exports: [
     ReactiveFormsModule,
     FormsModule,
+    TagInputModule,
     FilterPipe,
     TruncatecharsPipe,
     FeatureComponent,
