@@ -18,14 +18,14 @@
         </thead>
         <tbody>
 
-        <tr *ngFor="let item of agents | in: selectedGroup?.agents" pDraggable="dd"
+        <tr *ngFor="let item of agents | in: selectedGroup?.agents; let i = index" pDraggable="dd"
             (onDragStart)="dragStart($event, item)">
           <td>{{item.name}}</td>
           <td>{{item.url}}</td>
           <td>{{item.attributes}}</td>
           <td>
             <button class="btn btn-link" (click)="deleteAgent(item._id)"><i class="material-icons">delete</i></button>
-            <button class="btn btn-link" (click)="deleteAgent(item._id)"><i class="material-icons">edit</i></button>
+            <button class="btn btn-link" (click)="editAgent(i)"><i class="material-icons">edit</i></button>
           </td>
         </tr>
 

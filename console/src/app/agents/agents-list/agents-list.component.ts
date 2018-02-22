@@ -1,9 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { AgentsService } from '../agents.service';
-import { Agent } from '../models/agent.model';
-import { Group } from '../models/group.model';
+import { BsModalService } from 'ngx-bootstrap';
 import { Subscription } from 'rxjs/Subscription';
+
+import { AgentsService } from '../agents.service';
+import { Agent, Group } from '@agents/models';
+import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
 
 @Component({
   selector: 'app-agents-list',
@@ -21,7 +23,7 @@ export class AgentsListComponent implements OnInit, OnDestroy {
   selectedGroupSubscription: Subscription;
   selectedGroup: Group;
 
-  constructor(private agentsService: AgentsService) {
+  constructor(private agentsService: AgentsService, private modalService: BsModalService) {
   }
 
   ngOnInit() {
@@ -67,16 +69,27 @@ export class AgentsListComponent implements OnInit, OnDestroy {
     })
   }
 
-  onSelectAgent(agent) {
-    this.selectedAgent = agent;
+  editAgent(agentIndex) {
+    let agent = this.agents[agentIndex];
+    const modal = this.modalService.show(EditAgentComponent);
+    modal.content.name = agent.name;
+    modal.content.attributes = agent.attributes;
+    modal.content.result
+      .take(1)
+      .filter(r => !!r)
+      .subscribe(r => {
+        agent.name = r.name;
+        agent.attributes = r.attributes;
+        this.updateAgent(agent);
+      });
   }
 
-  onUpdateAgent(event) {
-    if (!Array.isArray(this.selectedAgent.attributes))
-      this.selectedAgent.attributes = this.selectedAgent.attributes.split(',');
-    this.updateReq = this.agentsService.update(this.selectedAgent).subscribe(agent => {
-      console.log(agent);
-    });
+  updateAgent(agent: Agent) {
+    this.updateReq = this.agentsService.update(agent).subscribe();
+  }
+
+  onSelectAgent(agent) {
+    this.selectedAgent = agent;
   }
 
   dragStart($event, agent) {
