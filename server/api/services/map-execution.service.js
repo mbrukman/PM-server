@@ -204,7 +204,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
     let mapStructure;
     let mapAgents;
     let executionContext;
-    let selectedConfiguration;
+    let selectedConfiguration = {};
 
     return mapsService.get(mapId).then(mapobj => {
         if (mapobj.archived) {
