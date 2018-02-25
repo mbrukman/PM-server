@@ -237,7 +237,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
             runId: runId,
             startTime: new Date(),
             structure: structure._id,
-            configuration: selectedConfiguration.value,
+            configuration: selectedConfiguration ? selectedConfiguration.value : '',
             visitedProcesses: new Set() // saving uuid of process ran by all the agents (used in flow control)
         };
 
