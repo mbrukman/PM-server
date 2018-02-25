@@ -369,7 +369,7 @@ function validate_plugin_installation(map, structure, runId, agentKey) {
         if (filesPaths && filesPaths.length > 0) {
             async.each(filesPaths,
                 function (filePath, callback) {
-                    agentsService.installPluginOnAgent(filePath, agents[key]).then(() => {
+                    agentsService.installPluginOnAgent(filePath, agents[agentKey]).then(() => {
                     }).catch((e) => {
                         winston.log('error', 'Error installing on agent', e);
                     });
