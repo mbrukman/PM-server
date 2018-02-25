@@ -61,7 +61,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     this.processUpdateSubscription = this.mapDesignService.getUpdateProcessAsObservable()
       .filter(process => process.uuid === this.process.uuid)
       .subscribe(process => {
-        console.log('aba');
         this.process = process;
         this.processForm.get('coordination').setValue(process.coordination);
       });
