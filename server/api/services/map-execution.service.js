@@ -1031,7 +1031,7 @@ function sendKillRequest(mapId, actionId, agentKey) {
  */
 function summarizeExecution(map, runId, executionContext, agentsResults) {
     let result = {};
-    result.map = map._id;
+    result.map = map._id || map.id;
     result.structure = executionContext.structure;
     result.startTime = executionContext.startTime;
     result.finishTime = executionContext.finishTime;
@@ -1157,7 +1157,7 @@ function stopExecution(mapId, runId, socket) {
                 })
             });
 
-            summarizeExecution(executions[runId].map, runId, Object.assign({}, executions[runId].executionContext), Object.assign({}, executions[runId].executionAgents))
+        summarizeExecution(executions[runId].executionContext.map, runId, Object.assign({}, executions[runId].executionContext), Object.assign({}, executions[runId].executionAgents))
                 .then(mapResult => {
                     socket.emit('map-execution-result', mapResult);
                 });
