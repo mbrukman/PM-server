@@ -1131,6 +1131,10 @@ function stopExecution(mapId, runId, socket) {
                     agent.status = 'stopped';
                     agent.finishTime = d;
                 }
+
+                if (!agent.hasOwnProperty('processes')) {
+                    return;
+                }
                 Object.keys(agent.processes).forEach(processKey => {
                     let processArray = agent.processes[processKey];
                     processArray.forEach(process => {
@@ -1139,7 +1143,7 @@ function stopExecution(mapId, runId, socket) {
                             process.result = 'Process stopped';
                             process.finishTime = d;
                         }
-                        if (process.actions) {
+                        if (process.hasOwnProperty('actions')) {
                             Object.keys(process.actions).forEach(actionKey => {
                                 let action = process.actions[actionKey];
                                 if (!action.status || action.status === 'executing') {
