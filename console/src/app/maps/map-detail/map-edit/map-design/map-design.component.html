@@ -1,5 +1,5 @@
-<div class="wrapper row" #wrapper (window:resize)="onResize($event)">
-  <div class="main" [ngClass]="{'col-12': !editing, 'col-8': editing}">
+<div class="wrapper row design-wrapper" #wrapper>
+  <div class="main">
     <h3 class="pane-header">Design</h3>
     <div class="map-controllers">
       <button class="btn" (click)="onScale(0.1)"><i class="icon-zoom1" aria-hidden="true"></i></button>

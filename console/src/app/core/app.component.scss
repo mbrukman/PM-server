@@ -4,21 +4,36 @@
   margin-left: 0;
   margin-right: 0;
   height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: initial;
+
   .pm-sidebar {
+    width : 80px;
     max-width: 80px;
-    flex: 0 0 80px;
+    flex-grow: 1;
     background-color: $turquoise-blue;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 5px 0;
+    align-items: center;
+
     img {
-      margin-top: 23px;
-      margin-left: 15px;
+      width: 40px;
+      margin-bottom: 30px;
     }
 
   }
   .main {
     padding: 0px;
-    //padding-right: 35px;
-    flex: 0 0 calc(100% - 80px);
-    max-width: calc(100% - 80px);
+    flex-grow: 1;
+    display: flex;
+
+    ::ng-deep >*:not(router-outlet){
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
   }
 }
 
@@ -29,9 +44,6 @@
     border-radius: 5px;
     &.active, &:hover {
       background: $selected-nav;
-    }
-    &:first-child {
-      margin-top: 47px;
     }
     a.nav-link {
       color: $text-color;
@@ -49,5 +61,7 @@
   height: 100%;
   top: 0;
   left: 0;
+  background-color: $background;
+  border-right: 1px solid $selected-nav;
+  padding : 0 30px;
 }
-

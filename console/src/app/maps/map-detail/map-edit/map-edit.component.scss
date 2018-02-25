@@ -15,6 +15,9 @@
   max-width: 250px;
   flex: 0 0 250px;
   overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+
   .pane-header {
     i {
       &:hover {
@@ -27,7 +30,14 @@
   }
 
   .pane-content {
-    height: 100%;
+    flex-grow: 1;
+    display: flex;
+    
+    > * {
+      flex-grow: 1;
+      display: flex;
+    }
+    
   }
 }
 
@@ -36,8 +46,8 @@
 }
 
 .designer {
-  flex: 1 1;
-
+  flex-grow: 1;
+  display: flex;
 }
 
 ul.nav {
@@ -68,11 +78,24 @@ ul.nav {
 }
 
 .router-wrapper {
-  height: 100%;
+  display: flex;
+  flex-grow: 1;
+
+  ::ng-deep > *:not(router-outlet) {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+  }
 }
 
 .row {
   margin-left: 0;
   margin-right: 0;
   height: 100%;
+}
+
+
+.map-edit-wrapper, app-plugin-toolbox{
+  display: flex;
+  flex-grow: 1;
 }

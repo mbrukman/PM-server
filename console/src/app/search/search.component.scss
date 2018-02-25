@@ -1,3 +1,5 @@
+@import '~assets/sass/variables';
+
 .main {
   padding: 30px;
 }
@@ -6,4 +8,20 @@
   position: absolute;
   top: 30px;
   left: 0;
+}
+
+
+.results{
+
+  h6:not(:first-of-type){
+    margin-top : 30px;
+  }
+  a.list-group-item{
+    background-color: $background;
+    color : $text-color;
+
+    i{
+      margin-right: 7px;
+    }
+  }
 }

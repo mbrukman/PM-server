@@ -19,15 +19,14 @@ export class ProjectsListComponent implements OnInit {
   resultCount: number;
 
   constructor(private projectsService: ProjectsService) {
+    this.onDataLoad = this.onDataLoad.bind(this);
   }
 
   ngOnInit() {
-    this.projectsReq = this.projectsService.filter(null, null, this.page).subscribe(data => {
-      this.projects = data.items;
-      this.resultCount = data.totalCount;
-    });
+    this.projectsReq = this.projectsService.filter(null, null, this.page).subscribe(this.onDataLoad);
     this.projectsService.filter(null, '-createdAt', this.page).take(1).subscribe(data => {
-      this.featuredProjects = data.items.slice(0, 4);
+      if (data)
+        this.featuredProjects = data.items.slice(0, 4);
       console.log(">>", this.featuredProjects);
     });
   }
@@ -41,10 +40,13 @@ export class ProjectsListComponent implements OnInit {
         sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.projectsService.filter(fields, sort, page, this.filterTerm).subscribe(data => {
-      this.projects = data.items;
-      this.resultCount = data.totalCount;
-    });
+    this.projectsService.filter(fields, sort, page, this.filterTerm).subscribe(this.onDataLoad);
+  }
+
+  onDataLoad(data){
+    if (!data) return;
+    this.projects = data.items;
+    this.resultCount = data.totalCount;
   }
 
 }
