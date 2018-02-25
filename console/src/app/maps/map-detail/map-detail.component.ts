@@ -234,15 +234,15 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         cancel: 'Cancel'
       };
       modal.content.message = 'You have unsaved changes that will be lost by this action. Discard changes?';
-      modal.content.confirm = 'Discard';
-      modal.content.third = 'Save';
-      modal.content.cancel = 'Cancel';
+      modal.content.confirm = answers.confirm;
+      modal.content.third = answers.third;
+      modal.content.cancel = answers.cancel;
       return modal.content.result.asObservable()
         .do(ans => {
           if (ans === answers.third) {
             this.saveMap();
           }
-        }).map(ans => ans === answers.confirm || ans === answers.third);
+        }).map(ans => ans !== answers.cancel);
     }
     return true;
   }
