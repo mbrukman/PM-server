@@ -195,7 +195,16 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         console.log(error);
       });
     }
+
     if (this.structureEdited) {
+      let content = JSON.parse(this.mapStructure.content);
+      content.cells.forEach(cell => {
+        if (cell.type !== 'devs.MyImageModel') {
+          return;
+        }
+        cell.attrs.rect.fill = '#2d3236';
+      });
+      this.mapStructure.content = JSON.stringify(content);
       delete this.mapStructure._id;
       delete this.mapStructure.id;
       delete this.mapStructure.createdAt;
@@ -249,7 +258,6 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.mapStructure.configurations[index].selected = true;
     this.mapsService.setCurrentMapStructure(this.mapStructure);
   }
-
 
 
 }
