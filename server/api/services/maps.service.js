@@ -85,6 +85,7 @@ module.exports = {
         return MapStructure.find({ map: mapId }, '_id createdAt', { sort: { createdAt: -1 } }).limit(20).skip((page - 1) * 20)
     },
     update: (mapId, map) => {
+        delete map.updatedAt;
         return Map.findByIdAndUpdate(mapId, map, { new: true }).populate('agents')
     },
 
