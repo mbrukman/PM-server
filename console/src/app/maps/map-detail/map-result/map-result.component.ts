@@ -46,7 +46,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-
     // getting current map and requesting the executions list
     this.mapSubscription = this.mapsService.getCurrentMap()
       .filter(map => map)
