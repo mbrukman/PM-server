@@ -54,7 +54,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
       .flatMap(map => this.mapsService.executionResults(map.id)) // request execution results list
       .subscribe(executions => {
         this.executionsList = executions;
-        this.selectExecution(executions[0].id);
+        if (executions && executions.length)
+          this.selectExecution(executions[0].id);
       });
 
     // getting the current executions list when initiating

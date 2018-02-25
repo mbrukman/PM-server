@@ -119,8 +119,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       }
     });
 
-    this.resizePaper();
-
     this.listeners();
     this.mapStructureSubscription = this.mapsService.getCurrentMapStructure()
       .do(structure => this.mapStructure = structure)
@@ -259,8 +257,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
     let imageModel = new joint.shapes.devs['MyImageModel']({
       position: {
-        x: obj.x - (300 * this.scale),
-        y: obj.y - (270 * this.scale)
+        x: obj.x - (430 * this.scale),
+        y: obj.y - (240 * this.scale)
       },
       size: {
         width: 110,
@@ -431,15 +429,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
     this.editing = false;
     this.process = null;
-
-    this.resizePaper();
-  }
-
-  resizePaper() {
-    this.paper.setDimensions(
-      this.wrapper.nativeElement.offsetWidth - (this.designService.tabOpen && this.editing ? 250 : 0),
-      this.wrapper.nativeElement.offsetHeight
-    );
   }
 
   onDelete(event) {
@@ -486,14 +475,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   onScale(scale) {
     this.scale += scale;
     this.paper.scale(this.scale, this.scale);
-  }
-
-  onResize(event) {
-    // when resizing window paper size should be updated
-    if (!event) {
-      return;
-    }
-    this.resizePaper();
   }
 
   selectCell(cell) {

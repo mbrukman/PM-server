@@ -1,4 +1,5 @@
 @import "~assets/sass/base";
+@import "~assets/sass/mixins";
 
 .pad {
   margin-top: 25px;
@@ -42,18 +43,12 @@
   h5 {
     padding-bottom: 15px;
   }
-  div {
-    padding-bottom: 10px;
-    i {
-      color: #97999B;
-      position: relative;
-      top: 30px;
-      left: 195px;
-    }
-    input {
-      width: 220px;
-      height: 34px;
-    }
+
+  @include searchBox();
+
+  input {
+    width: 220px;
+    height: 34px;
   }
 
 }

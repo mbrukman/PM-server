@@ -1,8 +1,8 @@
 <div class="container pm-modal">
   <div class="modal-header">
     <h1>Add trigger</h1>
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true" (click)="onClose()">&times;</span>
+    <button type="button" class="close" (click)="onClose()" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <form [formGroup]="triggerForm" (ngSubmit)="onConfirm(triggerForm.value)" *ngIf="triggerForm">

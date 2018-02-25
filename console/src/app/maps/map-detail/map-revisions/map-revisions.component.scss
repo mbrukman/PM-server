@@ -1,16 +1,30 @@
 @import "~assets/sass/variables";
 
 .main {
-  padding-left: 15px;
-  padding-top: 15px;
   height: 100%;
+  flex-grow: 1;
+  display: flex;
+
   .row {
-    height: 100%;
+    flex-grow: 1;
+    margin: 0;
+
+    .col-3{
+      padding-top : 15px;
+    }
+
+    .col-9{
+      display: flex;
+      padding : 0;
+    }
   }
 }
 
 #graph {
   background: $dark-background;
+  width : initial !important;
+  height : initial !important;
+  flex-grow: 1;
 }
 
 .btn-inline-action {
@@ -36,8 +50,15 @@
       padding-left: 15px;
       border-bottom: 1px solid $cool-grey;
       height: 55px;
+      display: flex;
+      align-items: center;
+      
       &:hover {
         background-color: $dark-background;
+      }
+
+      .revision-title{
+        margin-right : 10px;
       }
     }
   }

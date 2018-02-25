@@ -2,59 +2,56 @@
 @import "~assets/sass/mixins";
 @import "~assets/sass/variables";
 
+
 .map-nav {
-  //@include border-box($dark-color, 1px, 0, 1px, 0);
   height: 70px;
   border-top: 1px solid $cool-grey;
   border-bottom: 1px solid $cool-grey;
-  font-size: 16px;
-  line-height: 18px;
-  padding-top: 16px;
-  ul.nav {
-    height: 100%;
-  }
-}
-.export {
-  position: absolute;
-  left: 105px;
-  top: 65px;
-  .btn {
-    padding: 5px 29px 5px 29px;
-    color: $text-color;
-    background: transparent;
-    border-radius: 20px;
-    border: 2px solid $turquoise-blue;
-    &:hover {
-      cursor: pointer;
-      background: $turquoise-blue;
-      color: $background;
-      font-weight: bolder;
-    }
-  }
-}
-.action-buttons {
-  position: absolute;
-  right: 55px;
-  top: 65px;
-  .btn {
-    padding: 5px 29px 5px 29px;
-    color: $text-color;
-    background: transparent;
-    border-radius: 20px;
-    border: 2px solid $turquoise-blue;
-    &:hover {
-      cursor: pointer;
-      background: $turquoise-blue;
-      color: $background;
-      font-weight: bolder;
-    }
-  }
-}
+  display: flex;
+  align-items: center;
 
-.nav-item {
-  &.active {
-    border-bottom: 5px solid $turquoise-blue;
+  ul.nav {
+    flex-grow: 1;
+    height: 100%;
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+
+      &.active {
+        border-bottom: 5px solid $turquoise-blue;
+      }
+    }
   }
+
+  .action-buttons {
+    //flex : 0 0 30%;
+    padding : 0 15px;
+
+    .btn {
+      padding: 5px 29px 5px 29px;
+      color: $text-color;
+      background: transparent;
+      border-radius: 20px;
+      border: 2px solid $turquoise-blue;
+      &:hover {
+        cursor: pointer;
+        background: $turquoise-blue;
+        color: $background;
+        font-weight: bolder;
+      }
+    }
+
+    > *:not(:first-child){
+      margin-left: 10px;
+    }
+
+    &:last-of-type{
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+
 }
 
 .header {
@@ -69,5 +66,11 @@
 }
 
 .router-wrapper {
-  height: calc(100% - 145px);
+  display: flex;
+  flex-grow: 1;
+
+  ::ng-deep > *:not(router-outlet) {
+    display: flex;
+    flex-grow: 1;
+  }
 }

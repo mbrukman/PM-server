@@ -54,7 +54,7 @@ textarea {
 }
 
 .main {
-  overflow-y: scroll;
+  overflow-y: auto;
 
   ::-webkit-scrollbar {
     width: 0px; /* remove scrollbar space */
@@ -269,17 +269,24 @@ rect.body {
 }
 
 .btn {
+  display: inline-flex;
+  
   &.pm {
-    padding: 5px 29px 5px 29px;
+    padding: 7px 29px;
     color: $text-color;
     background: transparent;
     border-radius: 20px;
     border: 2px solid $turquoise-blue;
+    
     &:hover {
       cursor: pointer;
       background: $turquoise-blue;
       color: $background;
       font-weight: bolder;
+    }
+
+    > i {
+      margin-left : 10px;
     }
   }
 }
@@ -398,3 +405,4 @@ rect.body {
     outline: none !important;
   }
 }
+

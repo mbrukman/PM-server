@@ -3,3 +3,16 @@
   border-width: $top $right $bottom $left;
   border-color: $color;
 }
+
+@mixin searchBox(){
+  > div {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-bottom: 10px;
+    i {
+      position: absolute;
+      right: 10px;
+    }
+  }
+}

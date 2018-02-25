@@ -1,3 +1,18 @@
+.setup-wrapper{
+  display: flex;
+  flex-direction: column;
+
+  img {
+    width: 300px;
+    align-self: center;
+    padding: 20px 0;
+  }
+
+  p{
+    padding-left: 15px;
+  }
+}
+
 .form-check-input {
   margin-left: 0;
   margin-top: 0.45rem;

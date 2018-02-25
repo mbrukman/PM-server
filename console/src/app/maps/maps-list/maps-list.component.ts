@@ -19,15 +19,14 @@ export class MapsListComponent implements OnInit, OnDestroy {
   featuredMaps: Map[];
 
   constructor(private mapsService: MapsService) {
+    this.onDataLoad = this.onDataLoad.bind(this);
   }
 
   ngOnInit() {
-    this.mapReq = this.mapsService.filterMaps(null, null, this.page).subscribe(data => {
-      this.maps = data.items;
-      this.resultCount = data.totalCount;
-    });
+    this.mapReq = this.mapsService.filterMaps(null, null, this.page).subscribe(this.onDataLoad);
     this.mapsService.filterMaps(null, '-createdAt', this.page).take(1).subscribe(data => {
-      this.featuredMaps = data.items.slice(0, 4);
+      if (data)
+        this.featuredMaps = data.items.slice(0, 4);
     });
   }
 
@@ -44,10 +43,13 @@ export class MapsListComponent implements OnInit, OnDestroy {
         sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.mapReq = this.mapsService.filterMaps(fields, sort, page, this.filterTerm).subscribe(data => {
-      this.maps = data.items;
-      this.resultCount = data.totalCount;
-    });
+    this.mapReq = this.mapsService.filterMaps(fields, sort, page, this.filterTerm).subscribe(this.onDataLoad);
+  }
+
+  onDataLoad(data){
+    if (!data) return;
+    this.maps = data.items;
+    this.resultCount = data.totalCount;
   }
 
 }

@@ -9,11 +9,12 @@
   </h1>
 </div>
 
-<div class="export" *ngIf="map && downloadJson">
-  <a [href]="downloadJson" download="{{map.name}}.json" class="btn pm">Export</a>
-</div>
-
 <div class="map-nav">
+
+  <div class="action-buttons">
+    <a *ngIf="map && downloadJson" [href]="downloadJson"  download="{{map.name}}.json" class="btn pm">Export</a>
+  </div>
+
   <ul class="nav justify-content-center">
 
     <li class="nav-item" routerLinkActive="active">
@@ -33,20 +34,22 @@
     </li>
 
   </ul>
+
+  <div class="action-buttons">
+      <!--<button type="button" class="btn" (click)="discardChanges()" *ngIf="edited || structureEdited" disabled>Discard</button>-->
+      <button type="button" class="btn" (click)="saveMap()" *ngIf="!edited && !structureEdited" disabled>Saved</button>
+      <button type="button" class="btn" (click)="saveMap()" *ngIf="edited || structureEdited">Save</button>
+      <button class="btn" (click)="executeMap()">Execute <span *ngIf="executing"><i class="fa fa-spinner fa-pulse fa-fw"></i></span> </button>
+      <select [(ngModel)]="selected">
+        <option *ngIf="mapStructure?.configurations?.length === 0">No configs</option>
+        <option (change)="changeSelected(i)" [value]="item.name" *ngFor="let item of mapStructure?.configurations">
+          {{item.name | truncatechars: 8}}
+        </option>
+      </select>
+    </div>
 </div>
 
-<div class="action-buttons">
-  <!--<button type="button" class="btn" (click)="discardChanges()" *ngIf="edited || structureEdited" disabled>Discard</button>-->
-  <button type="button" class="btn" (click)="saveMap()" *ngIf="!edited && !structureEdited" disabled>Saved</button>
-  <button type="button" class="btn" (click)="saveMap()" *ngIf="edited || structureEdited">Save</button>
-  <button class="btn" (click)="executeMap()">Execute <span *ngIf="executing"><i class="fa fa-spinner fa-pulse fa-fw"></i></span> </button>
-  <select [(ngModel)]="selected">
-    <option *ngIf="mapStructure?.configurations?.length === 0">No configs</option>
-    <option (change)="changeSelected(i)" [value]="item.name" *ngFor="let item of mapStructure?.configurations">
-      {{item.name | truncatechars: 8}}
-    </option>
-  </select>
-</div>
+
 
 <div class="router-wrapper">
   <router-outlet></router-outlet>
