@@ -137,7 +137,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   addNewLink(cell) {
     if (!cell.targetMagnet) {
-      cell.remove();
+      this.graph.getCell(cell.model.id).remove();
       return;
     }
     if (!this.link) {
@@ -149,7 +149,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     if (link) {
       return;
     }
-
 
     this.link.uuid = cell.model.id;
 
@@ -409,13 +408,18 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         let linkIndex = _.findIndex(self.mapStructure.links, (o) => {
           return o.uuid === cell.id
         });
+        if (linkIndex === -1) {
+          self.mapsService.setCurrentMapStructure(self.mapStructure);
+          return;
+        }
         const targetUuid = cell.get('target').id;
         self.mapStructure.links.splice(linkIndex, 1);
         const siblingLinks = self.mapStructure.links.filter(o => o.targetId === targetUuid);
         if (siblingLinks && siblingLinks.length <= 1) {
-
-          let p = self.mapStructure.processes.find(o => o.uuid = targetUuid);
-          p.coordination = null;
+          let p = self.mapStructure.processes.find(o => o.uuid === targetUuid);
+          if (!p) {
+            return;
+          }
           delete p.coordination;
           self.mapDesignService.updateProcess(p);
         }

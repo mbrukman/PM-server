@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
@@ -137,7 +137,6 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
     let plugins = [];
     let iteration = 0;
     this.plugins.forEach(plugin => {
-      console.log((iteration % 2 ? iteration * 73 : Math.abs((iteration - 1) * 73)) + 16);
       let imageModel = new joint.shapes.devs['MyImageModel']({
         position: {
           x: iteration % 2 ? 115 : 5,
