@@ -1,7 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { BsModalService } from 'ngx-bootstrap';
 import { Subscription } from 'rxjs/Subscription';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/timer';
+import 'rxjs/add/operator/switchMap';
+import { BsModalService } from 'ngx-bootstrap';
 
 import { AgentsService } from '../agents.service';
 import { Agent, Group } from '@agents/models';
@@ -32,15 +35,19 @@ export class AgentsListComponent implements OnInit, OnDestroy {
       this.agents = agents;
     });
 
-    // get agents status to pass to filters
-    this.agentsStatusReq = this.agentsService.status()
-      .subscribe(agents => {
-        this.agentsStatus = Object.keys(agents).map(o => agents[o]);
-      });
 
     this.selectedGroupSubscription = this.agentsService
       .getSelectedGroupAsObservable()
       .subscribe(group => this.selectedGroup = group);
+
+    // get agents status to pass
+
+    this.agentsStatusReq = Observable
+      .timer(0, 5000)
+      .switchMap(() => this.agentsService.status())
+      .subscribe(statuses => {
+        this.agentsStatus = statuses;
+      });
 
     this.items = [
       { label: 'View', icon: 'fa-search', command: (event) => console.log('!') },

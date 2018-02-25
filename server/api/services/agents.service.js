@@ -91,6 +91,9 @@ let unfollowAgentStatus = (agentId) => {
         return o.id === agentId
     });
     // stop the check interval
+    if (!agent) {
+        return;
+    }
     clearInterval(agents[agent.key].intervalId);
     agents[agent.key].alive = false;
     agents[agent.key].following = false;

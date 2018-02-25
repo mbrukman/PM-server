@@ -54,20 +54,19 @@ module.exports = {
         });
     },
     /* Delete an agent */
-    delete:
-        (req, res) => {
-            hooks.hookPre('agent-delete').then(() => {
-                return agentsService.delete(req.params.id)
-            }).then(() => {
-                req.io.emit('notification', { title: 'Agent deleted', message: ``, type: 'success' });
-                return res.status(200).send('OK');
-            }).catch(error => {
-                req.io.emit('notification', { title: 'Whoops...', message: `Error deleting agent`, type: 'error' });
-                winston.log('error', "Error deleting agent", error);
-                return res.status(500).send(error);
-            });
-            agentsService.unfollowAgent(req.params.id);
-        },
+    delete: (req, res) => {
+        hooks.hookPre('agent-delete').then(() => {
+            return agentsService.delete(req.params.id)
+        }).then(() => {
+            req.io.emit('notification', { title: 'Agent deleted', message: ``, type: 'success' });
+            return res.status(200).send('OK');
+        }).catch(error => {
+            req.io.emit('notification', { title: 'Whoops...', message: `Error deleting agent`, type: 'error' });
+            winston.log('error', "Error deleting agent", error);
+            return res.status(500).send(error);
+        });
+        agentsService.unfollowAgent(req.params.id);
+    },
     /* Get all agents list */
     list:
         (req, res) => {
