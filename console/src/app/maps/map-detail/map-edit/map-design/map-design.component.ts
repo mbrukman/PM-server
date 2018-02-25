@@ -60,6 +60,11 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   ngOnDestroy() {
     this.dropSubscription.unsubscribe();
     this.mapStructureSubscription.unsubscribe();
+    this.graph.getElements().forEach(cell => {
+      this.deselectCell(cell);
+    });
+    this.mapStructure.content = JSON.stringify(this.graph.toJSON());
+    this.mapsService.setCurrentMapStructure(this.mapStructure);
   }
 
   ngAfterContentInit() {
@@ -332,17 +337,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     if (!process.plugin) {
       process.plugin = this.plugins.find((o) => o.name === process.used_plugin.name);
     }
-    const cell = this.graph.get('cells');
-    let model = cell.models.find((o) => {
-      return o.id === process.uuid;
-    });
-    model.attr('rect/fill', '#000000');
-    if (this.process) {
-      model = cell.models.find((o) => {
-        return o.id === this.process.uuid;
-      });
-      model.attr('rect/fill', '#2d3236');
-    }
+    this.graph.getElements().forEach(c => this.deselectCell(c));
+    const cell = this.graph.getCell(process.uuid);
+    this.selectCell(cell);
     this.paper.setDimensions(this.wrapper.nativeElement.offsetWidth - 250, this.wrapper.nativeElement.offsetHeight);
     this.process = process;
     if (this.editing) {
@@ -430,13 +427,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   onClose(event) {
-    const cell = this.graph.get('cells');
-    const model = cell.models.find((o) => {
-      return o.id === this.process.uuid;
-    });
-    if (model) {
-      model.attr('rect/fill', '#2d3236');
-    }
+    this.deselectCell(this.graph.getCell(this.process.uuid));
+
     this.editing = false;
     this.process = null;
 
@@ -465,6 +457,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     let index = _.findIndex(this.mapStructure.processes, (o) => {
       return o.uuid === this.process.uuid
     });
+
+    this.updateNodeLabel(process.uuid, process.name || this.process.used_plugin.name);
     this.mapStructure.processes[index].name = process.name;
     this.mapStructure.processes[index].description = process.description;
     this.mapStructure.processes[index].mandatory = process.mandatory;
@@ -474,6 +468,18 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.mapStructure.processes[index].correlateAgents = process.correlateAgents;
     this.mapStructure.processes[index].flowControl = process.flowControl;
     this.mapStructure.processes[index].filterAgents = process.filterAgents;
+    this.mapsService.setCurrentMapStructure(this.mapStructure);
+  }
+
+  /**
+   * Updating node label
+   * @param {string} uuid
+   * @param {string} label
+   */
+  updateNodeLabel(uuid: string, label: string): void {
+    let cell = this.graph.getCell(uuid);
+    cell.attr('text/text', label);
+    this.mapStructure.content = JSON.stringify(this.graph.toJSON());
     this.mapsService.setCurrentMapStructure(this.mapStructure);
   }
 
@@ -488,5 +494,13 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       return;
     }
     this.resizePaper();
+  }
+
+  selectCell(cell) {
+    cell.attr('rect/fill', '#000');
+  }
+
+  deselectCell(cell) {
+    cell.attr('rect/fill', '#2d3236');
   }
 }
