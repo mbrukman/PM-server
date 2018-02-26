@@ -13,6 +13,7 @@ const serverUrl = environment.serverUrl;
 @Injectable()
 export class AgentsService {
   draggedItem: any;
+  private updatedGroup: Subject<Group> = new Subject();
   private dragSubject: Subject<any> = new Subject<any>();
   private selectedGroupSubject: Subject<Group> = new Subject<Group>();
   private reEvaluateFilterSubject: Subject<Group> = new Subject<Group>();
@@ -126,6 +127,22 @@ export class AgentsService {
   }
 
   /**
+   * Passing next group to updated group subject
+   * @param group
+   */
+  updateGroup(group: Group) {
+    this.updatedGroup.next(group);
+  }
+
+  /**
+   * Returns a group to updated group as observable
+   * @returns {Observable<Group>}
+   */
+  getUpdateGroupAsObservable(): Observable<Group> {
+    return this.updatedGroup.asObservable();
+  }
+
+  /**
    * Passing next group to the reevabluate subject
    * @param group
    */
@@ -139,6 +156,15 @@ export class AgentsService {
    */
   getGroupToReEvaluateAsObservable(): Observable<Group> {
     return this.reEvaluateFilterSubject.asObservable()
+  }
+
+  /**
+   * Removes an agent from a group. returns updated group
+   * @param {string} agentId
+   * @param {string} groupId
+   */
+  removeAgentFromGroup(agentId: string, groupId: string) {
+    return this.http.post<Group>(`${serverUrl}api/agents/groups/${groupId}/remove-agent`, { agentId });
   }
 
 }

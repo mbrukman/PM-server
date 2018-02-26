@@ -354,5 +354,15 @@ module.exports = {
      */
     removeAgentFromGroups: (agentId) => {
         return Group.update({ agents: { $in: [agentId] } }, { $pull: { agents: { $in: [agentId] } } })
+    },
+
+    /**
+     * Removing an agent from a group
+     * @param groupId
+     * @param agentId
+     * @returns {Query|*}
+     */
+    removeAgentFromGroup: (groupId, agentId) => {
+        return Group.findOneAndUpdate(groupId, { $pull: { agents: { $in: [agentId] } } }, { new: true });
     }
 };
