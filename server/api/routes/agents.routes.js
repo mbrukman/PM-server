@@ -14,6 +14,7 @@ router.post("/groups/:id/add-filters", agentsController.addGroupFilters);
 router.post("/groups/create", agentsController.createGroup);
 router.get("/groups/:id", agentsController.groupDetail);
 router.delete("/groups/:id/delete", agentsController.deleteGroup);
+router.post("/groups/:id/remove-agent", agentsController.removeAgentFromGroup);
 
 router.delete("/:id/delete", agentsController.delete);
 router.put("/:id/update", agentsController.update);

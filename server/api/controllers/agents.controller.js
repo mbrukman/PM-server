@@ -71,16 +71,16 @@ module.exports = {
     },
     /* Get all agents list */
     list: (req, res) => {
-            hooks.hookPre('agent-list').then(() => {
-                return agentsService.filter({})
-            }).then(agents => {
-                res.json(agents);
-            }).catch(error => {
-                req.io.emit('notification', { title: 'Whoops...', message: `Error finding agents`, type: 'error' });
-                winston.log('error', "Error filtering agents", error);
-                return res.status(500).send(error);
-            });
-        },
+        hooks.hookPre('agent-list').then(() => {
+            return agentsService.filter({})
+        }).then(agents => {
+            res.json(agents);
+        }).catch(error => {
+            req.io.emit('notification', { title: 'Whoops...', message: `Error finding agents`, type: 'error' });
+            winston.log('error', "Error filtering agents", error);
+            return res.status(500).send(error);
+        });
+    },
     /* Get agents status */
     status:
         (req, res) => {
@@ -193,6 +193,18 @@ module.exports = {
             winston.log('error', "Error creating group", error);
             res.status(500).send(error);
         });
+    },
+
+    removeAgentFromGroup: (req, res) => {
+        hooks.hookPre('group-remove-agent', req).then(() => {
+            return agentsService.removeAgentFromGroup(req.params.id, req.body.agentId)
+        }).then((group) => {
+            req.io.emit('notification', { title: '', message: `Agent removed`, type: 'success' });
+            return res.json(group);
+        }).catch(error => {
+            req.io.emit('notification', { title: 'Whoops...', message: `Error removing group`, type: 'error' });
+            winston.log('error', "Error removing agent group", error);
+            res.status(500).send(error);
+        });
     }
-}
-;
+};

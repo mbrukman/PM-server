@@ -17,6 +17,7 @@ import { Agent } from '@agents/models/agent.model';
 export class GroupsComponent implements OnInit, OnDestroy {
   @Input('agents') agents: Agent[];
   groupsReq: any;
+  updatedGroupSubscription: Subscription;
   groups: Group[];
   draggedItem: any;
   draggetItemSubscription: Subscription;
@@ -49,6 +50,10 @@ export class GroupsComponent implements OnInit, OnDestroy {
     this.draggetItemSubscription = this.agentsService
       .getDragAsObservable()
       .subscribe(item => this.draggedItem = item);
+
+    this.updatedGroupSubscription = this.agentsService.getUpdateGroupAsObservable().subscribe(group => {
+      this.groups[this.groups.findIndex(o => o._id === group._id)] = group;
+    });
   }
 
   ngOnDestroy() {
@@ -57,6 +62,10 @@ export class GroupsComponent implements OnInit, OnDestroy {
     }
     if (this.draggetItemSubscription) {
       this.draggetItemSubscription.unsubscribe();
+    }
+
+    if (this.updatedGroupSubscription) {
+      this.updatedGroupSubscription.unsubscribe();
     }
   }
 

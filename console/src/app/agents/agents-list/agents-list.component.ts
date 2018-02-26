@@ -101,7 +101,13 @@ export class AgentsListComponent implements OnInit, OnDestroy {
 
   dragStart($event, agent) {
     this.agentsService.dragStart(agent);
-
   }
 
+  removeAgentFromGroup(agentId: string, groupId: string) {
+    this.agentsService.removeAgentFromGroup(agentId, groupId)
+      .take(1)
+      .subscribe(group => {
+        this.agentsService.updateGroup(group);
+      });
+  }
 }

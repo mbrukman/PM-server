@@ -33,9 +33,10 @@
           <td>
             <button class="btn btn-link" (click)="deleteAgent(item._id)"><i class="material-icons">delete</i></button>
             <button class="btn btn-link" (click)="editAgent(i)"><i class="material-icons">edit</i></button>
+            <button class="btn btn-link" (click)="removeAgentFromGroup(item._id, selectedGroup._id)"
+                    *ngIf="selectedGroup"><i class="material-icons">close</i></button>
           </td>
         </tr>
-
 
         </tbody>
       </table>
