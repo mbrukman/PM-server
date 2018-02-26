@@ -137,7 +137,7 @@ export class AgentsService {
    * Returns a group to reevavluate the filter as observable
    * @returns {Observable<Group>}
    */
-  getGroupToReEvalueateAsObservable(): Observable<Group> {
+  getGroupToReEvaluateAsObservable(): Observable<Group> {
     return this.reEvaluateFilterSubject.asObservable()
   }
 
