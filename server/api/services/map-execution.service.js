@@ -246,7 +246,6 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
         let groupsAgents = {};
 
         return new Promise((resolve, reject) => {
-            console.log(map.groups);
             async.each(map.groups,
                 (group, callback) => {
                     groupsAgents = Object.assign(groupsAgents, agentsService.evaluateGroupAgents(group));
@@ -256,9 +255,9 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
                 })
         });
     }).then((groupsAgents) => {
-        let agents = agentsService.agentsStatus();
+        let agents = Object.assign({}, agentsService.agentsStatus());
         let executionAgents = {};
-        let totalMaps = [...JSON.parse(JSON.stringify(map.agents)), ...groupsAgents];
+        let totalMaps = [...JSON.parse(JSON.stringify(map.agents)), ...JSON.parse(JSON.stringify(groupsAgents))];
         for (let mapAgent of totalMaps) { // filtering only the live agents of the map.
             if (mapAgent.key && agents.hasOwnProperty(mapAgent.key) && agents[mapAgent.key].alive) {
                 mapAgent.status = 'available';
@@ -280,7 +279,6 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
             }, socket);
             throw new Error('No agents selected or no live agents');
         }
-
         executionContext.agents = executionAgents;
         executions[runId] = { map: mapId, executionContext: executionContext, executionAgents: executionAgents };
         let res = createContext(mapStructure, executionContext);
@@ -589,7 +587,6 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
             process: process
         });
     });
-
     async.each(nodesToRun, runProcess(map, structure, runId, agent, socket), (error) => {
         if (error) {
             winston.log('error', error);
@@ -714,7 +711,6 @@ function runProcess(map, structure, runId, agent, socket) {
                 updateExecutionContext(runId, agent.key);
                 runNodeSuccessors(map, structure, runId, agent, false, socket); // by passing false, no successors would be called
                 callback();
-                console.log("STOP STOP");
                 return;
             }
         }
@@ -1048,7 +1044,6 @@ function summarizeExecution(map, runId, executionContext, agentsResults) {
             startTime: agent.startTime,
             finishTime: agent.finishTime
         };
-
         for (let j in agent.processes) {
             let process = agent.processes[j];
 
