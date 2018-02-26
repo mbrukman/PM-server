@@ -124,6 +124,7 @@ function setDefaultUrl(agent) {
  * @returns {any}
  */
 function evaluateGroupAgents(group) {
+    group = JSON.parse(JSON.stringify(group)); // make sure its not a mongoose document
     let filteredAgents = Object.keys(agents).map(key => agents[key]);
     group.filters.forEach(filter => {
         filteredAgents = evaluateFilter(filter, filteredAgents);
@@ -132,7 +133,7 @@ function evaluateGroupAgents(group) {
     // array of the constant agents attached to the group
     const constAgents = group.agents.reduce((total, current) => {
         const agent = Object.keys(agents).find(key => {
-            return agents[key].id === current.toString();
+            return agents[key].id === current;
         });
         if (agent) {
             total.push(agents[agent]);
