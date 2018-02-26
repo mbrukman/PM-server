@@ -7,8 +7,10 @@ const async = require('async');
 const request = require('request');
 const _ = require("lodash");
 
-const MapResult = require('../models/map-results.model');
-const MapExecutionLog = require('../models/map-execution-log.model');
+const models = require("../models");
+
+const MapResult = models.Result;
+const MapExecutionLog = models.ExecutionLog;
 const agentsService = require('./agents.service');
 const mapsService = require('./maps.service');
 const pluginsService = require('../services/plugins.service');
@@ -242,18 +244,16 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
         };
 
         let groupsAgents = {};
+
         return new Promise((resolve, reject) => {
-            async.each(map.groups, (group, callback) => {
-                agentsService.groupDetail(group)
-                    .then((groupObj) => {
-                        groupsAgents = Object.assign(groupsAgents, agentsService.evaluateGroupAgents(groupObj));
-                        callback();
-                    }).catch(() => {
+            console.log(map.groups);
+            async.each(map.groups,
+                (group, callback) => {
+                    groupsAgents = Object.assign(groupsAgents, agentsService.evaluateGroupAgents(group));
                     callback();
-                });
-            }, (error) => {
-                resolve(Object.keys(groupsAgents).map(key => groupsAgents[key]));
-            })
+                }, (error) => {
+                    resolve(Object.keys(groupsAgents).map(key => groupsAgents[key]));
+                })
         });
     }).then((groupsAgents) => {
         let agents = agentsService.agentsStatus();
@@ -1043,7 +1043,7 @@ function summarizeExecution(map, runId, executionContext, agentsResults) {
         let agent = agentsResults[i];
         let agentResult = {
             processes: [],
-            agent: agent._id,
+            agent: agent._id || agent.id,
             status: agent.status === 'available' ? 'success' : agent.status,
             startTime: agent.startTime,
             finishTime: agent.finishTime
