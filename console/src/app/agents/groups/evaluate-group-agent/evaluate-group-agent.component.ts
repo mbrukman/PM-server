@@ -38,9 +38,13 @@ export class EvaluateGroupAgentComponent implements OnInit, OnChanges {
   }
 
   filterAgents(filters: FilterParam[]) {
-    filters.forEach(f => {
-      this.evaluateFilter(f);
-    });
+    if (!filters || filters.length === 0) {
+      this.filteredAgents = [];
+    } else {
+      filters.forEach(f => {
+        this.evaluateFilter(f);
+      });
+    }
   }
 
   evaluateFilter(filter: FilterParam) {
