@@ -50,11 +50,11 @@ export class EvaluateGroupAgentComponent implements OnInit, OnChanges {
   evaluateFilter(filter: FilterParam) {
     this.filteredAgents = this.filteredAgents
       .filter(o => {
+        if (!o.hasOwnProperty(filter.field)) {
+          return false;
+        }
         switch (filter.filterType) {
           case FILTER_TYPES.equal: {
-            if (!o[filter.field]) {
-              return false;
-            }
             return o[filter.field].toString() === filter.value;
           }
           case FILTER_TYPES.contains: {
