@@ -22,7 +22,7 @@
       <div>
         Constant agents: <span class="badge badge-pill badge-light">{{item?.agents?.length}}</span>
       </div>
-      <app-evaluate-group-agent [group]="item" [agents]="agents" *ngIf="agents?.length > 0"></app-evaluate-group-agent>
+      <app-evaluate-group-agent [group]="item" [agents]="agents"></app-evaluate-group-agent>
       <hr/>
       <br>
       <app-group-dynamic-condition-filter [group]="item"></app-group-dynamic-condition-filter>

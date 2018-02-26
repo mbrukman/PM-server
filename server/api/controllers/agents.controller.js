@@ -56,6 +56,8 @@ module.exports = {
     /* Delete an agent */
     delete: (req, res) => {
         hooks.hookPre('agent-delete').then(() => {
+            return agentsService.removeAgentFromGroups(req.params.id);
+        }).then(() => {
             return agentsService.delete(req.params.id)
         }).then(() => {
             req.io.emit('notification', { title: 'Agent deleted', message: ``, type: 'success' });
@@ -68,8 +70,7 @@ module.exports = {
         agentsService.unfollowAgent(req.params.id);
     },
     /* Get all agents list */
-    list:
-        (req, res) => {
+    list: (req, res) => {
             hooks.hookPre('agent-list').then(() => {
                 return agentsService.filter({})
             }).then(agents => {

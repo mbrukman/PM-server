@@ -346,5 +346,13 @@ module.exports = {
         return Group.findById(groupId);
     },
 
-    evaluateGroupAgents: evaluateGroupAgents
+    evaluateGroupAgents: evaluateGroupAgents,
+
+    /**
+     * Removes agents ref from groups.
+     * @param agentId
+     */
+    removeAgentFromGroups: (agentId) => {
+        return Group.update({ agents: { $in: [agentId] } }, { $pull: { agents: { $in: [agentId] } } })
+    }
 };
