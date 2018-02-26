@@ -23,10 +23,10 @@
     overflow-y: hidden;
   }
   .map-management {
+    max-width: 450px;
     padding: 0;
     background: $selected-tab-environment;
-    height: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 }
 
