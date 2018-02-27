@@ -34,7 +34,7 @@
     <span>{{ event.title }}</span>
     <span *ngIf="event.datetime">{{ event.datetime | date: 'shortTime' }}</span>
     <span *ngIf="event.job.cron">{{ event.job.cron }}</span>
-    <span class="button"><i class="material-icons" (click)="deleteJob(event.job.id)">delete</i></span>
+    <span class="button"><i class="material-icons" (click)="deleteJob(event.job)">delete</i></span>
   </div>
 </ng-template>
 

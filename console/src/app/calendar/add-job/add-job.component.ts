@@ -50,6 +50,7 @@ export class AddJobComponent implements OnInit {
   onSelectMap() {
     const mapId = this.form.controls.map.value;
     this.mapsService.getMapStructure(mapId)
+      .filter(structure => !!structure)
       .filter(structure => !!structure.configurations)
       .subscribe(structure => {
         this.selectedMapConfigurations = structure.configurations.map(o => o.name);
