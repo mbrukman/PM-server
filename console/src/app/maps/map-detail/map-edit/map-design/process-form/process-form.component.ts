@@ -102,7 +102,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
               param.type
             ));
           });
-        } else {
         }
       });
     }
@@ -291,6 +290,12 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       this.backToProcessView();
     }
     this.saved.emit(this.processForm.value);
+  }
+
+  onMouseUp(event) {
+    setTimeout(() => {
+      this.processForm.controls.actions.updateValueAndValidity();
+    }, 0)
   }
 
 }
