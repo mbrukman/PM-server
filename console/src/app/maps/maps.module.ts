@@ -6,6 +6,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { NgxDnDModule } from '@swimlane/ngx-dnd';
 
 import { SharedModule } from '@shared/shared.module';
 
@@ -41,7 +42,8 @@ import { SelectGroupsComponent } from './map-detail/map-edit/map-enviroment-pane
     BsDropdownModule,
     ModalModule,
     AccordionModule,
-    TooltipModule
+    TooltipModule,
+    NgxDnDModule
   ],
   declarations: [
     MapDetailComponent,
@@ -67,4 +69,4 @@ import { SelectGroupsComponent } from './map-detail/map-edit/map-enviroment-pane
   ],
   entryComponents: [SelectAgentComponent, AddConfigurationComponent, TriggerFormComponent, SelectGroupsComponent]
 })
-export class MapsModule { }
+export class MapsModule {}
