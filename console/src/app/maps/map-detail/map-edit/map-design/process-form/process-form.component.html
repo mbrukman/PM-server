@@ -24,7 +24,7 @@
 </div>
 
 <div class="process-form">
-  <form [formGroup]="processForm" (ngSubmit)="saveProcess(processForm.value)">
+  <form [formGroup]="processForm">
     <accordion [closeOthers]="true" [hidden]="action">
       <accordion-group>
         <div accordion-heading class="clearfix">
@@ -218,10 +218,11 @@
           </div>
         </div>
       </div>
+      <div class="text-center">
+        <button type="button" (click)="backToProcessView()" class="btn pm text-center">Back to process</button>
+      </div>
     </div>
-    <div class="pane-bottom">
-      <button type="submit" class="btn pm">Save</button>
-    </div>
+
   </form>
 </div>
 
