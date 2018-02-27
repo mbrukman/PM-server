@@ -14,10 +14,13 @@
 
   .execution-select-pane {
     flex: 0 0 176px;
+    display: flex;
+    flex-direction: column;
     border-right: 1px solid $cool-grey;
+
     .execution-list {
-      height: 100%;
-      overflow-y: scroll;
+      flex-grow: 1;
+      overflow-y: auto;
       ul {
         padding-left: 0;
         list-style: none;
@@ -40,8 +43,17 @@
       }
     }
   }
+  
   .result {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .result-content{
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
   }
 }
 
