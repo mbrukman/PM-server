@@ -138,9 +138,11 @@
         </div>
         <button type="button" class="btn btn-sm btn-block pm" (click)="addNewAction()">Add action
         </button>
-        <div formArrayName="actions">
-          <div *ngFor="let action of processForm.controls.actions['controls']; let i=index">
-            <div class="d-flex justify-content-between">
+        <div formArrayName="actions" class="actions-dnd" [model]="processForm.controls.actions['controls']"
+             (mouseup)="onMouseUp($event)" ngxDroppable>
+          <div *ngFor="let action of processForm.controls.actions['controls']; let i=index" ngxDraggable
+               [model]="action">
+            <div class="d-flex justify-content-between action-tile">
               <span *ngIf="processForm.get('actions').at(i).get('name').value">{{processForm.get('actions').at(i).get('name').value}} (#{{i + 1}})</span>
               <span *ngIf="!processForm.get('actions').at(i).get('name').value">Action #{{i + 1}}</span>
               <span>
@@ -181,7 +183,7 @@
         <small class="form-text text-muted">If the action fails the process will stop (with failure).</small>
       </div>
       <p class="lead">Method</p>
-      <select id="inputState" class="form-control" formControlName="method" (change)="onSelectMethod()">-->
+      <select id="inputState" class="form-control" formControlName="method" (change)="onSelectMethod()">
         <option selected disabled>Select a method</option>
         <option *ngFor="let method of plugin.methods" id="method._id" [ngValue]="method.name">{{method.viewName}}
         </option>
