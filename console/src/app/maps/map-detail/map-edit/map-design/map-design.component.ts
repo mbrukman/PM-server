@@ -30,7 +30,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   link: Link;
   init: boolean = false;
   scale: number = 1;
-
   @ViewChild('wrapper') wrapper: ElementRef;
 
   constructor(private designService: MapDesignService,
@@ -365,6 +364,11 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
     this.paper.on('blank:pointerup', (event, x, y) => {
       move = false;
+
+      // closing process pane if opened
+      if (this.process) {
+        this.onClose()
+      }
     });
 
     this.paper.on('cell:pointerup', (cellView, evt, x, y) => {
@@ -428,7 +432,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     })
   }
 
-  onClose(event) {
+  onClose(event?) {
     this.deselectCell(this.graph.getCell(this.process.uuid));
 
     this.editing = false;
