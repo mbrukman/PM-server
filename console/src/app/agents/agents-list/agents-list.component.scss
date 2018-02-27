@@ -2,3 +2,19 @@
   flex-grow: 1;
   padding : 25px 15px 15px;
 }
+
+.table{
+  td {
+    padding: 0;
+    vertical-align: middle;
+
+    > div{
+      display: flex;
+      align-items: center;
+
+      > i {
+        margin-right: 7px;
+      }
+    }
+  }
+}
