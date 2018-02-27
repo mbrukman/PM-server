@@ -19,16 +19,13 @@ import { IsSetUpGuard } from './core/setup/issetup.guard';
 
 
 @NgModule({
-  declarations: [
-
-  ],
   imports: [
     CoreModule,
     BrowserModule,
     BrowserAnimationsModule,
     SharedModule,
 
-    AppRoutingModule,
+    AppRoutingModule
   ],
   providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SetupService, IsSetUpGuard],
   bootstrap: [AppComponent]

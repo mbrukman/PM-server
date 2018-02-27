@@ -4,7 +4,7 @@
       <div class='versions' style="height: 100%; overflow-y: scroll" infiniteScroll [onScroll]="scrollCallback">
         <ul>
           <li *ngFor="let item of structures">
-            <span>{{ (item.createdAt | date: 'dd/MM/yyyy') + ' ' +  (item.createdAt | date: 'HH:mm') }}</span>
+            <span class="revision-title">{{ (item.createdAt | date: 'dd/MM/yyyy') + ' ' +  (item.createdAt | date: 'HH:mm') }}</span>
             <span>
             <button class="btn-inline-action" (click)="previewStructure(item.id)"
                     tooltip="Preview"

@@ -18,6 +18,7 @@ let TriggerSchema = new Schema({
     active: { type: Boolean, default: true },
     plugin: String,
     method: String,
+    configuration: String,
     params: [actionParamsSchema]
 });
 

@@ -1,53 +1,35 @@
-<div class="row">
+<div class="row map-edit-wrapper">
   <div class="environment-pane">
     <!--<app-map-environment-pane></app-map-environment-pane>-->
     <div class="nav">
-      <ul class="nav flex-column">
-        <li class="nav-item" (click)="tab='agents'; designService.tabOpen = true" [ngClass]="{'active': tab==='agents'}">
-          <a class="nav-link"
-             tooltip="Agents"
-             placement="right"><i class="icon-agent" aria-hidden="true"></i></a>
-        </li>
-        <li class="nav-item" (click)="tab='attributes'; designService.tabOpen = true" [ngClass]="{'active': tab==='attributes'}">
-          <a class="nav-link"
-             tooltip="Attributes"
-             placement="right"><i class="icon-attribute" aria-hidden="true"></i></a>
-        </li>
-
-        <li class="nav-item" (click)="tab='triggers'; designService.tabOpen = true" [ngClass]="{'active': tab==='triggers'}">
-          <a class="nav-link"
-             tooltip="Triggers"
-             placement="right"> <i class="icon-trigger" aria-hidden="true"></i></a>
-        </li>
-
-        <li class="nav-item" (click)="tab='plugins'; designService.tabOpen = true" [ngClass]="{'active': tab==='plugins'}">
-          <a class="nav-link"
-             tooltip="Plugins"
-             placement="right"><i class="icon-plugins" aria-hidden="true"></i></a>
-        </li>
-
+        <ul class="nav flex-column">
+          <li class="nav-item" *ngFor="let tab of envTabs" (click)="openTab(tab);" [ngClass]="{'active': activeTab && tab.key===activeTab.key}">
+            <a class="nav-link" [tooltip]="tab.label" placement="right">
+              <i [ngClass]="tab.icon" aria-hidden="true"></i>
+            </a>
+          </li>
       </ul>
     </div>
 
   </div>
-  <div class="environment" [ngSwitch]="tab" *ngIf="tab">
-    <div class="pane-header">Environment <span (click)="tab=''; designService.tabOpen = false;">
+  <div class="environment" [ngSwitch]="activeTab.key" *ngIf="activeTab">
+    <div class="pane-header">{{activeTab.label}}<span (click)="closeTabs();">
       <i class="material-icons">chevron_left</i>
     </span>
     </div>
-    <div *ngSwitchCase="'agents'">
+    <div *ngSwitchCase="'agents'" class="pane-content pane-content-agents">
       <app-map-agents></app-map-agents>
     </div>
 
-    <div *ngSwitchCase="'attributes'">
-      <app-map-attributes></app-map-attributes>
+    <div *ngSwitchCase="'configurations'" class="pane-content">
+      <app-map-configurations></app-map-configurations>
     </div>
 
-    <div *ngSwitchCase="'triggers'">
+    <div *ngSwitchCase="'triggers'" class="pane-content">
       <app-map-triggers></app-map-triggers>
     </div>
 
-    <div *ngSwitchCase="'plugins'">
+    <div *ngSwitchCase="'plugins'" class="pane-content">
       <app-plugin-toolbox></app-plugin-toolbox>
     </div>
   </div>

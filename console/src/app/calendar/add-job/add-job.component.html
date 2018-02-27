@@ -9,10 +9,19 @@
     </select>
   </div>
   <div class="form-group">
-    <label for="project">Map</label>
-    <select class="form-control" formControlName="map" id="map">
+    <label for="map">Map</label>
+    <select class="form-control" formControlName="map" id="map" (change)="onSelectMap()">
       <option disabled>Select a map</option>
       <option *ngFor="let map of selectedProject?.maps" [ngValue]="map._id" [disabled]="!selectedProject">{{map.name}}
+      </option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="configuration">Configuration</label>
+    <select class="form-control" formControlName="configuration" id="configuration">
+      <option disabled>Select a configuration</option>
+      <option *ngFor="let item of selectedMapConfigurations" [ngValue]="item" [disabled]="!selectedMapConfigurations">
+        {{item}}
       </option>
     </select>
   </div>
@@ -28,7 +37,6 @@
   </div>
 
 
-
   <div [ngSwitch]="form.controls.type.value">
     <div *ngSwitchDefault>
 
@@ -39,10 +47,10 @@
     </div>
 
     <div *ngSwitchCase="'repeated'">
-        <label>Cron:</label>
+      <label>Cron:</label>
       <div class="input-group mb-2 mb-sm-0">
 
-        <input type="text" class="form-control" formControlName="cron" />
+        <input type="text" class="form-control" formControlName="cron"/>
         <button type="button" class="input-group-addon"
                 [popover]="popTemplate"
                 placement="right"

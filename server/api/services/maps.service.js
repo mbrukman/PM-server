@@ -67,7 +67,7 @@ module.exports = {
         return Map.find(query);
     },
     get: (id) => {
-        return Map.findOne({ _id: id }).populate('agents')
+        return Map.findOne({ _id: id }).populate('agents groups')
     },
     /* get map structure. if structure id is not defined, get the latest */
     getMapStructure: (mapId, structureId) => {
@@ -85,6 +85,7 @@ module.exports = {
         return MapStructure.find({ map: mapId }, '_id createdAt', { sort: { createdAt: -1 } }).limit(20).skip((page - 1) * 20)
     },
     update: (mapId, map) => {
+        delete map.updatedAt;
         return Map.findByIdAndUpdate(mapId, map, { new: true }).populate('agents')
     },
 

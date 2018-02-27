@@ -12,10 +12,11 @@ let actionResultSchema = new Schema({
 });
 
 let processResultSchema = new Schema({
+    index: Number,
     name: String,
     process: { type: Schema.Types.ObjectId, ref: 'MapStructure.processes' },
     uuid: String,
-    plugin: { name: String, _id: { type: Schema.Types.ObjectId, ref: 'Plugin' } },
+    plugin: String,
     actions: [actionResultSchema],
     status: String,
     startTime: Date,
@@ -38,6 +39,7 @@ let mapResultSchema = new Schema({
     map: { type: Schema.Types.ObjectId, ref: 'Map' },
     runId: { type: String, required: true },
     structure: { type: Schema.Types.ObjectId, ref: 'MapStructure' },
+    configuration: Schema.Types.Mixed,
     agentsResults: [agentResultSchema],
     startAgentsNumber: Number,
     startTime: Date,

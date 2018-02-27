@@ -10,7 +10,8 @@
 
 .main {
   display: flex;
-  height: 100%;
+  flex-grow: 1;
+
   .execution-select-pane {
     flex: 0 0 176px;
     border-right: 1px solid $cool-grey;
@@ -48,6 +49,8 @@
   height: 200px;
   .card {
     height: 100%;
+  }
+  .card:not(:first-child) {
     overflow-y: hidden;
   }
 }

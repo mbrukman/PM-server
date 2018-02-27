@@ -3,7 +3,8 @@
     <div class="pane-header">Executions</div>
     <div class="execution-list">
       <ul>
-        <li *ngFor="let execution of executionsList; let i = index" (click)="selectExecution(execution._id)" [ngClass]="{'active': selectedExecution?.id === execution.id}">
+        <li *ngFor="let execution of executionsList; let i = index" (click)="selectExecution(execution._id)"
+            [ngClass]="{'active': selectedExecution?.id === execution.id}">
           <span>
           {{ execution.startTime | date: 'short' }}
           </span>
@@ -25,7 +26,8 @@
             <div class="card bg-dark">
               <div class="card-body">
                 <h5 class="card-title">Display data</h5>
-                <p-dropdown [options]="agents" [(ngModel)]="selectedAgent" [filter]="true" [style]="{'width': '100%'}">
+                <p-dropdown [options]="agents" (onChange)="changeAgent()" [(ngModel)]="selectedAgent" [filter]="true"
+                            [style]="{'width': '100%'}">
                   <ng-template let-item pTemplate="item">
                     <span style="vertical-align:middle">{{item.label}}</span>
                   </ng-template>
@@ -72,10 +74,10 @@
             <div class="card process-select bg-dark">
               <div class="card-body">
                 <ul class="process-list">
-                  <li *ngFor="let item of selectedExecution.structure?.processes; let i = index"
+                  <li *ngFor="let item of processesList; let i = index"
                       (click)="selectProcess(item)"
-                      [ngClass]="{'active': selectedProcess?._id === item._id }">
-                    {{ (item.name) || ('Process #' + (i+1) ) }}
+                      [ngClass]="{'active': selectedProcess[0].uuid === item.uuid && selectedProcess[0].index === item.index }">
+                    {{ item.name | truncatechars: 15 }} <span *ngIf="item.overall > 1">({{ item.index + 1 }}/{{ item.overall }})</span>
                   </li>
                 </ul>
               </div>

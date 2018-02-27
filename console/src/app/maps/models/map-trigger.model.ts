@@ -1,8 +1,7 @@
-import { Map } from "./map.model";
-import { IMapTrigger, ITriggerActionParam } from "../interfaces/map-trigger.interface";
-import { Plugin } from "../../plugins/models/plugin.model";
-import { PluginMethod } from "../../plugins/models/plugin-method.model";
-import { PluginMethodParam } from "../../plugins/models/plugin-method-param.model";
+import { Map } from './map.model';
+import { ITriggerActionParam } from '../interfaces/map-trigger.interface';
+import { PluginMethod, PluginMethodParam } from '@plugins/models';
+
 
 export class TriggerActionParam implements ITriggerActionParam {
   value: string;
@@ -11,12 +10,13 @@ export class TriggerActionParam implements ITriggerActionParam {
   name: string;
 }
 
-export class MapTrigger implements IMapTrigger {
+export class MapTrigger {
   id?: string;
   _id?: string;
   map: string | Map;
   name: string;
   description?: string;
+  configuration?: string;
   createdAt?: Date;
   active?: boolean;
   plugin: string | Plugin;

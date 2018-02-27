@@ -2,13 +2,15 @@
   <div class="col-12">
     <div class="modal-header">
       <h4>Select Agents</h4>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true" (click)="onClose()">&times;</span>
+      <button type="button" class="close" (click)="onClose()" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
       </button>
     </div>
     <div class="modal-body">
-
-      <p-dataTable [value]="agents"  [responsive]="true" [(selection)]="selectedAgents" dataKey="name">
+      <div class="ui-widget-header" style="padding:4px 10px;border-bottom: 0 none">
+        <input #gb type="text" pInputText size="50" class="form-control" placeholder="Filter">
+      </div>
+      <p-dataTable [value]="agents" [globalFilter]="gb" [responsive]="true" [(selection)]="selectedAgents" dataKey="id">
         <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
         <p-column field="name" header="name" [sortable]="true">
           <ng-template let-col let-agent="rowData" pTemplate="body">

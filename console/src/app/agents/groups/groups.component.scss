@@ -1,0 +1,9 @@
+@import "~assets/sass/variables";
+
+.card-link {
+  color: $turquoise-blue !important;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline solid $turquoise-blue !important;
+  }
+}

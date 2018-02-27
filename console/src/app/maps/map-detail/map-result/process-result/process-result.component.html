@@ -4,10 +4,9 @@
     <div class="row">
       <div class="col-8">
         <p>{{ process.description }}</p>
-        <p *ngIf="selectedProcess && !showProcessResult(selectedProcess?.result)">Start time: {{ selectedProcess?.startTime | date: 'short' }}</p>
-        <p *ngIf="selectedProcess && !showProcessResult(selectedProcess?.result)">Finish time: {{ selectedProcess?.finishTime | date: 'short' }}</p>
-        <p *ngIf="!selectedProcess">This process wasn't executed</p>
-        <p *ngIf="showProcessResult(selectedProcess?.result)">{{ selectedProcess.result }}</p>
+        <p *ngIf="generalInfo">Start time: {{ generalInfo?.startTime | date: 'short' }}</p>
+        <p *ngIf="generalInfo">Finish time: {{ generalInfo?.finishTime | date: 'short' }}</p>
+        <p *ngIf="showProcessResult(generalInfo?.result)">{{ generalInfo?.result }}</p>
       </div>
       <div class="col-4">
         <ngx-charts-pie-chart
@@ -19,7 +18,7 @@
       </div>
     </div>
     <div class="row">
-      <p-dataTable [value]="process.actions" expandableRows="true" #dt (onRowClick)="dt.toggleRow($event.data)">
+      <p-dataTable [value]="actions" expandableRows="true" #dt (onRowClick)="dt.toggleRow($event.data)">
         <p-column field="name" header="Action">
           <ng-template let-col let-i="rowIndex" let-action="rowData" pTemplate="body">
             {{action.name || 'Action #' + (i+1)}}
@@ -37,23 +36,23 @@
           </ng-template>
         </p-column>
         <ng-template let-action pTemplate="rowexpansion">
-          <div *ngIf="agActionsStatus[action._id]">
+          <div *ngIf="agActionsStatus[action.action]">
             <div class="row">
               <div class="col-8">
                 <div *ngIf="count === 1">
-                  <p>Start time: {{ agActionsStatus[action._id]?.startTime | date: 'medium' }}</p>
-                  <p>Finish time: {{ agActionsStatus[action._id]?.finishTime | date: 'medium'}}</p>
+                  <p>Start time: {{ agActionsStatus[action.action]?.startTime | date: 'medium' }}</p>
+                  <p>Finish time: {{ agActionsStatus[action.action]?.finishTime | date: 'medium'}}</p>
                 </div>
                 <h5>Output:</h5>
                 <div class="raw-output">
-                  <span *ngFor="let item of agActionsStatus[action._id]?.results?.stdout">{{ item }} <br></span>
-                  <span *ngFor="let item of agActionsStatus[action._id]?.results?.stderr">{{ item }} <br></span>
-                  <span *ngFor="let item of agActionsStatus[action._id]?.results?.result">{{ item }} <br></span>
+                  <span *ngFor="let item of agActionsStatus[action.action]?.results?.stdout">{{ item }} <br></span>
+                  <span *ngFor="let item of agActionsStatus[action.action]?.results?.stderr">{{ item }} <br></span>
+                  <span *ngFor="let item of agActionsStatus[action.action]?.results?.result">{{ item }} <br></span>
                 </div>
               </div>
               <div class="col-4">
                 <ngx-charts-pie-chart
-                  [results]="agActionsStatus[action._id].status"
+                  [results]="agActionsStatus[action.action].status"
                   [labels]="false"
                   [scheme]="colorScheme"
                   [doughnut]="true">

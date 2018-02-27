@@ -1,25 +1,32 @@
 @import "~assets/sass/base";
 @import "~assets/sass/variables";
 
-.main {
-  padding: 0;
-  border-left: 1px solid $cool-grey;
-}
-
-.wrapper {
-  height: 100%;
-  width: 100%;
-  overflow-y: scroll;
+.design-wrapper{
+  display: flex;
+  flex-grow: 1;
+  overflow-y: auto;
   margin-left: 0;
   margin-right: 0;
+
+  .main{
+    display: flex;
+    flex-grow: 1;
+    padding: 0;
+    border-left: 1px solid $cool-grey;
+    flex-direction: column;
+  }
+}
+
+
+.wrapper {
   .main {
     overflow-y: hidden;
   }
   .map-management {
+    max-width: 450px;
     padding: 0;
     background: $selected-tab-environment;
-    height: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 }
 
@@ -40,6 +47,9 @@
 
 .graph {
   background: $dark-background;
+  width : initial !important;
+  height : initial !important;
+  flex-grow: 1;
 }
 
 .pane-header {

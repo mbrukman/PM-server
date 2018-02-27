@@ -54,7 +54,7 @@ textarea {
 }
 
 .main {
-  overflow-y: scroll;
+  overflow-y: auto;
 
   ::-webkit-scrollbar {
     width: 0px; /* remove scrollbar space */
@@ -173,6 +173,18 @@ tr.ui-widget-content.ui-datatable-odd {
   }
 }
 
+/* primeng accordion */
+.ui-accordion .ui-accordion-header {
+  background: none !important;
+  border-top: 1px solid $cool-grey;
+  &:hover {
+    border-top: 1px solid $cool-grey !important;
+  }
+  a {
+    color: $turquoise-blue !important;
+  }
+}
+
 /*------*/
 
 table, .table {
@@ -223,6 +235,7 @@ table, .table {
 // dropdown
 .dropdown-item {
   color: $text-color !important;
+  background: $background;
   &:hover {
     color: #000 !important;
     background: $turquoise-blue !important;
@@ -244,6 +257,10 @@ table, .table {
   }
 }
 
+.ui-dropdown-items-wrapper {
+  background: $background;
+}
+
 rect.body {
   stroke: #bbbbbb;
   &:hover {
@@ -257,17 +274,24 @@ rect.body {
 }
 
 .btn {
+  display: inline-flex;
+
   &.pm {
-    padding: 5px 29px 5px 29px;
+    padding: 7px 29px;
     color: $text-color;
     background: transparent;
     border-radius: 20px;
     border: 2px solid $turquoise-blue;
+
     &:hover {
       cursor: pointer;
       background: $turquoise-blue;
       color: $background;
       font-weight: bolder;
+    }
+
+    > i {
+      margin-left : 10px;
     }
   }
 }
@@ -386,3 +410,4 @@ rect.body {
     outline: none !important;
   }
 }
+

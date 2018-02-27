@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { ProjectsService } from '../../projects/projects.service';
-import { Project } from '../../projects/models/project.model';
+import { ProjectsService } from '@projects/projects.service';
+import { Project } from '@projects/models/project.model';
 import { CalendarService } from '../calendar.service';
 import { CronJobsConfig } from 'ngx-cron-jobs/src/app/lib/contracts/contracts';
+import { MapsService } from '@maps/maps.service';
 
 @Component({
   selector: 'app-add-job',
@@ -12,6 +13,7 @@ import { CronJobsConfig } from 'ngx-cron-jobs/src/app/lib/contracts/contracts';
   styleUrls: ['./add-job.component.scss']
 })
 export class AddJobComponent implements OnInit {
+  selectedMapConfigurations: string[];
   projects: Project[];
   selectedProject: Project;
   projectsReq: any;
@@ -24,7 +26,7 @@ export class AddJobComponent implements OnInit {
   };
 
 
-  constructor(private calendarService: CalendarService, private projectsService: ProjectsService) {
+  constructor(private calendarService: CalendarService, private projectsService: ProjectsService, private mapsService: MapsService) {
   }
 
   ngOnInit() {
@@ -42,11 +44,24 @@ export class AddJobComponent implements OnInit {
 
   }
 
+  /**
+   * Invoked when a map selected. Send a request for map structure and set the selectedMapConfiguration.
+   */
+  onSelectMap() {
+    const mapId = this.form.controls.map.value;
+    this.mapsService.getMapStructure(mapId)
+      .filter(structure => !!structure.configurations)
+      .subscribe(structure => {
+        this.selectedMapConfigurations = structure.configurations.map(o => o.name);
+      })
+  }
+
   initForm(): FormGroup {
     return new FormGroup({
       project: new FormControl(null, Validators.required),
       map: new FormControl(null, Validators.required),
       type: new FormControl('once', Validators.required),
+      configuration: new FormControl(null),
       datetime: new FormControl(null),
       cron: new FormControl(null)
     });

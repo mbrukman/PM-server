@@ -1,15 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { environment } from '@env/environment';
 
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { Map } from './models/map.model';
-import { MapStructure } from './models/map-structure.model';
-import { MapTrigger } from './models/map-trigger.model';
-import { MapResult } from './models/execution-result.model';
-import { MapExecutionLogs } from './models/map-logs.model';
+import { Map, MapExecutionLogs, MapResult, MapStructure, MapTrigger } from './models';
 
 
 const serverUrl = environment.serverUrl;

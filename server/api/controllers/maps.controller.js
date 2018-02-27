@@ -96,7 +96,7 @@ module.exports = {
             const newStructure = {
                 links: structure.links,
                 processes: structure.processes,
-                attributes: structure.attributes,
+                configurations: structure.configurations,
                 content: structure.content,
                 code: structure.code,
                 map: dupMap._id
@@ -196,13 +196,18 @@ module.exports = {
     /* get a list of ongoing executions */
     currentRuns: (req, res) => {
         hooks.hookPre('map-currentruns', req).then(() => {
-            return res.json(mapsExecutionService.executions);
+            const executions = mapsExecutionService.executions;
+            return res.json(Object.keys(executions).reduce((total, current) => {
+                console.log(executions[current].map);
+                total[current] = executions[current].map;
+                return total;
+            }, {}));
         });
     },
     /* execute a map */
     execute: (req, res) => {
         hooks.hookPre('map-execute', req).then(() => {
-            return mapsExecutionService.execute(req.params.id, null, null, req);
+            return mapsExecutionService.execute(req.params.id, req.params.structure, null, req);
         }).then((r) => {
             res.json(r);
         }).catch(error => {
@@ -215,7 +220,7 @@ module.exports = {
 
     /* stop map execution */
     stopExecution: (req, res) => {
-      return res.json(mapsExecutionService.stop(req.io, req.params.id, req.params.runId));
+        return res.json(mapsExecutionService.stop(req.params.id, req.params.runId, req.io));
     },
 
     logs: (req, res) => {
@@ -291,7 +296,7 @@ module.exports = {
         }).then(() => {
             req.io.emit('notification', {
                 title: 'Trigger deleted',
-                message: `${trigger.name} saved successfully`,
+                message: ``,
                 type: 'success'
             });
 

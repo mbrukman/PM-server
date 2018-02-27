@@ -7,11 +7,11 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
-import { SharedModule } from '../shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 
 import { MapsRoutingModule } from './maps-routing.module';
 import { MapTriggersComponent } from './map-detail/map-edit/map-enviroment-pane/map-triggers/map-triggers.component';
-import { AddAttributeComponent } from './map-detail/map-edit/map-enviroment-pane/map-attributes/add-attribute/add-attribute.component';
+import { AddConfigurationComponent } from './map-detail/map-edit/map-enviroment-pane/map-configurations/add-configuration/add-configuration.component';
 import { MapDesignComponent } from './map-detail/map-edit/map-design/map-design.component';
 import { MapDetailComponent } from './map-detail/map-detail.component';
 import { MapsListComponent } from './maps-list/maps-list.component';
@@ -19,7 +19,7 @@ import { SelectAgentComponent } from './map-detail/map-edit/map-enviroment-pane/
 import { TriggerFormComponent } from './map-detail/map-edit/map-enviroment-pane/map-triggers/trigger-form/trigger-form.component';
 import { MapEditComponent } from './map-detail/map-edit/map-edit.component';
 import { MapAgentsComponent } from './map-detail/map-edit/map-enviroment-pane/map-agents/map-agents.component';
-import { MapAttributesComponent } from './map-detail/map-edit/map-enviroment-pane/map-attributes/map-attributes.component';
+import { MapConfigurationsComponent } from './map-detail/map-edit/map-enviroment-pane/map-configurations/map-configurations.component';
 import { MapCodeComponent } from './map-detail/map-edit/map-code/map-code.component';
 import { MapRevisionsComponent } from './map-detail/map-revisions/map-revisions.component';
 import { ProcessFormComponent } from './map-detail/map-edit/map-design/process-form/process-form.component';
@@ -29,6 +29,7 @@ import { MapCreateComponent } from './map-create/map-create.component';
 import { MapEnvironmentPaneComponent } from './map-detail/map-edit/map-enviroment-pane/map-environment-pane.component';
 import { MapResultComponent } from './map-detail/map-result/map-result.component';
 import { ProcessResultComponent } from './map-detail/map-result/process-result/process-result.component';
+import { SelectGroupsComponent } from './map-detail/map-edit/map-enviroment-pane/map-agents/select-groups/select-groups.component';
 
 
 @NgModule({
@@ -54,15 +55,16 @@ import { ProcessResultComponent } from './map-detail/map-result/process-result/p
     MapAgentsComponent,
     MapRevisionsComponent,
     SelectAgentComponent,
-    MapAttributesComponent,
-    AddAttributeComponent,
+    AddConfigurationComponent,
+    MapConfigurationsComponent,
     MapTriggersComponent,
     TriggerFormComponent,
     ProcessFormComponent,
     PluginToolboxComponent,
     MapResultComponent,
-    ProcessResultComponent
+    ProcessResultComponent,
+    SelectGroupsComponent
   ],
-  entryComponents: [SelectAgentComponent, AddAttributeComponent, TriggerFormComponent]
+  entryComponents: [SelectAgentComponent, AddConfigurationComponent, TriggerFormComponent, SelectGroupsComponent]
 })
 export class MapsModule { }

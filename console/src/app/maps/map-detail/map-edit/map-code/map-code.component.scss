@@ -2,6 +2,25 @@
 
 .main {
   height: 100%;
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+
+  ngx-monaco-editor{
+    flex-grow: 1;
+    display: flex;
+    width : initial !important;
+    height : initial !important;
+  }
+
+  ::ng-deep{
+    .editorContainer, .monaco-editor, .monaco-editor .overflow-guard{
+      flex-grow: 1;
+      display: flex;
+      width : initial !important;
+      height : initial !important;
+    }
+  }
 }
 .pane-title {
   @extend .pane-header;

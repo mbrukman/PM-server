@@ -9,8 +9,8 @@ export class ProcessResultComponent implements OnChanges {
   @Input('process') process: any;
   @Input('result') result: any;
   @Input('count') count: number;
-  processResult: any;
-  selectedProcess: any;
+  actions: any[];
+  generalInfo: any;
   agProcessActionsStatus: any;
   agActionsStatus: any;
   colorScheme = {
@@ -23,28 +23,19 @@ export class ProcessResultComponent implements OnChanges {
   ngOnChanges(changes) {
     this.agProcessActionsStatus = null;
     this.agActionsStatus = null;
+    this.generalInfo = null;
     this.aggregateProcessActionResults(this.result);
-    if (this.result.length === 1) {
-      this.selectedProcess = this.result[0].processes.find((o) => {
-        return o.process === this.process._id;
-      });
+    if (this.process.length === 1) {
+      this.generalInfo = this.result[0].processes.find(o => o.uuid === this.process[0].uuid && o.index === this.process[0].index);
     }
   }
 
   aggregateProcessActionResults(result) {
-    let processes = [];
     let actions = [];
-    result.forEach(agent => {
-      let process = agent.processes.find((o) => {
-        return o.process === this.process._id;
-      });
-      if (!process) {
-        return;
-      }
-      processes.push(process);
+    this.process.forEach(process => {
       actions = [...actions, ...process.actions];
     });
-
+    this.actions = actions;
 
     // aggregating actions status
     let agActionsStatus = actions.reduce((total, current) => {
@@ -68,9 +59,12 @@ export class ProcessResultComponent implements OnChanges {
         };
       }
       total[current.action]['status'][current.status] = (total[current.action][current.status] || 0) + 1;
-      total[current.action]['results']['result'].push(current.result.result);
-      total[current.action]['results']['stderr'].push(current.result.stderr);
-      total[current.action]['results']['stdout'].push(current.result.stdout);
+      if (current.result) {
+
+        total[current.action]['results']['result'].push(current.result.result);
+        total[current.action]['results']['stderr'].push(current.result.stderr);
+        total[current.action]['results']['stdout'].push(current.result.stdout);
+      }
       total[current.action]['startTime'] = new Date(current.startTime) < total[current.action]['startTime'] ? current.startTime : total[current.action]['startTime'];
       total[current.action]['finishTime'] = new Date(current.finishTime) > total[current.action]['finishTime'] ? current.startTime : total[current.action]['finishTime'];
       return total;

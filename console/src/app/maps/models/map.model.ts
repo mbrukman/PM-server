@@ -1,5 +1,5 @@
-import { IMap } from "../interfaces/map.interface";
-import { Agent } from "../../agents/models/agent.model";
+import { IMap } from '../interfaces/map.interface';
+import { Agent, Group } from '@agents/models';
 
 export class Map implements IMap {
   id?: string;
@@ -10,5 +10,6 @@ export class Map implements IMap {
   licence?: string;
   archived: boolean;
   agents?: [Agent];
+  groups?: Group[];
   project?: string;
 }

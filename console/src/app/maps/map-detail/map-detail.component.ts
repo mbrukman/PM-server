@@ -7,10 +7,9 @@ import * as _ from 'lodash';
 import { BsModalService } from 'ngx-bootstrap/modal';
 
 import { MapsService } from '../maps.service';
-import { Map } from '../models/map.model';
-import { MapStructure } from '../models/map-structure.model';
-import { ConfirmComponent } from '../../shared/confirm/confirm.component';
-import { SocketService } from '../../shared/socket.service';
+import { Map, MapStructure } from '@maps/models';
+import { ConfirmComponent } from '@shared/confirm/confirm.component';
+import { SocketService } from '@shared/socket.service';
 
 
 @Component({
@@ -38,6 +37,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   mapExecutionSubscription: Subscription;
   executing: boolean;
   downloadJson: SafeUrl;
+  selected: string;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -79,8 +79,10 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         this.router.navigate(['NotFound']);
       });
     });
-    this.mapsService.getCurrentMap().subscribe(map => {
-      if (map) {
+
+    this.mapsService.getCurrentMap()
+      .filter(map => map)
+      .subscribe(map => {
         this.map = map;
         this.originalMap.archived = map.archived;
         if (!_.isEqual(map, this.originalMap)) {
@@ -88,27 +90,39 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         } else {
           this.edited = false;
         }
-      }
-    });
-    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().subscribe(structure => {
-      if (!structure) {
-        return;
-      }
-      if (!this.initiated) {
-        this.originalMapStructure = _.cloneDeep(structure);
-      }
-      if (this.initiated && !_.isEqual(structure, this.originalMapStructure)) {
-        this.structureEdited = true;
-      } else {
-        this.structureEdited = false;
-      }
-      this.mapStructure = structure;
-      this.initiated = true;
-      this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
-        return o.id === structure.id;
       });
-      this.generateDownloadJsonUri();
-    });
+
+    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure()
+      .filter(structure => !!structure)
+      .subscribe(structure => {
+        if (!this.initiated) {
+          this.originalMapStructure = _.cloneDeep(structure);
+        }
+
+        this.structureEdited = this.initiated && !_.isEqual(structure, this.originalMapStructure);
+        this.mapStructure = structure;
+        this.initiated = true;
+        this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
+          return o.id === structure.id;
+        });
+        this.generateDownloadJsonUri();
+
+        if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0) {
+          const selected = this.mapStructure.configurations.find(o => o.selected);
+          this.selected = selected ? selected.name : this.mapStructure.configurations[0].name;
+        }
+      });
+
+
+    // get the current executing maps
+    this.mapsService.currentExecutionList()
+      .take(1)
+      .subscribe(executions => {
+        const maps = Object.keys(executions).map(key => executions[key]);
+        this.executing = maps.indexOf(this.id) > -1;
+      });
+
+    // subscribing to executions updates
     this.mapExecutionSubscription = this.socketService.getCurrentExecutionsAsObservable().subscribe(executions => {
       const maps = Object.keys(executions).map(key => executions[key]);
       this.executing = maps.indexOf(this.id) > -1;
@@ -181,7 +195,16 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         console.log(error);
       });
     }
+
     if (this.structureEdited) {
+      let content = JSON.parse(this.mapStructure.content);
+      content.cells.forEach(cell => {
+        if (cell.type !== 'devs.MyImageModel') {
+          return;
+        }
+        cell.attrs.rect.fill = '#2d3236';
+      });
+      this.mapStructure.content = JSON.stringify(content);
       delete this.mapStructure._id;
       delete this.mapStructure.id;
       delete this.mapStructure.createdAt;
@@ -197,14 +220,44 @@ export class MapDetailComponent implements OnInit, OnDestroy {
 
   }
 
+  /**
+   * Will be invoked when trying to deactivate the detail route. If needed, promotes the user with a
+   * @returns {boolean}
+   */
   canDeactivate() {
     // will be triggered by deactivate guard
     if (this.edited || this.structureEdited) {
       let modal = this.modalService.show(ConfirmComponent);
+      let answers = {
+        confirm: 'Discard',
+        third: 'Save and continue',
+        cancel: 'Cancel'
+      };
       modal.content.message = 'You have unsaved changes that will be lost by this action. Discard changes?';
-      return modal.content.result.asObservable();
+      modal.content.confirm = answers.confirm;
+      modal.content.third = answers.third;
+      modal.content.cancel = answers.cancel;
+      return modal.content.result.asObservable()
+        .do(ans => {
+          if (ans === answers.third) {
+            this.saveMap();
+          }
+        }).map(ans => ans !== answers.cancel);
     }
     return true;
   }
+
+  /**
+   * Updating selected configuration
+   * @param {number} index
+   */
+  changeSelected(index: number) {
+    this.mapStructure.configurations.forEach((configuration) => {
+      configuration.selected = false;
+    });
+    this.mapStructure.configurations[index].selected = true;
+    this.mapsService.setCurrentMapStructure(this.mapStructure);
+  }
+
 
 }

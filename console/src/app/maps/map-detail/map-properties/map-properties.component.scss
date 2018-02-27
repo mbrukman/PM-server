@@ -3,6 +3,12 @@
 
 .main {
   @extend .reset-padding;
+  display: flex;
+  flex-grow: 1;
+
+  .row{
+    flex-grow: 1;
+  }
 }
 
 .btn {

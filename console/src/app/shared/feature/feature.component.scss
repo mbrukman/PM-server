@@ -1,6 +1,8 @@
 .featured {
   width: 100%;
   display: flex;
+  cursor: pointer; 
+  
   .col {
     flex-grow: 1;
     max-width: 450px;

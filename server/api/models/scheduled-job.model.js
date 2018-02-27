@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 let scheduledJobSchema = new Schema({
     project: { type: Schema.Types.ObjectId, ref: 'Project', required: true },
     map: { type: Schema.Types.ObjectId, ref: 'Map', required: true },
+    configuration: String,
     type: { type: String, enum: ['once', 'repeated'], required: true, default: 'once' },
     cron: {
         type: String,
