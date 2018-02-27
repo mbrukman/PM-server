@@ -26,6 +26,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   @Output() saved: EventEmitter<any> = new EventEmitter<any>();
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
+  formValueChangeSubscription: Subscription;
   processUpdateSubscription: Subscription;
   processForm: FormGroup;
   action: boolean = false;
@@ -108,11 +109,23 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
 
     this.plugin = _.cloneDeep(this.process.plugin);
     this.generateAutocompleteParams();
+
+    // subscribe to changes in form
+    this.formValueChangeSubscription = this.processForm.valueChanges
+      .debounceTime(300)
+      .distinctUntilChanged()
+      .filter(formvalue => this.processForm.valid)
+      .subscribe(formValue => {
+        this.saved.emit(this.processForm.value);
+      });
   }
 
   ngOnDestroy(): void {
     if (this.processUpdateSubscription) {
       this.processUpdateSubscription.unsubscribe();
+    }
+    if (this.formValueChangeSubscription) {
+      this.formValueChangeSubscription.unsubscribe();
     }
   }
 
@@ -277,21 +290,24 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Emitting close event
+   */
   closePane() {
     this.close.emit();
   }
 
+  /**
+   * Emitting delete event
+   */
   deleteProcess() {
     this.delete.emit();
   }
 
-  saveProcess(form) {
-    if (this.action) {
-      this.backToProcessView();
-    }
-    this.saved.emit(this.processForm.value);
-  }
-
+  /**
+   * Emitting form change when mouse up event happened over action
+   * @param event
+   */
   onMouseUp(event) {
     setTimeout(() => {
       this.processForm.controls.actions.updateValueAndValidity();
