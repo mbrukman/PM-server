@@ -235,6 +235,7 @@ table, .table {
 // dropdown
 .dropdown-item {
   color: $text-color !important;
+  background: $background;
   &:hover {
     color: #000 !important;
     background: $turquoise-blue !important;
@@ -256,6 +257,10 @@ table, .table {
   }
 }
 
+.ui-dropdown-items-wrapper {
+  background: $background;
+}
+
 rect.body {
   stroke: #bbbbbb;
   &:hover {
@@ -270,14 +275,14 @@ rect.body {
 
 .btn {
   display: inline-flex;
-  
+
   &.pm {
     padding: 7px 29px;
     color: $text-color;
     background: transparent;
     border-radius: 20px;
     border: 2px solid $turquoise-blue;
-    
+
     &:hover {
       cursor: pointer;
       background: $turquoise-blue;

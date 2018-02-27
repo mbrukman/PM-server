@@ -26,7 +26,8 @@
             <div class="card bg-dark">
               <div class="card-body">
                 <h5 class="card-title">Display data</h5>
-                <p-dropdown [options]="agents" [(ngModel)]="selectedAgent" [filter]="true" [style]="{'width': '100%'}">
+                <p-dropdown [options]="agents" (onChange)="changeAgent()" [(ngModel)]="selectedAgent" [filter]="true"
+                            [style]="{'width': '100%'}">
                   <ng-template let-item pTemplate="item">
                     <span style="vertical-align:middle">{{item.label}}</span>
                   </ng-template>

@@ -25,7 +25,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   selectedExecution: MapResult;
   selectedExecutionReq: any;
   selectedExecutionLogs: any[];
-  selectedAgent: string = 'default';
+  selectedAgent: any = 'default';
   selectedProcess: any;
   agProcessesStatus: [{ name: string, value: number }];
   result: any;
@@ -165,7 +165,11 @@ export class MapResultComponent implements OnInit, OnDestroy {
    */
   changeAgent() {
     let agentResult = this.selectedExecution.agentsResults.find((o) => {
-      return o.agent === this.selectedAgent;
+      if (this.selectedAgent.agent) {
+        return (<Agent>o.agent)._id === this.selectedAgent.agent._id;
+      } else {
+        return false;
+      }
     });
     if (!agentResult) { // if not found it aggregate
       this.result = this.selectedExecution.agentsResults;
