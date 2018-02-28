@@ -4,6 +4,8 @@ import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import * as _ from 'lodash';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/observable/of';
+
+import { distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -113,7 +115,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     // subscribe to changes in form
     this.formValueChangeSubscription = this.processForm.valueChanges
       .debounceTime(300)
-      .distinctUntilChanged()
+      .pipe(distinctUntilChanged())
       .filter(formvalue => this.processForm.valid)
       .subscribe(formValue => {
         this.saved.emit(this.processForm.value);
