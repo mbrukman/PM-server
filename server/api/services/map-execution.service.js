@@ -779,10 +779,10 @@ function runProcess(map, structure, runId, agent, socket) {
 
             } else {
                 let actionStatuses = [];
-                if (executions[runId].executionAgents[agent.key].processes[processUUID].actions) {
-                    actionStatuses = Object.keys(executions[runId].executionAgents[agent.key].processes[processUUID].actions)
+                if (executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions) {
+                    actionStatuses = Object.keys(executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions)
                         .map((actionKey) => {
-                            return executions[runId].executionAgents[agent.key].processes[processUUID].actions[actionKey].status;
+                            return executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions[actionKey].status;
                         });
                 }
                 if (actionStatuses.indexOf('error') > -1 && actionStatuses.indexOf('success') === -1) { // if only errors - process status is error
@@ -979,13 +979,12 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                         status: 'success'
                     }, socket);
 
-
                     if (action.mandatory) {
-                        callback('Action \'' + action.name + '\' failed: ' + res);
+                        callback(res);
                         return;
                     }
                     else {
-                        callback(null, 'Action \'' + action.name + '\' failed: ' + res); // Action failed but it doesn't mater
+                        callback(null, res); // Action failed but it doesn't mater
                         return;
                     }
                 }
