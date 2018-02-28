@@ -8,6 +8,8 @@ router.post("/create", mapController.create);
 router.get("/jobs", mapController.filterJobs); // scheduled jobs route
 router.get("/results", mapController.dashboard);
 router.get("/currentruns", mapController.currentRuns);
+router.put("/scheduledJob/updateJob", mapController.updateJob);
+router.delete("/jobs/:jobId/delete", mapController.deleteJob);
 
 router.get("/:id", mapController.detail);
 
@@ -39,6 +41,5 @@ router.put("/:id/triggers/:triggerId/update", mapController.triggerUpdate);
 /* schedule jobs - should be updated */
 router.post("/:id/jobs/create", mapController.createJob);
 router.delete("/:id/jobs/:jobId/delete", mapController.deleteJob);
-router.put("/scheduledJob/updateJob", mapController.updateJob);
 
 module.exports = router;
