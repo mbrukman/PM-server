@@ -445,7 +445,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
     this.mapStructure.processes.splice(processIndex, 1);
     this.graph.removeCells([this.graph.getCell(this.process.uuid)]);
-    this.onClose(null);
+    this.editing = false;
+    this.process = null;
     this.mapStructure.content = JSON.stringify(this.graph.toJSON());
     this.mapsService.setCurrentMapStructure(this.mapStructure);
   }
