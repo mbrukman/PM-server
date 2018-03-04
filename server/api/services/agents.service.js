@@ -211,6 +211,17 @@ function evaluateFilter(filter, agents) {
     });
 }
 
+/**
+ * Adding a socketid to agents statuses (if agentkey exists)
+ * @param agentKey
+ * @param socket
+ */
+function addSocketIdToAgent(agentKey, socket) {
+    if (!agents.hasOwnProperty(agentKey)) {
+        return;
+    }
+    agents[agentKey].socket = socket;
+}
 
 module.exports = {
     add: (agent) => {
@@ -365,5 +376,19 @@ module.exports = {
      */
     removeAgentFromGroup: (groupId, agentId) => {
         return Group.findOneAndUpdate(groupId, { $pull: { agents: { $in: [agentId] } } }, { new: true });
+    },
+    /**
+     * Establish a room for agents
+     * @param socket
+     */
+    establishSocket: (socket) => {
+        const nsp = socket.of('/agents');
+        nsp.on('connection', function (socket) {
+            winston.log("info", "Agent log");
+            // agent send key on connection string
+            addSocketIdToAgent(socket.client.request._query.key, socket);
+        });
+
+
     }
 };

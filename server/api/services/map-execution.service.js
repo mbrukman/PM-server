@@ -263,6 +263,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
                 mapAgent.status = 'available';
                 mapAgent.continue = true;
                 mapAgent.pendingProcesses = {};
+                mapAgent.socket = agents[mapAgent.key].socket;
                 mapAgent.executionContext = vm.createContext(Object.assign({}, executionContext)); // cloning the execution context for each agent
                 vm.runInNewContext(libpm + '\n' + mapStructure.code, mapAgent.executionContext);
                 executionAgents[mapAgent.key] = mapAgent;
@@ -837,6 +838,59 @@ function runProcess(map, structure, runId, agent, socket) {
     }
 }
 
+/**
+ * Send action to agent via socket
+ * @param socket
+ * @param action
+ * @param actionForm
+ * @returns {Promise<any>}
+ */
+function sendActionViaSocket(socket, action, actionForm) {
+    socket.emit('add-task', actionForm);
+
+    return new Promise((resolve, reject) => {
+        socket.on(action.uniqueRunId, (data) => {
+            resolve(data);
+        });
+    });
+}
+
+
+/**
+ * Send action to agent via request
+ * @param agent
+ * @param action
+ * @param actionForm
+ * @returns {Promise<any>}
+ */
+function sendActionViaRequest(agent, action, actionForm) {
+
+    return new Promise((resolve, reject) => {
+        request.post(
+            agentsService.agentsStatus()[agent.key].defaultUrl + '/api/task/add',
+            {
+                form: actionForm
+            },
+            function (error, response, body) {
+                try {
+                    body = JSON.parse(body);
+                } catch (e) {
+                    // statements
+                    body = {
+                        res: e
+                    };
+                }
+
+                if (error || response.statusCode !== 200) {
+                    if (!body) {
+                        body = { result: error };
+                    }
+                }
+                resolve(body);
+            });
+    });
+}
+
 function executeAction(map, structure, runId, agent, process, processIndex, action, plugin, socket) {
     return (callback) => {
         let key = action._id;
@@ -875,120 +929,119 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             return callback();
         }
 
+        action.uniqueRunId = `${runId}|${processIndex}|${key}`;
 
-        request.post(
-            agentsService.agentsStatus()[agent.key].defaultUrl + '/api/task/add',
-            {
-                form: {
-                    mapId: map.id,
-                    versionId: 0,
-                    executionId: 0,
-                    action: action,
-                    key: agent.key
+        const actionExecutionForm = {
+            mapId: map.id,
+            versionId: 0,
+            executionId: 0,
+            action: action,
+            key: agent.key
+        };
+
+
+        let actionString = `+ ${plugin.name} - ${method.name}: `;
+        for (let i in action.params) {
+            actionString += `${i}: ${action.params[i]}`;
+        }
+        createLog({
+            map: map._id,
+            runId: runId,
+            message: actionString,
+            status: 'info'
+        }, socket);
+
+        // will send action to agent via socket or regular request
+        let requestPromise;
+        let socketPromise;
+        if (agent.socket) {
+            socketPromise = sendActionViaSocket(agent.socket, action, actionExecutionForm);
+        } else {
+            requestPromise = sendActionViaRequest(agent, action, actionExecutionForm);
+        }
+
+        (socketPromise || requestPromise).then((result) => {
+            updateActionContext(runId, agent.key, process.uuid, processIndex, key, { finishTime: new Date() });
+            if (result.status === 'success') {
+                if (result.hasOwnProperty('stdout')) {
+                    result.stdout = actionString + '\n' + result.stdout;
+                } else {
+                    result.stdout = actionString;
                 }
-            },
-            function (error, response, body) {
-                try {
-                    body = JSON.parse(body);
-                } catch (e) {
-                    // statements
-                    body = {
-                        res: e
-                    };
-                }
-
-                let actionString = `+ ${plugin.name} - ${method.name}: `;
-                for (let i in action.params) {
-                    actionString += `${i}: ${action.params[i]}`;
-                }
-
-                updateActionContext(runId, agent.key, process.uuid, processIndex, key, { finishTime: new Date() });
+                updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
+                    status: 'success',
+                    result: result
+                });
 
 
-                createLog({
-                    map: map._id,
-                    runId: runId,
-                    message: actionString,
-                    status: 'info'
-                }, socket);
-
-                if (!error && response.statusCode === 200) {
-                    body.stdout = actionString + '\n' + body.stdout;
-
-                    updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
-                        status: 'success',
-                        result: body
-                    });
-
-                    let actionExecutionLogs = [];
-                    if (body.stdout) {
-                        actionExecutionLogs.push(
-                            {
-                                map: map._id,
-                                runId: runId,
-                                message: `'${action.name}' output: ${JSON.stringify(body.stdout)} (${agent.name})`,
-                                status: 'success'
-                            }
-                        );
-                    }
-                    if (body.stderr) {
-                        actionExecutionLogs.push(
-                            {
-                                map: map._id,
-                                runId: runId,
-                                message: `'${action.name}' errors: ${JSON.stringify(body.stderr)} (${agent.name})`,
-                                status: 'success'
-                            }
-                        );
-                    }
+                let actionExecutionLogs = [];
+                if (result.stdout) {
                     actionExecutionLogs.push(
                         {
                             map: map._id,
                             runId: runId,
-                            message: `'${action.name}' result: ${JSON.stringify(body.result)} (${agent.name})`,
+                            message: `'${action.name}' output: ${JSON.stringify(result.stdout)} (${agent.name})`,
                             status: 'success'
                         }
                     );
-
-                    MapExecutionLog.create(actionExecutionLogs).then(logs => {
-                        logs.forEach(log => {
-                            socket.emit('update', log);
-                        });
-                    });
-                    callback(null, body);
-                    return;
-
                 }
-                else {
-                    let res = body;
-                    if (!res) {
-                        res = { stdout: actionString, result: error };
-                    } else {
-                        res.stdout = actionString + '\n' + body.stdout;
-                    }
-
-                    updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
-                        status: 'error',
-                        result: res
-                    });
-
-                    createLog({
+                if (result.stderr) {
+                    actionExecutionLogs.push(
+                        {
+                            map: map._id,
+                            runId: runId,
+                            message: `'${action.name}' errors: ${JSON.stringify(result.stderr)} (${agent.name})`,
+                            status: 'success'
+                        }
+                    );
+                }
+                actionExecutionLogs.push(
+                    {
                         map: map._id,
                         runId: runId,
-                        message: `'${action.name}': Error running action on (${agent.name}): ${JSON.stringify(res)  }`,
+                        message: `'${action.name}' result: ${JSON.stringify(result.result)} (${agent.name})`,
                         status: 'success'
-                    }, socket);
+                    }
+                );
 
-                    if (action.mandatory) {
-                        callback(res);
-                        return;
-                    }
-                    else {
-                        callback(null, res); // Action failed but it doesn't mater
-                        return;
-                    }
+                MapExecutionLog.create(actionExecutionLogs).then(logs => {
+                    logs.forEach(log => {
+                        socket.emit('update', log);
+                    });
+                });
+                callback(null, result);
+            } else {
+                let res = {};
+                if (!result) {
+                    res = { stdout: actionString, result: 'Error running action on agent' };
+                } else {
+                    res = result;
+                    res.stdout = actionString + '\n' + result.stdout;
                 }
-            });
+
+                updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
+                    status: 'error',
+                    result: res
+                });
+
+                createLog({
+                    map: map._id,
+                    runId: runId,
+                    message: `'${action.name}': Error running action on (${agent.name}): ${JSON.stringify(res)  }`,
+                    status: 'success'
+                }, socket);
+
+                if (action.mandatory) {
+                    callback(res);
+                } else {
+                    callback(null, res); // Action failed but it doesn't mater
+                }
+            }
+        }).catch((error) => {
+            console.log("Error occurred: ", error);
+        });
+
+
     }
 }
 
