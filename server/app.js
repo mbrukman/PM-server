@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const bootstrap = require("./helpers/bootstrap").bootstrap;
 const socket = require('socket.io');
 const winstonMongo = require('winston-mongodb');
+const parseArgs = require('minimist')(process.argv.slice(2));
 
 const env = require('./env/enviroment');
 const app = express();
@@ -106,7 +107,7 @@ app.all('*', (req, res) => {
 
 
 //Set Port
-const port = process.env.PORT || '3000';
+const port = parseArgs.PORT || '3000';
 app.set('port', port);
 app.io = io;
 
