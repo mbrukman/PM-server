@@ -142,7 +142,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
         this.selectedExecution = result;
 
         this.agents = result.agentsResults.map(o => {
-          return { label: (<Agent>o.agent).name, value: o }
+          return { label: o.agent ? (<Agent>o.agent).name : '', value: o }
         });
 
         if (this.agents.length > 1) { // if there is more than one agent, add an aggregated option.

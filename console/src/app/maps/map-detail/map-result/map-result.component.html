@@ -76,7 +76,7 @@
                 <ul class="process-list"> 
                   <li *ngFor="let item of processesList; let i = index"
                       (click)="selectProcess(item)"
-                      [ngClass]="{'active': selectedProcess[0].uuid === item.uuid && selectedProcess[0].index === item.index }">
+                      [ngClass]="{'active': selectedProcess && selectedProcess[0].uuid === item.uuid && selectedProcess[0].index === item.index }">
                       <span class="process-name">{{ item.name }}</span>
                       <span *ngIf="item.overall > 1">({{ item.index + 1 }}/{{ item.overall }})</span>
                   </li>
