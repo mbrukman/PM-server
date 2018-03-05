@@ -19,6 +19,8 @@ import { CalendarEvent } from 'angular-calendar';
 import { CalendarService } from '../calendar.service';
 import { Job } from '../models/job.model';
 import { Map } from '@maps/models';
+import { BsModalService } from 'ngx-bootstrap';
+import { ConfirmComponent } from '@shared/confirm/confirm.component';
 
 const colors: any = {
   // TODO: add color pallet
@@ -36,6 +38,12 @@ const colors: any = {
   }
 };
 
+enum DeleteOptions {
+  skip = 'skip next job',
+  cancel = 'cancel',
+  delete = 'delete all jobs'
+}
+
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
@@ -48,7 +56,7 @@ export class CalendarComponent implements OnInit {
   refreshCalendar: Subject<any> = new Subject();
   newJobSubscription: Subscription;
 
-  constructor(private calendarService: CalendarService) {
+  constructor(private calendarService: CalendarService, private modalService: BsModalService) {
   }
 
   ngOnInit() {
@@ -152,7 +160,6 @@ export class CalendarComponent implements OnInit {
         map: job.map
       }];
     }
-
   }
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
@@ -172,9 +179,43 @@ export class CalendarComponent implements OnInit {
       return job.id === (<any>o).job.id;
     });
 
-    this.calendarService.deleteJob(job.id).subscribe(() => {
-      this.events.splice(jobIndex, 1);
-      this.refreshCalendar.next();
-    });
+    if (job.type === 'once') {
+      return this.calendarService.deleteJob(job.id)
+        .take(1)
+        .subscribe(() => {
+          this.events.splice(jobIndex, 1);
+          this.refreshCalendar.next();
+        });
+    }
+
+    const modal = this.modalService.show(ConfirmComponent);
+    modal.content.message = 'How would you like to proceed?';
+    modal.content.confirm = DeleteOptions.delete;
+    modal.content.cancel = DeleteOptions.cancel;
+    modal.content.third = DeleteOptions.skip;
+    modal.content.result
+      .take(1)
+      .subscribe(result => {
+        console.log(result);
+        switch (result) {
+          case DeleteOptions.delete:
+            this.calendarService.deleteJob(job.id)
+              .take(1)
+              .subscribe(() => {
+                this.events.splice(jobIndex, 1);
+                this.refreshCalendar.next();
+              });
+            break;
+          case DeleteOptions.skip:
+            job.skip = true;
+            this.calendarService.updateJob(job)
+              .take(1)
+              .subscribe();
+            break;
+          default:
+            break;
+        }
+      });
+
   }
 }
