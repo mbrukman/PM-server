@@ -89,7 +89,8 @@ module.exports = {
                 const agents = _.cloneDeep(agentsService.agentsStatus());
                 const status = Object.keys(agents)
                     .reduce((total, current) => {
-                        current = agents[current];
+
+                        current = _.cloneDeep(agents[current]);
                         if (!current.hasOwnProperty('id')) {
                             return total;
                         }
