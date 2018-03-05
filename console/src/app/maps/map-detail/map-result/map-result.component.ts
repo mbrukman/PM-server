@@ -219,8 +219,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
           overall: overall[o.uuid]
         }
       });
-
-    this.selectProcess(processesList[0]); // selecting the first process
+    
+    if(processesList.length)
+      this.selectProcess(processesList[0]); // selecting the first process
   }
 
   selectProcess(process) {
