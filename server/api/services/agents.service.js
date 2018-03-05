@@ -229,7 +229,7 @@ module.exports = {
             if (!agentObj) {
                 return Agent.create(agent)
             }
-            return Agent.findByIdAndUpdate(agentObj._id, agent)
+            return agentObj;
         })
     },
     // get an object of installed plugins and versions on certain agent.
