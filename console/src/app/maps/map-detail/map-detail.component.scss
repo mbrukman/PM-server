@@ -41,6 +41,12 @@
         color: $background;
         font-weight: bolder;
       }
+
+      &.execute-btn{
+        span {
+          margin-left: 5px;
+        }
+      }
     }
 
     > *:not(:first-child){
