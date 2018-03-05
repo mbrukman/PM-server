@@ -1,5 +1,8 @@
 import { Component, Input, OnChanges } from '@angular/core';
 
+import * as moment from 'moment';
+
+
 @Component({
   selector: 'app-process-result',
   templateUrl: './process-result.component.html',
@@ -65,8 +68,8 @@ export class ProcessResultComponent implements OnChanges {
         total[current.action]['results']['stderr'].push(current.result.stderr);
         total[current.action]['results']['stdout'].push(current.result.stdout);
       }
-      total[current.action]['startTime'] = new Date(current.startTime) < total[current.action]['startTime'] ? current.startTime : total[current.action]['startTime'];
-      total[current.action]['finishTime'] = new Date(current.finishTime) > total[current.action]['finishTime'] ? current.startTime : total[current.action]['finishTime'];
+      total[current.action]['startTime'] = moment(current.startTime).isBefore(moment(total[current.action]['startTime'])) ? current.startTime : total[current.action]['startTime'];
+      total[current.action]['finishTime'] = moment(current.finishTime).isAfter(moment(total[current.action]['finishTime'])) ? current.finishTime : total[current.action]['finishTime'];
       return total;
     }, {});
 
