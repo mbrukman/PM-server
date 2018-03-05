@@ -75,10 +75,13 @@
       padding-left: 0;
       list-style: none;
       font-size: 14px;
+
       li {
-        padding-left: 15px;
+        padding: 0 15px;
+        display: flex;
         height: 41px;
-        line-height: 41px;
+        align-items: center;
+        
         &:hover {
           cursor: pointer;
           background: $cool-grey;
@@ -87,6 +90,16 @@
         &.active {
           background: $turquoise-blue;
         }
+
+        .process-name{
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          margin-right: 5px;
+        }
+
+
+
       }
     }
   }
