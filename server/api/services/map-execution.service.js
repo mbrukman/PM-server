@@ -257,18 +257,22 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
     }).then((groupsAgents) => {
         let agents = Object.assign({}, agentsService.agentsStatus());
         let executionAgents = {};
-        let totalMaps = [...JSON.parse(JSON.stringify(map.agents)), ...JSON.parse(JSON.stringify(groupsAgents))];
-        for (let mapAgent of totalMaps) { // filtering only the live agents of the map.
-            if (mapAgent.key && agents.hasOwnProperty(mapAgent.key) && agents[mapAgent.key].alive) {
-                mapAgent.status = 'available';
-                mapAgent.continue = true;
-                mapAgent.pendingProcesses = {};
-                mapAgent.socket = agents[mapAgent.key].socket;
-                mapAgent.executionContext = vm.createContext(Object.assign({}, executionContext)); // cloning the execution context for each agent
-                vm.runInNewContext(libpm + '\n' + mapStructure.code, mapAgent.executionContext);
-                executionAgents[mapAgent.key] = mapAgent;
+        let totalAgents = [...JSON.parse(JSON.stringify(map.agents)), ...JSON.parse(JSON.stringify(groupsAgents))];
+        totalAgents.forEach((agentObj) => {
+            const agentStatus = _.find(agents, (agent) => agent.id === agentObj.id);
+            if (!agentStatus) {
+                return;
             }
-        }
+            agentObj.status = 'available';
+            agentObj.key = agentStatus.key;
+            agentObj.continue = true;
+            agentObj.pendingProcesses = {};
+            agentObj.socket = agents[agentStatus.key].socket;
+            agentObj.executionContext = vm.createContext(Object.assign({}, executionContext));
+            vm.runInNewContext(libpm + '\n' + mapStructure.code, agentObj.executionContext);
+            executionAgents[agentStatus.key] = agentObj;
+        });
+
 
         if (Object.keys(executionAgents).length === 0) { // exit if no live agents for this map
             winston.log('error', 'No agents selected or no live agents');
