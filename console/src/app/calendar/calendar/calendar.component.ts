@@ -154,7 +154,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
           this.refreshCalendar.next();
         });
     }
-
     const modal = this.modalService.show(ConfirmComponent);
     modal.content.message = 'How would you like to proceed?';
     modal.content.confirm = DeleteOptions.delete;
@@ -163,13 +162,18 @@ export class CalendarComponent implements OnInit, OnDestroy {
     modal.content.result
       .take(1)
       .subscribe(result => {
-        console.log(result);
         switch (result) {
           case DeleteOptions.delete:
             this.calendarService.deleteJob(job.id)
               .take(1)
               .subscribe(() => {
-                this.events.splice(jobIndex, 1);
+                this.events = this.events.reduce((total, current) => {
+                  if ((<any>current).job.id !== job.id) {
+                    total.push(current);
+                  }
+                  return total;
+                }, []);
+
                 this.refreshCalendar.next();
               });
             break;
