@@ -6,6 +6,7 @@ let scheduledJobSchema = new Schema({
     map: { type: Schema.Types.ObjectId, ref: 'Map', required: true },
     configuration: String,
     type: { type: String, enum: ['once', 'repeated'], required: true, default: 'once' },
+    skip: Boolean,
     cron: {
         type: String,
         required: function () {

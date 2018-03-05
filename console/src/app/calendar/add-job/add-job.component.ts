@@ -70,7 +70,6 @@ export class AddJobComponent implements OnInit {
 
   onSubmit(form) {
     this.calendarService.create(form.map, form).subscribe(job => {
-      console.log(job);
       this.calendarService.setNewJob(job);
     });
   }

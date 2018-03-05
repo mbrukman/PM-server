@@ -16,7 +16,6 @@ export class CalendarService {
   }
 
   create(mapId: string, job) {
-    console.log('HI');
     return this.http.post<Job>(`${serverUrl}api/maps/${mapId}/jobs/create`, job);
   }
 
