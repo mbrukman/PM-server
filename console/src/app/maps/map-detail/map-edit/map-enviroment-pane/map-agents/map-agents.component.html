@@ -8,7 +8,7 @@
         <td>{{ agent?.name }}</td>
         <td>
         <span
-          [ngClass]="{'text-success': statuses[agent?.key]?.alive, 'text-danger': !statuses[agent?.key]?.alive}"
+          [ngClass]="{'text-success': statuses[agent?.id]?.alive, 'text-danger': !statuses[agent?.id]?.alive}"
           *ngIf="statuses">
           <i class="material-icons">cloud_circle</i>
         </span>

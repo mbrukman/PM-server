@@ -22,8 +22,9 @@
             (onDragStart)="dragStart($event, item)">
           <td>
             <div>
-              <i [ngClass]="{'text-success': agentsStatus[item?.key]?.alive, 'text-danger': !agentsStatus[item?.key]?.alive}"
-              *ngIf="agentsStatus" class="material-icons">cloud_circle</i>
+              <i
+                [ngClass]="{'text-success': agentsStatus[item?.id]?.alive, 'text-danger': !agentsStatus[item?.id]?.alive}"
+                *ngIf="agentsStatus" class="material-icons">cloud_circle</i>
               {{item.name}}
             </div>
           </td>
