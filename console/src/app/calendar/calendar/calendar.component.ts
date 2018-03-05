@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
+import 'rxjs/add/operator/takeUntil';
 import {
   addDays,
   addHours,
@@ -14,7 +14,8 @@ import {
   subDays
 } from 'date-fns';
 import { CalendarEvent } from 'angular-calendar';
-
+import * as cronParser from 'cron-parser';
+import * as moment from 'moment';
 
 import { CalendarService } from '../calendar.service';
 import { Job } from '../models/job.model';
@@ -49,27 +50,37 @@ enum DeleteOptions {
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss']
 })
-export class CalendarComponent implements OnInit {
+export class CalendarComponent implements OnInit, OnDestroy {
   viewDate = new Date();
   events: CalendarEvent[] = [];
   activeDayIsOpen: boolean = false;
   refreshCalendar: Subject<any> = new Subject();
-  newJobSubscription: Subscription;
+  destroy$: Subject<boolean> = new Subject<boolean>();
 
   constructor(private calendarService: CalendarService, private modalService: BsModalService) {
   }
 
   ngOnInit() {
-    this.calendarService.list().subscribe(jobs => {
-      jobs.forEach(job => {
-        this.addNewEvent(this.createCalendarEventFromJob(job));
+    this.calendarService.list()
+      .takeUntil(this.destroy$)
+      .subscribe(jobs => {
+        jobs.forEach(job => {
+          this.addNewEvent(this.createCalendarEventFromJob(job));
+        });
       });
-    });
-    this.newJobSubscription = this.calendarService.newJobAsObservable().subscribe(job => {
-      if (job) {
-        this.addNewEvent(this.createCalendarEventFromJob(job));
-      }
-    });
+
+    this.calendarService.newJobAsObservable()
+      .takeUntil(this.destroy$)
+      .subscribe(job => {
+        if (job) {
+          this.addNewEvent(this.createCalendarEventFromJob(job));
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next(true);
+    this.destroy$.unsubscribe();
   }
 
   addNewEvent(event) {
@@ -78,70 +89,26 @@ export class CalendarComponent implements OnInit {
     this.refreshCalendar.next();
   }
 
-
   createMonthEventsFromCron(job) {
-    const cron = job.cron
     let crons = [];
-    let r = cron.split(' ');
-    if (cron === '* * * * *' || cron === '*/1 * * * *') {
-      for (let i = 0; i < 31; i++) {
-        crons.push(
-          {
-            start: startOfDay(addDays(new Date(this.viewDate.getFullYear(), this.viewDate.getMonth(), 1), i)),
-            title: (<Map>job.map).name,
-            color: colors.yellow,
-            job: job,
-            datetime: job.datetime,
-            map: job.map
-          }
-        );
-      }
-    } else {
-      if (r[2] !== '*') {
-        if (r[3] === '*') { // certain day on every month
-          crons.push(
-            {
-              start: startOfDay(addDays(new Date(this.viewDate.getFullYear(), this.viewDate.getMonth(), 1), r[2] - 1)),
-              title: (<Map>job.map).name,
-              color: colors.yellow,
-              job: job,
-              datetime: job.datetime,
-              map: job.map
-            }
-          );
-        } else { // every month in certain day
-          crons.push(
-            {
-              start: startOfDay(new Date(this.viewDate.getFullYear(), r[3], 1)),
-              title: (<Map>job.map).name,
-              color: colors.yellow,
-              job: job,
-              datetime: job.datetime,
-              map: job.map
-            }
-          );
+    let endDate = moment().add('6', 'M').toDate(); // setting end date to 6 month from now;
+    const interval = cronParser.parseExpression(job.cron, { endDate });
+    let flag = true;
+    while (flag) {
+      try {
+        let obj = interval.next();
+        if (crons.findIndex(sj => (job.id === sj.job.id) && (JSON.stringify(startOfDay(obj.toDate())) === JSON.stringify(sj.start))) > -1) {
+          continue;
         }
-      } else {
-        if (r[4] !== '*') {
-          if (r[3] === '*') { // every week in certain day
-            let todayDay = (new Date()).getDay();
-            addDays(new Date(), r[4] - todayDay);
-            for (let i = 0; i < 4; i++) {
-              crons.push(
-                {
-                  start: startOfDay(addWeeks(addDays(new Date(), r[4] - todayDay), i)),
-                  title: job.map ? (<Map>job.map).name : '',
-                  color: colors.yellow,
-                  job: job,
-                  datetime: job.datetime,
-                  map: job.map
-                }
-              );
-
-            }
-          }
-        }
-      }
+        crons.push({
+          start: startOfDay(obj.toDate()),
+          title: (<Map>job.map).name,
+          color: colors.yellow,
+          job: job,
+          datetime: job.datetime,
+          map: job.map
+        });
+      } catch (e) { flag = false;}
     }
 
     return crons;
@@ -151,14 +118,14 @@ export class CalendarComponent implements OnInit {
     if (job.cron) {
       return this.createMonthEventsFromCron(job);
     } else {
-      return [{
+      return {
         start: startOfDay(job.datetime),
         title: job.map ? (<Map>job.map).name : '',
         color: colors.yellow,
         job: job,
         datetime: job.datetime,
         map: job.map
-      }];
+      };
     }
   }
 
@@ -216,6 +183,5 @@ export class CalendarComponent implements OnInit {
             break;
         }
       });
-
   }
 }
