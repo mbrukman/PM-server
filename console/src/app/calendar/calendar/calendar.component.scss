@@ -12,14 +12,22 @@
 }
 
 .event {
+  display: flex;
+
   span {
     margin-right: 5px;
-  }
-}
 
-.delete-job {
-  &:hover {
-    cursor: pointer;
-    color: $turquoise-blue;
+    &.delete-job{
+      margin-left : 10px;
+
+      &:hover {
+        cursor: pointer;
+        color: $turquoise-blue;
+      }
+    }
+
+    &.text-info{
+      margin-right : 10px;
+    }
   }
 }
