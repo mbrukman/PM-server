@@ -30,7 +30,6 @@ export class ProcessResultComponent implements OnChanges {
     this.aggregateProcessActionResults(this.result);
     if (this.process.length === 1) {
       this.generalInfo = this.result[0].processes.find(o => o.uuid === this.process[0].uuid && o.index === this.process[0].index);
-      console.log(this.generalInfo)
     }
   }
 
