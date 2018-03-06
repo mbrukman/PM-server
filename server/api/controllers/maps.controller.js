@@ -212,9 +212,8 @@ module.exports = {
             res.json(r);
         }).catch(error => {
             winston.log('error', "Error executing map", error);
-            req.io.emit('notification', { title: 'Whoops...', message: `Error executing map`, type: 'error' });
-
-            return res.status(500).json(error);
+            req.io.emit('notification', { title: 'Error executing map', message: error.message, type: 'error' });
+            return res.status(500).send(error.message);
         });
     },
 
