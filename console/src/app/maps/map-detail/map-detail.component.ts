@@ -228,8 +228,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       delete structure.links[i]._id;
       delete structure.links[i].createdAt;
     });
-    console.log(this.mapStructure);
-    console.log(JSON.stringify(this.mapStructure));
+    
     this.downloadJson = this.sanitizer.bypassSecurityTrustUrl('data:text/json;charset=UTF-8,' + encodeURIComponent(JSON.stringify(structure)));
   }
 
