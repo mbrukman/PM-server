@@ -176,21 +176,24 @@ export class MapDetailComponent implements OnInit, OnDestroy {
           delete p[propName];
         }
       }
-      p.actions.forEach(a => {
-        delete a['_id'];
-        delete a['id'];
-        for (let propName in a) {
-          if (a[propName] === null || a[propName] === undefined || a[propName] === '') {
-            delete a[propName];
+      if(p.actions){
+        p.actions.forEach(a => {
+          delete a['_id'];
+          delete a['id'];
+          for (let propName in a) {
+            if (a[propName] === null || a[propName] === undefined || a[propName] === '') {
+              delete a[propName];
+            }
           }
-        }
-        a.params.forEach(param => {
-          delete param['_id'];
-          delete param['id'];
-          delete param['param'];
+          a.params.forEach(param => {
+            delete param['_id'];
+            delete param['id'];
+            delete param['param'];
+          });
         });
-      });
+      }
     });
+    
     return structure;
   }
 
