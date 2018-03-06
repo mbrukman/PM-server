@@ -95,13 +95,44 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.mapStructureSubscription = this.mapsService.getCurrentMapStructure()
       .filter(structure => !!structure)
       .subscribe(structure => {
+        let newContent;
+        let oldContent;
         if (!this.initiated) {
           this.originalMapStructure = _.cloneDeep(structure);
+          this.initiated = true;
+          return;
         }
+        try {
+          newContent = JSON.parse(structure.content).cells
+            .filter(c => c.type = 'devs.MyImageModel')
+            .map(c => {
+              return {
+                position: c.position
+              }
+            });
+          oldContent = JSON.parse(this.originalMapStructure.content).cells
+            .filter(c => c.type = 'devs.MyImageModel')
+            .map(c => {
+              return {
+                position: c.position
+              }
+            });
+        } catch (e) {}
 
-        this.structureEdited = this.initiated && !_.isEqual(structure, this.originalMapStructure);
+        const compareStructure = JSON.parse(JSON.stringify(structure));
+        const compareOriginalStructure = JSON.parse(JSON.stringify(this.originalMapStructure));
+        delete compareStructure.content;
+        delete compareOriginalStructure.content;
+        compareStructure.processes.forEach((p, i) => {
+          delete compareStructure.processes[i].plugin;
+          for (let propName in p) {
+            if (p[propName] === null || p[propName] === undefined || p[propName] === '') {
+              delete p[propName];
+            }
+          }
+        });
+        this.structureEdited = (JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent);
         this.mapStructure = structure;
-        this.initiated = true;
         this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
           return o.id === structure.id;
         });

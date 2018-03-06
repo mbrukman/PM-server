@@ -9,7 +9,7 @@ let actionResultSchema = new Schema({
     startTime: Date,
     finishTime: Date,
     result: Schema.Types.Mixed
-});
+}, { _id: false });
 
 let processResultSchema = new Schema({
     index: Number,
@@ -22,7 +22,7 @@ let processResultSchema = new Schema({
     startTime: Date,
     finishTime: Date,
     result: Schema.Types.Mixed
-});
+}, { _id: false });
 
 let agentResultSchema = new Schema({
     name: String,
@@ -32,7 +32,7 @@ let agentResultSchema = new Schema({
     startTime: Date,
     finish: Date,
     result: Schema.Types.Mixed
-});
+}, { _id: false });
 
 
 let mapResultSchema = new Schema({
@@ -42,6 +42,7 @@ let mapResultSchema = new Schema({
     configuration: Schema.Types.Mixed,
     agentsResults: [agentResultSchema],
     startAgentsNumber: Number,
+    cleanFinish: Boolean,
     startTime: Date,
     finishTime: Date,
 });
