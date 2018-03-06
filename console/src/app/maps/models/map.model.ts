@@ -12,4 +12,5 @@ export class Map implements IMap {
   agents?: [Agent];
   groups?: Group[];
   project?: string;
+  queue?: number;
 }

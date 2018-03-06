@@ -7,7 +7,8 @@ let mapSchema = new Schema({
     licence: String,
     archived: { type: Boolean, default: false },
     agents: [{ type: Schema.Types.ObjectId, ref: 'Agent' }],
-    groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }]
+    groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
+    queue: Number
 }, { timestamps: true });
 
 mapSchema.set('toJSON', {

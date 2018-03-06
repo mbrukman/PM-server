@@ -9,6 +9,7 @@ export interface IMap {
   updatedAt?: Date,
   licence?: string,
   archived: boolean,
-  agents?: [IAgent]
-  groups?: Group[];
+  agents?: [IAgent],
+  groups?: Group[],
+  queue?: number
 }
