@@ -99,8 +99,6 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         let oldContent;
         if (!this.initiated) {
           this.originalMapStructure = _.cloneDeep(structure);
-          this.initiated = true;
-          return;
         }
         try {
           newContent = JSON.parse(structure.content).cells
@@ -129,6 +127,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
           return o.id === structure.id;
         });
+        this.initiated = true;
         this.generateDownloadJsonUri();
 
         if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0) {
@@ -196,13 +195,16 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   }
 
   generateDownloadJsonUri() {
-    let structure = Object.assign({}, this.mapStructure);
+    let structure;
+    try {
+      structure = JSON.parse(JSON.stringify(this.mapStructure));
+    } catch (e) {
+      structure = Object.assign({}, this.mapStructure);
+    }
     delete structure._id;
     delete structure.id;
     delete structure.map;
     delete structure.map;
-    delete structure._id;
-    delete structure.id;
     if (structure.used_plugins) {
       structure.used_plugins.forEach(plugin => {
         delete plugin._id
@@ -226,7 +228,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       delete structure.links[i]._id;
       delete structure.links[i].createdAt;
     });
-
+    
     this.downloadJson = this.sanitizer.bypassSecurityTrustUrl('data:text/json;charset=UTF-8,' + encodeURIComponent(JSON.stringify(structure)));
   }
 
