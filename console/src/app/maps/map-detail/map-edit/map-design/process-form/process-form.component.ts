@@ -246,8 +246,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       timeout: new FormControl(timeout),
       timeunit: new FormControl(timeunit),
       retries: new FormControl(retries),
-      mandatory: new FormControl(mandatory),
       method: new FormControl(method),
+      mandatory: new FormControl(mandatory),
       params: new FormArray([])
     });
   }

@@ -2,6 +2,7 @@ import { IMap } from '../interfaces/map.interface';
 import { Agent, Group } from '@agents/models';
 
 export class Map implements IMap {
+  _id?: string;
   id?: string;
   name: string;
   description?: string;
@@ -9,7 +10,8 @@ export class Map implements IMap {
   updatedAt?: Date;
   licence?: string;
   archived: boolean;
-  agents?: [Agent];
+  agents?: Agent[];
   groups?: Group[];
   project?: string;
+  queue?: number;
 }

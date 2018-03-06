@@ -119,18 +119,11 @@ export class MapDetailComponent implements OnInit, OnDestroy {
             });
         } catch (e) {}
 
-        const compareStructure = JSON.parse(JSON.stringify(structure));
-        const compareOriginalStructure = JSON.parse(JSON.stringify(this.originalMapStructure));
+        const compareStructure = this.cleanStructure(JSON.parse(JSON.stringify(structure)));
+        const compareOriginalStructure = this.cleanStructure(JSON.parse(JSON.stringify(this.originalMapStructure)));
         delete compareStructure.content;
         delete compareOriginalStructure.content;
-        compareStructure.processes.forEach((p, i) => {
-          delete compareStructure.processes[i].plugin;
-          for (let propName in p) {
-            if (p[propName] === null || p[propName] === undefined || p[propName] === '') {
-              delete p[propName];
-            }
-          }
-        });
+
         this.structureEdited = (JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent);
         this.mapStructure = structure;
         this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
@@ -172,6 +165,34 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.mapsService.clearCurrentMap();
     this.mapsService.clearCurrentMapStructure();
     this.mapExecutionSubscription.unsubscribe();
+  }
+
+  cleanStructure(structure) {
+    structure.processes.forEach((p, i) => {
+      delete structure.processes[i].plugin;
+      delete p['_id'];
+      delete p['createdAt'];
+      for (let propName in p) {
+        if (p[propName] === null || p[propName] === undefined || p[propName] === '') {
+          delete p[propName];
+        }
+      }
+      p.actions.forEach(a => {
+        delete a['_id'];
+        delete a['id'];
+        for (let propName in a) {
+          if (a[propName] === null || a[propName] === undefined || a[propName] === '') {
+            delete a[propName];
+          }
+        }
+        a.params.forEach(param => {
+          delete param['_id'];
+          delete param['id'];
+          delete param['param'];
+        });
+      });
+    });
+    return structure;
   }
 
   generateDownloadJsonUri() {

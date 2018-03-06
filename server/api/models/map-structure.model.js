@@ -15,16 +15,16 @@ const actionSchema = new Schema({
     timeout: Number,
     timeunit: Number,
     retries: Number,
-    mandatory: { type: Boolean, default: false },
     method: String,
-    params: [actionParamsSchema]
+    params: [actionParamsSchema],
+    mandatory: { type: Boolean, default: false }
 });
 
 
 const usedPluginsSchema = new Schema({
     name: { type: String, required: true },
     version: { type: String, required: true }
-});
+}, { _id: false });
 
 const processSchema = new Schema({
     name: String,
