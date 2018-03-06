@@ -47,7 +47,7 @@ export class MapResult implements IMapResult {
   structure: string | MapStructure;
   agentsResults?: [AgentResult];
   configuration: Configuration;
-  startAgentsNumber: number;
+  cleanFinish?: boolean;
   startTime: Date;
   finishTime: Date;
 }
