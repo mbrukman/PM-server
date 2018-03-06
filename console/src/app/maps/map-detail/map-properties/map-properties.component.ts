@@ -1,12 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
+
 import { MapsService } from '../../maps.service';
-import { Map } from '../../models/map.model';
-import { ProjectsService } from '../../../projects/projects.service';
-import { Project } from '../../../projects/models/project.model';
+import { Map } from '@maps/models/map.model';
+import { ProjectsService } from '@projects/projects.service';
+import { Project } from '@projects/models/project.model';
 
 @Component({
   selector: 'app-map-metadata',
@@ -19,6 +20,7 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
   mapSubscription: Subscription;
   projectsReq: any;
   selectedProject: string;
+  queue: number;
 
   constructor(private mapsService: MapsService, private projectsService: ProjectsService) {
   }
