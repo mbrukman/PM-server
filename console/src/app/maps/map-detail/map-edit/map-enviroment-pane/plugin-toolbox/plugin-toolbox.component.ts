@@ -3,8 +3,8 @@ import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
 
-import { PluginsService } from '../../../../../plugins/plugins.service';
-import { Plugin } from '../../../../../plugins/models/plugin.model';
+import { PluginsService } from '@plugins/plugins.service';
+import { Plugin } from '@plugins/models/plugin.model';
 import { MapDesignService } from '../../map-design.service';
 
 

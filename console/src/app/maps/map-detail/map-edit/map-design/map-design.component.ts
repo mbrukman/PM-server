@@ -39,16 +39,14 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   ngOnInit() {
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
-    this.dropSubscription = this.designService.getDrop().subscribe(obj => {
-      let offsetLeft = this.wrapper.nativeElement.offsetParent.offsetLeft;
-      let offsetTop = this.wrapper.nativeElement.offsetParent.offsetTop;
-      let height = this.wrapper.nativeElement.offsetHeight;
-
-      // check if obj is on our map
-      if (obj.x - 45 > offsetLeft && obj.y > offsetTop && obj.y < offsetTop + height) {
+    this.dropSubscription = this.designService
+      .getDrop()
+      .filter(obj => this.isDroppedOnMap(obj.x, obj.y))
+      .subscribe(obj => {
+        let offsetLeft = this.wrapper.nativeElement.offsetParent.offsetLeft;
+        let offsetTop = this.wrapper.nativeElement.offsetParent.offsetTop;
         this.addNewProcess(obj, offsetLeft, offsetTop);
-      }
-    });
+      });
 
     this.pluginsReq = this.pluginsService.list().subscribe(plugins => {
       this.plugins = plugins;
@@ -129,6 +127,19 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           }
         }
       });
+  }
+
+  /**
+   * Check if the x, y are over the map
+   * @param {number} x
+   * @param {number} y
+   * @returns {boolean}
+   */
+  isDroppedOnMap(x: number, y: number): boolean {
+    let offsetLeft = this.wrapper.nativeElement.offsetLeft;
+    let offsetTop = this.wrapper.nativeElement.offsetTop;
+    let height = this.wrapper.nativeElement.offsetHeight;
+    return (x > offsetLeft) && (y > offsetTop) && (y < offsetTop + height);
   }
 
   deselectAllCellsAndUpdateStructure() {
