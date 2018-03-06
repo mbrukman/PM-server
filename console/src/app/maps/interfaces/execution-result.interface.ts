@@ -45,7 +45,7 @@ export interface IMapResult {
   structure: string | IMapStructure,
   agentsResults?: [IAgentResult],
   configuration: Configuration,
-  startAgentsNumber: number,
+  cleanFinish?: boolean,
   startTime: Date,
   finishTime: Date,
 }

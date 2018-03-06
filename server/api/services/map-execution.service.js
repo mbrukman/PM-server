@@ -529,8 +529,11 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
             executions[runId].executionAgents[agent.key].done = true;
             if (areAllAgentsDone(runId)) {
                 executions[runId].executionContext.finishTime = new Date();
-                summarizeExecution(map, runId, Object.assign({}, executions[runId].executionContext), Object.assign({}, executions[runId].executionAgents))
-                    .then(mapResult => {
+                MapResult.findByIdAndUpdate(
+                    executions[runId].resultObj,
+                    { $set: { finishTime: new Date(), cleanFinish: true } },
+                    { new: true })
+                    .then((mapResult) => {
                         socket.emit('map-execution-result', mapResult);
                     });
                 delete executions[runId];
@@ -799,6 +802,7 @@ function runProcess(map, structure, runId, agent, socket) {
                 }
             }
 
+            // updateResultsObj(_.cloneDeep(executions[runId].executionAgents));
 
             if (process.postRun) {
                 createLog({
@@ -977,6 +981,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                     result: result
                 });
 
+                updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
 
                 let actionExecutionLogs = [];
                 if (result.stdout) {
@@ -1028,6 +1033,8 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                     result: res
                 });
 
+                updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
+
                 createLog({
                     map: map._id,
                     runId: runId,
@@ -1074,6 +1081,61 @@ function sendKillRequest(mapId, actionId, agentKey) {
 }
 
 /**
+ * Updating the result object.
+ * @param runId
+ * @param agentsResults
+ */
+function updateResultsObj(runId, agentsResults) {
+    const results = [];
+    let agentKeys = Object.keys(agentsResults);
+    for (let i of agentKeys) {
+        let agent = agentsResults[i];
+        let agentResult = {
+            processes: [],
+            agent: agent._id || agent.id,
+            status: agent.status === 'available' ? 'success' : agent.status,
+            startTime: agent.startTime,
+            finishTime: agent.finishTime
+        };
+        for (let j in agent.processes) {
+            let process = agent.processes[j];
+
+            process.forEach((instance, index) => {
+                let processResult = {
+                    index: index,
+                    name: instance.name,
+                    result: instance.result,
+                    uuid: instance.uuid,
+                    plugin: instance.plugin,
+                    actions: [],
+                    status: instance.status,
+                    startTime: instance.startTime,
+                    finishTime: instance.finishTime
+                };
+
+                for (let k in instance.actions) {
+                    let action = instance.actions[k];
+
+                    let actionResult = {
+                        action: k,
+                        name: action.name,
+                        startTime: action.startTime,
+                        finishTime: action.finishTime,
+                        status: action.status,
+                        result: action.result,
+                        method: action.method.name
+                    };
+                    processResult.actions.push(actionResult);
+                }
+                agentResult.processes.push(processResult);
+            });
+        }
+        results.push(agentResult);
+    }
+    MapResult.findByIdAndUpdate(executions[runId].resultObj, { $set: { agentsResults: results } }, { new: true }).then(() => {});
+}
+
+/**
  * Updating the execution object with results and updating the model in the db.
  * @param map
  * @param runId
@@ -1088,7 +1150,7 @@ function summarizeExecution(map, runId, executionContext, agentsResults) {
     result.startTime = executionContext.startTime;
     result.finishTime = executionContext.finishTime;
     result.runId = runId;
-
+    result.cleanFinish = true;
     result.agentsResults = [];
     let agentKeys = Object.keys(agentsResults);
     for (let i of agentKeys) {
