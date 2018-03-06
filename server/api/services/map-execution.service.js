@@ -835,6 +835,7 @@ function runProcess(map, structure, runId, agent, socket) {
                 result: actionsResults,
                 finishTime: new Date()
             });
+            updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
 
             if (!(error && process.mandatory)) { // if the process was mandatory agent should not call other process.
                 executions[runId].executionAgents[agent.key].status = 'available';
