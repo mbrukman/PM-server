@@ -274,8 +274,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         y: obj.y - (240 * this.scale)
       },
       size: {
-        width: 110,
-        height: 75
+        width: 100,
+        height: 73
       },
       inPorts: [' '],
       outPorts: ['  '],
