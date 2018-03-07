@@ -176,7 +176,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
           delete p[propName];
         }
       }
-      if(p.actions){
+      if (p.actions) {
         p.actions.forEach(a => {
           delete a['_id'];
           delete a['id'];
@@ -193,7 +193,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         });
       }
     });
-    
+
     return structure;
   }
 
@@ -231,7 +231,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       delete structure.links[i]._id;
       delete structure.links[i].createdAt;
     });
-    
+
     this.downloadJson = this.sanitizer.bypassSecurityTrustUrl('data:text/json;charset=UTF-8,' + encodeURIComponent(JSON.stringify(structure)));
   }
 
