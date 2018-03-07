@@ -18,6 +18,7 @@ router.get("/:id/execute", mapController.execute);
 router.get("/:id/execute/:structure", mapController.execute);
 router.get("/:id/stop-execution", mapController.stopExecution);
 router.get("/:id/stop-execution/:runId", mapController.stopExecution);
+router.post("/:id/cancel-pending", mapController.cancelPending);
 router.get("/:id/results", mapController.results);
 router.get("/:id/results/logs", mapController.logs);
 router.get("/:id/results/:resultId", mapController.resultDetail);

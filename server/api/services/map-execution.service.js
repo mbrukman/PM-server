@@ -93,6 +93,19 @@ function updateExecutions(socket) {
 }
 
 /**
+ * Emmiting pending executions where mapId is keys and value is array of pending runIds
+ * @param socket
+ */
+function updatePending(socket) {
+    let emitv = {};
+    Object.keys(pending).forEach((mapId) => {
+        emitv[mapId] = pending[mapId].map(o => o.runId);
+    });
+
+    socket.emit('pending', emitv);
+}
+
+/**
  * Adding a new process to context and returning its index in the executions array.
  * @param runId
  * @param agentKey
@@ -327,6 +340,12 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
         startMapExecution(map, mapStructure, runId, socket);
         updateExecutions(socket);
         return runId;
+    }).catch((error) => {
+        winston.log('error', error);
+        if (pending.hasOwnProperty(map.id) && pending[map.id].length) {
+            startPendingExecution(map.id);
+            updatePending(socket);
+        }
     });
 
 }
@@ -358,15 +377,14 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
             throw new Error('Can\'t execute archived map');
         }
         map = mapobj;
-        console.log(countOngoingMapExecutions(mapId));
         const ongoingExecutions = countOngoingMapExecutions(mapId);
         if (map.queue && (ongoingExecutions >= map.queue || (pending.hasOwnProperty(mapId) && pending[mapId].length))) {
-            console.log("Getting it to pending");
             // check if there is a queue and running maps or a pending queue for this map
             if (!pending.hasOwnProperty(mapId)) {
                 pending[mapId] = [];
             }
             pending[mapId].push({ map, structureId, runId, cleanWorkspace, socket, configurationName });
+            updatePending(socket);
             return;
         }
         return executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configurationName);
@@ -600,6 +618,7 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
                 delete executions[runId];
                 if (map.queue && pending.hasOwnProperty(map.id)) {
                     startPendingExecution(map.id); // starting pending execution if necessary
+                    updatePending(socket);
                 }
                 updateExecutions(socket);
             }
@@ -1339,12 +1358,21 @@ function stopExecution(mapId, runId, socket) {
                 })
             });
 
-        summarizeExecution(executions[runId].executionContext.map, runId, Object.assign({}, executions[runId].executionContext), Object.assign({}, executions[runId].executionAgents))
-                .then(mapResult => {
+        summarizeExecution(
+            executions[runId].executionContext.map,
+            runId,
+            Object.assign({}, executions[runId].executionContext),
+            Object.assign({}, executions[runId].executionAgents)
+        )
+            .then((mapResult) => {
                     socket.emit('map-execution-result', mapResult);
                 });
             delete executions[runId];
             updateExecutions(socket);
+        if (pending.hasOwnProperty(mapId) && pending[mapId].length) {
+            startPendingExecution(mapId);
+            updatePending(socket);
+        }
         }
     );
     return stoppedRuns;
@@ -1352,6 +1380,32 @@ function stopExecution(mapId, runId, socket) {
 
 
 module.exports = {
+    /**
+     * removes pending execution from pending object
+     * @param mapId
+     * @param runId
+     * @param socket
+     */
+    cancelPending: (mapId, runId, socket) => {
+        return new Promise((resolve, reject) => {
+            if (!mapId || !runId) {
+                throw new Error('Not enough parameters');
+
+            }
+            if (!pending.hasOwnProperty(mapId)) {
+                throw new Error('No pending executions for this map');
+            }
+            const runIndex = pending[mapId].findIndex((o) => o.runId === runId);
+            if (runIndex === -1) {
+                throw new Error('No such job');
+
+            }
+            pending[mapId].splice(runIndex, 1);
+            updatePending(socket);
+            resolve();
+        });
+
+    },
     /**
      * starting a map execution
      * @param mapId {string}
