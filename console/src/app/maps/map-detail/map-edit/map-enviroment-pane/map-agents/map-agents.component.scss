@@ -16,8 +16,30 @@
 //}
 
 .container {
+
   height: calc(100% - 43px);
   overflow-y: scroll;
+  padding : 0;
+
+  table {
+    td {
+      vertical-align: middle;
+    }
+
+    &.agents{
+      tbody tr td{
+        &:first-of-type{
+          width: 60%;
+          padding: 0 0 0 10px;
+        }
+        &:last-of-type{
+          text-align: right;
+          padding: 0 10px 0;
+        }
+      }
+    }
+  }
+
   .agents {
     height: 50%;
   }
