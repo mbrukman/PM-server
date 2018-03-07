@@ -51,9 +51,13 @@
                 <div class="row">
                   <div class="col-6">
                     <h5 class="card-title">Execution {{ selectedExecution?.runId }}</h5>
-                    <p>Start time: {{ selectedExecution?.startTime | date: 'short' }}</p>
-                    <p>Finish time: {{ selectedExecution?.finishTime | date: 'short' }}</p>
-                    <p>Structure: {{ selectedExecution?.structure?._id }}</p>
+                    <p class="execution-detail">Start time: {{ selectedExecution?.startTime | date: 'short' }}</p>
+                    <p class="execution-detail">Finish time: {{ selectedExecution?.finishTime | date: 'short' }}</p>
+                    <p class="execution-detail">Structure: {{ selectedExecution?.structure?._id }}</p>
+                    <p class="execution-detail" *ngIf="selectedExecution?.trigger">Trigger: {{
+                      selectedExecution?.trigger }}</p>
+                    <p class="execution-detail" *ngIf="selectedExecution?.configuration">Configuration: {{
+                      selectedExecution?.configuration.name}}</p>
                   </div>
                   <div class="col-6">
                     <ngx-charts-pie-chart

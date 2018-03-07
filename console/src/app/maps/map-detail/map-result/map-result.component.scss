@@ -65,7 +65,7 @@
 }
 
 .result-header-deck {
-  height: 200px;
+  height: 230px;
   .card {
     height: 100%;
   }
@@ -74,6 +74,11 @@
   }
 }
 
+p {
+  &.execution-detail {
+    margin-bottom: 10px;
+  }
+}
 .process-select {
   padding: 0;
   .card-body {
@@ -104,9 +109,6 @@
           white-space: nowrap;
           margin-right: 5px;
         }
-
-
-
       }
     }
   }
