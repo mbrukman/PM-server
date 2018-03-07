@@ -274,8 +274,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         y: obj.y - (240 * this.scale)
       },
       size: {
-        width: 110,
-        height: 75
+        width: 100,
+        height: 73
       },
       inPorts: [' '],
       outPorts: ['  '],
@@ -316,7 +316,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.graph.addCell(imageModel);
     let p = new Process();
     p.plugin = plugin;
-    p.used_plugin = { name: pluginName, version: plugin.version, _id: plugin._id };
+    p.used_plugin = { name: pluginName, version: plugin.version };
     p.uuid = <string>imageModel.id;
 
     if (!this.mapStructure.processes) {
@@ -401,6 +401,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           return o.uuid === id;
         });
         if (process) {
+          console.log(process);
           this.editProcess(process);
         }
       }
