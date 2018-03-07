@@ -1,24 +1,10 @@
 @import "~assets/sass/variables";
 
-//.bottom {
-//  position: absolute;
-//  bottom: 35px;
-//  left: 200px;
-//  button {
-//    border-radius: 25px;
-//    background: transparent;
-//    border: 4px solid $turquoise-blue;
-//    &:hover {
-//      background: $turquoise-blue;
-//      color: #000;
-//    }
-//  }
-//}
-
 .container {
 
-  height: calc(100% - 43px);
-  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
   padding : 0;
 
   table {
@@ -35,15 +21,33 @@
         &:last-of-type{
           text-align: right;
           padding: 0 10px 0 0;
+
+          i{
+            line-height: initial;
+          }
         }
       }
     }
   }
 
-  .agents {
-    height: 50%;
+  button {
+    align-self: center;
+    border-radius: 25px;
+    background: transparent;
+    border: 4px solid $turquoise-blue;
+    &:hover {
+      background: $turquoise-blue;
+      color: #000;
+    }
   }
-  .groups {
-    height: 50%;
+
+  > div{
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+
+    &:not(:last-of-type){
+      border-bottom : 1px solid rgba(0,0,0,.1);
+    }
   }
 }
