@@ -35,7 +35,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
   mapExecutionSubscription: Subscription;
   mapExecutionResultSubscription: Subscription;
   mapExecutionMessagesSubscription: Subscription;
+  pendingMessagesSubscriptions: Subscription;
   executing: string[] = [];
+  pendingExecutions: string[];
   processesList: processList[];
 
   colorScheme = {
@@ -88,6 +90,15 @@ export class MapResultComponent implements OnInit, OnDestroy {
       .subscribe(message => {
         this.selectedExecutionLogs.push(message);
         this.scrollOutputToBottom();
+      });
+
+    this.pendingMessagesSubscriptions = this.socketService.getCurrentPendingAsObservable()
+      .subscribe((message) => {
+        if (!message.hasOwnProperty(this.map.id)) {
+          this.pendingExecutions = [];
+        } else {
+          this.pendingExecutions = message[this.map.id];
+        }
       });
   }
 
@@ -219,8 +230,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
           overall: overall[o.uuid]
         }
       });
-    
-    if(processesList.length)
+
+    if (processesList.length)
       this.selectProcess(processesList[0]); // selecting the first process
   }
 
@@ -234,6 +245,10 @@ export class MapResultComponent implements OnInit, OnDestroy {
 
   stopRun(runId: string) {
     this.mapsService.stopExecutions(this.map.id, runId).subscribe();
+  }
+
+  cancelPending(runId: string) {
+    this.mapsService.cancelPending(this.map.id, runId).subscribe();
   }
 
 

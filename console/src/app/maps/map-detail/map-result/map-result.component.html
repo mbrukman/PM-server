@@ -3,7 +3,17 @@
     <div class="pane-header">Executions</div>
     <div class="execution-list">
       <ul>
+        <li *ngFor="let pending of pendingExecutions; let i = index" class="d-flex justify-content-between">
+          <span>
+          #{{ i + 1 }} - {{ pending }}
+          </span>
+          <span>
+            <i class="fa fa-stop text-danger" (click)="cancelPending(pending)"></i>
+          </span>
+
+        </li>
         <li *ngFor="let execution of executionsList; let i = index" (click)="selectExecution(execution._id)"
+            class="d-flex justify-content-between"
             [ngClass]="{'active': selectedExecution?.id === execution.id}">
           <span>
           {{ execution.startTime | date: 'short' }}
@@ -77,8 +87,8 @@
                   <li *ngFor="let item of processesList; let i = index"
                       (click)="selectProcess(item)"
                       [ngClass]="{'active': selectedProcess && selectedProcess[0].uuid === item.uuid && selectedProcess[0].index === item.index }">
-                      <span class="process-name">{{ item.name }}</span>
-                      <span *ngIf="item.overall > 1">({{ item.index + 1 }}/{{ item.overall }})</span>
+                    <span class="process-name">{{ item.name }}</span>
+                    <span *ngIf="item.overall > 1">({{ item.index + 1 }}/{{ item.overall }})</span>
                   </li>
                 </ul>
               </div>
