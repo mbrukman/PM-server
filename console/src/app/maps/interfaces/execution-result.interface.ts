@@ -48,4 +48,5 @@ export interface IMapResult {
   cleanFinish?: boolean,
   startTime: Date,
   finishTime: Date,
+  trigger?: string
 }

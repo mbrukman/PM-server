@@ -50,4 +50,5 @@ export class MapResult implements IMapResult {
   cleanFinish?: boolean;
   startTime: Date;
   finishTime: Date;
+  trigger?: string;
 }
