@@ -16,6 +16,7 @@ const mapsService = require('./maps.service');
 const pluginsService = require('../services/plugins.service');
 
 let executions = {};
+let pending = {};
 
 let libpm = '';
 
@@ -182,40 +183,56 @@ function shouldContinueExecution(runId, agentKey) {
     return executions.hasOwnProperty(runId) && !executions[runId].stop && executions[runId].executionAgents[agentKey].continue;
 }
 
-function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) {
-    const socket = req.io;
-
-    function guidGenerator() {
-        let S4 = function () {
-            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-        };
-        return (S4() + '-' + S4());
+/**
+ * returns how many executions exists for map
+ * @param mapId
+ * @returns {number}
+ */
+function countOngoingMapExecutions(mapId) {
+    if (typeof(mapId) !== 'string') {
+        mapId = mapId.toString();
     }
+    return Object.keys(executions).filter(runId => {
+        return executions[runId].map.toString() === mapId
+    }).length;
+}
 
-    // TODO: add execution by sourceID
-    let runId = guidGenerator();
-    createLog({
-        map: mapId,
-        runId: runId,
-        message: 'Starting map execution',
-        status: 'info'
-    }, socket);
+/**
+ * Starting a pending execution
+ * @param mapId
+ */
+function startPendingExecution(mapId) {
+    if (!pending.hasOwnProperty(mapId) || !pending[mapId].length) {
+        return;
+    }
+    const pendingToExecute = pending[mapId].splice(0, 1)[0];
+    executeFromMapStructure(
+        pendingToExecute.map,
+        pendingToExecute.structureId,
+        pendingToExecute.runId,
+        pendingToExecute.cleanWorkspace,
+        pendingToExecute.socket,
+        pendingToExecute.configurationName
+    );
+}
 
-    let map;
+/**
+ *
+ * @param map
+ * @param structureId
+ * @param runId
+ * @param cleanWorkspace
+ * @param socket
+ * @param configurationName
+ */
+function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configurationName) {
     let mapResult;
     let mapStructure;
-    let mapAgents;
     let executionContext;
     let selectedConfiguration = {};
+    let mapAgents = map.agents;
 
-    return mapsService.get(mapId).then(mapobj => {
-        if (mapobj.archived) {
-            throw new Error('Can\'t execute archived map');
-        }
-        map = mapobj;
-        mapAgents = map.agents;
-        return mapsService.getMapStructure(mapId, structureId);
-    }).then(structure => {
+    return mapsService.getMapStructure(map._id, structureId).then(structure => {
         if (!structure) {
             throw new Error('No structure found.');
         }
@@ -242,6 +259,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
             configuration: selectedConfiguration ? selectedConfiguration.value : '',
             visitedProcesses: new Set() // saving uuid of process ran by all the agents (used in flow control)
         };
+
 
         let groupsAgents = {};
 
@@ -277,7 +295,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
         if (Object.keys(executionAgents).length === 0) { // exit if no live agents for this map
             winston.log('error', 'No agents selected or no live agents');
             createLog({
-                map: mapId,
+                map: map._id,
                 runId: runId,
                 message: 'No agents selected or no live agents',
                 status: 'error'
@@ -285,14 +303,14 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
             throw new Error('No agents selected or no live agents');
         }
         executionContext.agents = executionAgents;
-        executions[runId] = { map: mapId, executionContext: executionContext, executionAgents: executionAgents };
+        executions[runId] = { map: map._id, executionContext: executionContext, executionAgents: executionAgents };
         let res = createContext(mapStructure, executionContext);
         if (res !== 0) {
             throw new Error('Error running map code' + res);
         }
 
         return MapResult.create({
-            map: mapId,
+            map: map._id,
             runId: runId,
             structure: mapStructure._id,
             startTime: new Date(),
@@ -309,6 +327,49 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
         startMapExecution(map, mapStructure, runId, socket);
         updateExecutions(socket);
         return runId;
+    });
+
+}
+
+
+function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) {
+    const socket = req.io;
+
+    function guidGenerator() {
+        let S4 = function () {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        };
+        return (S4() + '-' + S4());
+    }
+
+    // TODO: add execution by sourceID
+    let runId = guidGenerator();
+    createLog({
+        map: mapId,
+        runId: runId,
+        message: 'Starting map execution',
+        status: 'info'
+    }, socket);
+
+    let map;
+
+    return mapsService.get(mapId).then((mapobj) => {
+        if (mapobj.archived) {
+            throw new Error('Can\'t execute archived map');
+        }
+        map = mapobj;
+        console.log(countOngoingMapExecutions(mapId));
+        const ongoingExecutions = countOngoingMapExecutions(mapId);
+        if (map.queue && (ongoingExecutions >= map.queue || (pending.hasOwnProperty(mapId) && pending[mapId].length))) {
+            console.log("Getting it to pending");
+            // check if there is a queue and running maps or a pending queue for this map
+            if (!pending.hasOwnProperty(mapId)) {
+                pending[mapId] = [];
+            }
+            pending[mapId].push({ map, structureId, runId, cleanWorkspace, socket, configurationName });
+            return;
+        }
+        return executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configurationName);
     });
 }
 
@@ -537,13 +598,16 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
                         socket.emit('map-execution-result', mapResult);
                     });
                 delete executions[runId];
+                if (map.queue && pending.hasOwnProperty(map.id)) {
+                    startPendingExecution(map.id); // starting pending execution if necessary
+                }
                 updateExecutions(socket);
             }
         }
 
     }
     let nodesToRun = [];
-    successors.forEach(successor => {
+    successors.forEach((successor) => {
         let ancestors = findAncestors(successor, structure);
         const process = findProcessByUuid(successor, structure);
         if (ancestors.length > 1) {
