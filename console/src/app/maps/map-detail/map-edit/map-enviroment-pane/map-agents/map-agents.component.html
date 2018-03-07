@@ -2,7 +2,7 @@
   <div class="agents">
 
     <span *ngIf="map?.agents?.length === 0">No agents selected for this map</span>
-    <table class="table agents" *ngIf="map?.agents?.length > 0">
+    <table class="table agents-table" *ngIf="map?.agents?.length > 0">
       <tbody>
       <tr *ngFor="let agent of map.agents; let i = index;">
         <td>{{ agent?.name }}</td>
