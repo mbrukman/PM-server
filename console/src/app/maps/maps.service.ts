@@ -75,8 +75,12 @@ export class MapsService {
 
   /* map execution */
 
-  execute(mapId) {
-    return this.http.get(serverUrl + 'api/maps/' + mapId + '/execute')
+  cancelPending(mapId: string, runId: string) {
+    return this.http.post(`${serverUrl}api/maps/${mapId}/cancel-pending`, { runId });
+  }
+
+  execute(mapId: string) {
+    return this.http.get(serverUrl + 'api/maps/' + mapId + '/execute');
   }
 
   stopExecutions(mapId: string, runId='') {
