@@ -45,6 +45,7 @@ let mapResultSchema = new Schema({
     cleanFinish: Boolean,
     startTime: Date,
     finishTime: Date,
+    trigger: String
 });
 
 mapResultSchema.set('toJSON', {

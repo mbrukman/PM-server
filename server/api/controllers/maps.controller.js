@@ -218,7 +218,7 @@ module.exports = {
     /* execute a map */
     execute: (req, res) => {
         hooks.hookPre('map-execute', req).then(() => {
-            return mapsExecutionService.execute(req.params.id, req.params.structure, null, req, req.query.config);
+            return mapsExecutionService.execute(req.params.id, req.params.structure, null, req, req.query.config, req.body ? req.body.trigger : '');
         }).then((r) => {
             res.json(r);
         }).catch(error => {

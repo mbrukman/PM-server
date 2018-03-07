@@ -225,7 +225,8 @@ function startPendingExecution(mapId) {
         pendingToExecute.runId,
         pendingToExecute.cleanWorkspace,
         pendingToExecute.socket,
-        pendingToExecute.configurationName
+        pendingToExecute.configurationName,
+        pendingToExecute.triggerReason
     );
 }
 
@@ -238,7 +239,7 @@ function startPendingExecution(mapId) {
  * @param socket
  * @param configurationName
  */
-function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configurationName) {
+function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configurationName, triggerReason) {
     let mapResult;
     let mapStructure;
     let executionContext;
@@ -253,6 +254,12 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
 
         if (mapStructure.configurations) {
             selectedConfiguration = configurationName ? mapStructure.configurations.find(o => o.name === configurationName) : mapStructure.configurations.find(o => o.selected);
+            createLog({
+                map: map._id,
+                runId: runId,
+                message: `Using '${selectedConfiguration.name}' as configuration`,
+                status: 'error'
+            }, socket);
         }
 
         executionContext = {
@@ -327,7 +334,8 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
             runId: runId,
             structure: mapStructure._id,
             startTime: new Date(),
-            configuration: selectedConfiguration
+            configuration: selectedConfiguration,
+            trigger: triggerReason
         });
     }).then(result => {
         socket.emit('map-execution-result', result);
@@ -351,7 +359,7 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
 }
 
 
-function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) {
+function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, triggerReason) {
     const socket = req.io;
 
     function guidGenerator() {
@@ -366,7 +374,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
     createLog({
         map: mapId,
         runId: runId,
-        message: 'Starting map execution',
+        message: triggerReason || 'Starting map execution',
         status: 'info'
     }, socket);
 
@@ -383,11 +391,11 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
             if (!pending.hasOwnProperty(mapId)) {
                 pending[mapId] = [];
             }
-            pending[mapId].push({ map, structureId, runId, cleanWorkspace, socket, configurationName });
+            pending[mapId].push({ map, structureId, runId, cleanWorkspace, socket, configurationName, triggerReason });
             updatePending(socket);
             return;
         }
-        return executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configurationName);
+        return executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configurationName, triggerReason);
     });
 }
 
