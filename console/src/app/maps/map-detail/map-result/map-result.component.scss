@@ -27,6 +27,7 @@
         font-size: 14px;
         li {
           padding-left: 15px;
+          padding-right: 15px;
           height: 41px;
           line-height: 41px;
 
@@ -43,12 +44,12 @@
       }
     }
   }
-  
+
   .result {
     flex: 1;
     display: flex;
     flex-direction: column;
-    
+
     .result-content{
       flex-grow: 1;
       overflow-y: auto;
@@ -87,7 +88,7 @@
         display: flex;
         height: 41px;
         align-items: center;
-        
+
         &:hover {
           cursor: pointer;
           background: $cool-grey;

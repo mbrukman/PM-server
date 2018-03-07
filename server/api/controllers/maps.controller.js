@@ -193,6 +193,17 @@ module.exports = {
     },
 
     /* execution */
+    /* cancel a pending executions */
+    cancelPending: (req, res) => {
+        hooks.hookPre('map-cancel-pending', req).then(() => {
+            return mapsExecutionService.cancelPending(req.params.id, req.body.runId, req.io);
+        }).then(() => {
+            return res.send(req.body);
+        }).catch((error) => {
+            winston.log('error', "Error finding map structures", error);
+            return res.status(500).send(error.message);
+        })
+    },
     /* get a list of ongoing executions */
     currentRuns: (req, res) => {
         hooks.hookPre('map-currentruns', req).then(() => {
