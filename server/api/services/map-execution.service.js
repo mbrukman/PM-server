@@ -253,6 +253,12 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
 
         if (mapStructure.configurations) {
             selectedConfiguration = configurationName ? mapStructure.configurations.find(o => o.name === configurationName) : mapStructure.configurations.find(o => o.selected);
+            createLog({
+                map: map._id,
+                runId: runId,
+                message: `Using '${selectedConfiguration.name}' as configuration`,
+                status: 'error'
+            }, socket);
         }
 
         executionContext = {
