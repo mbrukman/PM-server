@@ -351,7 +351,7 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
 }
 
 
-function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) {
+function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, triggerReason) {
     const socket = req.io;
 
     function guidGenerator() {
@@ -366,7 +366,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName) 
     createLog({
         map: mapId,
         runId: runId,
-        message: 'Starting map execution',
+        message: triggerReason || 'Starting map execution',
         status: 'info'
     }, socket);
 

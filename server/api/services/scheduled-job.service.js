@@ -27,7 +27,7 @@ module.exports = {
                             });
                             return;
                         }
-                        mapsExecutionService.execute(job.map, null, 0, { io: socket }, job.configuration);
+                        mapsExecutionService.execute(job.map, null, 0, { io: socket }, job.configuration, 'Started by schedules task');
                     })
             });
     },

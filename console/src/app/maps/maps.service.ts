@@ -80,10 +80,10 @@ export class MapsService {
   }
 
   execute(mapId: string) {
-    return this.http.get(serverUrl + 'api/maps/' + mapId + '/execute');
+    return this.http.post(serverUrl + 'api/maps/' + mapId + '/execute', { trigger: 'Started manually by user' });
   }
 
-  stopExecutions(mapId: string, runId='') {
+  stopExecutions(mapId: string, runId = '') {
     return this.http.get(`${serverUrl}api/maps/${mapId}/stop-execution/${runId}`);
   }
 
