@@ -1,8 +1,10 @@
 @import "~assets/sass/variables";
 
 .container-fluid {
-  height: 100%;
   padding : 15px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 
   .mode {
     margin-bottom: 15px;
@@ -18,15 +20,29 @@
       }
     }
   }
+
+  .content-wrapper{
+    display: flex;
+    flex-grow: 1;
+
+    .grid-view{
+      margin : 0;
+
+      .dashboard-card {
+        flex-grow: 1;
+        overflow-y: scroll;
+        margin-top: 15px;
+        cursor: pointer;
+      }
+    }
+
+    .list-view {
+      margin : 0;
+    }
+
+  }
+
 }
 
-.list-view {
-  padding: 30px;
-}
 
-.dashboard-card {
-  height: 190px;
-  overflow-y: scroll;
-  margin-top: 15px;
-  cursor: pointer;
-}
+
