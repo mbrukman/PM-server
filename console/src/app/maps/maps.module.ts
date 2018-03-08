@@ -31,6 +31,7 @@ import { MapEnvironmentPaneComponent } from './map-detail/map-edit/map-enviromen
 import { MapResultComponent } from './map-detail/map-result/map-result.component';
 import { ProcessResultComponent } from './map-detail/map-result/process-result/process-result.component';
 import { SelectGroupsComponent } from './map-detail/map-edit/map-enviroment-pane/map-agents/select-groups/select-groups.component';
+import { ProcessListItemComponent } from './map-detail/map-result/process-list-item/process-list-item.component';
 
 
 @NgModule({
@@ -65,7 +66,8 @@ import { SelectGroupsComponent } from './map-detail/map-edit/map-enviroment-pane
     PluginToolboxComponent,
     MapResultComponent,
     ProcessResultComponent,
-    SelectGroupsComponent
+    SelectGroupsComponent,
+    ProcessListItemComponent
   ],
   entryComponents: [SelectAgentComponent, AddConfigurationComponent, TriggerFormComponent, SelectGroupsComponent]
 })

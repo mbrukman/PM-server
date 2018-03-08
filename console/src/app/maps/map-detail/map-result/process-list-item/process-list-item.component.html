@@ -1,0 +1,28 @@
+<span [ngSwitch]="statuses.length">
+  <i class="fa fa-circle"
+     *ngSwitchCase="1"
+     [ngClass]="{
+     'text-info': statuses[0] === 'partial',
+     'text-danger': statuses[0] == 'error',
+     'text-warning': statuses[0] == 'stopped',
+     'text-success': statuses[0] == 'success'
+     }"
+     aria-hidden="true" [tooltip]="statuses[0]"></i>
+  <i class="fa fa-circle rainbow" *ngSwitchDefault aria-hidden="true" [tooltip]="tolTemplate"></i>
+</span>
+<span class="process-name">{{ item.name }}</span>
+<span *ngIf="item.overall > 1">({{ item.index + 1 }}/{{ item.overall }})</span>
+
+
+<ng-template #tolTemplate>
+  <span *ngFor="let status of statuses">
+     <i class="fa fa-circle"
+        [ngClass]="{
+         'text-info': status === 'partial',
+         'text-danger': status == 'error',
+         'text-warning': status == 'stopped',
+         'text-success': status == 'success'
+         }"
+        aria-hidden="true"></i>
+  </span>
+</ng-template>
