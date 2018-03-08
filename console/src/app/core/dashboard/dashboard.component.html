@@ -5,16 +5,18 @@
   </span>
   <div class="content-wrapper" [ngSwitch]="mode" *ngIf="executions">
     <div class="row grid-view" *ngSwitchCase="'grid'">
-      <div class="col-4 card dashboard-card" *ngFor="let item of executions.slice(0,9)" [routerLink]="['/maps',item.map.id, 'results']">
-        <div class="card-body">
-          <div class="row">
-            <div class="col">
-              <h5 class="card-title">{{ item.map.name }}</h5>
-              <p>Last run: {{ item.startTime | date: 'short' }}</p>
-            </div>
-            <div class="col">
-              <ngx-charts-pie-chart [results]="item.status" [labels]="showLabels" [scheme]="colorScheme" [doughnut]="true" [view]="[120, 120]">
-              </ngx-charts-pie-chart>
+      <div class="col-4">
+        <div class="card dashboard-card" *ngFor="let item of executions.slice(0,9)" [routerLink]="['/maps',item.map.id, 'results']">
+          <div class="card-body">
+            <div class="row">
+              <div class="col">
+                <h5 class="card-title">{{ item.map.name }}</h5>
+                <p>Last run: {{ item.startTime | date: 'short' }}</p>
+              </div>
+              <div class="col">
+                <ngx-charts-pie-chart [results]="item.status" [labels]="showLabels" [scheme]="colorScheme" [doughnut]="true" [view]="[120, 120]">
+                </ngx-charts-pie-chart>
+              </div>
             </div>
           </div>
         </div>
