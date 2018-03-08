@@ -8,3 +8,16 @@
   overflow-y: scroll;
   padding: 15px 13px 15px 13px;
 }
+
+
+.action-status{
+  display: flex;
+
+  i {
+    margin-right: 5px;
+  }
+
+  .action-status-text{
+    text-transform: capitalize;
+  }
+}

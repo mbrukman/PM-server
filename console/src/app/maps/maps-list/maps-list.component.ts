@@ -38,7 +38,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
     let fields, page, sort;
     if (event) {
       fields = event.filters || null;
-      page = event.first / 5 + 1;
+      page = event.first / 15 + 1;
       if (event.sortField) {
         sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
