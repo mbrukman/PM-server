@@ -49,5 +49,9 @@
     &:not(:last-of-type){
       border-bottom : 1px solid rgba(0,0,0,.1);
     }
+
+    .not-chosen{
+      padding-top: 10px;
+    }
   }
 }

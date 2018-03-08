@@ -1,7 +1,10 @@
 <div class="container">
   <div class="agents">
-
-    <span *ngIf="map?.agents?.length === 0">No agents selected for this map</span>
+    <div class="not-chosen">
+      <span *ngIf="map?.agents?.length === 0">
+        No agents selected for this map
+      </span>
+    </div>
     <table class="table agents-table" *ngIf="map?.agents?.length > 0">
       <tbody>
       <tr *ngFor="let agent of map.agents; let i = index;">
@@ -18,8 +21,11 @@
     <button type="button" class="btn btn-primary" (click)="openSelectAgentsModal()">Select agents</button>
   </div>
   <div class="groups">
-    <hr/>
-    <span *ngIf="!map?.groups || map?.groups?.length === 0">No groups selected for this map</span>
+    <div class="not-chosen">
+      <span *ngIf="!map?.groups || map?.groups?.length === 0">
+        No groups selected for this map
+      </span>
+    </div>
     <table class="table" *ngIf="map?.groups?.length > 0">
       <tbody>
       <tr *ngFor="let group of map.groups; let i = index;">
