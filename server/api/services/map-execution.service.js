@@ -252,8 +252,11 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
         }
         mapStructure = structure;
 
-        if (mapStructure.configurations) {
+        if (mapStructure.configurations && mapStructure.configurations.length) {
             selectedConfiguration = configurationName ? mapStructure.configurations.find(o => o.name === configurationName) : mapStructure.configurations.find(o => o.selected);
+            if (!selectedConfiguration) {
+                selectedConfiguration = mapStructure.configurations[0];
+            }
             createLog({
                 map: map._id,
                 runId: runId,
