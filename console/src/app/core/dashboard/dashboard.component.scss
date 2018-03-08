@@ -28,12 +28,26 @@
     .grid-view{
       margin : 0;
 
-      .dashboard-card {
+      .col-4{
         flex-grow: 1;
-        overflow-y: scroll;
-        margin-top: 15px;
-        cursor: pointer;
+        display: flex;
+
+        .dashboard-card {
+          flex-grow: 1;
+          overflow-y: auto;
+          margin-top: 15px;
+          cursor: pointer;
+
+          .card-body{
+            display: flex;
+
+            .row{
+              flex-grow: 1;
+            }
+          }
+        }
       }
+
     }
 
     .list-view {
