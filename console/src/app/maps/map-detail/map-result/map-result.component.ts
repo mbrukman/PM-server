@@ -6,6 +6,7 @@ import { Map } from '@maps/models/map.model';
 import { MapResult } from '@maps/models/execution-result.model';
 import { SocketService } from '@shared/socket.service';
 import { Agent } from '@agents/models/agent.model';
+import { ProcessResultByProcessIndex } from '@maps/models';
 
 interface processList {
   name: string,
@@ -39,6 +40,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   executing: string[] = [];
   pendingExecutions: string[];
   processesList: processList[];
+  agProcessStatusesByProcessIndex: ProcessResultByProcessIndex;
 
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
@@ -117,8 +119,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Aggregating all processes and returning count for results graph.
+   * @param results
+   * @returns result
+   */
   aggregateProcessStatuses(results) {
-    // agProcessesStatus
     let processes = [];
     results.forEach(res => {
       processes = [...processes, ...res.processes];
@@ -140,6 +146,28 @@ export class MapResultComponent implements OnInit, OnDestroy {
       return ag[key];
     });
     return <[{ name: string, value: number }]>result;
+  }
+
+  /**
+   * Aggregating results status by processes indexes
+   * @param results
+   * @returns {ProcessResultByProcessIndex}
+   */
+  aggregateProcessStatusesByProcessIndex(results): ProcessResultByProcessIndex {
+    let processes = [];
+    results.forEach(res => {
+      processes = [...processes, ...res.processes];
+    });
+    return processes.reduce((total, current) => {
+      if (!total.hasOwnProperty(current.uuid)) {
+        total[current.uuid] = {};
+      }
+      if (!total[current.uuid].hasOwnProperty(current.index)) {
+        total[current.uuid][current.index] = [];
+      }
+      total[current.uuid][current.index].push(current.status);
+      return total;
+    }, {});
   }
 
   /**
@@ -189,6 +217,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     }
     this.generateProcessesList();
     this.agProcessesStatus = this.aggregateProcessStatuses(this.result);
+    this.agProcessStatusesByProcessIndex = this.aggregateProcessStatusesByProcessIndex(this.result);
   }
 
   /**

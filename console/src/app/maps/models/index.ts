@@ -5,3 +5,4 @@ export * from './map-structure.model';
 export * from './map-trigger.model';
 export * from './plugin-cell.model';
 export * from './pending.model';
+export * from './process-result.model';
