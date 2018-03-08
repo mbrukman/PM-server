@@ -8,14 +8,19 @@ router.post("/create", mapController.create);
 router.get("/jobs", mapController.filterJobs); // scheduled jobs route
 router.get("/results", mapController.dashboard);
 router.get("/currentruns", mapController.currentRuns);
+router.put("/scheduledJob/updateJob", mapController.updateJob);
+router.delete("/jobs/:jobId/delete", mapController.deleteJob);
 
 router.get("/:id", mapController.detail);
 
 /* map execution */
 router.get("/:id/execute", mapController.execute);
+router.post("/:id/execute", mapController.execute);
 router.get("/:id/execute/:structure", mapController.execute);
+router.post("/:id/execute/:structure", mapController.execute);
 router.get("/:id/stop-execution", mapController.stopExecution);
 router.get("/:id/stop-execution/:runId", mapController.stopExecution);
+router.post("/:id/cancel-pending", mapController.cancelPending);
 router.get("/:id/results", mapController.results);
 router.get("/:id/results/logs", mapController.logs);
 router.get("/:id/results/:resultId", mapController.resultDetail);
@@ -39,6 +44,5 @@ router.put("/:id/triggers/:triggerId/update", mapController.triggerUpdate);
 /* schedule jobs - should be updated */
 router.post("/:id/jobs/create", mapController.createJob);
 router.delete("/:id/jobs/:jobId/delete", mapController.deleteJob);
-router.put("/scheduledJob/updateJob", mapController.updateJob);
 
 module.exports = router;

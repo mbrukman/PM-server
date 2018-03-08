@@ -3,7 +3,17 @@
     <div class="pane-header">Executions</div>
     <div class="execution-list">
       <ul>
+        <li *ngFor="let pending of pendingExecutions; let i = index" class="d-flex justify-content-between">
+          <span>
+          #{{ i + 1 }} - {{ pending }}
+          </span>
+          <span>
+            <i class="fa fa-stop text-danger" (click)="cancelPending(pending)"></i>
+          </span>
+
+        </li>
         <li *ngFor="let execution of executionsList; let i = index" (click)="selectExecution(execution._id)"
+            class="d-flex justify-content-between"
             [ngClass]="{'active': selectedExecution?.id === execution.id}">
           <span>
           {{ execution.startTime | date: 'short' }}
@@ -41,9 +51,13 @@
                 <div class="row">
                   <div class="col-6">
                     <h5 class="card-title">Execution {{ selectedExecution?.runId }}</h5>
-                    <p>Start time: {{ selectedExecution?.startTime | date: 'short' }}</p>
-                    <p>Finish time: {{ selectedExecution?.finishTime | date: 'short' }}</p>
-                    <p>Structure: {{ selectedExecution?.structure?._id }}</p>
+                    <p class="execution-detail">Start time: {{ selectedExecution?.startTime | date: 'short' }}</p>
+                    <p class="execution-detail">Finish time: {{ selectedExecution?.finishTime | date: 'short' }}</p>
+                    <p class="execution-detail">Structure: {{ selectedExecution?.structure?._id }}</p>
+                    <p class="execution-detail" *ngIf="selectedExecution?.trigger">Trigger: {{
+                      selectedExecution?.trigger }}</p>
+                    <p class="execution-detail" *ngIf="selectedExecution?.configuration">Configuration: {{
+                      selectedExecution?.configuration.name}}</p>
                   </div>
                   <div class="col-6">
                     <ngx-charts-pie-chart
@@ -70,14 +84,16 @@
           </div>
         </div>
         <div class="row card-row" *ngIf="selectedExecution && executing?.indexOf(selectedExecution.runId) === -1">
-          <div class="col-2">
+          <div class="col-2" *ngIf="processesList && processesList.length">
             <div class="card process-select bg-dark">
               <div class="card-body">
                 <ul class="process-list">
                   <li *ngFor="let item of processesList; let i = index"
                       (click)="selectProcess(item)"
-                      [ngClass]="{'active': selectedProcess[0].uuid === item.uuid && selectedProcess[0].index === item.index }">
-                    {{ item.name | truncatechars: 15 }} <span *ngIf="item.overall > 1">({{ item.index + 1 }}/{{ item.overall }})</span>
+                      [ngClass]="{'active': selectedProcess && selectedProcess[0].uuid === item.uuid && selectedProcess[0].index === item.index }">
+                    <app-process-list-item [item]="item"
+                                           [statuses]="agProcessStatusesByProcessIndex[item.uuid][item.index]"></app-process-list-item>
+
                   </li>
                 </ul>
               </div>

@@ -1,4 +1,4 @@
-import { IAgent } from "../interfaces/agent.interface";
+import { IAgent } from '../interfaces/agent.interface';
 
 export class Agent implements IAgent {
   _id?: string;
@@ -6,7 +6,7 @@ export class Agent implements IAgent {
   name?: string;
   url: string;
   publicUrl: string;
-  key: string;
+  key?: string;
   sshKey?: string;
-  attributes: any[] | string;
+  attributes: string[];
 }

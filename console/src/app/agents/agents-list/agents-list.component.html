@@ -22,17 +22,27 @@
             (onDragStart)="dragStart($event, item)">
           <td>
             <div>
-              <i [ngClass]="{'text-success': agentsStatus[item?.key]?.alive, 'text-danger': !agentsStatus[item?.key]?.alive}"
-              *ngIf="agentsStatus" class="material-icons">cloud_circle</i>
+              <i
+                [ngClass]="{'text-success': agentsStatus[item?.id]?.alive, 'text-danger': !agentsStatus[item?.id]?.alive}"
+                *ngIf="agentsStatus" class="material-icons">cloud_circle</i>
               {{item.name}}
             </div>
           </td>
           <td>{{item.url}}</td>
           <td>{{item.attributes}}</td>
           <td>
-            <button class="btn btn-link" (click)="deleteAgent(item._id)"><i class="material-icons">delete</i></button>
-            <button class="btn btn-link" (click)="editAgent(i)"><i class="material-icons">edit</i></button>
-            <button class="btn btn-link" (click)="removeAgentFromGroup(item._id, selectedGroup._id)"
+            <button class="btn btn-link"
+                    (click)="deleteAgent(item._id)"
+                    tooltip="Delete"
+                    placement="bottom"><i class="material-icons">delete</i></button>
+            <button class="btn btn-link"
+                    (click)="editAgent(i)"
+                    tooltip="Edit"
+                    placement="bottom"><i class="material-icons">edit</i></button>
+            <button class="btn btn-link"
+                    (click)="removeAgentFromGroup(item._id, selectedGroup._id)"
+                    tooltip="Remove from group"
+                    placement="bottom"
                     *ngIf="selectedGroup"><i class="material-icons">close</i></button>
           </td>
         </tr>

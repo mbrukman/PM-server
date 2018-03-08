@@ -21,6 +21,24 @@ div {
   }
 }
 
+div {
+  .actions-dnd {
+    .action-tile {
+      &:hover {
+        cursor: grab;
+      }
+      &:active {
+        cursor: grabbing !important;
+      }
+    }
+    .gu-transit {
+      background: black;
+      padding: 5px 10px 5px 20px;
+    }
+  }
+
+}
+
 .clearfix {
   color: $greyish-text;
   &:hover {

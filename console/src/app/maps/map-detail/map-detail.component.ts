@@ -95,16 +95,39 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.mapStructureSubscription = this.mapsService.getCurrentMapStructure()
       .filter(structure => !!structure)
       .subscribe(structure => {
+        let newContent;
+        let oldContent;
         if (!this.initiated) {
           this.originalMapStructure = _.cloneDeep(structure);
         }
+        try {
+          newContent = JSON.parse(structure.content).cells
+            .filter(c => c.type = 'devs.MyImageModel')
+            .map(c => {
+              return {
+                position: c.position
+              }
+            });
+          oldContent = JSON.parse(this.originalMapStructure.content).cells
+            .filter(c => c.type = 'devs.MyImageModel')
+            .map(c => {
+              return {
+                position: c.position
+              }
+            });
+        } catch (e) {}
 
-        this.structureEdited = this.initiated && !_.isEqual(structure, this.originalMapStructure);
+        const compareStructure = this.cleanStructure(JSON.parse(JSON.stringify(structure)));
+        const compareOriginalStructure = this.cleanStructure(JSON.parse(JSON.stringify(this.originalMapStructure)));
+        delete compareStructure.content;
+        delete compareOriginalStructure.content;
+
+        this.structureEdited = (JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent);
         this.mapStructure = structure;
-        this.initiated = true;
         this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
           return o.id === structure.id;
         });
+        this.initiated = true;
         this.generateDownloadJsonUri();
 
         if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0) {
@@ -143,14 +166,48 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.mapExecutionSubscription.unsubscribe();
   }
 
+  cleanStructure(structure) {
+    structure.processes.forEach((p, i) => {
+      delete structure.processes[i].plugin;
+      delete p['_id'];
+      delete p['createdAt'];
+      for (let propName in p) {
+        if (p[propName] === null || p[propName] === undefined || p[propName] === '') {
+          delete p[propName];
+        }
+      }
+      if(p.actions){
+        p.actions.forEach(a => {
+          delete a['_id'];
+          delete a['id'];
+          for (let propName in a) {
+            if (a[propName] === null || a[propName] === undefined || a[propName] === '') {
+              delete a[propName];
+            }
+          }
+          a.params.forEach(param => {
+            delete param['_id'];
+            delete param['id'];
+            delete param['param'];
+          });
+        });
+      }
+    });
+    
+    return structure;
+  }
+
   generateDownloadJsonUri() {
-    let structure = Object.assign({}, this.mapStructure);
+    let structure;
+    try {
+      structure = JSON.parse(JSON.stringify(this.mapStructure));
+    } catch (e) {
+      structure = Object.assign({}, this.mapStructure);
+    }
     delete structure._id;
     delete structure.id;
     delete structure.map;
     delete structure.map;
-    delete structure._id;
-    delete structure.id;
     if (structure.used_plugins) {
       structure.used_plugins.forEach(plugin => {
         delete plugin._id
@@ -174,7 +231,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       delete structure.links[i]._id;
       delete structure.links[i].createdAt;
     });
-
+    
     this.downloadJson = this.sanitizer.bypassSecurityTrustUrl('data:text/json;charset=UTF-8,' + encodeURIComponent(JSON.stringify(structure)));
   }
 

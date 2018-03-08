@@ -10,5 +10,6 @@ export class Job {
   configuration?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  skip?: boolean;
 }
 

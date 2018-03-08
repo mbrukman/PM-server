@@ -4,6 +4,8 @@ import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import * as _ from 'lodash';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/observable/of';
+
+import { distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -26,6 +28,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   @Output() saved: EventEmitter<any> = new EventEmitter<any>();
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
+  formValueChangeSubscription: Subscription;
   processUpdateSubscription: Subscription;
   processForm: FormGroup;
   action: boolean = false;
@@ -102,18 +105,29 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
               param.type
             ));
           });
-        } else {
         }
       });
     }
 
     this.plugin = _.cloneDeep(this.process.plugin);
     this.generateAutocompleteParams();
+
+    // subscribe to changes in form
+    this.formValueChangeSubscription = this.processForm.valueChanges
+      .debounceTime(300)
+      .pipe(distinctUntilChanged())
+      .filter(formvalue => this.processForm.valid)
+      .subscribe(formValue => {
+        this.saved.emit(this.processForm.value);
+      });
   }
 
   ngOnDestroy(): void {
     if (this.processUpdateSubscription) {
       this.processUpdateSubscription.unsubscribe();
+    }
+    if (this.formValueChangeSubscription) {
+      this.formValueChangeSubscription.unsubscribe();
     }
   }
 
@@ -232,8 +246,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       timeout: new FormControl(timeout),
       timeunit: new FormControl(timeunit),
       retries: new FormControl(retries),
-      mandatory: new FormControl(mandatory),
       method: new FormControl(method),
+      mandatory: new FormControl(mandatory),
       params: new FormArray([])
     });
   }
@@ -278,19 +292,28 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Emitting close event
+   */
   closePane() {
     this.close.emit();
   }
 
+  /**
+   * Emitting delete event
+   */
   deleteProcess() {
     this.delete.emit();
   }
 
-  saveProcess(form) {
-    if (this.action) {
-      this.backToProcessView();
-    }
-    this.saved.emit(this.processForm.value);
+  /**
+   * Emitting form change when mouse up event happened over action
+   * @param event
+   */
+  onMouseUp(event) {
+    setTimeout(() => {
+      this.processForm.controls.actions.updateValueAndValidity();
+    }, 0)
   }
 
 }

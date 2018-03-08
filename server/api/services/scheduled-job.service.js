@@ -1,7 +1,7 @@
 const scheduler = require('node-schedule');
 const mapsService = require("../services/maps.service");
 const mapsExecutionService = require("../services/map-execution.service");
-const ScheduledJob = require("../models/scheduled-job.model");
+const ScheduledJob = require("../models").ScheduledJob;
 
 let jobs = {};
 let socket;
@@ -14,9 +14,22 @@ module.exports = {
      * */
     addScheduledJob: (job) => {
 
-        jobs[job._id] = scheduler.scheduleJob((job.datetime || job.cron), function () {
-            mapsExecutionService.execute(job.map, null, 0, { io: socket }, job.configuration);
-        });
+        jobs[job._id] = scheduler.scheduleJob((job.datetime || job.cron),
+            function () {
+                ScheduledJob.findById(job._id)
+                    .then((jobObj) => {
+                        if (!jobObj) {
+                            return;
+                        }
+                        if (jobObj.skip) {
+                            ScheduledJob.findByIdAndUpdate(job._id, { $set: { skip: false } }).then(() => {
+                                console.log('Removed skip from job');
+                            });
+                            return;
+                        }
+                        mapsExecutionService.execute(job.map, null, 0, { io: socket }, job.configuration, 'Started by schedules task');
+                    })
+            });
     },
     /* creating new job */
     create: (job) => {

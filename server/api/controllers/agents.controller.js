@@ -1,5 +1,6 @@
 const async = require("async");
 const winston = require("winston");
+const _ = require("lodash");
 
 const agentsService = require("../services/agents.service");
 const pluginsService = require("../services/plugins.service");
@@ -85,14 +86,27 @@ module.exports = {
     status:
         (req, res) => {
             hooks.hookPre('agent-status-list', req).then(() => {
-                let status = agentsService.agentsStatus();
+                const agents = _.cloneDeep(agentsService.agentsStatus());
+                const status = Object.keys(agents)
+                    .reduce((total, current) => {
+
+                        current = _.cloneDeep(agents[current]);
+                        if (!current.hasOwnProperty('id')) {
+                            return total;
+                        }
+                        delete current.key;
+                        delete current.intervalId;
+                        delete current.socket;
+                        total[current.id] = current;
+                        return total;
+                    }, {});
+
+
+                // console.log(status);
                 if (status) {
-                    for (let i in status) {
-                        delete status[i].intervalId;
-                        return res.json(status);
-                    }
+                    return res.json(status);
                 }
-                return res.send('');
+                return res.status(204).send();
             }).catch(error => {
                 winston.log('error', "Error getting agents status", error);
                 return res.status(500).send();

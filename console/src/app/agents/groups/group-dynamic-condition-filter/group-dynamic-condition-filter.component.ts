@@ -3,7 +3,7 @@ import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { FILTER_FIELDS, FILTER_TYPES, Group } from '@agents/models/group.model';
 import { AgentsService } from '@agents/agents.service';
-import { retry } from 'rxjs/operators';
+import { retry, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-group-dynamic-condition-filter',
@@ -32,7 +32,7 @@ export class GroupDynamicConditionFilterComponent implements OnInit {
 
     this.filterForm.valueChanges
       .debounceTime(1000)
-      .distinctUntilChanged()
+      .pipe(distinctUntilChanged())
       .filter(val => this.filterForm.valid)
       .flatMap(val => this.agentsService.addGroupFilters(this.group.id, val.params))
       .pipe(

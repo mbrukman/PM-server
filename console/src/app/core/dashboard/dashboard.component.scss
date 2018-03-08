@@ -2,10 +2,14 @@
 
 .container-fluid {
   height: 100%;
+  padding : 15px;
+
   .mode {
     margin-bottom: 15px;
     color: $greyish-text;
     i {
+      cursor: pointer;
+
       &:hover {
         color: #fff;
       }

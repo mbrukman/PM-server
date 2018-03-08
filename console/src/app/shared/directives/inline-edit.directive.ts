@@ -10,8 +10,8 @@ import {
   SimpleChanges
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { distinctUntilChanged } from 'rxjs/operators';
 import 'rxjs/add/observable/fromEvent';
-import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/debounceTime';
 
 
@@ -40,7 +40,7 @@ export class InlineEditDirective implements AfterViewInit, OnChanges {
   registerInputEvent() {
     this.inputEvent = Observable.fromEvent(this.elm.nativeElement, 'blur')
       .map(e => (<any>e).target.innerText)
-      .distinctUntilChanged()
+      .pipe(distinctUntilChanged())
       .subscribe(e => {
         this.model = e;
         this.onChange.emit(e);
