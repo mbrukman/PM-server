@@ -144,7 +144,7 @@ function addProcessToContext(runId, agentKey, processKey, process) {
  */
 function updateProcessContext(runId, agentKey, processKey, processIndex, processData) {
     if (!executions.hasOwnProperty(runId) || executions[runId].stop) {
-        console.log('out out out out out out');
+        // console.log('out out out out out out');
         return;
     }
     executions[runId].executionAgents[agentKey].processes[processKey][processIndex] = Object.assign(
