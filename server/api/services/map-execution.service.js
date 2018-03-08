@@ -144,6 +144,7 @@ function addProcessToContext(runId, agentKey, processKey, process) {
  */
 function updateProcessContext(runId, agentKey, processKey, processIndex, processData) {
     if (!executions.hasOwnProperty(runId) || executions[runId].stop) {
+        console.log('out out out out out out');
         return;
     }
     executions[runId].executionAgents[agentKey].processes[processKey][processIndex] = Object.assign(
@@ -923,19 +924,20 @@ function runProcess(map, structure, runId, agent, socket) {
                 }
             }
 
-            // updating context
             updateProcessContext(runId, agent.key, processUUID, processIndex, {
                 status: status,
                 result: actionsResults,
                 finishTime: new Date()
             });
             updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
+            updateExecutionContext(runId, agent.key);
 
             if (!(error && process.mandatory)) { // if the process was mandatory agent should not call other process.
                 executions[runId].executionAgents[agent.key].status = 'available';
-                runNodeSuccessors(map, structure, runId, agent, processUUID, socket);
+                setTimeout(() => {
+                    runNodeSuccessors(map, structure, runId, agent, processUUID, socket);
+                }, 0);
             }
-            updateExecutionContext(runId, agent.key);
             callback();
         });
     }
