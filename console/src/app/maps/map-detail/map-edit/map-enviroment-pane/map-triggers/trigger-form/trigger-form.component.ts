@@ -1,14 +1,14 @@
-import {AfterContentInit, Component, OnDestroy} from '@angular/core';
+import { AfterContentInit, Component, OnDestroy } from '@angular/core';
 
-import {Subject} from 'rxjs/Subject';
-import {FormArray, FormControl, FormGroup, Validators} from '@angular/forms';
+import { Subject } from 'rxjs/Subject';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import {BsModalRef} from 'ngx-bootstrap';
+import { BsModalRef } from 'ngx-bootstrap';
 import * as _ from 'lodash';
 
-import {PluginsService} from '@plugins/plugins.service';
-import {Plugin, PluginMethod, PluginMethodParam} from '@plugins/models';
-import {MapTrigger} from '@maps/models';
+import { PluginsService } from '@plugins/plugins.service';
+import { Plugin, PluginMethod, PluginMethodParam } from '@plugins/models';
+import { MapTrigger } from '@maps/models';
 
 @Component({
   selector: 'app-trigger-form',
@@ -27,7 +27,8 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
   plugin: Plugin;
 
 
-  constructor(public bsModalRef: BsModalRef, private pluginsService: PluginsService) { }
+  constructor(public bsModalRef: BsModalRef, private pluginsService: PluginsService) {
+  }
 
   ngAfterContentInit() {
     this.pluginsReq = this.pluginsService.list().subscribe(plugins => {
@@ -58,7 +59,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
       name: new FormControl(this.trigger ? this.trigger.name : null, Validators.required),
       description: new FormControl(),
       plugin: new FormControl(this.trigger ? this.trigger.plugin : null, Validators.required),
-      configuration: new FormControl(this.trigger ? this.trigger.method : null, Validators.required),
+      configuration: new FormControl(this.trigger ? this.trigger.method : null),
       method: new FormControl(this.trigger ? this.trigger.method : null, Validators.required),
       params: new FormArray([])
     })

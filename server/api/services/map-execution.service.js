@@ -395,7 +395,15 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, 
             if (!pending.hasOwnProperty(mapId)) {
                 pending[mapId] = [];
             }
-            pending[mapId].push({map, structureId, runId, cleanWorkspace, socket, configurationName, triggerReason});
+            pending[mapId].push({
+                map,
+                structureId,
+                runId,
+                cleanWorkspace,
+                socket,
+                configurationName,
+                triggerReason
+            });
             updatePending(socket);
             return;
         }
@@ -621,6 +629,14 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
             executions[runId].executionAgents[agent.key].done = true;
             if (areAllAgentsDone(runId)) {
                 executions[runId].executionContext.finishTime = new Date();
+                summarizeExecution(
+                    executions[runId].executionContext.map,
+                    runId,
+                    _.cloneDeep(executions[runId].executionContext),
+                    _.cloneDeep(executions[runId].executionAgents)
+                ).then((mapResult) => {
+                    socket.emit('map-execution-result', mapResult);
+                });
                 MapResult.findByIdAndUpdate(
                     executions[runId].resultObj,
                     {$set: {finishTime: new Date(), cleanFinish: true}},
@@ -1322,7 +1338,7 @@ function summarizeExecution(map, runId, executionContext, agentsResults) {
                         finishTime: action.finishTime,
                         status: action.status,
                         result: action.result,
-                        method: action.method.name
+                        method: action.method? action.method.name : null
                     };
                     processResult.actions.push(actionResult);
                 }
