@@ -10,7 +10,6 @@ Package: production-map-server
 Architecture: all
 Depends: nodejs
 Suggests:mongodb | mongodb-orig
-Version:1.0.0
 Description: platform for developing and executing DevOps automations
  This package requires nodejs and mongodb to work, please
  check https://github.com/nodesource/distributions#deb and
