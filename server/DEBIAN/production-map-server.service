@@ -1,0 +1,10 @@
+[Unit]
+Description=ProductionMap server
+
+[Service]
+EnvironmentFile=-/etc/default/production-map
+ExecStart=/usr/bin/nodejs /usr/lib/nodejs/production-map/app.js
+
+[Install]
+WantedBy=multi-user.target
+
