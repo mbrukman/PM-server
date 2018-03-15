@@ -6,7 +6,6 @@ Build-Depends: debhelper (>= 9), dh-systemd (>= 1.5), nodejs
 Standards-Version: 4.0.0
 Homepage: http://www.productionmap
 Vcs-Browser: https://github.com/ProductionMap/PM-server.git
-
 Package: production-map-server
 Architecture: all
 Depends: nodejs
