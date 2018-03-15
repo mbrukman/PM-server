@@ -61,7 +61,7 @@ function findStartNode(structure) {
             return o.uuid === source;
         });
         if (index === -1) {
-            node = { type: 'start_node', uuid: source };
+            node = {type: 'start_node', uuid: source};
             return node;
         }
     }
@@ -144,7 +144,7 @@ function addProcessToContext(runId, agentKey, processKey, process) {
  */
 function updateProcessContext(runId, agentKey, processKey, processIndex, processData) {
     if (!executions.hasOwnProperty(runId) || executions[runId].stop) {
-        console.log('out out out out out out');
+        // console.log('out out out out out out');
         return;
     }
     executions[runId].executionAgents[agentKey].processes[processKey][processIndex] = Object.assign(
@@ -327,7 +327,7 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
             throw new Error('No agents selected or no live agents');
         }
         executionContext.agents = executionAgents;
-        executions[runId] = { map: map._id, executionContext: executionContext, executionAgents: executionAgents };
+        executions[runId] = {map: map._id, executionContext: executionContext, executionAgents: executionAgents};
         let res = createContext(mapStructure, executionContext);
         if (res !== 0) {
             throw new Error('Error running map code' + res);
@@ -346,7 +346,7 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
         mapResult = result;
         executions[runId].resultObj = result._id;
         const names = mapStructure.used_plugins.map(plugin => plugin.name);
-        return pluginsService.filterPlugins({ name: { $in: names } })
+        return pluginsService.filterPlugins({name: {$in: names}})
     }).then((plugins) => {
         executionContext.plugins = plugins;
         startMapExecution(map, mapStructure, runId, socket);
@@ -494,7 +494,8 @@ function startMapExecution(map, structure, runId, socket) {
     let agents = executions[runId].executionAgents;
     const startNode = findStartNode(structure);
 
-    async.each(agents, runMapFromAgent(map, structure, runId, startNode.uuid, socket), function (error) {})
+    async.each(agents, runMapFromAgent(map, structure, runId, startNode.uuid, socket), function (error) {
+    })
 }
 
 function runMapFromAgent(map, structure, runId, node, socket) {
@@ -638,8 +639,8 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
                 });
                 MapResult.findByIdAndUpdate(
                     executions[runId].resultObj,
-                    { $set: { finishTime: new Date(), cleanFinish: true } },
-                    { new: true })
+                    {$set: {finishTime: new Date(), cleanFinish: true}},
+                    {new: true})
                     .then((mapResult) => {
                         socket.emit('map-execution-result', mapResult);
                     });
@@ -839,7 +840,7 @@ function runProcess(map, structure, runId, agent, socket) {
             let res;
             try {
                 res = vm.runInNewContext(process.preRun, executions[runId].executionAgents[agent.key].executionContext);
-                updateProcessContext(runId, agent.key, processUUID, { preRun: res });
+                updateProcessContext(runId, agent.key, processUUID, {preRun: res});
                 updateExecutionContext(runId, agent.key);
             } catch (e) {
                 winston.log('error', 'Error running pre process function');
@@ -926,7 +927,7 @@ function runProcess(map, structure, runId, agent, socket) {
                 let res;
                 try {
                     res = vm.runInNewContext(process.postRun, executions[runId].executionAgents[agent.key].executionContext);
-                    updateProcessContext(runId, agent.key, processUUID, processIndex, { postRun: res });
+                    updateProcessContext(runId, agent.key, processUUID, processIndex, {postRun: res});
                     updateExecutionContext(runId, agent.key);
 
                 } catch (e) {
@@ -1004,7 +1005,7 @@ function sendActionViaRequest(agent, action, actionForm) {
 
                 if (error || response.statusCode !== 200) {
                     if (!body) {
-                        body = { result: error };
+                        body = {result: error};
                     }
                 }
                 resolve(body);
@@ -1018,10 +1019,45 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
 
         plugin = JSON.parse(JSON.stringify(plugin));
         action = JSON.parse(JSON.stringify(action));
+        action.startTime = new Date();
+        if (!action.hasOwnProperty('method') || !action.method) {
+            const result = 'No method was provided';
+            updateActionContext(runId, agent.key, process.uuid, processIndex, key, Object.assign(action, {
+                status: 'error',
+                finishTime: new Date(),
+                result: {result, status: 'error'}
+
+            }));
+            updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
+            createLog({
+                map: map._id,
+                runId: runId,
+                message: `'${action.name}': ${result}`,
+                status: 'success'
+            }, socket);
+            callback(null, {result});
+            return;
+        }
 
         let method = plugin.methods.find(o => o.name === action.method);
+        if (!method) {
+            const result = 'Method wasn\'t found';
+            updateActionContext(runId, agent.key, process.uuid, processIndex, key, Object.assign(action, {
+                status: 'error',
+                finishTime: new Date(),
+                result: {result, status: 'error'}
+            }));
+            updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
+            createLog({
+                map: map._id,
+                runId: runId,
+                message: `'${action.name}': ${result}`,
+                status: 'success'
+            }, socket);
+            callback(null, {result});
+            return;
+        }
         action.method = method;
-        action.startTime = new Date();
         let params = action.params ? [...action.params] : [];
         action.params = {};
         for (let i = 0; i < params.length; i++) {
@@ -1082,7 +1118,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
         }
 
         (socketPromise || requestPromise).then((result) => {
-            updateActionContext(runId, agent.key, process.uuid, processIndex, key, { finishTime: new Date() });
+            updateActionContext(runId, agent.key, process.uuid, processIndex, key, {finishTime: new Date()});
             if (result.status === 'success') {
                 if (result.hasOwnProperty('stdout')) {
                     result.stdout = actionString + '\n' + result.stdout;
@@ -1135,7 +1171,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             } else {
                 let res = {};
                 if (!result) {
-                    res = { stdout: actionString, result: 'Error running action on agent' };
+                    res = {stdout: actionString, result: 'Error running action on agent'};
                 } else {
                     res = result;
                     res.stdout = actionString + '\n' + result.stdout;
@@ -1236,7 +1272,7 @@ function updateResultsObj(runId, agentsResults) {
                         finishTime: action.finishTime,
                         status: action.status,
                         result: action.result,
-                        method: action.method.name
+                        method: action.method ? action.method.name : null
                     };
                     processResult.actions.push(actionResult);
                 }
@@ -1245,7 +1281,8 @@ function updateResultsObj(runId, agentsResults) {
         }
         results.push(agentResult);
     }
-    MapResult.findByIdAndUpdate(executions[runId].resultObj, { $set: { agentsResults: results } }, { new: true }).then(() => {});
+    MapResult.findByIdAndUpdate(executions[runId].resultObj, {$set: {agentsResults: results}}, {new: true}).then(() => {
+    });
 }
 
 /**
@@ -1311,7 +1348,7 @@ function summarizeExecution(map, runId, executionContext, agentsResults) {
         result.agentsResults.push(agentResult);
     }
 
-    return MapResult.findByIdAndUpdate(executions[executionContext.runId].resultObj, result, { new: true });
+    return MapResult.findByIdAndUpdate(executions[executionContext.runId].resultObj, result, {new: true});
 }
 
 /**
@@ -1450,7 +1487,7 @@ module.exports = {
      * @param resultId {string}
      */
     logs: (mapId, resultId) => {
-        let q = resultId ? { runId: resultId } : { map: mapId };
+        let q = resultId ? {runId: resultId} : {map: mapId};
         return MapExecutionLog.find(q)
     },
     /**
@@ -1458,7 +1495,7 @@ module.exports = {
      * @param mapId {string}
      */
     results: (mapId) => {
-        return MapResult.find({ map: mapId }, null, { sort: { startTime: -1 } }).select('-agentsResults')
+        return MapResult.find({map: mapId}, null, {sort: {startTime: -1}}).select('-agentsResults')
     },
     /**
      * get an id of specific result and return populated object
@@ -1474,7 +1511,7 @@ module.exports = {
      * @returns {Document|Promise|Query|*|void}
      */
     list: () => {
-        return MapResult.find({}, null, { sort: { startTime: -1 } }).populate({ path: 'map', select: 'name' });
+        return MapResult.find({}, null, {sort: {startTime: -1}}).populate({path: 'map', select: 'name'});
     },
 
     /**
