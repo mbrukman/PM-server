@@ -1,11 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 
-import { Subscription } from 'rxjs/Subscription';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap';
+import {Subscription} from 'rxjs/Subscription';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 
-import { MapsService } from '@maps/maps.service';
-import { Map, MapStructure, MapTrigger } from '@maps/models';
-import { TriggerFormComponent } from './trigger-form/trigger-form.component';
+import {MapsService} from '@maps/maps.service';
+import {Map, MapStructure, MapTrigger} from '@maps/models';
+import {TriggerFormComponent} from './trigger-form/trigger-form.component';
 
 @Component({
   selector: 'app-map-triggers',
@@ -49,10 +49,7 @@ export class MapTriggersComponent implements OnInit, OnDestroy {
   }
 
   openTriggerFormModal(index?) {
-    let edit = false;
-    if (index || index===0) {
-      edit = true;
-    }
+    const edit = index || index === 0;
     let modal: BsModalRef;
     modal = this.modalService.show(TriggerFormComponent);
     modal.content.trigger = this.triggers[index];

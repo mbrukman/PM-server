@@ -39,6 +39,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
         if (this.trigger) {
           this.onSelectTrigger();
           this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method);
+          this.params = this.method.params;
           let paramsControl = <FormArray>this.triggerForm.controls['params'];
           this.trigger.params.forEach(param => {
             paramsControl.push(this.initParamsForm(param.value, param.param, param.viewName, param.name));
