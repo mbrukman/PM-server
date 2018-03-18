@@ -2,6 +2,5 @@
   "upload_path": "uploads",
   "interval_time": 5000,
   "retries": 3,
-  "page_size": 15,
-  "dbURI": "mongodb://127.0.0.1:27017/refactor"
+  "page_size": 15
 }
