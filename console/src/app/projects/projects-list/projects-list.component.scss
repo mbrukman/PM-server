@@ -19,6 +19,13 @@
   padding-right: 15px;
   margin-top: 39px;
 
+  a, button {
+    &.create {
+      margin-top: 15px;
+      margin-right: 10px;
+    }
+  }
+
 }
 
 .featured {
@@ -41,7 +48,7 @@
 
 .filter {
   margin-top: 25px;
-  
+
   h5 {
     padding-bottom: 15px;
   }
