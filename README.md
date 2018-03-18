@@ -17,7 +17,7 @@ Execute repetitive workflows and tasks, save time, and optimize your development
 All instruction on how to install and start using ProdcutionMap can be found on our [UserGuide].
 
 # Source
-You can alwasy find our latest source on [ServerGitHub]. Fork us!
+You can alwasy find our latest source on [GitHub]. Fork us!
 
 # News and Website
 All information about ProductionMap can be found on our [website].
@@ -25,6 +25,6 @@ All information about ProductionMap can be found on our [website].
 
 [LogoImage]: http://www.productionmap.com/wp-content/uploads/2016/06/logoTop.png
 [Mirrors]: http://mirrors.jenkins-ci.org
-[ServerGitHub]: https://github.com/ProductionMap/PM-server
+[GitHub]: https://github.com/ProductionMap/PM-server
 [website]: http://www.productionmap.com/
-[UserGuide] : http://www.productionmap.com/production-map-user-guide/
+[UserGuide]: http://www.productionmap.com/production-map-user-guide/
