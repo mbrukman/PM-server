@@ -1338,7 +1338,7 @@ function summarizeExecution(map, runId, executionContext, agentsResults) {
                         finishTime: action.finishTime,
                         status: action.status,
                         result: action.result,
-                        method: action.method.name
+                        method: action.method? action.method.name : null
                     };
                     processResult.actions.push(actionResult);
                 }
