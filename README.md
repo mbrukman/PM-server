@@ -14,7 +14,7 @@ Use ProductionMap to automate all your workflow so you can focus on work that ma
 Execute repetitive workflows and tasks, save time, and optimize your development process.
 
 # User Guide & Installation
-All instruction on how to install and start using ProdcutionMap can be found on our [UserGuide].
+All instruction on how to install and start using ProdcutionMap can be found on our [user guide][UserGuide].
 
 # Source
 You can alwasy find our latest source on [GitHub]. Fork us!
