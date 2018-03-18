@@ -1118,122 +1118,142 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
 
         let timeout;
         let timeoutPromise;
-        console.log(action.timeout);
-        if (action.timeout) {
-            timeoutPromise = new Promise((resolve, reject) => {
-                timeout = setTimeout(() => {
-                    resolve(-1);
-                }, action.timeout);
-            });
-        } else {
-            timeoutPromise = new Promise(() => {});
-        }
+        runAction();
 
-        Promise.race([p, timeoutPromise]).then((result) => {
-            clearTimeout(timeout);
-            if (result !== -1) {
-                updateActionContext(runId, agent.key, process.uuid, processIndex, key, { finishTime: new Date() });
-                if (result.status === 'success') {
-                    if (result.hasOwnProperty('stdout')) {
-                        result.stdout = actionString + '\n' + result.stdout;
+        function runAction() {
+            if (action.timeout) {
+                timeoutPromise = new Promise((resolve, reject) => {
+                    timeout = setTimeout(() => {
+                        resolve(-1);
+                    }, action.timeout);
+                });
+            } else {
+                timeoutPromise = new Promise(() => {});
+            }
+            Promise.race([p, timeoutPromise]).then((result) => { // race condition between agent action and action timeout
+                clearTimeout(timeout);
+                if (result !== -1) {
+                    if (result.status === 'error' && action.retries > 1) { return ['retry', result]; }
+                    updateActionContext(runId, agent.key, process.uuid, processIndex, key, { finishTime: new Date() });
+                    if (result.status === 'success') {
+                        if (result.hasOwnProperty('stdout')) {
+                            result.stdout = actionString + '\n' + result.stdout;
+                        } else {
+                            result.stdout = actionString;
+                        }
+                        updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
+                            status: 'success',
+                            result: result
+                        });
+
+                        updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
+
+                        let actionExecutionLogs = [];
+                        if (result.stdout) {
+                            actionExecutionLogs.push(
+                                {
+                                    map: map._id,
+                                    runId: runId,
+                                    message: `'${action.name}' output: ${JSON.stringify(result.stdout)} (${agent.name})`,
+                                    status: 'success'
+                                }
+                            );
+                        }
+                        if (result.stderr) {
+                            actionExecutionLogs.push(
+                                {
+                                    map: map._id,
+                                    runId: runId,
+                                    message: `'${action.name}' errors: ${JSON.stringify(result.stderr)} (${agent.name})`,
+                                    status: 'success'
+                                }
+                            );
+                        }
+                        actionExecutionLogs.push(
+                            {
+                                map: map._id,
+                                runId: runId,
+                                message: `'${action.name}' result: ${JSON.stringify(result.result)} (${agent.name})`,
+                                status: 'success'
+                            }
+                        );
+
+                        MapExecutionLog.create(actionExecutionLogs).then(logs => {
+                            logs.forEach(log => {
+                                socket.emit('update', log);
+                            });
+                        });
+                        callback(null, result);
                     } else {
-                        result.stdout = actionString;
-                    }
-                    updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
-                        status: 'success',
-                        result: result
-                    });
+                        let res = {};
+                        if (!result) {
+                            res = { stdout: actionString, result: 'Error running action on agent' };
+                        } else {
+                            res = result;
+                            res.stdout = actionString + '\n' + result.stdout;
+                        }
 
-                    updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
+                        updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
+                            status: 'error',
+                            result: res
+                        });
 
-                    let actionExecutionLogs = [];
-                    if (result.stdout) {
-                        actionExecutionLogs.push(
-                            {
-                                map: map._id,
-                                runId: runId,
-                                message: `'${action.name}' output: ${JSON.stringify(result.stdout)} (${agent.name})`,
-                                status: 'success'
-                            }
-                        );
-                    }
-                    if (result.stderr) {
-                        actionExecutionLogs.push(
-                            {
-                                map: map._id,
-                                runId: runId,
-                                message: `'${action.name}' errors: ${JSON.stringify(result.stderr)} (${agent.name})`,
-                                status: 'success'
-                            }
-                        );
-                    }
-                    actionExecutionLogs.push(
-                        {
+                        updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
+
+                        createLog({
                             map: map._id,
                             runId: runId,
-                            message: `'${action.name}' result: ${JSON.stringify(result.result)} (${agent.name})`,
+                            message: `'${action.name}': Error running action on (${agent.name}): ${JSON.stringify(res)  }`,
                             status: 'success'
+                        }, socket);
+
+                        if (action.mandatory) {
+                            callback(res);
+                        } else {
+                            callback(null, res); // Action failed but it doesn't mater
                         }
-                    );
-
-                    MapExecutionLog.create(actionExecutionLogs).then(logs => {
-                        logs.forEach(log => {
-                            socket.emit('update', log);
-                        });
-                    });
-                    callback(null, result);
-                } else {
-                    let res = {};
-                    if (!result) {
-                        res = { stdout: actionString, result: 'Error running action on agent' };
-                    } else {
-                        res = result;
-                        res.stdout = actionString + '\n' + result.stdout;
                     }
-
+                } else {
+                    let result = { result: 'Timeout Error', status: 'error', stdout: actionString };
+                    if (action.retries > 1) { return ['retry', result]; }
                     updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
-                        status: 'error',
-                        result: res
+                        status: "error",
+                        result,
+                        finishTime: new Date()
                     });
-
                     updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-
                     createLog({
                         map: map._id,
                         runId: runId,
-                        message: `'${action.name}': Error running action on (${agent.name}): ${JSON.stringify(res)  }`,
-                        status: 'success'
+                        message: `'${action.name}': Error running action on (${agent.name}): timeout error  }`,
+                        status: 'error'
                     }, socket);
-
                     if (action.mandatory) {
-                        callback(res);
+                        callback(result);
                     } else {
-                        callback(null, res); // Action failed but it doesn't mater
+                        callback(null, result); // Action failed but it doesn't mater
                     }
                 }
-            } else {
-                let result = { result: 'Timeout Error', status: 'error', stdout: actionString };
-                updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
-                    status: "error",
-                    result,
-                    finishTime: new Date()
+            })
+                .then((res) => {
+                    if (Array.isArray(res) && res[0] === 'retry') { // retry handling
+                        action.retries--;
+
+                        createLog({
+                            map: map._id,
+                            runId: runId,
+                            message: `'${action.name}': Error running action on '${agent.name}'. \nRetries left: ${action.retries}`,
+                            status: 'success'
+                        }, socket);
+
+                        runAction();
+                    }
+                })
+                .catch((error) => {
+                    console.log("Error occurred: ", error);
                 });
-                updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-                createLog({
-                    map: map._id,
-                    runId: runId,
-                    message: `'${action.name}': Error running action on (${agent.name}): timeout error  }`,
-                    status: 'error'
-                }, socket);
-                if (action.mandatory) {
-                    callback(result);
-                } else {
-                    callback(null, result); // Action failed but it doesn't mater
-                }
-            }
-        }).catch((error) => {
-            console.log("Error occurred: ", error);
-        });
+        }
+
 
     }
 }
