@@ -89,7 +89,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
           action.id,
           action.name,
           action.timeout,
-          action.timeunit,
           action.retries,
           action.mandatory,
           action.method
@@ -239,12 +238,11 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @param method
    * @returns {FormGroup}
    */
-  initActionController(id?, name?, timeout?, timeunit?, retries?, mandatory?, method?): FormGroup {
+  initActionController(id?, name?, timeout = 600000, retries = 0, mandatory?, method?): FormGroup {
     return new FormGroup({
       id: new FormControl(id),
       name: new FormControl(name),
       timeout: new FormControl(timeout),
-      timeunit: new FormControl(timeunit),
       retries: new FormControl(retries),
       method: new FormControl(method),
       mandatory: new FormControl(mandatory),

@@ -12,9 +12,8 @@ const actionParamsSchema = new Schema({
 
 const actionSchema = new Schema({
     name: String,
-    timeout: Number,
-    timeunit: Number,
-    retries: Number,
+    timeout: { type: Number, default: 600000 },
+    retries: { type: Number, default: 0 },
     method: String,
     params: [actionParamsSchema],
     mandatory: { type: Boolean, default: false }
