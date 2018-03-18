@@ -27,7 +27,6 @@ export class Action implements IAction {
   _id?: string;
   name: string;
   timeout?: number;
-  timeunit?: number;
   retries?: number;
   order: number;
   mandatory: boolean;
