@@ -4,7 +4,7 @@ export interface IAgent {
   name?: string,
   url: string,
   publicUrl: string,
-  key: string,
+  key?: string,
   sshKey?: string,
-  attributes: any[] | string
+  attributes: string[]
 }

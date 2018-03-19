@@ -6,6 +6,7 @@ import { Map } from '@maps/models/map.model';
 import { MapResult } from '@maps/models/execution-result.model';
 import { SocketService } from '@shared/socket.service';
 import { Agent } from '@agents/models/agent.model';
+import { ProcessResultByProcessIndex } from '@maps/models';
 
 interface processList {
   name: string,
@@ -35,8 +36,11 @@ export class MapResultComponent implements OnInit, OnDestroy {
   mapExecutionSubscription: Subscription;
   mapExecutionResultSubscription: Subscription;
   mapExecutionMessagesSubscription: Subscription;
+  pendingMessagesSubscriptions: Subscription;
   executing: string[] = [];
+  pendingExecutions: string[];
   processesList: processList[];
+  agProcessStatusesByProcessIndex: ProcessResultByProcessIndex;
 
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
@@ -89,6 +93,15 @@ export class MapResultComponent implements OnInit, OnDestroy {
         this.selectedExecutionLogs.push(message);
         this.scrollOutputToBottom();
       });
+
+    this.pendingMessagesSubscriptions = this.socketService.getCurrentPendingAsObservable()
+      .subscribe((message) => {
+        if (!message.hasOwnProperty(this.map.id)) {
+          this.pendingExecutions = [];
+        } else {
+          this.pendingExecutions = message[this.map.id];
+        }
+      });
   }
 
   ngOnDestroy() {
@@ -106,8 +119,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Aggregating all processes and returning count for results graph.
+   * @param results
+   * @returns result
+   */
   aggregateProcessStatuses(results) {
-    // agProcessesStatus
     let processes = [];
     results.forEach(res => {
       processes = [...processes, ...res.processes];
@@ -132,6 +149,28 @@ export class MapResultComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Aggregating results status by processes indexes
+   * @param results
+   * @returns {ProcessResultByProcessIndex}
+   */
+  aggregateProcessStatusesByProcessIndex(results): ProcessResultByProcessIndex {
+    let processes = [];
+    results.forEach(res => {
+      processes = [...processes, ...res.processes];
+    });
+    return processes.reduce((total, current) => {
+      if (!total.hasOwnProperty(current.uuid)) {
+        total[current.uuid] = {};
+      }
+      if (!total[current.uuid].hasOwnProperty(current.index)) {
+        total[current.uuid][current.index] = [];
+      }
+      total[current.uuid][current.index].push(current.status);
+      return total;
+    }, {});
+  }
+
+  /**
    * Selecting execution and getting result from the server
    * @param executionId
    */
@@ -142,7 +181,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
         this.selectedExecution = result;
 
         this.agents = result.agentsResults.map(o => {
-          return { label: (<Agent>o.agent).name, value: o }
+          return { label: o.agent ? (<Agent>o.agent).name : '', value: o }
         });
 
         if (this.agents.length > 1) { // if there is more than one agent, add an aggregated option.
@@ -178,6 +217,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     }
     this.generateProcessesList();
     this.agProcessesStatus = this.aggregateProcessStatuses(this.result);
+    this.agProcessStatusesByProcessIndex = this.aggregateProcessStatusesByProcessIndex(this.result);
   }
 
   /**
@@ -220,7 +260,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.selectProcess(processesList[0]); // selecting the first process
+    if (processesList.length)
+      this.selectProcess(processesList[0]); // selecting the first process
   }
 
   selectProcess(process) {
@@ -233,6 +274,10 @@ export class MapResultComponent implements OnInit, OnDestroy {
 
   stopRun(runId: string) {
     this.mapsService.stopExecutions(this.map.id, runId).subscribe();
+  }
+
+  cancelPending(runId: string) {
+    this.mapsService.cancelPending(this.map.id, runId).subscribe();
   }
 
 

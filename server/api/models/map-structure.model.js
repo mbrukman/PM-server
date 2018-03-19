@@ -13,18 +13,17 @@ const actionParamsSchema = new Schema({
 const actionSchema = new Schema({
     name: String,
     timeout: Number,
-    timeunit: Number,
-    retries: Number,
-    mandatory: { type: Boolean, default: false },
+    retries: { type: Number, default: 0 },
     method: String,
-    params: [actionParamsSchema]
+    params: [actionParamsSchema],
+    mandatory: { type: Boolean, default: false }
 });
 
 
 const usedPluginsSchema = new Schema({
     name: { type: String, required: true },
     version: { type: String, required: true }
-});
+}, { _id: false });
 
 const processSchema = new Schema({
     name: String,

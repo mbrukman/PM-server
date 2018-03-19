@@ -9,8 +9,10 @@
   flex-wrap: initial;
 
   .pm-sidebar {
-    width : 80px;
-    max-width: 80px;
+    width : $sidebar-Width;
+    max-width: $sidebar-Width;
+    min-width: $sidebar-Width;
+    
     flex-grow: 1;
     background-color: $turquoise-blue;
     display: flex;

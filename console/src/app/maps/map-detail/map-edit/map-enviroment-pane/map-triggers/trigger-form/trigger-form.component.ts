@@ -7,7 +7,7 @@ import { BsModalRef } from 'ngx-bootstrap';
 import * as _ from 'lodash';
 
 import { PluginsService } from '@plugins/plugins.service';
-import { Plugin, PluginMethod } from '@plugins/models';
+import { Plugin, PluginMethod, PluginMethodParam } from '@plugins/models';
 import { MapTrigger } from '@maps/models';
 
 @Component({
@@ -16,6 +16,7 @@ import { MapTrigger } from '@maps/models';
   styleUrls: ['./trigger-form.component.scss']
 })
 export class TriggerFormComponent implements AfterContentInit, OnDestroy {
+  params: PluginMethodParam[];
   public result: Subject<any> = new Subject();
   configurations: string[];
   triggerForm: FormGroup;
@@ -26,7 +27,8 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
   plugin: Plugin;
 
 
-  constructor(public bsModalRef: BsModalRef, private pluginsService: PluginsService) { }
+  constructor(public bsModalRef: BsModalRef, private pluginsService: PluginsService) {
+  }
 
   ngAfterContentInit() {
     this.pluginsReq = this.pluginsService.list().subscribe(plugins => {
@@ -38,6 +40,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
         if (this.trigger) {
           this.onSelectTrigger();
           this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method);
+          this.params = this.method.params;
           let paramsControl = <FormArray>this.triggerForm.controls['params'];
           this.trigger.params.forEach(param => {
             paramsControl.push(this.initParamsForm(param.value, param.param, param.viewName, param.name));
@@ -56,7 +59,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
       name: new FormControl(this.trigger ? this.trigger.name : null, Validators.required),
       description: new FormControl(),
       plugin: new FormControl(this.trigger ? this.trigger.plugin : null, Validators.required),
-      configuration: new FormControl(this.trigger ? this.trigger.method : null, Validators.required),
+      configuration: new FormControl(this.trigger ? this.trigger.method : null),
       method: new FormControl(this.trigger ? this.trigger.method : null, Validators.required),
       params: new FormArray([])
     })
@@ -86,6 +89,8 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
 
   onSelectMethod() {
     this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method);
+    this.params = this.method.params;
+    console.log(this.method.params);
     let paramsControl = <FormArray>this.triggerForm.controls['params'];
     this.method.params.forEach(param => {
       paramsControl.push(this.initParamsForm(param.value, param._id, param.viewName, param.name));

@@ -16,12 +16,11 @@ export class CalendarService {
   }
 
   create(mapId: string, job) {
-    console.log('HI');
     return this.http.post<Job>(`${serverUrl}api/maps/${mapId}/jobs/create`, job);
   }
 
-  deleteJob(mapId, jobId) {
-    return this.http.delete<string>(`${serverUrl}api/maps/${mapId}/jobs/${jobId}/delete`, { responseType: 'text' as 'json' });
+  deleteJob(jobId: string) {
+    return this.http.delete<string>(`${serverUrl}api/maps/jobs/${jobId}/delete`, { responseType: 'text' as 'json' });
   }
 
   getFutureJobs() {

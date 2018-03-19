@@ -15,6 +15,15 @@
       <p>
         Description: <span [(inlineEdit)]="map.description" (valueChanged)="onMapUpdate()" *ngIf="map">    </span>
       </p>
+      <div class="form-row">
+        <p class="col-4">
+          Queue: <input type="number"
+                        class="form-control"
+                        [(ngModel)]="map.queue"
+                        (change)="onMapUpdate()"
+                        *ngIf="map"/>
+        </p>
+      </div>
       <hr class="my-4">
       <p>Created at: {{ map?.createdAt | date: 'short'}}</p>
       <p>

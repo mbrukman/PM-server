@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { environment } from '@env/environment';
 
 import * as io from 'socket.io-client';
 import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Observable';
 
-import { MapResult } from '../maps/models/execution-result.model';
+import { MapResult, Pending } from '@maps/models';
 
 @Injectable()
 export class SocketService {
@@ -13,6 +14,8 @@ export class SocketService {
   notification: Subject<any> = new Subject<any>();
   executions: Subject<object> = new Subject<object>();
   mapExecution: Subject<MapResult> = new Subject<MapResult>();
+  pending: Subject<Pending> = new Subject<Pending>();
+  test: Pending;
 
   constructor() {
     this.socket = io(environment.serverUrl);
@@ -38,6 +41,10 @@ export class SocketService {
 
     this.socket.on('map-execution-result', (data) => {
       this.updateExecutionResult(data);
+    });
+
+    this.socket.on('pending', (data) => {
+      this.updateCurrentPending(data);
     });
   }
 
@@ -73,6 +80,13 @@ export class SocketService {
     this.mapExecution.next(data);
   }
 
+  updateCurrentPending(data) {
+    this.pending.next(data);
+  }
+
+  getCurrentPendingAsObservable(): Observable<Pending> {
+    return this.pending.asObservable();
+  }
 
 
 }

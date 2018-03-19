@@ -1,14 +1,14 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
 
 import { MapsService } from '../../maps.service';
-import { MapStructure } from '../../models/map-structure.model';
-import { SocketService } from '../../../shared/socket.service';
-import { ProjectsService } from '../../../projects/projects.service';
-import { Project } from '../../../projects/models/project.model';
+import { MapStructure } from '@maps/models';
+import { Project } from '@projects/models/project.model';
+import { ProjectsService } from '@projects/projects.service';
+import { SocketService } from '@shared/socket.service';
 
 @Component({
   selector: 'app-map-revisions',
@@ -28,7 +28,7 @@ export class MapRevisionsComponent implements OnInit {
   morePages: boolean = true;
   @ViewChild('wrapper') wrapper: ElementRef;
 
-  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketServiec: SocketService) {
+  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService) {
     this.scrollCallback = this.loadRevisions.bind(this);
   }
 
@@ -94,7 +94,7 @@ export class MapRevisionsComponent implements OnInit {
   changeStructure(structureId) {
     this.mapsService.getMapStructure(this.mapId, structureId).subscribe(structure => {
       this.mapsService.setCurrentMapStructure(structure);
-      this.socketServiec.setNotification({
+      this.socketService.setNotification({
         title: 'Changed version',
         type: 'info'
       })
@@ -149,6 +149,34 @@ export class MapRevisionsComponent implements OnInit {
             fill: '#262626'
           }
         }
+      }, joint.shapes.devs.Model.prototype.defaults)
+    });
+
+
+    joint.shapes.devs['PMStartPoint'] = joint.shapes.devs.Model.extend({
+
+      markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
+      portMarkup: '<g class="port"><circle class="port-body"/><text class="port-label"/></g>',
+
+      defaults: joint.util.deepSupplement({
+
+        type: 'devs.PMStartPoint',
+        size: { width: 40, height: 39 },
+        outPorts: [' '],
+        attrs: {
+          '.body': { stroke: '#3c3e41', fill: '#2c2c2c', 'rx': 6, 'ry': 6, 'opacity': 0 },
+          '.label': {
+            text: '', 'ref-y': 0.83, 'y-alignment': 'middle',
+            fill: '#f1f1f1', 'font-size': 13
+          },
+          '.port-body': { r: 7.5, stroke: 'gray', fill: '#2c2c2c', magnet: 'active' },
+          'image': {
+            'ref-x': 10, 'ref-y': 18, ref: 'rect',
+            width: 35, height: 34, 'y-alignment': 'middle',
+            'x-alignment': 'middle', 'xlink:href': 'assets/images/start.png'
+          }
+        }
+
       }, joint.shapes.devs.Model.prototype.defaults)
     });
   }

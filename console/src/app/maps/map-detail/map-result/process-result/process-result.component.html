@@ -26,12 +26,12 @@
         </p-column>
         <p-column field="name" header="Result">
           <ng-template let-col let-action="rowData" pTemplate="body">
-            <div *ngIf="agActionsStatus">
-              <i class="material-icons text-success" *ngIf="agActionsStatus[action._id]?.total === 'success'">done</i>
-              <i class="material-icons text-danger" *ngIf="agActionsStatus[action._id]?.total === 'error'">change_history</i>
-              <i class="material-icons text-warning"
-                 *ngIf="agActionsStatus[action._id]?.total === 'partial'">tonality</i>
-              {{agActionsStatus[action._id]?.total}}
+            <div class="action-status" *ngIf="agActionsStatus">
+              <i class="material-icons text-success" *ngIf="agActionsStatus[action.action]?.total === 'success'">done</i>
+              <i class="material-icons text-danger" *ngIf="agActionsStatus[action.action]?.total === 'error'">change_history</i>
+              <i class="material-icons text-danger" *ngIf="agActionsStatus[action.action]?.total === 'stopped'">stop</i>
+              <i class="material-icons text-warning"*ngIf="agActionsStatus[action.action]?.total === 'partial'">tonality</i>
+              <span class="action-status-text">{{agActionsStatus[action.action]?.total}}</span>
             </div>
           </ng-template>
         </p-column>

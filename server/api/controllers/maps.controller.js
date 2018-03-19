@@ -193,6 +193,17 @@ module.exports = {
     },
 
     /* execution */
+    /* cancel a pending executions */
+    cancelPending: (req, res) => {
+        hooks.hookPre('map-cancel-pending', req).then(() => {
+            return mapsExecutionService.cancelPending(req.params.id, req.body.runId, req.io);
+        }).then(() => {
+            return res.send(req.body);
+        }).catch((error) => {
+            winston.log('error', "Error finding map structures", error);
+            return res.status(500).send(error.message);
+        })
+    },
     /* get a list of ongoing executions */
     currentRuns: (req, res) => {
         hooks.hookPre('map-currentruns', req).then(() => {
@@ -207,14 +218,13 @@ module.exports = {
     /* execute a map */
     execute: (req, res) => {
         hooks.hookPre('map-execute', req).then(() => {
-            return mapsExecutionService.execute(req.params.id, req.params.structure, null, req);
+            return mapsExecutionService.execute(req.params.id, req.params.structure, null, req, req.query.config, req.body ? req.body.trigger : '');
         }).then((r) => {
             res.json(r);
         }).catch(error => {
             winston.log('error', "Error executing map", error);
-            req.io.emit('notification', { title: 'Whoops...', message: `Error executing map`, type: 'error' });
-
-            return res.status(500).json(error);
+            req.io.emit('notification', { title: 'Error executing map', message: error.message, type: 'error' });
+            return res.status(500).send(error.message);
         });
     },
 

@@ -1,3 +1,5 @@
+@import "~assets/sass/variables";
+
 .month-control {
   padding: 0px 25px 0px 25px;
   i {
@@ -10,7 +12,22 @@
 }
 
 .event {
+  display: flex;
+
   span {
     margin-right: 5px;
+
+    &.delete-job{
+      margin-left : 10px;
+
+      &:hover {
+        cursor: pointer;
+        color: $turquoise-blue;
+      }
+    }
+
+    &.text-info{
+      margin-right : 10px;
+    }
   }
 }
