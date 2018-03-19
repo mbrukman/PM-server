@@ -1121,11 +1121,11 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
         runAction();
 
         function runAction() {
-            if (action.timeout) {
+            if (action.timeout || (!action.timeout && action.timeout !== 0)) { // if there is a timeout or no timeout
                 timeoutPromise = new Promise((resolve, reject) => {
                     timeout = setTimeout(() => {
                         resolve(-1);
-                    }, action.timeout);
+                    }, (action.timeout || 600000));
                 });
             } else {
                 timeoutPromise = new Promise(() => {});

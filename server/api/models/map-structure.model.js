@@ -12,7 +12,7 @@ const actionParamsSchema = new Schema({
 
 const actionSchema = new Schema({
     name: String,
-    timeout: { type: Number, default: 600000 },
+    timeout: Number,
     retries: { type: Number, default: 0 },
     method: String,
     params: [actionParamsSchema],
