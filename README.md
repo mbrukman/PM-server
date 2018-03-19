@@ -23,7 +23,7 @@ You can alwasy find our latest source on [GitHub]. Fork us!
 All information about ProductionMap can be found on our [website].
 
 
-[LogoImage]: http://www.productionmap.com/wp-content/uploads/2016/06/logoTop.png
+[LogoImage]: /logo.png
 [Mirrors]: http://mirrors.jenkins-ci.org
 [GitHub]: https://github.com/ProductionMap/PM-server
 [website]: http://www.productionmap.com/
