@@ -32,6 +32,7 @@ import { MapResultComponent } from './map-detail/map-result/map-result.component
 import { ProcessResultComponent } from './map-detail/map-result/process-result/process-result.component';
 import { SelectGroupsComponent } from './map-detail/map-edit/map-enviroment-pane/map-agents/select-groups/select-groups.component';
 import { ProcessListItemComponent } from './map-detail/map-result/process-list-item/process-list-item.component';
+import { ProcessViewComponent } from './map-detail/map-revisions/process-view/process-view.component';
 
 
 @NgModule({
@@ -67,7 +68,8 @@ import { ProcessListItemComponent } from './map-detail/map-result/process-list-i
     MapResultComponent,
     ProcessResultComponent,
     SelectGroupsComponent,
-    ProcessListItemComponent
+    ProcessListItemComponent,
+    ProcessViewComponent
   ],
   entryComponents: [SelectAgentComponent, AddConfigurationComponent, TriggerFormComponent, SelectGroupsComponent]
 })

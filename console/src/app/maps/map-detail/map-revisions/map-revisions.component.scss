@@ -52,7 +52,7 @@
       height: 55px;
       display: flex;
       align-items: center;
-      
+
       &:hover {
         background-color: $dark-background;
       }
@@ -62,4 +62,12 @@
       }
     }
   }
+}
+
+.process-preview {
+  position: absolute;
+  right: 0;
+  width: 25%;
+  height: calc(100% - 120px);
+  background: $background;
 }
