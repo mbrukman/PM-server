@@ -344,7 +344,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
    * Updating selected configuration
    * @param {number} index
    */
-  changeSelected(index: number) {
+  changeSelected() {
     this.mapStructure.configurations.forEach((configuration, i) => {
       configuration.selected = (this.selected.toString() === i.toString());
     });

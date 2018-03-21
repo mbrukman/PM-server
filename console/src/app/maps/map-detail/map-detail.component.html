@@ -29,7 +29,7 @@
         Execute
         <span *ngIf="executing"><i class="fa fa-spinner fa-pulse fa-fw"></i></span>
       </button>
-    <select [(ngModel)]="selected" (change)="changeSelected(i)">
+    <select [(ngModel)]="selected" (change)="changeSelected()">
         <option *ngIf="mapStructure?.configurations?.length === 0">No configs</option>
       <option [value]="i" *ngFor="let item of mapStructure?.configurations; let i = index;">
           {{item.name | truncatechars: 8}}
