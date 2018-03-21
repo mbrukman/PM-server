@@ -52,5 +52,8 @@
         <span class="option" (click)="changeMode('code')" [ngClass]="{'selected': viewMode === 'code'}">Code</span>
       </div>
     </div>
+    <div class="process-preview" *ngIf="previewProcess">
+      <app-process-view [process]="previewProcess" (close)="onClose()"></app-process-view>
+    </div>
   </div>
 </div>

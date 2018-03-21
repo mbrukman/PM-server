@@ -104,4 +104,10 @@
   width: 100%;
 }
 
-
+.process-preview {
+  position: absolute;
+  right: 0;
+  width: 25%;
+  height: calc(100% - 120px);
+  background: $background;
+}
