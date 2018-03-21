@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { MapEditComponent } from './map-detail/map-edit/map-edit.component';
 import { MapDesignComponent } from './map-detail/map-edit/map-design/map-design.component';
 import { MapDetailComponent } from './map-detail/map-detail.component';
@@ -7,10 +7,10 @@ import { MapCodeComponent } from './map-detail/map-edit/map-code/map-code.compon
 import { MapsListComponent } from './maps-list/maps-list.component';
 import { MapRevisionsComponent } from './map-detail/map-revisions/map-revisions.component';
 import { MapPropertiesComponent } from './map-detail/map-properties/map-properties.component';
-import { UnsavedGuard } from '../shared/guards/unsaved.guard';
+import { UnsavedGuard } from '@shared/guards/unsaved.guard';
 import { MapCreateComponent } from './map-create/map-create.component';
 import { MapResultComponent } from './map-detail/map-result/map-result.component';
-import { DashboardComponent } from '../core/dashboard/dashboard.component';
+import { MapConfigurationsComponent } from "@maps/map-detail/map-configurations/map-configurations.component";
 
 const routes: Routes = [
   {
@@ -43,6 +43,10 @@ const routes: Routes = [
       {
         path: 'revisions',
         component: MapRevisionsComponent
+      },
+      {
+        path: 'configurations',
+        component: MapConfigurationsComponent
       },
       {
         path: 'edit',

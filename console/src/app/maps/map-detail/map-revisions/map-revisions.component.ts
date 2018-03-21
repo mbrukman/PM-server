@@ -57,10 +57,10 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   addPaperDrag() {
-    let initialPosition = {x: 0, y: 0};
+    let initialPosition = { x: 0, y: 0 };
     let move = false;
     this.paper.on('blank:pointerdown', (event, x, y) => {
-      initialPosition = {x: x * 0.75, y: y * 0.75};
+      initialPosition = { x: x * 0.75, y: y * 0.75 };
       move = true;
     });
 
@@ -173,15 +173,15 @@ export class MapRevisionsComponent implements OnInit {
       defaults: joint.util.deepSupplement({
 
         type: 'devs.PMStartPoint',
-        size: {width: 40, height: 39},
+        size: { width: 40, height: 39 },
         outPorts: [' '],
         attrs: {
-          '.body': {stroke: '#3c3e41', fill: '#2c2c2c', 'rx': 6, 'ry': 6, 'opacity': 0},
+          '.body': { stroke: '#3c3e41', fill: '#2c2c2c', 'rx': 6, 'ry': 6, 'opacity': 0 },
           '.label': {
             text: '', 'ref-y': 0.83, 'y-alignment': 'middle',
             fill: '#f1f1f1', 'font-size': 13
           },
-          '.port-body': {r: 7.5, stroke: 'gray', fill: '#2c2c2c', magnet: 'active'},
+          '.port-body': { r: 7.5, stroke: 'gray', fill: '#2c2c2c', magnet: 'active' },
           'image': {
             'ref-x': 10, 'ref-y': 18, ref: 'rect',
             width: 35, height: 34, 'y-alignment': 'middle',
