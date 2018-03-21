@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 import { BsModalService } from 'ngx-bootstrap/modal';
 
 import { MapsService } from '../maps.service';
-import { Map, MapStructure } from '@maps/models';
+import { Configuration, Map, MapStructure } from '@maps/models';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { SocketService } from '@shared/socket.service';
 
@@ -37,7 +37,11 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   mapExecutionSubscription: Subscription;
   executing: boolean;
   downloadJson: SafeUrl;
-  selected: string;
+  selected: number;
+  navItems: [{
+    name: string,
+    routerLink: string[]
+  }];
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -45,6 +49,15 @@ export class MapDetailComponent implements OnInit, OnDestroy {
               private mapsService: MapsService,
               private socketService: SocketService,
               private modalService: BsModalService) {
+
+    this.navItems = [
+      { name: 'Properties', routerLink: ['properties'] },
+      { name: 'Design', routerLink: ['edit', 'design'] },
+      { name: 'Code', routerLink: ['edit', 'code'] },
+      { name: 'Configurations', routerLink: ['configurations'] },
+      { name: 'Execution Results', routerLink: ['results'] },
+      { name: 'Revisions', routerLink: ['revisions'] }
+    ]
   }
 
   ngOnInit() {
@@ -131,8 +144,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         this.generateDownloadJsonUri();
 
         if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0) {
-          const selected = this.mapStructure.configurations.find(o => o.selected);
-          this.selected = selected ? selected.name : this.mapStructure.configurations[0].name;
+          const selected = this.mapStructure.configurations.findIndex(o => o.selected);
+          this.selected = selected !== -1 ? selected : 0;
         }
       });
 
@@ -176,7 +189,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
           delete p[propName];
         }
       }
-      if(p.actions){
+      if (p.actions) {
         p.actions.forEach(a => {
           delete a['_id'];
           delete a['id'];
@@ -193,7 +206,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         });
       }
     });
-    
+
     return structure;
   }
 
@@ -231,7 +244,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       delete structure.links[i]._id;
       delete structure.links[i].createdAt;
     });
-    
+
     this.downloadJson = this.sanitizer.bypassSecurityTrustUrl('data:text/json;charset=UTF-8,' + encodeURIComponent(JSON.stringify(structure)));
   }
 
@@ -262,6 +275,9 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         cell.attrs.rect.fill = '#2d3236';
       });
       this.mapStructure.content = JSON.stringify(content);
+      if (!this.checkConfigurationValidity(this.mapStructure.configurations)) {
+        return;
+      }
       delete this.mapStructure._id;
       delete this.mapStructure.id;
       delete this.mapStructure.createdAt;
@@ -275,6 +291,26 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       });
     }
 
+  }
+
+  checkConfigurationValidity(configurations: Configuration[]): boolean {
+    for (let i = 0; i < configurations.length; i++) {
+      try {
+        if (typeof(configurations[i].value) === "string") {
+          configurations[i].value = JSON.parse(<string>(configurations[i].value));
+        }
+      } catch (e) {
+
+        this.socketService.setNotification({
+          title: "bad configuration",
+          message: `configuration '${configurations[i].name}' is invalid`,
+          type: 'error'
+        });
+
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -309,10 +345,9 @@ export class MapDetailComponent implements OnInit, OnDestroy {
    * @param {number} index
    */
   changeSelected(index: number) {
-    this.mapStructure.configurations.forEach((configuration) => {
-      configuration.selected = false;
+    this.mapStructure.configurations.forEach((configuration, i) => {
+      configuration.selected = (this.selected.toString() === i.toString());
     });
-    this.mapStructure.configurations[index].selected = true;
     this.mapsService.setCurrentMapStructure(this.mapStructure);
   }
 

@@ -1,0 +1,15 @@
+<div class="pm-modal">
+  <div class="modal-header">
+    <h4>Enter configuration name</h4>
+    <button type="button" class="close" (click)="onClose(false)" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <input type="text" class="form-control" [(ngModel)]="name">
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-primary" (click)="onClose(false)">Cancel</button>
+    <button class="btn-primary btn" (click)="onClose(true)">Confirm</button>
+  </div>
+</div>
