@@ -5,7 +5,7 @@ import * as $ from 'jquery';
 import * as joint from 'jointjs';
 
 import { MapsService } from '../../maps.service';
-import { MapStructure } from '@maps/models';
+import { MapStructure, Process } from '@maps/models';
 import { Project } from '@projects/models/project.model';
 import { ProjectsService } from '@projects/projects.service';
 import { SocketService } from '@shared/socket.service';
@@ -16,6 +16,7 @@ import { SocketService } from '@shared/socket.service';
   styleUrls: ['./map-revisions.component.scss']
 })
 export class MapRevisionsComponent implements OnInit {
+  previewProcess: Process;
   structures: MapStructure[] = [];
   structureId: string;
   mapId: string;
@@ -26,6 +27,7 @@ export class MapRevisionsComponent implements OnInit {
   scrollCallback: any;
   page: number = 1;
   morePages: boolean = true;
+  currentStructure: MapStructure;
   @ViewChild('wrapper') wrapper: ElementRef;
 
   constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService) {
@@ -51,6 +53,7 @@ export class MapRevisionsComponent implements OnInit {
     this.defineShape();
     this.paper.scale(0.75, 0.75);
     this.addPaperDrag();
+    this.listeners();
   }
 
   addPaperDrag() {
@@ -68,6 +71,15 @@ export class MapRevisionsComponent implements OnInit {
 
     this.paper.on('blank:pointerup', (event, x, y) => {
       move = false;
+    });
+  }
+
+  listeners() {
+    this.paper.on('cell:pointerup', (cellView, evt, x, y) => {
+      if (cellView.model.isLink()) {
+        return;
+      }
+      this.previewProcess = this.currentStructure.processes.find(p => p.uuid === cellView.model.id);
     });
   }
 
@@ -188,9 +200,12 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   previewStructure(structureId) {
-    this.mapsService.getMapStructure(this.mapId, structureId).subscribe(structure => {
-      this.graph.fromJSON(JSON.parse(structure.content));
-    });
+    this.previewProcess = null;
+    this.mapsService.getMapStructure(this.mapId, structureId)
+      .subscribe(structure => {
+        this.currentStructure = structure;
+        this.graph.fromJSON(JSON.parse(structure.content));
+      });
   }
 
   onResize(event) {
@@ -211,6 +226,10 @@ export class MapRevisionsComponent implements OnInit {
     }
     this.page++;
     this.getMapStructures(this.page);
+  }
+
+  onClose() {
+    this.previewProcess = null;
   }
 
 }
