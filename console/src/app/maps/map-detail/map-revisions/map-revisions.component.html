@@ -31,5 +31,8 @@
     <div class="col-9" #wrapper (window:resize)="onResize($event)">
       <div id="graph"></div>
     </div>
+    <div class="process-preview" *ngIf="previewProcess">
+      <app-process-view [process]="previewProcess" (close)="onClose()"></app-process-view>
+    </div>
   </div>
 </div>

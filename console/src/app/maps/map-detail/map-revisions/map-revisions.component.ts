@@ -5,7 +5,7 @@ import * as $ from 'jquery';
 import * as joint from 'jointjs';
 
 import { MapsService } from '../../maps.service';
-import { MapStructure } from '@maps/models';
+import { MapStructure, Process } from '@maps/models';
 import { Project } from '@projects/models/project.model';
 import { ProjectsService } from '@projects/projects.service';
 import { SocketService } from '@shared/socket.service';
@@ -16,6 +16,7 @@ import { SocketService } from '@shared/socket.service';
   styleUrls: ['./map-revisions.component.scss']
 })
 export class MapRevisionsComponent implements OnInit {
+  previewProcess: Process;
   structures: MapStructure[] = [];
   structureId: string;
   mapId: string;
@@ -26,6 +27,7 @@ export class MapRevisionsComponent implements OnInit {
   scrollCallback: any;
   page: number = 1;
   morePages: boolean = true;
+  currentStructure: MapStructure;
   @ViewChild('wrapper') wrapper: ElementRef;
 
   constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService) {
@@ -51,13 +53,14 @@ export class MapRevisionsComponent implements OnInit {
     this.defineShape();
     this.paper.scale(0.75, 0.75);
     this.addPaperDrag();
+    this.listeners();
   }
 
   addPaperDrag() {
-    let initialPosition = { x: 0, y: 0 };
+    let initialPosition = {x: 0, y: 0};
     let move = false;
     this.paper.on('blank:pointerdown', (event, x, y) => {
-      initialPosition = { x: x * 0.75, y: y * 0.75 };
+      initialPosition = {x: x * 0.75, y: y * 0.75};
       move = true;
     });
 
@@ -68,6 +71,15 @@ export class MapRevisionsComponent implements OnInit {
 
     this.paper.on('blank:pointerup', (event, x, y) => {
       move = false;
+    });
+  }
+
+  listeners() {
+    this.paper.on('cell:pointerup', (cellView, evt, x, y) => {
+      if (cellView.model.isLink()) {
+        return;
+      }
+      this.previewProcess = this.currentStructure.processes.find(p => p.uuid === cellView.model.id);
     });
   }
 
@@ -161,15 +173,15 @@ export class MapRevisionsComponent implements OnInit {
       defaults: joint.util.deepSupplement({
 
         type: 'devs.PMStartPoint',
-        size: { width: 40, height: 39 },
+        size: {width: 40, height: 39},
         outPorts: [' '],
         attrs: {
-          '.body': { stroke: '#3c3e41', fill: '#2c2c2c', 'rx': 6, 'ry': 6, 'opacity': 0 },
+          '.body': {stroke: '#3c3e41', fill: '#2c2c2c', 'rx': 6, 'ry': 6, 'opacity': 0},
           '.label': {
             text: '', 'ref-y': 0.83, 'y-alignment': 'middle',
             fill: '#f1f1f1', 'font-size': 13
           },
-          '.port-body': { r: 7.5, stroke: 'gray', fill: '#2c2c2c', magnet: 'active' },
+          '.port-body': {r: 7.5, stroke: 'gray', fill: '#2c2c2c', magnet: 'active'},
           'image': {
             'ref-x': 10, 'ref-y': 18, ref: 'rect',
             width: 35, height: 34, 'y-alignment': 'middle',
@@ -188,9 +200,12 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   previewStructure(structureId) {
-    this.mapsService.getMapStructure(this.mapId, structureId).subscribe(structure => {
-      this.graph.fromJSON(JSON.parse(structure.content));
-    });
+    this.previewProcess = null;
+    this.mapsService.getMapStructure(this.mapId, structureId)
+      .subscribe(structure => {
+        this.currentStructure = structure;
+        this.graph.fromJSON(JSON.parse(structure.content));
+      });
   }
 
   onResize(event) {
@@ -211,6 +226,10 @@ export class MapRevisionsComponent implements OnInit {
     }
     this.page++;
     this.getMapStructures(this.page);
+  }
+
+  onClose() {
+    this.previewProcess = null;
   }
 
 }
