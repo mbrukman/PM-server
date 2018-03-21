@@ -3,7 +3,7 @@
     <div class="col-3">
       <div class='versions' style="height: 100%; overflow-y: scroll" infiniteScroll [onScroll]="scrollCallback">
         <ul>
-          <li *ngFor="let item of structures">
+          <li *ngFor="let item of structures" [class.selected]="currentStructure?.id === item?.id">
             <span class="revision-title">{{ (item.createdAt | date: 'dd/MM/yyyy') + ' ' +  (item.createdAt | date: 'HH:mm') }}</span>
             <span>
             <button class="btn-inline-action" (click)="previewStructure(item.id)"
@@ -29,7 +29,28 @@
       </div>
     </div>
     <div class="col-9" #wrapper (window:resize)="onResize($event)">
-      <div id="graph"></div>
+      <div id="graph" [hidden]="viewMode !== 'design'"></div>
+      <div class="row code-container" id="container" *ngIf="viewMode === 'code'">
+        <div class="col-6">
+          <h5>Current</h5>
+          <ngx-monaco-editor class="code-editor"
+                             [options]="editorOptions"
+                             [(ngModel)]="currentCode"
+          ></ngx-monaco-editor>
+        </div>
+        <div class="col-6">
+          <h5>Latest</h5>
+          <ngx-monaco-editor class="code-editor"
+                             [options]="editorOptions"
+                             [(ngModel)]="latestCode"
+          ></ngx-monaco-editor>
+        </div>
+      </div>
+      <div class="select-mode" *ngIf="currentStructure">
+        <span class="option" (click)="changeMode('design')"
+              [ngClass]="{'selected': viewMode === 'design'}">Design</span>
+        <span class="option" (click)="changeMode('code')" [ngClass]="{'selected': viewMode === 'code'}">Code</span>
+      </div>
     </div>
     <div class="process-preview" *ngIf="previewProcess">
       <app-process-view [process]="previewProcess" (close)="onClose()"></app-process-view>

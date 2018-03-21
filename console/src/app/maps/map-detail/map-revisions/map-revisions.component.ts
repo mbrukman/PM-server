@@ -28,7 +28,16 @@ export class MapRevisionsComponent implements OnInit {
   page: number = 1;
   morePages: boolean = true;
   currentStructure: MapStructure;
+  viewMode: 'code' | 'design' = 'design';
+  latestStructure: MapStructure;
   @ViewChild('wrapper') wrapper: ElementRef;
+  editorOptions = {
+    theme: 'vs-dark',
+    language: 'javascript',
+    readOnly: true
+  };
+  latestCode: string;
+  currentCode: string;
 
   constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService) {
     this.scrollCallback = this.loadRevisions.bind(this);
@@ -193,19 +202,27 @@ export class MapRevisionsComponent implements OnInit {
     });
   }
 
-  duplicateMap(structureId) {
+  duplicateMap(structureId: string) {
     this.mapsService.duplicateMap(this.mapId, structureId, this.project.id).subscribe(map => {
       this.router.navigate(['/maps', map.id])
     });
   }
 
-  previewStructure(structureId) {
+  previewStructure(structureId: string) {
     this.previewProcess = null;
     this.mapsService.getMapStructure(this.mapId, structureId)
       .subscribe(structure => {
         this.currentStructure = structure;
         this.graph.fromJSON(JSON.parse(structure.content));
       });
+
+    if (!this.latestStructure) {
+      this.setLatestStructure(this.mapId, this.structures[0].id);
+    }
+
+    if (this.viewMode === 'code') {
+      this.loadCodeDiff();
+    }
   }
 
   onResize(event) {
@@ -214,10 +231,6 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   onVersionScroll(event) {
-    console.log(event);
-    console.log(event.target.scrollHeight,
-      event.target.scrollTop,
-      event.target.clientHeight)
   }
 
   loadRevisions() {
@@ -228,8 +241,31 @@ export class MapRevisionsComponent implements OnInit {
     this.getMapStructures(this.page);
   }
 
+  changeMode(mode: 'code' | 'design') {
+    this.viewMode = mode;
+    this.graph.clear();
+    if (mode === 'code') {
+      this.loadCodeDiff();
+    } else {
+      setTimeout(() => {
+
+        this.graph.fromJSON(JSON.parse(this.currentStructure.content));
+      }, 0);
+    }
+  }
+
+  loadCodeDiff() {
+    this.latestCode = this.latestStructure.code || '';
+    this.currentCode = this.currentStructure.code || '';
+  }
+
+  setLatestStructure(mapId: string, structureId: string) {
+    this.mapsService.getMapStructure(mapId, structureId)
+      .take(1)
+      .subscribe(structure => this.latestStructure = structure);
+  }
+
   onClose() {
     this.previewProcess = null;
   }
-
 }
