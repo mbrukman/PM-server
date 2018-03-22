@@ -13,8 +13,8 @@
                 <h5 class="card-title">{{ item.map.name }}</h5>
                 <p>Last run: {{ item.startTime | date: 'short' }}</p>
               </div>
-              <div class="col">
-                <ngx-charts-pie-chart [results]="item.status" [labels]="showLabels" [scheme]="colorScheme" [doughnut]="true" [view]="[150,150]">
+              <div class="col chart-wrapper">
+                <ngx-charts-pie-chart [results]="item.status" [labels]="showLabels" [scheme]="colorScheme" [doughnut]="true" [view]="[200,200]">
                 </ngx-charts-pie-chart>
               </div>
             </div>

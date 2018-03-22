@@ -43,6 +43,12 @@
 
             .row{
               flex-grow: 1;
+
+              .chart-wrapper{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              }
             }
           }
         }
