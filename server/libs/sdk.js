@@ -15,21 +15,35 @@ var getProcessById = function (processId) {
 };
 
 /**
+ * Get a specific iteration of process, defaults to first one
+ * @param index
+ * @param process
+ */
+var getProcessIteration = function (process, index = -1) {
+    index = (index === -1 || index === 0) ? 0 : index - 1;
+    return process[index];
+};
+
+/**
  * Return the first process with the specific name or undefined.
  * @param {string} name the name of the process
  */
 var getProcessByName = function (name) {
-    return processes.find((o) => o.name === name);
+    var processesKey = Object.keys(process);
+    var processesName = processesKey.map(k => processes[k].name);
+    return processes[processesKey[processesName.findIndex(o => o === name)]]
 };
 
 /**
  * Return the action in the {actionIndex} number in the process specified
  * @param {number} actionIndex the index number of the action.
- * @param {string} processId the id of the process containing the action
+ * @param process
  * @returns {*|Action}
  */
-var getActionByIndex = function (actionIndex, processId) {
-    var process = getProcessById(processId);
+var getActionByIndex = function (actionIndex, process) {
+    if (typeof process !== 'object') {
+        return 'invalid parameters: process should be an object';
+    }
     var actionId = Object.keys(process.actions)[actionIndex];
     return process.actions[actionId];
 };
@@ -46,6 +60,7 @@ var getProcessCrossAgent = function (processId) {
     });
     return processes;
 };
+
 
 /**
  * Return the selected configuration or undefined
