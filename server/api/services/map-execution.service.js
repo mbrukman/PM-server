@@ -524,22 +524,6 @@ function areAllAgentsDone(runId) {
     return true;
 }
 
-
-/**
- * resuming pending agents
- * @param map
- * @param structure
- * @param runId
- * @param processKey
- * @param socket
- */
-function resumePendingAgents(map, structure, runId, processKey, socket) {
-    const executionAgents = executions[runId].executionAgents;
-    for (let i in executionAgents) {
-        runProcess(map, structure, runId, executionAgents[i], socket);
-    }
-}
-
 /**
  *
  * @param runId
