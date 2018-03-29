@@ -254,12 +254,6 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
                 selectedConfiguration = mapStructure.configurations[0];
             }
             executionLogService.error(runId,map._id, `Using '${selectedConfiguration.name}' as configuration`,socket);
-            // createLog({
-            //     map: map._id,
-            //     runId: runId,
-            //     message: `Using '${selectedConfiguration.name}' as configuration`,
-            //     status: 'error'
-            // }, socket);
         }
 
         executionContext = {
@@ -315,12 +309,6 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
         if (Object.keys(executionAgents).length === 0) { // exit if no live agents for this map
             winston.log('error', 'No agents selected or no live agents');
             executionLogService.error(runId,map._id, 'No agents selected or no live agents',socket);
-            // createLog({
-            //     map: map._id,
-            //     runId: runId,
-            //     message: 'No agents selected or no live agents',
-            //     status: 'error'
-            // }, socket);
             throw new Error('No agents selected or no live agents');
         }
         executionContext.agents = executionAgents;
@@ -373,12 +361,6 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, 
     // TODO: add execution by sourceID
     let runId = guidGenerator();
     executionLogService.info(runId, mapId, triggerReason || 'Starting map execution',socket);
-    // createLog({
-    //     map: mapId,
-    //     runId: runId,
-    //     message: triggerReason || 'Starting map execution',
-    //     status: 'info'
-    // }, socket);
 
     let map;
 
@@ -768,12 +750,6 @@ function runProcess(map, structure, runId, agent, socket) {
             if (!res) {
                 winston.log('error', (errorMsg || 'Agent didn\'t pass filter agent condition'));
                 executionLogService.error(runId, map._id, (errorMsg || `'${process.name}': agent '${agent.name}' didn't pass filter function`),socket);
-                // createLog({
-                //     map: map._id,
-                //     runId: runId,
-                //     message: (errorMsg || `'${process.name}': agent '${agent.name}' didn't pass filter function`),
-                //     status: 'error'
-                // }, socket);
 
                 updateProcessContext(runId, agent.key, processUUID, processIndex, {
                     status: 'error',
@@ -802,12 +778,6 @@ function runProcess(map, structure, runId, agent, socket) {
             } catch (e) {
                 errMsg = `Error running process condition: ${e.message}`;
                 executionLogService.error(runId, map._id, `'${process.name}': Error running process condition: ${JSON.stringify(e)}`,socket);
-                // createLog({
-                //     map: map._id,
-                //     runId: runId,
-                //     message: `'${process.name}': Error running process condition: ${JSON.stringify(e)}`,
-                //     status: 'error'
-                // }, socket);
             }
 
             if (!res) { // process didn't pass condition or failed run condition function
@@ -845,12 +815,6 @@ function runProcess(map, structure, runId, agent, socket) {
             } catch (e) {
                 winston.log('error', 'Error running pre process function');
                 executionLogService.error(runId, map._id, `'${process.name}': error running pre-process function`,socket);
-                // createLog({
-                //     map: map._id,
-                //     runId: runId,
-                //     message: `'${process.name}': error running pre-process function`,
-                //     status: 'error'
-                // }, socket);
             }
         }
 
@@ -889,12 +853,6 @@ function runProcess(map, structure, runId, agent, socket) {
             if (error) {
                 winston.log('error', 'Fatal error: ', error);
                 executionLogService.error(runId, map._id, `'${process.name}': A mandatory action failed`,socket);
-                // createLog({
-                //     map: map._id,
-                //     runId: runId,
-                //     message: `'${process.name}': A mandatory action failed`,
-                //     status: 'error'
-                // });
                 status = 'error';
                 executions[runId].executionAgents['continue'] = (error && process.mandatory);
                 updateExecutionContext(runId, agent.key);
@@ -920,12 +878,6 @@ function runProcess(map, structure, runId, agent, socket) {
 
             if (process.postRun) {
                 executionLogService.error(runId, map._id, `'${process.name}': Running post process function`,socket);
-                // createLog({
-                //     map: map._id,
-                //     runId: runId,
-                //     message: `'${process.name}': Running post process function`,
-                //     status: 'error'
-                // }, socket);
 
                 // post run hook for link (enables user to change context)
                 let res;
@@ -937,12 +889,6 @@ function runProcess(map, structure, runId, agent, socket) {
                 } catch (e) {
                     winston.log('error', 'Error running post process function');
                     executionLogService.error(runId, map._id, `'${process.name}': Error running post process function`,socket);
-                    // createLog({
-                    //     map: map._id,
-                    //     runId: runId,
-                    //     message: `'${process.name}': Error running post process function`,
-                    //     status: 'error'
-                    // }, socket);
                 }
             }
 
@@ -1035,12 +981,6 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             }));
             updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
             executionLogService.success(runId, map._id, `'${action.name}': ${result}`,socket);
-            // createLog({
-            //     map: map._id,
-            //     runId: runId,
-            //     message: `'${action.name}': ${result}`,
-            //     status: 'success'
-            // }, socket);
             callback(null, { result });
             return;
         }
@@ -1055,12 +995,6 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             }));
             updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
             executionLogService.success(runId, map._id, `'${action.name}': ${result}`,socket);
-            // createLog({
-            //     map: map._id,
-            //     runId: runId,
-            //     message: `'${action.name}': ${result}`,
-            //     status: 'success'
-            // }, socket);
             callback(null, { result });
             return;
         }
@@ -1082,13 +1016,6 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
         updateActionContext(runId, agent.key, process.uuid, processIndex, key, action);
 
         executionLogService.info(runId, map._id, `'${action.name}': executing action (${agent.name})`,socket);
-        // createLog({
-        //     map: map._id,
-        //     runId: runId,
-        //     message: `'${action.name}': executing action (${agent.name})`,
-        //     status: 'info'
-        // }, socket);
-
         if (!shouldContinueExecution(runId, agent.key)) {
             console.log('Should not continue');
             return callback();
@@ -1110,12 +1037,6 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             actionString += `${i}: ${action.params[i]}`;
         }
         executionLogService.info(runId, map._id, actionString,socket);
-        // createLog({
-        //     map: map._id,
-        //     runId: runId,
-        //     message: actionString,
-        //     status: 'info'
-        // }, socket);
 
         // will send action to agent via socket or regular request
         let p;
@@ -1208,16 +1129,8 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                             status: 'error',
                             result: res
                         });
-
                         updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-
                         executionLogService.success(runId,map._id, `'${action.name}': Error running action on (${agent.name}): ${JSON.stringify(res)  }`,socket);
-                        // createLog({
-                        //     map: map._id,
-                        //     runId: runId,
-                        //     message: `'${action.name}': Error running action on (${agent.name}): ${JSON.stringify(res)  }`,
-                        //     status: 'success'
-                        // }, socket);
 
                         if (action.mandatory) {
                             callback(res);
@@ -1235,12 +1148,6 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                     });
                     updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
                     executionLogService.error(runId,map._id, `'${action.name}': Error running action on (${agent.name}): timeout error  }`,socket);
-                    // createLog({
-                    //     map: map._id,
-                    //     runId: runId,
-                    //     message: `'${action.name}': Error running action on (${agent.name}): timeout error  }`,
-                    //     status: 'error'
-                    // }, socket);
                     if (action.mandatory) {
                         callback(result);
                     } else {
@@ -1252,13 +1159,6 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                     if (Array.isArray(res) && res[0] === 'retry') { // retry handling
                         action.retries--;
                         executionLogService.success(runId,map._id, `'${action.name}': Error running action on '${agent.name}'. \nRetries left: ${action.retries}`,socket);
-                        // createLog({
-                        //     map: map._id,
-                        //     runId: runId,
-                        //     message: `'${action.name}': Error running action on '${agent.name}'. \nRetries left: ${action.retries}`,
-                        //     status: 'success'
-                        // }, socket);
-
                         runAction();
                     }
                 })
@@ -1446,12 +1346,6 @@ function stopExecution(mapId, runId, socket) {
     const d = new Date();
     stoppedRuns.forEach(runId => {
             executionLogService.info(runId,mapId, "Got stop signal. Stopping execution",socket);
-            // createLog({
-            //     map: mapId,
-            //     runId: runId,
-            //     message: "Got stop signal. Stopping execution",
-            //     status: "info"
-            // }, socket);
             let executionAgents = executions[runId].executionAgents;
             executions[runId].executionContext.finishTime = d;
 
