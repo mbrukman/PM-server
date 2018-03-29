@@ -151,6 +151,8 @@ function updateProcessContext(runId, agentKey, processKey, processIndex, process
         (executions[runId].executionAgents[agentKey].processes[processKey][processIndex] || {}),
         processData
     );
+
+    executions[runId].executionAgents[agentKey].executionContext.processes = executions[runId].executionAgents[agentKey].processes;
 }
 
 /**
@@ -170,6 +172,9 @@ function updateActionContext(runId, agentKey, processKey, processIndex, actionKe
         (executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[actionKey] || {}),
         actionData
     );
+
+    executions[runId].executionAgents[agentKey].executionContext.processes = executions[runId].executionAgents[agentKey].processes;
+
 }
 
 /**
