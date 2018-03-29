@@ -874,8 +874,6 @@ function runProcess(map, structure, runId, agent, socket) {
                 }
             }
 
-            // updateResultsObj(_.cloneDeep(executions[runId].executionAgents));
-
             if (process.postRun) {
                 executionLogService.error(runId, map._id, `'${process.name}': Running post process function`,socket);
 
@@ -1109,12 +1107,6 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                         );
 
                         executionLogService.create(actionExecutionLogs);
-
-                        // MapExecutionLog.create(actionExecutionLogs).then(logs => {
-                        //     logs.forEach(log => {
-                        //         socket.emit('update', log);
-                        //     });
-                        // });
                         callback(null, result);
                     } else {
                         let res = {};
@@ -1196,11 +1188,10 @@ function sendKillRequest(mapId, actionId, agentKey) {
 }
 
 /**
- * Updating the result object.
- * @param runId
- * @param agentsResults
+ * Formatting the agents results and returns the formatted array
+ * @param agentsResults 
  */
-function updateResultsObj(runId, agentsResults) {
+function formatAgentsResults(agentsResults){
     const results = [];
     let agentKeys = Object.keys(agentsResults);
     for (let i of agentKeys) {
@@ -1247,6 +1238,17 @@ function updateResultsObj(runId, agentsResults) {
         }
         results.push(agentResult);
     }
+
+    return results;
+}
+
+/**
+ * Updating the result object.
+ * @param runId
+ * @param agentsResults
+ */
+function updateResultsObj(runId, agentsResults) {
+    const results = formatAgentsResults(agentsResults);
     MapResult.findByIdAndUpdate(executions[runId].resultObj, { $set: { agentsResults: results } }, { new: true }).then(() => {
     });
 }
@@ -1267,53 +1269,7 @@ function summarizeExecution(map, runId, executionContext, agentsResults) {
     result.finishTime = executionContext.finishTime;
     result.runId = runId;
     result.cleanFinish = true;
-    result.agentsResults = [];
-    let agentKeys = Object.keys(agentsResults);
-    for (let i of agentKeys) {
-        let agent = agentsResults[i];
-        let agentResult = {
-            processes: [],
-            agent: agent._id || agent.id,
-            status: agent.status === 'available' ? 'success' : agent.status,
-            startTime: agent.startTime,
-            finishTime: agent.finishTime
-        };
-        for (let j in agent.processes) {
-            let process = agent.processes[j];
-
-            process.forEach((instance, index) => {
-                let processResult = {
-                    index: index,
-                    name: instance.name,
-                    result: instance.result,
-                    uuid: instance.uuid,
-                    plugin: instance.plugin,
-                    actions: [],
-                    status: instance.status,
-                    startTime: instance.startTime,
-                    finishTime: instance.finishTime
-                };
-
-                for (let k in instance.actions) {
-                    let action = instance.actions[k];
-
-                    let actionResult = {
-                        action: k,
-                        name: action.name,
-                        startTime: action.startTime,
-                        finishTime: action.finishTime,
-                        status: action.status,
-                        result: action.result,
-                        method: action.method ? action.method.name : null
-                    };
-                    processResult.actions.push(actionResult);
-                }
-                agentResult.processes.push(processResult);
-            });
-        }
-        result.agentsResults.push(agentResult);
-    }
-
+    result.agentsResults = formatAgentsResults(agentsResults);
     return MapResult.findByIdAndUpdate(executions[executionContext.runId].resultObj, result, { new: true });
 }
 
