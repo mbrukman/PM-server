@@ -37,7 +37,7 @@ export class MapConfigurationsComponent implements OnInit {
       .take(1)
       .filter(name => !!name)
       .subscribe(name => {
-        this.mapStructure.configurations.push(new Configuration(name));
+        this.mapStructure.configurations.push(new Configuration(name,'{\n\n}'));
         this.editConfiguration(this.mapStructure.configurations.length - 1);
       });
 

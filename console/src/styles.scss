@@ -401,11 +401,25 @@ rect.body {
   }
 }
 
+span[contenteditable=true]{
+  display: inline-block;
+  &:hover{
+    cursor: text;
+  }
+
+  &:empty{
+    &:before{
+      content: attr(placeholder);
+      color: gray;
+    }
+  }
+}
+
 .pm-inline-edit {
-  &:hover, &:focus {
+  padding: 5px;
+  &:hover, &:focus, &:empty {
     background: $input-bg;
     border-radius: 5px;
-    padding: 5px;
     border: 1px solid $input-border;
     outline: none !important;
   }
