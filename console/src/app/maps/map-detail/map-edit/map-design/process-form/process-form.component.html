@@ -209,11 +209,17 @@
                 <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
                 <select formControlName="value" class="form-control" *ngSwitchCase="'autocomplete'">
                   <option *ngFor="let opt of methods[processForm.value.actions[index].method].params[k].options"
-                          id="opt._id" [ngValue]="opt.id">{{ opt.value }}
+                          [ngValue]="opt.id">{{ opt.value }}
                   </option>
                 </select>
+                <select formControlName="value" class="form-control" *ngSwitchCase="'options'">
+                  <option *ngFor="let opt of methods[processForm.value.actions[index].method].params[k].options"
+                          [ngValue]="opt.id">{{ opt.name }}
+                  </option>
+                </select>
+                <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
+                <input formControlName="value" type="number" class="form-control" *ngSwitchCase="'int'">
                 <input formControlName="value" type="text" class="form-control" *ngSwitchDefault>
-
               </div>
             </div>
           </div>
