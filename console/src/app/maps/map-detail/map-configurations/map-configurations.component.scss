@@ -1,0 +1,59 @@
+@import "~assets/sass/variables";
+
+.main {
+  display: flex;
+  flex-grow: 1;
+
+  .side-pane {
+    flex: 0 0 225px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid $cool-grey;
+
+    .configurations-list {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-bottom: 15px;
+
+      .btn.pm {
+        margin: 5px;
+        align-self: center;
+      }
+
+      ul {
+        padding-left: 0;
+        list-style: none;
+        font-size: 14px;
+
+        li {
+          padding : 0 15px;
+          height: 41px;
+          align-items: center;
+
+          &:hover {
+            cursor: pointer;
+            background: $dark-background;
+          }
+
+          &.active {
+            background: $turquoise-blue;
+          }
+
+        }
+      }
+    }
+  }
+
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .code-editor {
+      height: 100%;
+    }
+  }
+}

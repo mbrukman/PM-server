@@ -1,0 +1,83 @@
+<div class="d-flex justify-content-between pane-header">
+  <h3>
+    <span *ngIf="!action">{{process?.name? process.name: 'process'}}</span>
+    <span *ngIf="action">action</span>
+  </h3>
+  <div>
+    <button type="button" class="btn btn-link" (click)="closePane()">
+      <i class="material-icons text-light">close</i>
+    </button>
+  </div>
+</div>
+
+<div *ngIf="!action">
+  <accordion [closeOthers]="true" [hidden]="action">
+    <accordion-group *ngFor="let group of groups">
+      <div accordion-heading class="clearfix">
+        {{group.name}}
+        <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
+      </div>
+      <table class="table">
+        <tbody>
+        <tr *ngFor="let property of group.properties">
+          <td>{{property}}</td>
+          <td>{{process[property] || '-'}}</td>
+        </tr>
+        </tbody>
+      </table>
+    </accordion-group>
+    <accordion-group>
+      <div accordion-heading class="clearfix">
+        Actions
+        <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
+      </div>
+      <table class="table">
+        <tbody>
+        <tr *ngFor="let action of process.actions; let i = index">
+          <td *ngIf="action.name">{{action.name}}</td>
+          <td *ngIf="!action.name">Action #{{i+1}}</td>
+          <td (click)="showAction(i)"><i class="material-icons">remove_red_eye</i></td>
+        </tr>
+        </tbody>
+      </table>
+    </accordion-group>
+  </accordion>
+</div>
+
+<div *ngIf="action">
+  <table class="table">
+    <tbody>
+    <tr>
+      <td>Name</td>
+      <td>{{action.name || '-'}}</td>
+    </tr>
+    <tr>
+      <td>Timeout</td>
+      <td>{{action.timeout || '-'}}</td>
+    </tr>
+    <tr>
+      <td>Retries</td>
+      <td>{{action.retries || '-'}}</td>
+    </tr>
+    <tr>
+      <td>Mandatory</td>
+      <td>{{action.mandatory || '-'}}</td>
+    </tr>
+    <tr>
+      <td>Method</td>
+      <td>{{action.method || '-'}}</td>
+    </tr>
+    </tbody>
+  </table>
+  <h5 class="subtitle">Params</h5>
+  <table class="table">
+    <tbody>
+    <tr *ngFor="let param of action.params">
+      <td class="emphasize">Name</td>
+      <td>{{param.viewName}}</td>
+      <td class="emphasize">Value</td>
+      <td>{{param.value}}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>

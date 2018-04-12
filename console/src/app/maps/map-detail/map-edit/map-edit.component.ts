@@ -20,13 +20,12 @@ export class MapEditComponent implements OnInit, OnDestroy {
   mapSubscription: Subscription;
   mapStructureSubscription: Subscription;
   activeTab: any;
-  
+
   envTabs = [
     {key : 'agents', label: 'Agents', icon:'icon-agent'},
-    {key : 'configurations', label: 'Configurations', icon:'icon-attribute'},
     {key : 'triggers', label: 'Triggers', icon:'icon-trigger'},
     {key : 'plugins', label: 'Plugins', icon:'icon-plugins'}
-  ]
+  ];
 
   @ViewChild('wrapper') wrapper: ElementRef;
 

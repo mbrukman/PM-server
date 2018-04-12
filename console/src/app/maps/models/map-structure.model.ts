@@ -76,8 +76,13 @@ export class Link implements ILink {
 
 export class Configuration {
   name: string;
-  value: object;
+  value: object | string;
   selected?: boolean;
+
+  constructor(name?, value?) {
+    this.name = name;
+    this.value = value;
+  }
 }
 
 export class MapStructure implements IMapStructure {

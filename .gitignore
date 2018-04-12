@@ -66,3 +66,5 @@ coverage
 benchmarks/graphs
 
 private.ts
+
+/server/dist

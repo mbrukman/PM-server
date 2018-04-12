@@ -1,0 +1,20 @@
+<div class="main">
+  <div class="side-pane">
+    <div class="pane-header">Configurations
+    </div>
+    <div class="configurations-list">
+      <ul>
+        <li *ngFor="let configuration of mapStructure?.configurations; let i = index" (click)="editConfiguration(i)"
+            class="d-flex justify-content-between" [class.active]="selectedConfiguration === configuration">
+          <span class="configuration-name">{{configuration.name}}</span>
+          <i class="material-icons" (click)="removeConfiguration(i)">delete</i>
+        </li>
+      </ul>
+      <button class="btn pm" (click)="addNewConfiguration()">Add Configuration</button>
+    </div>
+  </div>
+  <div class="main-content">
+    <ngx-monaco-editor *ngIf="selectedConfiguration" class="code-editor" [options]="editorOptions"
+                       [(ngModel)]="selectedConfiguration.value" (keyup)="updateMapStructure()"></ngx-monaco-editor>
+  </div>
+</div>

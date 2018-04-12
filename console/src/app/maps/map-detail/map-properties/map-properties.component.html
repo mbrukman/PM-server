@@ -13,7 +13,7 @@
         </p>
       </div>
       <p>
-        Description: <span [(inlineEdit)]="map.description" (valueChanged)="onMapUpdate()" *ngIf="map">    </span>
+        Description: <span placeholder="Add description..." [(inlineEdit)]="map.description" (valueChanged)="onMapUpdate()" *ngIf="map">    </span>
       </p>
       <div class="form-row">
         <p class="col-4">
@@ -27,7 +27,8 @@
       <hr class="my-4">
       <p>Created at: {{ map?.createdAt | date: 'short'}}</p>
       <p>
-        Licence: <span [(inlineEdit)]="map.licence" (valueChanged)="onMapUpdate()" *ngIf="map"></span>
+        Licence: <span placeholder="Add map licence..." [(inlineEdit)]="map.licence" (valueChanged)="onMapUpdate()" *ngIf="map"></span>
+        <!-- Licence: <input type="text" placeholder="Add map licence..." (onChange)="onMapUpdate()" [(ngModel)]="map.licence" *ngIf="map" /> -->
       </p>
     </div>
   </div>
