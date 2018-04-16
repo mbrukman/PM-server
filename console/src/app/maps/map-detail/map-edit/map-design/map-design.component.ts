@@ -11,6 +11,20 @@ import { MapsService } from '@maps/maps.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { Plugin } from '@plugins/models/plugin.model';
 
+export const linkAttrs = {
+  router: { name: 'manhattan' },
+  connector: { name: 'rounded' },
+  attrs: {
+    '.connection': {
+      stroke: '#87939A',
+      'stroke-width': 3
+    },
+    '.marker-target': {
+      fill: '#87939A',
+      d: 'M 10 0 L 0 5 L 10 10 z'
+    }
+  }
+};
 
 @Component({
   selector: 'app-map-design',
@@ -38,6 +52,11 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
               private mapDesignService: MapDesignService) { }
 
   ngOnInit() {
+    this.defineShape();
+    this.pluginsReq = this.pluginsService.list().subscribe(plugins => {
+      this.plugins = plugins;
+    });
+
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
     this.dropSubscription = this.designService
       .getDrop()
@@ -48,10 +67,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         this.addNewProcess(obj, offsetLeft, offsetTop);
       });
 
-    this.pluginsReq = this.pluginsService.list().subscribe(plugins => {
-      this.plugins = plugins;
-    });
-    this.defineShape();
   }
 
   ngOnDestroy() {
@@ -71,20 +86,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       snapLinks: { radius: 75 },
       linkPinning: true,
       embeddingMode: false,
-      defaultLink: new joint.dia.Link({
-        router: { name: 'manhattan' },
-        connector: { name: 'rounded' },
-        attrs: {
-          '.connection': {
-            stroke: '#87939A',
-            'stroke-width': 3
-          },
-          '.marker-target': {
-            fill: '#87939A',
-            d: 'M 10 0 L 0 5 L 10 10 z'
-          }
-        }
-      }),
+      defaultLink: new joint.dia.Link(linkAttrs),
       markAvailable: true,
       validateConnection: function (cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
         // Prevent linking from input ports.
@@ -113,7 +115,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
 
     this.listeners();
-    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure()
+    this.mapStructureSubscription = this.mapsService
+      .getCurrentMapStructure()
       .do(structure => this.mapStructure = structure)
       .filter(structure => !!structure)
       .subscribe(structure => {
@@ -243,7 +246,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
         type: 'devs.PMStartPoint',
         size: { width: 40, height: 39 },
-        outPorts: [' '],
+        outPorts: ['  '],
         attrs: {
           '.body': { stroke: '#3c3e41', fill: '#2c2c2c', 'rx': 6, 'ry': 6, 'opacity': 0 },
           '.label': {
@@ -340,6 +343,83 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         }
       });
       this.graph.addCell(startNode);
+
+      if (this.mapStructure.processes.length) {
+        this.mapStructure.processes.forEach((process, i) => {
+          let plugin = this.plugins.find((p) => p.name === process.used_plugin.name);
+          let imageModel = new joint.shapes.devs['MyImageModel']({
+            id: process.uuid,
+            position: {
+              x: ((i + 1) * 160),
+              y: 200
+            },
+            size: {
+              width: 100,
+              height: 73
+            },
+            inPorts: [' '],
+            outPorts: ['  '],
+            attrs: {
+              '.label': {
+                text: process.name || process.used_plugin.name,
+                'ref-y': 5,
+                'font-size': 14,
+                fill: '#bbbbbb'
+              },
+              rect: {
+                'stroke-width': 1,
+                'stroke-opacity': .7,
+                'stroke': '#7f7f7f',
+                rx: 3,
+                ry: 3,
+                fill: '#2d3236',
+                'fill-opacity': .5
+              },
+              image: {
+                'xlink:href': `plugins/${plugin.name}/${plugin.imgUrl}`,
+                width: 46,
+                height: 32,
+                'ref-x': 50,
+                'ref-y': 50,
+                ref: 'rect',
+                'x-alignment': 'middle',
+                'y-alignment': 'middle'
+              },
+              '.inPorts circle': {
+                fill: '#c80f15'
+              },
+              '.outPorts circle': {
+                fill: '#262626'
+              }
+            }
+          });
+          this.graph.addCell(imageModel);
+
+        });
+
+        if (this.mapStructure.links.length) {
+          this.mapStructure.links.forEach((link, i) => {
+            if (!this.mapStructure.processes.find(p => p.uuid === link.sourceId)) {
+              link.sourceId = startNode.id;
+            }
+            let newLink = new joint.shapes.devs.Link({
+              ...linkAttrs,
+              source: {
+                id: link.sourceId,
+                port: '  '
+              },
+              target: {
+                id: link.targetId,
+                port: ' '
+              }
+            });
+            this.graph.addCell(newLink);
+          });
+        }
+
+        this.mapStructure.content = JSON.stringify(this.graph.toJSON())
+        this.mapsService.setCurrentMapStructure(this.mapStructure);
+      }
     }
   }
 
@@ -401,7 +481,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           return o.uuid === id;
         });
         if (process) {
-          console.log(process);
           this.editProcess(process);
         }
       }
