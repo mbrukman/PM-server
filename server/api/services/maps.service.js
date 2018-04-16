@@ -1,5 +1,6 @@
 const Map = require("../models/map.model");
-const MapStructure = require("../models/map-structure.model");
+const MapStructure = require("../models").Structure;
+const Plugin = require("../models").Plugin;
 const env = require("../../env/enviroment");
 
 const PAGE_SIZE = env.page_size;
@@ -65,6 +66,18 @@ module.exports = {
     },
     filterByQuery(query = {}) {
         return Map.find(query);
+    },
+    generateMap(map) {
+        return Map
+            .create({ name: map.name, project: map.project })
+            .then((newMap) =>
+                MapStructure
+                    .create({
+                        map: newMap._id,
+                        processes: map.processes,
+                        links: map.links,
+                        used_plugins: map.used_plugins
+                    }));
     },
     get: (id) => {
         return Map.findOne({ _id: id }).populate('agents groups')
