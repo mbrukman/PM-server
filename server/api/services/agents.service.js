@@ -52,6 +52,8 @@ let followAgentStatus = (agent) => {
                     body = { res: e };
                 }
                 if (!error && response.statusCode === 200) {
+                    agents[agent.key].name = agent.name;
+                    agents[agent.key].attributes = agent.attributes;
                     agents[agent.key].alive = true;
                     agents[agent.key].hostname = body.hostname;
                     agents[agent.key].arch = body.arch;
