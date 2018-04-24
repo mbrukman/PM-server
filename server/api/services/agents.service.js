@@ -36,10 +36,11 @@ const FILTER_FIELDS = Object.freeze({
 
 /* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
 let followAgentStatus = (agent) => {
-    let start = new Date();
     agents[agent.key] = {};
     setDefaultUrl(agent);
     let listenInterval = setInterval(() => {
+        let start = new Date();
+
         request.post(
             agents[agent.key].defaultUrl + '/api/status', {
                 form: {
