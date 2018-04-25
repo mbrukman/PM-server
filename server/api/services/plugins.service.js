@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require('path');
-const unzip = require('unzip');
+const unzip = require('node-unzip-2');
 const streams = require('memory-streams');
 const child_process = require("child_process");
 const async = require("async");
