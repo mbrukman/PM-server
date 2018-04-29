@@ -142,13 +142,19 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
           this.pluginsService.generatePluginParams(this.plugin._id, method.name) // generated params
         );
       }).map(data => { // data: [method, [generated params]]
-        data[1].forEach(param => {
-          data[0].params[data[0].params.findIndex(o => o.name === param.name)] = param;
-        });
-        return data[0];
-      })
+      data[1].forEach(param => {
+        data[0].params[data[0].params.findIndex(o => o.name === param.name)] = param;
+      });
+      return data[0];
+    })
       .subscribe(method => {
         this.plugin.methods[this.plugin.methods.findIndex(o => o.name === method.name)] = method;
+        this.addToMethodContext(method);
+      });
+
+    Observable.from(this.plugin.methods)
+      .filter(method => this.hasOptionsParam(method))
+      .subscribe((method) => {
         this.addToMethodContext(method);
       });
   }
@@ -160,6 +166,10 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
 
   hasAutocompleteParam(method): boolean {
     return method.params.findIndex(p => p.type === 'autocomplete') > -1
+  }
+
+  hasOptionsParam(method): boolean {
+    return method.params.findIndex(p => p.type === 'options') > -1
   }
 
   /**
