@@ -229,8 +229,13 @@ module.exports = {
     },
     /* execute a map */
     execute: (req, res) => {
+        let agents, trigger;
+        if (req.body) {
+            agents = req.body.agents ? req.body.agents.split(',') : null;
+            trigger = req.body.trigger;
+        }
         hooks.hookPre('map-execute', req).then(() => {
-            return mapsExecutionService.execute(req.params.id, req.params.structure, null, req, req.query.config, req.body ? req.body.trigger : '');
+            return mapsExecutionService.execute(req.params.id, req.params.structure, null, req, req.query.config, trigger, agents);
         }).then((r) => {
             res.json(r);
         }).catch(error => {
