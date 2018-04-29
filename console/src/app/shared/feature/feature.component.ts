@@ -12,7 +12,7 @@ export class FeatureComponent implements OnInit {
   constructor() {
   }
   ngOnInit() {
-    console.log(this.redirectPrefix);
+    // console.log(this.redirectPrefix);
   }
 
 }

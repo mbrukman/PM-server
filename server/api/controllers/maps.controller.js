@@ -132,6 +132,17 @@ module.exports = {
             return res.status(500).json(error);
         });
     },
+
+    generate: (req, res) => {
+        hooks.hookPre('map-generate', req).then(() => {
+            return mapsService.generateMap(req.body);
+        }).then((data) => {
+            return res.status(200).send(data._id);
+        }).catch((error) => {
+            winston.log('error', "Error generating map", error);
+            return res.status(500).send(error.message);
+        });
+    },
     getMapStructure: (req, res) => {
         hooks.hookPre('map-get-structure', req).then(() => {
             return mapsService.getMapStructure(req.params.id, req.params.structureId)
@@ -169,6 +180,7 @@ module.exports = {
     createStructure: (req, res) => {
         let mapId = req.params.id;
         req.body.map = mapId;
+        console.log(req.body);
         hooks.hookPre('map-create-structure', req).then(() => {
             return mapsService.createStructure(req.body)
         }).then(structure => {

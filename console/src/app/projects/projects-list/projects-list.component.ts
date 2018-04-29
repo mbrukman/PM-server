@@ -27,7 +27,7 @@ export class ProjectsListComponent implements OnInit {
     this.projectsService.filter(null, '-createdAt', this.page).take(1).subscribe(data => {
       if (data)
         this.featuredProjects = data.items.slice(0, 4);
-      console.log(">>", this.featuredProjects);
+      // console.log(">>", this.featuredProjects);
     });
   }
 
