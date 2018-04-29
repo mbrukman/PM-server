@@ -54,10 +54,6 @@
     .result-content{
       flex-grow: 1;
       overflow-y: auto;
-
-      ul > li {
-        word-break: break-word;
-      }
     }
 
   }
@@ -129,6 +125,9 @@ p {
     ul {
       max-height: 135px;
       overflow-y: scroll;
+      > li {
+        word-break: break-word;
+      }
     }
   }
 }
