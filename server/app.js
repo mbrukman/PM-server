@@ -13,7 +13,7 @@ require('winston-mongodb');
 const parseArgs = require('minimist')(process.argv.slice(2));
 
 const env = require('./env/enviroment');
-const app = express();
+const app = express(); 
 
 /////////////////////
 // configurations //
