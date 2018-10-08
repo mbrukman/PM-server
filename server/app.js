@@ -7,7 +7,7 @@ const expressWinston = require('express-winston');
 const mongoose = require('mongoose');
 const bootstrap = require("./helpers/bootstrap").bootstrap;
 const socket = require('socket.io');
-const winstonMongo = require('winston-mongodb');
+require('winston-mongodb');
 const parseArgs = require('minimist')(process.argv.slice(2));
 
 const env = require('./env/enviroment');
@@ -39,9 +39,9 @@ if (env.dbURI) {
     mongoose.connect(env.dbURI, {
         useMongoClient: true
     }).then(() => {
-        winston.add(winstonMongo.MongoDB, {
+        winston.add(new winston.transports.MongoDB({
             db: env.dbURI,
-        });
+        }));
         winston.log('info', `Succesfully Connected to the Mongodb at ${env.dbURI}`);
     });
     expressWinstonTranports.push(new winston.transports.MongoDB({ db: env.dbURI }));

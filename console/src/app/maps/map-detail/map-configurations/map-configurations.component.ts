@@ -17,6 +17,7 @@ export class MapConfigurationsComponent implements OnInit {
     theme: 'vs-dark',
     language: 'json'
   };
+  value: string = '';
 
   constructor(private mapsService: MapsService, private modalService: BsModalService) { }
 
@@ -45,20 +46,22 @@ export class MapConfigurationsComponent implements OnInit {
 
   removeConfiguration(index: number) {
     this.mapStructure.configurations.splice(index, 1);
-    this.updateMapStructure()
+    this.updateMapStructure();
     this.selectedConfiguration = null;
   }
 
   editConfiguration(index: number) {
-    if (typeof(this.mapStructure.configurations[index].value) !== 'string') {
-      let re = new RegExp('\",\"', "g");
-      this.mapStructure.configurations[index].value = (JSON.stringify(this.mapStructure.configurations[index].value) || '').replace(re, '\", \n\"');
-    }
+    const re = new RegExp('\",\"', 'g');
+    this.value = (JSON.stringify(this.mapStructure.configurations[index].value) || '').replace(re, '\", \n\"');
+    // this.mapStructure.configurations[index].value = (JSON.stringify(this.mapStructure.configurations[index].value) || '').replace(re, '\", \n\"');
     this.selectedConfiguration = this.mapStructure.configurations[index];
   }
 
   updateMapStructure() {
-    this.mapsService.setCurrentMapStructure(this.mapStructure);
+    try {
+      this.selectedConfiguration.value = JSON.parse(this.value);
+      this.mapsService.setCurrentMapStructure(this.mapStructure);
+    } catch (err) {}
   }
 
 }
