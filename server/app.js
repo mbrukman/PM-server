@@ -6,7 +6,9 @@ const winston = require('winston');
 const expressWinston = require('express-winston');
 const mongoose = require('mongoose');
 const bootstrap = require("./helpers/bootstrap").bootstrap;
-const socket = require('socket.io');
+
+const socketService = require('./api/services/socket.service');
+
 require('winston-mongodb');
 const parseArgs = require('minimist')(process.argv.slice(2));
 
@@ -58,12 +60,7 @@ app.use(expressWinston.logger({
 
 mongoose.Promise = require('bluebird');
 
-// socket.io
-io = socket(server);
-io.on('connection', function (socket) {
-    winston.log('info', 'a user connected');
-});
-
+var io = socketService.init(server);
 
 app.use(bodyParser.urlencoded({
     extended: false
@@ -115,6 +112,3 @@ server.listen(port, () => {
     winston.log('info', `Running on localhost:${port}`);
     bootstrap(app);
 });
-
-
-
