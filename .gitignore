@@ -68,3 +68,5 @@ benchmarks/graphs
 private.ts
 
 /server/dist
+/server/env/config.json
+/server/libs/plugins/*
