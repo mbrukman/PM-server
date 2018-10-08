@@ -6,8 +6,10 @@ const winston = require('winston');
 const expressWinston = require('express-winston');
 const mongoose = require('mongoose');
 const bootstrap = require("./helpers/bootstrap").bootstrap;
-const socket = require('socket.io');
-const winstonMongo = require('winston-mongodb');
+
+const socketService = require('./api/services/socket.service');
+
+require('winston-mongodb');
 const parseArgs = require('minimist')(process.argv.slice(2));
 
 const env = require('./env/enviroment');
@@ -39,9 +41,9 @@ if (env.dbURI) {
     mongoose.connect(env.dbURI, {
         useMongoClient: true
     }).then(() => {
-        winston.add(winstonMongo.MongoDB, {
+        winston.add(new winston.transports.MongoDB({
             db: env.dbURI,
-        });
+        }));
         winston.log('info', `Succesfully Connected to the Mongodb at ${env.dbURI}`);
     });
     expressWinstonTranports.push(new winston.transports.MongoDB({ db: env.dbURI }));
@@ -58,12 +60,7 @@ app.use(expressWinston.logger({
 
 mongoose.Promise = require('bluebird');
 
-// socket.io
-io = socket(server);
-io.on('connection', function (socket) {
-    winston.log('info', 'a user connected');
-});
-
+var io = socketService.init(server);
 
 app.use(bodyParser.urlencoded({
     extended: false
@@ -115,6 +112,3 @@ server.listen(port, () => {
     winston.log('info', `Running on localhost:${port}`);
     bootstrap(app);
 });
-
-
-

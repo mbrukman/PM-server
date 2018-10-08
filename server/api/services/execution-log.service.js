@@ -1,5 +1,6 @@
 const models = require("../models");
 const MapExecutionLog = models.ExecutionLog;
+const socketService = require('./socket.service');
 
 function _createLogObject(runId, mapId, message, level){
     return {
@@ -10,7 +11,7 @@ function _createLogObject(runId, mapId, message, level){
     };
 }
 
-function _createLog(log, socket){
+function _createLog(log){
     return MapExecutionLog.create(log).then((newLog) => {
         if(Array.isArray(newLog))
             newLog.forEach( l=> emitLog(l));
@@ -18,8 +19,9 @@ function _createLog(log, socket){
             emitLog(newLog);
 
         function emitLog(logToEmit){
-            socket.emit('notification', logToEmit);
-            socket.emit('update', logToEmit);
+            if(!socketService.socket) return;
+            socketService.socket.emit('notification', logToEmit);
+            socketService.socket.emit('update', logToEmit);
         }
     });
 }
@@ -29,9 +31,9 @@ let exportedMethods = {
 };
 
 MapExecutionLog.schema.tree.status.enum.forEach((level)=>{
-    exportedMethods[level] = (runId, mapId, message, socket) => {
+    exportedMethods[level] = (runId, mapId, message) => {
         let log = _createLogObject(runId, mapId, message, level)
-        return _createLog(log, socket)
+        return _createLog(log)
     }
 })
 

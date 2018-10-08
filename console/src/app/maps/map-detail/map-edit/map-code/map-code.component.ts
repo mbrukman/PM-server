@@ -12,13 +12,13 @@ import { MapStructure } from "../../../models/map-structure.model";
   styleUrls: ['./map-code.component.scss']
 })
 export class MapCodeComponent implements OnInit {
-  structure: MapStructure;
+  structure: MapStructure = new MapStructure();
   mapSubscription: Subscription;
   editorOptions = {
     theme: 'vs-dark',
     language: 'javascript'
   };
-  code: string;
+  // code: string;
 
   constructor(private mapsService: MapsService) {
   }
@@ -27,14 +27,14 @@ export class MapCodeComponent implements OnInit {
     this.mapSubscription = this.mapsService.getCurrentMapStructure().subscribe(structure => {
       if (structure) {
         this.structure = structure;
-        this.code = structure.code;
+        // this.code = structure.code;
       }
     });
   }
 
   onKeyDown() {
-    this.structure.code = this.code;
-    this.mapsService.setCurrentMapStructure(this.structure);
+    // this.structure.code = this.code;
+    // this.mapsService.setCurrentMapStructure(this.structure);
   }
 
 }

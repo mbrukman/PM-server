@@ -1126,7 +1126,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                             }
                         );
 
-                        executionLogService.create(actionExecutionLogs);
+                        executionLogService.create(actionExecutionLogs, socket);
                         callback(null, result);
                     } else {
                         let res = {};

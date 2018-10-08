@@ -41,9 +41,9 @@ module.exports = {
                         let tmpRoute = req.app._router.stack.pop();
                         req.app._router.stack.splice(3, 0, tmpRoute); // adding to router stack
                         // adding mongo transporter to winston
-                        winston.add(winstonMongo.MongoDB, {
+                        winston.add(new winston.transports.MongoDB({
                             db: dbDetails.uri
-                        });
+                        }));
                         config = Object.assign({}, config, { dbURI: dbDetails.uri });
                         fs.writeFileSync('./env/config.json', JSON.stringify(config));
                         res.status(204).send();
