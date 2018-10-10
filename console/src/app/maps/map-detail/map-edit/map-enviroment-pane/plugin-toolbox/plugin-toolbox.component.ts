@@ -134,8 +134,8 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
   }
 
   getPluginCubeText(pluginName: string): string {
-    if (pluginName.length > 17) {
-      return `${pluginName.substr(0, 14)}...`;
+    if (pluginName.length > 15) {
+      return `${pluginName.substr(0, 12)}...`;
     }
     return pluginName;
   }
