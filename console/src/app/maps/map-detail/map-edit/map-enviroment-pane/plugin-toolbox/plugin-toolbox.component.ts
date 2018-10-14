@@ -82,7 +82,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
 
     this.pluginsReq = this.pluginsService.list().subscribe(plugins => {
       this.plugins = plugins.filter(plugin => {
-        return plugin.type === 'executer'
+        return plugin.type === 'executer';
       });
       this.addPluginsToGraph();
     });
@@ -133,6 +133,13 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  getPluginCubeText(pluginName: string): string {
+    if (pluginName.length > 15) {
+      return `${pluginName.substr(0, 12)}...`;
+    }
+    return pluginName;
+  }
+
   addPluginsToGraph() {
     let plugins = [];
     let iteration = 0;
@@ -147,7 +154,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
           height: 73
         },
         attrs: {
-          '.label': { text: plugin.name },
+          '.label': { text: this.getPluginCubeText(plugin.name) },
           image: {
             'xlink:href': `plugins/${plugin.name}/${plugin.imgUrl}`,
             width: 46,
