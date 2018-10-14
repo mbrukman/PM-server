@@ -14,7 +14,7 @@ Use Kaholo to automate all your workflow so you can focus on work that matters m
 Execute repetitive workflows and tasks, save time, and optimize your development process.
 
 # User Guide & Installation
-All instruction on how to install and start using ProdcutionMap can be found on our [user guide][UserGuide].
+All instruction on how to install and start using Kaholo can be found on our [user guide][UserGuide].
 
 # Source
 You can alwasy find our latest source on [GitHub]. Fork us!
