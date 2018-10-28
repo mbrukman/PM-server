@@ -9,9 +9,10 @@ import { distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
-import { Process } from '@maps/models/map-structure.model';
+import { Process, Action, ActionParam } from '@maps/models/map-structure.model';
 import { Plugin } from '@plugins/models/plugin.model';
 import { PluginMethod } from '@plugins/models/plugin-method.model';
+import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
 import { SocketService } from '@shared/socket.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
@@ -63,49 +64,20 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       .getUpdateProcessAsObservable()
       .filter(process => process.uuid === this.process.uuid)
       .subscribe(process => {
-        this.process = process;
+        this.process = new Process(process);
         this.processForm.get('coordination').setValue(process.coordination);
       });
 
-    this.processForm = this.initProcessForm(
-      this.process.name,
-      this.process.uuid,
-      this.process.description,
-      this.process.mandatory,
-      this.process.condition,
-      this.process.coordination,
-      this.process.flowControl,
-      this.process.preRun,
-      this.process.postRun,
-      this.process.correlateAgents,
-      this.process.filterAgents
-    );
+    this.process = new Process(this.process);
+    this.processForm = this.process.getFormGroup();
 
     if (this.process.actions) {
       this.process.actions.forEach((action, actionIndex) => {
         const actionControl = <FormArray>this.processForm.controls['actions'];
-        actionControl.push(
-          this.initActionController(
-            action.id,
-            action.name,
-            action.timeout,
-            action.retries,
-            action.mandatory,
-            action.method
-          )
-        );
+        actionControl.push(this.initActionController(action));
         if (action.params && action.params.length > 0) {
           action.params.forEach(param => {
-            actionControl.controls[actionIndex]['controls'].params.push(
-              this.initActionParamController(
-                param.code,
-                param.value,
-                param._id ? param._id : param.param,
-                param.viewName,
-                param.name,
-                param.type
-              )
-            );
+            actionControl.controls[actionIndex]['controls'].params.push(new ActionParam(param).getFormGroup());
           });
         }
       });
@@ -181,50 +153,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Initiating the process form with values, returning a form group object
-   * @param name
-   * @param uuid
-   * @param description
-   * @param mandatory
-   * @param condition
-   * @param coordination
-   * @param flowControl
-   * @param preRun
-   * @param postRun
-   * @param correlateAgents
-   * @param filterAgents
-   * @returns {FormGroup}
-   */
-  initProcessForm(
-    name,
-    uuid,
-    description,
-    mandatory,
-    condition,
-    coordination,
-    flowControl,
-    preRun,
-    postRun,
-    correlateAgents,
-    filterAgents
-  ) {
-    return new FormGroup({
-      name: new FormControl(name),
-      uuid: new FormControl(uuid),
-      description: new FormControl(description),
-      mandatory: new FormControl(mandatory),
-      condition: new FormControl(condition),
-      coordination: new FormControl(coordination),
-      flowControl: new FormControl(flowControl),
-      preRun: new FormControl(preRun),
-      postRun: new FormControl(postRun),
-      correlateAgents: new FormControl(correlateAgents),
-      filterAgents: new FormControl(filterAgents),
-      actions: new FormArray([])
-    });
-  }
-
-  /**
    * Add a new action to process
    */
   addNewAction() {
@@ -244,8 +172,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @param {number} index
    */
   removeAction(index: number) {
-    const actionControl = <FormArray>this.processForm.controls['actions'];
-    actionControl.removeAt(index);
+    (<FormArray>this.processForm.controls['actions']).removeAt(index);
   }
 
   /**
@@ -259,53 +186,11 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
 
   /**
    * Returning a FormGroup with process action fields
-   * @param id
-   * @param name
-   * @param timeout
-   * @param timeunit
-   * @param retries
-   * @param mandatory
-   * @param method
+   * @param action
    * @returns {FormGroup}
    */
-  initActionController(
-    id?,
-    name?,
-    timeout?,
-    retries = 0,
-    mandatory?,
-    method?
-  ): FormGroup {
-    return new FormGroup({
-      id: new FormControl(id),
-      name: new FormControl(name),
-      timeout: new FormControl(timeout),
-      retries: new FormControl(retries),
-      method: new FormControl(method),
-      mandatory: new FormControl(mandatory),
-      params: new FormArray([])
-    });
-  }
-
-  /**
-   * Returning a FormGroup with action params fields
-   * @param code
-   * @param value
-   * @param id
-   * @param viewName
-   * @param name
-   * @param type
-   * @returns {FormGroup}
-   */
-  initActionParamController(code?, value?, id?, viewName?, name?, type?) {
-    return new FormGroup({
-      code: new FormControl(code),
-      value: new FormControl(value),
-      param: new FormControl(id),
-      viewName: new FormControl(viewName),
-      name: new FormControl(name),
-      type: new FormControl(type)
-    });
+  initActionController(action?: Action): FormGroup {
+    return new Action(action).getFormGroup();
   }
 
   /**
@@ -325,16 +210,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       return;
     }
     method.params.forEach(param => {
-      action.controls.params.push(
-        this.initActionParamController(
-          null,
-          null,
-          param._id,
-          param.viewName,
-          param.name,
-          param.type
-        )
-      );
+      action.controls.params.push(new PluginMethodParam(param).getFormGroup());
     });
   }
 
