@@ -16,14 +16,12 @@ import { SocketService } from '@shared/socket.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
 
-
 @Component({
   selector: 'app-process-form',
   templateUrl: './process-form.component.html',
   styleUrls: ['./process-form.component.scss']
 })
 export class ProcessFormComponent implements OnInit, OnDestroy {
-
   @Input('process') process: Process;
   @Output() saved: EventEmitter<any> = new EventEmitter<any>();
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
@@ -38,22 +36,22 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   selectedMethod: PluginMethod;
 
   COORDINATION_TYPES = {
-    'wait': 'Wait for all',
-    'race': 'Run once for first',
-    'each': 'Run for each in link'
+    wait: 'Wait for all',
+    race: 'Run once for first',
+    each: 'Run for each in link'
   };
-
 
   FLOW_CONTROL_TYPES = {
-    'wait': 'Wait for all agents and then run',
-    'race': 'Run only for first agent',
-    'each': 'Run for each agent'
+    wait: 'Wait for all agents and then run',
+    race: 'Run only for first agent',
+    each: 'Run for each agent'
   };
 
-
-  constructor(private socketService: SocketService,
-              private pluginsService: PluginsService,
-              private mapDesignService: MapDesignService) { }
+  constructor(
+    private socketService: SocketService,
+    private pluginsService: PluginsService,
+    private mapDesignService: MapDesignService
+  ) {}
 
   ngOnInit() {
     if (!this.process) {
@@ -61,7 +59,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.processUpdateSubscription = this.mapDesignService.getUpdateProcessAsObservable()
+    this.processUpdateSubscription = this.mapDesignService
+      .getUpdateProcessAsObservable()
       .filter(process => process.uuid === this.process.uuid)
       .subscribe(process => {
         this.process = process;
@@ -85,24 +84,28 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     if (this.process.actions) {
       this.process.actions.forEach((action, actionIndex) => {
         const actionControl = <FormArray>this.processForm.controls['actions'];
-        actionControl.push(this.initActionController(
-          action.id,
-          action.name,
-          action.timeout,
-          action.retries,
-          action.mandatory,
-          action.method
-        ));
+        actionControl.push(
+          this.initActionController(
+            action.id,
+            action.name,
+            action.timeout,
+            action.retries,
+            action.mandatory,
+            action.method
+          )
+        );
         if (action.params && action.params.length > 0) {
-          action.params.forEach((param) => {
-            actionControl.controls[actionIndex]['controls'].params.push(this.initActionParamController(
-              param.code,
-              param.value,
-              param._id ? param._id : param.param,
-              param.viewName,
-              param.name,
-              param.type
-            ));
+          action.params.forEach(param => {
+            actionControl.controls[actionIndex]['controls'].params.push(
+              this.initActionParamController(
+                param.code,
+                param.value,
+                param._id ? param._id : param.param,
+                param.viewName,
+                param.name,
+                param.type
+              )
+            );
           });
         }
       });
@@ -141,20 +144,26 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
           Observable.of(method), // the method
           this.pluginsService.generatePluginParams(this.plugin._id, method.name) // generated params
         );
-      }).map(data => { // data: [method, [generated params]]
-      data[1].forEach(param => {
-        data[0].params[data[0].params.findIndex(o => o.name === param.name)] = param;
-      });
-      return data[0];
-    })
+      })
+      .map(data => {
+        // data: [method, [generated params]]
+        data[1].forEach(param => {
+          data[0].params[
+            data[0].params.findIndex(o => o.name === param.name)
+          ] = param;
+        });
+        return data[0];
+      })
       .subscribe(method => {
-        this.plugin.methods[this.plugin.methods.findIndex(o => o.name === method.name)] = method;
+        this.plugin.methods[
+          this.plugin.methods.findIndex(o => o.name === method.name)
+        ] = method;
         this.addToMethodContext(method);
       });
 
     Observable.from(this.plugin.methods)
       .filter(method => this.hasOptionsParam(method))
-      .subscribe((method) => {
+      .subscribe(method => {
         this.addToMethodContext(method);
       });
   }
@@ -163,13 +172,12 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     this.methods[method.name] = method;
   }
 
-
   hasAutocompleteParam(method): boolean {
-    return method.params.findIndex(p => p.type === 'autocomplete') > -1
+    return method.params.findIndex(p => p.type === 'autocomplete') > -1;
   }
 
   hasOptionsParam(method): boolean {
-    return method.params.findIndex(p => p.type === 'options') > -1
+    return method.params.findIndex(p => p.type === 'options') > -1;
   }
 
   /**
@@ -187,7 +195,19 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @param filterAgents
    * @returns {FormGroup}
    */
-  initProcessForm(name, uuid, description, mandatory, condition, coordination, flowControl, preRun, postRun, correlateAgents, filterAgents) {
+  initProcessForm(
+    name,
+    uuid,
+    description,
+    mandatory,
+    condition,
+    coordination,
+    flowControl,
+    preRun,
+    postRun,
+    correlateAgents,
+    filterAgents
+  ) {
     return new FormGroup({
       name: new FormControl(name),
       uuid: new FormControl(uuid),
@@ -201,7 +221,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       correlateAgents: new FormControl(correlateAgents),
       filterAgents: new FormControl(filterAgents),
       actions: new FormArray([])
-    })
+    });
   }
 
   /**
@@ -248,7 +268,14 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @param method
    * @returns {FormGroup}
    */
-  initActionController(id?, name?, timeout?, retries = 0, mandatory?, method?): FormGroup {
+  initActionController(
+    id?,
+    name?,
+    timeout?,
+    retries = 0,
+    mandatory?,
+    method?
+  ): FormGroup {
     return new FormGroup({
       id: new FormControl(id),
       name: new FormControl(name),
@@ -286,17 +313,28 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    */
   onSelectMethod() {
     this.selectedMethod = this.processForm.value.actions[this.index].method;
-    /* when a method selected - change the form params*/
     const methodName = this.processForm.value.actions[this.index].method;
     const action = this.processForm.controls['actions']['controls'][this.index];
-    action.controls.params.setControl([]);
-    const method = this.plugin.methods.find((o) => o.name === methodName);
+    const method = this.plugin.methods.find(o => o.name === methodName);
+    action.controls.params = new FormArray([]);
     if (!method) {
-      this.socketService.setNotification({ title: 'OH OH', message: 'Unexpected error, please try again.' });
+      this.socketService.setNotification({
+        title: 'OH OH',
+        message: 'Unexpected error, please try again.'
+      });
       return;
     }
     method.params.forEach(param => {
-      action.controls.params.push(this.initActionParamController(null, null, param._id, param.viewName, param.name, param.type));
+      action.controls.params.push(
+        this.initActionParamController(
+          null,
+          null,
+          param._id,
+          param.viewName,
+          param.name,
+          param.type
+        )
+      );
     });
   }
 
@@ -321,7 +359,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   onMouseUp(event) {
     setTimeout(() => {
       this.processForm.controls.actions.updateValueAndValidity();
-    }, 0)
+    }, 0);
   }
-
 }
