@@ -108,7 +108,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
   deleteGroup(groupIndex, groupId) {
     this.agentsService.groupDelete(groupId).subscribe(() => {
       this.groups.splice(groupIndex, 1);
-    })
+    });
   }
 
 }

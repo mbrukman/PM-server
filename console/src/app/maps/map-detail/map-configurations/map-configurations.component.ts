@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Configuration, MapStructure } from "@maps/models";
 import { BsModalService } from 'ngx-bootstrap';
 
-import { MapsService } from "@maps/maps.service";
-import { AddConfigurationComponent } from "@maps/map-detail/map-configurations/add-configuration/add-configuration.component";
+import { Configuration, MapStructure } from '@maps/models';
+import { MapsService } from '@maps/maps.service';
+import { AddConfigurationComponent } from '@maps/map-detail/map-configurations/add-configuration/add-configuration.component';
 
 @Component({
   selector: 'app-main-map-configurations',

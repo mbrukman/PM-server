@@ -7,7 +7,6 @@ import { PluginsService } from '@plugins/plugins.service';
 import { Plugin } from '@plugins/models/plugin.model';
 import { MapDesignService } from '../../map-design.service';
 
-
 @Component({
   selector: 'app-plugin-toolbox',
   templateUrl: './plugin-toolbox.component.html',
@@ -21,12 +20,13 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
   pluginsReq: any;
   pluginCell: any;
 
-  constructor(private pluginsService: PluginsService, private designService: MapDesignService) {
-  }
+  constructor(
+    private pluginsService: PluginsService,
+    private designService: MapDesignService
+  ) {}
 
   ngAfterViewInit() {
-
-    this.stencilGraph = new joint.dia.Graph;
+    this.stencilGraph = new joint.dia.Graph();
     this.stencilPaper = new joint.dia.Paper({
       el: $('#stencil'),
       width: 250,
@@ -37,47 +37,49 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
     });
 
     joint.shapes.devs['MyImageModel'] = joint.shapes.devs.Model.extend({
+      markup:
+        '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
 
-      markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
-
-      defaults: joint.util.deepSupplement({
-
-        type: 'devs.MyImageModel',
-        size: {
-          width: 108,
-          height: 73
-        },
-        attrs: {
-          rect: {
-            'stroke-width': '1',
-            'stroke-opacity': .7,
-            stroke: '#7f7f7f',
-            rx: 3,
-            ry: 3,
-            fill: '#2d3236',
-            'fill-opacity': .5
+      defaults: joint.util.deepSupplement(
+        {
+          type: 'devs.MyImageModel',
+          size: {
+            width: 108,
+            height: 73
           },
-          circle: {
-            stroke: 'gray'
-          },
-          '.label': {
-            text: '',
-            'ref-y': 5,
-            'font-size': 14,
-            fill: '#bbbbbb'
-          },
-          image: {
-            'xlink:href': 'http://via.placeholder.com/350x150',
-            width: 46,
-            height: 32,
-            'ref-x': 50,
-            'ref-y': 60,
-            ref: 'rect',
-            'x-alignment': 'middle',
-            'y-alignment': 'middle'
+          attrs: {
+            rect: {
+              'stroke-width': '1',
+              'stroke-opacity': 0.7,
+              stroke: '#7f7f7f',
+              rx: 3,
+              ry: 3,
+              fill: '#2d3236',
+              'fill-opacity': 0.5
+            },
+            circle: {
+              stroke: 'gray'
+            },
+            '.label': {
+              text: '',
+              'ref-y': 5,
+              'font-size': 14,
+              fill: '#bbbbbb'
+            },
+            image: {
+              'xlink:href': 'http://via.placeholder.com/350x150',
+              width: 46,
+              height: 32,
+              'ref-x': 50,
+              'ref-y': 60,
+              ref: 'rect',
+              'x-alignment': 'middle',
+              'y-alignment': 'middle'
+            }
           }
-        }
-      }, joint.shapes.devs.Model.prototype.defaults)
+        },
+        joint.shapes.devs.Model.prototype.defaults
+      )
     });
 
     this.pluginsReq = this.pluginsService.list().subscribe(plugins => {
@@ -88,15 +90,16 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
     });
 
     this.stencilPaper.on('cell:pointerdown', (cellView, event, x, y) => {
-        this.flyCell(cellView, event, x, y);
-      }
-    );
+      this.flyCell(cellView, event, x, y);
+    });
   }
 
   flyCell(cellView, event, x, y) {
     let self = this;
-    $('body').append('<div id="flyPaper" style="position:fixed;z-index:100;opacity:.7;pointer-event:none;background: transparent"></div>');
-    var flyGraph = new joint.dia.Graph,
+    $('body').append(
+      '<div id="flyPaper" style="position:fixed;z-index:100;opacity:.7;pointer-event:none;background: transparent"></div>'
+    );
+    let flyGraph = new joint.dia.Graph(),
       flyPaper = new joint.dia.Paper({
         el: $('#flyPaper'),
         model: flyGraph,
@@ -115,20 +118,19 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
       left: event.pageX - offset.x,
       top: event.pageY - offset.y
     });
-    $('body').on('mousemove.fly', function (e) {
+    $('body').on('mousemove.fly', function(e) {
       $('#flyPaper').offset({
         left: e.pageX - offset.x,
         top: e.pageY - offset.y
       });
     });
 
-    $('body').on('mouseup.fly', function (e) {
-      let x = e.pageX;
-      let y = e.pageY;
-
-      $('body').off('mousemove.fly').off('mouseup.fly');
+    $('body').on('mouseup.fly', function(e) {
+      $('body')
+        .off('mousemove.fly')
+        .off('mouseup.fly');
       flyShape.remove();
-      self.designService.drop(x, y, cellView);
+      self.designService.drop(e.pageX, e.pageY, cellView);
       $('#flyPaper').remove();
     });
   }
@@ -177,5 +179,4 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy() {
     this.pluginsReq.unsubscribe();
   }
-
 }

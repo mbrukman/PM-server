@@ -8,11 +8,11 @@ import { SocketService } from '@shared/socket.service';
 import { Agent } from '@agents/models/agent.model';
 import { ProcessResultByProcessIndex } from '@maps/models';
 
-interface processList {
-  name: string,
-  index: number,
-  overall: number,
-  uuid: string
+interface IProcessList {
+  name: string;
+  index: number;
+  overall: number;
+  uuid: string;
 }
 
 @Component({
@@ -39,7 +39,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   pendingMessagesSubscriptions: Subscription;
   executing: string[] = [];
   pendingExecutions: string[];
-  processesList: processList[];
+  processesList: IProcessList[];
   agProcessStatusesByProcessIndex: ProcessResultByProcessIndex;
 
   colorScheme = {
@@ -57,8 +57,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
       .flatMap(map => this.mapsService.executionResults(map.id)) // request execution results list
       .subscribe(executions => {
         this.executionsList = executions;
-        if (executions && executions.length)
+        if (executions && executions.length) {
           this.selectExecution(executions[0].id);
+        }
       });
 
     // getting the current executions list when initiating
@@ -132,7 +133,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
 
     let ag = processes.reduce((total, current) => {
       if (!total[current.status]) {
-        return total
+        return total;
       }
       total[current.status].value = (total[current.status].value || 0) + 1;
       return total;
@@ -181,11 +182,11 @@ export class MapResultComponent implements OnInit, OnDestroy {
         this.selectedExecution = result;
 
         this.agents = result.agentsResults.map(o => {
-          return { label: o.agent ? (<Agent>o.agent).name : '', value: o }
+          return { label: o.agent ? (<Agent>o.agent).name : '', value: o };
         });
 
         if (this.agents.length > 1) { // if there is more than one agent, add an aggregated option.
-          this.agents.unshift({ label: 'Aggregate', value: 'default' })
+          this.agents.unshift({ label: 'Aggregate', value: 'default' });
         }
 
         this.changeAgent();
@@ -225,15 +226,15 @@ export class MapResultComponent implements OnInit, OnDestroy {
    */
   generateProcessesList() {
     function sortByDate(a, b) {
-      let dateA = new Date(a.startTime);
-      let dateB = new Date(b.startTime);
+      const dateA = new Date(a.startTime);
+      const dateB = new Date(b.startTime);
       if (dateA < dateB) {
         return -1;
       }
       if (dateA > dateB) {
         return 1;
       }
-      return 0
+      return 0;
     }
 
     let processesList = [];
@@ -257,11 +258,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
           index: o.index,
           uuid: o.uuid,
           overall: overall[o.uuid]
-        }
+        };
       });
 
-    if (processesList.length)
+    if (processesList.length) {
       this.selectProcess(processesList[0]); // selecting the first process
+    }
   }
 
   selectProcess(process) {
@@ -279,7 +281,4 @@ export class MapResultComponent implements OnInit, OnDestroy {
   cancelPending(runId: string) {
     this.mapsService.cancelPending(this.map.id, runId).subscribe();
   }
-
-
 }
-

@@ -2,13 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 import 'rxjs/add/operator/finally';
+import { BsModalRef } from 'ngx-bootstrap';
+import { Subject } from 'rxjs/Subject';
 
-import { PluginsService } from "../plugins.service";
-import { BsModalRef } from "ngx-bootstrap";
-import { Subject } from "rxjs/Subject";
-
-
-const serverUrl = environment.serverUrl;
+import { PluginsService } from '../plugins.service';
 
 @Component({
   selector: 'app-plugin-upload',

@@ -54,7 +54,7 @@ export class AddJobComponent implements OnInit {
       .filter(structure => !!structure.configurations)
       .subscribe(structure => {
         this.selectedMapConfigurations = structure.configurations.map(o => o.name);
-      })
+      });
   }
 
   initForm(): FormGroup {

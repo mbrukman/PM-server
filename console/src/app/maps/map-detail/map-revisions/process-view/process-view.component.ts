@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { Process } from "@maps/models";
+import { Process } from '@maps/models';
 
 @Component({
   selector: 'app-process-view',
@@ -8,7 +8,7 @@ import { Process } from "@maps/models";
 })
 export class ProcessViewComponent implements OnInit, OnChanges {
   action: any;
-  groups: [{ name: string, properties: string[] }];
+  groups: { name: string, properties: string[] }[];
   @Input('process') process: Process;
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
 
@@ -18,20 +18,20 @@ export class ProcessViewComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.groups = [
       {
-        name: "Details",
-        properties: ["name", "description", "uuid"]
+        name: 'Details',
+        properties: ['name', 'description', 'uuid']
       },
       {
-        name: "Conditions",
-        properties: ["mandatory", "condition"]
+        name: 'Conditions',
+        properties: ['mandatory', 'condition']
       },
       {
-        name: "Flow control",
-        properties: ["flowControl", "coordination"]
+        name: 'Flow control',
+        properties: ['flowControl', 'coordination']
       },
       {
-        name: "Hooks",
-        properties: ['preRun', "postRun"]
+        name: 'Hooks',
+        properties: ['preRun', 'postRun']
       }
     ];
   }

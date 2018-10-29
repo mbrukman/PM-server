@@ -25,8 +25,8 @@ export class InlineEditDirective implements AfterViewInit, OnChanges {
   @Output('valueChanged') update: EventEmitter<any> = new EventEmitter();
 
   constructor(private elm: ElementRef, private renderer: Renderer2) {
-    this.renderer.setAttribute(this.elm.nativeElement, 'contenteditable', 'true')
-    this.renderer.addClass(this.elm.nativeElement, 'pm-inline-edit')
+    this.renderer.setAttribute(this.elm.nativeElement, 'contenteditable', 'true');
+    this.renderer.addClass(this.elm.nativeElement, 'pm-inline-edit');
   }
 
   ngAfterViewInit() {
@@ -34,7 +34,7 @@ export class InlineEditDirective implements AfterViewInit, OnChanges {
   }
 
   ngOnChanges(change: SimpleChanges) {
-    this.elm.nativeElement.innerText= this.model;
+    this.elm.nativeElement.innerText = this.model;
   }
 
   registerInputEvent() {
@@ -45,6 +45,6 @@ export class InlineEditDirective implements AfterViewInit, OnChanges {
         this.model = e;
         this.onChange.emit(e);
         this.update.emit(e);
-      })
+      });
   }
 }

@@ -108,7 +108,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
           datetime: job.datetime,
           map: job.map
         });
-      } catch (e) { flag = false;}
+      } catch (e) { flag = false; }
     }
 
     return crons;

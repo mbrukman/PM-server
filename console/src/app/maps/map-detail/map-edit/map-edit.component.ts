@@ -22,9 +22,9 @@ export class MapEditComponent implements OnInit, OnDestroy {
   activeTab: any;
 
   envTabs = [
-    {key : 'agents', label: 'Agents', icon:'icon-agent'},
-    {key : 'triggers', label: 'Triggers', icon:'icon-trigger'},
-    {key : 'plugins', label: 'Plugins', icon:'icon-plugins'}
+    {key : 'agents', label: 'Agents', icon: 'icon-agent'},
+    {key : 'triggers', label: 'Triggers', icon: 'icon-trigger'},
+    {key : 'plugins', label: 'Plugins', icon: 'icon-plugins'}
   ];
 
   @ViewChild('wrapper') wrapper: ElementRef;
@@ -51,12 +51,12 @@ export class MapEditComponent implements OnInit, OnDestroy {
 
   }
 
-  closeTabs(){
-    this.activeTab=null;
-    this.designService.tabOpen=false;
+  closeTabs() {
+    this.activeTab = null;
+    this.designService.tabOpen = false;
   }
 
-  openTab(tab){
+  openTab(tab) {
     this.activeTab = tab;
     this.designService.tabOpen = true;
   }

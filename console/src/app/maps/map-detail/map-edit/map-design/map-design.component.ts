@@ -162,7 +162,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       return;
     }
     const link = _.find(this.mapStructure.links, (o) => {
-      return (o.targetId === this.link.targetId && o.sourceId === this.link.sourceId)
+      return (o.targetId === this.link.targetId && o.sourceId === this.link.sourceId);
     });
     if (link) {
       return;
@@ -179,7 +179,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       if (!this.mapStructure.processes[processIndex].coordination) {
         this.mapStructure.processes[processIndex].coordination = 'wait';
         this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
-
       }
     }
     this.deselectAllCellsAndUpdateStructure();
@@ -417,7 +416,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           });
         }
 
-        this.mapStructure.content = JSON.stringify(this.graph.toJSON())
+        this.mapStructure.content = JSON.stringify(this.graph.toJSON());
         this.mapsService.setCurrentMapStructure(this.mapStructure);
       }
     }
@@ -452,8 +451,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
 
     $('#graph').mousemove((event) => {
-      if (move)
+      if (move) {
         self.paper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
+      }
     });
 
     this.paper.on('blank:pointerup', (event, x, y) => {
@@ -461,7 +461,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
       // closing process pane if opened
       if (this.process) {
-        this.onClose()
+        this.onClose();
       }
     });
 
@@ -503,7 +503,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.graph.on('remove', function (cell, collection, opt) {
       if (cell.isLink()) {
         let linkIndex = _.findIndex(self.mapStructure.links, (o) => {
-          return o.uuid === cell.id
+          return o.uuid === cell.id;
         });
         if (linkIndex === -1) {
           self.deselectAllCellsAndUpdateStructure();
@@ -522,7 +522,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         }
         self.deselectAllCellsAndUpdateStructure();
       }
-    })
+    });
   }
 
   onClose(event?) {
@@ -534,7 +534,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   onDelete(event) {
     let processIndex = _.findIndex(this.mapStructure.processes, (o) => {
-      return o.uuid === this.process.uuid
+      return o.uuid === this.process.uuid;
     });
     this.mapStructure.processes.splice(processIndex, 1);
     this.graph.removeCells([this.graph.getCell(this.process.uuid)]);
@@ -545,7 +545,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   onSave(process) {
     let index = _.findIndex(this.mapStructure.processes, (o) => {
-      return o.uuid === this.process.uuid
+      return o.uuid === this.process.uuid;
     });
 
     this.updateNodeLabel(process.uuid, process.name || this.process.used_plugin.name);

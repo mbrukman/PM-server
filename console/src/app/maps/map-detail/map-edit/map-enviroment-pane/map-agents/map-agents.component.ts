@@ -60,8 +60,7 @@ export class MapAgentsComponent implements OnInit, OnDestroy {
     modal.content.result.subscribe(result => {
       this.map.agents = result;
       this.mapsService.setCurrentMap(this.map);
-    })
-
+    });
   }
 
   openSelectGroupsModal() {

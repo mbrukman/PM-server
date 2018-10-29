@@ -36,16 +36,18 @@ export class MapTriggersComponent implements OnInit, OnDestroy {
     this.mapStructureSubscription = this.mapsService.getCurrentMapStructure()
       .subscribe(structure => {
         this.mapStructure = structure;
-      })
+      });
   }
 
   ngOnDestroy() {
     this.mapSubscription.unsubscribe();
     this.triggerReq.unsubscribe();
-    if (this.resultSubscription)
+    if (this.resultSubscription) {
       this.resultSubscription.unsubscribe();
-    if (this.deleteReq)
+    }
+    if (this.deleteReq) {
       this.deleteReq.unsubscribe();
+    }
   }
 
   openTriggerFormModal(index?) {

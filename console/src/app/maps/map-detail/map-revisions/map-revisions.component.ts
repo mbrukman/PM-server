@@ -74,8 +74,9 @@ export class MapRevisionsComponent implements OnInit {
     });
 
     $('#graph').mousemove((event) => {
-      if (move)
+      if (move) {
         this.paper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
+      }
     });
 
     this.paper.on('blank:pointerup', (event, x, y) => {
@@ -95,7 +96,7 @@ export class MapRevisionsComponent implements OnInit {
   getMapStructures(page: number) {
     this.mapsService.structuresList(this.mapId, page).subscribe(structures => {
       if (structures && structures.length > 0) {
-        this.structures = [...this.structures, ...structures]
+        this.structures = [...this.structures, ...structures];
       } else {
         this.morePages = false;
       }
@@ -118,7 +119,7 @@ export class MapRevisionsComponent implements OnInit {
       this.socketService.setNotification({
         title: 'Changed version',
         type: 'info'
-      })
+      });
     });
   }
 
@@ -204,7 +205,7 @@ export class MapRevisionsComponent implements OnInit {
 
   duplicateMap(structureId: string) {
     this.mapsService.duplicateMap(this.mapId, structureId, this.project.id).subscribe(map => {
-      this.router.navigate(['/maps', map.id])
+      this.router.navigate(['/maps', map.id]);
     });
   }
 

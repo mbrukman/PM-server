@@ -22,15 +22,15 @@ export class AgentsService {
   }
 
   delete(agentId) {
-    return this.http.delete(serverUrl + 'api/agents/' + agentId + '/delete', { responseType: 'text' as 'json' })
+    return this.http.delete(serverUrl + 'api/agents/' + agentId + '/delete', { responseType: 'text' as 'json' });
   }
 
   list() {
-    return this.http.get<[Agent]>(serverUrl + 'api/agents')
+    return this.http.get<[Agent]>(serverUrl + 'api/agents');
   }
 
   status() {
-    return this.http.get<any>(serverUrl + 'api/agents/status')
+    return this.http.get<any>(serverUrl + 'api/agents/status');
   }
 
   update(agent) {
@@ -63,7 +63,7 @@ export class AgentsService {
    * @returns {Observable<Object>}
    */
   groupDetail(groupId: string) {
-    return this.http.get<Group>(`${serverUrl}api/agents/groups/${groupId}`)
+    return this.http.get<Group>(`${serverUrl}api/agents/groups/${groupId}`);
   }
 
   /**
@@ -155,7 +155,7 @@ export class AgentsService {
    * @returns {Observable<Group>}
    */
   getGroupToReEvaluateAsObservable(): Observable<Group> {
-    return this.reEvaluateFilterSubject.asObservable()
+    return this.reEvaluateFilterSubject.asObservable();
   }
 
   /**

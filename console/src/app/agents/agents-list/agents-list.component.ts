@@ -70,10 +70,10 @@ export class AgentsListComponent implements OnInit, OnDestroy {
   deleteAgent(agentId) {
     this.agentsService.delete(agentId).subscribe(() => {
       let i = this.agents.findIndex((o) => {
-        return o._id === agentId
+        return o._id === agentId;
       });
       this.agents.splice(i, 1);
-    })
+    });
   }
 
   editAgent(agentIndex) {
