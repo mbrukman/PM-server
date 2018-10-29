@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { FormArray, FormControl, FormGroup } from '@angular/forms';
+import { FormArray, FormGroup } from '@angular/forms';
 
 import * as _ from 'lodash';
 import 'rxjs/add/observable/forkJoin';
@@ -110,7 +110,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    */
   generateAutocompleteParams() {
     Observable.from(this.plugin.methods)
-      .filter(method => this.hasAutocompleteParam(method)) // check if has autocomplete
+      .filter(method => this.methodHaveParamType(method, 'autocomplete')) // check if has autocomplete
       .flatMap(method => {
         return Observable.forkJoin(
           Observable.of(method), // the method
@@ -134,7 +134,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       });
 
     Observable.from(this.plugin.methods)
-      .filter(method => this.hasOptionsParam(method))
+      .filter(method => this.methodHaveParamType(method, 'options'))
       .subscribe(method => {
         this.addToMethodContext(method);
       });
@@ -144,12 +144,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     this.methods[method.name] = method;
   }
 
-  hasAutocompleteParam(method): boolean {
-    return method.params.findIndex(p => p.type === 'autocomplete') > -1;
-  }
-
-  hasOptionsParam(method): boolean {
-    return method.params.findIndex(p => p.type === 'options') > -1;
+  methodHaveParamType(method: PluginMethod, type: string): boolean {
+    return method.params.findIndex(p => p.type === type) > -1;
   }
 
   /**
