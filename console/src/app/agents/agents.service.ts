@@ -22,19 +22,19 @@ export class AgentsService {
   }
 
   delete(agentId) {
-    return this.http.delete(serverUrl + 'api/agents/' + agentId + '/delete', { responseType: 'text' as 'json' });
+    return this.http.delete(`${serverUrl}api/agents/${agentId}/delete`, { responseType: 'text' as 'json' });
   }
 
   list() {
-    return this.http.get<[Agent]>(serverUrl + 'api/agents');
+    return this.http.get<[Agent]>(`${serverUrl}api/agents`);
   }
 
   status() {
-    return this.http.get<any>(serverUrl + 'api/agents/status');
+    return this.http.get<any>(`${serverUrl}api/agents/status`);
   }
 
   update(agent) {
-    return this.http.put<Agent>(serverUrl + 'api/agents/' + agent._id + '/update', agent);
+    return this.http.put<Agent>(`${serverUrl}api/agents/${agent._id}/update`, agent);
   }
 
   /* groups */

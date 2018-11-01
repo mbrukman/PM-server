@@ -34,7 +34,7 @@ export class PluginsListComponent implements OnInit, OnDestroy {
 
   deletePlugin(id, index) {
     this.pluginsService.delete(id).subscribe(() => {
-      this.plugins.splice(index, 1);
+      this.requestPlugins();
     });
   }
 

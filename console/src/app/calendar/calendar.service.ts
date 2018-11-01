@@ -24,7 +24,7 @@ export class CalendarService {
   }
 
   getFutureJobs() {
-    return this.http.get<Job[]>(serverUrl + 'api/maps/scheduledJob/getFutureJobs');
+    return this.http.get<Job[]>(`${serverUrl}api/maps/scheduledJob/getFutureJobs`);
   }
 
   newJobAsObservable() {
@@ -40,7 +40,7 @@ export class CalendarService {
   }
 
   updateJob(job) {
-    return this.http.put<Job>(serverUrl + 'api/maps/scheduledJob/updateJob', job);
+    return this.http.put<Job>(`${serverUrl}api/maps/scheduledJob/updateJob`, job);
   }
 
 }

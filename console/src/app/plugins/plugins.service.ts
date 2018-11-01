@@ -6,7 +6,6 @@ import { environment } from '../../environments/environment';
 
 import { Plugin } from './models/plugin.model';
 
-
 const serverUrl = environment.serverUrl;
 
 @Injectable()
@@ -16,11 +15,11 @@ export class PluginsService {
   }
 
   delete(id) {
-    return this.http.delete(serverUrl + 'api/plugins/' + id + '/delete');
+    return this.http.delete(`${serverUrl}api/plugins/${id}/delete`);
   }
 
   list() {
-    return this.http.get<[Plugin]>(serverUrl + 'api/plugins');
+    return this.http.get<[Plugin]>(`${serverUrl}api/plugins`);
   }
 
   generatePluginParams(pluginId, methodName) {
@@ -28,6 +27,6 @@ export class PluginsService {
   }
 
   upload(file): Observable<any> {
-    return this.http.post(serverUrl + 'api/plugins/upload', file);
+    return this.http.post(`${serverUrl}api/plugins/upload`, file);
   }
 }
