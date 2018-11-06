@@ -19,7 +19,9 @@ export class PluginsService {
   }
 
   list() {
-    return this.http.get<[Plugin]>(`${serverUrl}api/plugins`);
+    return this.http.get<Plugin[]>(`${serverUrl}api/plugins`).map(plugins=>{
+      return plugins.map(plugin=> new Plugin(plugin));
+    })
   }
 
   generatePluginParams(pluginId, methodName) {

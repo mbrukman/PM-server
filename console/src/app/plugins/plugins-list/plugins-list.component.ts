@@ -11,7 +11,7 @@ import { PluginUploadComponent } from '../plugin-upload/plugin-upload.component'
   styleUrls: ['./plugins-list.component.scss']
 })
 export class PluginsListComponent implements OnInit, OnDestroy {
-  plugins: [Plugin];
+  plugins: Plugin[];
   pluginsReq: any;
   filterTerm: string;
 

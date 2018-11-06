@@ -39,7 +39,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   mapStructureSubscription: Subscription;
   editing: boolean = false;
   pluginsReq: any;
-  plugins: [Plugin];
+  plugins: Plugin[];
   process: Process;
   link: Link;
   init: boolean = false;
@@ -298,7 +298,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           'fill-opacity': .5
         },
         image: {
-          'xlink:href': `plugins/${pluginName}/${plugin.imgUrl}`,
+          'xlink:href': plugin.fullImageUrl,
           width: 46,
           height: 32,
           'ref-x': 50,
@@ -375,7 +375,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
                 'fill-opacity': .5
               },
               image: {
-                'xlink:href': `plugins/${plugin.name}/${plugin.imgUrl}`,
+                'xlink:href': plugin.fullImageUrl,
                 width: 46,
                 height: 32,
                 'ref-x': 50,
