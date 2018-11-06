@@ -19,7 +19,7 @@
     *ngIf="plugins && plugins?.length > 0">
     <p-column field="name" header="Name" [sortable]="true">
       <ng-template let-col let-plugin="rowData" pTemplate="body">
-        <img src="plugins/{{plugin.name}}/{{plugin.imgUrl}}" class="thumbnail"> {{ plugin.name }}
+        <img [src]="plugin.fullImageUrl" class="thumbnail"> {{ plugin.name }}
       </ng-template>
     </p-column>
     <p-column field="description" header="Description" [sortable]="true">

@@ -158,14 +158,14 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
         attrs: {
           '.label': { text: this.getPluginCubeText(plugin.name) },
           image: {
-            'xlink:href': `plugins/${plugin.name}/${plugin.imgUrl}`,
+            'xlink:href': plugin.fullImageUrl,
             width: 46,
             height: 32,
             'ref-x': 50,
             'ref-y': 50,
             ref: 'rect',
             'x-alignment': 'middle',
-            'y-alignment': 'middle'
+            'y-alignment': 'middle' 
           }
         }
       });
