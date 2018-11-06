@@ -52,7 +52,13 @@ export class MapConfigurationsComponent implements OnInit {
 
   editConfiguration(index: number) {
     const re = new RegExp('\",\"', 'g');
-    this.value = (JSON.stringify(this.mapStructure.configurations[index].value) || '').replace(re, '\", \n\"');
+    if ((typeof this.mapStructure.configurations[index].value)=="object"){
+      this.value = (JSON.stringify(this.mapStructure.configurations[index].value) || '').replace(re, '\", \n\"');
+    }
+    else {
+      this.value = String(this.mapStructure.configurations[index].value);
+    }
+    
     // this.mapStructure.configurations[index].value = (JSON.stringify(this.mapStructure.configurations[index].value) || '').replace(re, '\", \n\"');
     this.selectedConfiguration = this.mapStructure.configurations[index];
   }
