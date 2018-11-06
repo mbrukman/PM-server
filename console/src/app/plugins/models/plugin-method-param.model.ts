@@ -19,7 +19,7 @@ export class PluginMethodParam extends Serializable implements IPluginMethodPara
     return new FormGroup({
       code: new FormControl(this.code),
       value: new FormControl(this.value),
-      param: new FormControl(this.id),
+      param: new FormControl(this._id),
       viewName: new FormControl(this.viewName),
       name: new FormControl(this.name),
       type: new FormControl(this.type)

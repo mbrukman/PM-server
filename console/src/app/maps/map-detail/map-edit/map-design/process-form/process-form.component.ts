@@ -68,8 +68,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         this.processForm.get('coordination').setValue(process.coordination);
       });
 
-    this.process = new Process(this.process);
-    this.processForm = this.process.getFormGroup();
+    // this.process = new Process(this.process);
+    this.processForm = Process.getFormGroup(this.process);
 
     if (this.process.actions) {
       this.process.actions.forEach((action, actionIndex) => {
@@ -77,7 +77,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         actionControl.push(this.initActionController(action));
         if (action.params && action.params.length > 0) {
           action.params.forEach(param => {
-            actionControl.controls[actionIndex]['controls'].params.push(new ActionParam(param).getFormGroup());
+            actionControl.controls[actionIndex]['controls'].params.push(ActionParam.getFormGroup(param));
           });
         }
       });
@@ -186,7 +186,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @returns {FormGroup}
    */
   initActionController(action?: Action): FormGroup {
-    return new Action(action).getFormGroup();
+    return Action.getFormGroup(action);
   }
 
   /**

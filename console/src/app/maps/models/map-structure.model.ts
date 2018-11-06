@@ -23,14 +23,14 @@ export class ActionParam extends Serializable implements IActionParam {
   param: PluginMethodParam | string;
   type: 'string' | 'text';
 
-  getFormGroup(): FormGroup {
+  static getFormGroup(param: ActionParam): FormGroup {
     return new FormGroup({
-      code: new FormControl(this.code),
-      value: new FormControl(this.value),
-      param: new FormControl(this.id),
-      viewName: new FormControl(this.viewName),
-      name: new FormControl(this.name),
-      type: new FormControl(this.type)
+      code: new FormControl(param.code),
+      value: new FormControl(param.value),
+      param: new FormControl(param._id),
+      viewName: new FormControl(param.viewName),
+      name: new FormControl(param.name),
+      type: new FormControl(param.type)
     });
   }
 }
@@ -46,14 +46,14 @@ export class Action extends Serializable implements IAction {
   method: PluginMethod | string;
   params?: ActionParam[];
 
-  getFormGroup(): FormGroup {
+  static getFormGroup(action: Action): FormGroup {
     return new FormGroup({
-      id: new FormControl(this.id),
-      name: new FormControl(this.name),
-      timeout: new FormControl(this.timeout),
-      retries: new FormControl(this.retries),
-      method: new FormControl(this.method),
-      mandatory: new FormControl(this.mandatory),
+      id: new FormControl(action.id),
+      name: new FormControl(action.name),
+      timeout: new FormControl(action.timeout),
+      retries: new FormControl(action.retries),
+      method: new FormControl(action.method),
+      mandatory: new FormControl(action.mandatory),
       params: new FormArray([]),
     });
   }
@@ -90,19 +90,19 @@ export class Process extends Serializable implements IProcess {
     this.flowControl = 'each';
   }
 
-  getFormGroup(): FormGroup {
+  static getFormGroup(process: Process): FormGroup {
     return new FormGroup({
-      name : new FormControl(this.name),
-      uuid : new FormControl(this.uuid),
-      description : new FormControl(this.description),
-      mandatory : new FormControl(this.mandatory),
-      condition : new FormControl(this.condition),
-      coordination : new FormControl(this.coordination),
-      flowControl : new FormControl(this.flowControl),
-      preRun : new FormControl(this.preRun),
-      postRun : new FormControl(this.postRun),
-      correlateAgents : new FormControl(this.correlateAgents),
-      filterAgents : new FormControl(this.filterAgents),
+      name : new FormControl(process.name),
+      uuid : new FormControl(process.uuid),
+      description : new FormControl(process.description),
+      mandatory : new FormControl(process.mandatory),
+      condition : new FormControl(process.condition),
+      coordination : new FormControl(process.coordination),
+      flowControl : new FormControl(process.flowControl),
+      preRun : new FormControl(process.preRun),
+      postRun : new FormControl(process.postRun),
+      correlateAgents : new FormControl(process.correlateAgents),
+      filterAgents : new FormControl(process.filterAgents),
       actions: new FormArray([])
     });
   }
