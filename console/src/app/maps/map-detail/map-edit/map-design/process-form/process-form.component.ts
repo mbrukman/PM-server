@@ -197,7 +197,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     const methodName = this.processForm.value.actions[this.index].method;
     const action = this.processForm.controls['actions']['controls'][this.index];
     const method = this.plugin.methods.find(o => o.name === methodName);
-    action.controls.params = new FormArray([]);
+    this.clearFormArray(action.controls.params);
     if (!method) {
       this.socketService.setNotification({
         title: 'OH OH',
@@ -206,7 +206,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       return;
     }
     method.params.forEach(param => {
-      action.controls.params.push(new PluginMethodParam(param).getFormGroup());
+      action.controls.params.push(PluginMethodParam.getFormGroup(param));
     });
   }
 
@@ -232,5 +232,11 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.processForm.controls.actions.updateValueAndValidity();
     }, 0);
+  }
+
+  private clearFormArray(formArray: FormArray) {
+    while (formArray.length !== 0) {
+      formArray.removeAt(0);
+    }
   }
 }

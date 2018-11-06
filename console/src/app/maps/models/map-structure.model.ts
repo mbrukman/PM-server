@@ -16,14 +16,16 @@ import { Serializable } from '@core/models/serializable.model';
 export class ActionParam extends Serializable implements IActionParam {
   id?: string;
   _id?: string;
-  value: string = null;
-  code: boolean = null;
+  value: string = undefined;
+  code: boolean = undefined;
   viewName?: string;
   name?: string;
   param: PluginMethodParam | string;
   type: 'string' | 'text';
 
-  static getFormGroup(param: ActionParam): FormGroup {
+  static getFormGroup(param?: ActionParam): FormGroup {
+    if(!param) param = new ActionParam();
+
     return new FormGroup({
       code: new FormControl(param.code),
       value: new FormControl(param.value),
@@ -46,9 +48,10 @@ export class Action extends Serializable implements IAction {
   method: PluginMethod | string;
   params?: ActionParam[];
 
-  static getFormGroup(action: Action): FormGroup {
+  static getFormGroup(action?: Action): FormGroup {
+    if(!action) action = new Action();
     return new FormGroup({
-      id: new FormControl(action.id),
+      id: new FormControl(action._id),
       name: new FormControl(action.name),
       timeout: new FormControl(action.timeout),
       retries: new FormControl(action.retries),
@@ -90,7 +93,7 @@ export class Process extends Serializable implements IProcess {
     this.flowControl = 'each';
   }
 
-  static getFormGroup(process: Process): FormGroup {
+  static getFormGroup(process?: Process): FormGroup {
     return new FormGroup({
       name : new FormControl(process.name),
       uuid : new FormControl(process.uuid),
