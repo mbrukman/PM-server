@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 import { BsModalService } from 'ngx-bootstrap/modal';
 
 import { MapsService } from '../maps.service';
-import { Configuration, Map, MapStructure } from '@maps/models';
+import { MapStructureConfiguration, Map, MapStructure } from '@maps/models';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { SocketService } from '@shared/socket.service';
 
@@ -293,7 +293,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
 
   }
 
-  checkConfigurationValidity(configurations: Configuration[]): boolean {
+  checkConfigurationValidity(configurations: MapStructureConfiguration[]): boolean {
     for (let i = 0; i < configurations.length; i++) {
       try {
         if (typeof(configurations[i].value) === "string") {

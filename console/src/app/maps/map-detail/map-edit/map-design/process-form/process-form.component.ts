@@ -9,7 +9,7 @@ import { distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
-import { Process, Action, ActionParam } from '@maps/models/map-structure.model';
+import { Process, Action, ActionParam } from '@maps/models';
 import { Plugin } from '@plugins/models/plugin.model';
 import { PluginMethod } from '@plugins/models/plugin-method.model';
 import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';

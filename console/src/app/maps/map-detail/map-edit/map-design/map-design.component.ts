@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { Subscription } from 'rxjs/Subscription';
 
 import { MapDesignService } from '../map-design.service';
-import { Link, MapStructure, Process } from '@maps/models/map-structure.model';
+import { Link, MapStructure, Process } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { Plugin } from '@plugins/models/plugin.model';

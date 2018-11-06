@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap';
 
-import { Configuration, MapStructure } from '@maps/models';
+import { MapStructureConfiguration, MapStructure } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { AddConfigurationComponent } from '@maps/map-detail/map-configurations/add-configuration/add-configuration.component';
 
@@ -11,7 +11,7 @@ import { AddConfigurationComponent } from '@maps/map-detail/map-configurations/a
   styleUrls: ['./map-configurations.component.scss']
 })
 export class MapConfigurationsComponent implements OnInit {
-  selectedConfiguration: Configuration;
+  selectedConfiguration: MapStructureConfiguration;
   mapStructure: MapStructure;
   editorOptions = {
     theme: 'vs-dark',
@@ -38,7 +38,7 @@ export class MapConfigurationsComponent implements OnInit {
       .take(1)
       .filter(name => !!name)
       .subscribe(name => {
-        this.mapStructure.configurations.push(new Configuration(name, '{\n\n}'));
+        this.mapStructure.configurations.push(new MapStructureConfiguration(name, '{\n\n}'));
         this.editConfiguration(this.mapStructure.configurations.length - 1);
       });
 
