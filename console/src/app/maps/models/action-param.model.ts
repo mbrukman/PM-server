@@ -17,7 +17,9 @@ export class ActionParam extends Serializable implements IActionParam {
   type: 'string' | 'text';
 
   static getFormGroup(param?: ActionParam): FormGroup {
-    if(!param) param = new ActionParam();
+    if (!param) {
+      param = new ActionParam();
+    }
 
     return new FormGroup({
       code: new FormControl(param.code),

@@ -1,5 +1,5 @@
-import { IPlugin } from "../interfaces/plugin.interface";
-import { PluginMethod } from "./plugin-method.model";
+import { IPlugin } from '../interfaces/plugin.interface';
+import { PluginMethod } from './plugin-method.model';
 
 export class Plugin implements IPlugin {
   id?: string;
@@ -12,5 +12,5 @@ export class Plugin implements IPlugin {
   active: boolean;
   version: string;
   imgUrl?: string;
-  methods?: [PluginMethod]
+  methods?: [PluginMethod];
 }

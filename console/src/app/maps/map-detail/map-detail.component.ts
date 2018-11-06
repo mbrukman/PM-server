@@ -57,7 +57,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       { name: 'Configurations', routerLink: ['configurations'] },
       { name: 'Execution Results', routerLink: ['results'] },
       { name: 'Revisions', routerLink: ['revisions'] }
-    ]
+    ];
   }
 
   ngOnInit() {
@@ -119,14 +119,14 @@ export class MapDetailComponent implements OnInit, OnDestroy {
             .map(c => {
               return {
                 position: c.position
-              }
+              };
             });
           oldContent = JSON.parse(this.originalMapStructure.content).cells
             .filter(c => c.type = 'devs.MyImageModel')
             .map(c => {
               return {
                 position: c.position
-              }
+              };
             });
         } catch (e) {}
 
@@ -223,7 +223,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     delete structure.map;
     if (structure.used_plugins) {
       structure.used_plugins.forEach(plugin => {
-        delete plugin._id
+        delete plugin._id;
       });
     }
     structure.processes.forEach((process, i) => {
@@ -296,13 +296,13 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   checkConfigurationValidity(configurations: MapStructureConfiguration[]): boolean {
     for (let i = 0; i < configurations.length; i++) {
       try {
-        if (typeof(configurations[i].value) === "string") {
+        if (typeof(configurations[i].value) === 'string') {
           configurations[i].value = JSON.parse(<string>(configurations[i].value));
         }
       } catch (e) {
 
         this.socketService.setNotification({
-          title: "bad configuration",
+          title: 'bad configuration',
           message: `configuration '${configurations[i].name}' is invalid`,
           type: 'error'
         });

@@ -18,7 +18,9 @@ export class Action extends Serializable implements IAction {
   params?: ActionParam[];
 
   static getFormGroup(action?: Action): FormGroup {
-    if(!action) action = new Action();
+    if (!action) {
+      action = new Action();
+    }
     return new FormGroup({
       id: new FormControl(action._id),
       name: new FormControl(action.name),
