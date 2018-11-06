@@ -79,8 +79,12 @@ export class MapsService {
     return this.http.post(`${serverUrl}api/maps/${mapId}/cancel-pending`, { runId });
   }
 
-  execute(mapId: string) {
-    return this.http.post(`${serverUrl}api/maps/${mapId}/execute`, { trigger: 'Started manually by user' });
+  execute(mapId: string, config?: string) {
+    let data: any = { trigger: 'Started manually by user' };
+    if (config) {
+      data.config = config;
+    }
+    return this.http.post(`${serverUrl}api/maps/${mapId}/execute`, data);
   }
 
   stopExecutions(mapId: string, runId = '') {

@@ -253,7 +253,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   }
 
   executeMap() {
-    this.mapExecReq = this.mapsService.execute(this.id).subscribe();
+    this.mapExecReq = this.mapsService.execute(this.id, this.mapStructure.configurations[this.selected].name).subscribe();
   }
 
   saveMap() {
