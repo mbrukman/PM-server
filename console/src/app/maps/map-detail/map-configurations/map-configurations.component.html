@@ -15,6 +15,6 @@
   </div>
   <div class="main-content">
     <ngx-monaco-editor *ngIf="selectedConfiguration" class="code-editor" [options]="editorOptions"
-                       [(ngModel)]="value" (keyup)="updateMapStructure()"></ngx-monaco-editor>
+                       [(ngModel)]="value" (onInit)="onEditorInit($event)" (keyup)="updateMapStructure()"></ngx-monaco-editor>
   </div>
 </div>
