@@ -41,7 +41,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   pendingExecutions: string[];
   processesList: IProcessList[];
   agProcessStatusesByProcessIndex: ProcessResultByProcessIndex;
-
+  view: number[] = [200, 200];
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
@@ -146,7 +146,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     let result = Object.keys(ag).map((key) => {
       return ag[key];
     });
-    return <[{ name: string, value: number }]>result;
+    return <[{ name: string, value: number }]>result; 
   }
 
   /**

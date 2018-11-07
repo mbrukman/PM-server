@@ -59,13 +59,16 @@
                     <p class="execution-detail" *ngIf="selectedExecution?.configuration">Configuration: {{
                       selectedExecution?.configuration.name}}</p>
                   </div>
-                  <div class="col-6">
-                    <ngx-charts-pie-chart
-                      [results]="agProcessesStatus"
-                      [labels]="showLabels"
-                      [scheme]="colorScheme"
-                      [doughnut]="true">
-                    </ngx-charts-pie-chart>
+                  <div class="col-6"> 
+                    <div class="pie-chart-parent">
+                      <ngx-charts-pie-chart
+                        [results]="agProcessesStatus"
+                        [labels]="showLabels"
+                        [scheme]="colorScheme"
+                        [doughnut]="true"
+                        [view]="view">
+                      </ngx-charts-pie-chart>
+                    </div>
                   </div>
                 </div>
               </div>
