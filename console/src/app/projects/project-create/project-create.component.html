@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-sm-12">
       <h1>Create a new project</h1>
-      <form [formGroup]="projectForm" (ngSubmit)="onSubmitForm(projectForm.value)">
+      <form [formGroup]="projectForm" (ngSubmit)="onSubmitForm(projectForm.value)" class="project-form">
         <div class="form-group">
           <label>Name:</label>
           <input type="text" id="name" class="form-control" formControlName="name"/>

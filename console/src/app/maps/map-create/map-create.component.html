@@ -3,11 +3,11 @@
     <div class="col-sm-12">
       <h1 *ngIf="!map">Create a new map</h1>
       <h1 *ngIf="map">Update map '{{ map.name }}'</h1>
-      <form [formGroup]="mapForm" (ngSubmit)="onSubmitForm(mapForm.value)">
+      <form [formGroup]="mapForm" (ngSubmit)="onSubmitForm(mapForm.value)" class="map-form">
         <div class="form-group">
           <label for="project">Project</label>
           <select class="form-control" formControlName="project" id="project">
-            <option disabled>Select a project</option>
+            <option value="" disabled>Select a project</option>
             <option *ngFor="let project of projects" [ngValue]="project._id">{{project.name}}</option>
           </select>
         </div>
