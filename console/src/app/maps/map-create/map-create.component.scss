@@ -3,5 +3,8 @@ input.form-control.ng-invalid.ng-touched, textarea.form-control.ng-invalid.ng-to
 }
 
 .main {
-  padding:15px;
+  padding:20px 30px;
+  .map-form {
+    max-width: 850px
+  }
 }

@@ -35,7 +35,10 @@
         <span>{{ ((map.updatedAt | date: 'dd/MM/yyyy') || '') + ' ' +  ((map.updatedAt | date: 'HH:mm') || '' )}}</span>
       </ng-template>
     </p-column>
+    
   </p-dataTable>
+  <a routerLink="/maps/create" class="btn pm create">Add map</a>
 </div>
+
 
 
