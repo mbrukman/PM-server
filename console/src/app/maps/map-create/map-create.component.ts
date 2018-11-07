@@ -62,7 +62,7 @@ export class MapCreateComponent implements OnInit, OnDestroy {
 
   initMapForm(project?) {
     this.mapForm = new FormGroup({
-      project: new FormControl(project, Validators.required),
+      project: new FormControl(project || '', Validators.required),
       name: new FormControl(null, Validators.required),
       description: new FormControl(),
       licence: new FormControl()

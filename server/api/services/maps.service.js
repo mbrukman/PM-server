@@ -33,6 +33,10 @@ module.exports = {
         structure.used_plugins = getMapPlugins(structure);
         return MapStructure.create(structure)
     },
+    mapDelete: id => {
+        return Map.remove({ _id: id });
+    },
+
     filter: (query = {}) => {
         let q = {};
         if (query.fields) {
