@@ -1,8 +1,3 @@
-.main {
-  flex-grow: 1;
-  padding : 25px 15px 15px;
-}
-
 .table{
   td {
     padding: 0;
@@ -15,6 +10,24 @@
       > i {
         margin-right: 7px;
       }
+    }
+  }
+}
+
+.main{
+  flex-grow: 1;
+
+  .section-title{
+    margin-bottom: 25px;
+  }
+
+  .row{
+    .col-3{
+      padding-left: 0;
+    }
+
+    .col-9{
+      padding-right: 0;
     }
   }
 }

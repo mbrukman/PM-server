@@ -1,4 +1,4 @@
-<div class="main">
+<div class="main pm-main-wrapper">
   <h1 class="section-title">Maps</h1>
   <div class="featured">
     <app-feature [items]="featuredMaps"></app-feature>
@@ -35,7 +35,7 @@
         <span>{{ ((map.updatedAt | date: 'dd/MM/yyyy') || '') + ' ' +  ((map.updatedAt | date: 'HH:mm') || '' )}}</span>
       </ng-template>
     </p-column>
-    
+
   </p-dataTable>
   <a routerLink="/maps/create" class="btn pm create">Add map</a>
 </div>
