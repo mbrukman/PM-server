@@ -22,7 +22,7 @@
     </p-column>
     <p-column field="project" header="Project" [sortable]="true">
       <ng-template let-col let-map="rowData" pTemplate="body">
-        <a [routerLink] = "['../projects', map.projectId]" >{{ map.projectName }}</a>
+        <a [routerLink] = "['../projects', map.project.id]" >{{ map.project.name }}</a>
       </ng-template>
     </p-column>
     <p-column field="description" header="Description" [sortable]="true">

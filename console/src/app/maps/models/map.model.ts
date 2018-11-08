@@ -13,7 +13,6 @@ export class Map implements IMap {
   archived: boolean;
   agents?: Agent[];
   groups?: Group[];
-  projectId?: string;
-  projectName?:string;
+  project:{name: String, id:String};
   queue?: number;
 }

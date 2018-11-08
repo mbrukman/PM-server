@@ -62,7 +62,7 @@ export class MapsService {
     if (globalFilter) {
       params = params.set('globalFilter', globalFilter);
     }
-    return this.http.get<{ items: Map[],totalCount: number , mapProject:{mapId: String, projectId:String, projectName: String}[]}>(`${serverUrl}api/maps`, { params: params });
+    return this.http.get<{ items: Map[],totalCount: number}>(`${serverUrl}api/maps`, { params: params });
   }
 
   setCurrentMap(map: Map) {
