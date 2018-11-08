@@ -20,6 +20,11 @@
         <a [routerLink]="map.id">{{ map.name }}</a>
       </ng-template>
     </p-column>
+    <p-column field="project" header="Project" [sortable]="true">
+      <ng-template let-col let-map="rowData" pTemplate="body">
+        <a [routerLink] = "['../projects', map.projectId]" >{{ map.projectName }}</a>
+      </ng-template>
+    </p-column>
     <p-column field="description" header="Description" [sortable]="true">
       <ng-template let-col let-map="rowData" pTemplate="body">
         <span>{{ map.description | truncatechars : 70 : '' }}<span class="etc" *ngIf="map?.description?.length > 70"> ... </span></span>

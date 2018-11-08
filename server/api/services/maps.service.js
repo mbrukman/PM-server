@@ -2,7 +2,7 @@ const Map = require("../models/map.model");
 const MapStructure = require("../models").Structure;
 const Plugin = require("../models").Plugin;
 const env = require("../../env/enviroment");
-
+const Project = require("../models/project.model");
 const PAGE_SIZE = env.page_size;
 
 
@@ -38,6 +38,7 @@ module.exports = {
     },
 
     filter: (query = {}) => {
+        mapProjectArray = [];
         let q = {};
         if (query.fields) {
             // This will change the fields in the query to query that we can use with mongoose (using regex for contains)
@@ -61,10 +62,33 @@ module.exports = {
             // apply paging. if no paging, return all
             m.limit(PAGE_SIZE).skip((query.page - 1) * PAGE_SIZE);
         }
-
+        // creating a variable that will allow us to have array of projects
+        let p = Project.find()
         return m.then(projects => {
+            // creating javascript object that will store mapID projectName and projectId
+            mapProject = {mapId: String, projectId:String, projectName:String};
+            p.then(s => {
+                //looping into maps
+                for(project in projects){
+                    //looping into projects
+                    for(map in s){
+                        // looping into maps of each project
+                        for(id in s[map].maps){
+                            if (s[map].maps[id].toString() == projects[project].id){
+                                mapId = projects[project].id;
+                                projectId = s[map].id;
+                                projectName = s[map].name;
+                                mapProject = {mapId,projectId,projectName};
+                                mapProjectArray.push(mapProject);
+                                
+                            }
+                        }
+                    }
+                }
+            })
+            
             return module.exports.count(q).then(r => {
-                return { items: projects, totalCount: r }
+                return { items: projects, totalCount: r, mapProject: mapProjectArray}
             });
         });
     },
