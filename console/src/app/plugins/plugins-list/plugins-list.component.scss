@@ -3,6 +3,13 @@
 .main {
   width : 100%;
 
+  .section-title-wrapper{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
   .thumbnail {
     width: 35px;
     max-height: 45px;
