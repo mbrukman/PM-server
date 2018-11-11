@@ -236,7 +236,7 @@ module.exports = {
     },
     /* get a list of ongoing executions */
     currentRuns: (req, res) => {
-        hooks.hookPre('map-currentruns', reqproject.maps[map].id).then(() => {
+        hooks.hookPre('map-currentruns', req).then(() => {
             const executions = mapsExecutionService.executions;
             return res.json(Object.keys(executions).reduce((total, current) => {
                 console.log(executions[current].map);

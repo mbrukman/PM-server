@@ -66,7 +66,7 @@ export class MapsService {
   }
 
   delete(id) {
-    return this.http.delete(`${serverUrl}api/maps/${id}/delete`);
+    return this.http.delete(`${serverUrl}api/maps/${id}`);
   }
 
   

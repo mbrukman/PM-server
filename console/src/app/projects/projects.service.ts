@@ -55,9 +55,6 @@ export class ProjectsService {
   }
 
 
-  delete(id) {
-    return this.http.delete(`${serverUrl}api/projects/${id}/delete`);
-  }
 
 
   createMap(map) {
