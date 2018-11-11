@@ -65,6 +65,13 @@ export class MapsService {
     return this.http.get<{ items: Map[],totalCount: number}>(`${serverUrl}api/maps`, { params: params });
   }
 
+  delete(id) {
+    return this.http.delete(`${serverUrl}api/maps/${id}`);
+  }
+
+  
+
+
   setCurrentMap(map: Map) {
     this.currentMap.next(map);
   }

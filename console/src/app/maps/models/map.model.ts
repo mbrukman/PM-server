@@ -1,8 +1,8 @@
 import { IMap } from '../interfaces/map.interface';
 import { Agent, Group } from '@agents/models';
-import { Project } from '@projects/models/project.model';
+import { Serializable } from '@core/models/serializable.model';
 
-export class Map implements IMap {
+export class Map extends Serializable implements IMap {
   _id?: string;
   id?: string;
   name: string;

@@ -37,8 +37,15 @@ module.exports = {
         structure.used_plugins = getMapPlugins(structure);
         return MapStructure.create(structure)
     },
+    
     mapDelete: id => {
-        return Map.remove({ _id: id });
+        return Promise.all([
+            MapExecutionLog.remove({map:id}),
+            MapResult.remove({map:id}),
+            MapStructure.remove({map:id}),
+            MapTrigger.remove({map:id}),
+            Map.remove({ _id: id })
+        ]);
     },
 
     filter: (query = {}) => {

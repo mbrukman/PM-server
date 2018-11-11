@@ -46,7 +46,17 @@ export class MapsListComponent implements OnInit, OnDestroy {
     }
    
     this.mapReq = this.mapsService.filterMaps(fields, sort, page, this.filterTerm).subscribe(this.onDataLoad);
+    
+    
   }
+
+  deleteMap(id, index) {
+
+    this.mapsService.delete(id).subscribe(() => {
+      this.loadProjectLazy();
+    });
+  }
+
 
   onDataLoad(data){
     if (!data) {
@@ -57,4 +67,24 @@ export class MapsListComponent implements OnInit, OnDestroy {
     this.maps = data.items;
     this.resultCount = data.totalCount;
   }
- }
+  
+  
+ onConfirmDelete(id, i) {
+   // will be triggered by deactivate guard
+   
+     let modal = this.modalService.show(ConfirmComponent);
+     let answers = {
+       confirm: 'Delete',
+       cancel: 'Cancel'
+     };
+     modal.content.message = 'Are you sure you want to delete? all data related to the map will get permanently lost';
+     modal.content.confirm = answers.confirm;
+     modal.content.cancel = answers.cancel;
+     modal.content.result.asObservable().subscribe(ans => {
+         if (ans === answers.confirm) {
+           this.deleteMap(id,i);
+         }
+      })
+       
+  }
+}
