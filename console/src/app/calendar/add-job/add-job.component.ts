@@ -6,6 +6,7 @@ import { Project } from '@projects/models/project.model';
 import { CalendarService } from '../calendar.service';
 import { CronJobsConfig } from 'ngx-cron-jobs/src/app/lib/contracts/contracts';
 import { MapsService } from '@maps/maps.service';
+import { from } from 'rxjs/observable/from';
 
 @Component({
   selector: 'app-add-job',
@@ -69,6 +70,7 @@ export class AddJobComponent implements OnInit {
   }
 
   onSubmit(form) {
+    form.type === 'once' ? form.cron = null :  form.datetime = null; 
     this.calendarService.create(form.map, form).subscribe(job => {
       this.calendarService.setNewJob(job);
     });
