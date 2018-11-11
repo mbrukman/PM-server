@@ -141,7 +141,20 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
   }
 
+closeDayBar(){
+  for (let i = 0; i < this.events.length; i++) {
+    if(this.events[i].start.getDay === this.viewDate.getDay && this.events[i].start.getMonth === this.viewDate.getMonth && this.events[i].start.getFullYear === this.viewDate.getFullYear){
+      this.activeDayIsOpen = false;
+      break;
+    }
+  }
+}
+
   deleteJob(job) {
+    console.log("events",this.events);
+    console.log("viewDate",this.viewDate);
+    
+    console.log(this.activeDayIsOpen);
     const jobIndex = this.events.findIndex((o, i) => {
       return job.id === (<any>o).job.id;
     });
@@ -152,6 +165,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         .subscribe(() => {
           this.events.splice(jobIndex, 1);
           this.refreshCalendar.next();
+          this.closeDayBar();
         });
     }
     const modal = this.modalService.show(ConfirmComponent);
@@ -186,6 +200,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
           default:
             break;
         }
+        this.closeDayBar();
       });
-  }
+    }
+
 }
