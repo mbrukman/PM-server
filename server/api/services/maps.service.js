@@ -1,7 +1,11 @@
 const Map = require("../models/map.model");
 const MapStructure = require("../models").Structure;
-const Project = require("../models/project.model");
+const Plugin = require("../models").Plugin;
 const env = require("../../env/enviroment");
+const MapExecutionLog = require("../models/map-execution-log.model")
+const MapTrigger = require("../models/map-trigger.model")
+const MapResult = require("../models/map-results.model")
+const Project = require("../models/project.model")
 
 const PAGE_SIZE = env.page_size;
 
@@ -63,30 +67,26 @@ module.exports = {
             m.limit(PAGE_SIZE).skip((query.page - 1) * PAGE_SIZE);
         }
 
-        
-
-        
-        
         return m.then(maps => {
-            for(map in maps){
-                mapsId.push(maps[map].id)
-            }
+            let mapsId = maps.map(map=> map.id);
             // searching project in DB when maps holds an array with a least one element of the mapsId
-            let p = Project.find({ maps: { $in: mapsId} })
-            p.then(projects => {
-                 //looping into maps
-                for(map in maps){
-                     //looping into projects
-                    for(project in projects){
-                        if (projects[project].maps.toString().includes(maps[map].id)){
-                            maps[map].project.name = projects[project].name;
-                            maps[map].project.id = projects[project].id;
-
-                        }
-                     }
-                 }
-             })
-             
+            return {maps, mapsId};
+        }).then(({maps,mapsId}) => {
+            return Project.find({ maps: { $in: mapsId} },{_id:1,name:1, maps:1}).then(projects=>{
+                return {maps, projects}
+            })
+        }).then(({maps, projects})=>{
+            for(let i=0, length=maps.length; i<length; i++){
+                for(let j=0, projectsLength = projects.length; j<projectsLength; j++){
+                    if (projects[j].maps.toString().includes(maps[i].id)){
+                        maps[i] = maps[i].toObject();
+                        maps[i].project = projects[j];
+                        break;
+                   }
+                }
+            }
+            return maps;
+        }).then(maps=>{
             return module.exports.count(q).then(r => {
                 return { items: maps, totalCount: r }
             });
