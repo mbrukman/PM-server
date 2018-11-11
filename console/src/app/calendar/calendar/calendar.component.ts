@@ -151,10 +151,6 @@ closeDayBar(){
 }
 
   deleteJob(job) {
-    console.log("events",this.events);
-    console.log("viewDate",this.viewDate);
-    
-    console.log(this.activeDayIsOpen);
     const jobIndex = this.events.findIndex((o, i) => {
       return job.id === (<any>o).job.id;
     });
