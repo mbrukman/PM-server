@@ -1,4 +1,4 @@
-<div class="main">
+<div class="main pm-main-wrapper">
   <h1 class="section-title">Maps</h1>
   <div class="featured">
     <app-feature [items]="featuredMaps"></app-feature>
@@ -40,7 +40,6 @@
         <button class="btn btn-danger" (click)="onConfirmDelete(map.id, i)"><i class="material-icons">delete</i></button>
       </ng-template>
     </p-column>
-    
   </p-dataTable>
   <a routerLink="/maps/create" class="btn pm create">Add map</a>
 </div>

@@ -1,25 +1,32 @@
 @import "~assets/sass/mixins";
 
 .main {
-  padding: 25px 15px 15px;
-}
+  width : 100%;
 
-.thumbnail {
-  width: 35px;
-  max-height: 45px;
-  margin-right: 8px;
-}
-
-.filter {
-  h5 {
-    padding-bottom: 15px;
+  .section-title-wrapper{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
   }
 
-  @include searchBox();
-
-  input {
-    width: 220px;
-    height: 34px;
+  .thumbnail {
+    width: 35px;
+    max-height: 45px;
+    margin-right: 8px;
   }
 
+  .filter {
+    h5 {
+      padding-bottom: 15px;
+    }
+
+    @include searchBox();
+
+    input {
+      width: 220px;
+      height: 34px;
+    }
+
+  }
 }

@@ -14,16 +14,16 @@
 }
 
 .main {
-  margin-left: 35px;
-  padding-left: 15px;
-  padding-right: 15px;
-  margin-top: 39px;
-
   a, button {
     &.create {
       margin-top: 15px;
       margin-right: 10px;
     }
+  }
+
+  .featured-projects{
+    width : 100%;
+
   }
 
 }

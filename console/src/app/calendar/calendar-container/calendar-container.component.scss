@@ -1,10 +1,14 @@
 .main {
   flex-grow: 1;
-  padding : 25px 15px 15px;
 
   .row {
     .add-job {
+      padding-left: 0;
       margin-top: 34px;
+    }
+
+    .col-9{
+      padding-right: 0;
     }
 
   }
