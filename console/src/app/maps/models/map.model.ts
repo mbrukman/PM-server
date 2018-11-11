@@ -13,6 +13,6 @@ export class Map extends Serializable implements IMap {
   archived: boolean;
   agents?: Agent[];
   groups?: Group[];
-  project?: string;
+  project:{name: String, id:String};
   queue?: number;
 }

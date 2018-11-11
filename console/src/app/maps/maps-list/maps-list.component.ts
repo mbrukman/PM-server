@@ -86,7 +86,5 @@ export class MapsListComponent implements OnInit, OnDestroy {
          }
       })
        
+  }
 }
- }
-
-
