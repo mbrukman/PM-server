@@ -11,7 +11,7 @@ router.get("/results", mapController.dashboard);
 router.get("/currentruns", mapController.currentRuns);
 router.put("/scheduledJob/updateJob", mapController.updateJob);
 router.delete("/jobs/:jobId/delete", mapController.deleteJob);
-
+router.delete("/:id/delete", mapController.mapDelete);
 router.get("/:id", mapController.detail);
 
 /* map execution */

@@ -54,6 +54,12 @@ export class ProjectsService {
     return this.http.put<Project>(serverUrl + 'api/projects/' + projectId + '/update', project);
   }
 
+
+  delete(id) {
+    return this.http.delete(`${serverUrl}api/projects/${id}/delete`);
+  }
+
+
   createMap(map) {
     return this.http.post<Map>(serverUrl + 'api/maps/create', map);
   }

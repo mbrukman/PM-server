@@ -2,6 +2,9 @@ const Map = require("../models/map.model");
 const MapStructure = require("../models").Structure;
 const Plugin = require("../models").Plugin;
 const env = require("../../env/enviroment");
+const MapExecutionLog = require("../models/map-execution-log.model")
+const MapTrigger = require("../models/map-trigger.model")
+const MapResult = require("../models/map-results.model")
 
 const PAGE_SIZE = env.page_size;
 
@@ -33,8 +36,15 @@ module.exports = {
         structure.used_plugins = getMapPlugins(structure);
         return MapStructure.create(structure)
     },
+    
     mapDelete: id => {
-        return Map.remove({ _id: id });
+        return Promise.all([
+            MapExecutionLog.remove({map:id}),
+            MapResult.remove({map:id}),
+            MapStructure.remove({map:id}),
+            MapTrigger.remove({map:id}),
+            Map.remove({ _id: id })
+        ]);
     },
 
     filter: (query = {}) => {
