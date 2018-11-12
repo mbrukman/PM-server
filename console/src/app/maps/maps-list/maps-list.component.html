@@ -42,7 +42,7 @@
     </p-column>
     <p-column field="" header="Actions" [sortable]="true">
       <ng-template let-col let-i="rowIndex" let-map="rowData" pTemplate="body">
-        <button class="btn btn-danger" (click)="onConfirmDelete(map.id, i)"><i class="material-icons">delete</i></button>
+        <button class="btn btn-danger" (click)="onConfirmDelete(map.id)"><i class="material-icons">delete</i></button>
       </ng-template>
     </p-column>
   </p-dataTable>
