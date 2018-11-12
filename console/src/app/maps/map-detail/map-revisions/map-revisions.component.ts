@@ -215,15 +215,16 @@ export class MapRevisionsComponent implements OnInit {
       .subscribe(structure => {
         this.currentStructure = structure;
         this.graph.fromJSON(JSON.parse(structure.content));
+        if (!this.latestStructure) {
+          this.setLatestStructure(this.mapId, this.structures[0].id);
+        }
+    
+        if (this.viewMode === 'code') {
+          this.loadCodeDiff();
+        }
       });
 
-    if (!this.latestStructure) {
-      this.setLatestStructure(this.mapId, this.structures[0].id);
-    }
-
-    if (this.viewMode === 'code') {
-      this.loadCodeDiff();
-    }
+   
   }
 
   onResize(event) {
