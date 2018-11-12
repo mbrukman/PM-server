@@ -9,6 +9,7 @@ import { MapStructure, Process } from '@maps/models';
 import { Project } from '@projects/models/project.model';
 import { ProjectsService } from '@projects/projects.service';
 import { SocketService } from '@shared/socket.service';
+import { DiffEditorModel } from 'ngx-monaco-editor';
 
 @Component({
   selector: 'app-map-revisions',
@@ -30,6 +31,7 @@ export class MapRevisionsComponent implements OnInit {
   currentStructure: MapStructure;
   viewMode: 'code' | 'design' = 'design';
   latestStructure: MapStructure;
+  automaticLayout?:boolean;
   @ViewChild('wrapper') wrapper: ElementRef;
   editorOptions = {
     theme: 'vs-dark',
@@ -38,6 +40,11 @@ export class MapRevisionsComponent implements OnInit {
   };
   latestCode: string;
   currentCode: string;
+  
+  monacoOptions = {
+    theme: 'vs-dark'
+  };
+  
 
   constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService) {
     this.scrollCallback = this.loadRevisions.bind(this);
@@ -64,6 +71,16 @@ export class MapRevisionsComponent implements OnInit {
     this.addPaperDrag();
     this.listeners();
   }
+
+  originalModel: DiffEditorModel = {
+    code: this.latestCode,
+    language: 'text/javascript'
+  };
+ 
+  modifiedModel: DiffEditorModel = {
+    code: this.currentCode,
+    language: 'text/javascript'
+  };
 
   addPaperDrag() {
     let initialPosition = { x: 0, y: 0 };
@@ -215,6 +232,10 @@ export class MapRevisionsComponent implements OnInit {
       .subscribe(structure => {
         this.currentStructure = structure;
         this.graph.fromJSON(JSON.parse(structure.content));
+        this.originalModel = {
+          code : structure.code,
+          language : 'javascript'
+        }
         if (!this.latestStructure) {
           this.setLatestStructure(this.mapId, this.structures[0].id);
         }
@@ -264,7 +285,10 @@ export class MapRevisionsComponent implements OnInit {
   setLatestStructure(mapId: string, structureId: string) {
     this.mapsService.getMapStructure(mapId, structureId)
       .take(1)
-      .subscribe(structure => this.latestStructure = structure);
+      .subscribe(structure => {
+        this.latestStructure = structure
+        this.modifiedModel.code = structure.code;
+      });
   }
 
   onClose() {

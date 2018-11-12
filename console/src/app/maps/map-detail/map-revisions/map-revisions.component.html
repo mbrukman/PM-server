@@ -1,6 +1,6 @@
 <div class="main">
-  <div class="row">
-    <div class="col-3">
+  <div class="row" id="flex">
+    <div class="col-3 element">
       <div class='versions' style="height: 100%; overflow-y: scroll" infiniteScroll [onScroll]="scrollCallback">
         <ul>
           <li *ngFor="let item of structures" [class.selected]="currentStructure?.id === item?.id">
@@ -28,23 +28,14 @@
         </ul>
       </div>
     </div>
-    <div class="col-9" #wrapper (window:resize)="onResize($event)">
+    <div class="col-9 element" #wrapper (window:resize)="onResize($event)">
       <div id="graph" [hidden]="viewMode !== 'design'"></div>
       <div class="row code-container" id="container" *ngIf="viewMode === 'code'">
-        <div class="col-6">
-          <h5>Current</h5>
-          <ngx-monaco-editor class="code-editor"
-                             [options]="editorOptions"
-                             [(ngModel)]="currentCode"
-          ></ngx-monaco-editor>
-        </div>
-        <div class="col-6">
-          <h5>Latest</h5>
-          <ngx-monaco-editor class="code-editor"
-                             [options]="editorOptions"
-                             [(ngModel)]="latestCode"
-          ></ngx-monaco-editor>
-        </div>
+        <div class="title">
+            <span class="current">Current</span>
+            <span>Latest</span>
+        </div>  
+        <ngx-monaco-diff-editor [options]="monacoOptions" [originalModel]="originalModel" [modifiedModel]="modifiedModel"></ngx-monaco-diff-editor>
       </div>
       <div class="select-mode" *ngIf="currentStructure">
         <span class="option" (click)="changeMode('design')"
