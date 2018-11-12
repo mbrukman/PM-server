@@ -19,6 +19,8 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
   plugins: Plugin[];
   pluginsReq: any;
   pluginCell: any;
+  pluginsSearch : Plugin[];
+  searchText : string;
 
   constructor(
     private pluginsService: PluginsService,
@@ -86,12 +88,19 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
       this.plugins = plugins.filter(plugin => {
         return plugin.type === 'executer';
       });
+      this.pluginsSearch =  this.plugins.map(x => Object.assign({}, x));
       this.addPluginsToGraph();
     });
 
     this.stencilPaper.on('cell:pointerdown', (cellView, event, x, y) => {
       this.flyCell(cellView, event, x, y);
     });
+  }
+
+
+  filter(event ){
+    this.pluginsSearch =  this.plugins.filter(plugin => {return plugin.name.toLowerCase().includes(event.target.value.toLowerCase())})
+    this.addPluginsToGraph();
   }
 
   flyCell(cellView, event, x, y) {
@@ -145,7 +154,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
   addPluginsToGraph() {
     let plugins = [];
     let iteration = 0;
-    this.plugins.forEach(plugin => {
+    this.pluginsSearch.forEach(plugin => {
       let imageModel = new joint.shapes.devs['MyImageModel']({
         position: {
           x: iteration % 2 ? 115 : 5,
@@ -173,6 +182,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
       iteration++;
     });
     this.stencilPaper.setDimensions(250, iteration * 80);
+    this.stencilGraph.clear();
     this.stencilGraph.addCells(plugins);
   }
 
