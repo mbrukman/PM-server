@@ -40,6 +40,16 @@ module.exports = {
     
     mapDelete: id => {
         return Promise.all([
+            Project.findOne({maps:{$in:[id]}}).select('maps').then(project=>{
+                for(let i=0, length=project.maps.length; i<length; i++){
+                    if(project.maps[i]==id){
+                        project.maps.splice(i,1);
+                        break;
+                    }
+                }
+
+                return project.save();
+            }),
             MapExecutionLog.remove({map:id}),
             MapResult.remove({map:id}),
             MapStructure.remove({map:id}),
@@ -86,7 +96,7 @@ module.exports = {
             for(let i=0, length=maps.length; i<length; i++){
                 for(let j=0, projectsLength = projects.length; j<projectsLength; j++){
                     if (projects[j].maps.toString().includes(maps[i].id)){
-                        maps[i] = maps[i].toObject();
+                        maps[i] = maps[i].toJSON();
                         maps[i].project = projects[j];
                         break;
                    }
@@ -102,10 +112,6 @@ module.exports = {
     filterByQuery(query = {}) {
         return Map.find(query);
     },
-
-    mapDelete: id => {
-        return Map.remove({ _id: id });
-      },
 
     generateMap(map) {
         return Map
