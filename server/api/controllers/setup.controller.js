@@ -1,5 +1,5 @@
 const fs = require('fs');
-
+const path = require('path');
 const winston = require('winston');
 const expressWinston = require('express-winston');
 const winstonMongo = require('winston-mongodb');
@@ -45,7 +45,7 @@ module.exports = {
                             db: dbDetails.uri
                         }));
                         config = Object.assign({}, config, { dbURI: dbDetails.uri });
-                        fs.writeFileSync('./env/config.json', JSON.stringify(config));
+                        fs.writeFileSync(path.join(__dirname, '../../env/config.json'), JSON.stringify(config));
                         res.status(204).send();
                         return resolve()
                     },
