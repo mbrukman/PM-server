@@ -50,9 +50,15 @@ export class MapsListComponent implements OnInit, OnDestroy {
     
   }
 
-  deleteMap(id, index) {
+  deleteMap(id) {
 
     this.mapsService.delete(id).subscribe(() => {
+      for(let i =0,lenght=this.featuredMaps.length; i<lenght;i++){
+        if(this.featuredMaps[i].id == id){
+          this.featuredMaps.splice(i,1);
+          break;
+        }
+      }
       this.loadProjectLazy();
     });
   }
@@ -69,9 +75,8 @@ export class MapsListComponent implements OnInit, OnDestroy {
   }
   
   
- onConfirmDelete(id, i) {
+ onConfirmDelete(id) {
    // will be triggered by deactivate guard
-   
      let modal = this.modalService.show(ConfirmComponent);
      let answers = {
        confirm: 'Delete',
@@ -82,7 +87,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
      modal.content.cancel = answers.cancel;
      modal.content.result.asObservable().subscribe(ans => {
          if (ans === answers.confirm) {
-           this.deleteMap(id,i);
+           this.deleteMap(id);
          }
       })
        
