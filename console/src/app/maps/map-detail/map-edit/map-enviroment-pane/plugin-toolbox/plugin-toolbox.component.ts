@@ -98,8 +98,8 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
   }
 
 
-  filter(event ){
-    this.pluginsSearch =  this.plugins.filter(plugin => {return plugin.name.toLowerCase().includes(event.target.value.toLowerCase())})
+  filter(){
+    this.pluginsSearch =  this.plugins.filter(plugin => {return plugin.name.toLowerCase().includes(this.searchText.toLowerCase())})
     this.addPluginsToGraph();
   }
 
