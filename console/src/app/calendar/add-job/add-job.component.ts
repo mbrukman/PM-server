@@ -69,6 +69,7 @@ export class AddJobComponent implements OnInit {
   }
 
   onSubmit(form) {
+    form.type === 'once' ? form.cron = null :  form.datetime = null; 
     this.calendarService.create(form.map, form).subscribe(job => {
       this.calendarService.setNewJob(job);
     });
