@@ -143,11 +143,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
 closeDayBar(){
   for (let i = 0; i < this.events.length; i++) {
-    if(this.events[i].start.getDay === this.viewDate.getDay && this.events[i].start.getMonth === this.viewDate.getMonth && this.events[i].start.getFullYear === this.viewDate.getFullYear){
-      this.activeDayIsOpen = false;
-      break;
+    if(this.events[i].start.getDay() === this.viewDate.getDay() && this.events[i].start.getMonth() === this.viewDate.getMonth() && this.events[i].start.getFullYear() === this.viewDate.getFullYear()){
+      return;
     }
   }
+  this.activeDayIsOpen = false;
 }
 
   deleteJob(job) {
@@ -185,6 +185,7 @@ closeDayBar(){
                 }, []);
 
                 this.refreshCalendar.next();
+                this.closeDayBar();
               });
             break;
           case DeleteOptions.skip:
@@ -192,11 +193,11 @@ closeDayBar(){
             this.calendarService.updateJob(job)
               .take(1)
               .subscribe();
+                this.closeDayBar();
             break;
           default:
             break;
         }
-        this.closeDayBar();
       });
     }
 
