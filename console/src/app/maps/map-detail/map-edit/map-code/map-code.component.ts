@@ -18,23 +18,24 @@ export class MapCodeComponent implements OnInit {
     theme: 'vs-dark',
     language: 'javascript'
   };
-  // code: string;
+  code: string;
 
   constructor(private mapsService: MapsService) {
   }
 
   ngOnInit() {
+    
     this.mapSubscription = this.mapsService.getCurrentMapStructure().subscribe(structure => {
       if (structure) {
         this.structure = structure;
-        // this.code = structure.code;
+        this.code = structure.code;
       }
     });
   }
-
-  onKeyDown() {
-    // this.structure.code = this.code;
-    // this.mapsService.setCurrentMapStructure(this.structure);
+ 
+  onKeyDown(e) {
+    this.structure.code = e.target.value || undefined;
+    this.mapsService.setCurrentMapStructure(this.structure);
   }
 
 }

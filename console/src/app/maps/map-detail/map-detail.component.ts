@@ -136,6 +136,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         delete compareOriginalStructure.content;
 
         this.structureEdited = (JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent);
+        
         this.mapStructure = structure;
         this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
           return o.id === structure.id;
@@ -164,7 +165,6 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       this.executing = maps.indexOf(this.id) > -1;
     });
   }
-
   ngOnDestroy() {
     this.routeReq.unsubscribe();
     this.mapReq.unsubscribe();
