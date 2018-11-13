@@ -54,6 +54,7 @@
     "@angular/cli": "1.7.4",
     "@angular/compiler-cli": "5.0.0",
     "@angular/language-service": "5.0.0",
+    "@fortawesome/fontawesome-free": "^5.5.0",
     "@types/jasmine": "2.5.53",
     "@types/jasminewd2": "2.0.2",
     "@types/jointjs": "1.0.5",

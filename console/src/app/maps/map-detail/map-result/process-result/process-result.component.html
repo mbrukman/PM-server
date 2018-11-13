@@ -45,6 +45,9 @@
                 </div>
                 <h5>Output:</h5>
                 <div class="raw-output">
+                  <div class="row-card">
+                    <i class="fas fa-arrows-alt" (click)="expandOutput()"></i>
+                  </div>
                   <span *ngFor="let item of agActionsStatus[action.action]?.results?.stdout">{{ item }} <br></span>
                   <span *ngFor="let item of agActionsStatus[action.action]?.results?.stderr">{{ item }} <br></span>
                   <span *ngFor="let item of agActionsStatus[action.action]?.results?.result">{{ item }} <br></span>

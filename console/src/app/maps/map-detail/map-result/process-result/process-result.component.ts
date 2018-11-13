@@ -1,6 +1,8 @@
 import { Component, Input, OnChanges } from '@angular/core';
 
 import * as moment from 'moment';
+import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
+import { BsModalService } from 'ngx-bootstrap';
 
 
 @Component({
@@ -20,8 +22,8 @@ export class ProcessResultComponent implements OnChanges {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
 
-  constructor() {
-  }
+
+  constructor(private modalService: BsModalService) { }
 
   ngOnChanges(changes) {
     this.agProcessActionsStatus = null;
@@ -31,6 +33,20 @@ export class ProcessResultComponent implements OnChanges {
     if (this.process.length === 1) {
       this.generalInfo = this.result[0].processes.find(o => o.uuid === this.process[0].uuid && o.index === this.process[0].index);
     }
+  }
+
+  expandOutput() {
+    let messages = [];
+    this.actions.forEach(item => {
+      let results = this.agActionsStatus[item.action].results
+      let msg = "";
+      results.stdout.forEach(text => { msg += text });
+      results.stderr.forEach(text => { msg += '<br/>' + text });
+      results.result.forEach(text => { msg += '<br/>' + text });
+      messages.push(msg);
+    });
+    const modal = this.modalService.show(RawOutputComponent);
+    modal.content.messages = messages;
   }
 
   aggregateProcessActionResults(result) {
