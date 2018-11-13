@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, DoCheck } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
@@ -17,7 +17,7 @@ import { SocketService } from '@shared/socket.service';
   templateUrl: './map-detail.component.html',
   styleUrls: ['./map-detail.component.scss']
 })
-export class MapDetailComponent implements OnInit, OnDestroy {
+export class MapDetailComponent implements OnInit, OnDestroy,DoCheck {
   id: string;
   originalMap: Map;
   map: Map;
@@ -42,6 +42,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     name: string,
     routerLink: string[]
   }];
+  empty:boolean=true;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -164,7 +165,16 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       this.executing = maps.indexOf(this.id) > -1;
     });
   }
-
+  ngDoCheck(){
+    this.mapsService.getCurrentMapStructure().subscribe(structure => {
+      if (typeof structure != 'undefined' && structure && structure.code !== '') {
+        this.empty = false;
+      }
+      else{
+        this.empty = true;
+      }
+    });
+  }
   ngOnDestroy() {
     this.routeReq.unsubscribe();
     this.mapReq.unsubscribe();
