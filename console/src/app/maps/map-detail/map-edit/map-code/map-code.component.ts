@@ -18,7 +18,6 @@ export class MapCodeComponent implements OnInit {
     theme: 'vs-dark',
     language: 'javascript'
   };
-  code: string;
 
   constructor(private mapsService: MapsService) {
   }
@@ -28,13 +27,12 @@ export class MapCodeComponent implements OnInit {
     this.mapSubscription = this.mapsService.getCurrentMapStructure().subscribe(structure => {
       if (structure) {
         this.structure = structure;
-        this.code = structure.code;
       }
     });
   }
  
-  onKeyDown(e) {
-    this.structure.code = e.target.value || undefined;
+  onKeyDown() {
+    this.structure.code = this.structure.code || undefined;
     this.mapsService.setCurrentMapStructure(this.structure);
   }
 
