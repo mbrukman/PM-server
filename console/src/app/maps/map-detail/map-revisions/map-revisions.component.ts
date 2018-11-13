@@ -31,7 +31,6 @@ export class MapRevisionsComponent implements OnInit {
   currentStructure: MapStructure;
   viewMode: 'code' | 'design' = 'design';
   latestStructure: MapStructure;
-  automaticLayout?:boolean;
   @ViewChild('wrapper') wrapper: ElementRef;
   editorOptions = {
     theme: 'vs-dark',
