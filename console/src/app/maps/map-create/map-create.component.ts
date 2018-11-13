@@ -31,9 +31,9 @@ export class MapCreateComponent implements OnInit, OnDestroy {
           this.mapsService.getMap(params.map).subscribe(map => {
             this.map = map;
             this.setFormValues({
-              name: map.name || null,
-              description: map.description || null,
-              licence: map.licence || null
+              name: map.name || '',
+              description: map.description || '',
+              licence: map.licence || ''
             });
           });
         }
@@ -64,15 +64,15 @@ export class MapCreateComponent implements OnInit, OnDestroy {
     this.mapForm = new FormGroup({
       project: new FormControl(project || '', Validators.required),
       name: new FormControl(null, Validators.required),
-      description: new FormControl(),
-      licence: new FormControl()
+      description: new FormControl(''),
+      licence: new FormControl('')
     });
   }
 
   setFormValues(data: { name: string, description: string, licence: string }) {
-    this.mapForm.controls.name.setValue(data.name || null);
-    this.mapForm.controls.description.setValue(data.description || null);
-    this.mapForm.controls.licence.setValue(data.licence || null);
+    this.mapForm.controls.name.setValue(data.name || '');
+    this.mapForm.controls.description.setValue(data.description || '');
+    this.mapForm.controls.licence.setValue(data.licence || '');
   }
 
 
@@ -83,6 +83,7 @@ export class MapCreateComponent implements OnInit, OnDestroy {
       });
     } else {
       this.mapsService.createMap(value).subscribe(map => {
+        console.log(map.description)
         this.router.navigate(['/maps', map.id]);
       });
     }

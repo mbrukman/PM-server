@@ -6,7 +6,7 @@ export class Map extends Serializable implements IMap {
   _id?: string;
   id?: string;
   name: string;
-  description?: string;
+  description?: string = '';
   createdAt?: Date;
   updatedAt?: Date;
   licence?: string;
