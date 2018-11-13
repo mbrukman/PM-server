@@ -35,16 +35,16 @@ export class ProcessResultComponent implements OnChanges {
     }
   }
 
-  expandOutput() {
+  expandOutput(action) {
     let messages = [];
-    this.actions.forEach(item => {
-      let results = this.agActionsStatus[item.action].results
-      let msg = "";
-      results.stdout.forEach(text => { msg += text });
-      results.stderr.forEach(text => { msg += '<br/>' + text });
-      results.result.forEach(text => { msg += '<br/>' + text });
-      messages.push(msg);
-    });
+    
+    let results = this.agActionsStatus[action.action].results
+    let msg = "";
+    results.stdout.forEach(text => { msg += text });
+    results.stderr.forEach(text => { msg += '<br/>' + text });
+    results.result.forEach(text => { msg += '<br/>' + text });
+    messages.push(msg);
+
     const modal = this.modalService.show(RawOutputComponent);
     modal.content.messages = messages;
   }

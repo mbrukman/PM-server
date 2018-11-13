@@ -134,6 +134,11 @@ p {
 
 .raw-output {
   .card-body {
+
+    .fa-arrows-alt{
+      cursor: pointer;
+    }
+
     ul {
       max-height: 135px;
       overflow-y: scroll;
