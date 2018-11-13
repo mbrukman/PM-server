@@ -34,6 +34,7 @@ export const linkAttrs = {
 export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   dropSubscription: Subscription;
   graph: joint.dia.Graph;
+  defaultGraph:joint.dia.Graph;
   paper: joint.dia.Paper;
   mapStructure: MapStructure;
   mapStructureSubscription: Subscription;
@@ -44,6 +45,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   link: Link;
   init: boolean = false;
   scale: number = 1;
+
+  defaultContent: string;
   @ViewChild('wrapper') wrapper: ElementRef;
 
   constructor(private designService: MapDesignService,
@@ -77,6 +80,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   ngAfterContentInit() {
     this.graph = new joint.dia.Graph;
+    this.defaultGraph = new joint.dia.Graph;
     this.paper = new joint.dia.Paper({
       el: $('#graph'),
       width: this.wrapper.nativeElement.offsetWidth,
@@ -130,8 +134,13 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           }
         }
       });
+      this.defaultGraph = this.graph;
+      this.defaultGraph.getElements().forEach(cell => {
+        this.deselectCell(cell);
+      });
+      this.defaultContent = JSON.stringify(this.defaultGraph.toJSON());
+ 
   }
-
   /**
    * Check if the x, y are over the map
    * @param {number} x
@@ -150,7 +159,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       this.deselectCell(cell);
     });
     this.mapStructure.content = JSON.stringify(this.graph.toJSON());
-    this.mapsService.setCurrentMapStructure(this.mapStructure);
+    if(this.mapStructure.content != this.defaultContent)
+      this.mapsService.setCurrentMapStructure(this.mapStructure);
+
   }
 
   addNewLink(cell) {
