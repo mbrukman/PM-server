@@ -35,10 +35,10 @@ export class ProcessResultComponent implements OnChanges {
     }
   }
 
-  expandOutput(action) {
+  expandOutput(action: ActionResult) {
     let messages = [];
     
-    let results = this.agActionsStatus[action.action].results
+    let results = this.agActionsStatus[<string>action.action].results;
     let msg = "";
     results.stdout.forEach(text => { msg += text });
     results.stderr.forEach(text => { msg += '<br/>' + text });

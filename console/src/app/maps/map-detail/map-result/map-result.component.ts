@@ -21,7 +21,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   map: Map;
   executionsList: MapResult[];
   selectedExecution: MapResult;
-  selectedExecutionReq: any;
+  selectedExecutionReq: Subscription;
   selectedExecutionLogs: any[];
   selectedAgent: any = 'default';
   selectedProcess: ProcessResult[];
@@ -185,8 +185,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
       .do(result => {
         this.selectedExecution = result;
 
-        this.agents = result.agentsResults.map(o => {
-          return { label: o.agent ? (<Agent>o.agent).name : '', value: o };
+        this.agents = result.agentsResults.map(agentResult => {
+          return { label: agentResult.agent ? (<Agent>agentResult.agent).name : '', value: agentResult };
         });
 
         if (this.agents.length > 1) { // if there is more than one agent, add an aggregated option.
