@@ -1,6 +1,6 @@
 <div class="main">
-  <div class="row" id="flex">
-    <div class="col-3 element">
+  <div class="row content-wrapper" >
+    <div class="col-3">
       <div class='versions' style="height: 100%; overflow-y: scroll" infiniteScroll [onScroll]="scrollCallback">
         <ul>
           <li *ngFor="let item of structures" [class.selected]="currentStructure?.id === item?.id">
@@ -28,7 +28,7 @@
         </ul>
       </div>
     </div>
-    <div class="col-9 element" #wrapper (window:resize)="onResize($event)">
+    <div class="col-9" #wrapper (window:resize)="onResize($event)">
       <div id="graph" [hidden]="viewMode !== 'design'"></div>
       <div class="row code-container" id="container" *ngIf="viewMode === 'code'">
         <div class="title">
