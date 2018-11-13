@@ -3,6 +3,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import * as moment from 'moment';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 import { BsModalService } from 'ngx-bootstrap';
+import { AgentResult, ProcessResult, ActionResult } from '@maps/models';
 
 
 @Component({
@@ -11,17 +12,16 @@ import { BsModalService } from 'ngx-bootstrap';
   styleUrls: ['./process-result.component.scss']
 })
 export class ProcessResultComponent implements OnChanges {
-  @Input('process') process: any;
-  @Input('result') result: any;
+  @Input('process') process: ProcessResult[];
+  @Input('result') result: AgentResult[];
   @Input('count') count: number;
-  actions: any[];
-  generalInfo: any;
+  actions: ActionResult[];
+  generalInfo: ProcessResult;
   agProcessActionsStatus: any;
   agActionsStatus: any;
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
-
 
   constructor(private modalService: BsModalService) { }
 

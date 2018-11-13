@@ -3,19 +3,14 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { MapsService } from '@maps/maps.service';
 import { Map } from '@maps/models/map.model';
-import { MapResult } from '@maps/models/execution-result.model';
+import { IProcessList } from '@maps/interfaces/process-list.interface';
+import { MapResult, AgentResult, ProcessResult } from '@maps/models/execution-result.model';
 import { SocketService } from '@shared/socket.service';
 import { Agent } from '@agents/models/agent.model';
 import { ProcessResultByProcessIndex } from '@maps/models';
 import { BsModalService } from 'ngx-bootstrap';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 
-interface IProcessList {
-  name: string;
-  index: number;
-  overall: number;
-  uuid: string;
-}
 
 @Component({
   selector: 'app-map-result',
@@ -29,9 +24,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
   selectedExecutionReq: any;
   selectedExecutionLogs: any[];
   selectedAgent: any = 'default';
-  selectedProcess: any;
+  selectedProcess: ProcessResult[];
   agProcessesStatus: [{ name: string, value: number }];
-  result: any;
+  result: AgentResult[];
   agents: any;
   @ViewChild('rawOutput') rawOutputElm: ElementRef;
   mapSubscription: Subscription;
