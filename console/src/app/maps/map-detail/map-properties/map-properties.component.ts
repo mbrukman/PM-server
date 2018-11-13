@@ -29,7 +29,6 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
     this.mapSubscription = this.mapsService.getCurrentMap()
       .filter(map => map) // filtering empty map result
       .do(map => this.map = map)
-      .do(map => this.selectedProject = map.project)
       .filter(map => !this.projects)
       .flatMap(() => this.projectsService.list())
       .subscribe(data => {
