@@ -134,16 +134,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         const compareOriginalStructure = this.cleanStructure(JSON.parse(JSON.stringify(this.originalMapStructure)));
         delete compareStructure.content;
         delete compareOriginalStructure.content;
-        if((JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent) || structure.code){
-          this.structureEdited = true;
-        }
-        if (structure.code=='')
-        {
-          this.structureEdited = false;
-        }
-        else{
-          this.structureEdited = false;
-        }
+
+        this.structureEdited = (JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent);
         
         this.mapStructure = structure;
         this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {

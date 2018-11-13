@@ -23,7 +23,7 @@
 
   <div class="action-buttons">
       <!--<button type="button" class="btn" (click)="discardChanges()" *ngIf="edited || structureEdited" disabled>Discard</button>-->
-      <button type="button" class="btn" (click)="saveMap()" *ngIf="!edited && !structureEdited" [disabled]="empty">Saved</button>
+      <button type="button" class="btn" *ngIf="!edited && !structureEdited" disabled>Saved</button>
       <button type="button" class="btn" (click)="saveMap()" *ngIf="edited || structureEdited">Save</button>
       <button class="btn execute-btn" (click)="executeMap()">
         Execute

@@ -34,7 +34,7 @@ export class MapCodeComponent implements OnInit {
   }
  
   onKeyDown(e) {
-    this.structure.code = e.target.value;
+    this.structure.code = e.target.value || undefined;
     this.mapsService.setCurrentMapStructure(this.structure);
   }
 
