@@ -127,6 +127,11 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         if (!this.init || (<any>structure).imported) {
           this.drawGraph();
           this.init = true;
+          this.defaultGraph = this.graph;
+          this.defaultGraph.getElements().forEach(cell => {
+            this.deselectCell(cell);
+          });
+          this.defaultContent = JSON.stringify(this.defaultGraph.toJSON());
           if ((<any>structure).imported) {
             delete (<any>structure).imported;
             this.mapStructure = structure;
@@ -134,11 +139,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           }
         }
       });
-      this.defaultGraph = this.graph;
-      this.defaultGraph.getElements().forEach(cell => {
-        this.deselectCell(cell);
-      });
-      this.defaultContent = JSON.stringify(this.defaultGraph.toJSON());
+     
  
   }
   /**
@@ -159,9 +160,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       this.deselectCell(cell);
     });
     this.mapStructure.content = JSON.stringify(this.graph.toJSON());
-    if(this.mapStructure.content != this.defaultContent)
+    if(this.mapStructure.content != this.defaultContent){
       this.mapsService.setCurrentMapStructure(this.mapStructure);
-
+    }
   }
 
   addNewLink(cell) {
