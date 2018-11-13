@@ -7,6 +7,8 @@ import { MapResult } from '@maps/models/execution-result.model';
 import { SocketService } from '@shared/socket.service';
 import { Agent } from '@agents/models/agent.model';
 import { ProcessResultByProcessIndex } from '@maps/models';
+import { BsModalService } from 'ngx-bootstrap';
+import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 
 interface IProcessList {
   name: string;
@@ -46,7 +48,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
 
-  constructor(private mapsService: MapsService, private socketService: SocketService) {
+  constructor(private mapsService: MapsService, private socketService: SocketService, private modalService: BsModalService) {
   }
 
   ngOnInit() {
@@ -118,6 +120,13 @@ export class MapResultComponent implements OnInit, OnDestroy {
     if (this.mapExecutionMessagesSubscription) {
       this.mapExecutionMessagesSubscription.unsubscribe();
     }
+  }
+
+  expandOutput(){
+    let messages = []
+    this.selectedExecutionLogs.forEach(item=>{messages.push(item.message)});
+    const modal = this.modalService.show(RawOutputComponent);
+    modal.content.messages = messages;
   }
 
   /**

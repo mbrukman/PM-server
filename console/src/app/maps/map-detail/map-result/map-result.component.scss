@@ -1,7 +1,10 @@
 @import "~assets/sass/variables";
 
 
-
+.row-card{
+  display: flex;
+  justify-content: space-between;
+}
 
 .bg-dark {
   background: $dark-background !important;
