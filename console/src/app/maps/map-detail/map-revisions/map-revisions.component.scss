@@ -4,18 +4,28 @@
   height: 100%;
   flex-grow: 1;
   display: flex;
-
+  .content-wrapper{
+    display: flex;
+  }
   .row {
     flex-grow: 1;
     margin: 0;
 
     .col-3 {
       padding-top: 15px;
+      flex: 0 0 25%;
+      max-width: 300px;
     }
 
     .col-9 {
-      display: flex;
+   
       padding: 0;
+      flex: 0 0 75%;
+      flex-grow: 1;
+      max-width: initial;
+      display: flex;
+      
+      
     }
   }
 }
@@ -94,6 +104,33 @@
 
 .code-container {
   height: 100%;
+  flex-direction: column;
+
+  .title {
+    display: flex;
+    padding: 10px 0;
+    width: 100%;
+    height: auto;
+ 
+
+    .current {
+
+      flex: 0 0 calc((100% - 45px) / 2);
+      text-align: left;
+
+    }
+  }
+
+  ngx-monaco-diff-editor{
+    flex-grow: 1; 
+  }
+
+  ::ng-deep{
+    .editor-container{
+      height: 100%;
+    }
+  }
+
   div {
     height: 100%;
   }
