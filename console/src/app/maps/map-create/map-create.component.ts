@@ -83,7 +83,6 @@ export class MapCreateComponent implements OnInit, OnDestroy {
       });
     } else {
       this.mapsService.createMap(value).subscribe(map => {
-        console.log(map.description)
         this.router.navigate(['/maps', map.id]);
       });
     }
