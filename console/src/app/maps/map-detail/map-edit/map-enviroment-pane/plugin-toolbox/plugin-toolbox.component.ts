@@ -88,7 +88,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
       this.plugins = plugins.filter(plugin => {
         return plugin.type === 'executer';
       });
-      this.pluginsSearch =  this.plugins.map(x => Object.assign({}, x));
+      this.pluginsSearch =  this.plugins;
       this.addPluginsToGraph();
     });
 
