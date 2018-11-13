@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, DoCheck } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
@@ -17,7 +17,7 @@ import { SocketService } from '@shared/socket.service';
   templateUrl: './map-detail.component.html',
   styleUrls: ['./map-detail.component.scss']
 })
-export class MapDetailComponent implements OnInit, OnDestroy,DoCheck {
+export class MapDetailComponent implements OnInit, OnDestroy {
   id: string;
   originalMap: Map;
   map: Map;
@@ -42,7 +42,6 @@ export class MapDetailComponent implements OnInit, OnDestroy,DoCheck {
     name: string,
     routerLink: string[]
   }];
-  empty:boolean=true;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -135,8 +134,17 @@ export class MapDetailComponent implements OnInit, OnDestroy,DoCheck {
         const compareOriginalStructure = this.cleanStructure(JSON.parse(JSON.stringify(this.originalMapStructure)));
         delete compareStructure.content;
         delete compareOriginalStructure.content;
-
-        this.structureEdited = (JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent);
+        if((JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent) || structure.code){
+          this.structureEdited = true;
+        }
+        if (structure.code=='')
+        {
+          this.structureEdited = false;
+        }
+        else{
+          this.structureEdited = false;
+        }
+        
         this.mapStructure = structure;
         this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
           return o.id === structure.id;
@@ -163,16 +171,6 @@ export class MapDetailComponent implements OnInit, OnDestroy,DoCheck {
     this.mapExecutionSubscription = this.socketService.getCurrentExecutionsAsObservable().subscribe(executions => {
       const maps = Object.keys(executions).map(key => executions[key]);
       this.executing = maps.indexOf(this.id) > -1;
-    });
-  }
-  ngDoCheck(){
-    this.mapsService.getCurrentMapStructure().subscribe(structure => {
-      if (typeof structure != 'undefined' && structure && structure.code !== '') {
-        this.empty = false;
-      }
-      else{
-        this.empty = true;
-      }
     });
   }
   ngOnDestroy() {
