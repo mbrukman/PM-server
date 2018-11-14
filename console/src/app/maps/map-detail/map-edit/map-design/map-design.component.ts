@@ -44,6 +44,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   link: Link;
   init: boolean = false;
   scale: number = 1;
+
+  defaultContent: string;
   @ViewChild('wrapper') wrapper: ElementRef;
 
   constructor(private designService: MapDesignService,
@@ -123,6 +125,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         if (!this.init || (<any>structure).imported) {
           this.drawGraph();
           this.init = true;
+          this.graph.getElements().forEach(cell => {
+            this.deselectCell(cell);
+          });
+          this.defaultContent = JSON.stringify(this.graph.toJSON());
           if ((<any>structure).imported) {
             delete (<any>structure).imported;
             this.mapStructure = structure;
@@ -130,8 +136,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           }
         }
       });
+     
+ 
   }
-
   /**
    * Check if the x, y are over the map
    * @param {number} x
@@ -147,10 +154,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   deselectAllCellsAndUpdateStructure() {
     this.graph.getElements().forEach(cell => {
-      this.deselectCell(cell);
+        this.deselectCell(cell);
     });
-    this.mapStructure.content = JSON.stringify(this.graph.toJSON());
-    this.mapsService.setCurrentMapStructure(this.mapStructure);
+    this.onMapContentUpdate();
   }
 
   addNewLink(cell) {
@@ -416,8 +422,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           });
         }
 
-        this.mapStructure.content = JSON.stringify(this.graph.toJSON());
-        this.mapsService.setCurrentMapStructure(this.mapStructure);
+        this.onMapContentUpdate();
       }
     }
 
@@ -582,8 +587,7 @@ center(){
   updateNodeLabel(uuid: string, label: string): void {
     let cell = this.graph.getCell(uuid);
     cell.attr('text/text', label);
-    this.mapStructure.content = JSON.stringify(this.graph.toJSON());
-    this.mapsService.setCurrentMapStructure(this.mapStructure);
+    this.onMapContentUpdate()
   }
 
   onScale(scale) {
@@ -597,5 +601,13 @@ center(){
 
   deselectCell(cell) {
     cell.attr('rect/fill', '#2d3236');
+  }
+
+  private onMapContentUpdate(){
+    let graphContent = JSON.stringify(this.graph.toJSON());
+    if(graphContent != this.defaultContent){
+      this.mapStructure.content = graphContent;
+      this.mapsService.setCurrentMapStructure(this.mapStructure);
+    }
   }
 }
