@@ -3,17 +3,14 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { MapsService } from '@maps/maps.service';
 import { Map } from '@maps/models/map.model';
-import { MapResult } from '@maps/models/execution-result.model';
+import { IProcessList } from '@maps/interfaces/process-list.interface';
+import { MapResult, AgentResult, ProcessResult } from '@maps/models/execution-result.model';
 import { SocketService } from '@shared/socket.service';
 import { Agent } from '@agents/models/agent.model';
 import { ProcessResultByProcessIndex } from '@maps/models';
+import { BsModalService } from 'ngx-bootstrap';
+import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 
-interface processList {
-  name: string,
-  index: number,
-  overall: number,
-  uuid: string
-}
 
 @Component({
   selector: 'app-map-result',
@@ -24,12 +21,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
   map: Map;
   executionsList: MapResult[];
   selectedExecution: MapResult;
-  selectedExecutionReq: any;
+  selectedExecutionReq: Subscription;
   selectedExecutionLogs: any[];
   selectedAgent: any = 'default';
-  selectedProcess: any;
+  selectedProcess: ProcessResult[];
   agProcessesStatus: [{ name: string, value: number }];
-  result: any;
+  result: AgentResult[];
   agents: any;
   @ViewChild('rawOutput') rawOutputElm: ElementRef;
   mapSubscription: Subscription;
@@ -39,14 +36,14 @@ export class MapResultComponent implements OnInit, OnDestroy {
   pendingMessagesSubscriptions: Subscription;
   executing: string[] = [];
   pendingExecutions: string[];
-  processesList: processList[];
+  processesList: IProcessList[];
   agProcessStatusesByProcessIndex: ProcessResultByProcessIndex;
-
+  view: number[] = [200, 200];
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
 
-  constructor(private mapsService: MapsService, private socketService: SocketService) {
+  constructor(private mapsService: MapsService, private socketService: SocketService, private modalService: BsModalService) {
   }
 
   ngOnInit() {
@@ -57,8 +54,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
       .flatMap(map => this.mapsService.executionResults(map.id)) // request execution results list
       .subscribe(executions => {
         this.executionsList = executions;
-        if (executions && executions.length)
+        if (executions && executions.length) {
           this.selectExecution(executions[0].id);
+        }
       });
 
     // getting the current executions list when initiating
@@ -119,6 +117,13 @@ export class MapResultComponent implements OnInit, OnDestroy {
     }
   }
 
+  expandOutput(){
+    let messages = []
+    this.selectedExecutionLogs.forEach(item=>{messages.push(item.message)});
+    const modal = this.modalService.show(RawOutputComponent);
+    modal.content.messages = messages;
+  }
+
   /**
    * Aggregating all processes and returning count for results graph.
    * @param results
@@ -132,7 +137,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
 
     let ag = processes.reduce((total, current) => {
       if (!total[current.status]) {
-        return total
+        return total;
       }
       total[current.status].value = (total[current.status].value || 0) + 1;
       return total;
@@ -145,7 +150,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     let result = Object.keys(ag).map((key) => {
       return ag[key];
     });
-    return <[{ name: string, value: number }]>result;
+    return <[{ name: string, value: number }]>result; 
   }
 
   /**
@@ -180,12 +185,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
       .do(result => {
         this.selectedExecution = result;
 
-        this.agents = result.agentsResults.map(o => {
-          return { label: o.agent ? (<Agent>o.agent).name : '', value: o }
+        this.agents = result.agentsResults.map(agentResult => {
+          return { label: agentResult.agent ? (<Agent>agentResult.agent).name : '', value: agentResult };
         });
 
         if (this.agents.length > 1) { // if there is more than one agent, add an aggregated option.
-          this.agents.unshift({ label: 'Aggregate', value: 'default' })
+          this.agents.unshift({ label: 'Aggregate', value: 'default' });
         }
 
         this.changeAgent();
@@ -225,15 +230,15 @@ export class MapResultComponent implements OnInit, OnDestroy {
    */
   generateProcessesList() {
     function sortByDate(a, b) {
-      let dateA = new Date(a.startTime);
-      let dateB = new Date(b.startTime);
+      const dateA = new Date(a.startTime);
+      const dateB = new Date(b.startTime);
       if (dateA < dateB) {
         return -1;
       }
       if (dateA > dateB) {
         return 1;
       }
-      return 0
+      return 0;
     }
 
     let processesList = [];
@@ -257,11 +262,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
           index: o.index,
           uuid: o.uuid,
           overall: overall[o.uuid]
-        }
+        };
       });
 
-    if (processesList.length)
+    if (processesList.length) {
       this.selectProcess(processesList[0]); // selecting the first process
+    }
   }
 
   selectProcess(process) {
@@ -279,7 +285,4 @@ export class MapResultComponent implements OnInit, OnDestroy {
   cancelPending(runId: string) {
     this.mapsService.cancelPending(this.map.id, runId).subscribe();
   }
-
-
 }
-

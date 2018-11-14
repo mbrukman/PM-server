@@ -7,12 +7,12 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class FeatureComponent implements OnInit {
   @Input('items') items: any[];
-  @Input('prefix') redirectPrefix: string;
+  @Input('prefix') prefix: string;
 
   constructor() {
   }
   ngOnInit() {
-    // console.log(this.redirectPrefix);
+    // console.log(this.prefix);
   }
 
 }

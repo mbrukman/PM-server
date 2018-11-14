@@ -1,7 +1,11 @@
-import { IPlugin } from "../interfaces/plugin.interface";
-import { PluginMethod } from "./plugin-method.model";
+import { IPlugin } from '../interfaces/plugin.interface';
+import { PluginMethod } from './plugin-method.model';
 
-export class Plugin implements IPlugin {
+import { Serializable } from '@core/models/serializable.model'
+
+import { environment } from '@env/environment';
+
+export class Plugin extends Serializable implements IPlugin {
   id?: string;
   _id?: string;
   name: string;
@@ -12,5 +16,9 @@ export class Plugin implements IPlugin {
   active: boolean;
   version: string;
   imgUrl?: string;
-  methods?: [PluginMethod]
+  methods?: [PluginMethod];
+
+  get fullImageUrl(){
+    return `${environment.serverUrl}plugins/${this.name}/${this.imgUrl}`;
+  }
 }

@@ -299,11 +299,11 @@ function filterExecutionAgents(mapCode, executionContext, groups, mapAgents, exe
  * @param triggerReason - trigger message
  * @param agents - object of agents to run, if none will run on selected agents. should be name or id
  */
-function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configurationName, triggerReason, agents) {
+function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configuration, triggerReason, agents) {
     let mapResult;
     let mapStructure;
     let executionContext;
-    let selectedConfiguration = {};
+    let selectedConfiguration;
     let mapAgents = map.agents;
 
     return mapsService.getMapStructure(map._id, structureId).then(structure => {
@@ -312,13 +312,23 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
         }
         mapStructure = structure;
 
-        if (mapStructure.configurations && mapStructure.configurations.length) {
-            selectedConfiguration = configurationName ? mapStructure.configurations.find(o => o.name === configurationName) : mapStructure.configurations.find(o => o.selected);
+        if (configuration && typeof configuration != 'string'){
+            selectedConfiguration = {
+                name : 'custom',
+                value : configuration
+            }
+        } else if (mapStructure.configurations && mapStructure.configurations.length) {
+            if(configuration)
+                selectedConfiguration = configuration ? mapStructure.configurations.find(o => o.name === configuration) : mapStructure.configurations.find(o => o.selected);
             if (!selectedConfiguration) {
                 selectedConfiguration = mapStructure.configurations[0];
             }
-            executionLogService.error(runId, map._id, `Using '${selectedConfiguration.name}' as configuration`, socket);
         }
+
+        if(selectedConfiguration)
+            executionLogService.error(runId, map._id, `Using '${selectedConfiguration.name}' as configuration`, socket);
+        else
+            selectedConfiguration = {};
 
         executionContext = {
             map: {

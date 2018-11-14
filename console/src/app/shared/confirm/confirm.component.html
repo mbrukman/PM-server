@@ -12,7 +12,7 @@
 
   <div class="modal-footer">
     <button type="button" class="btn pm" (click)="onAction(cancel)">{{ cancel }}</button>
-    <button type="submit" class="btn pm" (click)="onAction(third)" *ngIf="third">{{ third }}</button>
+    <button type="submit" [hidden]="!third" class="btn pm" (click)="onAction(third)" *ngIf="third">{{ third }}</button>
     <button type="submit" class="btn pm" (click)="onAction(confirm)">{{ confirm }}</button>
   </div>
 </div>

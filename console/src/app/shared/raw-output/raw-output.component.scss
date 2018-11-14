@@ -1,0 +1,30 @@
+::ng-deep .modal-dialog{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    max-width: initial;
+
+    .modal-content{
+        background-color: #ffffff00;
+    }
+}
+
+.container {
+    &.pm-modal{
+        max-width: initial;
+        max-height: 85vh;
+        overflow-y: auto;
+        width: 85vw;
+        max-width: 1300px;
+
+        .modal-header{
+            position: absolute;
+            right: 30px;
+            top: 5px;
+            z-index: 1;
+        }
+    }
+}

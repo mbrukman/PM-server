@@ -133,6 +133,24 @@ module.exports = {
         });
     },
 
+    /**
+     * Deleting a map
+     * @param req
+     * @param res
+     */
+    mapDelete: (req, res) => {
+        hooks.hookPre('map-delete', req).then(() => {
+            return mapsService.mapDelete(req.params.id)
+        }).then(() => {
+            req.io.emit('notification', { title: 'Map deleted', message: ``, type: 'success' });
+            return res.status(200).send();
+        }).catch(error => {
+            req.io.emit('notification', { title: 'Whoops', message: `Error deleting map`, type: 'error' });
+            winston.log('error', "Error deleting map", error);
+            return res.status(500).send(error);
+        });
+    },
+
     generate: (req, res) => {
         hooks.hookPre('map-generate', req).then(() => {
             return mapsService.generateMap(req.body);
@@ -229,13 +247,14 @@ module.exports = {
     },
     /* execute a map */
     execute: (req, res) => {
-        let agents, trigger;
+        let agents, trigger, config;
         if (req.body) {
             agents = req.body.agents ? req.body.agents.split(',') : null;
             trigger = req.body.trigger;
+            config = req.body.config ? req.body.config : req.query.config;
         }
         hooks.hookPre('map-execute', req).then(() => {
-            return mapsExecutionService.execute(req.params.id, req.params.structure, null, req, req.query.config, trigger, agents);
+            return mapsExecutionService.execute(req.params.id, req.params.structure, null, req, config, trigger, agents);
         }).then((r) => {
             res.json(r);
         }).catch(error => {

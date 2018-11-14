@@ -1,5 +1,11 @@
 @import "~assets/sass/variables";
 
+
+.row-card{
+  display: flex;
+  justify-content: space-between;
+}
+
 .bg-dark {
   background: $dark-background !important;
 }
@@ -73,6 +79,11 @@
   .card:not(:first-child) {
     overflow-y: hidden;
   }
+
+  .pie-chart-parent { 
+    display: grid; 
+    overflow: hidden;
+  }
 }
 
 p {
@@ -80,6 +91,7 @@ p {
     margin-bottom: 10px;
   }
 }
+
 .process-select {
   padding: 0;
   .card-body {
@@ -122,6 +134,11 @@ p {
 
 .raw-output {
   .card-body {
+
+    .fa-arrows-alt{
+      cursor: pointer;
+    }
+
     ul {
       max-height: 135px;
       overflow-y: scroll;

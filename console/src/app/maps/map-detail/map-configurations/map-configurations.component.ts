@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Configuration, MapStructure } from "@maps/models";
 import { BsModalService } from 'ngx-bootstrap';
 
-import { MapsService } from "@maps/maps.service";
-import { AddConfigurationComponent } from "@maps/map-detail/map-configurations/add-configuration/add-configuration.component";
+import { MapStructureConfiguration, MapStructure } from '@maps/models';
+import { MapsService } from '@maps/maps.service';
+import { AddConfigurationComponent } from '@maps/map-detail/map-configurations/add-configuration/add-configuration.component';
 
 @Component({
   selector: 'app-main-map-configurations',
@@ -11,15 +11,30 @@ import { AddConfigurationComponent } from "@maps/map-detail/map-configurations/a
   styleUrls: ['./map-configurations.component.scss']
 })
 export class MapConfigurationsComponent implements OnInit {
-  selectedConfiguration: Configuration;
+  selectedConfiguration: MapStructureConfiguration;
   mapStructure: MapStructure;
   editorOptions = {
     theme: 'vs-dark',
     language: 'json'
   };
   value: string = '';
+  editor: any;
 
   constructor(private mapsService: MapsService, private modalService: BsModalService) { }
+
+  onEditorInit(editor) {
+    this.editor = editor;
+    this.formatJson();
+  }
+
+  private formatJson() {
+    if (!this.editor) {
+      return;
+    }
+    setTimeout(() => {
+      this.editor.getAction('editor.action.formatDocument').run();
+    }, 50);
+  }
 
   ngOnInit() {
     this.mapsService.getCurrentMapStructure()
@@ -33,15 +48,13 @@ export class MapConfigurationsComponent implements OnInit {
   }
 
   addNewConfiguration() {
-    const modalRef = this.modalService.show(AddConfigurationComponent);
-    modalRef.content.result
+    this.modalService.show(AddConfigurationComponent).content.result
       .take(1)
       .filter(name => !!name)
       .subscribe(name => {
-        this.mapStructure.configurations.push(new Configuration(name, '{\n\n}'));
+        this.mapStructure.configurations.push(new MapStructureConfiguration(name, '{\n\n}'));
         this.editConfiguration(this.mapStructure.configurations.length - 1);
       });
-
   }
 
   removeConfiguration(index: number) {
@@ -51,9 +64,13 @@ export class MapConfigurationsComponent implements OnInit {
   }
 
   editConfiguration(index: number) {
-    const re = new RegExp('\",\"', 'g');
-    this.value = (JSON.stringify(this.mapStructure.configurations[index].value) || '').replace(re, '\", \n\"');
-    // this.mapStructure.configurations[index].value = (JSON.stringify(this.mapStructure.configurations[index].value) || '').replace(re, '\", \n\"');
+    if ((typeof this.mapStructure.configurations[index].value) === 'object') {
+      this.value = (JSON.stringify(this.mapStructure.configurations[index].value) || '');
+      this.formatJson();
+    } else {
+      this.value = <string>this.mapStructure.configurations[index].value;
+    }
+
     this.selectedConfiguration = this.mapStructure.configurations[index];
   }
 
@@ -63,5 +80,4 @@ export class MapConfigurationsComponent implements OnInit {
       this.mapsService.setCurrentMapStructure(this.mapStructure);
     } catch (err) {}
   }
-
 }

@@ -29,7 +29,7 @@ export class SelectAgentComponent implements OnInit, OnDestroy {
         return Observable.forkJoin(
           Observable.of(agents),
           this.agentsService.status()
-        )
+        );
       })
       .subscribe(data => {
         let [agents, agentsStatus] = data;

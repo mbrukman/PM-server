@@ -1,11 +1,6 @@
 @import "~assets/sass/mixins";
 
 .main {
-  padding-right: 15px;
-  padding-left: 15px;
-  margin-left: 35px;
-  margin-top: 39px;
-  margin-bottom: 39px;
   .featured {
     width: 100%;
   }
@@ -31,6 +26,8 @@
 }
 
 .filter {
+  margin-top: 25px;
+
   h5 {
     padding-bottom: 15px;
   }

@@ -274,7 +274,7 @@ module.exports = {
                     }
 
                     request.post({
-                        url: agents[agent.key].defaultUrl + "/api/plugins/install",
+                        url: agents[agents[i].key].defaultUrl + "/api/plugins/install",
                         formData: Object.assign(formData, { key: i })
                     });
                 }

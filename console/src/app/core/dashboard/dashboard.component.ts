@@ -33,7 +33,7 @@ export class DashboardComponent implements OnInit {
   aggregateProcessesStatus(processes) {
     let ag = processes.reduce((total, current) => {
       if (!total[current.status]) {
-        return total
+        return total;
       }
       total[current.status].value = (total[current.status].value || 0) + 1;
       return total;

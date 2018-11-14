@@ -1,9 +1,9 @@
 <div class="card bg-dark">
   <div class="card-body">
-    <h5 class="card-title">{{ process.name || 'Process' }}</h5>
+    <h5 class="card-title">{{ generalInfo.name || 'Process' }}</h5>
     <div class="row">
       <div class="col-8">
-        <p>{{ process.description }}</p>
+        <!-- <p>{{ generalInfo.description }}</p> -->
         <p *ngIf="generalInfo">Start time: {{ generalInfo?.startTime | date: 'short' }}</p>
         <p *ngIf="generalInfo">Finish time: {{ generalInfo?.finishTime | date: 'short' }}</p>
         <p *ngIf="showProcessResult(generalInfo?.result)">{{ generalInfo?.result }}</p>
@@ -45,6 +45,9 @@
                 </div>
                 <h5>Output:</h5>
                 <div class="raw-output">
+                  <div class="row-card">
+                    <i class="fas fa-arrows-alt" (click)="expandOutput(action)"></i>
+                  </div>
                   <span *ngFor="let item of agActionsStatus[action.action]?.results?.stdout">{{ item }} <br></span>
                   <span *ngFor="let item of agActionsStatus[action.action]?.results?.stderr">{{ item }} <br></span>
                   <span *ngFor="let item of agActionsStatus[action.action]?.results?.result">{{ item }} <br></span>

@@ -10,7 +10,7 @@ import { Observable } from 'rxjs/Observable';
 export class InfiniteScrollDirective implements AfterViewInit {
   scrollEvent: any;
   scrollSubscription: any;
-  @Input('onScroll') onScrollCb: any;
+  @Input('onScroll') onScroll: any;
 
   constructor(private elm: ElementRef) {
     console.log(elm);
@@ -18,7 +18,7 @@ export class InfiniteScrollDirective implements AfterViewInit {
 
   ngAfterViewInit() {
     this.registerScrollEvent();
-    this.onScroll();
+    this.onScrollEvent();
   }
 
   private registerScrollEvent() {
@@ -33,11 +33,11 @@ export class InfiniteScrollDirective implements AfterViewInit {
     ;
   }
 
-  onScroll() {
+  onScrollEvent() {
     this.scrollEvent.subscribe(a => {
-      this.onScrollCb();
+      this.onScroll();
     });
-    this.scrollSubscription = this.scrollEvent
+    this.scrollSubscription = this.scrollEvent;
   }
 
   isCloseToBottom(position) {

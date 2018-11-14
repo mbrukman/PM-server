@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { Subscription } from 'rxjs/Subscription';
 
 import { MapDesignService } from '../map-design.service';
-import { Link, MapStructure, Process } from '@maps/models/map-structure.model';
+import { Link, MapStructure, Process } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { Plugin } from '@plugins/models/plugin.model';
@@ -39,17 +39,19 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   mapStructureSubscription: Subscription;
   editing: boolean = false;
   pluginsReq: any;
-  plugins: [Plugin];
+  plugins: Plugin[];
   process: Process;
   link: Link;
   init: boolean = false;
   scale: number = 1;
+
+  defaultContent: string;
   @ViewChild('wrapper') wrapper: ElementRef;
 
   constructor(private designService: MapDesignService,
-              private mapsService: MapsService,
-              private pluginsService: PluginsService,
-              private mapDesignService: MapDesignService) { }
+    private mapsService: MapsService,
+    private pluginsService: PluginsService,
+    private mapDesignService: MapDesignService) { }
 
   ngOnInit() {
     this.defineShape();
@@ -123,6 +125,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         if (!this.init || (<any>structure).imported) {
           this.drawGraph();
           this.init = true;
+          this.graph.getElements().forEach(cell => {
+            this.deselectCell(cell);
+          });
+          this.defaultContent = JSON.stringify(this.graph.toJSON());
           if ((<any>structure).imported) {
             delete (<any>structure).imported;
             this.mapStructure = structure;
@@ -130,8 +136,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           }
         }
       });
+     
+ 
   }
-
   /**
    * Check if the x, y are over the map
    * @param {number} x
@@ -147,10 +154,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   deselectAllCellsAndUpdateStructure() {
     this.graph.getElements().forEach(cell => {
-      this.deselectCell(cell);
+        this.deselectCell(cell);
     });
-    this.mapStructure.content = JSON.stringify(this.graph.toJSON());
-    this.mapsService.setCurrentMapStructure(this.mapStructure);
+    this.onMapContentUpdate();
   }
 
   addNewLink(cell) {
@@ -162,7 +168,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       return;
     }
     const link = _.find(this.mapStructure.links, (o) => {
-      return (o.targetId === this.link.targetId && o.sourceId === this.link.sourceId)
+      return (o.targetId === this.link.targetId && o.sourceId === this.link.sourceId);
     });
     if (link) {
       return;
@@ -179,7 +185,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       if (!this.mapStructure.processes[processIndex].coordination) {
         this.mapStructure.processes[processIndex].coordination = 'wait';
         this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
-
       }
     }
     this.deselectAllCellsAndUpdateStructure();
@@ -299,7 +304,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           'fill-opacity': .5
         },
         image: {
-          'xlink:href': `plugins/${pluginName}/${plugin.imgUrl}`,
+          'xlink:href': plugin.fullImageUrl,
           width: 46,
           height: 32,
           'ref-x': 50,
@@ -376,7 +381,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
                 'fill-opacity': .5
               },
               image: {
-                'xlink:href': `plugins/${plugin.name}/${plugin.imgUrl}`,
+                'xlink:href': plugin.fullImageUrl,
                 width: 46,
                 height: 32,
                 'ref-x': 50,
@@ -417,11 +422,19 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           });
         }
 
-        this.mapStructure.content = JSON.stringify(this.graph.toJSON())
-        this.mapsService.setCurrentMapStructure(this.mapStructure);
+        this.onMapContentUpdate();
       }
     }
+
+    this.center();
   }
+
+center(){
+  let bbox = this.graph.getBBox(this.graph.getElements());
+  let y = 10 + Math.abs(bbox.y)
+  let x = 10 + Math.abs(bbox.x)
+  this.paper.translate(x, y)
+}
 
   editProcess(process) {
     if (!process.plugin) {
@@ -452,8 +465,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
 
     $('#graph').mousemove((event) => {
-      if (move)
+      if (move) {
         self.paper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
+      }
     });
 
     this.paper.on('blank:pointerup', (event, x, y) => {
@@ -461,7 +475,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
       // closing process pane if opened
       if (this.process) {
-        this.onClose()
+        this.onClose();
       }
     });
 
@@ -503,7 +517,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.graph.on('remove', function (cell, collection, opt) {
       if (cell.isLink()) {
         let linkIndex = _.findIndex(self.mapStructure.links, (o) => {
-          return o.uuid === cell.id
+          return o.uuid === cell.id;
         });
         if (linkIndex === -1) {
           self.deselectAllCellsAndUpdateStructure();
@@ -522,7 +536,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         }
         self.deselectAllCellsAndUpdateStructure();
       }
-    })
+    });
   }
 
   onClose(event?) {
@@ -534,7 +548,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   onDelete(event) {
     let processIndex = _.findIndex(this.mapStructure.processes, (o) => {
-      return o.uuid === this.process.uuid
+      return o.uuid === this.process.uuid;
     });
     this.mapStructure.processes.splice(processIndex, 1);
     this.graph.removeCells([this.graph.getCell(this.process.uuid)]);
@@ -545,7 +559,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   onSave(process) {
     let index = _.findIndex(this.mapStructure.processes, (o) => {
-      return o.uuid === this.process.uuid
+      return o.uuid === this.process.uuid;
     });
 
     this.updateNodeLabel(process.uuid, process.name || this.process.used_plugin.name);
@@ -573,8 +587,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   updateNodeLabel(uuid: string, label: string): void {
     let cell = this.graph.getCell(uuid);
     cell.attr('text/text', label);
-    this.mapStructure.content = JSON.stringify(this.graph.toJSON());
-    this.mapsService.setCurrentMapStructure(this.mapStructure);
+    this.onMapContentUpdate()
   }
 
   onScale(scale) {
@@ -588,5 +601,13 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   deselectCell(cell) {
     cell.attr('rect/fill', '#2d3236');
+  }
+
+  private onMapContentUpdate(){
+    let graphContent = JSON.stringify(this.graph.toJSON());
+    if(graphContent != this.defaultContent){
+      this.mapStructure.content = graphContent;
+      this.mapsService.setCurrentMapStructure(this.mapStructure);
+    }
   }
 }

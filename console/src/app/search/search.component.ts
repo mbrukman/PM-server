@@ -1,8 +1,8 @@
 import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
-import { MapsService } from "../maps/maps.service";
-import { Map } from "../maps/models/map.model";
-import { Project } from "../projects/models/project.model";
-import { ProjectsService } from "../projects/projects.service";
+import { MapsService } from '../maps/maps.service';
+import { Map } from '../maps/models/map.model';
+import { Project } from '../projects/models/project.model';
+import { ProjectsService } from '../projects/projects.service';
 
 
 @Component({
@@ -24,10 +24,12 @@ export class SearchComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.mapReq)
+    if (this.mapReq) {
       this.mapReq.unsubscribe();
-    if (this.projectReq)
+    }
+    if (this.projectReq) {
       this.projectReq.unsubscribe();
+    }
   }
 
   onKeyUp() {

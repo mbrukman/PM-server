@@ -1,10 +1,11 @@
 <div class="main">
-  <h1 class="section-title">Plugins</h1>
-
-  <button class="btn pm" (click)="onOpenModal()">Upload plugin</button>
+  <div class="section-title-wrapper">
+    <h1 class="section-title">Plugins</h1>
+    <button class="btn pm" (click)="onOpenModal()">Upload plugin</button>
+  </div>
   <div class="filter d-flex justify-content-between align-items-end">
     <h5 class="section-sub-title">All plugins</h5>
-    <div>
+    <div [hidden]="!plugins || !plugins.length">
       <i class="material-icons">search</i>
       <input class="form-control" #gb type="text" placeholder="Filter"/>
     </div>
@@ -16,10 +17,10 @@
     [paginator]="true"
     [pageLinks]="4"
     [globalFilter]="gb"
-    *ngIf="plugins && plugins?.length > 0">
+    [hidden]="!plugins || !plugins.length">
     <p-column field="name" header="Name" [sortable]="true">
       <ng-template let-col let-plugin="rowData" pTemplate="body">
-        <img src="plugins/{{plugin.name}}/{{plugin.imgUrl}}" class="thumbnail"> {{ plugin.name }}
+        <img [src]="plugin.fullImageUrl" class="thumbnail"> {{ plugin.name }}
       </ng-template>
     </p-column>
     <p-column field="description" header="Description" [sortable]="true">
@@ -34,7 +35,7 @@
       </ng-template>
     </p-column>
     <p-column field="" header="Actions" [sortable]="true">
-      <ng-template let-col let-plugin="rowData" pTemplate="body">
+      <ng-template let-col let-i="rowIndex" let-plugin="rowData" pTemplate="body">
         <button class="btn btn-danger" (click)="deletePlugin(plugin.id, i)"><i class="material-icons">delete</i></button>
       </ng-template>
     </p-column>

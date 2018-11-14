@@ -9,6 +9,7 @@ import { MapStructure, Process } from '@maps/models';
 import { Project } from '@projects/models/project.model';
 import { ProjectsService } from '@projects/projects.service';
 import { SocketService } from '@shared/socket.service';
+import { DiffEditorModel } from 'ngx-monaco-editor';
 
 @Component({
   selector: 'app-map-revisions',
@@ -38,6 +39,11 @@ export class MapRevisionsComponent implements OnInit {
   };
   latestCode: string;
   currentCode: string;
+  
+  monacoOptions = {
+    theme: 'vs-dark'
+  };
+  
 
   constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService) {
     this.scrollCallback = this.loadRevisions.bind(this);
@@ -65,6 +71,16 @@ export class MapRevisionsComponent implements OnInit {
     this.listeners();
   }
 
+  originalModel: DiffEditorModel = {
+    code: this.latestCode,
+    language: 'text/javascript'
+  };
+ 
+  modifiedModel: DiffEditorModel = {
+    code: this.currentCode,
+    language: 'text/javascript'
+  };
+
   addPaperDrag() {
     let initialPosition = { x: 0, y: 0 };
     let move = false;
@@ -74,8 +90,9 @@ export class MapRevisionsComponent implements OnInit {
     });
 
     $('#graph').mousemove((event) => {
-      if (move)
+      if (move) {
         this.paper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
+      }
     });
 
     this.paper.on('blank:pointerup', (event, x, y) => {
@@ -95,7 +112,7 @@ export class MapRevisionsComponent implements OnInit {
   getMapStructures(page: number) {
     this.mapsService.structuresList(this.mapId, page).subscribe(structures => {
       if (structures && structures.length > 0) {
-        this.structures = [...this.structures, ...structures]
+        this.structures = [...this.structures, ...structures];
       } else {
         this.morePages = false;
       }
@@ -118,7 +135,7 @@ export class MapRevisionsComponent implements OnInit {
       this.socketService.setNotification({
         title: 'Changed version',
         type: 'info'
-      })
+      });
     });
   }
 
@@ -204,7 +221,7 @@ export class MapRevisionsComponent implements OnInit {
 
   duplicateMap(structureId: string) {
     this.mapsService.duplicateMap(this.mapId, structureId, this.project.id).subscribe(map => {
-      this.router.navigate(['/maps', map.id])
+      this.router.navigate(['/maps', map.id]);
     });
   }
 
@@ -214,15 +231,20 @@ export class MapRevisionsComponent implements OnInit {
       .subscribe(structure => {
         this.currentStructure = structure;
         this.graph.fromJSON(JSON.parse(structure.content));
+        this.originalModel = {
+          code : structure.code,
+          language : 'javascript'
+        }
+        if (!this.latestStructure) {
+          this.setLatestStructure(this.mapId, this.structures[0].id);
+        }
+    
+        if (this.viewMode === 'code') {
+          this.loadCodeDiff();
+        }
       });
 
-    if (!this.latestStructure) {
-      this.setLatestStructure(this.mapId, this.structures[0].id);
-    }
-
-    if (this.viewMode === 'code') {
-      this.loadCodeDiff();
-    }
+   
   }
 
   onResize(event) {
@@ -262,7 +284,10 @@ export class MapRevisionsComponent implements OnInit {
   setLatestStructure(mapId: string, structureId: string) {
     this.mapsService.getMapStructure(mapId, structureId)
       .take(1)
-      .subscribe(structure => this.latestStructure = structure);
+      .subscribe(structure => {
+        this.latestStructure = structure
+        this.modifiedModel.code = structure.code;
+      });
   }
 
   onClose() {

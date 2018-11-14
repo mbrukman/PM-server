@@ -3,12 +3,12 @@ const Schema = mongoose.Schema;
 
 let mapSchema = new Schema({
     name: { type: String, required: true },
-    description: String,
+    description: {type: String, default: ''},
     licence: String,
     archived: { type: Boolean, default: false },
     agents: [{ type: Schema.Types.ObjectId, ref: 'Agent' }],
     groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
-    queue: Number
+    queue: Number,
 }, { timestamps: true });
 
 mapSchema.set('toJSON', {

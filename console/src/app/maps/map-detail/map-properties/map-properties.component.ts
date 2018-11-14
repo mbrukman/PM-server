@@ -29,13 +29,12 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
     this.mapSubscription = this.mapsService.getCurrentMap()
       .filter(map => map) // filtering empty map result
       .do(map => this.map = map)
-      .do(map => this.selectedProject = map.project)
       .filter(map => !this.projects)
       .flatMap(() => this.projectsService.list())
       .subscribe(data => {
         this.projects = data.items;
         let project = this.projects.find((o) => (<string[]>o.maps).indexOf(this.map.id) > -1);
-        if (project && !this.map.project) {
+        if (project) {
           this.selectedProject = project._id;
         }
       });

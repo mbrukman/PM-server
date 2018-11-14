@@ -33,7 +33,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
   ngAfterContentInit() {
     this.pluginsReq = this.pluginsService.list().subscribe(plugins => {
       this.triggers = plugins.filter(plugin => {
-        return plugin.type === "trigger" || plugin.type === "server" || plugin.type === "module"
+        return plugin.type === 'trigger' || plugin.type === 'server' || plugin.type === 'module';
       });
       if (this.triggers) {
         this.initTriggerForm();
@@ -62,7 +62,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
       configuration: new FormControl(this.trigger ? this.trigger.method : null),
       method: new FormControl(this.trigger ? this.trigger.method : null, Validators.required),
       params: new FormArray([])
-    })
+    });
   }
 
   initParamsForm(value?, id?, viewName?, name?) {

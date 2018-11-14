@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
-import { Process } from '@maps/models/map-structure.model';
+import { Process } from '@maps/models';
 
 @Injectable()
 export class MapDesignService {

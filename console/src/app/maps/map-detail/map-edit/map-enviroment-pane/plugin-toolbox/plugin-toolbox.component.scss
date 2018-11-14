@@ -1,6 +1,7 @@
 .container, .wrapper{
   display: flex;
   flex-grow: 1;
+  flex-direction: column;
 }
 
 .graph {
@@ -8,4 +9,12 @@
     width: initial !important;
     height: initial !important;
     flex-grow: 1;
+}
+
+
+.filter{
+  margin: 12px 0px 0px;
+  padding: 4px 10px;
+  height: 39px;
+  display: flex;
 }

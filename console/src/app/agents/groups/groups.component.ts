@@ -36,9 +36,9 @@ export class GroupsComponent implements OnInit, OnDestroy {
       .map(groups => {
         let g = new Group();
         groups.forEach(group => {
-          let g = new Group();
-          g = group;
-          group = g;
+          let gr = new Group();
+          gr = group;
+          group = gr;
         });
         return groups;
       })
@@ -108,7 +108,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
   deleteGroup(groupIndex, groupId) {
     this.agentsService.groupDelete(groupId).subscribe(() => {
       this.groups.splice(groupIndex, 1);
-    })
+    });
   }
 
 }

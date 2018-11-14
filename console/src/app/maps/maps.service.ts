@@ -19,7 +19,7 @@ export class MapsService {
   }
 
   allMaps(): Observable<[Map]> {
-    return this.http.get<[Map]>(serverUrl + 'api/maps')
+    return this.http.get<[Map]>(`${serverUrl}api/maps`);
   }
 
   archive(mapId) {
@@ -31,11 +31,11 @@ export class MapsService {
   }
 
   createMap(map): Observable<Map> {
-    return this.http.post<Map>(serverUrl + 'api/maps/create', map)
+    return this.http.post<Map>(`${serverUrl}api/maps/create`, map);
   }
 
   duplicateMap(mapId, structureId, projectId) {
-    return this.http.post<Map>(`${serverUrl}api/maps/${mapId}/structure/${structureId}/duplicate`, { projectId: projectId })
+    return this.http.post<Map>(`${serverUrl}api/maps/${mapId}/structure/${structureId}/duplicate`, { projectId: projectId });
   }
 
   getCurrentMap(): Observable<any> {
@@ -43,7 +43,7 @@ export class MapsService {
   }
 
   getMap(id: string): Observable<Map> {
-    return this.http.get<Map>(serverUrl + 'api/maps/' + id)
+    return this.http.get<Map>(`${serverUrl}api/maps/${id}`);
   }
 
   filterMaps(fields?: any, sort?: string, page?: number, globalFilter?: string) {
@@ -62,8 +62,15 @@ export class MapsService {
     if (globalFilter) {
       params = params.set('globalFilter', globalFilter);
     }
-    return this.http.get<{ totalCount: number, items: Map[] }>(`${serverUrl}api/maps`, { params: params });
+    return this.http.get<{ items: Map[],totalCount: number}>(`${serverUrl}api/maps`, { params: params });
   }
+
+  delete(id) {
+    return this.http.delete(`${serverUrl}api/maps/${id}`);
+  }
+
+  
+
 
   setCurrentMap(map: Map) {
     this.currentMap.next(map);
@@ -79,8 +86,12 @@ export class MapsService {
     return this.http.post(`${serverUrl}api/maps/${mapId}/cancel-pending`, { runId });
   }
 
-  execute(mapId: string) {
-    return this.http.post(serverUrl + 'api/maps/' + mapId + '/execute', { trigger: 'Started manually by user' });
+  execute(mapId: string, config?: string) {
+    let data: any = { trigger: 'Started manually by user' };
+    if (config) {
+      data.config = config;
+    }
+    return this.http.post(`${serverUrl}api/maps/${mapId}/execute`, data);
   }
 
   stopExecutions(mapId: string, runId = '') {
@@ -92,7 +103,7 @@ export class MapsService {
   }
 
   logsList(mapId: string, runId?: string) {
-    return this.http.get<MapExecutionLogs[]>(serverUrl + 'api/maps/' + mapId + '/results/' + (runId ? runId + '/' : '') + 'logs')
+    return this.http.get<MapExecutionLogs[]>(`${serverUrl}api/maps/${mapId}/results/${runId ? runId + '/' : ''}logs`);
   }
 
   currentExecutionList() {
@@ -110,7 +121,7 @@ export class MapsService {
   /* map structure */
 
   createMapStructure(mapId: string, structure: MapStructure) {
-    return this.http.post<MapStructure>(serverUrl + 'api/maps/' + mapId + '/structure/create', structure)
+    return this.http.post<MapStructure>(`${serverUrl}api/maps/${mapId}/structure/create`, structure);
   }
 
   clearCurrentMapStructure() {
@@ -118,7 +129,7 @@ export class MapsService {
   }
 
   getMapStructure(mapId, structureId = '') {
-    return this.http.get<MapStructure>(serverUrl + 'api/maps/' + mapId + '/structure/' + structureId)
+    return this.http.get<MapStructure>(`${serverUrl}api/maps/${mapId}/structure/${structureId}`);
   }
 
   getCurrentMapStructure(): Observable<MapStructure> {
@@ -134,25 +145,25 @@ export class MapsService {
     if (page) {
       params = params.set('page', page.toString());
     }
-    return this.http.get<MapStructure[]>(`${serverUrl}api/maps/${mapId}/structures`, { params: params })
+    return this.http.get<MapStructure[]>(`${serverUrl}api/maps/${mapId}/structures`, { params: params });
   }
 
   /* map triggers */
   createTrigger(mapId, trigger) {
-    return this.http.post<MapTrigger>(serverUrl + 'api/maps/' + mapId + '/triggers/create', trigger);
+    return this.http.post<MapTrigger>(`${serverUrl}api/maps/${mapId}/triggers/create`, trigger);
   }
 
   deleteTrigger(mapId, triggerId) {
     const options = { responseType: 'text' as 'json' };
-    return this.http.delete<any>(serverUrl + 'api/maps/' + mapId + '/triggers/' + triggerId + '/delete', options);
+    return this.http.delete<any>(`${serverUrl}api/maps/${mapId}/triggers/${triggerId}/delete`, options);
   }
 
   triggersList(mapId) {
-    return this.http.get<MapTrigger[]>(serverUrl + 'api/maps/' + mapId + '/triggers')
+    return this.http.get<MapTrigger[]>(`${serverUrl}api/maps/${mapId}/triggers`);
   }
 
   updateTrigger(mapId, trigger) {
-    return this.http.put<MapTrigger>(serverUrl + 'api/maps/' + mapId + '/triggers/' + trigger._id + '/update', trigger);
+    return this.http.put<MapTrigger>(`${serverUrl}api/maps/${mapId}/triggers/${trigger._id}/update`, trigger);
   }
 
 }

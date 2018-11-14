@@ -12,7 +12,7 @@ export class IsSetUpGuard implements CanActivate {
   }
 
   canActivate(): boolean | Observable<boolean> {
-    return this.isServerSetup()
+    return this.isServerSetup();
   }
 
   isServerSetup(): Observable<boolean> | boolean {
@@ -23,7 +23,7 @@ export class IsSetUpGuard implements CanActivate {
           this.router.navigate(['/', 'setup']);
         }
         this.setupService.setup = isSetup;
-        return isSetup
+        return isSetup;
       });
   }
 

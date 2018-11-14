@@ -21,6 +21,7 @@ import { InfiniteScrollDirective } from './directives/infinite-scroll.directive'
 import { LinebreakPipe } from './pipes/linebreak.pipe';
 import { InlineEditDirective } from './directives/inline-edit.directive';
 import { InPipe } from '@shared/pipes/filterIn.pipe';
+import { RawOutputComponent } from './raw-output/raw-output.component';
 
 
 @NgModule({
@@ -50,7 +51,8 @@ import { InPipe } from '@shared/pipes/filterIn.pipe';
     InfiniteScrollDirective,
     InlineEditDirective,
     LinebreakPipe,
-    InPipe
+    InPipe,
+    RawOutputComponent
   ],
   exports: [
     ReactiveFormsModule,
@@ -72,7 +74,7 @@ import { InPipe } from '@shared/pipes/filterIn.pipe';
     LinebreakPipe,
     InPipe
   ],
-  entryComponents: [ConfirmComponent]
+  entryComponents: [ConfirmComponent, RawOutputComponent]
 })
 export class SharedModule {
 }
