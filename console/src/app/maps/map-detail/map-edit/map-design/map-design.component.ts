@@ -74,7 +74,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   ngOnDestroy() {
     this.dropSubscription.unsubscribe();
     this.mapStructureSubscription.unsubscribe();
-    this.deselectAllCellsAndUpdateStructure(true);
+    this.deselectAllCellsAndUpdateStructure();
   }
 
   ngAfterContentInit() {
@@ -125,6 +125,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         if (!this.init || (<any>structure).imported) {
           this.drawGraph();
           this.init = true;
+          this.graph.getElements().forEach(cell => {
+            this.deselectCell(cell);
+          });
           this.defaultContent = JSON.stringify(this.graph.toJSON());
           if ((<any>structure).imported) {
             delete (<any>structure).imported;
@@ -149,17 +152,11 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     return (x > offsetLeft) && (y > offsetTop) && (y < offsetTop + height);
   }
 
-  deselectAllCellsAndUpdateStructure(onDestroy? : boolean) {
-    if(onDestroy !=null && onDestroy && JSON.stringify(this.graph.toJSON()) == this.defaultContent)
-      return;
-    else{
-      this.graph.getElements().forEach(cell => {
+  deselectAllCellsAndUpdateStructure() {
+    this.graph.getElements().forEach(cell => {
         this.deselectCell(cell);
-      });
-      this.mapStructure.content = JSON.stringify(this.graph.toJSON());
-      this.mapsService.setCurrentMapStructure(this.mapStructure);
-    }
-    
+    });
+    this.onMapContentUpdate();
   }
 
   addNewLink(cell) {
@@ -425,8 +422,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           });
         }
 
-        this.mapStructure.content = JSON.stringify(this.graph.toJSON());
-        this.mapsService.setCurrentMapStructure(this.mapStructure);
+        this.onMapContentUpdate();
       }
     }
   }
@@ -582,8 +578,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   updateNodeLabel(uuid: string, label: string): void {
     let cell = this.graph.getCell(uuid);
     cell.attr('text/text', label);
-    this.mapStructure.content = JSON.stringify(this.graph.toJSON());
-    this.mapsService.setCurrentMapStructure(this.mapStructure);
+    this.onMapContentUpdate()
   }
 
   onScale(scale) {
@@ -597,5 +592,13 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   deselectCell(cell) {
     cell.attr('rect/fill', '#2d3236');
+  }
+
+  private onMapContentUpdate(){
+    let graphContent = JSON.stringify(this.graph.toJSON());
+    if(graphContent != this.defaultContent){
+      this.mapStructure.content = graphContent;
+      this.mapsService.setCurrentMapStructure(this.mapStructure);
+    }
   }
 }
