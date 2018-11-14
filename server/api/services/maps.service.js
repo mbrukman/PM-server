@@ -93,7 +93,7 @@ module.exports = {
                 return {maps, projects}
             })
         }).then(({maps, projects})=>{
-            for(let i=0, length=maps.length; i<length; i++){
+            return Promise.all(maps.map(map=>{
                 for(let j=0, projectsLength = projects.length; j<projectsLength; j++){
                     if (projects[j].maps.toString().includes(maps[i].id)){
                         maps[i] = maps[i].toJSON();
@@ -101,16 +101,11 @@ module.exports = {
                         break;
                    }
                 }
-            }
-            return maps;
-        }).then(maps=>{
-            return Promise.all(maps.map(map=>{
                 return MapResult.findOne({map : map.id}).sort('-finishTime').select('finishTime').then(result=>{
                     map.latestExectionResult = result;
                     return map;
                 })
             }))
-            
         }).then(maps => {
             return module.exports.count(q).then(r => {
                 return { items: maps, totalCount: r }
