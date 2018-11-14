@@ -275,11 +275,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     const plugin = this.plugins.find((o) => {
       return o.name === pluginName;
     });
-
     let imageModel = new joint.shapes.devs['MyImageModel']({
       position: {
-        x: obj.x - (430 * this.scale),
-        y: obj.y - (240 * this.scale)
+        x: obj.x- (430 * this.scale) - this.paper.translate().tx,
+        y: obj.y - (240 * this.scale)  -this.paper.translate().ty
       },
       size: {
         width: 100,
