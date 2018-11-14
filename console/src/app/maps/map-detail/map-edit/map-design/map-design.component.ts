@@ -34,7 +34,6 @@ export const linkAttrs = {
 export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   dropSubscription: Subscription;
   graph: joint.dia.Graph;
-  defaultGraph:joint.dia.Graph;
   paper: joint.dia.Paper;
   mapStructure: MapStructure;
   mapStructureSubscription: Subscription;
@@ -75,12 +74,11 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   ngOnDestroy() {
     this.dropSubscription.unsubscribe();
     this.mapStructureSubscription.unsubscribe();
-    this.deselectAllCellsAndUpdateStructure();
+    this.deselectAllCellsAndUpdateStructure(true);
   }
 
   ngAfterContentInit() {
     this.graph = new joint.dia.Graph;
-    this.defaultGraph = new joint.dia.Graph;
     this.paper = new joint.dia.Paper({
       el: $('#graph'),
       width: this.wrapper.nativeElement.offsetWidth,
@@ -127,11 +125,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         if (!this.init || (<any>structure).imported) {
           this.drawGraph();
           this.init = true;
-          this.defaultGraph = this.graph;
-          this.defaultGraph.getElements().forEach(cell => {
-            this.deselectCell(cell);
-          });
-          this.defaultContent = JSON.stringify(this.defaultGraph.toJSON());
+          this.defaultContent = JSON.stringify(this.graph.toJSON());
           if ((<any>structure).imported) {
             delete (<any>structure).imported;
             this.mapStructure = structure;
@@ -155,14 +149,17 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     return (x > offsetLeft) && (y > offsetTop) && (y < offsetTop + height);
   }
 
-  deselectAllCellsAndUpdateStructure() {
-    this.graph.getElements().forEach(cell => {
-      this.deselectCell(cell);
-    });
-    this.mapStructure.content = JSON.stringify(this.graph.toJSON());
-    if(this.mapStructure.content != this.defaultContent){
+  deselectAllCellsAndUpdateStructure(onDestroy? : boolean) {
+    if(onDestroy !=null && onDestroy && JSON.stringify(this.graph.toJSON()) == this.defaultContent)
+      return;
+    else{
+      this.graph.getElements().forEach(cell => {
+        this.deselectCell(cell);
+      });
+      this.mapStructure.content = JSON.stringify(this.graph.toJSON());
       this.mapsService.setCurrentMapStructure(this.mapStructure);
     }
+    
   }
 
   addNewLink(cell) {
