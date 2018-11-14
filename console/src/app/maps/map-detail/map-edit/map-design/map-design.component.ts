@@ -47,9 +47,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   @ViewChild('wrapper') wrapper: ElementRef;
 
   constructor(private designService: MapDesignService,
-              private mapsService: MapsService,
-              private pluginsService: PluginsService,
-              private mapDesignService: MapDesignService) { }
+    private mapsService: MapsService,
+    private pluginsService: PluginsService,
+    private mapDesignService: MapDesignService) { }
 
   ngOnInit() {
     this.defineShape();
@@ -420,7 +420,16 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         this.mapsService.setCurrentMapStructure(this.mapStructure);
       }
     }
+
+    this.center();
   }
+
+center(){
+  let bbox = this.graph.getBBox(this.graph.getElements());
+  let y = 10 + Math.abs(bbox.y)
+  let x = 10 + Math.abs(bbox.x)
+  this.paper.translate(x, y)
+}
 
   editProcess(process) {
     if (!process.plugin) {
