@@ -27,7 +27,7 @@
     </p-column>
     <p-column field="lastrun" header="Last Run" [sortable]="true">
       <ng-template let-col let-map="rowData" pTemplate="body">
-        <span>{{ map.lastExecutionLog }}</span>
+        <span>{{ map.latestExectionResult }}</span>
       </ng-template>
     </p-column>
     <p-column field="description" header="Description" [sortable]="true">
