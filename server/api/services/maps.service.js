@@ -95,9 +95,9 @@ module.exports = {
         }).then(({maps, projects})=>{
             return Promise.all(maps.map(map=>{
                 for(let j=0, projectsLength = projects.length; j<projectsLength; j++){
-                    if (projects[j].maps.toString().includes(maps[i].id)){
-                        maps[i] = maps[i].toJSON();
-                        maps[i].project = projects[j];
+                    if (projects[j].maps.toString().includes(map.id)){
+                        map= map.toJSON();
+                        map.project = projects[j];
                         break;
                    }
                 }
