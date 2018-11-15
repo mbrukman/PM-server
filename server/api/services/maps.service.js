@@ -83,27 +83,30 @@ module.exports = {
             // apply paging. if no paging, return all
             m.limit(PAGE_SIZE).skip((query.page - 1) * PAGE_SIZE);
         }
-
         return m.then(maps => {
             let mapsId = maps.map(map=> map.id);
             // searching project in DB when maps holds an array with a least one element of the mapsId
             return {maps, mapsId};
         }).then(({maps,mapsId}) => {
-            return Project.find({ maps: { $in: mapsId} },{_id:1,name:1, maps:1}).then(projects=>{
+            return Project.find({ maps: { $in: mapsId} },{_id:1,name:1, maps:1})
+            .then(projects=>{
                 return {maps, projects}
             })
         }).then(({maps, projects})=>{
-            for(let i=0, length=maps.length; i<length; i++){
+            return Promise.all(maps.map(map=>{
                 for(let j=0, projectsLength = projects.length; j<projectsLength; j++){
-                    if (projects[j].maps.toString().includes(maps[i].id)){
-                        maps[i] = maps[i].toJSON();
-                        maps[i].project = projects[j];
+                    if (projects[j].maps.toString().includes(map.id)){
+                        map= map.toJSON();
+                        map.project = projects[j];
                         break;
                    }
                 }
-            }
-            return maps;
-        }).then(maps=>{
+                return MapResult.findOne({map : map.id}).sort('-finishTime').select('finishTime').then(result=>{
+                    map.latestExectionResult = result;
+                    return map;
+                })
+            }))
+        }).then(maps => {
             return module.exports.count(q).then(r => {
                 return { items: maps, totalCount: r }
             });
