@@ -27,7 +27,7 @@
     </p-column>
     <p-column field="lastrun" header="Last Run" [sortable]="true">
       <ng-template let-col let-map="rowData" pTemplate="body">
-        <span>{{ map.latestExectionResult.finishTime }}</span>
+        <span>{{ (map.latestExectionResult?.finishTime | date: 'dd/MM/yyyy HH:mm') || '' }}</span>
       </ng-template>
     </p-column>
     <p-column field="description" header="Description" [sortable]="true">
@@ -37,12 +37,12 @@
     </p-column>
     <p-column field="createdAt" header="Created" [sortable]="true">
       <ng-template let-col let-map="rowData" pTemplate="body">
-        <span>{{ (map.createdAt | date: 'dd/MM/yyyy') + ' ' +  (map.createdAt | date: 'HH:mm') }}</span>
+        <span>{{ map.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
       </ng-template>
     </p-column>
     <p-column field="updatedAt" header="Updated" [sortable]="true">
       <ng-template let-col let-map="rowData" pTemplate="body">
-        <span>{{ ((map.updatedAt | date: 'dd/MM/yyyy') || '') + ' ' +  ((map.updatedAt | date: 'HH:mm') || '' )}}</span>
+        <span>{{ ((map.updatedAt | date: 'dd/MM/yyyy HH:mm') || '')}}</span>
       </ng-template>
     </p-column>
     <p-column field="" header="Actions" [sortable]="true">
