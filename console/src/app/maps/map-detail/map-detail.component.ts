@@ -206,6 +206,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         });
       }
     });
+    structure._id = undefined;
+    structure.id = undefined;
 
     return structure;
   }
@@ -349,6 +351,15 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       configuration.selected = (this.selected.toString() === i.toString());
     });
     this.mapsService.setCurrentMapStructure(this.mapStructure);
+  }
+
+  onKeyDown($event) {
+    let charCode = String.fromCharCode($event.which).toLowerCase();
+    if ($event.ctrlKey && charCode === 's') {
+        // Action on Ctrl + S
+        this.saveMap();
+        $event.preventDefault();
+    } 
   }
 
 
