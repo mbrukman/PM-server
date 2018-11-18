@@ -31,7 +31,13 @@ export class MapCodeComponent implements OnInit {
     });
   }
  
-  onKeyDown() {
+  onKeyDown($event) {
+
+    let charCode = String.fromCharCode($event.which).toLowerCase();
+    if ($event.ctrlKey && charCode === 's') {
+        return;
+    } 
+
     this.structure.code = this.structure.code || undefined;
     this.mapsService.setCurrentMapStructure(this.structure);
   }
