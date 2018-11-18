@@ -40,10 +40,17 @@ function evaluateParam(param, context) {
 
 }
 
+function _createContext(context){
+    return {
+        ...context,
+        require,
+        console
+    }
+}
+
 function createContext(mapObj, context) {
     try {
-        vm.createContext(context);
-        vm.runInNewContext(libpm + '\n' + mapObj.code, context);
+        vm.runInNewContext(libpm + '\n' + mapObj.code, _createContext(context));
         return 0;
     } catch (error) {
         return error;
@@ -251,7 +258,7 @@ function filterExecutionAgents(mapCode, executionContext, groups, mapAgents, exe
             agentObj.continue = true;
             agentObj.pendingProcesses = {};
             agentObj.socket = agentsStatus[agentStatus.key].socket;
-            agentObj.executionContext = vm.createContext(Object.assign({}, executionContext));
+            agentObj.executionContext = _createContext(executionContext);
             vm.runInNewContext(libpm + '\n' + mapCode, agentObj.executionContext);
             executionAgents[agentStatus.key] = agentObj;
         });
