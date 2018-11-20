@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "spec": "speculate --name=kaholo-server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
     "build": "cd ../console && ng build",
@@ -32,5 +33,15 @@
     "unzipper": "0.9.4",
     "winston": "3.1.0",
     "winston-mongodb": "4.0.3"
+  },
+  "devDependencies": {
+    "speculate": "1.7.4"
+  },
+  "spec": {
+    "nodeVersion": "> 10.13.0",
+    "post": [
+      "sudo mkdir -p /usr/lib/static_cdn/uploads"
+    ]
   }
+  
 }
