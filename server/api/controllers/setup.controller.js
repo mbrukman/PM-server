@@ -9,10 +9,13 @@ let config = require('../../env/config');
 
 module.exports = {
     isSetUp: (req, res) => {
-        if (config.dbURI) {
+        mongoose.connect(config.dbURI, { useMongoClient: true })
+        .then(() => {
             return res.send(true);
-        }
-        return res.send(false)
+        })
+        .catch(() => {
+            return res.send(false)
+        })
     },
 
     setupDbConnectionString: (req, res) => {
