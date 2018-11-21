@@ -15,7 +15,10 @@ import { SocketService } from '@shared/socket.service';
 @Component({
   selector: 'app-map-detail',
   templateUrl: './map-detail.component.html',
-  styleUrls: ['./map-detail.component.scss']
+  styleUrls: ['./map-detail.component.scss'],
+  host : {
+    '(document:keydown)': 'onKeyDown($event)'
+  }
 })
 export class MapDetailComponent implements OnInit, OnDestroy {
   id: string;
@@ -165,6 +168,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       this.executing = maps.indexOf(this.id) > -1;
     });
   }
+
   ngOnDestroy() {
     this.routeReq.unsubscribe();
     this.mapReq.unsubscribe();
@@ -206,6 +210,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         });
       }
     });
+    structure._id = undefined;
+    structure.id = undefined;
 
     return structure;
   }
@@ -349,6 +355,15 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       configuration.selected = (this.selected.toString() === i.toString());
     });
     this.mapsService.setCurrentMapStructure(this.mapStructure);
+  }
+
+  onKeyDown($event: KeyboardEvent) {
+    let charCode = String.fromCharCode($event.which).toLowerCase();
+    if ($event.ctrlKey && charCode === 's') {
+        // Action on Ctrl + S
+        this.saveMap();
+        $event.preventDefault();
+    } 
   }
 
 
