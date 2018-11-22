@@ -23,20 +23,19 @@ let pluginsTmpPath = path.join(
 );
 
 function installPluginOnAgent(pluginDir, obj) {
+  agentsService.installPluginOnAgent(pluginDir);
+}
+
+function copyPluginImageFile(obj, extPath) {
   let outputPath = path.join(pluginsPath, obj.name);
   if (!fs.existsSync(outputPath)) {
     fs.mkdirSync(outputPath);
   }
-  // unzipping the img
-  fs.createReadStream(pluginDir)
-    .pipe(unzip.Parse())
-    .on("entry", entry => {
-      let fileName = entry.path;
-      if (fileName === obj.imgUrl) {
-        entry.pipe(fs.createWriteStream(path.join(outputPath, fileName)));
-      }
-    });
-  agentsService.installPluginOnAgent(pluginDir);
+
+  let srcImgPath = path.join(extPath, obj.imgUrl);
+  let dstImgPath = path.join(outputPath, obj.imgUrl);
+
+  fs.copyFileSync(srcImgPath, dstImgPath);
 }
 
 /*
@@ -87,17 +86,13 @@ function installPluginOnServer(pluginDir, obj) {
 
     // unziping the file and installing the modules
     fs.createReadStream(pluginDir)
-      .pipe(unzip.Parse())
-      .on("entry", entry => {
-        let fileName = entry.path;
-        entry.pipe(fs.createWriteStream(path.join(outputPath, fileName)));
-      })
-      .on("close", data => {
+      .pipe(unzip.Extract({ path: outputPath }))
+      .on("finish", () => {
         // when done unzipping, install the packages.
         console.log("Close");
         let cmd =
           "cd " + outputPath + " &&" + " npm install " + " && cd " + outputPath;
-        child_process.exec(cmd, function(error, stdout, stderr) {
+        child_process.exec(cmd, function (error, stdout, stderr) {
           if (error) {
             winston.log("error", "ERROR", error, stderr);
           }
@@ -118,15 +113,10 @@ function deployPluginFile(pluginPath, req) {
         let configPath = path.join(extPath, "config.json");
         fs.exists(configPath, exists => {
           if (!exists) return reject("No config file found!");
-        
+
           fs.readFile(configPath, "utf8", (err, body) => {
             if (err) return reject("Error reading config file: ", err);
 
-            del([extPath]).then(()=>{
-                winston.log("info", "Deleted extracted directory");
-            }).catch(err=>{
-                winston.log("error", "Error deleting extracted directory");
-            });
 
             let obj;
             try {
@@ -141,7 +131,7 @@ function deployPluginFile(pluginPath, req) {
                 if (!plugin) {
                   return Plugin.create(obj);
                 }
-                fs.unlink(plugin.file, function(error) {
+                fs.unlink(plugin.file, function (error) {
                   if (error) {
                     winston.log("error", "Error unlinking old file");
                   } else {
@@ -152,8 +142,10 @@ function deployPluginFile(pluginPath, req) {
               })
               .then(plugin => {
                 if (obj.type === "executer") {
+                  // copy image file
+                  copyPluginImageFile(obj, extPath);
                   installPluginOnAgent(pluginPath, obj);
-                  resolve(plugin);
+                  return plugin;
                 } else if (
                   obj.type === "trigger" ||
                   obj.type === "module" ||
@@ -161,13 +153,21 @@ function deployPluginFile(pluginPath, req) {
                 ) {
                   installPluginOnServer(pluginPath, obj).then(() => {
                     loadModule(plugin, req.app);
-                    resolve(plugin);
+                    return plugin;
                   });
                 } else return reject("No type was provided for this plugin");
-              })
-              .catch(error => {
+              }).then(plugin => {
+                resolve(plugin);
+              }).catch(error => {
                 winston.log("error", "Error creating plugin", error);
                 return reject(error);
+              }).finally(() => {
+                // delete extracted tmp dir
+                del([extPath]).then(() => {
+                  winston.log("info", "Deleted extracted directory");
+                }).catch(err => {
+                  winston.log("error", "Error deleting extracted directory");
+                });
               });
           });
         });
@@ -187,16 +187,16 @@ module.exports = {
     fs.readdir(path.join(env.static_cdn, env.upload_path), (err, files) => {
       async.each(
         files,
-        function(plugin, callback) {
+        function (plugin, callback) {
           let filePath = path.join(env.static_cdn, env.upload_path, plugin);
           deployPluginFile(filePath)
-            .then(() => {})
+            .then(() => { })
             .catch(error => {
               winston.log("error", "Error installing plugin: ", error);
             });
           callback();
         },
-        function(err) {}
+        function (err) { }
       );
     });
   },

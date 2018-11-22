@@ -44,7 +44,8 @@ function _createContext(context){
     return {
         ...context,
         require,
-        console
+        console,
+        Buffer
     }
 }
 
