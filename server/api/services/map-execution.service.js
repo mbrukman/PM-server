@@ -171,9 +171,10 @@ function updateActionContext(runId, agentKey, processKey, processIndex, actionKe
         (executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[actionKey] || {}),
         actionData
     );
-
+    
     executions[runId].executionAgents[agentKey].executionContext.processes = executions[runId].executionAgents[agentKey].processes;
-
+    if(actionData.result)
+        executions[runId].executionAgents[agentKey].executionContext.previousAction = executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[actionKey];
 }
 
 /**
