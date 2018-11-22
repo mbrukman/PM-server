@@ -40,7 +40,7 @@ function evaluateParam(param, context) {
 
 }
 
-function _createContext(context){
+function _createContext(context) {
     return {
         ...context,
         require,
@@ -207,7 +207,7 @@ function shouldContinueExecution(runId, agentKey) {
  * @returns {number}
  */
 function countOngoingMapExecutions(mapId) {
-    if (typeof(mapId) !== 'string') {
+    if (typeof (mapId) !== 'string') {
         mapId = mapId.toString();
     }
     return Object.keys(executions).filter(runId => {
@@ -320,20 +320,20 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
         }
         mapStructure = structure;
 
-        if (configuration && typeof configuration != 'string'){
+        if (configuration && typeof configuration != 'string') {
             selectedConfiguration = {
-                name : 'custom',
-                value : configuration
+                name: 'custom',
+                value: configuration
             }
         } else if (mapStructure.configurations && mapStructure.configurations.length) {
-            if(configuration)
+            if (configuration)
                 selectedConfiguration = configuration ? mapStructure.configurations.find(o => o.name === configuration) : mapStructure.configurations.find(o => o.selected);
             if (!selectedConfiguration) {
                 selectedConfiguration = mapStructure.configurations[0];
             }
         }
 
-        if(selectedConfiguration)
+        if (selectedConfiguration)
             executionLogService.error(runId, map._id, `Using '${selectedConfiguration.name}' as configuration`, socket);
         else
             selectedConfiguration = {};
@@ -1037,14 +1037,6 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
         action.method = method;
         let params = action.params ? [...action.params] : [];
         action.params = {};
-        for (let i = 0; i < params.length; i++) {
-            let param = _.find(method.params, (o) => {
-                return o.name === params[i].name
-            });
-
-            action.params[param.name] = evaluateParam(params[i], executions[runId].executionAgents[agent.key].executionContext);
-        }
-
         action.plugin = {
             name: plugin.name
         };
@@ -1074,6 +1066,22 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
         }
         executionLogService.info(runId, map._id, actionString, socket);
 
+
+        for (let i = 0; i < params.length; i++) {
+            let param = _.find(method.params, (o) => {
+                return o.name === params[i].name
+            });
+
+            // handle wrong code
+            try {
+                action.params[param.name] = evaluateParam(params[i], executions[runId].executionAgents[agent.key].executionContext);
+            } catch (e) {
+                return _handleActionError({
+                    stdout : actionString + '\n' + e.message
+                },undefined,callback)
+            }
+        }
+
         // will send action to agent via socket or regular request
         let p;
         if (agent.socket) {
@@ -1086,6 +1094,23 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
         let timeoutPromise;
         runAction();
 
+        function _handleActionError(result, message, cb) {
+            let res = result || { stdout: actionString, result: 'Error running action on agent' };
+            updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
+                status: 'error',
+                result: res,
+                finishTime: new Date()
+            });
+            updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
+            executionLogService.error(runId, map._id, `'${action.name}': Error running action on (${agent.name}): ${message  || JSON.stringify(res)}`, socket);
+
+            if (action.mandatory) {
+                cb(res);
+            } else {
+                cb(null, res); // Action failed but it doesn't mater
+            }
+        }
+
         function runAction() {
             if (action.timeout || (!action.timeout && action.timeout !== 0)) { // if there is a timeout or no timeout
                 timeoutPromise = new Promise((resolve, reject) => {
@@ -1094,7 +1119,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                     }, (action.timeout || 600000));
                 });
             } else {
-                timeoutPromise = new Promise(() => {});
+                timeoutPromise = new Promise(() => { });
             }
             Promise.race([p, timeoutPromise]).then((result) => { // race condition between agent action and action timeout
                 clearTimeout(timeout);
@@ -1147,42 +1172,13 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                         executionLogService.create(actionExecutionLogs, socket);
                         callback(null, result);
                     } else {
-                        let res = {};
-                        if (!result) {
-                            res = { stdout: actionString, result: 'Error running action on agent' };
-                        } else {
-                            res = result;
-                            res.stdout = actionString + '\n' + result.stdout;
-                        }
-
-                        updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
-                            status: 'error',
-                            result: res
-                        });
-                        updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-                        executionLogService.success(runId, map._id, `'${action.name}': Error running action on (${agent.name}): ${JSON.stringify(res)  }`, socket);
-
-                        if (action.mandatory) {
-                            callback(res);
-                        } else {
-                            callback(null, res); // Action failed but it doesn't mater
-                        }
+                        _handleActionError(result,undefined,callback);
                     }
                 } else {
                     let result = { result: 'Timeout Error', status: 'error', stdout: actionString };
                     if (action.retries > 1) { return ['retry', result]; }
-                    updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
-                        status: "error",
-                        result,
-                        finishTime: new Date()
-                    });
-                    updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-                    executionLogService.error(runId, map._id, `'${action.name}': Error running action on (${agent.name}): timeout error  }`, socket);
-                    if (action.mandatory) {
-                        callback(result);
-                    } else {
-                        callback(null, result); // Action failed but it doesn't mater
-                    }
+                    
+                    _handleActionError(result, 'timeout error',callback);
                 }
             })
                 .then((res) => {
@@ -1340,44 +1336,44 @@ function stopExecution(mapId, runId, socket) {
     const d = new Date();
     stoppedRuns.forEach(runId => {
         executionLogService.info(runId, mapId, "Got stop signal. Stopping execution", socket);
-            let executionAgents = executions[runId].executionAgents;
-            executions[runId].executionContext.finishTime = d;
+        let executionAgents = executions[runId].executionAgents;
+        executions[runId].executionContext.finishTime = d;
 
-            Object.keys(executionAgents).forEach(agentKey => {
-                let agent = executionAgents[agentKey];
-                if (agent.status !== 'error') {
-                    agent.status = 'stopped';
-                    agent.finishTime = d;
-                }
+        Object.keys(executionAgents).forEach(agentKey => {
+            let agent = executionAgents[agentKey];
+            if (agent.status !== 'error') {
+                agent.status = 'stopped';
+                agent.finishTime = d;
+            }
 
-                if (!agent.hasOwnProperty('processes')) {
-                    return;
-                }
-                Object.keys(agent.processes).forEach(processKey => {
-                    let processArray = agent.processes[processKey];
-                    processArray.forEach(process => {
-                        if (!process.status || process.status === 'executing') {
-                            process.status = 'stopped';
-                            process.result = 'Process stopped';
-                            process.finishTime = d;
-                        }
-                        if (process.hasOwnProperty('actions')) {
-                            Object.keys(process.actions).forEach(actionKey => {
-                                let action = process.actions[actionKey];
-                                if (!action.status || action.status === 'executing') {
-                                    action.status = 'stopped';
-                                    action.finishTime = d;
-                                    action.result = {
-                                        status: 'stopped',
-                                        result: 'Action stopped'
-                                    };
-                                    sendKillRequest(executions[runId].executionContext.map.id, actionKey, agentKey);
-                                }
-                            });
-                        }
-                    });
-                })
-            });
+            if (!agent.hasOwnProperty('processes')) {
+                return;
+            }
+            Object.keys(agent.processes).forEach(processKey => {
+                let processArray = agent.processes[processKey];
+                processArray.forEach(process => {
+                    if (!process.status || process.status === 'executing') {
+                        process.status = 'stopped';
+                        process.result = 'Process stopped';
+                        process.finishTime = d;
+                    }
+                    if (process.hasOwnProperty('actions')) {
+                        Object.keys(process.actions).forEach(actionKey => {
+                            let action = process.actions[actionKey];
+                            if (!action.status || action.status === 'executing') {
+                                action.status = 'stopped';
+                                action.finishTime = d;
+                                action.result = {
+                                    status: 'stopped',
+                                    result: 'Action stopped'
+                                };
+                                sendKillRequest(executions[runId].executionContext.map.id, actionKey, agentKey);
+                            }
+                        });
+                    }
+                });
+            })
+        });
 
         summarizeExecution(
             executions[runId].executionContext.map,
@@ -1386,15 +1382,15 @@ function stopExecution(mapId, runId, socket) {
             Object.assign({}, executions[runId].executionAgents)
         )
             .then((mapResult) => {
-                    socket.emit('map-execution-result', mapResult);
-                });
-            delete executions[runId];
-            updateExecutions(socket);
+                socket.emit('map-execution-result', mapResult);
+            });
+        delete executions[runId];
+        updateExecutions(socket);
         if (pending.hasOwnProperty(mapId) && pending[mapId].length) {
             startPendingExecution(mapId);
             updatePending(socket);
         }
-        }
+    }
     );
     return stoppedRuns;
 }
