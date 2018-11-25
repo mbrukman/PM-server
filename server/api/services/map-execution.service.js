@@ -1062,14 +1062,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             key: agent.key
         };
 
-
         let actionString = `+ ${plugin.name} - ${method.name}: `;
-        for (let i in action.params) {
-            actionString += `${i}: ${action.params[i]}`;
-        }
-        executionLogService.info(runId, map._id, actionString, socket);
-
-
         for (let i = 0; i < params.length; i++) {
             let param = _.find(method.params, (o) => {
                 return o.name === params[i].name
@@ -1083,7 +1076,10 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                     stdout : actionString + '\n' + e.message
                 },undefined,callback)
             }
+
+            actionString += `${param.name}: ${action.params[param.name]}${i != params.length-1 ? ', ' : ''}`;
         }
+        executionLogService.info(runId, map._id, actionString, socket);
 
         // will send action to agent via socket or regular request
         let p;
