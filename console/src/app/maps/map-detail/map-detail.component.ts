@@ -137,7 +137,6 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         const compareOriginalStructure = this.cleanStructure(JSON.parse(JSON.stringify(this.originalMapStructure)));
         delete compareStructure.content;
         delete compareOriginalStructure.content;
-
         this.structureEdited = (JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent);
         
         this.mapStructure = structure;
@@ -288,7 +287,9 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       delete this.mapStructure.id;
       delete this.mapStructure.createdAt;
       this.mapsService.createMapStructure(this.map.id, this.mapStructure).subscribe((structure) => {
-        this.originalMapStructure = Object.assign({}, this.mapStructure);
+        
+        this.originalMapStructure = _.cloneDeep(this.mapStructure);
+
         this.structureEdited = false;
         this.structuresList.unshift(structure);
         this.mapStructure.id = structure.id;
