@@ -48,9 +48,21 @@
                   <div class="row-card">
                     <i class="fas fa-arrows-alt" (click)="expandOutput(action)"></i>
                   </div>
-                  <span *ngFor="let item of agActionsStatus[action.action]?.results?.stdout">{{ item }} <br></span>
-                  <span *ngFor="let item of agActionsStatus[action.action]?.results?.stderr">{{ item }} <br></span>
-                  <span *ngFor="let item of agActionsStatus[action.action]?.results?.result">{{ item }} <br></span>
+                  <ng-container *ngFor="let item of agActionsStatus[action.action]?.results?.stdout">
+                    <span class="raw-output-data" *ngIf="item">
+                      {{ item }} <br>
+                    </span>
+                  </ng-container>
+                  <ng-container *ngFor="let item of agActionsStatus[action.action]?.results?.stderr">
+                    <span class="raw-output-data" *ngIf="item">
+                      {{ item }} <br>
+                    </span>
+                  </ng-container>
+                  <ng-container *ngFor="let item of agActionsStatus[action.action]?.results?.result">
+                    <span class="raw-output-data" *ngIf="item">
+                      {{ item | json }} <br>
+                    </span>
+                  </ng-container>
                 </div>
               </div>
               <div class="col-4">
