@@ -85,8 +85,7 @@ module.exports = {
             // copy the descriptive fields (not including archive) and create a new map.
             const newMap = {
                 name: map.name,
-                description: map.description,
-                licence: map.licence
+                description: map.description
             };
             return mapsService.create(newMap)
         }).then(duplicatedMap => {

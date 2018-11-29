@@ -26,10 +26,6 @@
       </div>
       <hr class="my-4">
       <p>Created at: {{ map?.createdAt | date: 'short'}}</p>
-      <p>
-        Licence: <span placeholder="Add map licence..." [(inlineEdit)]="map.licence" (valueChanged)="onMapUpdate()" *ngIf="map"></span>
-        <!-- Licence: <input type="text" placeholder="Add map licence..." (onChange)="onMapUpdate()" [(ngModel)]="map.licence" *ngIf="map" /> -->
-      </p>
     </div>
   </div>
 </div>

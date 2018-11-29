@@ -9,7 +9,6 @@ export class Map extends Serializable implements IMap {
   description?: string = '';
   createdAt?: Date;
   updatedAt?: Date;
-  licence?: string;
   archived: boolean;
   agents?: Agent[];
   groups?: Group[];
