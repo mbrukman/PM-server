@@ -129,17 +129,18 @@ function deployPluginFile(pluginPath, req) {
               .then(plugin => {
                 if (!plugin) {
                   for(let i=0, methodsLength = obj.methods.length; i<methodsLength; i++){
-                    if(obj.methods[i].name == "sendMailByService"){
                       for(let j=0, paramsLength = obj.methods[i].params.length; j<paramsLength; j++){
-                        if(obj.methods[i].params[j].type == "options"){
-                          for(let k=0, optionsLength = obj.methods[i].params[j].options.length; k<optionsLength; k++){
-                            if(typeof obj.methods[i].params[j].options[k].id == 'undefined' || typeof obj.methods[i].params[j].options[k].name == 'undefined'){
-                              throw err
-                            }
+                        if(obj.methods[i].params[j].type != "options"){
+                          continue;
+                        }
+                        for(let k=0, optionsLength = obj.methods[i].params[j].options.length; k<optionsLength; k++){
+                          if(!obj.methods[i].params[j].options[k].id || !obj.methods[i].params[j].options[k].name){
+                            throw err
                           }
                         }
+                        
                       }
-                    }
+
                   }
                     return Plugin.create(obj);
                 }
