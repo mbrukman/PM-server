@@ -134,7 +134,7 @@ function deployPluginFile(pluginPath, req) {
                           continue;
                         }
                         for(let k=0, optionsLength = obj.methods[i].params[j].options.length; k<optionsLength; k++){
-                          if(obj.methods[i].params[j].options[k].id != 'undefined' || obj.methods[i].params[j].options[k].name != 'undefined'){
+                          if(obj.methods[i].params[j].options[k].id == undefined || !obj.methods[i].params[j].options[k].name ){
                             throw err
                           }
                         }
