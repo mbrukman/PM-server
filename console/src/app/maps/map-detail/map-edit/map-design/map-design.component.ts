@@ -70,7 +70,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       });
 
   }
-  
+
   ngOnDestroy() {
     this.dropSubscription.unsubscribe();
     this.mapStructureSubscription.unsubscribe();
@@ -93,10 +93,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       validateConnection: function (cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
         // Prevent linking from input ports.
         if (magnetS && magnetS.getAttribute('port-group') === 'in') {
-          return false;
-        }
-        // Prevent linking from output ports to input ports within one element.
-        if (cellViewS === cellViewT) {
           return false;
         }
         // Prevent linking to input ports.
@@ -136,8 +132,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           }
         }
       });
-     
- 
+
+
   }
   /**
    * Check if the x, y are over the map
@@ -154,7 +150,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   deselectAllCellsAndUpdateStructure() {
     this.graph.getElements().forEach(cell => {
-        this.deselectCell(cell);
+      this.deselectCell(cell);
     });
     this.onMapContentUpdate();
   }
@@ -176,19 +172,29 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     }
 
     this.link.uuid = cell.model.id;
-
     this.mapStructure.links.push(this.link);
 
 
     const ancestors = this.mapStructure.links.filter(link => link.targetId === this.link.targetId);
     if (ancestors.length > 1) {
       const processIndex = this.mapStructure.processes.findIndex(process => process.uuid === this.link.targetId);
-      if (!this.mapStructure.processes[processIndex].coordination) {
+        if(this.isLoopInProcess(ancestors)){
+
+
+          this.mapStructure.processes[processIndex].isInsideLoop  = true;
+          this.mapStructure.processes[processIndex].coordination = 'race';
+          this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
+        }
+      else if (!this.mapStructure.processes[processIndex].coordination) {
         this.mapStructure.processes[processIndex].coordination = 'wait';
         this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
       }
     }
     this.deselectAllCellsAndUpdateStructure();
+  }
+
+  isLoopInProcess(ancestors){
+    return ancestors.filter(link => link.sourceId == link.targetId).length > 0 ;
   }
 
   defineShape() {
@@ -278,8 +284,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
     let imageModel = new joint.shapes.devs['MyImageModel']({
       position: {
-        x: obj.x- (430 * this.scale) - this.paper.translate().tx,
-        y: obj.y - (240 * this.scale)  -this.paper.translate().ty
+        x: obj.x - (430 * this.scale) - this.paper.translate().tx,
+        y: obj.y - (240 * this.scale) - this.paper.translate().ty
       },
       size: {
         width: 100,
@@ -424,16 +430,16 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
         this.onMapContentUpdate();
       }
+    }
+    this.center();
   }
-  this.center();
-}
 
-center(){
-  let bbox = this.graph.getBBox(this.graph.getElements());
-  let y = 10 + Math.abs(bbox.y)
-  let x = 10 + Math.abs(bbox.x)
-  this.paper.translate(x, y)
-}
+  center() {
+    let bbox = this.graph.getBBox(this.graph.getElements());
+    let y = 10 + Math.abs(bbox.y)
+    let x = 10 + Math.abs(bbox.x)
+    this.paper.translate(x, y)
+  }
 
   editProcess(process) {
     if (!process.plugin) {
@@ -500,7 +506,7 @@ center(){
 
     });
 
-      this.graph.on('change:source change:target', function (link) {
+    this.graph.on('change:source change:target', function (link) {
       let sourcePort = link.get('source').port;
       let sourceId = link.get('source').id;
       let targetPort = link.get('target').port;
@@ -508,9 +514,9 @@ center(){
       let id = link.get('id')
 
       if (sourceId && targetId) {
-        self.link = { uuid:id,sourceId: sourceId, targetId: targetId };
-        for(let j=0, linklenght = self.mapStructure.links.length; j<linklenght; j++){
-          if(self.mapStructure.links[j].uuid === id){
+        self.link = { uuid: id, sourceId: sourceId, targetId: targetId };
+        for (let j = 0, linklenght = self.mapStructure.links.length; j < linklenght; j++) {
+          if (self.mapStructure.links[j].uuid === id) {
             self.mapStructure.links[j] = self.link;
             break;
           }
@@ -525,7 +531,7 @@ center(){
     this.graph.on('remove', function (cell, collection, opt) {
       if (cell.isLink()) {
         let linkIndex = _.findIndex(self.mapStructure.links, (o) => {
-          return o.uuid === cell.id; 
+          return o.uuid === cell.id;
         });
         if (linkIndex === -1) {
           self.deselectAllCellsAndUpdateStructure();
@@ -540,6 +546,8 @@ center(){
             return;
           }
           delete p.coordination;
+          delete p.isInsideLoop;
+
           self.mapDesignService.updateProcess(p);
         }
         self.deselectAllCellsAndUpdateStructure();
@@ -576,6 +584,7 @@ center(){
     this.mapStructure.processes[index].mandatory = process.mandatory;
     this.mapStructure.processes[index].condition = process.condition;
     this.mapStructure.processes[index].coordination = process.coordination;
+    this.mapStructure.processes[index].isInsideLoop = process.isInsideLoop;
     this.mapStructure.processes[index].actions = process.actions;
     this.mapStructure.processes[index].correlateAgents = process.correlateAgents;
     this.mapStructure.processes[index].flowControl = process.flowControl;
@@ -611,9 +620,9 @@ center(){
     cell.attr('rect/fill', '#2d3236');
   }
 
-  private onMapContentUpdate(){
+  private onMapContentUpdate() {
     let graphContent = JSON.stringify(this.graph.toJSON());
-    if(graphContent != this.defaultContent){
+    if (graphContent != this.defaultContent) {
       this.mapStructure.content = graphContent;
       this.mapsService.setCurrentMapStructure(this.mapStructure);
     }

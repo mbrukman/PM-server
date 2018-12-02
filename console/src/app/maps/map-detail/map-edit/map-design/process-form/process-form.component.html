@@ -101,7 +101,7 @@
         <div class="form-group" *ngIf="process.coordination">
           <label>Process coordination</label>
           <select class="form-control" formControlName="coordination">
-            <option value="wait">{{COORDINATION_TYPES['wait']}}</option>
+            <option value="wait" hidden="process.isInsideLoop">{{COORDINATION_TYPES['wait']}}</option>
             <option value="race">{{COORDINATION_TYPES['race']}}</option>
             <option value="each">{{COORDINATION_TYPES['each']}}</option>
           </select>

@@ -587,11 +587,11 @@ function areAllAgentsDone(runId) {
  * @param processKey
  * @returns {boolean}
  */
-function isThisTheFirstAgentToGetToTheProcess(runId, processKey) {
-    if (executions.hasOwnProperty(runId) && executions[runId].executionContext.visitedProcesses.has(processKey)) {
-        return false;
+function isThisTheFirstAgentToGetToTheProcess(runId, processKey, agentKey) {
+    if (executions.hasOwnProperty(runId) && executions[runId].executionContext.visitedProcesses[processKey]) {
+        return executions[runId].executionContext.visitedProcesses[processKey] == agentKey;
     }
-    executions[runId].executionContext.visitedProcesses.add(process.uuid);
+    executions[runId].executionContext.visitedProcesses[processKey] = agentKey;
     return true;
 }
 
@@ -646,33 +646,7 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
     }
     const successors = node ? findSuccessors(node, structure) : [];
     if (successors.length === 0) {
-        if (!isThereProcessExecutingOnAgent(runId, agent.key)) {
-            executions[runId].executionAgents[agent.key].done = true;
-            if (areAllAgentsDone(runId)) {
-                executions[runId].executionContext.finishTime = new Date();
-                summarizeExecution(
-                    executions[runId].executionContext.map,
-                    runId,
-                    _.cloneDeep(executions[runId].executionContext),
-                    _.cloneDeep(executions[runId].executionAgents)
-                ).then((mapResult) => {
-                    socket.emit('map-execution-result', mapResult);
-                });
-                MapResult.findByIdAndUpdate(
-                    executions[runId].resultObj,
-                    { $set: { finishTime: new Date(), cleanFinish: true } },
-                    { new: true })
-                    .then((mapResult) => {
-                        socket.emit('map-execution-result', mapResult);
-                    });
-                delete executions[runId];
-                if (map.queue && pending.hasOwnProperty(map.id)) {
-                    startPendingExecution(map.id); // starting pending execution if necessary
-                    updatePending(socket);
-                }
-                updateExecutions(socket);
-            }
-        }
+        endRunPathResults(runId, agent, socket, map);
 
     }
     let nodesToRun = [];
@@ -693,7 +667,8 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
                     return;
                 }
             } else if (process.coordination === 'race') {
-                if (executions[runId].executionAgents[agent.key].processes.hasOwnProperty(process.uuid)) {
+                if (executions[runId].executionAgents[agent.key].processes && executions[runId].executionAgents[agent.key].processes.hasOwnProperty(process.uuid)) {
+                    endRunPathResults(runId, agent, socket, map);
                     return;
                 }
             }
@@ -702,7 +677,7 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
         // checking agent flow condition
         if (process.flowControl === 'race') {
             // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
-            if (!isThisTheFirstAgentToGetToTheProcess(runId, successor)) {
+            if ( !isThisTheFirstAgentToGetToTheProcess(runId, successor, agent.key)) {
                 return runNodeSuccessors(map, structure, runId, agent, successor, socket);
             }
         } else if (process.flowControl === 'wait') {
@@ -733,6 +708,28 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
             winston.log('error', error);
         }
     });
+}
+
+function  endRunPathResults(runId, agent, socket, map) {
+    if (!isThereProcessExecutingOnAgent(runId, agent.key)) {
+        executions[runId].executionAgents[agent.key].done = true;
+        if (areAllAgentsDone(runId)) {
+            executions[runId].executionContext.finishTime = new Date();
+            summarizeExecution(executions[runId].executionContext.map, runId, _.cloneDeep(executions[runId].executionContext), _.cloneDeep(executions[runId].executionAgents)).then((mapResult) => {
+                socket.emit('map-execution-result', mapResult);
+            });
+            MapResult.findByIdAndUpdate(executions[runId].resultObj, { $set: { finishTime: new Date(), cleanFinish: true } }, { new: true })
+                .then((mapResult) => {
+                    socket.emit('map-execution-result', mapResult);
+                });
+            delete executions[runId];
+            if (map.queue && pending.hasOwnProperty(map.id)) {
+                startPendingExecution(map.id); // starting pending execution if necessary
+                updatePending(socket);
+            }
+            updateExecutions(socket);
+        }
+    }
 }
 
 /**

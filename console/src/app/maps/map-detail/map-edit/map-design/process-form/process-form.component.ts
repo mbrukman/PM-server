@@ -61,16 +61,18 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     }
 
     this.processUpdateSubscription = this.mapDesignService
-      .getUpdateProcessAsObservable()
-      .filter(process => process.uuid === this.process.uuid)
-      .subscribe(process => {
-        this.process = new Process(process);
-        this.processForm.get('coordination').setValue(process.coordination);
-      });
-
+    .getUpdateProcessAsObservable()
+    .filter(process => process.uuid === this.process.uuid)
+    .subscribe(process => {
+      this.process = new Process(process);
+      console.log("process coor== ", process);
+      
+      this.processForm.get('coordination').setValue(process.coordination);
+    });
+    
     // this.process = new Process(this.process);
     this.processForm = Process.getFormGroup(this.process);
-
+    
     if (this.process.actions) {
       this.process.actions.forEach((action, actionIndex) => {
         const actionControl = <FormArray>this.processForm.controls['actions'];
@@ -82,10 +84,10 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         }
       });
     }
-
+    
     this.plugin = _.cloneDeep(this.process.plugin);
     this.generateAutocompleteParams();
-
+    
     // subscribe to changes in form
     this.formValueChangeSubscription = this.processForm.valueChanges
       .debounceTime(300)
