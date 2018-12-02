@@ -5,7 +5,6 @@ const child_process = require("child_process");
 const async = require("async");
 const winston = require("winston");
 const del = require("del");
-
 const env = require("../../env/enviroment");
 const agentsService = require("./agents.service");
 const models = require("../models");
@@ -129,7 +128,20 @@ function deployPluginFile(pluginPath, req) {
             Plugin.findOne({ name: obj.name })
               .then(plugin => {
                 if (!plugin) {
-                  return Plugin.create(obj);
+                  for(let i=0, methodsLength = obj.methods.length; i<methodsLength; i++){
+                    if(obj.methods[i].name == "sendMailByService"){
+                      for(let j=0, paramsLength = obj.methods[i].params.length; j<paramsLength; j++){
+                        if(obj.methods[i].params[j].type == "options"){
+                          for(let k=0, optionsLength = obj.methods[i].params[j].options.length; k<optionsLength; k++){
+                            if(typeof obj.methods[i].params[j].options[k].id == 'undefined' || typeof obj.methods[i].params[j].options[k].name == 'undefined'){
+                              throw err
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                    return Plugin.create(obj);
                 }
                 fs.unlink(plugin.file, function (error) {
                   if (error) {
