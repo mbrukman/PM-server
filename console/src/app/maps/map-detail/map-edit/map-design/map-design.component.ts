@@ -44,6 +44,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   link: Link;
   init: boolean = false;
   scale: number = 1;
+  isInsideLoop :boolean = false;
 
   defaultContent: string;
   @ViewChild('wrapper') wrapper: ElementRef;
@@ -179,9 +180,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     if (ancestors.length > 1) {
       const processIndex = this.mapStructure.processes.findIndex(process => process.uuid === this.link.targetId);
         if(this.isLoopInProcess(ancestors)){
-
-
-          this.mapStructure.processes[processIndex].isInsideLoop  = true;
+          this.isInsideLoop  = true;
           this.mapStructure.processes[processIndex].coordination = 'race';
           this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
         }
@@ -546,7 +545,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
             return;
           }
           delete p.coordination;
-          delete p.isInsideLoop;
 
           self.mapDesignService.updateProcess(p);
         }
@@ -584,7 +582,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.mapStructure.processes[index].mandatory = process.mandatory;
     this.mapStructure.processes[index].condition = process.condition;
     this.mapStructure.processes[index].coordination = process.coordination;
-    this.mapStructure.processes[index].isInsideLoop = process.isInsideLoop;
     this.mapStructure.processes[index].actions = process.actions;
     this.mapStructure.processes[index].correlateAgents = process.correlateAgents;
     this.mapStructure.processes[index].flowControl = process.flowControl;

@@ -24,6 +24,7 @@ import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
 })
 export class ProcessFormComponent implements OnInit, OnDestroy {
   @Input('process') process: Process;
+  @Input('isInsideLoop') isInsideLoop: boolean;
   @Output() saved: EventEmitter<any> = new EventEmitter<any>();
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
@@ -65,8 +66,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     .filter(process => process.uuid === this.process.uuid)
     .subscribe(process => {
       this.process = new Process(process);
-      console.log("process coor== ", process);
-      
       this.processForm.get('coordination').setValue(process.coordination);
     });
     
