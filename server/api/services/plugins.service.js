@@ -9,7 +9,7 @@ const env = require("../../env/enviroment");
 const agentsService = require("./agents.service");
 const models = require("../models");
 const Plugin = models.Plugin;
-
+var pluginConfigValidationSchema = require('../validation-schema/plugin-config.schema')
 let pluginsPath = path.join(
   path.dirname(path.dirname(__dirname)),
   "libs",
@@ -123,18 +123,10 @@ function deployPluginFile(pluginPath, req) {
             } catch (e) {
               return reject("Error parsing config file: ", e);
             }
-
-            for(let i=0, methodsLength = obj.methods.length; i<methodsLength; i++){
-              for(let j=0, paramsLength = obj.methods[i].params.length; j<paramsLength; j++){
-                if(obj.methods[i].params[j].type != "options"){
-                  continue;
-                }
-                for(let k=0, optionsLength = obj.methods[i].params[j].options.length; k<optionsLength; k++){
-                  if(obj.methods[i].params[j].options[k].id == undefined || !obj.methods[i].params[j].options[k].name ){
-                    throw err
-                  }
-                }
-              }
+            
+            var valid = pluginConfigValidationSchema(obj)
+            if(!valid){
+              reject(err)
             }
             
             // check the plugin type
