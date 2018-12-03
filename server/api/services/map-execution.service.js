@@ -171,11 +171,11 @@ function updateActionContext(runId, agentKey, processKey, processIndex, actionKe
         (executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[actionKey] || {}),
         actionData
     );
-    
+
     executions[runId].executionAgents[agentKey].executionContext.processes = executions[runId].executionAgents[agentKey].processes;
-    
+
     // If action have a result (i.e. done) set to previous action;
-    if(actionData.result)
+    if (actionData.result)
         executions[runId].executionAgents[agentKey].executionContext.previousAction = executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[actionKey];
 }
 
@@ -668,7 +668,6 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
                 }
             } else if (process.coordination === 'race') {
                 if (executions[runId].executionAgents[agent.key].processes && executions[runId].executionAgents[agent.key].processes.hasOwnProperty(process.uuid)) {
-                    endRunPathResults(runId, agent, socket, map);
                     return;
                 }
             }
@@ -677,7 +676,7 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
         // checking agent flow condition
         if (process.flowControl === 'race') {
             // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
-            if ( !isThisTheFirstAgentToGetToTheProcess(runId, successor, agent.key)) {
+            if (!isThisTheFirstAgentToGetToTheProcess(runId, successor, agent.key)) {
                 return runNodeSuccessors(map, structure, runId, agent, successor, socket);
             }
         } else if (process.flowControl === 'wait') {
@@ -710,7 +709,7 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
     });
 }
 
-function  endRunPathResults(runId, agent, socket, map) {
+function endRunPathResults(runId, agent, socket, map) {
     if (!isThereProcessExecutingOnAgent(runId, agent.key)) {
         executions[runId].executionAgents[agent.key].done = true;
         if (areAllAgentsDone(runId)) {
@@ -1070,11 +1069,11 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                 action.params[param.name] = evaluateParam(params[i], executions[runId].executionAgents[agent.key].executionContext);
             } catch (e) {
                 return _handleActionError({
-                    stdout : actionString + '\n' + e.message
-                },undefined,callback)
+                    stdout: actionString + '\n' + e.message
+                }, undefined, callback)
             }
 
-            actionString += `${param.name}: ${action.params[param.name]}${i != params.length-1 ? ', ' : ''}`;
+            actionString += `${param.name}: ${action.params[param.name]}${i != params.length - 1 ? ', ' : ''}`;
         }
         executionLogService.info(runId, map._id, actionString, socket);
 
@@ -1098,7 +1097,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                 finishTime: new Date()
             });
             updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-            executionLogService.error(runId, map._id, `'${action.name}': Error running action on (${agent.name}): ${message  || JSON.stringify(res)}`, socket);
+            executionLogService.error(runId, map._id, `'${action.name}': Error running action on (${agent.name}): ${message || JSON.stringify(res)}`, socket);
 
             if (action.mandatory) {
                 cb(res);
@@ -1168,13 +1167,13 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                         executionLogService.create(actionExecutionLogs, socket);
                         callback(null, result);
                     } else {
-                        _handleActionError(result,undefined,callback);
+                        _handleActionError(result, undefined, callback);
                     }
                 } else {
                     let result = { result: 'Timeout Error', status: 'error', stdout: actionString };
                     if (action.retries > 1) { return ['retry', result]; }
-                    
-                    _handleActionError(result, 'timeout error',callback);
+
+                    _handleActionError(result, 'timeout error', callback);
                 }
             })
                 .then((res) => {
