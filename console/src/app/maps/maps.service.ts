@@ -34,8 +34,8 @@ export class MapsService {
     return this.http.post<Map>(`${serverUrl}api/maps/create`, map);
   }
 
-  duplicateMap(mapId, structureId, projectId,mapName,agent) {
-    return this.http.post<Map>(`${serverUrl}api/maps/${mapId}/structure/${structureId}/duplicate`, { projectId: projectId ,mapName:mapName,agent:agent});
+  duplicateMap(mapId, structureId, projectId,options) {
+    return this.http.post<Map>(`${serverUrl}api/maps/${mapId}/structure/${structureId}/duplicate`, { projectId: projectId ,options});
   }
 
   getCurrentMap(): Observable<any> {

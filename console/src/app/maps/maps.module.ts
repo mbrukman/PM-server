@@ -33,7 +33,7 @@ import { ProcessListItemComponent } from './map-detail/map-result/process-list-i
 import { MapConfigurationsComponent } from './map-detail/map-configurations/map-configurations.component';
 import { AddConfigurationComponent } from './map-detail/map-configurations/add-configuration/add-configuration.component';
 import { ProcessViewComponent } from './map-detail/map-revisions/process-view/process-view.component';
-import { MapSavePopupComponent } from '@maps/map-detail/map-revisions/mapsave-popup/mapsave-popup.component';
+import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
 
 
 @NgModule({
@@ -71,8 +71,8 @@ import { MapSavePopupComponent } from '@maps/map-detail/map-revisions/mapsave-po
     ProcessListItemComponent,
     AddConfigurationComponent,
     ProcessViewComponent,
-    MapSavePopupComponent
+    MapDuplicateComponent
   ],
-  entryComponents: [SelectAgentComponent, TriggerFormComponent, SelectGroupsComponent, AddConfigurationComponent,MapSavePopupComponent]
+  entryComponents: [SelectAgentComponent, TriggerFormComponent, SelectGroupsComponent, AddConfigurationComponent,MapDuplicateComponent]
 })
 export class MapsModule {}

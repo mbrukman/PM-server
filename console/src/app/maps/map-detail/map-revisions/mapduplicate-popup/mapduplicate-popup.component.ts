@@ -3,11 +3,11 @@ import { Subject } from 'rxjs/Subject';
 import { BsModalRef } from 'ngx-bootstrap';
 
 @Component({
-  selector: 'app-mapsave-popup',
-  templateUrl: './mapsave-popup.component.html',
-  styleUrls: ['./mapsave-popup.component.scss']
+  selector: 'app-mapduplicate-popup',
+  templateUrl: './mapduplicate-popup.component.html',
+  styleUrls: ['./mapduplicate-popup.component.scss']
 })
-export class MapSavePopupComponent {
+export class MapDuplicateComponent {
   name: string;
   isChecked:boolean
   public result: Subject<{name:string,ischecked:boolean}> = new Subject<{name:string,ischecked:boolean}>();

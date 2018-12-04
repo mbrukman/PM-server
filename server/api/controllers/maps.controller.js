@@ -84,10 +84,10 @@ module.exports = {
             map = map[0];
             // copy the descriptive fields (not including archive) and create a new map.
             const newMap = {
-                name: req.body.mapName,
+                name: req.body.options.name,
                 description: map.description
             };
-            if(req.body.agent){
+            if(req.body.options.ischecked){
                 newMap.agents = map.agents
             }
             return mapsService.create(newMap)

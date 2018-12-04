@@ -11,7 +11,7 @@ import { ProjectsService } from '@projects/projects.service';
 import { SocketService } from '@shared/socket.service';
 import { DiffEditorModel } from 'ngx-monaco-editor';
 import { BsModalService } from 'ngx-bootstrap';
-import { MapSavePopupComponent } from '@maps/map-detail/map-revisions/mapsave-popup/mapsave-popup.component';
+import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
 
 
 @Component({
@@ -223,11 +223,11 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   duplicateMap(structureId: string) {
-    const modal = this.modalService.show(MapSavePopupComponent);
+    const modal = this.modalService.show(MapDuplicateComponent);
     modal.content.result
       .take(1)
       .filter(obj => !!obj.name) // filtering only results with a name
-      .flatMap(obj =>  this.mapsService.duplicateMap(this.mapId, structureId, this.project.id,obj.name,obj.ischecked))
+      .flatMap(obj =>  this.mapsService.duplicateMap(this.mapId, structureId, this.project.id,obj))
       .subscribe(map => { this.router.navigate(['/maps', map.id]);
     });
   }
