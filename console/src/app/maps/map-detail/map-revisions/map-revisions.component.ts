@@ -10,6 +10,9 @@ import { Project } from '@projects/models/project.model';
 import { ProjectsService } from '@projects/projects.service';
 import { SocketService } from '@shared/socket.service';
 import { DiffEditorModel } from 'ngx-monaco-editor';
+import { BsModalService } from 'ngx-bootstrap';
+import { MapSavePopupComponent } from '@maps/map-detail/map-revisions/mapsave-popup/mapsave-popup.component';
+
 
 @Component({
   selector: 'app-map-revisions',
@@ -45,7 +48,7 @@ export class MapRevisionsComponent implements OnInit {
   };
   
 
-  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService) {
+  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private modalService: BsModalService,private agentsService: AgentsService) {
     this.scrollCallback = this.loadRevisions.bind(this);
   }
 
@@ -220,11 +223,15 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   duplicateMap(structureId: string) {
-    this.mapsService.duplicateMap(this.mapId, structureId, this.project.id).subscribe(map => {
-      this.router.navigate(['/maps', map.id]);
+    const modal = this.modalService.show(MapSavePopupComponent);
+    modal.content.result
+      .take(1)
+      .filter(obj => !!obj.name) // filtering only results with a name
+      .flatMap(obj =>  this.mapsService.duplicateMap(this.mapId, structureId, this.project.id,obj.name,obj.ischecked))
+      .subscribe(map => { this.router.navigate(['/maps', map.id]);
     });
   }
-
+  
   previewStructure(structureId: string) {
     this.previewProcess = null;
     this.mapsService.getMapStructure(this.mapId, structureId)

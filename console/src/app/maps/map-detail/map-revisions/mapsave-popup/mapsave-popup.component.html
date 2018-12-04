@@ -1,0 +1,29 @@
+<div class="row pm-modal">
+    <div class="col-12">
+      <div class="modal-header">
+        <h4>Map name</h4>
+        <button type="button" class="close" (click)="onClose()" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <input type="text" class="form-control" [(ngModel)]="name">
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <label class="form-check-label">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="isChecked">
+                Would you lke to use the same agent ?
+            </label>
+          </div>
+        </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" (click)="onClose()">Cancel</button>
+        <button class="btn-primary btn" (click)="onConfirm()">Confirm</button>
+      </div>
+    </div>
+  </div>
+  
