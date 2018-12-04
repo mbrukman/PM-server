@@ -3,8 +3,8 @@
     <div class="">
       <h1 class="section-title">{{project?.name}} <span *ngIf="project?.archived  ">(archived)</span></h1>
       <a routerLink="/projects/update" [queryParams]="{'project': project?.id}" class="btn-primary btn">Edit <i class="material-icons">mode_edit</i></a>
-      <button class="btn-success btn" (click)="archiveProject()" [disabled]="project?.archived">
-        Archive
+      <button class="btn-success btn" (click)="archiveProject(!project?.archived)">
+        {{project?.archived ? 'Unarchive' : 'Archive' }}
         <i class="material-icons">archive</i>
       </button>
       <p class="lead">{{project?.description}}</p>

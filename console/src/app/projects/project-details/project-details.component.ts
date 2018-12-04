@@ -24,20 +24,20 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   featuredMaps: Map[];
 
   constructor(private route: ActivatedRoute,
-              private router: Router,
-              private projectsService: ProjectsService,
-              private modalService: BsModalService) {}
+    private router: Router,
+    private projectsService: ProjectsService,
+    private modalService: BsModalService) { }
 
   ngOnInit() {
     this.routeReq = this.route.params.subscribe(params => {
       this.id = params['id'];
       this.projectReq = this.projectsService.detail(this.id).subscribe(project => {
-          if (!project) {
-            this.router.navigate(['NotFound'])
-          }
-          this.project = project;
-          this.featureMaps(project.maps);
-        },
+        if (!project) {
+          this.router.navigate(['NotFound'])
+        }
+        this.project = project;
+        this.featureMaps(project.maps);
+      },
         error => {
           this.router.navigate(['NotFound'])
         }
@@ -55,16 +55,20 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  archiveProject() {
-    let modal = this.modalService.show(ConfirmComponent);
-    modal.content.title = 'Archive this project?';
-    modal.content.message = 'When archiving a project, all the maps will be archived as well.';
-    modal.content.confirm = 'Yes, archive';
-    modal.content.result.subscribe(result => {
-      if (result) {
-        this.archiveReq = this.projectsService.archive(this.id).subscribe(() => this.project.archived = true);
-      }
-    });
+  archiveProject(doArchive: boolean) {
+    if (doArchive) {
+      let modal = this.modalService.show(ConfirmComponent);
+      modal.content.title = 'Archive this project?';
+      modal.content.message = 'When archiving a project, all the maps will be archived as well.';
+      modal.content.confirm = 'Yes, archive';
+      modal.content.result.subscribe(result => {
+        if (result) {
+          this.archiveReq = this.projectsService.archive(this.id, true).subscribe(() => {this.project.archived = true});
+        }
+      });
+    } else {
+      this.projectsService.archive(this.id, false).subscribe(() =>{this.project.archived = false});
+    }
   }
 
   featureMaps(maps) {
