@@ -56,19 +56,19 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   archiveProject(doArchive: boolean) {
-    if (doArchive) {
-      let modal = this.modalService.show(ConfirmComponent);
-      modal.content.title = 'Archive this project?';
-      modal.content.message = 'When archiving a project, all the maps will be archived as well.';
-      modal.content.confirm = 'Yes, archive';
-      modal.content.result.subscribe(result => {
-        if (result) {
-          this.archiveReq = this.projectsService.archive(this.id, true).subscribe(() => {this.project.archived = true});
-        }
-      });
-    } else {
-      this.projectsService.archive(this.id, false).subscribe(() =>{this.project.archived = false});
-    }
+    doArchive ? this.archiveOn() : this.projectsService.archive(this.id, false).subscribe(() =>{this.project.archived = false});
+  }
+
+  private archiveOn() {
+    let modal = this.modalService.show(ConfirmComponent);
+    modal.content.title = 'Archive this project?';
+    modal.content.message = 'When archiving a project, all the maps will be archived as well.';
+    modal.content.confirm = 'Yes, archive';
+    modal.content.result.subscribe(result => {
+      if (result) {
+        this.archiveReq = this.projectsService.archive(this.id, true).subscribe(() => { this.project.archived = true; });
+      }
+    });
   }
 
   featureMaps(maps) {
