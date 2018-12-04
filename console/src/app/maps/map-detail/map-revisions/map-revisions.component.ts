@@ -48,7 +48,7 @@ export class MapRevisionsComponent implements OnInit {
   };
   
 
-  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private modalService: BsModalService,private agentsService: AgentsService) {
+  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private modalService: BsModalService) {
     this.scrollCallback = this.loadRevisions.bind(this);
   }
 
