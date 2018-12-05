@@ -25,6 +25,9 @@
     width : 100%;
 
   }
+  .section-sub-title{
+    width: 63%;
+  }
 
 }
 
@@ -55,7 +58,7 @@
 
   @include searchBox();
 
-  input {
+  .loadProject {
     width: 220px;
     height: 34px;
   }

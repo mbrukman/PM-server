@@ -64,7 +64,7 @@ module.exports = {
     /* get project details */
     detail: (req, res) => {
         hooks.hookPre('project-detail', req).then(() => {
-            return projectsService.detail(req.params.id);
+            return projectsService.detail(req);
         }).then(project => {
             res.json(project);
         }).catch((error) => {
@@ -97,7 +97,7 @@ module.exports = {
     /* filter projects */
     filter: (req, res) => {
         hooks.hookPre('project-filter', req).then(() => {
-            return projectsService.filter(req.query);
+            return projectsService.filter(req.body);
         }).then(data => {
             if (!data || data.totalCount === 0) {
                 return res.status(204).send();

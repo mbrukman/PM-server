@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
-
+import { FilterProjectsOptions } from '../models/filter-projects-options.model'
 import 'rxjs/operators/take';
 
 @Component({
@@ -17,18 +17,25 @@ export class ProjectsListComponent implements OnInit {
   filterTerm: string;
   page: number = 1;
   resultCount: number;
+  filterOptions : FilterProjectsOptions = new FilterProjectsOptions();
 
   constructor(private projectsService: ProjectsService) {
     this.onDataLoad = this.onDataLoad.bind(this);
   }
 
   ngOnInit() {
-    this.projectsReq = this.projectsService.filter(null, null, this.page).subscribe(this.onDataLoad);
-    this.projectsService.filter(null, '-createdAt', this.page).take(1).subscribe(data => {
+
+    this.projectsReq  = this.projectsService.filter(null, null, this.page,this.filterOptions).subscribe(this.onDataLoad);
+
+    this.projectsService.filter(null, '-createdAt', this.page,{isArchived:false,globalFilter:null}).take(1).subscribe(data => {
       if (data)
         this.featuredProjects = data.items.slice(0, 4);
       // console.log(">>", this.featuredProjects);
     });
+  }
+
+  getArchive(){
+    this.projectsReq  = this.projectsService.filter(null, null, this.page,this.filterOptions).subscribe(this.onDataLoad);
   }
 
   loadProjectLazy(event) {
@@ -40,7 +47,7 @@ export class ProjectsListComponent implements OnInit {
         sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.projectsService.filter(fields, sort, page, this.filterTerm).subscribe(this.onDataLoad);
+    this.getArchive()
   }
 
   onDataLoad(data){

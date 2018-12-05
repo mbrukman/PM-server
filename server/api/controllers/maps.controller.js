@@ -116,9 +116,9 @@ module.exports = {
         });
     },
     filter: (req, res) => {
-        let query = req.query;
+        let body = req.body;
         hooks.hookPre('map-filter', req).then(() => {
-            return mapsService.filter(query);
+            return mapsService.filter(body);
         }).then(data => {
             if (!data || data.totalCount === 0) {
                 return res.status(204).send();

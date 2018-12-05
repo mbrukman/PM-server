@@ -58,30 +58,40 @@ module.exports = {
         ]);
     },
 
-    filter: (query = {}) => {
+    filter: (body = {}) => {
         mapsId = [];
         let q = {};
-        if (query.fields) {
-            // This will change the fields in the query to query that we can use with mongoose (using regex for contains)
-            Object.keys(query.fields).map(key => { query.fields[key] = { '$regex': `.*${query.fields[key]}.*` }});
-            q = query.fields;
-        } else if (query.globalFilter) {
+        let fields = body.fields
+        let sort = body.sort
+        let page = body.page
+        if (fields) {
+            // This will change the fields in the body to body that we can use with mongoose (using regex for contains)
+            Object.keys(fields).map(key => { fields[key] = { '$regex': `.*${fields[key]}.*` }});
+            q = fields;
+        } else if (body.options.globalFilter!=undefined) {
             // if there is a global filter, expecting or condition between name and description fields
             q = {
                 $or: [
-                    { name: { '$regex': `.*${query.globalFilter}.*` } },
-                    { description: { '$regex': `.*${query.globalFilter}.*` } }
+                    { name: { '$regex': `.*${body.options.globalFilter}.*` } },
+                    { description: { '$regex': `.*${body.options.globalFilter}.*` } }
                 ]
             }
         }
-        let m = Map.find(q).where({ archived: false });
-        if (query.sort) {
-            // apply sorting by field name. for reverse, should pass with '-'.
-            m.sort(query.sort);
+        let m;
+        if(body.options.isArchived){
+            m = Map.find(q);
         }
-        if (query.page) {
+        else{
+            m = Map.find(q).where({archived:false});
+        }
+        
+        if (sort) {
+            // apply sorting by field name. for reverse, should pass with '-'.
+            m.sort(sort);
+        }
+        if (page) {
             // apply paging. if no paging, return all
-            m.limit(PAGE_SIZE).skip((query.page - 1) * PAGE_SIZE);
+            m.limit(PAGE_SIZE).skip((page - 1) * PAGE_SIZE);
         }
         return m.then(maps => {
             let mapsId = maps.map(map=> map.id);

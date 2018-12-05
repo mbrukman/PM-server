@@ -25,12 +25,22 @@ module.exports = {
     },
 
     /* get project details */
-    detail: (projectId) => {
-        return Project.findById(projectId).populate(
-            {
-                path: 'maps',
-                match: { archived: false }
-            })
+    detail: (req) => {
+        if(req.body.isArchived){
+            return Project.findById(req.params.id).populate(
+                {
+                    path: 'maps'
+                })
+        }
+        else{
+            return Project.findById(req.params.id).populate(
+                {
+                    path: 'maps',
+                    match:{archived:false}
+                })
+        }
+        
+        
     },
 
     /* delete a project */
@@ -39,29 +49,34 @@ module.exports = {
     },
 
     /* filter projects */
-    filter: (query = {}) => {
+    filter: (body = {}) => {
         let q = {};
-        if (query.fields) {
-            // This will change the fields in the query to query that we can use with mongoose (using regex for contains)
-            Object.keys(query.fields).map(key => { query.fields[key] = { '$regex': `.*${query.fields[key]}.*` }});
-            q = query.fields;
-        } else if (query.globalFilter) {
+        if (body.fields) {
+            // This will change the fields in the body to body that we can use with mongoose (using regex for contains)
+            Object.keys(body.fields).map(key => { body.fields[key] = { '$regex': `.*${body.fields[key]}.*` }});
+            q = body.fields;
+        } else if (body.globalFilter) {
             // if there is a global filter, expecting or condition between name and description fields
             q = {
-                $or: [{ name: { '$regex': `.*${query.globalFilter}.*` } }, { description: { '$regex': `.*${query.globalFilter}.*` } }]
+                $or: [{ name: { '$regex': `.*${body.globalFilter}.*` } }, { description: { '$regex': `.*${body.globalFilter}.*` } }]
             }
         }
-        if (!query.archived) {
-            q.archived = false;
+        
+        let p;
+        if(body.options.isArchived){
+            p = Project.find(q);
         }
-        let p = Project.find(q);
-        if (query.sort) {
+        else{
+            p = Project.find(q).where({archived:false});
+        }
+
+        if (body.sort) {
             // apply sorting by field name. for reverse, should pass with '-'.
-            p.sort(query.sort)
+            p.sort(body.sort)
         }
-        if (query.page) {
+        if (body.page) {
             // apply paging. if no paging, return all
-            p.limit(PAGE_SIZE).skip((query.page - 1) * PAGE_SIZE)
+            p.limit(PAGE_SIZE).skip((body.page - 1) * PAGE_SIZE)
         }
 
         return p.then(projects => {
