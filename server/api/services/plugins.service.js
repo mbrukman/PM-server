@@ -5,12 +5,11 @@ const child_process = require("child_process");
 const async = require("async");
 const winston = require("winston");
 const del = require("del");
-
 const env = require("../../env/enviroment");
 const agentsService = require("./agents.service");
 const models = require("../models");
 const Plugin = models.Plugin;
-
+var pluginConfigValidationSchema = require('../validation-schema/plugin-config.schema')
 let pluginsPath = path.join(
   path.dirname(path.dirname(__dirname)),
   "libs",
@@ -124,12 +123,17 @@ function deployPluginFile(pluginPath, req) {
             } catch (e) {
               return reject("Error parsing config file: ", e);
             }
-
+            
+            var valid = pluginConfigValidationSchema(obj)
+            if(!valid){
+              reject(err)
+            }
+            
             // check the plugin type
             Plugin.findOne({ name: obj.name })
               .then(plugin => {
                 if (!plugin) {
-                  return Plugin.create(obj);
+                    return Plugin.create(obj);
                 }
                 fs.unlink(plugin.file, function (error) {
                   if (error) {
