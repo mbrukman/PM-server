@@ -5,7 +5,7 @@
       <a routerLink="/projects/update" [queryParams]="{'project': project?.id}" class="btn-primary btn">Edit <i class="material-icons">mode_edit</i></a>
       <button class="btn-success btn" (click)="archiveProject(!project?.archived)">
         {{project?.archived ? 'Unarchive' : 'Archive' }}
-        <i class="material-icons">archive</i>
+        <i class="material-icons">  {{project?.archived ? 'unarchive' : 'archive' }}</i>
       </button>
       <p class="lead">{{project?.description}}</p>
     </div>
