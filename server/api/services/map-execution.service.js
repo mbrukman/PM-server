@@ -668,13 +668,9 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
                 }
             } else if (process.coordination === 'race') {
                 if (executions[runId].executionAgents[agent.key].processes && executions[runId].executionAgents[agent.key].processes.hasOwnProperty(process.uuid)) {
-                    // if(findSuccessors(process.uuid, structure).length == 1){
                         if(successors.length -1 == successorIdx){
                             endRunPathResults(runId, agent, socket, map);
                         }
-
-                    // }
-                    /// todo get process afterr if the end ===:
                     return;
                 }
             }
