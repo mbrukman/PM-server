@@ -650,7 +650,7 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
 
     }
     let nodesToRun = [];
-    successors.forEach((successor) => {
+    successors.forEach((successor, successorIdx) => {
         let ancestors = findAncestors(successor, structure);
         const process = findProcessByUuid(successor, structure);
         if (ancestors.length > 1) {
@@ -668,6 +668,13 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
                 }
             } else if (process.coordination === 'race') {
                 if (executions[runId].executionAgents[agent.key].processes && executions[runId].executionAgents[agent.key].processes.hasOwnProperty(process.uuid)) {
+                    // if(findSuccessors(process.uuid, structure).length == 1){
+                        if(successors.length -1 == successorIdx){
+                            endRunPathResults(runId, agent, socket, map);
+                        }
+
+                    // }
+                    /// todo get process afterr if the end ===:
                     return;
                 }
             }
@@ -708,6 +715,7 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
         }
     });
 }
+
 
 function endRunPathResults(runId, agent, socket, map) {
     if (!isThereProcessExecutingOnAgent(runId, agent.key)) {

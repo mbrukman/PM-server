@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between pane-header">
   <h3>Edit
-    <span *ngIf="!action">{{process?.name? process.name: 'process'}}</span>
+    <span *ngIf="!action">{{processViewWrapper.process?.name? processViewWrapper.process.name: 'process'}}</span>
     <span *ngIf="action">action</span>
   </h3>
   <div *ngIf="!action">
@@ -98,10 +98,10 @@
           <small class="form-text text-muted">Controlling syncing between agents.</small>
         </div>
 
-        <div class="form-group" *ngIf="process.coordination">
+        <div class="form-group" *ngIf="processViewWrapper.process?.coordination">
           <label>Process coordination</label>
           <select class="form-control" formControlName="coordination">
-            <option value="wait" hidden="isInsideLoop">{{COORDINATION_TYPES['wait']}}</option>
+            <option value="wait" *ngIf="!processViewWrapper.isInsideLoop">{{COORDINATION_TYPES['wait']}}</option>
             <option value="race">{{COORDINATION_TYPES['race']}}</option>
             <option value="each">{{COORDINATION_TYPES['each']}}</option>
           </select>

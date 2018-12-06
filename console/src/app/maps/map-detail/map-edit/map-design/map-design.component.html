@@ -8,7 +8,7 @@
     <div id="graph" class="graph"></div>
   </div>
   <div class="map-management col-4" *ngIf="editing">
-    <app-process-form [process]="process" [isInsideLoop]="isInsideLoop" (saved)="onSave($event)" (close)="onClose($event)"
+    <app-process-form [processViewWrapper]="processViewWrapper" (saved)="onSave($event)" (close)="onClose($event)"
                       (delete)="onDelete($event)"></app-process-form>
   </div>
 

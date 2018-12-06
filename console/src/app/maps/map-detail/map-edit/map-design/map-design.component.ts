@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { Subscription } from 'rxjs/Subscription';
 
 import { MapDesignService } from '../map-design.service';
-import { Link, MapStructure, Process } from '@maps/models';
+import { Link, MapStructure, Process, ProcessViewWrapper } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { Plugin } from '@plugins/models/plugin.model';
@@ -44,11 +44,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   link: Link;
   init: boolean = false;
   scale: number = 1;
-  isInsideLoop :boolean = false;
 
   defaultContent: string;
   @ViewChild('wrapper') wrapper: ElementRef;
-
+  processViewWrapper : ProcessViewWrapper;
   constructor(private designService: MapDesignService,
     private mapsService: MapsService,
     private pluginsService: PluginsService,
@@ -150,6 +149,14 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   deselectAllCellsAndUpdateStructure() {
+
+    if (this.process) {
+      this.processViewWrapper = new ProcessViewWrapper(this.process)
+      this.processViewWrapper.updateIsInsideLoop(this.mapStructure)
+    } else {
+      this.processViewWrapper = null
+    }
+
     this.graph.getElements().forEach(cell => {
       this.deselectCell(cell);
     });
@@ -179,22 +186,22 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     const ancestors = this.mapStructure.links.filter(link => link.targetId === this.link.targetId);
     if (ancestors.length > 1) {
       const processIndex = this.mapStructure.processes.findIndex(process => process.uuid === this.link.targetId);
-        if(this.isLoopInProcess(ancestors)){
-          this.isInsideLoop  = true;
-          this.mapStructure.processes[processIndex].coordination = 'race';
-          this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
-        }
+      if (this.isLoopInProcessByAncestors(ancestors)) {
+        this.mapStructure.processes[processIndex].coordination = 'race';
+      }
       else if (!this.mapStructure.processes[processIndex].coordination) {
         this.mapStructure.processes[processIndex].coordination = 'wait';
-        this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
       }
+      this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
     }
     this.deselectAllCellsAndUpdateStructure();
   }
 
-  isLoopInProcess(ancestors){
-    return ancestors.filter(link => link.sourceId == link.targetId).length > 0 ;
+  isLoopInProcessByAncestors(ancestors) {
+    return ancestors.filter(link => link.sourceId == link.targetId).length > 0;
   }
+
+
 
   defineShape() {
     joint.shapes.devs['MyImageModel'] = joint.shapes.devs.Model.extend({
@@ -449,6 +456,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.selectCell(cell);
     this.paper.setDimensions(this.wrapper.nativeElement.offsetWidth - 250, this.wrapper.nativeElement.offsetHeight);
     this.process = process;
+   
+    this.processViewWrapper = new ProcessViewWrapper(this.process)
+    this.processViewWrapper.updateIsInsideLoop(this.mapStructure)
+
     if (this.editing) {
       this.editing = false;
       setTimeout(() => {
