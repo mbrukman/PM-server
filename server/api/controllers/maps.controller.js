@@ -87,7 +87,7 @@ module.exports = {
                 name: req.body.options.name,
                 description: map.description
             };
-            if(req.body.options.ischecked){
+            if(req.body.options.isChecked){
                 newMap.agents = map.agents
             }
             return mapsService.create(newMap)

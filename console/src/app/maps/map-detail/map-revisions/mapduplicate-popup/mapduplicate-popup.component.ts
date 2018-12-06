@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { BsModalRef } from 'ngx-bootstrap';
+import {MapPopup} from '@maps/models/map-popup.model'
 
 @Component({
   selector: 'app-mapduplicate-popup',
@@ -8,9 +9,8 @@ import { BsModalRef } from 'ngx-bootstrap';
   styleUrls: ['./mapduplicate-popup.component.scss']
 })
 export class MapDuplicateComponent {
-  name: string;
-  isChecked:boolean
-  public result: Subject<{name:string,ischecked:boolean}> = new Subject<{name:string,ischecked:boolean}>();
+  optionsPopup:MapPopup = new MapPopup()
+  public result: Subject<MapPopup> = new Subject<MapPopup>();
 
   constructor(public bsModalRef: BsModalRef) {
   }
@@ -20,7 +20,7 @@ export class MapDuplicateComponent {
   }
 
   onConfirm() {
-    this.result.next({name:this.name,ischecked:this.isChecked });
+    this.result.next(this.optionsPopup);
     this.onClose();
   }
 

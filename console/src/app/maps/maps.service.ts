@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { Map, MapExecutionLogs, MapResult, MapStructure, MapTrigger } from './models';
-
+import {MapPopup} from './models/map-popup.model'
 
 const serverUrl = environment.serverUrl;
 
@@ -34,7 +34,7 @@ export class MapsService {
     return this.http.post<Map>(`${serverUrl}api/maps/create`, map);
   }
 
-  duplicateMap(mapId, structureId, projectId,options) {
+  duplicateMap(mapId, structureId, projectId,options:MapPopup) {
     return this.http.post<Map>(`${serverUrl}api/maps/${mapId}/structure/${structureId}/duplicate`, { projectId: projectId ,options});
   }
 
