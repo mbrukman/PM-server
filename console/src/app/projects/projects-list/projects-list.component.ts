@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
-import { FilterProjectsOptions } from '../models/filter-projects-options.model'
+import { FilterOptions } from '@shared/model/filter-options.model'
 import 'rxjs/operators/take';
 
 @Component({
@@ -17,7 +17,7 @@ export class ProjectsListComponent implements OnInit {
   filterTerm: string;
   page: number = 1;
   resultCount: number;
-  filterOptions : FilterProjectsOptions = new FilterProjectsOptions();
+  filterOptions : FilterOptions = new FilterOptions();
 
   constructor(private projectsService: ProjectsService) {
     this.onDataLoad = this.onDataLoad.bind(this);

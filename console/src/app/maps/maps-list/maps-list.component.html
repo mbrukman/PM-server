@@ -14,7 +14,7 @@
     <div>
       <i class="material-icons" *ngIf="!filterTerm">search</i>
       <i class="material-icons text-light" *ngIf="filterTerm" (click)="filterTerm = null">close</i>
-      <input class="form-control" [(ngModel)]="filterTerm" type="text" placeholder="Filter" (keyup)="loadProjectLazy(filterTerm)" />
+      <input class="form-control" [(ngModel)]="filterOptions.globalFilter" type="text" placeholder="Filter" (keyup)="loadProjectLazy()" />
     </div>
   </div>
 

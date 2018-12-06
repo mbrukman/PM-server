@@ -4,7 +4,7 @@ import { MapsService } from '../maps.service';
 import { Map } from '../models/map.model';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { FilterMapOptions } from '../models/filter-maps-options.model'
+import { FilterOptions } from '@shared/model/filter-options.model'
 
 @Component({
   selector: 'app-maps-list',
@@ -19,7 +19,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
   page: number = 1;
   isArchived : boolean = false;
   featuredMaps: Map[];
-  filterOptions : FilterMapOptions = new FilterMapOptions();
+  filterOptions : FilterOptions = new FilterOptions();
 
   constructor(private mapsService: MapsService,
     private modalService: BsModalService) {

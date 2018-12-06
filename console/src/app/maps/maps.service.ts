@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { Map, MapExecutionLogs, MapResult, MapStructure, MapTrigger } from './models';
-import {FilterMapOptions} from './models/filter-maps-options.model'
+import {FilterOptions} from '@shared/model/filter-options.model'
 
 
 const serverUrl = environment.serverUrl;
@@ -45,7 +45,7 @@ export class MapsService {
     return this.http.get<Map>(`${serverUrl}api/maps/${id}`);
   }
 
-  filterMaps(fields?: any, sort?: string, page?: number,options?:FilterMapOptions ) {
+  filterMaps(fields?: any, sort?: string, page?: number,options?:FilterOptions ) {
 
     return this.http.post<{ items: Map[],totalCount: number}>(`${serverUrl}api/maps`, { page, fields, sort ,options});
   }

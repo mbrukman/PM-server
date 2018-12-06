@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 import { Project } from './models/project.model';
 import { Map } from '@maps/models/map.model';
 import { MapStructure } from '@maps/models/map-structure.model';
-import {FilterProjectsOptions} from './models/filter-projects-options.model'
+import {FilterOptions} from '@shared/model/filter-options.model'
 
 const serverUrl = environment.serverUrl;
 
@@ -23,11 +23,11 @@ export class ProjectsService {
     return this.http.post<Project>(serverUrl + 'api/projects/create', project);
   }
 
-  detail(projectId,options?:FilterProjectsOptions) {
+  detail(projectId,options?:FilterOptions) {
     return this.http.post<Project>(serverUrl + 'api/projects/' + projectId,options);
   }
 
-  filter(fields?: any, sort?: string, page?: number, options?:FilterProjectsOptions) {
+  filter(fields?: any, sort?: string, page?: number, options?:FilterOptions) {
     return this.http.post<{ totalCount: number, items: Project[] }>(`${serverUrl}api/projects`, { page, fields, sort ,options});
   }
 

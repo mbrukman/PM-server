@@ -9,7 +9,7 @@ import { Map } from '../../maps/models/map.model';
 import { ConfirmComponent } from '../../shared/confirm/confirm.component';
 import { ImportModalComponent } from './import-modal/import-modal.component';
 
-import { FilterProjectsOptions } from '../models/filter-projects-options.model'
+import { FilterOptions } from '@shared/model/filter-options.model'
 
 @Component({
   selector: 'app-project-details',
@@ -23,7 +23,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   routeReq: any;
   archiveReq: any;
   filterTerm: string;
-  filterOptions : FilterProjectsOptions = new FilterProjectsOptions();
+  filterOptions : FilterOptions = new FilterOptions();
   featuredMaps: Map[];
 
   constructor(private route: ActivatedRoute,

@@ -1,4 +1,4 @@
-export class FilterProjectsOptions{
+export class FilterOptions{
     globalFilter?: string 
     isArchived?:boolean
 }
