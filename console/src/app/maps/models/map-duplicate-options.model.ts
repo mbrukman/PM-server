@@ -1,4 +1,4 @@
-export class MapPopup{
+export class MapDuplicateOptions{
     name:string
     isChecked:boolean
 }
