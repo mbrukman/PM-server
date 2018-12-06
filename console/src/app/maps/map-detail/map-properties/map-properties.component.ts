@@ -53,9 +53,9 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
     this.mapsService.setCurrentMap(mapObj);
   }
 
-  archiveMap() {
+  archiveMap(isArchive:boolean) {
     this.mapsService.archive(this.map.id).subscribe(() => {
-      this.map.archived = true;
+      this.map.archived = isArchive;
       this.mapsService.setCurrentMap(this.map);
     });
   }
