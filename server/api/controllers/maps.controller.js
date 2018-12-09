@@ -70,8 +70,6 @@ module.exports = {
                         }
                     }
                 })
-                console.log(filteredExecutions);
-
                 return res.json(filteredExecutions);
             })
         })
