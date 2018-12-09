@@ -59,7 +59,21 @@ module.exports = {
                 });
                 return i === index;
             });
-            return res.json(filteredExecutions);
+
+            let mapsId = filteredExecutions.map(execution => execution.map.id);
+            projectsService.getProjectNamesByMapsIds(mapsId).then((projects) => {
+                filteredExecutions.map(filteredExecution => {
+                    for (let j = 0, projectsLength = projects.length; j < projectsLength; j++) {
+                        if (projects[j].maps.toString().includes(filteredExecution.map.id)) {
+                            filteredExecution.map.project = projects[j].toJSON();
+                            break;
+                        }
+                    }
+                })
+                console.log(filteredExecutions);
+
+                return res.json(filteredExecutions);
+            })
         })
     },
 

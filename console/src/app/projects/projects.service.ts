@@ -64,4 +64,8 @@ export class ProjectsService {
   createMapStructure(mapId: string, structure: MapStructure) {
     return this.http.post<MapStructure>(serverUrl + 'api/maps/' + mapId + '/structure/create', structure);
   }
+
+  getProjectNamesByMapsIds(mapsIds :string[]){
+    return this.http.put(serverUrl + 'api/projects/getProjectNamesByMapsIds', mapsIds);
+  }
 }
