@@ -16,3 +16,45 @@
     }
   }
 }
+@mixin table(){
+  ::ng-deep p-datatable{
+    .ui-datatable{
+      table{
+        thead{
+          width: 1920px;
+          height: 1090px;
+          background-color: #2d3236;
+          td{
+            width: 1765px;
+            height: 53px;
+            background-color: #272c2f;
+            tr{
+              width: 140px;
+              height: 21px;
+              font-family: Roboto;
+              font-size: 18px;
+              font-weight: 500;
+              color: #dddddd;
+            }
+          }
+        }
+        tbody{
+          width: 1920px;
+          height: 1090px;
+          background-color: #2d3236;
+          td{
+            width: 1765px;
+            height: 53px;
+            tr{
+              width: 199px;
+              height: 32px;
+              font-family: Roboto;
+              font-size: 14px;
+              color: #dddddd
+            }
+          }
+        }
+      }
+    }
+  }
+}
