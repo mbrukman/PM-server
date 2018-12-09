@@ -114,6 +114,7 @@ export class MapRevisionsComponent implements OnInit {
 
   getMapStructures(page: number) {
     this.mapsService.structuresList(this.mapId, page).subscribe(structures => {
+      this.previewStructure(structures[0].id)
       if (structures && structures.length > 0) {
         this.structures = [...this.structures, ...structures];
       } else {
