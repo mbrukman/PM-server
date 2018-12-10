@@ -26,5 +26,12 @@
             top: 5px;
             z-index: 1;
         }
+
+        .modal-body{
+            > ul > li {
+                white-space: pre-line;
+                word-break: break-word;
+            }
+        }
     }
 }

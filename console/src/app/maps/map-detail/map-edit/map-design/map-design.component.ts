@@ -70,7 +70,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       });
 
   }
-
+  
   ngOnDestroy() {
     this.dropSubscription.unsubscribe();
     this.mapStructureSubscription.unsubscribe();
@@ -171,6 +171,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       return (o.targetId === this.link.targetId && o.sourceId === this.link.sourceId);
     });
     if (link) {
+      link.uuid = cell.model.id;
       return;
     }
 
@@ -275,11 +276,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     const plugin = this.plugins.find((o) => {
       return o.name === pluginName;
     });
-
     let imageModel = new joint.shapes.devs['MyImageModel']({
       position: {
-        x: obj.x - (430 * this.scale),
-        y: obj.y - (240 * this.scale)
+        x: obj.x- (430 * this.scale) - this.paper.translate().tx,
+        y: obj.y - (240 * this.scale)  -this.paper.translate().ty
       },
       size: {
         width: 100,
@@ -424,10 +424,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
         this.onMapContentUpdate();
       }
-    }
-
-    this.center();
   }
+  this.center();
+}
 
 center(){
   let bbox = this.graph.getBBox(this.graph.getElements());
@@ -501,13 +500,22 @@ center(){
 
     });
 
-    this.graph.on('change:source change:target', function (link) {
+      this.graph.on('change:source change:target', function (link) {
       let sourcePort = link.get('source').port;
       let sourceId = link.get('source').id;
       let targetPort = link.get('target').port;
       let targetId = link.get('target').id;
+      let id = link.get('id')
+
       if (sourceId && targetId) {
-        self.link = { sourceId: sourceId, targetId: targetId };
+        self.link = { uuid:id,sourceId: sourceId, targetId: targetId };
+        for(let j=0, linklenght = self.mapStructure.links.length; j<linklenght; j++){
+          if(self.mapStructure.links[j].uuid === id){
+            self.mapStructure.links[j] = self.link;
+            break;
+          }
+        }
+        self.deselectAllCellsAndUpdateStructure();
       } else {
         self.link = null;
       }
@@ -517,7 +525,7 @@ center(){
     this.graph.on('remove', function (cell, collection, opt) {
       if (cell.isLink()) {
         let linkIndex = _.findIndex(self.mapStructure.links, (o) => {
-          return o.uuid === cell.id;
+          return o.uuid === cell.id; 
         });
         if (linkIndex === -1) {
           self.deselectAllCellsAndUpdateStructure();

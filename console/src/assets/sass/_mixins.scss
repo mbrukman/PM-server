@@ -16,3 +16,38 @@
     }
   }
 }
+@mixin table(){
+  ::ng-deep p-datatable{
+    .ui-datatable{
+      table{
+        thead{
+          background-color: #2d3236;
+          td{
+            height: 53px;
+            background-color: #272c2f;
+            tr{
+              height: 21px;
+              font-family: Roboto;
+              font-size: 18px;
+              font-weight: 500;
+              color: #dddddd;
+            }
+          }
+        }
+        tbody{
+          height: 1090px;
+          background-color: #2d3236;
+          td{
+            height: 53px;
+            tr{
+              height: 32px;
+              font-family: Roboto;
+              font-size: 14px;
+              color: #dddddd
+            }
+          }
+        }
+      }
+    }
+  }
+}

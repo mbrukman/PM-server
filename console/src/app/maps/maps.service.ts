@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { Map, MapExecutionLogs, MapResult, MapStructure, MapTrigger } from './models';
-
+import {MapDuplicateOptions} from './models/map-duplicate-options.model'
 
 const serverUrl = environment.serverUrl;
 
@@ -34,8 +34,8 @@ export class MapsService {
     return this.http.post<Map>(`${serverUrl}api/maps/create`, map);
   }
 
-  duplicateMap(mapId, structureId, projectId) {
-    return this.http.post<Map>(`${serverUrl}api/maps/${mapId}/structure/${structureId}/duplicate`, { projectId: projectId });
+  duplicateMap(mapId, structureId, projectId,options:MapDuplicateOptions) {
+    return this.http.post<Map>(`${serverUrl}api/maps/${mapId}/structure/${structureId}/duplicate`, { projectId: projectId ,options});
   }
 
   getCurrentMap(): Observable<any> {
