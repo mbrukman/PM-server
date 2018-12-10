@@ -2,7 +2,7 @@
 
 .main {
   width : 100%;
-
+  @include table();
   .section-title-wrapper{
     display: flex;
     align-items: center;

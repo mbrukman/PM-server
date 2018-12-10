@@ -1,9 +1,12 @@
 @import "~assets/sass/mixins";
 
+
 .main {
   .featured {
     width: 100%;
   }
+
+  @include table();
 }
 
 .filter {
