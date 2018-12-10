@@ -6,4 +6,4 @@ libs etc/kaholo/server
 media_cdn etc/kaholo/server	
 app.js etc/kaholo/server	
 package.json etc/kaholo/server
-DEBIAN/kaholo-server.service /lib/systemd/system
+debian/kaholo-server.service /lib/systemd/system

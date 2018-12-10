@@ -1,5 +1,6 @@
 Source: kaholo
 Section: net
+Maintainer: Kaholo <info@kaholo.io>
 Build-Depends: debhelper (>= 9), dh-systemd (>= 1.5), nodejs
 Homepage: https://www.kaholo.io
 Vcs-Browser: https://github.com/Kaholo/PM-server.git
