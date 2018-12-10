@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+cd /lib/systemd/system
+sudo systemctl daemon-reload
+
+cd /etc/kaholo/server
+npm install

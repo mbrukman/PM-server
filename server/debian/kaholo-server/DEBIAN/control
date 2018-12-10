@@ -1,0 +1,11 @@
+Package: kaholo-server
+Source: kaholo
+Version: 1.1.0
+Architecture: all
+Maintainer: Kaholo <info@kaholo.io>
+Installed-Size: 236
+Depends: nodejs (>= 10.13.0)
+Section: base
+Priority: optional
+Homepage: https://www.kaholo.io
+Description: description
