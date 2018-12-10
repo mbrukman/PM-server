@@ -10,6 +10,9 @@ import { Project } from '@projects/models/project.model';
 import { ProjectsService } from '@projects/projects.service';
 import { SocketService } from '@shared/socket.service';
 import { DiffEditorModel } from 'ngx-monaco-editor';
+import { BsModalService } from 'ngx-bootstrap';
+import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
+
 
 @Component({
   selector: 'app-map-revisions',
@@ -45,7 +48,7 @@ export class MapRevisionsComponent implements OnInit {
   };
   
 
-  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService) {
+  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private modalService: BsModalService) {
     this.scrollCallback = this.loadRevisions.bind(this);
   }
 
@@ -111,6 +114,8 @@ export class MapRevisionsComponent implements OnInit {
 
   getMapStructures(page: number) {
     this.mapsService.structuresList(this.mapId, page).subscribe(structures => {
+      if(structures.length)
+        this.previewStructure(structures[0].id)
       if (structures && structures.length > 0) {
         this.structures = [...this.structures, ...structures];
       } else {
@@ -220,11 +225,15 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   duplicateMap(structureId: string) {
-    this.mapsService.duplicateMap(this.mapId, structureId, this.project.id).subscribe(map => {
-      this.router.navigate(['/maps', map.id]);
+    const modal = this.modalService.show(MapDuplicateComponent);
+    modal.content.result
+      .take(1)
+      .filter(obj => !!obj.name) // filtering only results with a name
+      .flatMap(obj =>  this.mapsService.duplicateMap(this.mapId, structureId, this.project.id,obj))
+      .subscribe(map => { this.router.navigate(['/maps', map.id]);
     });
   }
-
+  
   previewStructure(structureId: string) {
     this.previewProcess = null;
     this.mapsService.getMapStructure(this.mapId, structureId)

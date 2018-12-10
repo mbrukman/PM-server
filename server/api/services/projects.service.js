@@ -6,9 +6,9 @@ const PAGE_SIZE = env.page_size;
 
 module.exports = {
     /* archive project and maps */
-    archive: (projectId) => {
-        return Project.findByIdAndUpdate(projectId, { archived: true }).then(project => {
-            return mapsService.archive(project.maps);
+    archive: (projectId, isArchive) => {   
+        return Project.findByIdAndUpdate(projectId, { archived: isArchive }).then(project => {
+            return mapsService.archive(project.maps, isArchive);
         });
     },
     count: (filter) => {

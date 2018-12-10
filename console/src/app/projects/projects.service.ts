@@ -15,8 +15,8 @@ export class ProjectsService {
   constructor(private http: HttpClient) {
   }
 
-  archive(projectId) {
-    return this.http.get(`${serverUrl}api/projects/${projectId}/archive`);
+  archive(projectId, doArchive : boolean) {
+    return this.http.put(`${serverUrl}api/projects/${projectId}/archive`, {isArchive : doArchive});
   }
 
   create(project) {

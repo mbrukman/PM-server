@@ -4,6 +4,7 @@
   .featured {
     width: 100%;
   }
+  @include table();
   .row {
     a, button {
       &.create {
