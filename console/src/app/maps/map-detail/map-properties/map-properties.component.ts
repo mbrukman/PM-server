@@ -30,7 +30,7 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
       .filter(map => map) // filtering empty map result
       .do(map => this.map = map)
       .filter(map => !this.projects)
-      .flatMap(() => this.projectsService.list())
+      .flatMap(() => this.projectsService.list(null,null,null,{isArchived:false}))
       .subscribe(data => {
         this.projects = data.items;
         let project = this.projects.find((o) => (<string[]>o.maps).indexOf(this.map.id) > -1);
