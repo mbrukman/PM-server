@@ -1,9 +1,9 @@
-api          etc/kaholo/server	
-dist etc/kaholo/server	
-env etc/kaholo/server	
-helpers etc/kaholo/server	
-libs etc/kaholo/server	
-media_cdn etc/kaholo/server	
-app.js etc/kaholo/server	
-package.json etc/kaholo/server
+api          var/lib/kaholo/kaholo-server
+dist var/lib/kaholo/kaholo-server
+env var/lib/kaholo/kaholo-server	
+helpers var/lib/kaholo/kaholo-server	
+libs var/lib/kaholo/kaholo-server	
+media_cdn var/lib/kaholo/kaholo-server	
+app.js var/lib/kaholo/kaholo-server	
+package.json var/lib/kaholo/kaholo-server
 debian/kaholo-server.service /lib/systemd/system
