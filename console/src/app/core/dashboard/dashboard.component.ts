@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MapsService } from '../../maps/maps.service';
-import { MapResult } from '../../maps/models/execution-result.model';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,7 +13,7 @@ export class DashboardComponent implements OnInit {
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936']
   };
-  constructor(private mapsService: MapsService) {
+  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute) {
   }
 
   ngOnInit() {
@@ -21,13 +21,12 @@ export class DashboardComponent implements OnInit {
       this.executions = executions;
       executions.forEach(execution => {
         let processes = [];
-        execution.agentsResults.forEach(agent => {
+        execution.exec.agentsResults.forEach(agent => {
           processes = [...processes, ...agent.processes];
         });
         execution.status = this.aggregateProcessesStatus(processes);
       });
     });
-
   }
 
   aggregateProcessesStatus(processes) {
@@ -38,13 +37,19 @@ export class DashboardComponent implements OnInit {
       total[current.status].value = (total[current.status].value || 0) + 1;
       return total;
     }, {
-      success: { name: 'success', value: 0 },
-      error: { name: 'error', value: 0 },
-      partial: { name: 'partial', value: 0 }
-    });
+        success: { name: 'success', value: 0 },
+        error: { name: 'error', value: 0 },
+        partial: { name: 'partial', value: 0 }
+      });
     let result = Object.keys(ag).map((key) => {
       return ag[key];
     });
     return <[{ name: string, value: number }]>result;
+  }
+
+
+  goToProject($event, id){
+    $event.stopPropagation();
+    this.router.navigate([`/projects/${id}`], { relativeTo: this.route });
   }
 }

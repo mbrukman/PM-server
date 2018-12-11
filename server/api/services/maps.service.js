@@ -6,7 +6,7 @@ const MapExecutionLog = require("../models/map-execution-log.model")
 const MapTrigger = require("../models/map-trigger.model")
 const MapResult = require("../models/map-results.model")
 const Project = require("../models/project.model")
-
+const proejctServise = require("./projects.service")
 const PAGE_SIZE = env.page_size;
 
 
@@ -88,11 +88,9 @@ module.exports = {
             // searching project in DB when maps holds an array with a least one element of the mapsId
             return {maps, mapsId};
         }).then(({maps,mapsId}) => {
-            return Project.find({ maps: { $in: mapsId} },{_id:1,name:1, maps:1})
-            .then(projects=>{
-                return {maps, projects}
-            })
-        }).then(({maps, projects})=>{
+            return proejctServise.getProjectNamesByMapsIds(mapsId).then((projects)=>{
+            return {maps, projects}
+            })}).then(({maps, projects})=>{
             return Promise.all(maps.map(map=>{
                 for(let j=0, projectsLength = projects.length; j<projectsLength; j++){
                     if (projects[j].maps.toString().includes(map.id)){

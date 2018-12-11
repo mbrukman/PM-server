@@ -50,16 +50,26 @@ module.exports = {
     },
     dashboard: (req, res) => {
         hooks.hookPre('map-dashboard', req).then(() => {
-            return mapsExecutionService.list()
+            return mapsExecutionService.dashboard()
         }).then(executions => {
             executions = JSON.parse(JSON.stringify(executions));
-            let filteredExecutions = executions.filter((o, index) => {
-                let i = executions.findIndex((k) => {
-                    return k.map.id === o.map.id;
-                });
-                return i === index;
-            });
-            return res.json(filteredExecutions);
+            let mapsId = executions.map(execution => execution.map.id);
+            return projectsService.getProjectNamesByMapsIds(mapsId).then((projects)=>{
+                return { projects , executions};
+            })
+        }).then((result) => {
+            result.executions.map(exec => {
+                for (let j = 0, projectsLength = result.projects.length; j < projectsLength; j++) {
+                    if ( result.projects[j].maps.toString().includes(exec.map.id)) {
+                        exec.map.project = result.projects[j].toJSON();
+                        break;
+                    }
+                }
+            })
+            return res.json(result.executions);
+        }).catch(error=>{
+            console.log(error);
+            
         })
     },
 

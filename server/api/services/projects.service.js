@@ -83,6 +83,9 @@ module.exports = {
                 return module.exports.addMap(projectId, mapId); // add map to the selected project
             });
 
+    }, 
+    getProjectNamesByMapsIds : (mapsIds) => {
+        return Project.find({ maps: { $in: mapsIds} },{_id:1,name:1, maps:1})
     }
 
 };
