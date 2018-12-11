@@ -10,7 +10,7 @@ const hooks = require("../../libs/hooks/hooks");
 module.exports = {
     /* archive a map */
     archive: (req, res) => {
-        mapsService.archive([req.params.id]).then(map => {
+        mapsService.archive([req.params.id], req.body.isArchive).then(map => {
             return res.status(204).send();
         }).catch(error => {
             winston.log('error', "Error archiving map", error);

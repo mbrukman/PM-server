@@ -22,8 +22,9 @@ export class MapsService {
     return this.http.get<[Map]>(`${serverUrl}api/maps`);
   }
 
-  archive(mapId) {
-    return this.http.get(`${serverUrl}api/maps/${mapId}/archive`);
+  archive(mapId :string, isArchive : boolean) {
+    let body = {isArchive : isArchive}
+    return this.http.put(`${serverUrl}api/maps/${mapId}/archive`, body);
   }
 
   clearCurrentMap() {

@@ -27,7 +27,7 @@ router.get("/:id/results/logs", mapController.logs);
 router.get("/:id/results/:resultId", mapController.resultDetail);
 router.get("/:id/results/:resultId/logs", mapController.logs);
 router.put("/:id/update", mapController.update);
-router.get("/:id/archive", mapController.archive);
+router.put("/:id/archive", mapController.archive);
 
 /* map structure */
 router.get("/:id/structure", mapController.getMapStructure);
