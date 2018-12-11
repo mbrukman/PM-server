@@ -21,8 +21,8 @@ function getMapPlugins(mapStructure) {
 
 module.exports = {
     /* archiving maps in ids array */
-    archive: (mapsIds) => {
-        return Map.update({ _id: { $in: mapsIds } }, { archived: true }, { multi: true })
+    archive: (mapsIds, isArchive) => {
+        return Map.update({ _id: { $in: mapsIds } }, { archived: isArchive }, { multi: true })
     },
     /* count how many documents exist for a certain query */
     count: (filter) => {

@@ -1,10 +1,9 @@
-node_modules	usr/lib/nodejs/production-map
-api          usr/lib/nodejs/production-map
-dist usr/lib/nodejs/production-map
-env usr/lib/nodejs/production-map
-helpers usr/lib/nodejs/production-map
-libs usr/lib/nodejs/production-map
-media_cdn usr/lib/nodejs/production-map
-app.js usr/lib/nodejs/production-map
-package.json usr/lib/nodejs/production-map
-
+api          var/lib/kaholo/kaholo-server
+dist var/lib/kaholo/kaholo-server
+env var/lib/kaholo/kaholo-server	
+helpers var/lib/kaholo/kaholo-server	
+libs var/lib/kaholo/kaholo-server	
+media_cdn var/lib/kaholo/kaholo-server	
+app.js var/lib/kaholo/kaholo-server	
+package.json var/lib/kaholo/kaholo-server
+debian/kaholo-server.service /lib/systemd/system

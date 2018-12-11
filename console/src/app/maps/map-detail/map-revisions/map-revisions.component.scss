@@ -12,9 +12,10 @@
     margin: 0;
 
     .col-3 {
-      padding-top: 15px;
       flex: 0 0 25%;
       max-width: 300px;
+      padding-left: inherit;
+      padding-right: inherit;
     }
 
     .col-9 {
@@ -72,7 +73,7 @@
       }
 
       .revision-title {
-        margin-right: 10px;
+        margin-right: 60px;
       }
     }
   }

@@ -126,7 +126,7 @@ function deployPluginFile(pluginPath, req) {
             
             var valid = pluginConfigValidationSchema(obj)
             if(!valid){
-              reject(err)
+              return reject(err)
             }
             
             // check the plugin type

@@ -1,5 +1,5 @@
 @import "~assets/sass/variables";
-
+@import "~assets/sass/mixins";
 
 .mode {
   height: 70px;
@@ -80,6 +80,7 @@
 
     .list-view {
       margin : 0;
+      @include table();
     }
 
   }
