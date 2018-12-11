@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MapsService } from '../../maps/maps.service';
-import { MapResult } from '../../maps/models/execution-result.model';
-import { ProjectsService } from '@projects/projects.service';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,7 +13,7 @@ export class DashboardComponent implements OnInit {
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936']
   };
-  constructor(private mapsService: MapsService, private projecStervice: ProjectsService) {
+  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute) {
   }
 
   ngOnInit() {
@@ -22,7 +21,7 @@ export class DashboardComponent implements OnInit {
       this.executions = executions;
       executions.forEach(execution => {
         let processes = [];
-        execution.agentsResults.forEach(agent => {
+        execution.exec.agentsResults.forEach(agent => {
           processes = [...processes, ...agent.processes];
         });
         execution.status = this.aggregateProcessesStatus(processes);
@@ -46,5 +45,11 @@ export class DashboardComponent implements OnInit {
       return ag[key];
     });
     return <[{ name: string, value: number }]>result;
+  }
+
+
+  goToProject($event, id){
+    $event.stopPropagation();
+    this.router.navigate([`/projects/${id}`], { relativeTo: this.route });
   }
 }

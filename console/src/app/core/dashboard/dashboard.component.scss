@@ -19,23 +19,21 @@
 
 
 .container-fluid {
-  padding : 15px;
+  padding : 32px 40px 2px;
 
   .content-wrapper{
     display: flex;
+    margin : 0;
+    width: 100%;
     .grid-view{
-      margin : 0;
-      
-      &.row{
-        width: 100%;
-      }
+      justify-content: space-between;
         .dashboard-card :nth-child(4n){
           margin-right: 0px;
         }
         .dashboard-card {
 
-          margin: 15px 12.5px;
-          width: calc(25% - 25px);
+          margin-bottom: 30px;
+          width: calc(25% - 22px);
           max-width: 452px;
           overflow-y: auto;
           height: fit-content;
@@ -46,7 +44,6 @@
             font-family: Roboto;
             .content-card{
               color: #dddddd;
-              width: 60%;
             .card-title{
               font-size: 18px;
               line-height: 0.89;
@@ -63,7 +60,6 @@
         }
 
 
-            .row{
               .chart-wrapper{
                 display: flex;
                 justify-content: center;
@@ -71,7 +67,6 @@
                 position: absolute;
                 top: 16px;
                 right: 23px;
-              }
             }
           }
         }

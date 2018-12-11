@@ -5,20 +5,18 @@
 <div class="container-fluid">
   <div class="content-wrapper" [ngSwitch]="mode" *ngIf="executions">
     <div class="row grid-view" *ngSwitchCase="'grid'">
-        <div class="card dashboard-card" *ngFor="let item of executions.slice(0,16)" [routerLink]="['/maps',item.map.id, 'results']">
+        <div class="card dashboard-card" *ngFor="let item of executions.slice(0,16)"  [routerLink]="['/maps',item.map.id, 'results']" >
           <div class="card-body">
-            <div class="row">
               <div class="content-card">
                 <h5 class="card-title">{{ item.map.name }}</h5>
-                <p class="trigger-by">Trigger:  {{ item.trigger }}</p>
-                <p>Last run: {{ item.startTime | date: 'short' }}</p>
+                <p class="trigger-by">Trigger:  {{ item.exec.trigger }}</p>
+                <p>Last run: {{ item.exec.startTime | date: 'short' }}</p>
                 <!-- <p>Status:   {{ item.status}}</p> -->
-                <div class="content">Project: &nbsp;<a class="link" [routerLink]="['/projects',item.map.project.id]"> {{ item.map.project.name}}</a> </div>
+                <div class="content">Project: &nbsp;<a class="link" *ngIf="!isEnabled"  (click)="goToProject($event, item.map.project.id)" > {{ item.map.project.name}}</a> </div>
               </div>
               <div class="chart-wrapper">
                 <ngx-charts-pie-chart [results]="item.status" [labels]="showLabels" [scheme]="colorScheme" [doughnut]="true" [view]="[130,130]">
                 </ngx-charts-pie-chart>
-              </div>
             </div>
           </div>
       </div>
@@ -28,7 +26,7 @@
         <p-column field="map.name" header="Map"></p-column>
         <p-column field="startTime" header="Last executed">
           <ng-template let-col let-item="rowData" pTemplate="body">
-            {{ item.startTime | date: 'short' }}
+            {{ item.exec.startTime | date: 'short' }}
 
           </ng-template>
         </p-column>
