@@ -17,7 +17,6 @@ export class MapsListComponent implements OnInit, OnDestroy {
   filterTerm: string;
   resultCount: number = 0;
   page: number = 1;
-  isArchived : boolean = false;
   featuredMaps: Map[];
   filterOptions : FilterOptions = new FilterOptions();
 
@@ -28,14 +27,14 @@ export class MapsListComponent implements OnInit, OnDestroy {
   
 
   ngOnInit() {
-    this.mapReq = this.mapsService.filterMaps(null, null, this.page,this.filterOptions).subscribe(this.onDataLoad);
-    this.mapsService.filterMaps(null, '-createdAt', this.page,{isArchived:false,globalFilter:null}).take(1).subscribe(data => {
+    this.reloadMaps();
+    this.mapsService.filterMaps(null, '-createdAt', this.page,this.filterOptions).take(1).subscribe(data => {
       if (data)
         this.featuredMaps = data.items.slice(0, 4);
     });
   }
   
-  getArchive(){
+  reloadMaps(){
     this.mapReq = this.mapsService.filterMaps(null, null, this.page,this.filterOptions).subscribe(this.onDataLoad);
   }
 
@@ -53,7 +52,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
       }
     }
     
-    this.getArchive()
+    this.reloadMaps()
     
   }
 

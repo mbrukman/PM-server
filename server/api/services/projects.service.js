@@ -26,21 +26,14 @@ module.exports = {
 
     /* get project details */
     detail: (req) => {
-        if(req.body.isArchived){
-            return Project.findById(req.params.id).populate(
-                {
-                    path: 'maps'
-                })
-        }
-        else{
-            return Project.findById(req.params.id).populate(
-                {
-                    path: 'maps',
-                    match:{archived:false}
-                })
-        }
         
-        
+        let populate = {
+            path:'maps'
+        }
+        if(!req.body.isArchived){
+            populate.match={archived:false}
+        }
+        return Project.findById(req.params.id).populate(populate)
     },
 
     /* delete a project */
