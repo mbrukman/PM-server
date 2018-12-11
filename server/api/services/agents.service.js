@@ -290,6 +290,40 @@ module.exports = {
             }
         })
     },
+
+    deletePluginOnAgent: (name, agent) => {
+        return new Promise((resolve, reject) => {
+            // if there is no agents, send this plugin to all living agents
+            if (!agent) {
+                for (let i in agents) {
+                    if (!agents[i].alive) {
+                        continue;
+                    }
+
+                    request.post({
+                        json : true,
+                        url: agents[agents[i].key].defaultUrl + "/api/plugins/delete",
+                        body: {name:name,key:i}
+                    },(err,res,body)=>{
+                        console.log(err);
+                        resolve();
+                    });
+                }
+            } else {
+                winston.log('info', "Sending request to agent");
+                request.post({
+                    json : true,
+                    url: agents[agent.key].defaultUrl + "/api/plugins/delete",
+                    body:{name:name,key:i}
+                }, function (err, res, body) {
+                    winston.log('info', res, body);
+                    resolve();
+                });
+                
+            }
+        })
+    },
+    
     /* restarting the agents live status, and updating the status for all agents */
     restartAgentsStatus: () => {
         agents = {};

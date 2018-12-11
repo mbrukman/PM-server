@@ -9,6 +9,7 @@ const env = require("../../env/enviroment");
 const agentsService = require("./agents.service");
 const models = require("../models");
 const Plugin = models.Plugin;
+const rimraf = require('rimraf')
 var pluginConfigValidationSchema = require('../validation-schema/plugin-config.schema')
 let pluginsPath = path.join(
   path.dirname(path.dirname(__dirname)),
@@ -23,6 +24,16 @@ let pluginsTmpPath = path.join(
 
 function installPluginOnAgent(pluginDir, obj) {
   agentsService.installPluginOnAgent(pluginDir);
+}
+
+function deletePluginOnAgent(name){
+  agentsService.deletePluginOnAgent(name)
+}
+
+function deletePluginOnServer(name){
+  rimraf(`libs/plugins/${name}`,function(res,err){
+    console.log(err)
+  })
 }
 
 function copyPluginImageFile(obj, extPath) {
@@ -205,8 +216,21 @@ module.exports = {
     });
   },
   pluginDelete: id => {
-    return Plugin.remove({ _id: id });
+    return Plugin.findById(id)
+    .then((obj)=>{
+      if (obj.type === "executer") {
+        deletePluginOnAgent(obj.name);
+      } else if (
+        obj.type === "trigger" ||
+        obj.type === "module" ||
+        obj.type === "server"
+      ) {
+        deletePluginOnServer(obj.name);
+      } else return reject("No type was provided for this plugin");
+      return Plugin.remove({ _id: id });
+    })
   },
+
   getPlugin: id => {
     return Plugin.findOne({ _id: id });
   },
