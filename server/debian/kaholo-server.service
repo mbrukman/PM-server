@@ -1,0 +1,12 @@
+[Unit]
+Description=Kaholo server
+After=network-online.target
+
+[Service]
+Restart=always
+WorkingDirectory=/var/lib/kaholo/kaholo-server
+ExecStart=/usr/bin/nodejs /var/lib/kaholo/kaholo-server/app.js 
+
+[Install]
+WantedBy=multi-user.target
+
