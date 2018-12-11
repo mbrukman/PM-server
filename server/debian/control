@@ -10,5 +10,4 @@ Package: kaholo-server
 Version: {{version}}
 Architecture: all
 Depends: nodejs (>= 10.13.0)
-Maintainer: Your Name <you@email.com>
 Description: description
