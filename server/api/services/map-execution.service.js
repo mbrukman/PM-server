@@ -1472,7 +1472,8 @@ module.exports = {
                     map: { $first: "$map" },
                 }
             },
-            { $sort: { "exec.startTime": -1 } }
+            { $sort: { "exec.startTime": -1 } },
+            { $limit: 16 }
         ]).then(res => {
             return Map.populate(res, { path: 'map' })
         })

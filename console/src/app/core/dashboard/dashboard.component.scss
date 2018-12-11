@@ -26,19 +26,19 @@
     margin : 0;
     width: 100%;
     .grid-view{
-      justify-content: space-between;
-        .dashboard-card :nth-child(4n){
-          margin-right: 0px;
-        }
+        width: 100%;
         .dashboard-card {
-
+          margin-right: 25px;
           margin-bottom: 30px;
-          width: calc(25% - 22px);
+          width: calc(25% - 20px);
           max-width: 452px;
           overflow-y: auto;
           height: fit-content;
           cursor: pointer;
 
+          &:nth-child(4n){
+          margin-right: 0px;
+          }
           .card-body{
             display: flex;
             font-family: Roboto;

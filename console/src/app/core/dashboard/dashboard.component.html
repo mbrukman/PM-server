@@ -5,7 +5,7 @@
 <div class="container-fluid">
   <div class="content-wrapper" [ngSwitch]="mode" *ngIf="executions">
     <div class="row grid-view" *ngSwitchCase="'grid'">
-        <div class="card dashboard-card" *ngFor="let item of executions.slice(0,16)"  [routerLink]="['/maps',item.map.id, 'results']" >
+        <div class="card dashboard-card" *ngFor="let item of executions"  [routerLink]="['/maps',item.map.id, 'results']" >
           <div class="card-body">
               <div class="content-card">
                 <h5 class="card-title">{{ item.map.name }}</h5>
