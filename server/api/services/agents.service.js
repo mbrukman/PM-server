@@ -226,6 +226,27 @@ function addSocketIdToAgent(agentKey, socket) {
     agents[agentKey].socket = socket;
 }
 
+function sendRequestToAgent(options, agent){
+    return new Promise((resolve,reject) => {
+
+        options.url = agent.defaultUrl + options.url;
+        options.method = options.method || 'POST';
+
+        if (options.body){
+            options.json = true;
+            options.body.key = agent.key;
+        }
+        else if (options.formData)
+            Object.assign(options.formData,{key : agent.key})
+
+        winston.log('info', "Sending request to agent");
+        request(options,(error, response, body) => {
+            if(error){ return reject(error)}
+            resolve(response)
+        })
+    })
+}
+
 module.exports = {
     add: (agent) => {
         return Agent.findOne({ key: agent.key }).then(agentObj => {
@@ -257,71 +278,60 @@ module.exports = {
     },
     /* send plugin file to an agent */
     installPluginOnAgent: (pluginPath, agent) => {
-        return new Promise((resolve, reject) => {
-            let formData = {
-                file: {
-                    value: fs.createReadStream(pluginPath),
-                    options: {
-                        filename: path.basename(pluginPath)
-                    }
+        let formData = {
+            file: {
+                value: fs.createReadStream(pluginPath),
+                options: {
+                    filename: path.basename(pluginPath)
                 }
-            };
-            // if there is no agents, send this plugin to all living agents
-            if (!agent) {
-                for (let i in agents) {
-                    if (!agents[i].alive) {
-                        continue;
-                    }
-
-                    request.post({
-                        url: agents[agents[i].key].defaultUrl + "/api/plugins/install",
-                        formData: Object.assign(formData, { key: i })
-                    });
-                }
-            } else {
-                winston.log('info', "Sending request to agent");
-                request.post({
-                    url: agents[agent.key].defaultUrl + "/api/plugins/install",
-                    formData: Object.assign(formData, { key: agent.key })
-                }, function (err, res, body) {
-                    winston.log('info', res, body);
-                });
-                resolve();
             }
-        })
+        };
+        // if there is no agents, send this plugin to all living agents
+        var requestOptions = {
+            url : "/api/plugins/install",
+            formData : formData
+        };
+
+        if (!agent) {
+            var requests = []
+            for (let i in agents) {
+                if (!agents[i].alive) {
+                    continue;
+                }
+                requests.push(sendRequestToAgent(requestOptions,agents[i]));
+            }
+            return Promise.all(requests);
+        } else {
+            return Promise.all([sendRequestToAgent(requestOptions,agent)]);
+        }
     },
 
-    deletePluginOnAgent: (name, agent) => {
-        return new Promise((resolve, reject) => {
-            // if there is no agents, send this plugin to all living agents
-            if (!agent) {
-                for (let i in agents) {
-                    if (!agents[i].alive) {
-                        continue;
-                    }
-
-                    request.post({
-                        json : true,
-                        url: agents[agents[i].key].defaultUrl + "/api/plugins/delete",
-                        body: {name:name,key:i}
-                    },(err,res,body)=>{
-                        console.log(err);
-                        resolve();
-                    });
+    /**
+     * 
+     * @param {string} name 
+     * @param {Agent} agent 
+     * @returns {Promise<result[]>}
+     */
+    deletePluginOnAgent: function(name, agent) {
+        // if there is no agents, send this plugin to all living agents
+        var requestOptions = {
+            body : {name:name},
+            url : "/api/plugins/delete"
+        }
+        
+        if (!agent) {
+            var requests = [];
+            for (let i in agents) {
+                if (!agents[i].alive) {
+                    continue;
                 }
-            } else {
-                winston.log('info', "Sending request to agent");
-                request.post({
-                    json : true,
-                    url: agents[agent.key].defaultUrl + "/api/plugins/delete",
-                    body:{name:name,key:i}
-                }, function (err, res, body) {
-                    winston.log('info', res, body);
-                    resolve();
-                });
-                
+
+                requests.push(sendRequestToAgent(requestOptions,agents[i]));
             }
-        })
+            return Promise.all(requests);
+        } else {
+            return Promise.all([sendRequestToAgent(requestOptions,agent)]);
+        }
     },
     
     /* restarting the agents live status, and updating the status for all agents */
@@ -428,4 +438,5 @@ module.exports = {
 
 
     }
+
 };

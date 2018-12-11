@@ -27,12 +27,15 @@ function installPluginOnAgent(pluginDir, obj) {
 }
 
 function deletePluginOnAgent(name){
-  agentsService.deletePluginOnAgent(name)
+  return agentsService.deletePluginOnAgent(name)
 }
 
 function deletePluginOnServer(name){
-  rimraf(`libs/plugins/${name}`,function(res,err){
-    console.log(err)
+  return new Promise((resolve,reject) => {
+    rimraf(`libs/plugins/${name}`,(err,res)=>{
+      if(err) return reject(err)
+      else return resolve(res)
+    })
   })
 }
 
@@ -216,17 +219,12 @@ module.exports = {
     });
   },
   pluginDelete: id => {
-    return Plugin.findById(id)
-    .then((obj)=>{
-      if (obj.type === "executer") {
-        deletePluginOnAgent(obj.name);
-      } else if (
-        obj.type === "trigger" ||
-        obj.type === "module" ||
-        obj.type === "server"
-      ) {
-        deletePluginOnServer(obj.name);
-      } else return reject("No type was provided for this plugin");
+    return Plugin.findById(id).then((obj)=>{
+      if (obj.type === "executer") 
+        return deletePluginOnAgent(obj.name)
+      else
+        return deletePluginOnServer(obj.name);
+    }).then(()=>{
       return Plugin.remove({ _id: id });
     })
   },
