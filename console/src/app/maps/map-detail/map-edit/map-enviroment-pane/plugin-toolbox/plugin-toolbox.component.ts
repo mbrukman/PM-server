@@ -181,7 +181,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
       plugins.push(imageModel);
       iteration++;
     });
-    this.stencilPaper.setDimensions(250, iteration * 80);
+    this.stencilPaper.svg.style.height = `${iteration * 42}px`
     this.stencilGraph.clear();
     this.stencilGraph.addCells(plugins);
   }
