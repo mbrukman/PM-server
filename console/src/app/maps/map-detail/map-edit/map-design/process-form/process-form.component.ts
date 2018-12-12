@@ -109,6 +109,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * if the plugin has autocomplete method it generates them
    */
   generateAutocompleteParams() {
+    if (!this.plugin) return;
     Observable.from(this.plugin.methods)
       .filter(method => this.methodHaveParamType(method, 'autocomplete')) // check if has autocomplete
       .flatMap(method => {

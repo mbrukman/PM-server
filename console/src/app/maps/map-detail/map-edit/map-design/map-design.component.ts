@@ -128,6 +128,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           this.graph.getElements().forEach(cell => {
             this.deselectCell(cell);
           });
+    
           this.defaultContent = JSON.stringify(this.graph.toJSON());
           if ((<any>structure).imported) {
             delete (<any>structure).imported;
@@ -194,7 +195,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   defineShape() {
     joint.shapes.devs['MyImageModel'] = joint.shapes.devs.Model.extend({
 
-      markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
+      markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><image class="warning"/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
 
       defaults: joint.util.deepSupplement({
 
@@ -232,6 +233,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
             'x-alignment': 'middle',
             'y-alignment': 'middle'
           },
+          
           '.inPorts circle': {
             fill: '#c8c8c8'
           },
@@ -339,7 +341,27 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   drawGraph() {
     if (this.mapStructure.content) {
-      this.graph.fromJSON(JSON.parse(this.mapStructure.content));
+      var cells = JSON.parse(this.mapStructure.content).cells
+      for(let i=0, cellsLength = cells.length; i<cellsLength; i++){
+        if(cells[i].type != 'devs.MyImageModel')
+          continue;
+        
+        var pluginName;
+        for (let j=0, procLength = this.mapStructure.processes.length; j<procLength; j++){
+          if (cells[i].id == this.mapStructure.processes[j].uuid){
+            pluginName =  this.mapStructure.processes[j].used_plugin.name;
+            break;
+          }
+        }
+
+        if (!pluginName) continue;
+        this.checkProcessWarning(this.checkPluginExist(pluginName),cells[i].attrs)
+      }
+      
+      var content = JSON.parse(this.mapStructure.content);
+      content.cells = cells;
+      this.graph.fromJSON(content);
+
     } else {
       let startNode = new joint.shapes.devs['PMStartPoint']({
         position: {
@@ -390,6 +412,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
                 'x-alignment': 'middle',
                 'y-alignment': 'middle'
               },
+              
               '.inPorts circle': {
                 fill: '#c80f15'
               },
@@ -398,8 +421,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
               }
             }
           });
+          
+          this.checkProcessWarning(this.checkPluginExist(process.used_plugin.name),imageModel)
           this.graph.addCell(imageModel);
-
         });
 
         if (this.mapStructure.links.length) {
@@ -609,6 +633,31 @@ center(){
 
   deselectCell(cell) {
     cell.attr('rect/fill', '#2d3236');
+  }
+
+  checkPluginExist(name){
+    for(let i=0, pluginsLength = this.plugins.length; i<pluginsLength; i++){
+      if(name == this.plugins[i].name){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  checkProcessWarning(isExist,model){
+    if(!isExist){
+      model['.warning']={
+          'xlink:href': 'assets/images/warning.png',
+            width: 25,
+            height: 25,
+            'ref-x': 113,
+            'ref-y': 55,
+            ref: 'rect',
+            'x-alignment': 'right',
+            'y-alignment': 'top'
+      }
+    }
+    else  model['.warning']= {}
   }
 
   private onMapContentUpdate(){
