@@ -24,7 +24,7 @@ export class SearchComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit() {
-    this.onKeyUp()
+    this.onKeyUp(5)
   }
 
   ngOnDestroy() {
@@ -36,21 +36,17 @@ export class SearchComponent implements OnDestroy, OnInit {
     }
   }
 
-  onKeyUp() {
+  onKeyUp(limit ?: number ) {
     this.maps = this.projects = null;
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
       this.loading = true;
-      this.mapReq = this.mapsService.filterMaps(null, null, null, this.query).subscribe(data => {
-        if (data) {
-          this.maps = this.query ? data.items : data.items.slice(0, 5);
-        }
-        this.loading = false;
+      this.mapReq = this.mapsService.filterMaps(null, null, null,limit, this.query).subscribe(data => {
+      this.maps = data ? data.items : null;  
+      this.loading = false;
       });
-      this.projectReq = this.projectsService.filter(null, null, null, this.query).subscribe(data => {
-        if (data) {
-          this.projects = this.query ? data.items : data.items.slice(0, 5);
-        }
+      this.projectReq = this.projectsService.filter(null, null, null, limit, this.query).subscribe(data => {
+        this.projects = data ? data.items : null;
         this.loading = false;
       });
     }, 400);

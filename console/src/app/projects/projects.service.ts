@@ -27,7 +27,7 @@ export class ProjectsService {
     return this.http.get<Project>(serverUrl + 'api/projects/' + projectId);
   }
 
-  filter(fields?: any, sort?: string, page?: number, globalFilter?: string) {
+  filter(fields?: any, sort?: string, page?: number, limit?:number, globalFilter?: string) {
     let params = new HttpParams();
     if (fields) {
       Object.keys(fields).map(key => {
@@ -42,6 +42,9 @@ export class ProjectsService {
     }
     if (globalFilter) {
       params = params.set('globalFilter', globalFilter);
+    }
+    if (limit) {
+      params = params.set('limit', limit.toString());
     }
     return this.http.get<{ totalCount: number, items: Project[] }>(`${serverUrl}api/projects`, { params: params });
   }

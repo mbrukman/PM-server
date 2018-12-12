@@ -63,6 +63,9 @@ module.exports = {
             // apply paging. if no paging, return all
             p.limit(PAGE_SIZE).skip((query.page - 1) * PAGE_SIZE)
         }
+        else if (query.limit) {
+            p.limit(Number(query.limit));
+        }
 
         return p.then(projects => {
             return module.exports.count(q).then(r => {

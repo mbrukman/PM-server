@@ -24,9 +24,9 @@ export class ProjectsListComponent implements OnInit {
 
   ngOnInit() {
     this.projectsReq = this.projectsService.filter(null, null, this.page).subscribe(this.onDataLoad);
-    this.projectsService.filter(null, '-createdAt', this.page).take(1).subscribe(data => {
+    this.projectsService.filter(null, '-createdAt', null, 4).subscribe(data => {
       if (data)
-        this.featuredProjects = data.items.slice(0, 4);
+        this.featuredProjects = data.items;
       // console.log(">>", this.featuredProjects);
     });
   }
@@ -40,7 +40,7 @@ export class ProjectsListComponent implements OnInit {
         sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.projectsService.filter(fields, sort, page, this.filterTerm).subscribe(this.onDataLoad);
+    this.projectsService.filter(fields, sort, page, null,this.filterTerm).subscribe(this.onDataLoad);
   }
 
   onDataLoad(data){

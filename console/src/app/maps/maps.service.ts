@@ -46,7 +46,7 @@ export class MapsService {
     return this.http.get<Map>(`${serverUrl}api/maps/${id}`);
   }
 
-  filterMaps(fields?: any, sort?: string, page?: number, globalFilter?: string) {
+  filterMaps(fields?: any, sort?: string, page?: number, limit? :number,  globalFilter?: string) {
     let params = new HttpParams();
     if (fields) {
       Object.keys(fields).map(key => {
@@ -62,6 +62,11 @@ export class MapsService {
     if (globalFilter) {
       params = params.set('globalFilter', globalFilter);
     }
+    
+    if (limit) {
+      params = params.set('limit', limit.toString());
+    }
+
     return this.http.get<{ items: Map[],totalCount: number}>(`${serverUrl}api/maps`, { params: params });
   }
 
