@@ -25,9 +25,9 @@ export class MapsListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.mapReq = this.mapsService.filterMaps(null, null, this.page).subscribe(this.onDataLoad);
-    this.mapsService.filterMaps(null, '-createdAt', this.page).take(1).subscribe(data => {
+    this.mapsService.filterMaps(null, '-createdAt', null, 4).subscribe(data => {
       if (data)
-        this.featuredMaps = data.items.slice(0, 4);
+        this.featuredMaps = data.items;
     });
   }
 
@@ -45,7 +45,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
       }
     }
    
-    this.mapReq = this.mapsService.filterMaps(fields, sort, page, this.filterTerm).subscribe(this.onDataLoad);
+    this.mapReq = this.mapsService.filterMaps(fields, sort, page, null, this.filterTerm).subscribe(this.onDataLoad);
     
     
   }

@@ -83,6 +83,9 @@ module.exports = {
             // apply paging. if no paging, return all
             m.limit(PAGE_SIZE).skip((query.page - 1) * PAGE_SIZE);
         }
+        else if (query.limit) {
+            m.limit(Number(query.limit));
+        }
         return m.then(maps => {
             let mapsId = maps.map(map=> map.id);
             // searching project in DB when maps holds an array with a least one element of the mapsId
