@@ -12,7 +12,7 @@
                 <p class="trigger-by">Trigger:  {{ item.exec.trigger }}</p>
                 <p>Last run: {{ item.exec.startTime | date: 'short' }}</p>
                 <!-- <p>Status:   {{ item.status}}</p> -->
-                <div class="content">Project: &nbsp;<a class="link" *ngIf="!isEnabled"  (click)="goToProject($event, item.map.project.id)" > {{ item.map.project.name}}</a> </div>
+                <div class="project">Project: &nbsp;<a class="link" *ngIf="!isEnabled"  (click)="goToProject($event, item.map.project.id)" > {{ item.map.project.name}}</a> </div>
               </div>
               <div class="chart-wrapper">
                 <ngx-charts-pie-chart [results]="item.status" [labels]="showLabels" [scheme]="colorScheme" [doughnut]="true" [view]="[130,130]">
