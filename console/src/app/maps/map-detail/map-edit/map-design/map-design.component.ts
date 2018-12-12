@@ -648,10 +648,10 @@ center(){
     if(!isExist){
       model['.warning']={
           'xlink:href': 'assets/images/warning.png',
-            width: 25,
-            height: 25,
-            'ref-x': 113,
-            'ref-y': 55,
+            width: 19,
+            height: 19,
+            'ref-x': 98,
+            'ref-y': 52,
             ref: 'rect',
             'x-alignment': 'right',
             'y-alignment': 'top'
