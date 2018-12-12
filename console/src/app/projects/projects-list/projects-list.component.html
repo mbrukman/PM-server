@@ -14,7 +14,7 @@
     <h5 class="section-sub-title">All projects</h5>
     <div class="form-check">
       <label class="form-check-label">
-        <input id="archive" type="checkbox" class="form-check-input" (change)="getArchive()" [(ngModel)]="filterOptions.isArchived">
+        <input id="archive" type="checkbox" class="form-check-input" (change)="reloadProjects()" [(ngModel)]="filterOptions.isArchived">
         Show archived projects
       </label>
     </div>

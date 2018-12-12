@@ -24,17 +24,15 @@ export class ProjectsListComponent implements OnInit {
   }
 
   ngOnInit() {
-
-    this.projectsReq  = this.projectsService.filter(null, null, this.page,this.filterOptions).subscribe(this.onDataLoad);
-
-    this.projectsService.filter(null, '-createdAt', this.page,{isArchived:false,globalFilter:null}).take(1).subscribe(data => {
+    this.reloadProjects()
+    this.projectsService.filter(null, '-createdAt', this.page,this.filterOptions).take(1).subscribe(data => {
       if (data)
         this.featuredProjects = data.items.slice(0, 4);
       // console.log(">>", this.featuredProjects);
     });
   }
 
-  getArchive(){
+  reloadProjects(){
     this.projectsReq  = this.projectsService.filter(null, null, this.page,this.filterOptions).subscribe(this.onDataLoad);
   }
 
@@ -47,7 +45,7 @@ export class ProjectsListComponent implements OnInit {
         sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.getArchive()
+    this.reloadProjects()
   }
 
   onDataLoad(data){
