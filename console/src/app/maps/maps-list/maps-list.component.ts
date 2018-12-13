@@ -34,8 +34,8 @@ export class MapsListComponent implements OnInit, OnDestroy {
     });
   }
   
-  reloadMaps(fields=null,page=this.page,filter?:FilterOptions){
-    this.mapReq = this.mapsService.filterMaps(fields,page,this.filterOptions).subscribe(this.onDataLoad);
+  reloadMaps(fields=null,page=this.page,filter=this.filterOptions){
+    this.mapReq = this.mapsService.filterMaps(fields,page,filter).subscribe(this.onDataLoad);
   }
 
   ngOnDestroy() {

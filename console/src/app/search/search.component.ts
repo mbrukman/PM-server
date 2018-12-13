@@ -41,7 +41,7 @@ export class SearchComponent implements OnDestroy {
         this.maps = data.items;
         this.loading = false;
       });
-      this.projectReq = this.projectsService.filter(null, null, null, {isArchived:false,globalFilter:this.query,sort:'-createdAt'}).subscribe(data => {
+      this.projectReq = this.projectsService.filter(null, null, {isArchived:false,globalFilter:this.query,sort:'-createdAt'}).subscribe(data => {
         this.projects = data.items;
         this.loading = false;
       });

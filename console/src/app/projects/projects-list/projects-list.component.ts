@@ -25,15 +25,15 @@ export class ProjectsListComponent implements OnInit {
 
   ngOnInit() {
     this.reloadProjects()
-    this.projectsService.filter(null, '-createdAt', this.page,this.filterOptions).take(1).subscribe(data => {
+    this.projectsService.filter(null, this.page,this.filterOptions).take(1).subscribe(data => {
       if (data)
         this.featuredProjects = data.items.slice(0, 4);
       // console.log(">>", this.featuredProjects);
     });
   }
 
-  reloadProjects(){
-    this.projectsReq  = this.projectsService.filter(null, null, this.page,this.filterOptions).subscribe(this.onDataLoad);
+  reloadProjects(fields=null,page=this.page,filter=this.filterOptions){
+    this.projectsReq = this.projectsService.filter(fields,page,filter).subscribe(this.onDataLoad);
   }
 
   loadProjectLazy(event) {
@@ -45,7 +45,8 @@ export class ProjectsListComponent implements OnInit {
         sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.reloadProjects()
+    this.filterOptions.sort = sort
+    this.reloadProjects(fields,page,this.filterOptions)
   }
 
   onDataLoad(data){
