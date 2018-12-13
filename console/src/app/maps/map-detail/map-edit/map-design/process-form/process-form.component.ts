@@ -18,7 +18,7 @@ import { PluginsService } from '@plugins/plugins.service';
 import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
 import { BsModalService } from 'ngx-bootstrap';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
-import {PluginDeletedComponent} from '@maps/map-detail/map-edit/map-design/plugindeleted-popup/plugindeleted-popup.component'
+import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import {FLOW_CONTROL_TYPES, COORDINATION_TYPES}  from '@maps/contants'
 
 @Component({
@@ -152,18 +152,31 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   /**
    * Add a new action to process
    */
-  addNewAction() {
+
+  manageAction(action){
     if(this.processViewWrapper.plugin){
+      return action();
+    }
+    else{
+      this.bsModalRef = this.modalService.show(ConfirmComponent);
+      this.bsModalRef.content.title = 'Plugin missing'
+      this.bsModalRef.content.message = 'The process is using the plugin ' + this.processViewWrapper.process.used_plugin.name +' which have been removed.\nPlease reinstall the plugin to enable editing.';
+      this.bsModalRef.content.cancel = null;
+      this.bsModalRef.content.confirm = 'Confirm'
+    }
+  }
+
+  addNewAction() {
+    this.manageAction(()=>{
       const actionControl = <FormArray>this.processForm.controls['actions'];
       actionControl.push(this.initActionController());
       this.editAction(actionControl.length - 1); // switch to edit the new action
-    }
-    else {
-      this.bsModalRef = this.modalService.show(PluginDeletedComponent);
-      this.bsModalRef.content.pluginName = this.processViewWrapper.process.used_plugin.name
-    }
-    
+    })
   }
+
+    
+    
+  
 
   backToProcessView() {
     this.action = false;
@@ -184,14 +197,10 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @param {number} index
    */
   editAction(index: number) {
-    if(this.processViewWrapper.plugin){
-      this.index = index;
-      this.action = true;
-    }
-    else{
-      this.bsModalRef = this.modalService.show(PluginDeletedComponent);
-      this.bsModalRef.content.pluginName = this.processViewWrapper.process.used_plugin.name
-    }
+      this.manageAction(()=>{
+        this.action = true;
+        this.index = index;
+      })
   }
 
   /**

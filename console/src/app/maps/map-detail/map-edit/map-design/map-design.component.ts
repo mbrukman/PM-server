@@ -360,12 +360,16 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         
         for (let j=0, procLength = this.mapStructure.processes.length; j<procLength; j++){
           if (cells[i].id == this.mapStructure.processes[j].uuid){
-            this.checkProcessWarning(this.checkPluginExist(this.mapStructure.processes[j]),cells[i].attrs)
+            this.processViewWrapper = new ProcessViewWrapper(this.mapStructure.processes[j],this.mapStructure,this.plugins)
+            if(!this.processViewWrapper.plugin){
+              this.checkProcessWarning(cells[i].attrs)
+            }
+            else cells[i].attrs['.warning']={}
             break;
           }
         }
       }
-      this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure,this.plugins)
+      
       var content = JSON.parse(this.mapStructure.content);
       content.cells = cells;
       this.graph.fromJSON(content);
@@ -430,7 +434,11 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
             }
           });
           this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure,this.plugins)
-          this.checkProcessWarning(this.checkPluginExist(process),imageModel)
+          if(!this.processViewWrapper.plugin){
+            this.checkProcessWarning(imageModel)
+          }
+          else imageModel['.warning']={}
+          
           this.graph.addCell(imageModel);
         });
 
@@ -656,8 +664,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     return false;
   }
 
-  checkProcessWarning(isExist,model){
-    if(!isExist){
+  checkProcessWarning(model){
+    
       model['.warning']={
           'xlink:href': 'assets/images/warning.png',
             width: 19,
@@ -669,8 +677,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
             'y-alignment': 'top'
       }
     }
-    else  model['.warning']= {}
-  }
+
+  
 
   private onMapContentUpdate(){
     let graphContent = JSON.stringify(this.graph.toJSON());
