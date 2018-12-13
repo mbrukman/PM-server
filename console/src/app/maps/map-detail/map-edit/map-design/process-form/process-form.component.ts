@@ -48,7 +48,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     private socketService: SocketService,
     private pluginsService: PluginsService,
     private mapDesignService: MapDesignService,
-    private modalService:BsModalService
+    private modalService: BsModalService
+    
   ) {
     this.COORDINATION_TYPES = COORDINATION_TYPES;
     this.FLOW_CONTROL_TYPES = FLOW_CONTROL_TYPES;
@@ -152,14 +153,14 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * Add a new action to process
    */
   addNewAction() {
-    if(this.process.isPluginExist){
+    if(this.processViewWrapper.plugin){
       const actionControl = <FormArray>this.processForm.controls['actions'];
       actionControl.push(this.initActionController());
       this.editAction(actionControl.length - 1); // switch to edit the new action
     }
     else {
       this.bsModalRef = this.modalService.show(PluginDeletedComponent);
-      this.bsModalRef.content.pluginName = this.process.used_plugin.name
+      this.bsModalRef.content.pluginName = this.processViewWrapper.process.used_plugin.name
     }
     
   }
@@ -183,13 +184,13 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @param {number} index
    */
   editAction(index: number) {
-    if(this.process.isPluginExist){
+    if(this.processViewWrapper.plugin){
       this.index = index;
       this.action = true;
     }
     else{
       this.bsModalRef = this.modalService.show(PluginDeletedComponent);
-      this.bsModalRef.content.pluginName = this.process.used_plugin.name
+      this.bsModalRef.content.pluginName = this.processViewWrapper.process.used_plugin.name
     }
   }
 

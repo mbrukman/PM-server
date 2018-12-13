@@ -153,7 +153,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   deselectAllCellsAndUpdateStructure() {
 
     if (this.process) {
-      this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure)
+      this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure,this.plugins)
     } else {
       this.processViewWrapper = null
     }
@@ -365,7 +365,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           }
         }
       }
-      
+      this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure,this.plugins)
       var content = JSON.parse(this.mapStructure.content);
       content.cells = cells;
       this.graph.fromJSON(content);
@@ -429,7 +429,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
               }
             }
           });
-        
+          this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure,this.plugins)
           this.checkProcessWarning(this.checkPluginExist(process),imageModel)
           this.graph.addCell(imageModel);
         });
@@ -477,7 +477,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.paper.setDimensions(this.wrapper.nativeElement.offsetWidth - 250, this.wrapper.nativeElement.offsetHeight);
     this.process = process;
    
-    this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure)
+    this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure,this.plugins)
 
     if (this.editing) {
       this.editing = false;
@@ -647,16 +647,13 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     cell.attr('rect/fill', '#2d3236');
   }
 
-<<<<<<< HEAD
   checkPluginExist(process){
     for(let i=0, pluginsLength = this.plugins.length; i<pluginsLength; i++){
       if(process.used_plugin.name == this.plugins[i].name){
-        process.isPluginExist = true;
-        return process.isPluginExist;
+        return true;
       }
     }
-    process.isPluginExist = false;
-    return process.isPluginExist;
+    return false;
   }
 
   checkProcessWarning(isExist,model){
@@ -676,9 +673,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   private onMapContentUpdate(){
-=======
-  private onMapContentUpdate() {
->>>>>>> develop
     let graphContent = JSON.stringify(this.graph.toJSON());
     if (graphContent != this.defaultContent) {
       this.mapStructure.content = graphContent;
