@@ -61,8 +61,9 @@ module.exports = {
             p.sort(filterOptions.options.sort)
         }
         if (filterOptions.page) {
+            var pageSize = filterOptions.options.limit || PAGE_SIZE;
             // apply paging. if no paging, return all
-            p.limit(PAGE_SIZE).skip((filterOptions.page - 1) * PAGE_SIZE)
+            p.limit(pageSize).skip((filterOptions.page - 1) * pageSize)
         }
 
         return p.then(projects => {

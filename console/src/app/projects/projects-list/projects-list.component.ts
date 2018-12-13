@@ -25,9 +25,12 @@ export class ProjectsListComponent implements OnInit {
 
   ngOnInit() {
     this.reloadProjects()
+
+    let featuredFilterOptions = new FilterOptions();
+    featuredFilterOptions.limit = 4;
     this.projectsService.filter(null, this.page,this.filterOptions).take(1).subscribe(data => {
       if (data)
-        this.featuredProjects = data.items.slice(0,4);
+        this.featuredProjects = data.items;
     });
   }
 

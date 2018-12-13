@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import * as _ from 'lodash';
 import 'rxjs/operators/take';
 import { MapsService } from '../maps.service';
 import { Map } from '../models/map.model';
@@ -28,9 +29,12 @@ export class MapsListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.reloadMaps();
-    this.mapsService.filterMaps(null,this.page,this.filterOptions).take(1).subscribe(data => {
+
+    var featureOptions = _.clone(this.filterOptions);
+    featureOptions.limit = 4;
+    this.mapsService.filterMaps(null,this.page,featureOptions).take(1).subscribe(data => {
       if (data)
-        this.featuredMaps = data.items.slice(0,4);
+        this.featuredMaps = data.items;
     });
   }
   

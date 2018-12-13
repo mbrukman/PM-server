@@ -3,6 +3,7 @@ import { MapsService } from '../maps/maps.service';
 import { Map } from '../maps/models/map.model';
 import { Project } from '../projects/models/project.model';
 import { ProjectsService } from '../projects/projects.service';
+import { FilterOptions } from '@shared/model/filter-options.model';
 
 
 @Component({
@@ -40,12 +41,16 @@ export class SearchComponent implements OnDestroy, OnInit {
     this.maps = this.projects = null;
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
+      var filterOptions : FilterOptions = {isArchived:false,globalFilter:this.query,sort:'-createdAt'};
+      if (limit)
+        filterOptions.limit = limit;
+      
       this.loading = true;
-      this.mapReq = this.mapsService.filterMaps(null, null, {isArchived:false,globalFilter:this.query,sort:'-createdAt'}).subscribe(data => {
+      this.mapReq = this.mapsService.filterMaps(null, null, filterOptions).subscribe(data => {
         this.maps = data.items;
         this.loading = false;
       });
-      this.projectReq = this.projectsService.filter(null, null, {isArchived:false,globalFilter:this.query,sort:'-createdAt'}).subscribe(data => {
+      this.projectReq = this.projectsService.filter(null, null, filterOptions).subscribe(data => {
         this.projects = data.items;
         this.loading = false;
       });
