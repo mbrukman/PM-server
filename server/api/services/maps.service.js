@@ -89,8 +89,8 @@ module.exports = {
             // apply paging. if no paging, return all
             m.limit(PAGE_SIZE).skip((page - 1) * PAGE_SIZE);
         }
-        else if (query.limit) {
-            m.limit(Number(query.limit));
+        else if (filterOptions.limit) {
+            m.limit(Number(filterOptions.limit));
         }
         return m.then(maps => {
             let mapsId = maps.map(map=> map.id);
