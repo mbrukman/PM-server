@@ -20,10 +20,6 @@ function getMapPlugins(mapStructure) {
 
 
 module.exports = {
-    /* archiving maps in ids array */
-    archive: (mapsIds, isArchive) => {
-        return Map.update({ _id: { $in: mapsIds } }, { archived: isArchive }, { multi: true })
-    },
     /* count how many documents exist for a certain query */
     count: (filter) => {
         return Map.count(filter)
@@ -58,33 +54,43 @@ module.exports = {
         ]);
     },
 
-    filter: (query = {}) => {
+    filter: (filterOptions = {}) => {
         mapsId = [];
         let q = {};
-        if (query.fields) {
-            // This will change the fields in the query to query that we can use with mongoose (using regex for contains)
-            Object.keys(query.fields).map(key => { query.fields[key] = { '$regex': `.*${query.fields[key]}.*` }});
-            q = query.fields;
-        } else if (query.globalFilter) {
+        let fields = filterOptions.fields
+        let sort = filterOptions.options.sort
+        let page = filterOptions.page
+        if (fields) {
+            // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
+            Object.keys(fields).map(key => { fields[key] = { '$regex': `.*${fields[key]}.*` }});
+            q = fields;
+        } else if (filterOptions.options.globalFilter!=undefined) {
             // if there is a global filter, expecting or condition between name and description fields
             q = {
                 $or: [
-                    { name: { '$regex': `.*${query.globalFilter}.*` } },
-                    { description: { '$regex': `.*${query.globalFilter}.*` } }
+                    { name: { '$regex': `.*${filterOptions.options.globalFilter}.*` } },
+                    { description: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }
                 ]
             }
         }
-        let m = Map.find(q).where({ archived: false });
-        if (query.sort) {
+        let m;
+        if(filterOptions.options.isArchived){
+            m = Map.find(q);
+        }
+        else{
+            m = Map.find(q).where({archived:false});
+        }
+        
+        if (sort) {
             // apply sorting by field name. for reverse, should pass with '-'.
-            m.sort(query.sort);
+            m.sort(sort);
         }
-        if (query.page) {
+        if (page) {
             // apply paging. if no paging, return all
-            m.limit(PAGE_SIZE).skip((query.page - 1) * PAGE_SIZE);
+            m.limit(PAGE_SIZE).skip((page - 1) * PAGE_SIZE);
         }
-        else if (query.limit) {
-            m.limit(Number(query.limit));
+        else if (filterOptions.limit) {
+            m.limit(Number(filterOptions.limit));
         }
         return m.then(maps => {
             let mapsId = maps.map(map=> map.id);

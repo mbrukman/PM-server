@@ -41,12 +41,12 @@ export class SearchComponent implements OnDestroy, OnInit {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
       this.loading = true;
-      this.mapReq = this.mapsService.filterMaps(null, null, null,limit, this.query).subscribe(data => {
-      this.maps = data ? data.items : null;  
-      this.loading = false;
+      this.mapReq = this.mapsService.filterMaps(null, null, {isArchived:false,globalFilter:this.query,sort:'-createdAt'}).subscribe(data => {
+        this.maps = data.items;
+        this.loading = false;
       });
-      this.projectReq = this.projectsService.filter(null, null, null, limit, this.query).subscribe(data => {
-        this.projects = data ? data.items : null;
+      this.projectReq = this.projectsService.filter(null, null, {isArchived:false,globalFilter:this.query,sort:'-createdAt'}).subscribe(data => {
+        this.projects = data.items;
         this.loading = false;
       });
     }, 400);

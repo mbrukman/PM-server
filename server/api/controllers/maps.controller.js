@@ -1,6 +1,7 @@
 const winston = require("winston");
 
 const mapsService = require("../services/maps.service");
+const archiveService = require("../services/archive.service");
 const projectsService = require("../services/projects.service");
 const mapsExecutionService = require("../services/map-execution.service");
 const triggersService = require("../services/triggers.service");
@@ -10,7 +11,7 @@ const hooks = require("../../libs/hooks/hooks");
 module.exports = {
     /* archive a map */
     archive: (req, res) => {
-        mapsService.archive([req.params.id], req.body.isArchive).then(map => {
+        archiveService.archiveMaps([req.params.id], req.body.isArchive).then(map => {
             return res.status(204).send();
         }).catch(error => {
             winston.log('error', "Error archiving map", error);
@@ -129,9 +130,9 @@ module.exports = {
         });
     },
     filter: (req, res) => {
-        let query = req.query;
+        let body = req.body;
         hooks.hookPre('map-filter', req).then(() => {
-            return mapsService.filter(query);
+            return mapsService.filter(body);
         }).then(data => {
             if (!data || data.totalCount === 0) {
                 return res.status(204).send();
