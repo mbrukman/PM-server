@@ -14,16 +14,23 @@
     min-width: $sidebar-Width;
 
     flex-grow: 1;
-    background-color: $turquoise-blue;
+    background-color: $pale-blue;
     display: flex;
     flex-direction: column;
-    padding: 40px 5px 0;
+    padding: 0px 5px 0;
     align-items: center;
-
     img {
       width: 40px;
       margin-bottom: 30px;
     }
+
+  .logo-wrapper{
+    background-color: $dark-blue;
+    img{
+    margin: 15px;
+    height: 40px;
+  }
+}
 
   }
   .main {
