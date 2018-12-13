@@ -178,6 +178,14 @@ function updateActionContext(runId, agentKey, processKey, processIndex, actionKe
     // If action have a result (i.e. done) set to previous action;
     if (actionData.result)
         executions[runId].executionAgents[agentKey].executionContext.previousAction = executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[actionKey];
+        updatecurrentAgentContext(runId,agentKey);
+}
+
+
+function updatecurrentAgentContext(runId,agentKey){
+    executions[runId].executionAgents[agentKey].executionContext.currentAgent.name = executions[runId].executionAgents[agentKey].name;
+    executions[runId].executionAgents[agentKey].executionContext.currentAgent.url = executions[runId].executionAgents[agentKey].url;
+    executions[runId].executionAgents[agentKey].executionContext.currentAgent.attributes = executions[runId].executionAgents[agentKey].attributes;
 }
 
 /**
