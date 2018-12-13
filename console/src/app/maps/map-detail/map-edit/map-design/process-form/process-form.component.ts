@@ -16,6 +16,7 @@ import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
 import { SocketService } from '@shared/socket.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
+import {FLOW_CONTROL_TYPES, COORDINATION_TYPES}  from '@maps/contants'
 
 @Component({
   selector: 'app-process-form',
@@ -35,24 +36,18 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   plugin: Plugin;
   methods: object = {};
   selectedMethod: PluginMethod;
+  FLOW_CONTROL_TYPES 
+  COORDINATION_TYPES
 
-  COORDINATION_TYPES = {
-    wait: 'Wait for all',
-    race: 'Run once for first',
-    each: 'Run for each in link'
-  };
-
-  FLOW_CONTROL_TYPES = {
-    wait: 'Wait for all agents and then run',
-    race: 'Run only for first agent',
-    each: 'Run for each agent'
-  };
 
   constructor(
     private socketService: SocketService,
     private pluginsService: PluginsService,
     private mapDesignService: MapDesignService
-  ) {}
+  ) {
+    this.COORDINATION_TYPES = COORDINATION_TYPES;
+    this.FLOW_CONTROL_TYPES = FLOW_CONTROL_TYPES;
+   }
 
   ngOnInit() {
     if (!this.processViewWrapper.process) {
@@ -62,14 +57,14 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     this.processForm = Process.getFormGroup(this.processViewWrapper.process);
 
     this.processUpdateSubscription = this.mapDesignService
-    .getUpdateProcessAsObservable()
-    .filter(process => process.uuid === this.processViewWrapper.process.uuid)
-    .subscribe(process => {
-      this.processForm.get('coordination').setValue(process.coordination);
-    });
-    
+      .getUpdateProcessAsObservable()
+      .filter(process => process.uuid === this.processViewWrapper.process.uuid)
+      .subscribe(process => {
+        this.processForm.get('coordination').setValue(process.coordination);
+      });
+
     // this.process = new Process(this.process);
-    
+
     if (this.processViewWrapper.process.actions) {
       this.processViewWrapper.process.actions.forEach((action, actionIndex) => {
         const actionControl = <FormArray>this.processForm.controls['actions'];
@@ -81,10 +76,10 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         }
       });
     }
-    
+
     this.plugin = _.cloneDeep(this.processViewWrapper.process.plugin);
     this.generateAutocompleteParams();
-    
+
     // subscribe to changes in form
     this.formValueChangeSubscription = this.processForm.valueChanges
       .debounceTime(300)

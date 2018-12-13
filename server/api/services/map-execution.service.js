@@ -668,9 +668,9 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
                 }
             } else if (process.coordination === 'race') {
                 if (executions[runId].executionAgents[agent.key].processes && executions[runId].executionAgents[agent.key].processes.hasOwnProperty(process.uuid)) {
-                        if(successors.length -1 == successorIdx){
-                            endRunPathResults(runId, agent, socket, map);
-                        }
+                    if (successors.length - 1 == successorIdx) {
+                        endRunPathResults(runId, agent, socket, map);
+                    }
                     return;
                 }
             }
@@ -714,25 +714,23 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
 
 
 function endRunPathResults(runId, agent, socket, map) {
-    if (!isThereProcessExecutingOnAgent(runId, agent.key)) {
-        executions[runId].executionAgents[agent.key].done = true;
-        if (areAllAgentsDone(runId)) {
-            executions[runId].executionContext.finishTime = new Date();
-            summarizeExecution(executions[runId].executionContext.map, runId, _.cloneDeep(executions[runId].executionContext), _.cloneDeep(executions[runId].executionAgents)).then((mapResult) => {
-                socket.emit('map-execution-result', mapResult);
-            });
-            MapResult.findByIdAndUpdate(executions[runId].resultObj, { $set: { finishTime: new Date(), cleanFinish: true } }, { new: true })
-                .then((mapResult) => {
-                    socket.emit('map-execution-result', mapResult);
-                });
-            delete executions[runId];
-            if (map.queue && pending.hasOwnProperty(map.id)) {
-                startPendingExecution(map.id); // starting pending execution if necessary
-                updatePending(socket);
-            }
-            updateExecutions(socket);
-        }
+    if (isThereProcessExecutingOnAgent(runId, agent.key)) { return }
+    executions[runId].executionAgents[agent.key].done = true;
+    if (!areAllAgentsDone(runId)) { return }
+    executions[runId].executionContext.finishTime = new Date();
+    summarizeExecution(executions[runId].executionContext.map, runId, _.cloneDeep(executions[runId].executionContext), _.cloneDeep(executions[runId].executionAgents)).then((mapResult) => {
+        socket.emit('map-execution-result', mapResult);
+    });
+    MapResult.findByIdAndUpdate(executions[runId].resultObj, { $set: { finishTime: new Date(), cleanFinish: true } }, { new: true })
+        .then((mapResult) => {
+            socket.emit('map-execution-result', mapResult);
+        });
+    delete executions[runId];
+    if (map.queue && pending.hasOwnProperty(map.id)) {
+        startPendingExecution(map.id); // starting pending execution if necessary
+        updatePending(socket);
     }
+    updateExecutions(socket);
 }
 
 /**

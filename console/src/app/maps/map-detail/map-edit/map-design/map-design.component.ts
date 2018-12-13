@@ -10,6 +10,7 @@ import { Link, MapStructure, Process, ProcessViewWrapper } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { Plugin } from '@plugins/models/plugin.model';
+import {COORDINATION_TYPES}  from '@maps/contants'
 
 export const linkAttrs = {
   router: { name: 'manhattan' },
@@ -151,8 +152,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   deselectAllCellsAndUpdateStructure() {
 
     if (this.process) {
-      this.processViewWrapper = new ProcessViewWrapper(this.process)
-      this.processViewWrapper.updateIsInsideLoop(this.mapStructure)
+      this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure)
     } else {
       this.processViewWrapper = null
     }
@@ -187,10 +187,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     if (ancestors.length > 1) {
       const processIndex = this.mapStructure.processes.findIndex(process => process.uuid === this.link.targetId);
       if (this.isLoopInProcessByAncestors(ancestors)) {
-        this.mapStructure.processes[processIndex].coordination = 'race';
+        this.mapStructure.processes[processIndex].coordination = COORDINATION_TYPES.race.id;
       }
       else if (!this.mapStructure.processes[processIndex].coordination) {
-        this.mapStructure.processes[processIndex].coordination = 'wait';
+        this.mapStructure.processes[processIndex].coordination =  COORDINATION_TYPES.wait.id;
       }
       this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
     }
@@ -198,7 +198,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   isLoopInProcessByAncestors(ancestors) {
-    return ancestors.filter(link => link.sourceId == link.targetId).length > 0;
+    return ancestors.find(link => link.sourceId == link.targetId) ? true : false;
   }
 
 
@@ -457,8 +457,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.paper.setDimensions(this.wrapper.nativeElement.offsetWidth - 250, this.wrapper.nativeElement.offsetHeight);
     this.process = process;
    
-    this.processViewWrapper = new ProcessViewWrapper(this.process)
-    this.processViewWrapper.updateIsInsideLoop(this.mapStructure)
+    this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure)
 
     if (this.editing) {
       this.editing = false;
