@@ -46,7 +46,7 @@
       <p-column field="name" header="Name" [sortable]="true">
         <ng-template let-col let-map="rowData" pTemplate="body">
           <div class="name-wrapper">
-            <i class="material-icons" *ngIf="map.archived">archive</i>
+            <i class="material-icons" [hidden]="!map.archived">archive</i>
             <a [routerLink]="['/maps', map.id]">{{ map.name }}</a>
           </div>
         </ng-template>

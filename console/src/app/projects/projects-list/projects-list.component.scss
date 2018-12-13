@@ -14,12 +14,14 @@
 
 .main {
     @include table();
+    display: flex;
+    align-items: center;
     .name-wrapper{
       i {
         margin-right: 10px;
       }
     }
-    
+
     a,
     button {
         &.create {

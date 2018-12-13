@@ -21,6 +21,8 @@
     }
     @include table();
     .name-wrapper{
+      display: flex;
+      align-items: center;
       i {
         margin-right: 10px;
       }
