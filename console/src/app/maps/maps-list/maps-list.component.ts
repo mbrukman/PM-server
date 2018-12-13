@@ -30,7 +30,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
     this.reloadMaps();
     this.mapsService.filterMaps(null,this.page,this.filterOptions).take(1).subscribe(data => {
       if (data)
-        this.featuredMaps = data.items;
+        this.featuredMaps = data.items.slice(0,4);
     });
   }
   
