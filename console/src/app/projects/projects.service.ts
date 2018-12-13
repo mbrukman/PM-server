@@ -31,8 +31,8 @@ export class ProjectsService {
     return this.http.post<{ totalCount: number, items: Project[] }>(`${serverUrl}api/projects`, { page, fields ,options});
   }
 
-  list(fields?: any, sort?: string, page?: number, options?:FilterOptions) {
-    return this.http.post<{ totalCount: number, items: Project[] }>(serverUrl + 'api/projects',{fields,sort,page,options});
+  list(fields?: any, page?: number, options?:FilterOptions) {
+    return this.http.post<{ totalCount: number, items: Project[] }>(serverUrl + 'api/projects',{fields,page,options});
   }
 
   update(projectId, project) {
