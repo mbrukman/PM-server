@@ -9,6 +9,7 @@ const env = require("../../env/enviroment");
 const agentsService = require("./agents.service");
 const models = require("../models");
 const Plugin = models.Plugin;
+const rimraf = require('rimraf')
 var pluginConfigValidationSchema = require('../validation-schema/plugin-config.schema')
 let pluginsPath = path.join(
   path.dirname(path.dirname(__dirname)),
@@ -23,6 +24,19 @@ let pluginsTmpPath = path.join(
 
 function installPluginOnAgent(pluginDir, obj) {
   agentsService.installPluginOnAgent(pluginDir);
+}
+
+function deletePluginOnAgent(name){
+  return agentsService.deletePluginOnAgent(name)
+}
+
+function deletePluginOnServer(name){
+  return new Promise((resolve,reject) => {
+    rimraf(`libs/plugins/${name}`,(err,res)=>{
+      if(err) return reject(err)
+      else return resolve(res)
+    })
+  })
 }
 
 function copyPluginImageFile(obj, extPath) {
@@ -205,8 +219,16 @@ module.exports = {
     });
   },
   pluginDelete: id => {
-    return Plugin.remove({ _id: id });
+    return Plugin.findById(id).then((obj)=>{
+      if (obj.type === "executer") 
+        return deletePluginOnAgent(obj.name)
+      else
+        return deletePluginOnServer(obj.name);
+    }).then(()=>{
+      return Plugin.remove({ _id: id });
+    })
   },
+
   getPlugin: id => {
     return Plugin.findOne({ _id: id });
   },

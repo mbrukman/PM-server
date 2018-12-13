@@ -22,10 +22,10 @@
       table{
         thead{
           background-color: #2d3236;
-          td{
+          tr{
             height: 53px;
             background-color: #272c2f;
-            tr{
+            td{
               height: 21px;
               font-family: Roboto;
               font-size: 18px;
@@ -37,13 +37,20 @@
         tbody{
           height: 1090px;
           background-color: #2d3236;
-          td{
+          tr{
             height: 53px;
-            tr{
+            td{
               height: 32px;
               font-family: Roboto;
               font-size: 14px;
-              color: #dddddd
+              color: #dddddd;
+              .ui-cell-data{
+                display: flex;
+                align-items: center;
+                .material-icons{
+                  margin-right: 10px
+                }
+              }
             }
           }
         }

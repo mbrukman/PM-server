@@ -1,16 +1,9 @@
 const Project = require("../models/project.model");
-const mapsService = require("./maps.service");
 const env = require("../../env/enviroment");
 
 const PAGE_SIZE = env.page_size;
 
 module.exports = {
-    /* archive project and maps */
-    archive: (projectId, isArchive) => {   
-        return Project.findByIdAndUpdate(projectId, { archived: isArchive }).then(project => {
-            return mapsService.archive(project.maps, isArchive);
-        });
-    },
     count: (filter) => {
         return Project.count(filter)
     },
@@ -25,12 +18,15 @@ module.exports = {
     },
 
     /* get project details */
-    detail: (projectId) => {
-        return Project.findById(projectId).populate(
-            {
-                path: 'maps',
-                match: { archived: false }
-            })
+    detail: (projectId,options) => {
+        
+        let populate = {
+            path:'maps'
+        }
+        if(!options.isArchived){
+            populate.match={archived:false}
+        }
+        return Project.findById(projectId).populate(populate)
     },
 
     /* delete a project */
@@ -39,29 +35,34 @@ module.exports = {
     },
 
     /* filter projects */
-    filter: (query = {}) => {
+    filter: (filterOptions = {}) => {
         let q = {};
-        if (query.fields) {
-            // This will change the fields in the query to query that we can use with mongoose (using regex for contains)
-            Object.keys(query.fields).map(key => { query.fields[key] = { '$regex': `.*${query.fields[key]}.*` }});
-            q = query.fields;
-        } else if (query.globalFilter) {
+        if (filterOptions.fields) {
+            // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
+            Object.keys(filterOptions.fields).map(key => { filterOptions.fields[key] = { '$regex': `.*${filterOptions.fields[key]}.*` }});
+            q = filterOptions.fields;
+        } else if (filterOptions.globalFilter) {
             // if there is a global filter, expecting or condition between name and description fields
             q = {
-                $or: [{ name: { '$regex': `.*${query.globalFilter}.*` } }, { description: { '$regex': `.*${query.globalFilter}.*` } }]
+                $or: [{ name: { '$regex': `.*${filterOptions.globalFilter}.*` } }, { description: { '$regex': `.*${filterOptions.globalFilter}.*` } }]
             }
         }
-        if (!query.archived) {
-            q.archived = false;
+        
+        let p;
+        if(filterOptions.options.isArchived){
+            p = Project.find(q);
         }
-        let p = Project.find(q);
-        if (query.sort) {
+        else{
+            p = Project.find(q).where({archived:false});
+        }
+
+        if (filterOptions.options.sort) {
             // apply sorting by field name. for reverse, should pass with '-'.
-            p.sort(query.sort)
+            p.sort(filterOptions.options.sort)
         }
-        if (query.page) {
+        if (filterOptions.page) {
             // apply paging. if no paging, return all
-            p.limit(PAGE_SIZE).skip((query.page - 1) * PAGE_SIZE)
+            p.limit(PAGE_SIZE).skip((filterOptions.page - 1) * PAGE_SIZE)
         }
 
         return p.then(projects => {

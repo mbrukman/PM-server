@@ -7,6 +7,10 @@
   }
 
   @include table();
+  .section-sub-title{
+    width: 68%;
+  }
+
 }
 
 .filter {

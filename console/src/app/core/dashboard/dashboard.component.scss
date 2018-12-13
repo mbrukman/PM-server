@@ -1,91 +1,76 @@
 @import "~assets/sass/variables";
 @import "~assets/sass/mixins";
-
 .mode {
-  height: 70px;
-  background-color: #25292c;;
-  padding: 28px;
-  i {
-    cursor: pointer;
-
-    &:hover {
-      color: #fff;
+    height: 70px;
+    background-color: #25292c;
+    ;
+    padding: 28px;
+    i {
+        cursor: pointer;
+        &:hover {
+            color: #fff;
+        }
+        &.active {
+            color: $turquoise-blue;
+        }
     }
-    &.active {
-      color: $turquoise-blue;
-    }
-  }
 }
-
 
 .container-fluid {
-  padding : 32px 40px 2px;
-
-  .content-wrapper{
-    display: flex;
-    margin : 0;
-    width: 100%;
-    .grid-view{
+    padding: 32px 40px 2px;
+    .content-wrapper {
+        display: flex;
+        margin: 0;
         width: 100%;
-        .dashboard-card {
-          margin-right: 25px;
-          margin-bottom: 30px;
-          width: calc(25% - 20px);
-          max-width: 452px;
-          overflow-y: auto;
-          height: fit-content;
-          cursor: pointer;
-
-          &:nth-child(4n){
-          margin-right: 0px;
-          }
-          .card-body{
-            display: flex;
-            font-family: Roboto;
-            .content-card{
-              color: #dddddd;
-            .card-title{
-              font-size: 18px;
-              line-height: 0.89;
-              color: #44acdf;
-              padding-bottom: 16px;
-            }
-        
-            .content{
-              display: flex;
-              .link{
-               color: #44acdf;
-              }
+        .grid-view {
+            width: 100%;
+            .dashboard-card {
+                margin-right: 25px;
+                margin-bottom: 30px;
+                width: calc(25% - 20px);
+                max-width: 452px;
+                overflow-y: auto;
+                height: fit-content;
+                cursor: pointer;
+                &:nth-child(4n) {
+                    margin-right: 0px;
+                }
+                .card-body {
+                    display: flex;
+                    font-family: Roboto;
+                    .content-card {
+                        color: #dddddd;
+                        width: calc(100% - 130px);
+                        .card-title {
+                            font-size: 18px;
+                            line-height: 0.89;
+                            color: #44acdf;
+                            padding-bottom: 16px;
+                        }
+                        > p {
+                          white-space: nowrap;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                        }
+                        .project {
+                            display: flex;
+                            .link {
+                                color: #44acdf;
+                            }
+                        }
+                    }
+                    .chart-wrapper {
+                        display: flex;
+                        justify-content: center;
+                        align-items: flex-start;
+                        margin-top: -20px;
+                    }
+                }
             }
         }
-
-
-              .chart-wrapper{
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                position: absolute;
-                top: 16px;
-                right: 23px;
-            }
-          }
+        .list-view {
+            margin: 0;
+            @include table();
         }
     }
-
-    .trigger-by{
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .list-view {
-      margin : 0;
-      @include table();
-    }
-
-  }
-
 }
-
-
-

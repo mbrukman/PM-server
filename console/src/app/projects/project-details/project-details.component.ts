@@ -9,6 +9,8 @@ import { Map } from '../../maps/models/map.model';
 import { ConfirmComponent } from '../../shared/confirm/confirm.component';
 import { ImportModalComponent } from './import-modal/import-modal.component';
 
+import { FilterOptions } from '@shared/model/filter-options.model'
+
 @Component({
   selector: 'app-project-details',
   templateUrl: './project-details.component.html',
@@ -21,6 +23,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   routeReq: any;
   archiveReq: any;
   filterTerm: string;
+  filterOptions : FilterOptions = new FilterOptions();
   featuredMaps: Map[];
 
   constructor(private route: ActivatedRoute,
@@ -31,18 +34,24 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.routeReq = this.route.params.subscribe(params => {
       this.id = params['id'];
-      this.projectReq = this.projectsService.detail(this.id).subscribe(project => {
-        if (!project) {
-          this.router.navigate(['NotFound'])
-        }
-        this.project = project;
-        this.featureMaps(project.maps);
-      },
-        error => {
-          this.router.navigate(['NotFound'])
-        }
-      );
+      this.getProjectDetails(true);
     });
+  }
+
+  getProjectDetails(init:boolean = false){
+    this.projectReq = this.projectsService.detail(this.id, this.filterOptions).subscribe(project => {
+      if (!project) {
+        this.router.navigate(['NotFound'])
+      }
+      this.project = project;
+
+      if(init)
+        this.featureMaps(project.maps);
+    },
+    error => {
+      this.router.navigate(['NotFound'])
+    }
+  );
   }
 
   ngOnDestroy() {

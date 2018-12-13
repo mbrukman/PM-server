@@ -1,10 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import 'rxjs/operators/take';
-
 import { MapsService } from '../maps.service';
 import { Map } from '../models/map.model';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { BsModalService } from 'ngx-bootstrap/modal';
+import { FilterOptions } from '@shared/model/filter-options.model'
 
 @Component({
   selector: 'app-maps-list',
@@ -18,17 +18,24 @@ export class MapsListComponent implements OnInit, OnDestroy {
   resultCount: number = 0;
   page: number = 1;
   featuredMaps: Map[];
+  filterOptions : FilterOptions = new FilterOptions();
+
   constructor(private mapsService: MapsService,
     private modalService: BsModalService) {
     this.onDataLoad = this.onDataLoad.bind(this)
   }
+  
 
   ngOnInit() {
-    this.mapReq = this.mapsService.filterMaps(null, null, this.page).subscribe(this.onDataLoad);
-    this.mapsService.filterMaps(null, '-createdAt', this.page).take(1).subscribe(data => {
+    this.reloadMaps();
+    this.mapsService.filterMaps(null,this.page,this.filterOptions).take(1).subscribe(data => {
       if (data)
-        this.featuredMaps = data.items.slice(0, 4);
+        this.featuredMaps = data.items;
     });
+  }
+  
+  reloadMaps(fields=null,page=this.page,filter=this.filterOptions){
+    this.mapReq = this.mapsService.filterMaps(fields,page,filter).subscribe(this.onDataLoad);
   }
 
   ngOnDestroy() {
@@ -44,10 +51,8 @@ export class MapsListComponent implements OnInit, OnDestroy {
         sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-   
-    this.mapReq = this.mapsService.filterMaps(fields, sort, page, this.filterTerm).subscribe(this.onDataLoad);
-    
-    
+    this.filterOptions.sort = sort
+    this.reloadMaps(fields,page,this.filterOptions)
   }
 
   deleteMap(id) {

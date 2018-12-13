@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@env/environment';
-
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { Map, MapExecutionLogs, MapResult, MapStructure, MapTrigger } from './models';
+import {FilterOptions} from '@shared/model/filter-options.model'
 import {MapDuplicateOptions} from './models/map-duplicate-options.model'
 
 const serverUrl = environment.serverUrl;
@@ -14,7 +14,6 @@ const serverUrl = environment.serverUrl;
 export class MapsService {
   currentMap: BehaviorSubject<Map> = new BehaviorSubject<Map>(null);
   public currentMapStructure: BehaviorSubject<MapStructure> = new BehaviorSubject<MapStructure>(null);
-
   constructor(private http: HttpClient) {
   }
 
@@ -22,8 +21,9 @@ export class MapsService {
     return this.http.get<[Map]>(`${serverUrl}api/maps`);
   }
 
-  archive(mapId) {
-    return this.http.get(`${serverUrl}api/maps/${mapId}/archive`);
+  archive(mapId :string, isArchive : boolean) {
+    let body = {isArchive : isArchive}
+    return this.http.put(`${serverUrl}api/maps/${mapId}/archive`, body);
   }
 
   clearCurrentMap() {
@@ -46,31 +46,13 @@ export class MapsService {
     return this.http.get<Map>(`${serverUrl}api/maps/${id}`);
   }
 
-  filterMaps(fields?: any, sort?: string, page?: number, globalFilter?: string) {
-    let params = new HttpParams();
-    if (fields) {
-      Object.keys(fields).map(key => {
-        params = params.set(`fields[${key}]`, fields[key]);
-      });
-    }
-    if (sort) {
-      params = params.set('sort', sort);
-    }
-    if (page) {
-      params = params.set('page', page.toString());
-    }
-    if (globalFilter) {
-      params = params.set('globalFilter', globalFilter);
-    }
-    return this.http.get<{ items: Map[],totalCount: number}>(`${serverUrl}api/maps`, { params: params });
+  filterMaps(fields?: any, page?: number,options?:FilterOptions ) {
+    return this.http.post<{ items: Map[],totalCount: number}>(`${serverUrl}api/maps`, { page, fields ,options});
   }
 
   delete(id) {
     return this.http.delete(`${serverUrl}api/maps/${id}`);
   }
-
-  
-
 
   setCurrentMap(map: Map) {
     this.currentMap.next(map);
