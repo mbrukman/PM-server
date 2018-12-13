@@ -27,8 +27,10 @@
                (onLazyLoad)="loadProjectLazy($event)"  [globalFilter]="filterTerm">
     <p-column field="name" header="Name" [sortable]="true">
       <ng-template let-col let-map="rowData" pTemplate="body">
-        <i class="material-icons" *ngIf="map.archived">archive</i>
-        <a [routerLink]="map.id">{{ map.name }}</a>
+        <div class="name-wrapper">
+          <i class="material-icons" *ngIf="map.archived">archive</i>
+          <a [routerLink]="map.id">{{ map.name }}</a>
+        </div>
       </ng-template>
     </p-column>
     <p-column field="project" header="Project" [sortable]="true">

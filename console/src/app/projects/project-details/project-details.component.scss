@@ -3,7 +3,15 @@
     .featured {
         width: 100%;
     }
+    
+    
     @include table();
+    .name-wrapper{
+      i {
+        margin-right: 10px;
+      }
+    }
+
     .row {
         a,
         button {

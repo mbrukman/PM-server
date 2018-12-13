@@ -45,8 +45,10 @@
     <p-dataTable [value]="project?.maps" [rows]="15" [paginator]="true" [pageLinks]="4" [globalFilter]="gb" *ngIf="project?.maps && project?.maps?.length > 0">
       <p-column field="name" header="Name" [sortable]="true">
         <ng-template let-col let-map="rowData" pTemplate="body">
-          <i class="material-icons" *ngIf="map.archived">archive</i>
-          <a [routerLink]="['/maps', map.id]">{{ map.name }}</a>
+          <div class="name-wrapper">
+            <i class="material-icons" *ngIf="map.archived">archive</i>
+            <a [routerLink]="['/maps', map.id]">{{ map.name }}</a>
+          </div>
         </ng-template>
       </p-column>
       <p-column field="description" header="Description" [sortable]="true">

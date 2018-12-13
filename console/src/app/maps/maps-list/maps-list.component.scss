@@ -20,6 +20,13 @@
         }
     }
     @include table();
+    .name-wrapper{
+      i {
+        margin-right: 10px;
+      }
+    }
+
+
     .section-sub-title {
         width: 68%;
     }
