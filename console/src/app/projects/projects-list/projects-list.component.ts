@@ -28,7 +28,7 @@ export class ProjectsListComponent implements OnInit {
 
     let featuredFilterOptions = new FilterOptions();
     featuredFilterOptions.limit = 4;
-    this.projectsService.filter(null, this.page,this.filterOptions).take(1).subscribe(data => {
+    this.projectsService.filter(null, this.page,featuredFilterOptions).take(1).subscribe(data => {
       if (data)
         this.featuredProjects = data.items;
     });
