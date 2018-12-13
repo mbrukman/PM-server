@@ -45,9 +45,9 @@ export class MapsService {
     return this.http.get<Map>(`${serverUrl}api/maps/${id}`);
   }
 
-  filterMaps(fields?: any, sort?: string, page?: number,options?:FilterOptions ) {
+  filterMaps(fields?: any, page?: number,options?:FilterOptions ) {
 
-    return this.http.post<{ items: Map[],totalCount: number}>(`${serverUrl}api/maps`, { page, fields, sort ,options});
+    return this.http.post<{ items: Map[],totalCount: number}>(`${serverUrl}api/maps`, { page, fields ,options});
   }
 
   delete(id) {

@@ -28,14 +28,14 @@ export class MapsListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.reloadMaps();
-    this.mapsService.filterMaps(null, '-createdAt', this.page,this.filterOptions).take(1).subscribe(data => {
+    this.mapsService.filterMaps(null,this.page,this.filterOptions).take(1).subscribe(data => {
       if (data)
         this.featuredMaps = data.items.slice(0, 4);
     });
   }
   
-  reloadMaps(){
-    this.mapReq = this.mapsService.filterMaps(null, null, this.page,this.filterOptions).subscribe(this.onDataLoad);
+  reloadMaps(fields=null,page=this.page,filter?:FilterOptions){
+    this.mapReq = this.mapsService.filterMaps(fields,page,this.filterOptions).subscribe(this.onDataLoad);
   }
 
   ngOnDestroy() {
@@ -51,9 +51,8 @@ export class MapsListComponent implements OnInit, OnDestroy {
         sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    
-    this.reloadMaps()
-    
+    this.filterOptions.sort = sort
+    this.reloadMaps(fields,page,this.filterOptions)
   }
 
   deleteMap(id) {

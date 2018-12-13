@@ -62,7 +62,7 @@ module.exports = {
         mapsId = [];
         let q = {};
         let fields = body.fields
-        let sort = body.sort
+        let sort = body.options.sort
         let page = body.page
         if (fields) {
             // This will change the fields in the body to body that we can use with mongoose (using regex for contains)

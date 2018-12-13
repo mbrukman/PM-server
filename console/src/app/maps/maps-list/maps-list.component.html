@@ -7,7 +7,7 @@
     <h5 class="section-sub-title">All maps</h5>
     <div class="form-check">
       <label class="form-check-label">
-        <input id="archive" type="checkbox" class="form-check-input" [(ngModel)]="filterOptions.isArchived" (change)="reloadMaps()" >
+        <input id="archive" type="checkbox" class="form-check-input" [(ngModel)]="filterOptions.isArchived" (change)="reloadMaps(this.filterOptions)" >
         Show archived maps
       </label>
     </div>

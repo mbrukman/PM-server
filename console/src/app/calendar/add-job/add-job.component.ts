@@ -38,7 +38,7 @@ export class AddJobComponent implements OnInit {
 
   onSelectProject() {
     const projectId = this.form.controls.project.value;
-    this.projectsService.detail(projectId,{isArchived:false,globalFilter:null}).subscribe(project => {
+    this.projectsService.detail(projectId,{isArchived:false,globalFilter:null,sort:'-createdAt'}).subscribe(project => {
       this.selectedProject = project;
     });
 
