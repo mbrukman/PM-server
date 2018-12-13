@@ -16,6 +16,9 @@ import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
 import { SocketService } from '@shared/socket.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
+import { BsModalService } from 'ngx-bootstrap';
+import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import {PluginDeletedComponent} from '@maps/map-detail/map-edit/map-design/plugindeleted-popup/plugindeleted-popup.component'
 
 @Component({
   selector: 'app-process-form',
@@ -34,6 +37,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   index: number;
   plugin: Plugin;
   methods: object = {};
+  bsModalRef: BsModalRef;
   selectedMethod: PluginMethod;
 
   COORDINATION_TYPES = {
@@ -51,7 +55,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   constructor(
     private socketService: SocketService,
     private pluginsService: PluginsService,
-    private mapDesignService: MapDesignService
+    private mapDesignService: MapDesignService,
+    private modalService:BsModalService
   ) {}
 
   ngOnInit() {
@@ -153,9 +158,16 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * Add a new action to process
    */
   addNewAction() {
-    const actionControl = <FormArray>this.processForm.controls['actions'];
-    actionControl.push(this.initActionController());
-    this.editAction(actionControl.length - 1); // switch to edit the new action
+    if(this.process.isPluginExist){
+      const actionControl = <FormArray>this.processForm.controls['actions'];
+      actionControl.push(this.initActionController());
+      this.editAction(actionControl.length - 1); // switch to edit the new action
+    }
+    else {
+      this.bsModalRef = this.modalService.show(PluginDeletedComponent);
+      this.bsModalRef.content.pluginName = this.process.used_plugin.name
+    }
+    
   }
 
   backToProcessView() {
@@ -177,8 +189,14 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @param {number} index
    */
   editAction(index: number) {
-    this.index = index;
-    this.action = true;
+    if(this.process.isPluginExist){
+      this.index = index;
+      this.action = true;
+    }
+    else{
+      this.bsModalRef = this.modalService.show(PluginDeletedComponent);
+      this.bsModalRef.content.pluginName = this.process.used_plugin.name
+    }
   }
 
   /**

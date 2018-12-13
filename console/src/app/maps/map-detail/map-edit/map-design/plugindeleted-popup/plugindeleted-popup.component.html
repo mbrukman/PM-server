@@ -1,0 +1,19 @@
+<div class="row pm-modal">
+    <div class="col-12">
+      <div class="modal-header">
+        <h4>Plugin missing</h4>
+        <button type="button" class="close" (click)="onClose()" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>The process is using the plugin {{pluginName}} which have been removed. <br> Please reinstall the plugin to enable editing.</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary btn" (click)="onClose()">Confirm</button>
+      </div>
+    </div>
+  </div>
+  

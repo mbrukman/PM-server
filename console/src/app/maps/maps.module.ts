@@ -34,7 +34,7 @@ import { MapConfigurationsComponent } from './map-detail/map-configurations/map-
 import { AddConfigurationComponent } from './map-detail/map-configurations/add-configuration/add-configuration.component';
 import { ProcessViewComponent } from './map-detail/map-revisions/process-view/process-view.component';
 import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
-
+import { PluginDeletedComponent } from '@maps/map-detail/map-edit/map-design/plugindeleted-popup/plugindeleted-popup.component';
 
 @NgModule({
   imports: [
@@ -71,8 +71,10 @@ import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplica
     ProcessListItemComponent,
     AddConfigurationComponent,
     ProcessViewComponent,
-    MapDuplicateComponent
+    MapDuplicateComponent,
+    PluginDeletedComponent
+
   ],
-  entryComponents: [SelectAgentComponent, TriggerFormComponent, SelectGroupsComponent, AddConfigurationComponent,MapDuplicateComponent]
+  entryComponents: [SelectAgentComponent, TriggerFormComponent, SelectGroupsComponent, AddConfigurationComponent,MapDuplicateComponent,PluginDeletedComponent]
 })
 export class MapsModule {}

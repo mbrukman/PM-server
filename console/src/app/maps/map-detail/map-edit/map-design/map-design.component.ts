@@ -346,16 +346,12 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         if(cells[i].type != 'devs.MyImageModel')
           continue;
         
-        var pluginName;
         for (let j=0, procLength = this.mapStructure.processes.length; j<procLength; j++){
           if (cells[i].id == this.mapStructure.processes[j].uuid){
-            pluginName =  this.mapStructure.processes[j].used_plugin.name;
+            this.checkProcessWarning(this.checkPluginExist(this.mapStructure.processes[j]),cells[i].attrs)
             break;
           }
         }
-
-        if (!pluginName) continue;
-        this.checkProcessWarning(this.checkPluginExist(pluginName),cells[i].attrs)
       }
       
       var content = JSON.parse(this.mapStructure.content);
@@ -421,8 +417,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
               }
             }
           });
-          
-          this.checkProcessWarning(this.checkPluginExist(process.used_plugin.name),imageModel)
+        
+          this.checkProcessWarning(this.checkPluginExist(process),imageModel)
           this.graph.addCell(imageModel);
         });
 
@@ -635,13 +631,15 @@ center(){
     cell.attr('rect/fill', '#2d3236');
   }
 
-  checkPluginExist(name){
+  checkPluginExist(process){
     for(let i=0, pluginsLength = this.plugins.length; i<pluginsLength; i++){
-      if(name == this.plugins[i].name){
-        return true;
+      if(process.used_plugin.name == this.plugins[i].name){
+        process.isPluginExist = true;
+        return process.isPluginExist;
       }
     }
-    return false;
+    process.isPluginExist = false;
+    return process.isPluginExist;
   }
 
   checkProcessWarning(isExist,model){
