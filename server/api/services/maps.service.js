@@ -6,7 +6,7 @@ const MapExecutionLog = require("../models/map-execution-log.model")
 const MapTrigger = require("../models/map-trigger.model")
 const MapResult = require("../models/map-results.model")
 const Project = require("../models/project.model")
-
+const proejctServise = require("./projects.service")
 const PAGE_SIZE = env.page_size;
 
 
@@ -20,10 +20,6 @@ function getMapPlugins(mapStructure) {
 
 
 module.exports = {
-    /* archiving maps in ids array */
-    archive: (mapsIds, isArchive) => {
-        return Map.update({ _id: { $in: mapsIds } }, { archived: isArchive }, { multi: true })
-    },
     /* count how many documents exist for a certain query */
     count: (filter) => {
         return Map.count(filter)
@@ -58,27 +54,27 @@ module.exports = {
         ]);
     },
 
-    filter: (body = {}) => {
+    filter: (filterOptions = {}) => {
         mapsId = [];
         let q = {};
-        let fields = body.fields
-        let sort = body.options.sort
-        let page = body.page
+        let fields = filterOptions.fields
+        let sort = filterOptions.options.sort
+        let page = filterOptions.page
         if (fields) {
-            // This will change the fields in the body to body that we can use with mongoose (using regex for contains)
+            // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
             Object.keys(fields).map(key => { fields[key] = { '$regex': `.*${fields[key]}.*` }});
             q = fields;
-        } else if (body.options.globalFilter!=undefined) {
+        } else if (filterOptions.options.globalFilter!=undefined) {
             // if there is a global filter, expecting or condition between name and description fields
             q = {
                 $or: [
-                    { name: { '$regex': `.*${body.options.globalFilter}.*` } },
-                    { description: { '$regex': `.*${body.options.globalFilter}.*` } }
+                    { name: { '$regex': `.*${filterOptions.options.globalFilter}.*` } },
+                    { description: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }
                 ]
             }
         }
         let m;
-        if(body.options.isArchived){
+        if(filterOptions.options.isArchived){
             m = Map.find(q);
         }
         else{
@@ -93,16 +89,17 @@ module.exports = {
             // apply paging. if no paging, return all
             m.limit(PAGE_SIZE).skip((page - 1) * PAGE_SIZE);
         }
+        else if (query.limit) {
+            m.limit(Number(query.limit));
+        }
         return m.then(maps => {
             let mapsId = maps.map(map=> map.id);
             // searching project in DB when maps holds an array with a least one element of the mapsId
             return {maps, mapsId};
         }).then(({maps,mapsId}) => {
-            return Project.find({ maps: { $in: mapsId} },{_id:1,name:1, maps:1})
-            .then(projects=>{
-                return {maps, projects}
-            })
-        }).then(({maps, projects})=>{
+            return proejctServise.getProjectNamesByMapsIds(mapsId).then((projects)=>{
+            return {maps, projects}
+            })}).then(({maps, projects})=>{
             return Promise.all(maps.map(map=>{
                 for(let j=0, projectsLength = projects.length; j<projectsLength; j++){
                     if (projects[j].maps.toString().includes(map.id)){

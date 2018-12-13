@@ -1,5 +1,5 @@
 const winston = require("winston");
-
+const archiveService = require('../services/archive.service')
 const projectsService = require("../services/projects.service");
 const hooks = require("../../libs/hooks/hooks");
 
@@ -7,7 +7,7 @@ module.exports = {
     // archive a project
     archive: (req, res) => {
         hooks.hookPre('project-archive', req).then(() => {
-            return projectsService.archive(req.params.id, req.body.isArchive);
+            return archiveService.archiveProject(req.params.id, req.body.isArchive);
         }).then(() => {
             req.io.emit('notification', {
                 title: 'Archived',

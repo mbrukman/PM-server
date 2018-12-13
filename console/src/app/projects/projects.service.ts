@@ -42,7 +42,7 @@ export class ProjectsService {
   createMap(map) {
     return this.http.post<Map>(serverUrl + 'api/maps/create', map);
   }
-
+  
   createMapStructure(mapId: string, structure: MapStructure) {
     return this.http.post<MapStructure>(serverUrl + 'api/maps/' + mapId + '/structure/create', structure);
   }

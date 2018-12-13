@@ -1,16 +1,9 @@
 const Project = require("../models/project.model");
-const mapsService = require("./maps.service");
 const env = require("../../env/enviroment");
 
 const PAGE_SIZE = env.page_size;
 
 module.exports = {
-    /* archive project and maps */
-    archive: (projectId, isArchive) => {   
-        return Project.findByIdAndUpdate(projectId, { archived: isArchive }).then(project => {
-            return mapsService.archive(project.maps, isArchive);
-        });
-    },
     count: (filter) => {
         return Project.count(filter)
     },
@@ -42,34 +35,34 @@ module.exports = {
     },
 
     /* filter projects */
-    filter: (body = {}) => {
+    filter: (filterOptions = {}) => {
         let q = {};
-        if (body.fields) {
-            // This will change the fields in the body to body that we can use with mongoose (using regex for contains)
-            Object.keys(body.fields).map(key => { body.fields[key] = { '$regex': `.*${body.fields[key]}.*` }});
-            q = body.fields;
-        } else if (body.globalFilter) {
+        if (filterOptions.fields) {
+            // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
+            Object.keys(filterOptions.fields).map(key => { filterOptions.fields[key] = { '$regex': `.*${filterOptions.fields[key]}.*` }});
+            q = filterOptions.fields;
+        } else if (filterOptions.globalFilter) {
             // if there is a global filter, expecting or condition between name and description fields
             q = {
-                $or: [{ name: { '$regex': `.*${body.globalFilter}.*` } }, { description: { '$regex': `.*${body.globalFilter}.*` } }]
+                $or: [{ name: { '$regex': `.*${filterOptions.globalFilter}.*` } }, { description: { '$regex': `.*${filterOptions.globalFilter}.*` } }]
             }
         }
         
         let p;
-        if(body.options.isArchived){
+        if(filterOptions.options.isArchived){
             p = Project.find(q);
         }
         else{
             p = Project.find(q).where({archived:false});
         }
 
-        if (body.sort) {
+        if (filterOptions.options.sort) {
             // apply sorting by field name. for reverse, should pass with '-'.
-            p.sort(body.sort)
+            p.sort(filterOptions.options.sort)
         }
-        if (body.page) {
+        if (filterOptions.page) {
             // apply paging. if no paging, return all
-            p.limit(PAGE_SIZE).skip((body.page - 1) * PAGE_SIZE)
+            p.limit(PAGE_SIZE).skip((filterOptions.page - 1) * PAGE_SIZE)
         }
 
         return p.then(projects => {
@@ -91,6 +84,9 @@ module.exports = {
                 return module.exports.addMap(projectId, mapId); // add map to the selected project
             });
 
+    }, 
+    getProjectNamesByMapsIds : (mapsIds) => {
+        return Project.find({ maps: { $in: mapsIds} },{_id:1,name:1, maps:1})
     }
 
 };

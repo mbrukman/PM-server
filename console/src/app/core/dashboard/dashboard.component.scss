@@ -1,73 +1,76 @@
 @import "~assets/sass/variables";
 @import "~assets/sass/mixins";
-.container-fluid {
-  padding : 15px;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-
-  .mode {
-    margin-bottom: 15px;
-    color: $greyish-text;
+.mode {
+    height: 70px;
+    background-color: #25292c;
+    ;
+    padding: 28px;
     i {
-      cursor: pointer;
-
-      &:hover {
-        color: #fff;
-      }
-      &.active {
-        color: $turquoise-blue;
-      }
-    }
-  }
-
-  .content-wrapper{
-    display: flex;
-    flex-grow: 1;
-    .grid-view{
-      margin : 0;
-      
-      &.row{
-        width: 100%;
-      }
-
-      .col-4{
-        flex-grow: 1;
-        display: flex;
-        max-height: 300px;
-
-        .dashboard-card {
-          flex-grow: 1;
-          overflow-y: auto;
-          margin-top: 15px;
-          cursor: pointer;
-
-          .card-body{
-            display: flex;
-
-            .row{
-              flex-grow: 1;
-
-              .chart-wrapper{
-                display: flex;
-                justify-content: center;
-                align-items: center;
-              }
-            }
-          }
+        cursor: pointer;
+        &:hover {
+            color: #fff;
         }
-      }
-
+        &.active {
+            color: $turquoise-blue;
+        }
     }
-
-    .list-view {
-      margin : 0;
-      @include table();
-    }
-
-  }
-
 }
 
-
-
+.container-fluid {
+    padding: 32px 40px 2px;
+    .content-wrapper {
+        display: flex;
+        margin: 0;
+        width: 100%;
+        .grid-view {
+            width: 100%;
+            .dashboard-card {
+                margin-right: 25px;
+                margin-bottom: 30px;
+                width: calc(25% - 20px);
+                max-width: 452px;
+                overflow-y: auto;
+                height: fit-content;
+                cursor: pointer;
+                &:nth-child(4n) {
+                    margin-right: 0px;
+                }
+                .card-body {
+                    display: flex;
+                    font-family: Roboto;
+                    .content-card {
+                        color: #dddddd;
+                        width: calc(100% - 130px);
+                        .card-title {
+                            font-size: 18px;
+                            line-height: 0.89;
+                            color: #44acdf;
+                            padding-bottom: 16px;
+                        }
+                        > p {
+                          white-space: nowrap;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                        }
+                        .project {
+                            display: flex;
+                            .link {
+                                color: #44acdf;
+                            }
+                        }
+                    }
+                    .chart-wrapper {
+                        display: flex;
+                        justify-content: center;
+                        align-items: flex-start;
+                        margin-top: -20px;
+                    }
+                }
+            }
+        }
+        .list-view {
+            margin: 0;
+            @include table();
+        }
+    }
+}
