@@ -211,7 +211,7 @@ module.exports = {
     createStructure: (req, res) => {
         let mapId = req.params.id;
         req.body.map = mapId;
-        console.log(req.body);
+        console.log("createStructure", req.body);
         hooks.hookPre('map-create-structure', req).then(() => {
             return mapsService.createStructure(req.body)
         }).then(structure => {
@@ -252,7 +252,7 @@ module.exports = {
         hooks.hookPre('map-currentruns', req).then(() => {
             const executions = mapsExecutionService.executions;
             return res.json(Object.keys(executions).reduce((total, current) => {
-                console.log(executions[current].map);
+                console.log("currentRuns : ",executions[current].map);
                 total[current] = executions[current].map;
                 return total;
             }, {}));

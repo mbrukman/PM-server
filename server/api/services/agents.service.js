@@ -259,7 +259,7 @@ module.exports = {
     // get an object of installed plugins and versions on certain agent.
     checkPluginsOnAgent: (agent) => {
         return new Promise((resolve, reject) => {
-            console.log(agents[agent.key].defaultUrl);
+            console.log(" checkPluginsOnAgent", agents[agent.key].defaultUrl);
             request.post(agents[agent.key].defaultUrl + '/api/plugins', { form: { key: agent.key } }, function (error, response, body) {
                 if (error || response.statusCode !== 200) {
                     resolve('{}');
