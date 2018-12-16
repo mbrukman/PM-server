@@ -37,8 +37,7 @@ export class ProcessResultComponent implements OnChanges {
 
   expandOutput(action: ActionResult) {
     let messages = [];
-    
-    let results = this.agActionsStatus[<string>action.action].results;
+    let results = this.agActionsStatus[action.key].results;
     let msgs = [];
     results.stdout.forEach(text => { msgs.push(text)});
     results.stderr.forEach(text => { msgs.push(text)});
@@ -52,7 +51,7 @@ export class ProcessResultComponent implements OnChanges {
   aggregateProcessActionResults(result) {
     let actions = [];
     this.process.forEach(process => {
-      actions = [...actions, ...process.actions];
+      actions.push(Object.assign({agentKey: process.agentKey}, ...process.actions));
     });
     this.actions = actions;
 
@@ -61,34 +60,35 @@ export class ProcessResultComponent implements OnChanges {
       total[current.status] = (total[current.status] || 0) + 1;
       return total;
     }, { success: 0, error: 0, stopped: 0, partial: 0 });
-
+    
     // formatting for chart
     this.agProcessActionsStatus = Object.keys(agActionsStatus).map((o) => {
       return { name: o, value: agActionsStatus[o] };
     });
-
+    
     // aggregating status for each action
-    let agActions = actions.reduce((total, current) => {
-      if (!total[current.action]) {
-        total[current.action] = {
+    let agActions = this.actions.reduce((total, current) => {
+      let index = current.key = current.agentKey + current.action;  
+      // let index =  current.key
+      if (!total[index]) {
+        total[index] = {
           status: { success: 0, error: 0, stopped: 0 },
           results: { result: [], stderr: [], stdout: [] },
           startTime: new Date(),
           finishTime: new Date('1994-12-17T03:24:00')
         };
       }
-      total[current.action]['status'][current.status] = (total[current.action][current.status] || 0) + 1;
+      total[index]['status'][current.status] = (total[index][current.status] || 0) + 1;
       if (current.result) {
 
-        total[current.action]['results']['result'].push(current.result.result);
-        total[current.action]['results']['stderr'].push(current.result.stderr);
-        total[current.action]['results']['stdout'].push(current.result.stdout);
+        total[index]['results']['result'].push(current.result.result);
+        total[index]['results']['stderr'].push(current.result.stderr);
+        total[index]['results']['stdout'].push(current.result.stdout);
       }
-      total[current.action]['startTime'] = moment(current.startTime).isBefore(moment(total[current.action]['startTime'])) ? current.startTime : total[current.action]['startTime'];
-      total[current.action]['finishTime'] = moment(current.finishTime).isAfter(moment(total[current.action]['finishTime'])) ? current.finishTime : total[current.action]['finishTime'];
+      total[index]['startTime'] = moment(current.startTime).isBefore(moment(total[index]['startTime'])) ? current.startTime : total[index]['startTime'];
+      total[index]['finishTime'] = moment(current.finishTime).isAfter(moment(total[index]['finishTime'])) ? current.finishTime : total[index]['finishTime'];
       return total;
     }, {});
-
     Object.keys(agActions).map((o) => {
       agActions[o].total = this.calculateFinalStatus(agActions[o].status);
       // formatting for graph

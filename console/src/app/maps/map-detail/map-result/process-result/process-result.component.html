@@ -27,38 +27,38 @@
         <p-column field="name" header="Result">
           <ng-template let-col let-action="rowData" pTemplate="body">
             <div class="action-status" *ngIf="agActionsStatus">
-              <i class="material-icons text-success" *ngIf="agActionsStatus[action.action]?.total === 'success'">done</i>
-              <i class="material-icons text-danger" *ngIf="agActionsStatus[action.action]?.total === 'error'">change_history</i>
-              <i class="material-icons text-danger" *ngIf="agActionsStatus[action.action]?.total === 'stopped'">stop</i>
-              <i class="material-icons text-warning"*ngIf="agActionsStatus[action.action]?.total === 'partial'">tonality</i>
-              <span class="action-status-text">{{agActionsStatus[action.action]?.total}}</span>
+              <i class="material-icons text-success" *ngIf="agActionsStatus[action.key]?.total === 'success'">done</i>
+              <i class="material-icons text-danger" *ngIf="agActionsStatus[action.key]?.total === 'error'">change_history</i>
+              <i class="material-icons text-danger" *ngIf="agActionsStatus[action.key]?.total === 'stopped'">stop</i>
+              <i class="material-icons text-warning"*ngIf="agActionsStatus[action.key]?.total === 'partial'">tonality</i>
+              <span class="action-status-text">{{agActionsStatus[action.key]?.total}}</span>
             </div>
           </ng-template>
         </p-column>
         <ng-template let-action pTemplate="rowexpansion">
-          <div *ngIf="agActionsStatus[action.action]">
+          <div *ngIf="agActionsStatus[action.key]">
             <div class="row">
               <div class="col-8">
                 <div *ngIf="count === 1">
-                  <p>Start time: {{ agActionsStatus[action.action]?.startTime | date: 'medium' }}</p>
-                  <p>Finish time: {{ agActionsStatus[action.action]?.finishTime | date: 'medium'}}</p>
+                  <p>Start time: {{ agActionsStatus[action.key]?.startTime | date: 'medium' }}</p>
+                  <p>Finish time: {{ agActionsStatus[action.key]?.finishTime | date: 'medium'}}</p>
                 </div>
                 <h5>Output:</h5>
                 <div class="raw-output">
                   <div class="row-card">
                     <i class="fas fa-arrows-alt" (click)="expandOutput(action)"></i>
                   </div>
-                  <ng-container *ngFor="let item of agActionsStatus[action.action]?.results?.stdout">
+                  <ng-container *ngFor="let item of agActionsStatus[action.key]?.results?.stdout">
                     <span class="raw-output-data" *ngIf="item">
                       {{ item }} <br>
                     </span>
                   </ng-container>
-                  <ng-container *ngFor="let item of agActionsStatus[action.action]?.results?.stderr">
+                  <ng-container *ngFor="let item of agActionsStatus[action.key]?.results?.stderr">
                     <span class="raw-output-data" *ngIf="item">
                       {{ item }} <br>
                     </span>
                   </ng-container>
-                  <ng-container *ngFor="let item of agActionsStatus[action.action]?.results?.result">
+                  <ng-container *ngFor="let item of agActionsStatus[action.key]?.results?.result">
                     <span class="raw-output-data" *ngIf="item">
                       {{ item | json }} <br>
                     </span>
@@ -67,7 +67,7 @@
               </div>
               <div class="col-4">
                 <ngx-charts-pie-chart
-                  [results]="agActionsStatus[action.action].status"
+                  [results]="agActionsStatus[action.key].status"
                   [labels]="false"
                   [scheme]="colorScheme"
                   [doughnut]="true">
