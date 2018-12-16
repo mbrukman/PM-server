@@ -149,11 +149,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     return method.params.findIndex(p => p.type === type) > -1;
   }
 
-  /**
-   * Add a new action to process
-   */
 
-  manageAction(action){
+  runAction(action){
     if(this.processViewWrapper.plugin){
       return action();
     }
@@ -166,8 +163,11 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Add a new action to process
+   */
   addNewAction() {
-    this.manageAction(()=>{
+    this.runAction(()=>{
       const actionControl = <FormArray>this.processForm.controls['actions'];
       actionControl.push(this.initActionController());
       this.editAction(actionControl.length - 1); // switch to edit the new action
@@ -197,7 +197,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @param {number} index
    */
   editAction(index: number) {
-      this.manageAction(()=>{
+      this.runAction(()=>{
         this.action = true;
         this.index = index;
       })

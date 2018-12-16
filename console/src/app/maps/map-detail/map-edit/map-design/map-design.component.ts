@@ -362,7 +362,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           if (cells[i].id == this.mapStructure.processes[j].uuid){
             this.processViewWrapper = new ProcessViewWrapper(this.mapStructure.processes[j],this.mapStructure,this.plugins)
             if(!this.processViewWrapper.plugin){
-              this.checkProcessWarning(cells[i].attrs)
+              this.addWarningToProcess(cells[i].attrs)
             }
             else cells[i].attrs['.warning']={}
             break;
@@ -435,7 +435,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           });
           this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure,this.plugins)
           if(!this.processViewWrapper.plugin){
-            this.checkProcessWarning(imageModel)
+            this.addWarningToProcess(imageModel)
           }
           else imageModel['.warning']={}
           
@@ -655,16 +655,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     cell.attr('rect/fill', '#2d3236');
   }
 
-  checkPluginExist(process){
-    for(let i=0, pluginsLength = this.plugins.length; i<pluginsLength; i++){
-      if(process.used_plugin.name == this.plugins[i].name){
-        return true;
-      }
-    }
-    return false;
-  }
 
-  checkProcessWarning(model){
+  addWarningToProcess(model){
     
       model['.warning']={
           'xlink:href': 'assets/images/warning.png',

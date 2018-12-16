@@ -26,7 +26,7 @@ export class Process extends Serializable implements IProcess {
   updatedAt: Date;
   correlateAgents: boolean;
   uuid: string;
-  isPluginExist?: boolean
+
 
   constructor(json?: any) {
     super(json);
