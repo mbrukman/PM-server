@@ -215,7 +215,7 @@ module.exports = {
         hooks.hookPre('map-create-structure', req).then(() => {
             return mapsService.createStructure(req.body)
         }).then(structure => {
-            req.io.emit('notification', { title: 'Saved', message: `Map saved successfully`, type: 'success' });
+            req.io.emit('notification', { title: 'Saved', message: `Map saved successfully`, type: 'success', mapId:mapId });
             return res.json(structure)
         }).catch((error) => {
             winston.log('error', "Error creating map structure", error);
