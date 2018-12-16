@@ -91,7 +91,7 @@ module.exports = {
         }
         
         if (filterOptions.options.limit) {
-            m.limit(filterOptions.options.limit);
+            m.limit(Number(filterOptions.options.limit));
         }
         
         return m.then(maps => {
