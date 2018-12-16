@@ -18,6 +18,13 @@ function getMapPlugins(mapStructure) {
     return Array.from(plugins);
 }
 
+function sortProjectorLastRun(x,y,z){
+    if(x!=y){
+        return z!= '-' ? (x < y ? -1 : 1):(x < y ? 1:-1)
+    } 
+    else return 0
+}
+
 
 module.exports = {
     /* count how many documents exist for a certain query */
@@ -115,6 +122,18 @@ module.exports = {
                     return map;
                 })
             }))
+        }).then(maps => {
+            if (sort && ((sort == '-project')||(sort == 'project'))){
+                maps.sort(function(a, b){
+                    return sortProjectorLastRun(a.project,b.project,sort[0])
+                  })
+            }
+            else if (sort && ((sort == '-lastrun')||(sort == 'lastrun'))){
+                maps.sort(function(a, b){
+                    return sortProjectorLastRun(a.latestExectionResult,b.latestExectionResult,sort[0])
+                  })
+            }
+            return maps
         }).then(maps => {
             return module.exports.count(q).then(r => {
                 return { items: maps, totalCount: r }
