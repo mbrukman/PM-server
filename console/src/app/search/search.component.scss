@@ -15,7 +15,7 @@
 .results{
 
   height: 90%;
-  overflow: scroll;
+  overflow-y: scroll;
   h6:not(:first-of-type){
     margin-top : 30px;
   }
