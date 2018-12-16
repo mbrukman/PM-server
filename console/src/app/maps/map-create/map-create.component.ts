@@ -7,6 +7,7 @@ import { Map } from '../models/map.model';
 import { Project } from '../../projects/models/project.model';
 import { ProjectsService } from '../../projects/projects.service';
 import { DefaultKeyValueDiffer } from '@angular/core/src/change_detection/differs/default_keyvalue_differ';
+import { FilterOptions } from '@shared/model/filter-options.model';
 
 @Component({
   selector: 'app-map-create',
@@ -39,7 +40,8 @@ export class MapCreateComponent implements OnInit, OnDestroy {
       } else {
         this.initMapForm();
       }
-      this.projectsReq = this.projectsService.filter().subscribe(data => {
+      var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt'};
+      this.projectsReq = this.projectsService.filter(null,null,filterOptions).subscribe(data => {
         this.projects = data.items;
         if (params.map) {
           data.items.forEach(project => {
