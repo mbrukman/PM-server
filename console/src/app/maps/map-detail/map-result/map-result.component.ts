@@ -132,7 +132,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   aggregateProcessStatuses(results) {
     let processes = [];
     results.forEach(res => {
-      processes = [...processes, ...res.processes];
+      processes.push(...res.processes); 
     });
 
     let ag = processes.reduce((total, current) => {
@@ -273,7 +273,11 @@ export class MapResultComponent implements OnInit, OnDestroy {
   selectProcess(process) {
     let processes = [];
     this.result.forEach(res => {
-      processes.push(res.processes.find(o => o.uuid === process.uuid && o.index === process.index));
+      res.processes.forEach(o=>{
+        if(o.uuid === process.uuid && o.index === process.index){
+          processes.push({...o, agentKey: res.agent.id})    
+        }
+      })
     });
     this.selectedProcess = processes;
   }

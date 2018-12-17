@@ -13,3 +13,4 @@ export * from './action.model';
 export * from './action-param.model';
 export * from './link.model';
 export * from './process-view-wrapper.model'
+export * from './actionResultView.model'

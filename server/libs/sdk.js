@@ -1,7 +1,6 @@
 var currentAgent = {
     name: "",
     url: "",
-    dedicatedAgents: [{ type: "", url: "" }],
     attributes: [{ name: "", value: "" }]
 };
 
