@@ -25,6 +25,16 @@ function sortProjectorLastRun(x,y,z){
     else return 0
 }
 
+function getSort(sortString){
+    var sort = {}
+    if (sortString[0] == '-')
+        sort[sortString.slice(1)] = -1;
+    else 
+        sort[sortString] = 1;
+
+    return sort;
+}
+
 
 module.exports = {
     /* count how many documents exist for a certain query */
@@ -65,33 +75,95 @@ module.exports = {
         mapsId = [];
         let q = {};
         let fields = filterOptions.fields
-        let sort = filterOptions.options.sort
+        let sort = filterOptions.options.sort || 'name'
         let page = filterOptions.page
         if (fields) {
             // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
             Object.keys(fields).map(key => { fields[key] = { '$regex': `.*${fields[key]}.*` }});
             q = fields;
-        } else if (filterOptions.options.globalFilter!=undefined) {
-            // if there is a global filter, expecting or condition between name and description fields
-            q = {
-                $or: [
-                    { name: { '$regex': `.*${filterOptions.options.globalFilter}.*` } },
-                    { description: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }
-                ]
-            }
-        }
-        let m;
-        if(filterOptions.options.isArchived){
-            m = Map.find(q);
-        }
-        else{
-            m = Map.find(q).where({archived:false});
         }
         
-        if (sort) {
-            // apply sorting by field name. for reverse, should pass with '-'.
-            m.sort(sort);
+        var $match = {};
+        if (filterOptions.options.isArchived !== true)
+            $match.archived = false;
+        if (filterOptions.options.globalFilter){
+            $match.$or= [
+                { name: { '$regex': `.*${filterOptions.options.globalFilter}.*` } },
+                { description: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }
+            ]
         }
+
+        let m = Map.aggregate([
+            {
+                $match:$match
+            },
+            {
+                $lookup:
+                {
+                    from:"projects",
+                    let:{ mapId:"$_id"},
+                    pipeline:[
+                        {
+                            $match:{
+                                $expr:{
+                                        $in: [ "$$mapId", "$maps" ] 
+                                }
+                            }
+                        },
+                        { 
+                            $project: 
+                            {   
+                                name:1
+                            }
+                        }
+                     ],
+                    as:"project"
+                },
+            },
+            {
+                $lookup:
+                {
+                    from:"mapResults",
+                    let:{ mapId:"$_id"},
+                    pipeline:[
+                        {
+                            $match:{
+                                $expr:{
+                                        $eq: [ "$$mapId", "$map" ] 
+                                }
+                                
+                            }
+
+                        },
+                        {
+                            $limit:1
+                        },
+                        {
+                            $sort:{
+                                '-finishTime':1
+                            }
+                        },
+                        { 
+                            $project: 
+                            {   
+                                finishTime:1
+                            }
+                        }
+
+                     ],
+                    as:"latestExectionResult",
+      
+                },
+            },
+            {$sort:getSort(sort)},
+            {$unwind:'$project'},
+            {$unwind: {
+                    "path": "$latestExectionResult",
+                    "preserveNullAndEmptyArrays": true
+                }
+            }
+        ])
+        
         if (page) {
             // apply paging. if no paging, return all
             m.limit(PAGE_SIZE).skip((page - 1) * PAGE_SIZE);
@@ -102,39 +174,12 @@ module.exports = {
         }
         
         return m.then(maps => {
-            let mapsId = maps.map(map=> map.id);
-            // searching project in DB when maps holds an array with a least one element of the mapsId
-            return {maps, mapsId};
-        }).then(({maps,mapsId}) => {
-            return proejctServise.getProjectNamesByMapsIds(mapsId).then((projects)=>{
-            return {maps, projects}
-            })}).then(({maps, projects})=>{
-            return Promise.all(maps.map(map=>{
-                for(let j=0, projectsLength = projects.length; j<projectsLength; j++){
-                    if (projects[j].maps.toString().includes(map.id)){
-                        map= map.toJSON();
-                        map.project = projects[j];
-                        break;
-                   }
-                }
-                return MapResult.findOne({map : map.id}).sort('-finishTime').select('finishTime').then(result=>{
-                    map.latestExectionResult = result;
-                    return map;
-                })
-            }))
-        }).then(maps => {
-            if (sort && ((sort == '-project')||(sort == 'project'))){
-                maps.sort(function(a, b){
-                    return sortProjectorLastRun(a.project,b.project,sort[0])
-                  })
+            for(let i=0, mapsLength = maps.length; i<mapsLength; i++){
+                maps[i].id = maps[i]._id;
+                maps[i].project.id = maps[i].project._id;
+                delete maps[i]._id;
+                delete maps[i].project._id;
             }
-            else if (sort && ((sort == '-lastrun')||(sort == 'lastrun'))){
-                maps.sort(function(a, b){
-                    return sortProjectorLastRun(a.latestExectionResult,b.latestExectionResult,sort[0])
-                  })
-            }
-            return maps
-        }).then(maps => {
             return module.exports.count(q).then(r => {
                 return { items: maps, totalCount: r }
             });
