@@ -275,7 +275,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     this.result.forEach(res => {
       res.processes.forEach(o=>{
         if(o.uuid === process.uuid && o.index === process.index){
-          processes.push({...o, agentKey: res.agent.id})    
+          processes.push({...o, agentKey: (<Agent>res.agent).id})    
         }
       })
     });

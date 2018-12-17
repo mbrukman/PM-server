@@ -1,6 +1,6 @@
-import { Process } from "./process.model";
-import { MapStructure } from "./map-structure.model";
-import { Plugin } from "../../plugins/models/plugin.model";
+import { Process } from "../process.model";
+import { MapStructure } from "../map-structure.model";
+import { Plugin } from "../../../plugins/models/plugin.model";
 
 export class ProcessViewWrapper {
     process : Process;

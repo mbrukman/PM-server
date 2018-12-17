@@ -1,4 +1,4 @@
-import { ActionResult } from "./execution-result.model";
+import { ActionResult } from "../execution-result.model";
 
 export class ActionResultView {
     action : ActionResult;
