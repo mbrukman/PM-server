@@ -58,6 +58,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.defineShape();
     this.pluginsReq = this.pluginsService.list().subscribe(plugins => {
       this.plugins = plugins;
+      this.initMapDraw();
     });
 
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
@@ -119,24 +120,26 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       .do(structure => this.mapStructure = structure)
       .filter(structure => !!structure)
       .subscribe(structure => {
-        if (!this.init || (<any>structure).imported) {
-          this.drawGraph();
+        this.initMapDraw();
+      });
+  }
+
+  initMapDraw(){
+    if (!this.init && this.plugins && this.mapStructure){
+      this.drawGraph();
           this.init = true;
           this.graph.getElements().forEach(cell => {
             this.deselectCell(cell);
           });
     
           this.defaultContent = JSON.stringify(this.graph.toJSON());
-          if ((<any>structure).imported) {
-            delete (<any>structure).imported;
-            this.mapStructure = structure;
+          if ((<any>(this.mapStructure)).imported) {
+            delete (<any>(this.mapStructure)).imported;
             this.deselectAllCellsAndUpdateStructure();
           }
-        }
-      });
-
-
+    }
   }
+
   /**
    * Check if the x, y are over the map
    * @param {number} x
