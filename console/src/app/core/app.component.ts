@@ -32,32 +32,42 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.notificationSubscription = this.socketService.getNotificationAsObservable().subscribe(notification => {
-      this.mapsService.getCurrentMap().subscribe(map => {
-        if (map.id != notification.mapId) { return }
-
-        const toastOptions: ToastOptions = {
-          title: notification.title,
-          msg: notification.message,
-          showClose: true,
-          timeout: 5000
-        };
-        switch (notification.type) {
-          case 'default':
-            return this.toastyService.default(toastOptions);
-          case 'info':
-            return this.toastyService.info(toastOptions);
-          case 'success':
-            return this.toastyService.success(toastOptions);
-          case 'wait':
-            return this.toastyService.wait(toastOptions);
-          case 'error':
-            return this.toastyService.error(toastOptions);
-          case 'warning':
-            return this.toastyService.warning(toastOptions);
-        }
-      });
+      if (notification.mapId) {
+        this.mapsService.getCurrentMap().subscribe(map => {
+          if ((map) && (map.id == notification.mapId)) {
+            this.showMessage(notification)
+          }
+        });
+      } else {
+        this.showMessage(notification);
+      }
     });
   }
+
+
+  showMessage(notification) {
+    const toastOptions: ToastOptions = {
+      title: notification.title,
+      msg: notification.message,
+      showClose: true,
+      timeout: 5000
+    };
+    switch (notification.type) {
+      case 'default':
+        return this.toastyService.default(toastOptions);
+      case 'info':
+        return this.toastyService.info(toastOptions);
+      case 'success':
+        return this.toastyService.success(toastOptions);
+      case 'wait':
+        return this.toastyService.wait(toastOptions);
+      case 'error':
+        return this.toastyService.error(toastOptions);
+      case 'warning':
+        return this.toastyService.warning(toastOptions);
+    }
+  }
+
 
   toggleSearch() {
     this.search = !this.search;

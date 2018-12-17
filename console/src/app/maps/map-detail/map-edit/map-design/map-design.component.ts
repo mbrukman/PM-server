@@ -10,7 +10,7 @@ import { Link, MapStructure, Process, ProcessViewWrapper } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { Plugin } from '@plugins/models/plugin.model';
-import {COORDINATION_TYPES}  from '@maps/contants'
+import { COORDINATION_TYPES } from '@maps/contants'
 
 export const linkAttrs = {
   router: { name: 'manhattan' },
@@ -48,7 +48,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   defaultContent: string;
   @ViewChild('wrapper') wrapper: ElementRef;
-  processViewWrapper : ProcessViewWrapper;
+  processViewWrapper: ProcessViewWrapper;
   constructor(private designService: MapDesignService,
     private mapsService: MapsService,
     private pluginsService: PluginsService,
@@ -152,7 +152,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   deselectAllCellsAndUpdateStructure() {
 
     if (this.process) {
-      this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure)
+      this.processViewWrapper = new ProcessViewWrapper(this.process, this.mapStructure)
     } else {
       this.processViewWrapper = null
     }
@@ -190,7 +190,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         this.mapStructure.processes[processIndex].coordination = COORDINATION_TYPES.race.id;
       }
       else if (!this.mapStructure.processes[processIndex].coordination) {
-        this.mapStructure.processes[processIndex].coordination =  COORDINATION_TYPES.wait.id;
+        this.mapStructure.processes[processIndex].coordination = COORDINATION_TYPES.wait.id;
       }
       this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
     }
@@ -456,8 +456,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.selectCell(cell);
     this.paper.setDimensions(this.wrapper.nativeElement.offsetWidth - 250, this.wrapper.nativeElement.offsetHeight);
     this.process = process;
-   
-    this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure)
+
+    this.processViewWrapper = new ProcessViewWrapper(this.process, this.mapStructure)
 
     if (this.editing) {
       this.editing = false;
@@ -629,7 +629,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   private onMapContentUpdate() {
     let graphContent = JSON.stringify(this.graph.toJSON());
-    if (graphContent != this.defaultContent) {
+    if ((graphContent != this.defaultContent) && (this.mapStructure)) {
       this.mapStructure.content = graphContent;
       this.mapsService.setCurrentMapStructure(this.mapStructure);
     }
