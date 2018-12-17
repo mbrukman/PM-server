@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { MonacoEditorModule} from 'ngx-monaco-editor';
+import { MonacoEditorModule, NGX_MONACO_EDITOR_CONFIG} from 'ngx-monaco-editor';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
@@ -41,7 +41,12 @@ import { monacoConfig } from './monaco-config'
     CommonModule,
     MapsRoutingModule,
     SharedModule,
-    MonacoEditorModule.forRoot(monacoConfig),
+    {
+      ngModule : MonacoEditorModule,
+      providers : [
+        {provide : NGX_MONACO_EDITOR_CONFIG, useValue: monacoConfig}
+      ]
+    },
     BsDropdownModule,
     ModalModule,
     AccordionModule,
@@ -72,8 +77,6 @@ import { monacoConfig } from './monaco-config'
     AddConfigurationComponent,
     ProcessViewComponent,
     MapDuplicateComponent,
-    
-
   ],
   entryComponents: [SelectAgentComponent, TriggerFormComponent, SelectGroupsComponent, AddConfigurationComponent,MapDuplicateComponent]
 })

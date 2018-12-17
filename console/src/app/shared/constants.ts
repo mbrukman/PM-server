@@ -1,2 +1,2 @@
-const libEnv = require('../../../env.json');
-export const env = libEnv;
+import * as libEnv from '../../../env.json';
+export const env = libEnv.default;
