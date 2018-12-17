@@ -71,7 +71,9 @@ import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplica
     ProcessListItemComponent,
     AddConfigurationComponent,
     ProcessViewComponent,
-    MapDuplicateComponent
+    MapDuplicateComponent,
+    
+
   ],
   entryComponents: [SelectAgentComponent, TriggerFormComponent, SelectGroupsComponent, AddConfigurationComponent,MapDuplicateComponent]
 })

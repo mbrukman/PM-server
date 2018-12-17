@@ -27,6 +27,7 @@ export class Process extends Serializable implements IProcess {
   correlateAgents: boolean;
   uuid: string;
 
+
   constructor(json?: any) {
     super(json);
     this.flowControl = 'each';
