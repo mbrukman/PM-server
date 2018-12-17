@@ -1,6 +1,7 @@
 const winston = require("winston");
 
 const mapsService = require("../services/maps.service");
+const archiveService = require("../services/archive.service");
 const projectsService = require("../services/projects.service");
 const mapsExecutionService = require("../services/map-execution.service");
 const triggersService = require("../services/triggers.service");
@@ -10,7 +11,7 @@ const hooks = require("../../libs/hooks/hooks");
 module.exports = {
     /* archive a map */
     archive: (req, res) => {
-        mapsService.archive([req.params.id]).then(map => {
+        archiveService.archiveMaps([req.params.id], req.body.isArchive).then(map => {
             return res.status(204).send();
         }).catch(error => {
             winston.log('error', "Error archiving map", error);
@@ -50,16 +51,26 @@ module.exports = {
     },
     dashboard: (req, res) => {
         hooks.hookPre('map-dashboard', req).then(() => {
-            return mapsExecutionService.list()
+            return mapsExecutionService.dashboard()
         }).then(executions => {
             executions = JSON.parse(JSON.stringify(executions));
-            let filteredExecutions = executions.filter((o, index) => {
-                let i = executions.findIndex((k) => {
-                    return k.map.id === o.map.id;
-                });
-                return i === index;
-            });
-            return res.json(filteredExecutions);
+            let mapsId = executions.map(execution => execution.map.id);
+            return projectsService.getProjectNamesByMapsIds(mapsId).then((projects)=>{
+                return { projects , executions};
+            })
+        }).then((result) => {
+            result.executions.map(exec => {
+                for (let j = 0, projectsLength = result.projects.length; j < projectsLength; j++) {
+                    if ( result.projects[j].maps.toString().includes(exec.map.id)) {
+                        exec.map.project = result.projects[j].toJSON();
+                        break;
+                    }
+                }
+            })
+            return res.json(result.executions);
+        }).catch(error=>{
+            console.log(error);
+            
         })
     },
 
@@ -119,9 +130,9 @@ module.exports = {
         });
     },
     filter: (req, res) => {
-        let query = req.query;
+        let body = req.body;
         hooks.hookPre('map-filter', req).then(() => {
-            return mapsService.filter(query);
+            return mapsService.filter(body);
         }).then(data => {
             if (!data || data.totalCount === 0) {
                 return res.status(204).send();
@@ -200,7 +211,7 @@ module.exports = {
     createStructure: (req, res) => {
         let mapId = req.params.id;
         req.body.map = mapId;
-        console.log(req.body);
+        console.log("createStructure", req.body);
         hooks.hookPre('map-create-structure', req).then(() => {
             return mapsService.createStructure(req.body)
         }).then(structure => {
@@ -241,7 +252,7 @@ module.exports = {
         hooks.hookPre('map-currentruns', req).then(() => {
             const executions = mapsExecutionService.executions;
             return res.json(Object.keys(executions).reduce((total, current) => {
-                console.log(executions[current].map);
+                console.log("currentRuns : ",executions[current].map);
                 total[current] = executions[current].map;
                 return total;
             }, {}));

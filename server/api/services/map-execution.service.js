@@ -12,6 +12,7 @@ const models = require("../models");
 
 const MapResult = models.Result;
 const MapExecutionLog = models.ExecutionLog;
+const Map = models.Map;
 
 const executionLogService = require('./execution-log.service');
 const agentsService = require('./agents.service');
@@ -22,6 +23,7 @@ let executions = {};
 let pending = {};
 
 let libpm = '';
+let libpmObjects = {} 
 
 fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 'utf8', function (err, data) {
     // opens the lib_production file. this file is used for user to use overwrite custom function at map code
@@ -29,10 +31,11 @@ fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 
         return winston.log('error', err);
     }
     libpm = data;
+    eval(libpm)
+    libpmObjects.currentAgent = currentAgent
 });
 
 function evaluateParam(param, context) {
-
     if (!param.code) {
         return param.value;
     }
@@ -171,12 +174,20 @@ function updateActionContext(runId, agentKey, processKey, processIndex, actionKe
         (executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[actionKey] || {}),
         actionData
     );
-    
+
     executions[runId].executionAgents[agentKey].executionContext.processes = executions[runId].executionAgents[agentKey].processes;
-    
+
     // If action have a result (i.e. done) set to previous action;
-    if(actionData.result)
+    if (actionData.result)
         executions[runId].executionAgents[agentKey].executionContext.previousAction = executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[actionKey];
+        updatecurrentAgentContext(runId,agentKey);
+}
+
+
+function updatecurrentAgentContext(runId,agentKey){
+    Object.keys(libpmObjects.currentAgent).forEach(field =>{
+        executions[runId].executionAgents[agentKey].executionContext.currentAgent[field] = executions[runId].executionAgents[agentKey][field]    
+    })
 }
 
 /**
@@ -587,11 +598,11 @@ function areAllAgentsDone(runId) {
  * @param processKey
  * @returns {boolean}
  */
-function isThisTheFirstAgentToGetToTheProcess(runId, processKey) {
-    if (executions.hasOwnProperty(runId) && executions[runId].executionContext.visitedProcesses.has(processKey)) {
-        return false;
+function isThisTheFirstAgentToGetToTheProcess(runId, processKey, agentKey) {
+    if (executions.hasOwnProperty(runId) && executions[runId].executionContext.visitedProcesses[processKey]) {
+        return executions[runId].executionContext.visitedProcesses[processKey] == agentKey;
     }
-    executions[runId].executionContext.visitedProcesses.add(process.uuid);
+    executions[runId].executionContext.visitedProcesses[processKey] = agentKey;
     return true;
 }
 
@@ -646,37 +657,11 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
     }
     const successors = node ? findSuccessors(node, structure) : [];
     if (successors.length === 0) {
-        if (!isThereProcessExecutingOnAgent(runId, agent.key)) {
-            executions[runId].executionAgents[agent.key].done = true;
-            if (areAllAgentsDone(runId)) {
-                executions[runId].executionContext.finishTime = new Date();
-                summarizeExecution(
-                    executions[runId].executionContext.map,
-                    runId,
-                    _.cloneDeep(executions[runId].executionContext),
-                    _.cloneDeep(executions[runId].executionAgents)
-                ).then((mapResult) => {
-                    socket.emit('map-execution-result', mapResult);
-                });
-                MapResult.findByIdAndUpdate(
-                    executions[runId].resultObj,
-                    { $set: { finishTime: new Date(), cleanFinish: true } },
-                    { new: true })
-                    .then((mapResult) => {
-                        socket.emit('map-execution-result', mapResult);
-                    });
-                delete executions[runId];
-                if (map.queue && pending.hasOwnProperty(map.id)) {
-                    startPendingExecution(map.id); // starting pending execution if necessary
-                    updatePending(socket);
-                }
-                updateExecutions(socket);
-            }
-        }
+        endRunPathResults(runId, agent, socket, map);
 
     }
     let nodesToRun = [];
-    successors.forEach((successor) => {
+    successors.forEach((successor, successorIdx) => {
         let ancestors = findAncestors(successor, structure);
         const process = findProcessByUuid(successor, structure);
         if (ancestors.length > 1) {
@@ -693,7 +678,10 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
                     return;
                 }
             } else if (process.coordination === 'race') {
-                if (executions[runId].executionAgents[agent.key].processes.hasOwnProperty(process.uuid)) {
+                if (executions[runId].executionAgents[agent.key].processes && executions[runId].executionAgents[agent.key].processes.hasOwnProperty(process.uuid)) {
+                    if (successors.length - 1 == successorIdx) {
+                        endRunPathResults(runId, agent, socket, map);
+                    }
                     return;
                 }
             }
@@ -702,7 +690,7 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
         // checking agent flow condition
         if (process.flowControl === 'race') {
             // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
-            if (!isThisTheFirstAgentToGetToTheProcess(runId, successor)) {
+            if (!isThisTheFirstAgentToGetToTheProcess(runId, successor, agent.key)) {
                 return runNodeSuccessors(map, structure, runId, agent, successor, socket);
             }
         } else if (process.flowControl === 'wait') {
@@ -733,6 +721,27 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
             winston.log('error', error);
         }
     });
+}
+
+
+function endRunPathResults(runId, agent, socket, map) {
+    if (isThereProcessExecutingOnAgent(runId, agent.key)) { return }
+    executions[runId].executionAgents[agent.key].done = true;
+    if (!areAllAgentsDone(runId)) { return }
+    executions[runId].executionContext.finishTime = new Date();
+    summarizeExecution(executions[runId].executionContext.map, runId, _.cloneDeep(executions[runId].executionContext), _.cloneDeep(executions[runId].executionAgents)).then((mapResult) => {
+        socket.emit('map-execution-result', mapResult);
+    });
+    MapResult.findByIdAndUpdate(executions[runId].resultObj, { $set: { finishTime: new Date(), cleanFinish: true } }, { new: true })
+        .then((mapResult) => {
+            socket.emit('map-execution-result', mapResult);
+        });
+    delete executions[runId];
+    if (map.queue && pending.hasOwnProperty(map.id)) {
+        startPendingExecution(map.id); // starting pending execution if necessary
+        updatePending(socket);
+    }
+    updateExecutions(socket);
 }
 
 /**
@@ -1073,11 +1082,11 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                 action.params[param.name] = evaluateParam(params[i], executions[runId].executionAgents[agent.key].executionContext);
             } catch (e) {
                 return _handleActionError({
-                    stdout : actionString + '\n' + e.message
-                },undefined,callback)
+                    stdout: actionString + '\n' + e.message
+                }, undefined, callback)
             }
 
-            actionString += `${param.name}: ${action.params[param.name]}${i != params.length-1 ? ', ' : ''}`;
+            actionString += `${param.name}: ${action.params[param.name]}${i != params.length - 1 ? ', ' : ''}`;
         }
         executionLogService.info(runId, map._id, actionString, socket);
 
@@ -1101,7 +1110,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                 finishTime: new Date()
             });
             updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-            executionLogService.error(runId, map._id, `'${action.name}': Error running action on (${agent.name}): ${message  || JSON.stringify(res)}`, socket);
+            executionLogService.error(runId, map._id, `'${action.name}': Error running action on (${agent.name}): ${message || JSON.stringify(res)}`, socket);
 
             if (action.mandatory) {
                 cb(res);
@@ -1171,13 +1180,13 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                         executionLogService.create(actionExecutionLogs, socket);
                         callback(null, result);
                     } else {
-                        _handleActionError(result,undefined,callback);
+                        _handleActionError(result, undefined, callback);
                     }
                 } else {
                     let result = { result: 'Timeout Error', status: 'error', stdout: actionString };
                     if (action.retries > 1) { return ['retry', result]; }
-                    
-                    _handleActionError(result, 'timeout error',callback);
+
+                    _handleActionError(result, 'timeout error', callback);
                 }
             })
                 .then((res) => {
@@ -1460,8 +1469,22 @@ module.exports = {
      * returning all maps result
      * @returns {Document|Promise|Query|*|void}
      */
-    list: () => {
-        return MapResult.find({}, null, { sort: { startTime: -1 } }).populate({ path: 'map', select: 'name' });
+    dashboard: () => {
+        return MapResult.aggregate([
+            { $sort: { "startTime": -1 } },
+            {
+                "$group":
+                {
+                    _id: "$map", count: { $sum: 1 },
+                    exec: { $first: "$$CURRENT" },
+                    map: { $first: "$map" },
+                }
+            },
+            { $sort: { "exec.startTime": -1 } },
+            { $limit: 16 }
+        ]).then(res => {
+            return Map.populate(res, { path: 'map' })
+        })
     },
 
     /**

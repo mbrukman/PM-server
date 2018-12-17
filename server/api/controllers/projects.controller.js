@@ -1,5 +1,5 @@
 const winston = require("winston");
-
+const archiveService = require('../services/archive.service')
 const projectsService = require("../services/projects.service");
 const hooks = require("../../libs/hooks/hooks");
 
@@ -7,7 +7,7 @@ module.exports = {
     // archive a project
     archive: (req, res) => {
         hooks.hookPre('project-archive', req).then(() => {
-            return projectsService.archive(req.params.id, req.body.isArchive);
+            return archiveService.archiveProject(req.params.id, req.body.isArchive);
         }).then(() => {
             req.io.emit('notification', {
                 title: 'Archived',
@@ -64,7 +64,7 @@ module.exports = {
     /* get project details */
     detail: (req, res) => {
         hooks.hookPre('project-detail', req).then(() => {
-            return projectsService.detail(req.params.id);
+            return projectsService.detail(req.params.id,req.body);
         }).then(project => {
             res.json(project);
         }).catch((error) => {
@@ -97,7 +97,7 @@ module.exports = {
     /* filter projects */
     filter: (req, res) => {
         hooks.hookPre('project-filter', req).then(() => {
-            return projectsService.filter(req.query);
+            return projectsService.filter(req.body);
         }).then(data => {
             if (!data || data.totalCount === 0) {
                 return res.status(204).send();

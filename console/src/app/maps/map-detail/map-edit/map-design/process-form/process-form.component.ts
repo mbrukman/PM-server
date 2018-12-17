@@ -9,13 +9,17 @@ import { distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
-import { Process, Action, ActionParam } from '@maps/models';
+import { Process, Action, ActionParam, ProcessViewWrapper } from '@maps/models';
 import { Plugin } from '@plugins/models/plugin.model';
 import { PluginMethod } from '@plugins/models/plugin-method.model';
 import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
 import { SocketService } from '@shared/socket.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
+import { BsModalService } from 'ngx-bootstrap';
+import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import { ConfirmComponent } from '@shared/confirm/confirm.component';
+import {FLOW_CONTROL_TYPES, COORDINATION_TYPES}  from '@maps/contants'
 
 @Component({
   selector: 'app-process-form',
@@ -23,7 +27,7 @@ import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
   styleUrls: ['./process-form.component.scss']
 })
 export class ProcessFormComponent implements OnInit, OnDestroy {
-  @Input('process') process: Process;
+  @Input('processViewWrapper') processViewWrapper: ProcessViewWrapper;
   @Output() saved: EventEmitter<any> = new EventEmitter<any>();
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
@@ -34,45 +38,41 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   index: number;
   plugin: Plugin;
   methods: object = {};
+  bsModalRef: BsModalRef;
   selectedMethod: PluginMethod;
+  FLOW_CONTROL_TYPES 
+  COORDINATION_TYPES
 
-  COORDINATION_TYPES = {
-    wait: 'Wait for all',
-    race: 'Run once for first',
-    each: 'Run for each in link'
-  };
-
-  FLOW_CONTROL_TYPES = {
-    wait: 'Wait for all agents and then run',
-    race: 'Run only for first agent',
-    each: 'Run for each agent'
-  };
 
   constructor(
     private socketService: SocketService,
     private pluginsService: PluginsService,
-    private mapDesignService: MapDesignService
-  ) {}
+    private mapDesignService: MapDesignService,
+    private modalService: BsModalService
+    
+  ) {
+    this.COORDINATION_TYPES = COORDINATION_TYPES;
+    this.FLOW_CONTROL_TYPES = FLOW_CONTROL_TYPES;
+   }
 
   ngOnInit() {
-    if (!this.process) {
+    if (!this.processViewWrapper.process) {
       this.closePane();
       return;
     }
+    this.processForm = Process.getFormGroup(this.processViewWrapper.process);
 
     this.processUpdateSubscription = this.mapDesignService
       .getUpdateProcessAsObservable()
-      .filter(process => process.uuid === this.process.uuid)
+      .filter(process => process.uuid === this.processViewWrapper.process.uuid)
       .subscribe(process => {
-        this.process = new Process(process);
         this.processForm.get('coordination').setValue(process.coordination);
       });
 
     // this.process = new Process(this.process);
-    this.processForm = Process.getFormGroup(this.process);
 
-    if (this.process.actions) {
-      this.process.actions.forEach((action, actionIndex) => {
+    if (this.processViewWrapper.process.actions) {
+      this.processViewWrapper.process.actions.forEach((action, actionIndex) => {
         const actionControl = <FormArray>this.processForm.controls['actions'];
         actionControl.push(this.initActionController(action));
         if (action.params && action.params.length > 0) {
@@ -83,7 +83,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       });
     }
 
-    this.plugin = _.cloneDeep(this.process.plugin);
+    this.plugin = _.cloneDeep(this.processViewWrapper.process.plugin);
     this.generateAutocompleteParams();
 
     // subscribe to changes in form
@@ -109,6 +109,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * if the plugin has autocomplete method it generates them
    */
   generateAutocompleteParams() {
+    if (!this.plugin) return;
     Observable.from(this.plugin.methods)
       .filter(method => this.methodHaveParamType(method, 'autocomplete')) // check if has autocomplete
       .flatMap(method => {
@@ -148,14 +149,34 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     return method.params.findIndex(p => p.type === type) > -1;
   }
 
+
+  runAction(action){
+    if(this.processViewWrapper.plugin){
+      return action();
+    }
+    else{
+      this.bsModalRef = this.modalService.show(ConfirmComponent);
+      this.bsModalRef.content.title = 'Plugin missing'
+      this.bsModalRef.content.message = `This process uses the plugin ${this.processViewWrapper.process.used_plugin.name} which have been removed.\nPlease reinstall the plugin to enable editing.`;
+      this.bsModalRef.content.cancel = null;
+      this.bsModalRef.content.confirm = 'Confirm'
+    }
+  }
+
   /**
    * Add a new action to process
    */
   addNewAction() {
-    const actionControl = <FormArray>this.processForm.controls['actions'];
-    actionControl.push(this.initActionController());
-    this.editAction(actionControl.length - 1); // switch to edit the new action
+    this.runAction(()=>{
+      const actionControl = <FormArray>this.processForm.controls['actions'];
+      actionControl.push(this.initActionController());
+      this.editAction(actionControl.length - 1); // switch to edit the new action
+    })
   }
+
+    
+    
+  
 
   backToProcessView() {
     this.action = false;
@@ -176,8 +197,10 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @param {number} index
    */
   editAction(index: number) {
-    this.index = index;
-    this.action = true;
+      this.runAction(()=>{
+        this.action = true;
+        this.index = index;
+      })
   }
 
   /**

@@ -48,7 +48,7 @@ var schema = {
                       }
                     },
                     additionalProperties: false,
-                    required:['id','name','type']
+                    required:['id','name']
                   },
                 }
               },

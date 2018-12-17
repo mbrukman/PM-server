@@ -12,6 +12,7 @@ import { SocketService } from '@shared/socket.service';
 import { DiffEditorModel } from 'ngx-monaco-editor';
 import { BsModalService } from 'ngx-bootstrap';
 import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
+import { FilterOptions } from '@shared/model/filter-options.model';
 
 
 @Component({
@@ -114,6 +115,8 @@ export class MapRevisionsComponent implements OnInit {
 
   getMapStructures(page: number) {
     this.mapsService.structuresList(this.mapId, page).subscribe(structures => {
+      if(structures.length)
+        this.previewStructure(structures[0].id)
       if (structures && structures.length > 0) {
         this.structures = [...this.structures, ...structures];
       } else {
@@ -123,7 +126,8 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   getMapProject() {
-    this.projectsReq = this.projectsService.filter().subscribe(data => {
+    var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt'};
+    this.projectsReq = this.projectsService.filter(null,null,filterOptions).subscribe(data => {
       data.items.forEach(project => {
         if ((<string[]>project.maps).indexOf(this.mapId) > -1) {
           this.project = project;
