@@ -18,12 +18,7 @@ function getMapPlugins(mapStructure) {
     return Array.from(plugins);
 }
 
-function sortProjectorLastRun(x,y,z){
-    if(x!=y){
-        return z!= '-' ? (x < y ? -1 : 1):(x < y ? 1:-1)
-    } 
-    else return 0
-}
+
 
 function getSort(sortString){
     var sort = {}
@@ -131,9 +126,7 @@ module.exports = {
                                 $expr:{
                                         $eq: [ "$$mapId", "$map" ] 
                                 }
-                                
                             }
-
                         },
                         {
                             $limit:1
@@ -152,7 +145,6 @@ module.exports = {
 
                      ],
                     as:"latestExectionResult",
-      
                 },
             },
             {$sort:getSort(sort)},
