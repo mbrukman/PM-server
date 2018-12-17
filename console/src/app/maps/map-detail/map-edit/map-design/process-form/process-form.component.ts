@@ -157,7 +157,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     else{
       this.bsModalRef = this.modalService.show(ConfirmComponent);
       this.bsModalRef.content.title = 'Plugin missing'
-      this.bsModalRef.content.message = 'The process is using the plugin ' + this.processViewWrapper.process.used_plugin.name +' which have been removed.\nPlease reinstall the plugin to enable editing.';
+      this.bsModalRef.content.message = `This process uses the plugin ${this.processViewWrapper.process.used_plugin.name} which have been removed.\nPlease reinstall the plugin to enable editing.`;
       this.bsModalRef.content.cancel = null;
       this.bsModalRef.content.confirm = 'Confirm'
     }
