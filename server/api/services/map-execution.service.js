@@ -23,6 +23,7 @@ let executions = {};
 let pending = {};
 
 let libpm = '';
+let libpmObjects = {} 
 
 fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 'utf8', function (err, data) {
     // opens the lib_production file. this file is used for user to use overwrite custom function at map code
@@ -30,10 +31,11 @@ fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 
         return winston.log('error', err);
     }
     libpm = data;
+    eval(libpm)
+    libpmObjects.currentAgent = currentAgent
 });
 
 function evaluateParam(param, context) {
-
     if (!param.code) {
         return param.value;
     }
@@ -183,9 +185,9 @@ function updateActionContext(runId, agentKey, processKey, processIndex, actionKe
 
 
 function updatecurrentAgentContext(runId,agentKey){
-    executions[runId].executionAgents[agentKey].executionContext.currentAgent.name = executions[runId].executionAgents[agentKey].name;
-    executions[runId].executionAgents[agentKey].executionContext.currentAgent.url = executions[runId].executionAgents[agentKey].url;
-    executions[runId].executionAgents[agentKey].executionContext.currentAgent.attributes = executions[runId].executionAgents[agentKey].attributes;
+    Object.keys(libpmObjects.currentAgent).forEach(field =>{
+        executions[runId].executionAgents[agentKey].executionContext.currentAgent[field] = executions[runId].executionAgents[agentKey][field]    
+    })
 }
 
 /**

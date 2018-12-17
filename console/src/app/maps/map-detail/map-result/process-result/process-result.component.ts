@@ -3,7 +3,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import * as moment from 'moment';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 import { BsModalService } from 'ngx-bootstrap';
-import { AgentResult, ProcessResult, ActionResult } from '@maps/models';
+import { AgentResult, ProcessResult, ActionResultView } from '@maps/models';
 
 
 @Component({
@@ -15,7 +15,7 @@ export class ProcessResultComponent implements OnChanges {
   @Input('process') process: ProcessResult[];
   @Input('result') result: AgentResult[];
   @Input('count') count: number;
-  actions: ActionResult[];
+  actions: ActionResultView[];
   generalInfo: ProcessResult;
   agProcessActionsStatus: any;
   agActionsStatus: any;
@@ -35,7 +35,7 @@ export class ProcessResultComponent implements OnChanges {
     }
   }
 
-  expandOutput(action: ActionResult) {
+  expandOutput(action: ActionResultView) {
     let messages = [];
     let results = this.agActionsStatus[action.key].results;
     let msgs = [];
@@ -51,8 +51,8 @@ export class ProcessResultComponent implements OnChanges {
   aggregateProcessActionResults(result) {
     let actions = [];
     this.process.forEach(process => {
-      actions.push(Object.assign({agentKey: process.agentKey}, ...process.actions));
-    });
+      actions.push(...process.actions.map(a=> new ActionResultView(a,process.agentKey) ))
+      })
     this.actions = actions;
 
     // aggregating actions status
@@ -68,25 +68,23 @@ export class ProcessResultComponent implements OnChanges {
     
     // aggregating status for each action
     let agActions = this.actions.reduce((total, current) => {
-      let index = current.key = current.agentKey + current.action;  
-      // let index =  current.key
-      if (!total[index]) {
-        total[index] = {
+      if (!total[current.key]) {
+        total[current.key] = {
           status: { success: 0, error: 0, stopped: 0 },
           results: { result: [], stderr: [], stdout: [] },
           startTime: new Date(),
           finishTime: new Date('1994-12-17T03:24:00')
         };
       }
-      total[index]['status'][current.status] = (total[index][current.status] || 0) + 1;
-      if (current.result) {
+      total[current.key]['status'][current.action.status] = (total[current.key][current.action.status] || 0) + 1;
+      if (current.action.result) {
 
-        total[index]['results']['result'].push(current.result.result);
-        total[index]['results']['stderr'].push(current.result.stderr);
-        total[index]['results']['stdout'].push(current.result.stdout);
+        total[current.key]['results']['result'].push(current.action.result.result);
+        total[current.key]['results']['stderr'].push(current.action.result.stderr);
+        total[current.key]['results']['stdout'].push(current.action.result.stdout);
       }
-      total[index]['startTime'] = moment(current.startTime).isBefore(moment(total[index]['startTime'])) ? current.startTime : total[index]['startTime'];
-      total[index]['finishTime'] = moment(current.finishTime).isAfter(moment(total[index]['finishTime'])) ? current.finishTime : total[index]['finishTime'];
+      total[current.key]['startTime'] = moment(current.action.startTime).isBefore(moment(total[current.key]['startTime'])) ? current.action.startTime : total[current.key]['startTime'];
+      total[current.key]['finishTime'] = moment(current.action.finishTime).isAfter(moment(total[current.key]['finishTime'])) ? current.action.finishTime : total[current.key]['finishTime'];
       return total;
     }, {});
     Object.keys(agActions).map((o) => {

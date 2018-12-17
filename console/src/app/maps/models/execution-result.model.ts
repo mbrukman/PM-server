@@ -13,8 +13,6 @@ export class ActionResult implements IActionResult {
   startTime: Date;
   finishTime: Date;
   result: any;
-  key?: string
-  agentKey?:string
 }
 
 

@@ -132,7 +132,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   aggregateProcessStatuses(results) {
     let processes = [];
     results.forEach(res => {
-      processes = [...processes, ...res.processes, ...res.agent]; 
+      processes.push(...res.processes); 
     });
 
     let ag = processes.reduce((total, current) => {
