@@ -42,8 +42,9 @@ export class SearchComponent implements OnDestroy, OnInit {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
       var filterOptions : FilterOptions = {isArchived:false,globalFilter:this.query,sort:'-createdAt'};
-      if (limit)
+      if (limit){
         filterOptions.limit = limit;
+      }
       
       this.loading = true;
       this.mapReq = this.mapsService.filterMaps(null, null, filterOptions).subscribe(data => {
