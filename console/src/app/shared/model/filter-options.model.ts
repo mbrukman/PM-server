@@ -3,4 +3,5 @@ export class FilterOptions{
     isArchived?:boolean;
     sort:string = '-createdAt';
     limit? : number;
+    filter?:string
 }

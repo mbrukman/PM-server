@@ -126,7 +126,7 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   getMapProject() {
-    var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt'};
+    var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt',filter:this.mapId};
     this.projectsReq = this.projectsService.filter(null,null,filterOptions).subscribe(data => {
       data.items.forEach(project => {
         if ((<string[]>project.maps).indexOf(this.mapId) > -1) {
