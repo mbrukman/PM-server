@@ -83,7 +83,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       });
     }
 
-    this.plugin = _.cloneDeep(this.processViewWrapper.process.plugin);
+    this.plugin = _.cloneDeep(this.processViewWrapper.plugin);
     this.generateAutocompleteParams();
 
     // subscribe to changes in form
@@ -173,10 +173,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       this.editAction(actionControl.length - 1); // switch to edit the new action
     })
   }
-
-    
-    
-  
 
   backToProcessView() {
     this.action = false;
