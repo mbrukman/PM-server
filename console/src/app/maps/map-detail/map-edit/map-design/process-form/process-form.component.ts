@@ -40,20 +40,15 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   methods: object = {};
   bsModalRef: BsModalRef;
   selectedMethod: PluginMethod;
-  FLOW_CONTROL_TYPES 
-  COORDINATION_TYPES
-
+  FLOW_CONTROL_TYPES  = FLOW_CONTROL_TYPES;
+  COORDINATION_TYPES = COORDINATION_TYPES;
 
   constructor(
     private socketService: SocketService,
     private pluginsService: PluginsService,
     private mapDesignService: MapDesignService,
     private modalService: BsModalService
-    
-  ) {
-    this.COORDINATION_TYPES = COORDINATION_TYPES;
-    this.FLOW_CONTROL_TYPES = FLOW_CONTROL_TYPES;
-   }
+  ) {}
 
   ngOnInit() {
     if (!this.processViewWrapper.process) {
@@ -68,8 +63,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       .subscribe(process => {
         this.processForm.get('coordination').setValue(process.coordination);
       });
-
-    // this.process = new Process(this.process);
 
     if (this.processViewWrapper.process.actions) {
       this.processViewWrapper.process.actions.forEach((action, actionIndex) => {
@@ -119,7 +112,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         );
       })
       .map(data => {
-        // data: [method, [generated params]]
         data[1].forEach(param => {
           data[0].params[
             data[0].params.findIndex(o => o.name === param.name)
