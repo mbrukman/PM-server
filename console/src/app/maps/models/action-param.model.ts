@@ -14,7 +14,6 @@ export class ActionParam extends Serializable implements IActionParam {
   viewName?: string;
   name?: string;
   param: PluginMethodParam | string;
-  type: 'string' | 'text';
 
   static getFormGroup(param?: ActionParam): FormGroup {
     if (!param) {
@@ -27,7 +26,7 @@ export class ActionParam extends Serializable implements IActionParam {
       param: new FormControl(param._id),
       viewName: new FormControl(param.viewName),
       name: new FormControl(param.name),
-      type: new FormControl(param.type)
+
     });
   }
 }

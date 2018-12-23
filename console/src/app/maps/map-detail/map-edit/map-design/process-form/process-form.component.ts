@@ -216,20 +216,25 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * Called from the template once user changes a method
    */
   onSelectMethod() {
-    this.selectedMethod = this.processForm.value.actions[this.index].method;
     const methodName = this.processForm.value.actions[this.index].method;
     const action = this.processForm.controls['actions']['controls'][this.index];
-    const method = this.plugin.methods.find(o => o.name === methodName);
+    this.selectedMethod = this.plugin.methods.find(o => o.name === methodName);
     this.clearFormArray(action.controls.params);
-    if (!method) {
+    if (!this.selectedMethod) {
       this.socketService.setNotification({
         title: 'OH OH',
         message: 'Unexpected error, please try again.'
       });
       return;
     }
-    method.params.forEach(param => {
-      action.controls.params.push(PluginMethodParam.getFormGroup(param));
+    this.selectedMethod.params.forEach((param,i) => {
+      if(this.processViewWrapper.process.actions && this.index < this.processViewWrapper.process.actions.length){
+        action.controls.params.push(PluginMethodParam.getFormGroup(param,this.processViewWrapper.process.actions[this.index-1].params.find(p => p.name === param.name)));
+      }
+      else{
+        action.controls.params.push(PluginMethodParam.getFormGroup(param, new ActionParam()));
+      }
+        
     });
   }
 
