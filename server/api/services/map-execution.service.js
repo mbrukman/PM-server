@@ -423,7 +423,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, 
 
     return mapsService.get(mapId).then((mapobj) => {
         if(!mapobj){
-            throw new Error('map could not be find');
+            throw new Error(`Couldn't find map`);
         }
         if (mapobj.archived) {
             throw new Error('Can\'t execute archived map');
