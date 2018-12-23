@@ -18,7 +18,8 @@ module.exports = {
             req.io.emit('notification', {
                 title: 'Error',
                 message: `Error creating map. Please try again`,
-                type: 'error'
+                type: 'error', 
+                mapId : req.params.id
             });
             return res.status(500).send(error);
         });
@@ -81,7 +82,7 @@ module.exports = {
             return res.status(200).json(map);
         }).catch((error) => {
             winston.log('error', "Error finding map", error);
-            req.io.emit('notification', { title: 'Whoops...', message: `Error finding map`, type: 'error' });
+            req.io.emit('notification', { title: 'Whoops...', message: `Error finding map`, type: 'error', mapId :req.params.id });
             return res.status(500).json(error);
         });
     },
@@ -120,7 +121,8 @@ module.exports = {
                 req.io.emit('notification', {
                     title: 'Map duplicated',
                     message: `${dupMap.name} was duplicated`,
-                    type: 'success'
+                    type: 'success',
+                    mapId : req.params.id
                 });
                 return res.json(dupMap);
             });
@@ -155,7 +157,7 @@ module.exports = {
         hooks.hookPre('map-delete', req).then(() => {
             return mapsService.mapDelete(req.params.id)
         }).then(() => {
-            req.io.emit('notification', { title: 'Map deleted', message: ``, type: 'success' });
+            req.io.emit('notification', { title: 'Map deleted', message: ``, type: 'success', mapId : req.params.id });
             return res.status(200).send();
         }).catch(error => {
             req.io.emit('notification', { title: 'Whoops', message: `Error deleting map`, type: 'error' });
@@ -200,7 +202,7 @@ module.exports = {
             return res.send('OK');
         }).catch((error) => {
             winston.log('error', "Error updating map", error);
-            req.io.emit('notification', { title: 'Whoops...', message: `Error updating map`, type: 'error' });
+            req.io.emit('notification', { title: 'Whoops...', message: `Error updating map`, type: 'error', mapId:  mapId});
 
             return res.status(500).json(error);
         });
@@ -215,11 +217,11 @@ module.exports = {
         hooks.hookPre('map-create-structure', req).then(() => {
             return mapsService.createStructure(req.body)
         }).then(structure => {
-            req.io.emit('notification', { title: 'Saved', message: `Map saved successfully`, type: 'success' });
+            req.io.emit('notification', { title: 'Saved', message: `Map saved successfully`, type: 'success', mapId:mapId });
             return res.json(structure)
         }).catch((error) => {
             winston.log('error', "Error creating map structure", error);
-            req.io.emit('notification', { title: 'Whoops...', message: `Error saving map structure`, type: 'error' });
+            req.io.emit('notification', { title: 'Whoops...', message: `Error saving map structure`, type: 'error', mapId: mapId });
 
             return res.status(500).send(error);
         })
@@ -272,7 +274,7 @@ module.exports = {
             res.json(r);
         }).catch(error => {
             winston.log('error', "Error executing map", error);
-            req.io.emit('notification', { title: 'Error executing map', message: error.message, type: 'error' });
+            req.io.emit('notification', { title: 'Error executing map', message: error.message, type: 'error', mapId:req.params.id });
             return res.status(500).send(error.message);
         });
     },
@@ -303,7 +305,8 @@ module.exports = {
             req.io.emit('notification', {
                 title: 'Whoops...',
                 message: `Error getting execution results`,
-                type: 'error'
+                type: 'error',
+                mapId: req.params.id
             });
 
             return res.status(500).json(error);
@@ -323,7 +326,8 @@ module.exports = {
             req.io.emit('notification', {
                 title: 'Whoops...',
                 message: `Error getting execution result`,
-                type: 'error'
+                type: 'error', 
+                mapId: req.params.id
             });
 
             return res.status(500).json(error);
@@ -339,7 +343,8 @@ module.exports = {
             req.io.emit('notification', {
                 title: 'Trigger saved',
                 message: `${trigger.name} saved successfully`,
-                type: 'success'
+                type: 'success',
+                mapId: req.params.id
             });
 
             return res.json(trigger);
@@ -348,15 +353,16 @@ module.exports = {
             return res.status(500).json(error);
         });
     },
-    /* delete a trigger */
-    triggerDelete: (req, res) => {
+    /* delete a trigger */ 
+    triggerDelete: (req, res) => { 
         hooks.hookPre('trigger-delete', req).then(() => {
             return triggersService.delete(req.params.triggerId);
         }).then(() => {
             req.io.emit('notification', {
                 title: 'Trigger deleted',
                 message: ``,
-                type: 'success'
+                type: 'success',
+                mapId: req.params.id
             });
 
             return res.send("OK");
@@ -364,7 +370,8 @@ module.exports = {
             req.io.emit('notification', {
                 title: 'Error deleting',
                 message: `We couldn't delete this trigger`,
-                type: 'error'
+                type: 'error',
+                mapId: req.params.id
             });
             winston.log('error', "Error getting map's triggers", error);
             return res.status(500).json(error);
@@ -382,14 +389,15 @@ module.exports = {
         });
     },
     /* update a trigger */
-    triggerUpdate: (req, res) => {
+    triggerUpdate: (req, res) => { 
         hooks.hookPre('trigger-update', req).then(() => {
             return triggersService.update(req.params.triggerId, req.body)
         }).then(trigger => {
             req.io.emit('notification', {
                 title: 'Trigger saved',
                 message: `${trigger.name} saved successfully`,
-                type: 'success'
+                type: 'success', 
+                mapId: req.params.id
             });
 
             return res.json(trigger);
