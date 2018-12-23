@@ -25,6 +25,14 @@
     }
 }
 
+::ng-deep{
+  #flyPaper{
+    .hidden{
+      visibility: hidden;
+    }
+  }
+}
+
 
 .filter{
   margin: 12px 0px 0px;
