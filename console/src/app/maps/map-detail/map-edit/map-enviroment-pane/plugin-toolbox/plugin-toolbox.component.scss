@@ -17,6 +17,10 @@
       > svg {
         overflow: visible;
         margin-bottom: 10px;
+
+        .hidden{
+          visibility: hidden;
+        }
       }
     }
 }

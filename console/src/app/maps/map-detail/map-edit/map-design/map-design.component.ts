@@ -49,7 +49,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   defaultContent: string;
   @ViewChild('wrapper') wrapper: ElementRef;
   processViewWrapper: ProcessViewWrapper;
-  constructor(private designService: MapDesignService,
+  constructor(
     private mapsService: MapsService,
     private pluginsService: PluginsService,
     private mapDesignService: MapDesignService) { }
@@ -62,7 +62,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
 
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
-    this.dropSubscription = this.designService
+    this.dropSubscription = this.mapDesignService
       .getDrop()
       .filter(obj => this.isDroppedOnMap(obj.x, obj.y))
       .subscribe(obj => {
@@ -289,9 +289,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   addNewProcess(obj: { x: number, y: number, cell: any }, offsetTop: number, offsetLeft: number) {
-    const pluginName = obj.cell.model.attributes.attrs['.label'].text;
+    const pluginDisplayName = obj.cell.model.attributes.attrs['.label'].text;
+    const pluginId = obj.cell.model.attributes.attrs['.p_id'].text;
     const plugin = this.plugins.find((o) => {
-      return o.name === pluginName;
+      return o._id === pluginId;
     });
     let imageModel = new joint.shapes.devs['MyImageModel']({
       position: {
@@ -306,7 +307,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       outPorts: ['  '],
       attrs: {
         '.label': {
-          text: pluginName,
+          text: pluginDisplayName,
           'ref-y': 5,
           'font-size': 14,
           fill: '#bbbbbb'
@@ -341,7 +342,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.graph.addCell(imageModel);
     let p = new Process();
     p.plugin = plugin;
-    p.used_plugin = { name: pluginName, version: plugin.version };
+    p.used_plugin = { name: plugin.name, version: plugin.version };
     p.uuid = <string>imageModel.id;
 
     if (!this.mapStructure.processes) {
