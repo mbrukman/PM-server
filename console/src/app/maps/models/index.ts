@@ -12,4 +12,5 @@ export * from './used-plugin.model';
 export * from './action.model';
 export * from './action-param.model';
 export * from './link.model';
-export * from './process-view-wrapper.model'
+export * from './view-models/process-view-wrapper.model';
+export * from './view-models/action-result-view.model';

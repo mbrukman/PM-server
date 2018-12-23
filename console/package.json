@@ -4,9 +4,9 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "build:prod": "ng build --prod",
+    "set-env" : "node set-env.js",
+    "start": "npm run set-env && ng serve",
+    "build:prod": "npm run set-env && ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

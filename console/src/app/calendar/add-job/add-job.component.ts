@@ -6,6 +6,7 @@ import { Project } from '@projects/models/project.model';
 import { CalendarService } from '../calendar.service';
 import { CronJobsConfig } from 'ngx-cron-jobs/src/app/lib/contracts/contracts';
 import { MapsService } from '@maps/maps.service';
+import { FilterOptions } from '@shared/model/filter-options.model';
 
 @Component({
   selector: 'app-add-job',
@@ -30,7 +31,8 @@ export class AddJobComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.projectsReq = this.projectsService.filter().subscribe(data => {
+    var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt'};
+    this.projectsReq = this.projectsService.filter(null,null,filterOptions).subscribe(data => {
       this.projects = data.items;
     });
     this.form = this.initForm();

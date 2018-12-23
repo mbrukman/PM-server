@@ -27,6 +27,8 @@ export class ProcessResult implements IProcessResult {
   startTime: Date;
   finishTime: Date;
   result: any;
+  //TODO: move to wrapper
+  agentKey : string;
 }
 
 export class AgentResult implements IAgentResult {

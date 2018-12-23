@@ -16,6 +16,9 @@ import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
 import { SocketService } from '@shared/socket.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
+import { BsModalService } from 'ngx-bootstrap';
+import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import {FLOW_CONTROL_TYPES, COORDINATION_TYPES}  from '@maps/contants'
 
 @Component({
@@ -35,6 +38,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   index: number;
   plugin: Plugin;
   methods: object = {};
+  bsModalRef: BsModalRef;
   selectedMethod: PluginMethod;
   FLOW_CONTROL_TYPES 
   COORDINATION_TYPES
@@ -43,7 +47,9 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   constructor(
     private socketService: SocketService,
     private pluginsService: PluginsService,
-    private mapDesignService: MapDesignService
+    private mapDesignService: MapDesignService,
+    private modalService: BsModalService
+    
   ) {
     this.COORDINATION_TYPES = COORDINATION_TYPES;
     this.FLOW_CONTROL_TYPES = FLOW_CONTROL_TYPES;
@@ -103,6 +109,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * if the plugin has autocomplete method it generates them
    */
   generateAutocompleteParams() {
+    if (!this.plugin) return;
     Observable.from(this.plugin.methods)
       .filter(method => this.methodHaveParamType(method, 'autocomplete')) // check if has autocomplete
       .flatMap(method => {
@@ -142,14 +149,34 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     return method.params.findIndex(p => p.type === type) > -1;
   }
 
+
+  runAction(action){
+    if(this.processViewWrapper.plugin){
+      return action();
+    }
+    else{
+      this.bsModalRef = this.modalService.show(ConfirmComponent);
+      this.bsModalRef.content.title = 'Plugin missing'
+      this.bsModalRef.content.message = `This process uses the plugin ${this.processViewWrapper.process.used_plugin.name} which have been removed.\nPlease reinstall the plugin to enable editing.`;
+      this.bsModalRef.content.cancel = null;
+      this.bsModalRef.content.confirm = 'Confirm'
+    }
+  }
+
   /**
    * Add a new action to process
    */
   addNewAction() {
-    const actionControl = <FormArray>this.processForm.controls['actions'];
-    actionControl.push(this.initActionController());
-    this.editAction(actionControl.length - 1); // switch to edit the new action
+    this.runAction(()=>{
+      const actionControl = <FormArray>this.processForm.controls['actions'];
+      actionControl.push(this.initActionController());
+      this.editAction(actionControl.length - 1); // switch to edit the new action
+    })
   }
+
+    
+    
+  
 
   backToProcessView() {
     this.action = false;
@@ -170,8 +197,10 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @param {number} index
    */
   editAction(index: number) {
-    this.index = index;
-    this.action = true;
+      this.runAction(()=>{
+        this.action = true;
+        this.index = index;
+      })
   }
 
   /**
