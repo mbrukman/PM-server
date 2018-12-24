@@ -200,6 +200,14 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       this.runAction(()=>{
         this.action = true;
         this.index = index;
+        const action = this.processForm.controls['actions']['controls'][this.index];
+        if(this.processForm.value.actions[this.index].params.length > 0){
+          const methodName = this.processForm.value.actions[this.index].method;
+          this.selectedMethod = this.plugin.methods.find(o => o.name === methodName);
+          this.selectedMethod.params.forEach(param => {
+            action.controls.params.splice(0,1,PluginMethodParam.getFormGroup(param,this.processForm.value.actions[this.index].params.find(p => p.name === param.name)));
+          });
+        }
       })
   }
 
@@ -227,15 +235,9 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       });
       return;
     }
-    this.selectedMethod.params.forEach((param,i) => {
-      if(this.processViewWrapper.process.actions && this.index < this.processViewWrapper.process.actions.length){
-        action.controls.params.push(PluginMethodParam.getFormGroup(param,this.processViewWrapper.process.actions[this.index-1].params.find(p => p.name === param.name)));
-      }
-      else{
-        action.controls.params.push(PluginMethodParam.getFormGroup(param, new ActionParam()));
-      }
-        
-    });
+    this.selectedMethod.params.forEach(param => {
+      action.controls.params.push(PluginMethodParam.getFormGroup(param, new ActionParam()));
+    })
   }
 
   /**
