@@ -9,10 +9,8 @@ export interface IActionParam {
   _id?: string;
   value: string;
   code: boolean;
-  viewName?: string;
   name?: string;
-  param: IPluginMethodParam | string;
-  type: 'string' | 'text';
+
 }
 
 export interface IAction {

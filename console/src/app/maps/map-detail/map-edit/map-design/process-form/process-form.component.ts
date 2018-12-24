@@ -36,7 +36,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   processForm: FormGroup;
   action: boolean = false;
   index: number;
-  plugin: Plugin;
   methods: object = {};
   bsModalRef: BsModalRef;
   selectedMethod: PluginMethod;
@@ -64,20 +63,22 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         this.processForm.get('coordination').setValue(process.coordination);
       });
 
+    // this.process = new Process(this.process);
+
+    this.generateAutocompleteParams();
     if (this.processViewWrapper.process.actions) {
       this.processViewWrapper.process.actions.forEach((action, actionIndex) => {
         const actionControl = <FormArray>this.processForm.controls['actions'];
         actionControl.push(this.initActionController(action));
         if (action.params && action.params.length > 0) {
-          action.params.forEach(param => {
-            actionControl.controls[actionIndex]['controls'].params.push(ActionParam.getFormGroup(param));
+          action.params.forEach((param, i) => {
+            let pluginParam = this.processViewWrapper.plugin.methods.find(o => o.name === this.processForm.value.actions[actionIndex].method);
+            actionControl.controls[actionIndex]['controls'].params.push(PluginMethodParam.getFormGroup(pluginParam.params[i],param));
           });
         }
       });
     }
 
-    this.plugin = _.cloneDeep(this.processViewWrapper.plugin);
-    this.generateAutocompleteParams();
 
     // subscribe to changes in form
     this.formValueChangeSubscription = this.processForm.valueChanges
@@ -102,13 +103,13 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * if the plugin has autocomplete method it generates them
    */
   generateAutocompleteParams() {
-    if (!this.plugin) return;
-    Observable.from(this.plugin.methods)
+    if (!this.processViewWrapper.plugin) return;
+    Observable.from(this.processViewWrapper.plugin.methods)
       .filter(method => this.methodHaveParamType(method, 'autocomplete')) // check if has autocomplete
       .flatMap(method => {
         return Observable.forkJoin(
           Observable.of(method), // the method
-          this.pluginsService.generatePluginParams(this.plugin._id, method.name) // generated params
+          this.pluginsService.generatePluginParams(this.processViewWrapper.plugin._id, method.name) // generated params
         );
       })
       .map(data => {
@@ -120,13 +121,13 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         return data[0];
       })
       .subscribe(method => {
-        this.plugin.methods[
-          this.plugin.methods.findIndex(o => o.name === method.name)
+        this.processViewWrapper.plugin.methods[
+          this.processViewWrapper.plugin.methods.findIndex(o => o.name === method.name)
         ] = method;
         this.addToMethodContext(method);
       });
 
-    Observable.from(this.plugin.methods)
+    Observable.from(this.processViewWrapper.plugin.methods)
       .filter(method => this.methodHaveParamType(method, 'options'))
       .subscribe(method => {
         this.addToMethodContext(method);
@@ -188,6 +189,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       this.runAction(()=>{
         this.action = true;
         this.index = index;
+        
       })
   }
 
@@ -204,21 +206,20 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * Called from the template once user changes a method
    */
   onSelectMethod() {
-    this.selectedMethod = this.processForm.value.actions[this.index].method;
     const methodName = this.processForm.value.actions[this.index].method;
     const action = this.processForm.controls['actions']['controls'][this.index];
-    const method = this.plugin.methods.find(o => o.name === methodName);
+    this.selectedMethod = this.processViewWrapper.plugin.methods.find(o => o.name === methodName);
     this.clearFormArray(action.controls.params);
-    if (!method) {
+    if (!this.selectedMethod) {
       this.socketService.setNotification({
         title: 'OH OH',
         message: 'Unexpected error, please try again.'
       });
       return;
     }
-    method.params.forEach(param => {
+    this.selectedMethod.params.forEach(param => {
       action.controls.params.push(PluginMethodParam.getFormGroup(param));
-    });
+    })
   }
 
   /**
