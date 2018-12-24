@@ -42,9 +42,10 @@ module.exports = {
             Object.keys(filterOptions.fields).map(key => { filterOptions.fields[key] = { '$regex': `.*${filterOptions.fields[key]}.*` }});
             q = filterOptions.fields;
         } 
-        var filterQueryOptions = [{ name: { '$regex': `.*${filterOptions.globalFilter}.*` } }, { description: { '$regex': `.*${filterOptions.globalFilter}.*` } }]
+        
         if(filterOptions.options.globalFilter){
-                q.$or = filterQueryOptions;
+            var filterQueryOptions = [{ name: { '$regex': `.*${filterOptions.globalFilter}.*` } }, { description: { '$regex': `.*${filterOptions.globalFilter}.*` } }]
+            q.$or = filterQueryOptions;
         }
         
         if(!filterOptions.options.isArchived){

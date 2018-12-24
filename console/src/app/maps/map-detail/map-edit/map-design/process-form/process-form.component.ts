@@ -70,17 +70,15 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       });
 
     // this.process = new Process(this.process);
-    
-    this.plugin = _.cloneDeep(this.processViewWrapper.process.plugin);
+
     this.generateAutocompleteParams();
-    
     if (this.processViewWrapper.process.actions) {
       this.processViewWrapper.process.actions.forEach((action, actionIndex) => {
         const actionControl = <FormArray>this.processForm.controls['actions'];
         actionControl.push(this.initActionController(action));
         if (action.params && action.params.length > 0) {
           action.params.forEach((param, i) => {
-            let pluginParam = this.plugin.methods.find(o => o.name === this.processForm.value.actions[actionIndex].method);
+            let pluginParam = this.processViewWrapper.process.plugin.methods.find(o => o.name === this.processForm.value.actions[actionIndex].method);
             actionControl.controls[actionIndex]['controls'].params.push(PluginMethodParam.getFormGroup(pluginParam.params[i],param));
           });
         }
@@ -111,13 +109,13 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * if the plugin has autocomplete method it generates them
    */
   generateAutocompleteParams() {
-    if (!this.plugin) return;
-    Observable.from(this.plugin.methods)
+    if (!this.processViewWrapper.process.plugin) return;
+    Observable.from(this.processViewWrapper.process.plugin.methods)
       .filter(method => this.methodHaveParamType(method, 'autocomplete')) // check if has autocomplete
       .flatMap(method => {
         return Observable.forkJoin(
           Observable.of(method), // the method
-          this.pluginsService.generatePluginParams(this.plugin._id, method.name) // generated params
+          this.pluginsService.generatePluginParams(this.processViewWrapper.process.plugin._id, method.name) // generated params
         );
       })
       .map(data => {
@@ -130,13 +128,13 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         return data[0];
       })
       .subscribe(method => {
-        this.plugin.methods[
-          this.plugin.methods.findIndex(o => o.name === method.name)
+        this.processViewWrapper.process.plugin.methods[
+          this.processViewWrapper.process.plugin.methods.findIndex(o => o.name === method.name)
         ] = method;
         this.addToMethodContext(method);
       });
 
-    Observable.from(this.plugin.methods)
+    Observable.from(this.processViewWrapper.process.plugin.methods)
       .filter(method => this.methodHaveParamType(method, 'options'))
       .subscribe(method => {
         this.addToMethodContext(method);
@@ -221,7 +219,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   onSelectMethod() {
     const methodName = this.processForm.value.actions[this.index].method;
     const action = this.processForm.controls['actions']['controls'][this.index];
-    this.selectedMethod = this.plugin.methods.find(o => o.name === methodName);
+    this.selectedMethod = this.processViewWrapper.process.plugin.methods.find(o => o.name === methodName);
     this.clearFormArray(action.controls.params);
     if (!this.selectedMethod) {
       this.socketService.setNotification({
@@ -231,7 +229,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       return;
     }
     this.selectedMethod.params.forEach(param => {
-      action.controls.params.push(PluginMethodParam.getFormGroup(param, new ActionParam()));
+      action.controls.params.push(PluginMethodParam.getFormGroup(param));
     })
   }
 

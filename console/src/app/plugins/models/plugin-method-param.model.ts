@@ -16,7 +16,7 @@ export class PluginMethodParam extends Serializable implements IPluginMethodPara
   query?: object;
   model?: string;
 
-  static getFormGroup(param: PluginMethodParam, paramInUse: ActionParam): FormGroup {
+  static getFormGroup(param: PluginMethodParam, paramInUse = new ActionParam()): FormGroup {
     return new FormGroup({
       code: new FormControl(paramInUse.code),
       value: new FormControl(paramInUse.value),
