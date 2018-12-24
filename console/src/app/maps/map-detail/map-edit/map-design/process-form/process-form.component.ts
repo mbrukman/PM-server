@@ -19,7 +19,7 @@ import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
 import { BsModalService } from 'ngx-bootstrap';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
-import {FLOW_CONTROL_TYPES, COORDINATION_TYPES}  from '@maps/contants'
+import {FLOW_CONTROL_TYPES, COORDINATION_TYPES}  from '@maps/constants'
 
 @Component({
   selector: 'app-process-form',
