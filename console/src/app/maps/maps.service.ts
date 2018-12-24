@@ -132,7 +132,7 @@ export class MapsService {
 
   /* map triggers */
   createTrigger(mapId, trigger) {
-    return this.http.post<MapTrigger>(`${serverUrl}api/triggers/${mapId}/create`, trigger);
+    return this.http.post<MapTrigger>(`${serverUrl}api/triggers/${mapId}`, trigger);
   }
 
   deleteTrigger(mapId, triggerId) {
@@ -145,7 +145,7 @@ export class MapsService {
   }
 
   updateTrigger(mapId, trigger) {
-    return this.http.put<MapTrigger>(`${serverUrl}api/triggers/${mapId}/${trigger._id}/update`, trigger);
+    return this.http.put<MapTrigger>(`${serverUrl}api/triggers/${mapId}/${trigger._id}`, trigger);
   }
 
 }

@@ -6,13 +6,13 @@ module.exports = {
     /* create trigger */
     triggerCreate: (req, res) => {
         hooks.hookPre('trigger-create', req).then(() => {
-            return triggersService.create(req.params.id, req.body)
+            return triggersService.create(req.params.mapId, req.body)
         }).then(trigger => {
             req.io.emit('notification', {
                 title: 'Trigger saved',
                 message: `${trigger.name} saved successfully`,
                 type: 'success',
-                mapId: req.params.id
+                mapId: req.params.mapId
             });
 
             return res.json(trigger);
@@ -30,7 +30,7 @@ module.exports = {
                 title: 'Trigger deleted',
                 message: ``,
                 type: 'success',
-                mapId: req.params.id
+                mapId: req.params.mapId
             });
 
             return res.send("OK");
@@ -39,7 +39,7 @@ module.exports = {
                 title: 'Error deleting',
                 message: `We couldn't delete this trigger`,
                 type: 'error',
-                mapId: req.params.id
+                mapId: req.params.mapId
             });
             winston.log('error', "Error getting map's triggers", error);
             return res.status(500).json(error);
@@ -48,7 +48,7 @@ module.exports = {
     /* get triggers list for given map */
     triggersList: (req, res) => {
         hooks.hookPre('trigger-list', req).then(() => {
-            return triggersService.list(req.params.id)
+            return triggersService.list(req.params.mapId)
         }).then(triggers => {
             return res.json(triggers);
         }).catch((error) => {
@@ -65,7 +65,7 @@ module.exports = {
                 title: 'Trigger saved',
                 message: `${trigger.name} saved successfully`,
                 type: 'success', 
-                mapId: req.params.id
+                mapId: req.params.mapId
             });
 
             return res.json(trigger);
