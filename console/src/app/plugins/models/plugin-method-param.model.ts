@@ -2,6 +2,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 
 import {IPluginMethodParam} from '../interfaces/plugin-method-param.interface';
 import { Serializable } from '@core/models/serializable.model';
+import { ActionParam } from '@maps/models';
 
 export class PluginMethodParam extends Serializable implements IPluginMethodParam {
   id?: string;
@@ -15,11 +16,11 @@ export class PluginMethodParam extends Serializable implements IPluginMethodPara
   query?: object;
   model?: string;
 
-  static getFormGroup(param: PluginMethodParam): FormGroup {
+  static getFormGroup(param: PluginMethodParam, paramInUse = new ActionParam()): FormGroup {
     return new FormGroup({
-      code: new FormControl(param.code),
-      value: new FormControl(param.value),
-      param: new FormControl(param._id),
+      code: new FormControl(paramInUse.code),
+      value: new FormControl(paramInUse.value),
+      param: new FormControl(paramInUse._id),
       viewName: new FormControl(param.viewName),
       name: new FormControl(param.name),
       type: new FormControl(param.type)

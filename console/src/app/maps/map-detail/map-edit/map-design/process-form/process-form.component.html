@@ -45,7 +45,7 @@
         </div>
         <div class="form-group">
           <label for="type">Type</label>
-          <input type="text" class="form-control" id="type" [value]="plugin?.name" disabled>
+          <input type="text" class="form-control" id="type" [value]="processViewWrapper.plugin.name" disabled>
         </div>
       </accordion-group>
       <accordion-group>
@@ -186,7 +186,7 @@
       <p class="lead">Method</p>
       <select id="inputState" class="form-control" formControlName="method" (change)="onSelectMethod()">
         <option selected disabled>Select a method</option>
-        <option *ngFor="let method of plugin.methods" id="method._id" [ngValue]="method.name">{{method.viewName}}
+        <option *ngFor="let method of this.processViewWrapper.plugin.methods" id="method._id" [ngValue]="method.name">{{method.viewName}}
         </option>
       </select>
 

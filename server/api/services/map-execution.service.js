@@ -180,14 +180,15 @@ function updateActionContext(runId, agentKey, processKey, processIndex, actionKe
     // If action have a result (i.e. done) set to previous action;
     if (actionData.result)
         executions[runId].executionAgents[agentKey].executionContext.previousAction = executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[actionKey];
-        updatecurrentAgentContext(runId,agentKey);
+        // getCurrentAgent(runId,agentKey);
 }
 
-
-function updatecurrentAgentContext(runId,agentKey){
+function getCurrentAgent(agent){
+    let obj = {};
     Object.keys(libpmObjects.currentAgent).forEach(field =>{
-        executions[runId].executionAgents[agentKey].executionContext.currentAgent[field] = executions[runId].executionAgents[agentKey][field]    
+        obj[field] = agent[field]    
     })
+    return obj;
 }
 
 /**
@@ -275,10 +276,10 @@ function filterExecutionAgents(mapCode, executionContext, groups, mapAgents, exe
             agentObj.socket = agentsStatus[agentStatus.key].socket;
             agentObj.executionContext = _createContext(executionContext);
             vm.runInNewContext(libpm + '\n' + mapCode, agentObj.executionContext);
+            agentObj.executionContext.currentAgent = getCurrentAgent(agentObj);
             executionAgents[agentStatus.key] = agentObj;
         });
         return executionAgents;
-
     }
 
     if (!executionAgents) {
@@ -432,6 +433,9 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, 
     let map;
 
     return mapsService.get(mapId).then((mapobj) => {
+        if(!mapobj){
+            throw new Error(`Couldn't find map`);
+        }
         if (mapobj.archived) {
             throw new Error('Can\'t execute archived map');
         }

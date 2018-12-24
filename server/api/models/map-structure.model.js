@@ -3,11 +3,10 @@ const Schema = mongoose.Schema;
 
 const actionParamsSchema = new Schema({
     value: String,
-    viewName: String,
     param: { type: Schema.Types.ObjectId, ref: 'Plugin.methods.params' },
     name: String,
     code: Boolean,
-    type: String
+
 });
 
 const actionSchema = new Schema({

@@ -10,18 +10,18 @@ import { Link, MapStructure, Process, ProcessViewWrapper } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { Plugin } from '@plugins/models/plugin.model';
-import {COORDINATION_TYPES}  from '@maps/contants'
+import { COORDINATION_TYPES, JOINT_OPTIONS } from '@maps/constants'
 
 export const linkAttrs = {
   router: { name: 'manhattan' },
   connector: { name: 'rounded' },
   attrs: {
     '.connection': {
-      stroke: '#87939A',
+      stroke: JOINT_OPTIONS.LINK_COLOR,
       'stroke-width': 3
     },
     '.marker-target': {
-      fill: '#87939A',
+      fill: JOINT_OPTIONS.LINK_COLOR,
       d: 'M 10 0 L 0 5 L 10 10 z'
     }
   }
@@ -39,7 +39,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   mapStructure: MapStructure;
   mapStructureSubscription: Subscription;
   editing: boolean = false;
-  pluginsReq: any;
+  pluginsReq: Subscription;
   plugins: Plugin[];
   process: Process;
   link: Link;
@@ -47,9 +47,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   scale: number = 1;
 
   defaultContent: string;
+  processViewWrapper: ProcessViewWrapper;
   @ViewChild('wrapper') wrapper: ElementRef;
-  processViewWrapper : ProcessViewWrapper;
-  constructor(private designService: MapDesignService,
+
+  constructor(
     private mapsService: MapsService,
     private pluginsService: PluginsService,
     private mapDesignService: MapDesignService) { }
@@ -62,7 +63,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
 
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
-    this.dropSubscription = this.designService
+    this.dropSubscription = this.mapDesignService
       .getDrop()
       .filter(obj => this.isDroppedOnMap(obj.x, obj.y))
       .subscribe(obj => {
@@ -76,6 +77,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   ngOnDestroy() {
     this.dropSubscription.unsubscribe();
     this.mapStructureSubscription.unsubscribe();
+    this.pluginsReq.unsubscribe();
     this.deselectAllCellsAndUpdateStructure();
   }
 
@@ -124,19 +126,19 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       });
   }
 
-  initMapDraw(){
-    if (!this.init && this.plugins && this.mapStructure){
+  initMapDraw() {
+    if (!this.init && this.plugins && this.mapStructure) {
       this.drawGraph();
-          this.init = true;
-          this.graph.getElements().forEach(cell => {
-            this.deselectCell(cell);
-          });
-    
-          this.defaultContent = JSON.stringify(this.graph.toJSON());
-          if ((<any>(this.mapStructure)).imported) {
-            delete (<any>(this.mapStructure)).imported;
-            this.deselectAllCellsAndUpdateStructure();
-          }
+      this.init = true;
+      this.graph.getElements().forEach(cell => {
+        this.setCellSelectState(cell,false);
+      });
+
+      this.defaultContent = JSON.stringify(this.graph.toJSON());
+      if ((<any>(this.mapStructure)).imported) {
+        delete (<any>(this.mapStructure)).imported;
+        this.deselectAllCellsAndUpdateStructure();
+      }
     }
   }
 
@@ -154,15 +156,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   deselectAllCellsAndUpdateStructure() {
-
-    if (this.process) {
-      this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure,this.plugins)
-    } else {
-      this.processViewWrapper = null
-    }
-
+    this.processViewWrapper = this.process ? new ProcessViewWrapper(this.process, this.mapStructure, this.plugins) : null;
     this.graph.getElements().forEach(cell => {
-      this.deselectCell(cell);
+      this.setCellSelectState(cell, false);
     });
     this.onMapContentUpdate();
   }
@@ -186,7 +182,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.link.uuid = cell.model.id;
     this.mapStructure.links.push(this.link);
 
-
     const ancestors = this.mapStructure.links.filter(link => link.targetId === this.link.targetId);
     if (ancestors.length > 1) {
       const processIndex = this.mapStructure.processes.findIndex(process => process.uuid === this.link.targetId);
@@ -194,7 +189,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         this.mapStructure.processes[processIndex].coordination = COORDINATION_TYPES.race.id;
       }
       else if (!this.mapStructure.processes[processIndex].coordination) {
-        this.mapStructure.processes[processIndex].coordination =  COORDINATION_TYPES.wait.id;
+        this.mapStructure.processes[processIndex].coordination = COORDINATION_TYPES.wait.id;
       }
       this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
     }
@@ -205,15 +200,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     return ancestors.find(link => link.sourceId == link.targetId) ? true : false;
   }
 
-
-
   defineShape() {
     joint.shapes.devs['MyImageModel'] = joint.shapes.devs.Model.extend({
-
       markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><image class="warning"/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
-
       defaults: joint.util.deepSupplement({
-
         type: 'devs.MyImageModel',
         size: {
           width: 80,
@@ -223,10 +213,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           rect: {
             'stroke-width': '1',
             'stroke-opacity': .7,
-            stroke: '#7f7f7f',
+            stroke: JOINT_OPTIONS.RECT_STROKE_COLOR,
             rx: 3,
             ry: 3,
-            fill: '#2d3236'
+            fill: JOINT_OPTIONS.RECT_FILL_COLOR
             // 'fill-opacity': .5
           },
           circle: {
@@ -236,7 +226,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
             text: '',
             'ref-y': 5,
             'font-size': 14,
-            fill: '#bbbbbb'
+            fill: JOINT_OPTIONS.LABEL_FILL_COLOR
           },
           image: {
             'xlink:href': 'http://via.placeholder.com/350x150',
@@ -248,100 +238,38 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
             'x-alignment': 'middle',
             'y-alignment': 'middle'
           },
-          
           '.inPorts circle': {
-            fill: '#c8c8c8'
+            fill: JOINT_OPTIONS.INPORT_FILL_COLOR
           },
           '.outPorts circle': {
-            fill: '#262626'
+            fill: JOINT_OPTIONS.OUTPORT_FILL_COLOR
           }
         }
       }, joint.shapes.devs.Model.prototype.defaults)
     });
 
-
     joint.shapes.devs['PMStartPoint'] = joint.shapes.devs.Model.extend({
-
-      markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
-      portMarkup: '<g class="port"><circle class="port-body"/><text class="port-label"/></g>',
-
-      defaults: joint.util.deepSupplement({
-
-        type: 'devs.PMStartPoint',
-        size: { width: 40, height: 39 },
-        outPorts: ['  '],
-        attrs: {
-          '.body': { stroke: '#3c3e41', fill: '#2c2c2c', 'rx': 6, 'ry': 6, 'opacity': 0 },
-          '.label': {
-            text: '', 'ref-y': 0.83, 'y-alignment': 'middle',
-            fill: '#f1f1f1', 'font-size': 13
-          },
-          '.port-body': { r: 7.5, stroke: 'gray', fill: '#2c2c2c', magnet: 'active' },
-          'image': {
-            'ref-x': 10, 'ref-y': 18, ref: 'rect',
-            width: 35, height: 34, 'y-alignment': 'middle',
-            'x-alignment': 'middle', 'xlink:href': 'assets/images/start.png'
-          }
-        }
-
-      }, joint.shapes.devs.Model.prototype.defaults)
+      markup: JOINT_OPTIONS.startPoint.markup,
+      portMarkup: JOINT_OPTIONS.startPoint.portMarkup,
+      defaults: joint.util.deepSupplement(JOINT_OPTIONS.startPoint.defaults, joint.shapes.devs.Model.prototype.defaults)
     });
   }
 
   addNewProcess(obj: { x: number, y: number, cell: any }, offsetTop: number, offsetLeft: number) {
-    const pluginName = obj.cell.model.attributes.attrs['.label'].text;
+    const pluginDisplayName = obj.cell.model.attributes.attrs['.label'].text;
+    const pluginId = obj.cell.model.attributes.attrs['.p_id'].text;
     const plugin = this.plugins.find((o) => {
-      return o.name === pluginName;
+      return o._id === pluginId;
     });
-    let imageModel = new joint.shapes.devs['MyImageModel']({
-      position: {
-        x: obj.x - (430 * this.scale) - this.paper.translate().tx,
-        y: obj.y - (240 * this.scale) - this.paper.translate().ty
-      },
-      size: {
-        width: 100,
-        height: 73
-      },
-      inPorts: [' '],
-      outPorts: ['  '],
-      attrs: {
-        '.label': {
-          text: pluginName,
-          'ref-y': 5,
-          'font-size': 14,
-          fill: '#bbbbbb'
-        },
-        rect: {
-          'stroke-width': 1,
-          'stroke-opacity': .7,
-          'stroke': '#7f7f7f',
-          rx: 3,
-          ry: 3,
-          fill: '#2d3236',
-          'fill-opacity': .5
-        },
-        image: {
-          'xlink:href': plugin.fullImageUrl,
-          width: 46,
-          height: 32,
-          'ref-x': 50,
-          'ref-y': 50,
-          ref: 'rect',
-          'x-alignment': 'middle',
-          'y-alignment': 'middle'
-        },
-        '.inPorts circle': {
-          fill: '#c80f15'
-        },
-        '.outPorts circle': {
-          fill: '#262626'
-        }
-      }
-    });
+
+    let imageModel = this.getPluginCube({
+      x: obj.x - (430 * this.scale) - this.paper.translate().tx,
+      y: obj.y - (240 * this.scale) - this.paper.translate().ty
+    }, pluginDisplayName, plugin.fullImageUrl);
+
     this.graph.addCell(imageModel);
     let p = new Process();
-    p.plugin = plugin;
-    p.used_plugin = { name: pluginName, version: plugin.version };
+    p.used_plugin = { name: plugin.name, version: plugin.version };
     p.uuid = <string>imageModel.id;
 
     if (!this.mapStructure.processes) {
@@ -351,28 +279,24 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     }
     this.deselectAllCellsAndUpdateStructure();
     this.editProcess(this.mapStructure.processes[this.mapStructure.processes.length - 1]);
-
   }
 
   drawGraph() {
     if (this.mapStructure.content) {
       var cells = JSON.parse(this.mapStructure.content).cells
-      for(let i=0, cellsLength = cells.length; i<cellsLength; i++){
-        if(cells[i].type != 'devs.MyImageModel')
+      for (let i = 0, cellsLength = cells.length; i < cellsLength; i++) {
+        if (cells[i].type != 'devs.MyImageModel')
           continue;
-        
-        for (let j=0, procLength = this.mapStructure.processes.length; j<procLength; j++){
-          if (cells[i].id == this.mapStructure.processes[j].uuid){
-            this.processViewWrapper = new ProcessViewWrapper(this.mapStructure.processes[j],this.mapStructure,this.plugins)
-            if(!this.processViewWrapper.plugin){
-              this.addWarningToProcess(cells[i].attrs)
-            }
-            else cells[i].attrs['.warning']={}
+
+        for (let j = 0, procLength = this.mapStructure.processes.length; j < procLength; j++) {
+          if (cells[i].id == this.mapStructure.processes[j].uuid) {
+            this.processViewWrapper = new ProcessViewWrapper(this.mapStructure.processes[j], this.mapStructure, this.plugins)
+            this.setProcessWarning(cells[i].attrs);
             break;
           }
         }
       }
-      
+
       var content = JSON.parse(this.mapStructure.content);
       content.cells = cells;
       this.graph.fromJSON(content);
@@ -389,59 +313,13 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       if (this.mapStructure.processes.length) {
         this.mapStructure.processes.forEach((process, i) => {
           let plugin = this.plugins.find((p) => p.name === process.used_plugin.name);
-          let imageModel = new joint.shapes.devs['MyImageModel']({
-            id: process.uuid,
-            position: {
-              x: ((i + 1) * 160),
-              y: 200
-            },
-            size: {
-              width: 100,
-              height: 73
-            },
-            inPorts: [' '],
-            outPorts: ['  '],
-            attrs: {
-              '.label': {
-                text: process.name || process.used_plugin.name,
-                'ref-y': 5,
-                'font-size': 14,
-                fill: '#bbbbbb'
-              },
-              rect: {
-                'stroke-width': 1,
-                'stroke-opacity': .7,
-                'stroke': '#7f7f7f',
-                rx: 3,
-                ry: 3,
-                fill: '#2d3236',
-                'fill-opacity': .5
-              },
-              image: {
-                'xlink:href': plugin.fullImageUrl,
-                width: 46,
-                height: 32,
-                'ref-x': 50,
-                'ref-y': 50,
-                ref: 'rect',
-                'x-alignment': 'middle',
-                'y-alignment': 'middle'
-              },
-              
-              '.inPorts circle': {
-                fill: '#c80f15'
-              },
-              '.outPorts circle': {
-                fill: '#262626'
-              }
-            }
-          });
-          this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure,this.plugins)
-          if(!this.processViewWrapper.plugin){
-            this.addWarningToProcess(imageModel)
-          }
-          else imageModel['.warning']={}
-          
+          let imageModel = this.getPluginCube({
+            x: ((i + 1) * 160),
+            y: 200
+          }, process.name || process.used_plugin.name, plugin.fullImageUrl, process.uuid);
+
+          this.processViewWrapper = new ProcessViewWrapper(this.process, this.mapStructure, this.plugins)
+          this.setProcessWarning(imageModel);
           this.graph.addCell(imageModel);
         });
 
@@ -479,16 +357,12 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   editProcess(process) {
-    if (!process.plugin) {
-      process.plugin = this.plugins.find((o) => o.name === process.used_plugin.name);
-    }
-    this.graph.getElements().forEach(c => this.deselectCell(c));
+    this.graph.getElements().forEach(c => this.setCellSelectState(c,false));
     const cell = this.graph.getCell(process.uuid);
-    this.selectCell(cell);
+    this.setCellSelectState(cell);
     this.paper.setDimensions(this.wrapper.nativeElement.offsetWidth - 250, this.wrapper.nativeElement.offsetHeight);
     this.process = process;
-   
-    this.processViewWrapper = new ProcessViewWrapper(this.process,this.mapStructure,this.plugins)
+    this.processViewWrapper = new ProcessViewWrapper(this.process, this.mapStructure, this.plugins)
 
     if (this.editing) {
       this.editing = false;
@@ -595,7 +469,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   onClose(event?) {
-    this.deselectCell(this.graph.getCell(this.process.uuid));
+    this.setCellSelectState(this.graph.getCell(this.process.uuid),false);
 
     this.editing = false;
     this.process = null;
@@ -618,21 +492,12 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
 
     this.updateNodeLabel(process.uuid, process.name || this.process.used_plugin.name);
-    this.mapStructure.processes[index].name = process.name;
-    this.mapStructure.processes[index].description = process.description;
-    this.mapStructure.processes[index].mandatory = process.mandatory;
-    this.mapStructure.processes[index].condition = process.condition;
-    this.mapStructure.processes[index].coordination = process.coordination;
-    this.mapStructure.processes[index].actions = process.actions;
-    this.mapStructure.processes[index].correlateAgents = process.correlateAgents;
-    this.mapStructure.processes[index].flowControl = process.flowControl;
-    this.mapStructure.processes[index].filterAgents = process.filterAgents;
-    this.mapStructure.processes[index].postRun = process.postRun;
-    this.mapStructure.processes[index].preRun = process.preRun;
-    delete this.mapStructure.processes[index].plugin;
+    let updateFields = ['name', 'description', 'mandatory', 'condition', 'coordination', 'actions', 'correlateAgents', 'flowControl', 'filterAgents', 'postRun', 'preRun']
+    for (let i=0, length=updateFields.length;i<length;i++){
+      this.mapStructure.processes[index][updateFields[i]] =  process[updateFields[i]];
+    }
     this.mapsService.setCurrentMapStructure(this.mapStructure);
   }
-
 
   /**
    * Updating node label
@@ -641,6 +506,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
    */
   updateNodeLabel(uuid: string, label: string): void {
     let cell = this.graph.getCell(uuid);
+    cell.attr('.label/text',label);
     cell.attr('text/text', label);
     this.onMapContentUpdate()
   }
@@ -650,36 +516,85 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.paper.scale(this.scale, this.scale);
   }
 
-  selectCell(cell) {
-    cell.attr('rect/fill', '#000');
+  setCellSelectState(cell, mode:boolean = true) {
+    cell.attr('rect/fill', mode ? '#000' : '#2d3236');
   }
 
-  deselectCell(cell) {
-    cell.attr('rect/fill', '#2d3236');
+  setProcessWarning(model) {
+    model['.warning'] = !this.processViewWrapper.plugin ?{
+      'xlink:href': 'assets/images/warning.png',
+      width: 19,
+      height: 19,
+      'ref-x': 98,
+      'ref-y': 52,
+      ref: 'rect',
+      'x-alignment': 'right',
+      'y-alignment': 'top'
+    } : {}
   }
 
-
-  addWarningToProcess(model){
+  private getPluginCube(position: { x: number, y: number }, text: string, imageUrl: string, id?: string) {
+    if (text.length > 15) {
+      text = `${text.substr(0, 12)}...`;
+    }
     
-      model['.warning']={
-          'xlink:href': 'assets/images/warning.png',
-            width: 19,
-            height: 19,
-            'ref-x': 98,
-            'ref-y': 52,
-            ref: 'rect',
-            'x-alignment': 'right',
-            'y-alignment': 'top'
+    let options = {
+      id: undefined,
+      position: position,
+      size: {
+        width: 100,
+        height: 73
+      },
+      inPorts: [' '],
+      outPorts: ['  '],
+      attrs: {
+        '.label': {
+          text: text,
+          'ref-y': 5,
+          'font-size': 14,
+          fill: JOINT_OPTIONS.LABEL_FILL_COLOR
+        },
+        rect: {
+          'stroke-width': 1,
+          'stroke-opacity': .7,
+          'stroke': JOINT_OPTIONS.RECT_STROKE_COLOR,
+          rx: 3,
+          ry: 3,
+          fill: JOINT_OPTIONS.RECT_FILL_COLOR,
+          'fill-opacity': .5
+        },
+        image: {
+          'xlink:href': imageUrl,
+          width: 46,
+          height: 32,
+          'ref-x': 50,
+          'ref-y': 50,
+          ref: 'rect',
+          'x-alignment': 'middle',
+          'y-alignment': 'middle'
+        },
+
+        '.inPorts circle': {
+          fill: JOINT_OPTIONS.INPORT_FILL_COLOR
+        },
+        '.outPorts circle': {
+          fill: JOINT_OPTIONS.OUTPORT_FILL_COLOR
+        }
       }
     }
 
-  
+    if (id)
+      options.id = id;
 
-  private onMapContentUpdate(){
+    return new joint.shapes.devs['MyImageModel'](options);
+  }
+
+  private onMapContentUpdate() {
     let graphContent = JSON.stringify(this.graph.toJSON());
-    if (graphContent != this.defaultContent) {
+    if ((graphContent != this.defaultContent) && (this.mapStructure)) {
       this.mapStructure.content = graphContent;
       this.mapsService.setCurrentMapStructure(this.mapStructure);
     }
   }
+
 }

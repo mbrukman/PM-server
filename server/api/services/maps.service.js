@@ -148,6 +148,8 @@ module.exports = {
                 },
             },
             {$sort:getSort(sort)},
+            { $skip : page ? ((page - 1) * PAGE_SIZE) : 0 },
+            { $limit: filterOptions.options.limit || PAGE_SIZE },
             {$unwind:'$project'},
             {$unwind: {
                     "path": "$latestExectionResult",
@@ -155,15 +157,6 @@ module.exports = {
                 }
             }
         ])
-        
-        if (page) {
-            // apply paging. if no paging, return all
-            m.limit(PAGE_SIZE).skip((page - 1) * PAGE_SIZE);
-        }
-        
-        if (filterOptions.options.limit) {
-            m.limit(Number(filterOptions.options.limit));
-        }
         
         return m.then(maps => {
             for(let i=0, mapsLength = maps.length; i<mapsLength; i++){

@@ -21,7 +21,6 @@ export class Process extends Serializable implements IProcess {
   flowControl: string;
   actions: Action[];
   used_plugin: UsedPlugin;
-  plugin?: Plugin;
   createdAt: Date;
   updatedAt: Date;
   correlateAgents: boolean;
