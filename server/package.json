@@ -1,6 +1,6 @@
 {
-  "name": "pm-server",
-  "version": "1.0.0",
+  "name": "kaholo-server",
+  "version": "1.2.3",
   "description": "",
   "main": "app.js",
   "scripts": {
