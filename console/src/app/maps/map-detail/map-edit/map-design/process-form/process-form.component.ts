@@ -36,7 +36,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   processForm: FormGroup;
   action: boolean = false;
   index: number;
-  plugin: Plugin;
   methods: object = {};
   bsModalRef: BsModalRef;
   selectedMethod: PluginMethod;
