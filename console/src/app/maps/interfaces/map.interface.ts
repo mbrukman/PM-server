@@ -8,7 +8,6 @@ export interface IMap {
   description?: string,
   createdAt?: Date,
   updatedAt?: Date,
-  licence?: string,
   archived: boolean,
   agents?: IAgent[],
   groups?: Group[],

@@ -1,8 +1,9 @@
-import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, Output, OnInit } from '@angular/core';
 import { MapsService } from '../maps/maps.service';
 import { Map } from '../maps/models/map.model';
 import { Project } from '../projects/models/project.model';
 import { ProjectsService } from '../projects/projects.service';
+import { FilterOptions } from '@shared/model/filter-options.model';
 
 
 @Component({
@@ -10,7 +11,7 @@ import { ProjectsService } from '../projects/projects.service';
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent implements OnDestroy {
+export class SearchComponent implements OnDestroy, OnInit {
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
   query: string;
   maps: Map[];
@@ -23,6 +24,10 @@ export class SearchComponent implements OnDestroy {
   constructor(private mapsService: MapsService, private projectsService: ProjectsService) {
   }
 
+  ngOnInit() {
+    this.onKeyUp(5)
+  }
+
   ngOnDestroy() {
     if (this.mapReq) {
       this.mapReq.unsubscribe();
@@ -32,16 +37,21 @@ export class SearchComponent implements OnDestroy {
     }
   }
 
-  onKeyUp() {
+  onKeyUp(limit ?: number ) {
     this.maps = this.projects = null;
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
+      var filterOptions : FilterOptions = {isArchived:false,globalFilter:this.query,sort:'-createdAt'};
+      if (limit){
+        filterOptions.limit = limit;
+      }
+      
       this.loading = true;
-      this.mapReq = this.mapsService.filterMaps(null, null, null, this.query).subscribe(data => {
+      this.mapReq = this.mapsService.filterMaps(null, null, filterOptions).subscribe(data => {
         this.maps = data.items;
         this.loading = false;
       });
-      this.projectReq = this.projectsService.filter(null, null, null, this.query).subscribe(data => {
+      this.projectReq = this.projectsService.filter(null, null, filterOptions).subscribe(data => {
         this.projects = data.items;
         this.loading = false;
       });

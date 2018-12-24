@@ -9,6 +9,8 @@ import { Map } from '../../maps/models/map.model';
 import { ConfirmComponent } from '../../shared/confirm/confirm.component';
 import { ImportModalComponent } from './import-modal/import-modal.component';
 
+import { FilterOptions } from '@shared/model/filter-options.model'
+
 @Component({
   selector: 'app-project-details',
   templateUrl: './project-details.component.html',
@@ -21,28 +23,35 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   routeReq: any;
   archiveReq: any;
   filterTerm: string;
+  filterOptions : FilterOptions = new FilterOptions();
   featuredMaps: Map[];
 
   constructor(private route: ActivatedRoute,
-              private router: Router,
-              private projectsService: ProjectsService,
-              private modalService: BsModalService) {}
+    private router: Router,
+    private projectsService: ProjectsService,
+    private modalService: BsModalService) { }
 
   ngOnInit() {
     this.routeReq = this.route.params.subscribe(params => {
       this.id = params['id'];
-      this.projectReq = this.projectsService.detail(this.id).subscribe(project => {
-          if (!project) {
-            this.router.navigate(['NotFound'])
-          }
-          this.project = project;
-          this.featureMaps(project.maps);
-        },
-        error => {
-          this.router.navigate(['NotFound'])
-        }
-      );
+      this.getProjectDetails(true);
     });
+  }
+
+  getProjectDetails(init:boolean = false){
+    this.projectReq = this.projectsService.detail(this.id, this.filterOptions).subscribe(project => {
+      if (!project) {
+        this.router.navigate(['NotFound'])
+      }
+      this.project = project;
+
+      if(init)
+        this.featureMaps(project.maps);
+    },
+    error => {
+      this.router.navigate(['NotFound'])
+    }
+  );
   }
 
   ngOnDestroy() {
@@ -55,14 +64,18 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  archiveProject() {
+  archiveProject(doArchive: boolean) {
+    doArchive ? this.archiveOn() : this.projectsService.archive(this.id, false).subscribe(() =>{this.project.archived = false});
+  }
+
+  private archiveOn() {
     let modal = this.modalService.show(ConfirmComponent);
     modal.content.title = 'Archive this project?';
     modal.content.message = 'When archiving a project, all the maps will be archived as well.';
     modal.content.confirm = 'Yes, archive';
     modal.content.result.subscribe(result => {
       if (result) {
-        this.archiveReq = this.projectsService.archive(this.id).subscribe(() => this.project.archived = true);
+        this.archiveReq = this.projectsService.archive(this.id, true).subscribe(() => { this.project.archived = true; });
       }
     });
   }

@@ -1,7 +1,6 @@
 var currentAgent = {
     name: "",
     url: "",
-    dedicatedAgents: [{ type: "", url: "" }],
     attributes: [{ name: "", value: "" }]
 };
 
@@ -42,7 +41,7 @@ var getProcessByName = function (name) {
  */
 var getActionByIndex = function (actionIndex, process) {
     if (typeof process !== 'object') {
-        return 'invalid parameters: process should be an object';
+        throw new Error('invalid parameters: process should be an object');
     }
     var actionId = Object.keys(process.actions)[actionIndex];
     return process.actions[actionId];

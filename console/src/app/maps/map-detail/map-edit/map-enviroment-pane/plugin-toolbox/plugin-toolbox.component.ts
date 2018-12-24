@@ -40,7 +40,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
 
     joint.shapes.devs['MyImageModel'] = joint.shapes.devs.Model.extend({
       markup:
-        '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
+        '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><text class="p_id hidden"/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
 
       defaults: joint.util.deepSupplement(
         {
@@ -67,6 +67,9 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
               'ref-y': 5,
               'font-size': 14,
               fill: '#bbbbbb'
+            },
+            '.p_id': {
+              text: ''
             },
             image: {
               'xlink:href': 'http://via.placeholder.com/350x150',
@@ -166,6 +169,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
         },
         attrs: {
           '.label': { text: this.getPluginCubeText(plugin.name) },
+          '.p_id': { text: plugin._id },
           image: {
             'xlink:href': plugin.fullImageUrl,
             width: 46,
@@ -181,7 +185,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
       plugins.push(imageModel);
       iteration++;
     });
-    this.stencilPaper.setDimensions(250, iteration * 80);
+    this.stencilPaper.svg.style.height = `${iteration * 42}px`
     this.stencilGraph.clear();
     this.stencilGraph.addCells(plugins);
   }

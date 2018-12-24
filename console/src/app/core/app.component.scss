@@ -1,68 +1,71 @@
 @import '~assets/sass/variables';
-
 .root {
-  margin-left: 0;
-  margin-right: 0;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: initial;
-
-  .pm-sidebar {
-    width : $sidebar-Width;
-    max-width: $sidebar-Width;
-    min-width: $sidebar-Width;
-
-    flex-grow: 1;
-    background-color: $turquoise-blue;
+    margin-left: 0;
+    margin-right: 0;
+    height: 100%;
     display: flex;
-    flex-direction: column;
-    padding: 40px 5px 0;
-    align-items: center;
-
-    img {
-      width: 40px;
-      margin-bottom: 30px;
+    flex-direction: row;
+    flex-wrap: initial;
+    .pm-sidebar {
+        width: $sidebar-Width;
+        max-width: $sidebar-Width;
+        min-width: $sidebar-Width;
+        flex-grow: 1;
+        background-color: $pale-blue;
+        display: flex;
+        flex-direction: column;
+        padding: 0px 5px 0;
+        align-items: center;
+        img {
+            width: 40px;
+            margin-bottom: 30px;
+        }
+        .nav {
+            margin-top: 10px;
+            align-items: center;
+            li.nav-item {
+                margin-bottom: 15px;
+                border-radius: 5px;
+                &.active,
+                &:hover {
+                    background: $selected-nav;
+                }
+                a.nav-link {
+                    color: $text-color;
+                    font-size: 24px;
+                    i {
+                        width: 24px;
+                        height: 24px;
+                    }
+                }
+            }
+        }
+        .logo-wrapper {
+            background-color: $dark-blue;
+            img {
+                margin: 15px;
+                height: 40px;
+            }
+        }
     }
-
-  }
-  .main {
-    flex-grow: 1;
-    display: flex;
-
-    ::ng-deep >*:not(router-outlet){
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
+    .main {
+        flex-grow: 1;
+        display: flex;
+        ::ng-deep>*:not(router-outlet) {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
     }
-  }
-}
-
-.nav {
-  align-items: center;
-  li.nav-item {
-    margin-bottom: 15px;
-    border-radius: 5px;
-    &.active, &:hover {
-      background: $selected-nav;
-    }
-    a.nav-link {
-      color: $text-color;
-      font-size: 24px;
-      i {
-        width: 24px;
-        height: 24px;
-      }
-    }
-  }
 }
 
 .search {
-  position: fixed;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-color: $background;
-  border-right: 1px solid $selected-nav;
-  padding : 0 30px;
+    width: 450px;
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: $background;
+    border-right: 1px solid $selected-nav;
+    padding: 0 30px;
 }

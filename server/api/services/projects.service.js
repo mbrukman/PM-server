@@ -1,16 +1,9 @@
 const Project = require("../models/project.model");
-const mapsService = require("./maps.service");
 const env = require("../../env/enviroment");
 
 const PAGE_SIZE = env.page_size;
 
 module.exports = {
-    /* archive project and maps */
-    archive: (projectId) => {
-        return Project.findByIdAndUpdate(projectId, { archived: true }).then(project => {
-            return mapsService.archive(project.maps);
-        });
-    },
     count: (filter) => {
         return Project.count(filter)
     },
@@ -25,12 +18,15 @@ module.exports = {
     },
 
     /* get project details */
-    detail: (projectId) => {
-        return Project.findById(projectId).populate(
-            {
-                path: 'maps',
-                match: { archived: false }
-            })
+    detail: (projectId,options) => {
+        
+        let populate = {
+            path:'maps'
+        }
+        if(!options.isArchived){
+            populate.match={archived:false}
+        }
+        return Project.findById(projectId).populate(populate)
     },
 
     /* delete a project */
@@ -39,29 +35,32 @@ module.exports = {
     },
 
     /* filter projects */
-    filter: (query = {}) => {
-        let q = {};
-        if (query.fields) {
-            // This will change the fields in the query to query that we can use with mongoose (using regex for contains)
-            Object.keys(query.fields).map(key => { query.fields[key] = { '$regex': `.*${query.fields[key]}.*` }});
-            q = query.fields;
-        } else if (query.globalFilter) {
-            // if there is a global filter, expecting or condition between name and description fields
-            q = {
-                $or: [{ name: { '$regex': `.*${query.globalFilter}.*` } }, { description: { '$regex': `.*${query.globalFilter}.*` } }]
-            }
+    filter: (filterOptions = {}) => {
+        let q = filterOptions.options.filter || {};
+        if (filterOptions.fields) {
+            // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
+            Object.keys(filterOptions.fields).map(key => { filterOptions.fields[key] = { '$regex': `.*${filterOptions.fields[key]}.*` }});
+            q = filterOptions.fields;
+        } 
+        
+        if(filterOptions.options.globalFilter){
+            var filterQueryOptions = [{ name: { '$regex': `.*${filterOptions.globalFilter}.*` } }, { description: { '$regex': `.*${filterOptions.globalFilter}.*` } }]
+            q.$or = filterQueryOptions;
         }
-        if (!query.archived) {
-            q.archived = false;
+        
+        if(!filterOptions.options.isArchived){
+            q.archived = false
         }
-        let p = Project.find(q);
-        if (query.sort) {
+        let p = Project.find(q)
+
+        if (filterOptions.options.sort) {
             // apply sorting by field name. for reverse, should pass with '-'.
-            p.sort(query.sort)
+            p.sort(filterOptions.options.sort)
         }
-        if (query.page) {
+        if (filterOptions.page) {
+            var pageSize = filterOptions.options.limit || PAGE_SIZE;
             // apply paging. if no paging, return all
-            p.limit(PAGE_SIZE).skip((query.page - 1) * PAGE_SIZE)
+            p.limit(pageSize).skip((filterOptions.page - 1) * pageSize)
         }
 
         return p.then(projects => {
@@ -83,6 +82,9 @@ module.exports = {
                 return module.exports.addMap(projectId, mapId); // add map to the selected project
             });
 
+    }, 
+    getProjectNamesByMapsIds : (mapsIds) => {
+        return Project.find({ maps: { $in: mapsIds} },{_id:1,name:1, maps:1})
     }
 
 };

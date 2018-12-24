@@ -1,63 +1,86 @@
 @import "~assets/sass/base";
 @import "~assets/sass/mixins";
-
 .pad {
-  margin-top: 25px;
+    margin-top: 25px;
 }
 
 .link {
-  cursor: pointer;
-  &:hover {
-    @extend .focus-shadow;
-    transition: box-shadow 0.3s ease-in-out;
-  }
+    cursor: pointer;
+    &:hover {
+        @extend .focus-shadow;
+        transition: box-shadow 0.3s ease-in-out;
+    }
 }
 
 .main {
-  a, button {
-    &.create {
-      margin-top: 15px;
-      margin-right: 10px;
+    @include table();
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .name-wrapper{
+      i {
+        margin-right: 10px;
+      }
     }
-  }
 
-  .featured-projects{
-    width : 100%;
+    a,
+    button {
+        &.create {
+            margin-top: 15px;
+            margin-right: 10px;
+        }
+    }
+    >.row {
+        flex-direction: column;
+        width: 100%;
+        .section-sub-title {
+            width: 63%;
+        }
+        .featured-projects {
+            width: 100%;
+        }
+    }
+    .filter {
+        width: 100%;
+        margin-top: 25px;
+        h5 {
+            padding-bottom: 15px;
+        }
 
-  }
+        .filters{
+          display: flex;
+          align-items: center;
 
+          .filter-archive{
+            margin-right: 10px;
+          }
+
+          .filter-text{
+            @include searchBox();
+            .loadProject {
+                width: 220px;
+                height: 34px;
+            }
+          }
+        }
+
+    }
 }
 
 .featured {
-  padding-left: 10px;
-  padding-right: 10px;
-  .card {
-    height: 150px;
-    overflow-y: hidden;
-    .card-body {
-      padding: 16px 18px 18px 16px;
-      .card-text {
-        height: 75px;
+    padding-left: 10px;
+    padding-right: 10px;
+    .card {
+        height: 150px;
         overflow-y: hidden;
-        margin: 0;
-        line-height: 18px;
-      }
+        .card-body {
+            padding: 16px 18px 18px 16px;
+            .card-text {
+                height: 75px;
+                overflow-y: hidden;
+                margin: 0;
+                line-height: 18px;
+            }
+        }
     }
-  }
-}
-
-.filter {
-  margin-top: 25px;
-
-  h5 {
-    padding-bottom: 15px;
-  }
-
-  @include searchBox();
-
-  input {
-    width: 220px;
-    height: 34px;
-  }
-
 }

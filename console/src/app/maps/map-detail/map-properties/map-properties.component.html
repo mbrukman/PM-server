@@ -1,7 +1,8 @@
 <div class="main">
   <div class="row">
     <div class="col-12">
-      <button class="btn pm" (click)="archiveMap()">Archive <i class="material-icons">archive</i></button>
+      <button class="btn pm" *ngIf="!map?.archived" (click)="archiveMap(true)">Archive <i class="material-icons">archive</i></button>
+      <button class="btn pm" *ngIf="map?.archived" (click)="archiveMap(false)">Unarchive <i class="material-icons">unarchive</i></button>
 
       <div class="form-row">
         <p class="col-4">
@@ -26,10 +27,6 @@
       </div>
       <hr class="my-4">
       <p>Created at: {{ map?.createdAt | date: 'short'}}</p>
-      <p>
-        Licence: <span placeholder="Add map licence..." [(inlineEdit)]="map.licence" (valueChanged)="onMapUpdate()" *ngIf="map"></span>
-        <!-- Licence: <input type="text" placeholder="Add map licence..." (onChange)="onMapUpdate()" [(ngModel)]="map.licence" *ngIf="map" /> -->
-      </p>
     </div>
   </div>
 </div>

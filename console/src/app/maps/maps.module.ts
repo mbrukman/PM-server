@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { MonacoEditorModule } from 'ngx-monaco-editor';
+import { MonacoEditorModule, NGX_MONACO_EDITOR_CONFIG} from 'ngx-monaco-editor';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
@@ -33,14 +33,20 @@ import { ProcessListItemComponent } from './map-detail/map-result/process-list-i
 import { MapConfigurationsComponent } from './map-detail/map-configurations/map-configurations.component';
 import { AddConfigurationComponent } from './map-detail/map-configurations/add-configuration/add-configuration.component';
 import { ProcessViewComponent } from './map-detail/map-revisions/process-view/process-view.component';
-
+import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
+import { monacoConfig } from './monaco-config' 
 
 @NgModule({
   imports: [
     CommonModule,
     MapsRoutingModule,
     SharedModule,
-    MonacoEditorModule.forRoot(),
+    {
+      ngModule : MonacoEditorModule,
+      providers : [
+        {provide : NGX_MONACO_EDITOR_CONFIG, useValue: monacoConfig}
+      ]
+    },
     BsDropdownModule,
     ModalModule,
     AccordionModule,
@@ -69,8 +75,9 @@ import { ProcessViewComponent } from './map-detail/map-revisions/process-view/pr
     SelectGroupsComponent,
     ProcessListItemComponent,
     AddConfigurationComponent,
-    ProcessViewComponent
+    ProcessViewComponent,
+    MapDuplicateComponent,
   ],
-  entryComponents: [SelectAgentComponent, TriggerFormComponent, SelectGroupsComponent, AddConfigurationComponent]
+  entryComponents: [SelectAgentComponent, TriggerFormComponent, SelectGroupsComponent, AddConfigurationComponent,MapDuplicateComponent]
 })
 export class MapsModule {}

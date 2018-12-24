@@ -3,13 +3,18 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
+import { DiffEditorModel } from 'ngx-monaco-editor';
+import { BsModalService } from 'ngx-bootstrap';
 
 import { MapsService } from '../../maps.service';
 import { MapStructure, Process } from '@maps/models';
+import { JOINT_OPTIONS } from '@maps/constants'
 import { Project } from '@projects/models/project.model';
 import { ProjectsService } from '@projects/projects.service';
 import { SocketService } from '@shared/socket.service';
-import { DiffEditorModel } from 'ngx-monaco-editor';
+import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
+import { FilterOptions } from '@shared/model/filter-options.model';
+
 
 @Component({
   selector: 'app-map-revisions',
@@ -45,7 +50,7 @@ export class MapRevisionsComponent implements OnInit {
   };
   
 
-  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService) {
+  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private modalService: BsModalService) {
     this.scrollCallback = this.loadRevisions.bind(this);
   }
 
@@ -111,6 +116,8 @@ export class MapRevisionsComponent implements OnInit {
 
   getMapStructures(page: number) {
     this.mapsService.structuresList(this.mapId, page).subscribe(structures => {
+      if(structures.length)
+        this.previewStructure(structures[0].id)
       if (structures && structures.length > 0) {
         this.structures = [...this.structures, ...structures];
       } else {
@@ -120,7 +127,9 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   getMapProject() {
-    this.projectsReq = this.projectsService.filter().subscribe(data => {
+    let mapIdFilter = {maps:{$in:[this.mapId]}}
+    var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt',filter:mapIdFilter};
+    this.projectsReq = this.projectsService.filter(null,null,filterOptions).subscribe(data => {
       data.items.forEach(project => {
         if ((<string[]>project.maps).indexOf(this.mapId) > -1) {
           this.project = project;
@@ -141,11 +150,8 @@ export class MapRevisionsComponent implements OnInit {
 
   defineShape() {
     joint.shapes.devs['MyImageModel'] = joint.shapes.devs.Model.extend({
-
       markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
-
       defaults: joint.util.deepSupplement({
-
         type: 'devs.MyImageModel',
         size: {
           width: 80,
@@ -155,10 +161,10 @@ export class MapRevisionsComponent implements OnInit {
           rect: {
             'stroke-width': '1',
             'stroke-opacity': .7,
-            stroke: '#7f7f7f',
+            stroke: JOINT_OPTIONS.RECT_STROKE_COLOR,
             rx: 3,
             ry: 3,
-            fill: '#2d3236'
+            fill: JOINT_OPTIONS.RECT_FILL_COLOR
             // 'fill-opacity': .5
           },
           circle: {
@@ -168,7 +174,7 @@ export class MapRevisionsComponent implements OnInit {
             text: '',
             'ref-y': 5,
             'font-size': 14,
-            fill: '#bbbbbb'
+            fill: JOINT_OPTIONS.LABEL_FILL_COLOR
           },
           image: {
             'xlink:href': 'http://via.placeholder.com/350x150',
@@ -181,50 +187,32 @@ export class MapRevisionsComponent implements OnInit {
             'y-alignment': 'middle'
           },
           '.inPorts circle': {
-            fill: '#c8c8c8'
+            fill: JOINT_OPTIONS.INPORT_FILL_COLOR
           },
           '.outPorts circle': {
-            fill: '#262626'
+            fill: JOINT_OPTIONS.OUTPORT_FILL_COLOR
           }
         }
       }, joint.shapes.devs.Model.prototype.defaults)
     });
 
-
     joint.shapes.devs['PMStartPoint'] = joint.shapes.devs.Model.extend({
-
-      markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
-      portMarkup: '<g class="port"><circle class="port-body"/><text class="port-label"/></g>',
-
-      defaults: joint.util.deepSupplement({
-
-        type: 'devs.PMStartPoint',
-        size: { width: 40, height: 39 },
-        outPorts: [' '],
-        attrs: {
-          '.body': { stroke: '#3c3e41', fill: '#2c2c2c', 'rx': 6, 'ry': 6, 'opacity': 0 },
-          '.label': {
-            text: '', 'ref-y': 0.83, 'y-alignment': 'middle',
-            fill: '#f1f1f1', 'font-size': 13
-          },
-          '.port-body': { r: 7.5, stroke: 'gray', fill: '#2c2c2c', magnet: 'active' },
-          'image': {
-            'ref-x': 10, 'ref-y': 18, ref: 'rect',
-            width: 35, height: 34, 'y-alignment': 'middle',
-            'x-alignment': 'middle', 'xlink:href': 'assets/images/start.png'
-          }
-        }
-
-      }, joint.shapes.devs.Model.prototype.defaults)
+      markup: JOINT_OPTIONS.startPoint.markup,
+      portMarkup: JOINT_OPTIONS.startPoint.portMarkup,
+      defaults: joint.util.deepSupplement(JOINT_OPTIONS.startPoint.defaults, joint.shapes.devs.Model.prototype.defaults)
     });
   }
 
   duplicateMap(structureId: string) {
-    this.mapsService.duplicateMap(this.mapId, structureId, this.project.id).subscribe(map => {
-      this.router.navigate(['/maps', map.id]);
+    const modal = this.modalService.show(MapDuplicateComponent);
+    modal.content.result
+      .take(1)
+      .filter(obj => !!obj.name) // filtering only results with a name
+      .flatMap(obj =>  this.mapsService.duplicateMap(this.mapId, structureId, this.project.id,obj))
+      .subscribe(map => { this.router.navigate(['/maps', map.id]);
     });
   }
-
+  
   previewStructure(structureId: string) {
     this.previewProcess = null;
     this.mapsService.getMapStructure(this.mapId, structureId)

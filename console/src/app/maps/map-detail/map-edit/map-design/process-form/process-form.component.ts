@@ -9,13 +9,17 @@ import { distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
-import { Process, Action, ActionParam } from '@maps/models';
+import { Process, Action, ActionParam, ProcessViewWrapper } from '@maps/models';
 import { Plugin } from '@plugins/models/plugin.model';
 import { PluginMethod } from '@plugins/models/plugin-method.model';
 import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
 import { SocketService } from '@shared/socket.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
+import { BsModalService } from 'ngx-bootstrap';
+import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import { ConfirmComponent } from '@shared/confirm/confirm.component';
+import {FLOW_CONTROL_TYPES, COORDINATION_TYPES}  from '@maps/constants'
 
 @Component({
   selector: 'app-process-form',
@@ -23,7 +27,7 @@ import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
   styleUrls: ['./process-form.component.scss']
 })
 export class ProcessFormComponent implements OnInit, OnDestroy {
-  @Input('process') process: Process;
+  @Input('processViewWrapper') processViewWrapper: ProcessViewWrapper;
   @Output() saved: EventEmitter<any> = new EventEmitter<any>();
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
@@ -32,59 +36,49 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   processForm: FormGroup;
   action: boolean = false;
   index: number;
-  plugin: Plugin;
   methods: object = {};
+  bsModalRef: BsModalRef;
   selectedMethod: PluginMethod;
-
-  COORDINATION_TYPES = {
-    wait: 'Wait for all',
-    race: 'Run once for first',
-    each: 'Run for each in link'
-  };
-
-  FLOW_CONTROL_TYPES = {
-    wait: 'Wait for all agents and then run',
-    race: 'Run only for first agent',
-    each: 'Run for each agent'
-  };
+  FLOW_CONTROL_TYPES  = FLOW_CONTROL_TYPES;
+  COORDINATION_TYPES = COORDINATION_TYPES;
 
   constructor(
     private socketService: SocketService,
     private pluginsService: PluginsService,
-    private mapDesignService: MapDesignService
+    private mapDesignService: MapDesignService,
+    private modalService: BsModalService
   ) {}
 
   ngOnInit() {
-    if (!this.process) {
+    if (!this.processViewWrapper.process) {
       this.closePane();
       return;
     }
+    this.processForm = Process.getFormGroup(this.processViewWrapper.process);
 
     this.processUpdateSubscription = this.mapDesignService
       .getUpdateProcessAsObservable()
-      .filter(process => process.uuid === this.process.uuid)
+      .filter(process => process.uuid === this.processViewWrapper.process.uuid)
       .subscribe(process => {
-        this.process = new Process(process);
         this.processForm.get('coordination').setValue(process.coordination);
       });
 
     // this.process = new Process(this.process);
-    this.processForm = Process.getFormGroup(this.process);
 
-    if (this.process.actions) {
-      this.process.actions.forEach((action, actionIndex) => {
+    this.generateAutocompleteParams();
+    if (this.processViewWrapper.process.actions) {
+      this.processViewWrapper.process.actions.forEach((action, actionIndex) => {
         const actionControl = <FormArray>this.processForm.controls['actions'];
         actionControl.push(this.initActionController(action));
         if (action.params && action.params.length > 0) {
-          action.params.forEach(param => {
-            actionControl.controls[actionIndex]['controls'].params.push(ActionParam.getFormGroup(param));
+          action.params.forEach((param, i) => {
+            let pluginParam = this.processViewWrapper.plugin.methods.find(o => o.name === this.processForm.value.actions[actionIndex].method);
+            actionControl.controls[actionIndex]['controls'].params.push(PluginMethodParam.getFormGroup(pluginParam.params[i],param));
           });
         }
       });
     }
 
-    this.plugin = _.cloneDeep(this.process.plugin);
-    this.generateAutocompleteParams();
 
     // subscribe to changes in form
     this.formValueChangeSubscription = this.processForm.valueChanges
@@ -109,16 +103,16 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * if the plugin has autocomplete method it generates them
    */
   generateAutocompleteParams() {
-    Observable.from(this.plugin.methods)
+    if (!this.processViewWrapper.plugin) return;
+    Observable.from(this.processViewWrapper.plugin.methods)
       .filter(method => this.methodHaveParamType(method, 'autocomplete')) // check if has autocomplete
       .flatMap(method => {
         return Observable.forkJoin(
           Observable.of(method), // the method
-          this.pluginsService.generatePluginParams(this.plugin._id, method.name) // generated params
+          this.pluginsService.generatePluginParams(this.processViewWrapper.plugin._id, method.name) // generated params
         );
       })
       .map(data => {
-        // data: [method, [generated params]]
         data[1].forEach(param => {
           data[0].params[
             data[0].params.findIndex(o => o.name === param.name)
@@ -127,13 +121,13 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         return data[0];
       })
       .subscribe(method => {
-        this.plugin.methods[
-          this.plugin.methods.findIndex(o => o.name === method.name)
+        this.processViewWrapper.plugin.methods[
+          this.processViewWrapper.plugin.methods.findIndex(o => o.name === method.name)
         ] = method;
         this.addToMethodContext(method);
       });
 
-    Observable.from(this.plugin.methods)
+    Observable.from(this.processViewWrapper.plugin.methods)
       .filter(method => this.methodHaveParamType(method, 'options'))
       .subscribe(method => {
         this.addToMethodContext(method);
@@ -148,13 +142,29 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     return method.params.findIndex(p => p.type === type) > -1;
   }
 
+
+  runAction(action){
+    if(this.processViewWrapper.plugin){
+      return action();
+    }
+    else{
+      this.bsModalRef = this.modalService.show(ConfirmComponent);
+      this.bsModalRef.content.title = 'Plugin missing'
+      this.bsModalRef.content.message = `This process uses the plugin ${this.processViewWrapper.process.used_plugin.name} which have been removed.\nPlease reinstall the plugin to enable editing.`;
+      this.bsModalRef.content.cancel = null;
+      this.bsModalRef.content.confirm = 'Confirm'
+    }
+  }
+
   /**
    * Add a new action to process
    */
   addNewAction() {
-    const actionControl = <FormArray>this.processForm.controls['actions'];
-    actionControl.push(this.initActionController());
-    this.editAction(actionControl.length - 1); // switch to edit the new action
+    this.runAction(()=>{
+      const actionControl = <FormArray>this.processForm.controls['actions'];
+      actionControl.push(this.initActionController());
+      this.editAction(actionControl.length - 1); // switch to edit the new action
+    })
   }
 
   backToProcessView() {
@@ -176,8 +186,11 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @param {number} index
    */
   editAction(index: number) {
-    this.index = index;
-    this.action = true;
+      this.runAction(()=>{
+        this.action = true;
+        this.index = index;
+        
+      })
   }
 
   /**
@@ -193,21 +206,20 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * Called from the template once user changes a method
    */
   onSelectMethod() {
-    this.selectedMethod = this.processForm.value.actions[this.index].method;
     const methodName = this.processForm.value.actions[this.index].method;
     const action = this.processForm.controls['actions']['controls'][this.index];
-    const method = this.plugin.methods.find(o => o.name === methodName);
+    this.selectedMethod = this.processViewWrapper.plugin.methods.find(o => o.name === methodName);
     this.clearFormArray(action.controls.params);
-    if (!method) {
+    if (!this.selectedMethod) {
       this.socketService.setNotification({
         title: 'OH OH',
         message: 'Unexpected error, please try again.'
       });
       return;
     }
-    method.params.forEach(param => {
+    this.selectedMethod.params.forEach(param => {
       action.controls.params.push(PluginMethodParam.getFormGroup(param));
-    });
+    })
   }
 
   /**

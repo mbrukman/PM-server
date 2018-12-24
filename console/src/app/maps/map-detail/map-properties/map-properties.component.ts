@@ -30,7 +30,7 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
       .filter(map => map) // filtering empty map result
       .do(map => this.map = map)
       .filter(map => !this.projects)
-      .flatMap(() => this.projectsService.list())
+      .flatMap(() => this.projectsService.list(null,null,{isArchived:false,globalFilter:null,sort:'-createdAt'}))
       .subscribe(data => {
         this.projects = data.items;
         let project = this.projects.find((o) => (<string[]>o.maps).indexOf(this.map.id) > -1);
@@ -53,9 +53,9 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
     this.mapsService.setCurrentMap(mapObj);
   }
 
-  archiveMap() {
-    this.mapsService.archive(this.map.id).subscribe(() => {
-      this.map.archived = true;
+  archiveMap(isArchive:boolean) {
+    this.mapsService.archive(this.map.id, isArchive).subscribe(() => {
+      this.map.archived = isArchive;
       this.mapsService.setCurrentMap(this.map);
     });
   }

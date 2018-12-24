@@ -9,10 +9,8 @@ export interface IActionParam {
   _id?: string;
   value: string;
   code: boolean;
-  viewName?: string;
   name?: string;
-  param: IPluginMethodParam | string;
-  type: 'string' | 'text';
+
 }
 
 export interface IAction {
@@ -42,8 +40,8 @@ export interface IProcess {
   preRun?: string;
   postRun?: string;
   filterAgents?: string;
-  coordination?: 'wait' | 'race' | 'each';
-  flowControl?: 'wait' | 'race' | 'each';
+  coordination?: string;
+  flowControl?: string;
   actions: IAction[];
   used_plugin: IUsedPlugin;
   plugin?: IPlugin;

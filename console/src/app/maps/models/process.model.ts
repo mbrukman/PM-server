@@ -17,15 +17,15 @@ export class Process extends Serializable implements IProcess {
   preRun?: string;
   postRun?: string;
   filterAgents?: string;
-  coordination?: 'wait' | 'race' | 'each';
-  flowControl: 'wait' | 'race' | 'each';
+  coordination?: string;
+  flowControl: string;
   actions: Action[];
   used_plugin: UsedPlugin;
-  plugin?: Plugin;
   createdAt: Date;
   updatedAt: Date;
   correlateAgents: boolean;
   uuid: string;
+
 
   constructor(json?: any) {
     super(json);

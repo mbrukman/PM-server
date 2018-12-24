@@ -1,35 +1,58 @@
 @import "~assets/sass/mixins";
-
 .main {
-  .featured {
-    width: 100%;
-  }
-  .row {
-    a, button {
-      &.create {
-        margin-top: 15px;
+    .featured {
+        width: 100%;
+    }
+    
+    
+    @include table();
+    .name-wrapper{
+      display: flex;
+      align-items: center;
+      i {
         margin-right: 10px;
       }
     }
-  }
+
+    .row {
+        a,
+        button {
+            &.create {
+                margin-top: 15px;
+                margin-right: 10px;
+            }
+        }
+    }
+    .filter {
+        margin-top: 25px;
+        h5 {
+            padding-bottom: 15px;
+            width: 65%
+        }
+
+        .filters{
+          display: flex;
+          align-items: center;
+
+          .filter-archive{
+            margin-right: 10px;
+          }
+
+          .filter-text{
+            @include searchBox();
+          }
+        }
+
+    }
 }
 
 .lead {
-  .btn-link {
-    font-size: inherit;
-    outline: none;
-    padding: 0px;
-    border: 0px;
-    box-sizing: none;
-    background-color: transparent;
-  }
-}
-
-.filter {
-  margin-top: 25px;
-
-  h5 {
-    padding-bottom: 15px;
-  }
-  @include searchBox();
+    .btn-link {
+        font-size: inherit;
+        outline: none;
+        padding: 0px;
+        border: 0px;
+        box-sizing: none;
+        background-color: transparent;
+    }
 }

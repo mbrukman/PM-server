@@ -48,8 +48,8 @@
           <div class="col-5">
             <div class="card">
               <div class="card-body">
-                <div class="row">
-                  <div class="col-6">
+                <div class="result-overview">
+                  <div class="details">
                     <h5 class="card-title">Execution {{ selectedExecution?.runId }}</h5>
                     <p class="execution-detail">Start time: {{ selectedExecution?.startTime | date: 'short' }}</p>
                     <p class="execution-detail">Finish time: {{ selectedExecution?.finishTime | date: 'short' }}</p>
@@ -59,7 +59,7 @@
                     <p class="execution-detail" *ngIf="selectedExecution?.configuration">Configuration: {{
                       selectedExecution?.configuration.name}}</p>
                   </div>
-                  <div class="col-6"> 
+                  <div class="chart"> 
                     <div class="pie-chart-parent">
                       <ngx-charts-pie-chart
                         [results]="agProcessesStatus"

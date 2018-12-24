@@ -5,10 +5,21 @@
   </div>
   <div class="filter d-flex justify-content-between align-items-end">
     <h5 class="section-sub-title">All maps</h5>
-    <div>
-      <i class="material-icons" *ngIf="!filterTerm">search</i>
-      <i class="material-icons text-light" *ngIf="filterTerm" (click)="filterTerm = null">close</i>
-      <input class="form-control" [(ngModel)]="filterTerm" type="text" placeholder="Filter" (keyup)="loadProjectLazy(filterTerm)" />
+    
+    <div class="filters">
+      <div class="filter-archive">
+        <label class="form-check-label">
+          <input id="archive" type="checkbox" class="form-check-input" [(ngModel)]="filterOptions.isArchived" (change)="reloadMaps()" >
+          Show archived maps
+        </label>
+      </div>
+      <div class="filter-text">
+        <div>
+          <i class="material-icons" *ngIf="!filterTerm">search</i>
+          <i class="material-icons text-light" *ngIf="filterTerm" (click)="filterTerm = null">close</i>
+          <input class="form-control" [(ngModel)]="filterOptions.globalFilter" type="text" placeholder="Filter" (keyup)="loadProjectLazy()" />
+        </div>
+      </div>
     </div>
   </div>
 
@@ -16,13 +27,20 @@
                (onLazyLoad)="loadProjectLazy($event)"  [globalFilter]="filterTerm">
     <p-column field="name" header="Name" [sortable]="true">
       <ng-template let-col let-map="rowData" pTemplate="body">
-        <i class="material-icons" *ngIf="map.archived">archive</i>
-        <a [routerLink]="map.id">{{ map.name }}</a>
+        <div class="name-wrapper">
+          <i class="material-icons" [hidden]="!map.archived">archive</i>
+          <a [routerLink]="map.id">{{ map.name }}</a>
+        </div>
       </ng-template>
     </p-column>
-    <p-column field="project" header="Project" [sortable]="true">
+    <p-column field="project.name" header="Project" [sortable]="true">
       <ng-template let-col let-map="rowData" pTemplate="body">
         <a [routerLink] = "['../projects', map.project.id]" >{{ map.project.name }}</a>
+      </ng-template>
+    </p-column>
+    <p-column field="latestExectionResult.finishTime" header="Last Run" [sortable]="true">
+      <ng-template let-col let-map="rowData" pTemplate="body">
+        <span>{{ (map.latestExectionResult?.finishTime | date: 'dd/MM/yyyy HH:mm') || '' }}</span>
       </ng-template>
     </p-column>
     <p-column field="description" header="Description" [sortable]="true">
@@ -32,12 +50,12 @@
     </p-column>
     <p-column field="createdAt" header="Created" [sortable]="true">
       <ng-template let-col let-map="rowData" pTemplate="body">
-        <span>{{ (map.createdAt | date: 'dd/MM/yyyy') + ' ' +  (map.createdAt | date: 'HH:mm') }}</span>
+        <span>{{ map.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
       </ng-template>
     </p-column>
     <p-column field="updatedAt" header="Updated" [sortable]="true">
       <ng-template let-col let-map="rowData" pTemplate="body">
-        <span>{{ ((map.updatedAt | date: 'dd/MM/yyyy') || '') + ' ' +  ((map.updatedAt | date: 'HH:mm') || '' )}}</span>
+        <span>{{ ((map.updatedAt | date: 'dd/MM/yyyy HH:mm') || '')}}</span>
       </ng-template>
     </p-column>
     <p-column field="" header="Actions" [sortable]="true">

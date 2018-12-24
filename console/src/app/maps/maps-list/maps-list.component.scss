@@ -1,16 +1,35 @@
 @import "~assets/sass/mixins";
-
 .main {
-  .featured {
-    width: 100%;
-  }
-}
+    .featured {
+        width: 100%;
+    }
+    .filter {
+        margin-top: 25px;
+        h5 {
+            padding-bottom: 15px;
+        }
+        .filters {
+            display: flex;
+            align-items: center;
+            .filter-text {
+                @include searchBox();
+            }
+            .filter-archive {
+                margin-right: 10px;
+            }
+        }
+    }
+    @include table();
+    .name-wrapper{
+      display: flex;
+      align-items: center;
+      i {
+        margin-right: 10px;
+      }
+    }
 
-.filter {
-  margin-top: 25px;
 
-  h5 {
-    padding-bottom: 15px;
-  }
-  @include searchBox();
+    .section-sub-title {
+        width: 68%;
+    }
 }

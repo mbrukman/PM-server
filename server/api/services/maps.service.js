@@ -6,7 +6,7 @@ const MapExecutionLog = require("../models/map-execution-log.model")
 const MapTrigger = require("../models/map-trigger.model")
 const MapResult = require("../models/map-results.model")
 const Project = require("../models/project.model")
-
+const proejctServise = require("./projects.service")
 const PAGE_SIZE = env.page_size;
 
 
@@ -19,11 +19,19 @@ function getMapPlugins(mapStructure) {
 }
 
 
+
+function getSort(sortString){
+    var sort = {}
+    if (sortString[0] == '-')
+        sort[sortString.slice(1)] = -1;
+    else 
+        sort[sortString] = 1;
+
+    return sort;
+}
+
+
 module.exports = {
-    /* archiving maps in ids array */
-    archive: (mapsIds) => {
-        return Map.update({ _id: { $in: mapsIds } }, { archived: true }, { multi: true })
-    },
     /* count how many documents exist for a certain query */
     count: (filter) => {
         return Map.count(filter)
@@ -58,52 +66,105 @@ module.exports = {
         ]);
     },
 
-    filter: (query = {}) => {
+    filter: (filterOptions = {}) => {
         mapsId = [];
         let q = {};
-        if (query.fields) {
-            // This will change the fields in the query to query that we can use with mongoose (using regex for contains)
-            Object.keys(query.fields).map(key => { query.fields[key] = { '$regex': `.*${query.fields[key]}.*` }});
-            q = query.fields;
-        } else if (query.globalFilter) {
-            // if there is a global filter, expecting or condition between name and description fields
-            q = {
-                $or: [
-                    { name: { '$regex': `.*${query.globalFilter}.*` } },
-                    { description: { '$regex': `.*${query.globalFilter}.*` } }
-                ]
-            }
+        let fields = filterOptions.fields
+        let sort = filterOptions.options.sort || 'name'
+        let page = filterOptions.page
+        if (fields) {
+            // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
+            Object.keys(fields).map(key => { fields[key] = { '$regex': `.*${fields[key]}.*` }});
+            q = fields;
         }
-        let m = Map.find(q).where({ archived: false });
-        if (query.sort) {
-            // apply sorting by field name. for reverse, should pass with '-'.
-            m.sort(query.sort);
-        }
-        if (query.page) {
-            // apply paging. if no paging, return all
-            m.limit(PAGE_SIZE).skip((query.page - 1) * PAGE_SIZE);
+        
+        var $match = {};
+        if (filterOptions.options.isArchived !== true)
+            $match.archived = false;
+        if (filterOptions.options.globalFilter){
+            $match.$or= [
+                { name: { '$regex': `.*${filterOptions.options.globalFilter}.*` } },
+                { description: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }
+            ]
         }
 
-        return m.then(maps => {
-            let mapsId = maps.map(map=> map.id);
-            // searching project in DB when maps holds an array with a least one element of the mapsId
-            return {maps, mapsId};
-        }).then(({maps,mapsId}) => {
-            return Project.find({ maps: { $in: mapsId} },{_id:1,name:1, maps:1}).then(projects=>{
-                return {maps, projects}
-            })
-        }).then(({maps, projects})=>{
-            for(let i=0, length=maps.length; i<length; i++){
-                for(let j=0, projectsLength = projects.length; j<projectsLength; j++){
-                    if (projects[j].maps.toString().includes(maps[i].id)){
-                        maps[i] = maps[i].toJSON();
-                        maps[i].project = projects[j];
-                        break;
-                   }
+        let m = Map.aggregate([
+            {
+                $match:$match
+            },
+            {
+                $lookup:
+                {
+                    from:"projects",
+                    let:{ mapId:"$_id"},
+                    pipeline:[
+                        {
+                            $match:{
+                                $expr:{
+                                        $in: [ "$$mapId", "$maps" ] 
+                                }
+                            }
+                        },
+                        { 
+                            $project: 
+                            {   
+                                name:1
+                            }
+                        }
+                     ],
+                    as:"project"
+                },
+            },
+            {
+                $lookup:
+                {
+                    from:"mapResults",
+                    let:{ mapId:"$_id"},
+                    pipeline:[
+                        {
+                            $match:{
+                                $expr:{
+                                        $eq: [ "$$mapId", "$map" ] 
+                                }
+                            }
+                        },
+                        {
+                            $limit:1
+                        },
+                        {
+                            $sort:{
+                                '-finishTime':1
+                            }
+                        },
+                        { 
+                            $project: 
+                            {   
+                                finishTime:1
+                            }
+                        }
+
+                     ],
+                    as:"latestExectionResult",
+                },
+            },
+            {$sort:getSort(sort)},
+            { $skip : page ? ((page - 1) * PAGE_SIZE) : 0 },
+            { $limit: filterOptions.options.limit || PAGE_SIZE },
+            {$unwind:'$project'},
+            {$unwind: {
+                    "path": "$latestExectionResult",
+                    "preserveNullAndEmptyArrays": true
                 }
             }
-            return maps;
-        }).then(maps=>{
+        ])
+        
+        return m.then(maps => {
+            for(let i=0, mapsLength = maps.length; i<mapsLength; i++){
+                maps[i].id = maps[i]._id;
+                maps[i].project.id = maps[i].project._id;
+                delete maps[i]._id;
+                delete maps[i].project._id;
+            }
             return module.exports.count(q).then(r => {
                 return { items: maps, totalCount: r }
             });
