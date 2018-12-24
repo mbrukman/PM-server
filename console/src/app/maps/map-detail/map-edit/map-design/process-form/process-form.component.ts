@@ -70,21 +70,23 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       });
 
     // this.process = new Process(this.process);
-
+    
+    this.plugin = _.cloneDeep(this.processViewWrapper.process.plugin);
+    this.generateAutocompleteParams();
+    
     if (this.processViewWrapper.process.actions) {
       this.processViewWrapper.process.actions.forEach((action, actionIndex) => {
         const actionControl = <FormArray>this.processForm.controls['actions'];
         actionControl.push(this.initActionController(action));
         if (action.params && action.params.length > 0) {
-          action.params.forEach(param => {
-            actionControl.controls[actionIndex]['controls'].params.push(ActionParam.getFormGroup(param));
+          action.params.forEach((param, i) => {
+            let pluginParam = this.plugin.methods.find(o => o.name === this.processForm.value.actions[actionIndex].method);
+            actionControl.controls[actionIndex]['controls'].params.push(PluginMethodParam.getFormGroup(pluginParam.params[i],param));
           });
         }
       });
     }
 
-    this.plugin = _.cloneDeep(this.processViewWrapper.process.plugin);
-    this.generateAutocompleteParams();
 
     // subscribe to changes in form
     this.formValueChangeSubscription = this.processForm.valueChanges
@@ -200,14 +202,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       this.runAction(()=>{
         this.action = true;
         this.index = index;
-        const action = this.processForm.controls['actions']['controls'][this.index];
-        if(this.processForm.value.actions[this.index].params.length > 0){
-          const methodName = this.processForm.value.actions[this.index].method;
-          this.selectedMethod = this.plugin.methods.find(o => o.name === methodName);
-          this.selectedMethod.params.forEach(param => {
-            action.controls.params.splice(0,1,PluginMethodParam.getFormGroup(param,this.processForm.value.actions[this.index].params.find(p => p.name === param.name)));
-          });
-        }
+        
       })
   }
 
