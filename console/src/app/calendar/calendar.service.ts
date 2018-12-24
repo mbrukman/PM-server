@@ -16,15 +16,15 @@ export class CalendarService {
   }
 
   create(mapId: string, job) {
-    return this.http.post<Job>(`${serverUrl}api/maps/${mapId}/jobs/create`, job);
+    return this.http.post<Job>(`${serverUrl}api/scheduled-jobs`, job);
   }
 
   deleteJob(jobId: string) {
-    return this.http.delete<string>(`${serverUrl}api/maps/jobs/${jobId}/delete`, { responseType: 'text' as 'json' });
+    return this.http.delete<string>(`${serverUrl}api/scheduled-jobs/${jobId}`, { responseType: 'text' as 'json' });
   }
 
   getFutureJobs() {
-    return this.http.get<Job[]>(`${serverUrl}api/maps/scheduledJob/getFutureJobs`);
+    return this.http.get<Job[]>(`${serverUrl}api/scheduled-jobs/getFutureJobs`);
   }
 
   newJobAsObservable() {
@@ -32,7 +32,7 @@ export class CalendarService {
   }
 
   list() {
-    return this.http.get<Job[]>(`${serverUrl}api/maps/jobs`);
+    return this.http.get<Job[]>(`${serverUrl}api/scheduled-jobs`);
   }
 
   setNewJob(job: Job) {
@@ -40,7 +40,7 @@ export class CalendarService {
   }
 
   updateJob(job) {
-    return this.http.put<Job>(`${serverUrl}api/maps/scheduledJob/updateJob`, job);
+    return this.http.put<Job>(`${serverUrl}api/scheduled-jobs`, job);
   }
 
 }

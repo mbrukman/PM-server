@@ -6,11 +6,8 @@ const mapController = require("../controllers/maps.controller");
 router.post("/", mapController.filter);
 router.post("/create", mapController.create);
 // router.post("/generate", mapController.generate);
-router.get("/jobs", mapController.filterJobs); // scheduled jobs route
 router.get("/results", mapController.dashboard);
 router.get("/currentruns", mapController.currentRuns);
-router.put("/scheduledJob/updateJob", mapController.updateJob);
-router.delete("/jobs/:jobId/delete", mapController.deleteJob);
 router.delete("/:id", mapController.mapDelete);
 router.get("/:id", mapController.detail);
 
@@ -35,9 +32,4 @@ router.get("/:id/structures", mapController.getStructureList);
 router.post("/:id/structure/create", mapController.createStructure);
 router.get("/:id/structure/:structureId", mapController.getMapStructure);
 router.post("/:id/structure/:structureId/duplicate", mapController.duplicateMap);
-
-/* schedule jobs - should be updated */
-router.post("/:id/jobs/create", mapController.createJob);
-router.delete("/:id/jobs/:jobId/delete", mapController.deleteJob);
-
 module.exports = router;
