@@ -50,6 +50,14 @@
   width : initial !important;
   height : initial !important;
   flex-grow: 1;
+
+  ::ng-deep{
+    > svg {
+      .hidden{
+        visibility: hidden;
+      }
+    }
+  }
 }
 
 .pane-header {

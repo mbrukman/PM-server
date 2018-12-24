@@ -17,8 +17,20 @@
       > svg {
         overflow: visible;
         margin-bottom: 10px;
+
+        .hidden{
+          visibility: hidden;
+        }
       }
     }
+}
+
+::ng-deep{
+  #flyPaper{
+    .hidden{
+      visibility: hidden;
+    }
+  }
 }
 
 

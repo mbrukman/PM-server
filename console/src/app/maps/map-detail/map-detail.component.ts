@@ -228,7 +228,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     delete structure.map;
     if (structure.used_plugins) {
       structure.used_plugins.forEach(plugin => {
-        delete plugin._id;
+        plugin ? delete plugin._id : null;
       });
     }
     structure.processes.forEach((process, i) => {
