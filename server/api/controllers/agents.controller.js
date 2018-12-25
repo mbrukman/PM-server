@@ -24,8 +24,9 @@ module.exports = {
             plugins = activePlugins;
             return agentsService.setDefaultUrl(agent);
         }).then(() => {
-            return agentsService.checkPluginsOnAgent(agent);
+            return agentsService.checkPluginsOnAgent(agent); 
         }).then(agentsPlugin => {
+            let currentAgent = agentsService.getByKey(agent.key);
             agentsPlugin = JSON.parse(agentsPlugin);
             // the agent plugin returns an object with keys as plugin names and version number as version: { 'cmd': '0.0.1' }
             const filesPaths = plugins.reduce((total, current) => {
@@ -40,8 +41,7 @@ module.exports = {
             }
             async.each(filesPaths,
                 function (filePath, callback) {
-                    agentsService.installPluginOnAgent(filePath, agent).then(() => {
-                    }).catch((e) => {
+                    agentsService.installPluginOnAgent(filePath, currentAgent).catch((e) => {
                         winston.log('error', "Error installing on agent", e);
                     });
                     callback();
