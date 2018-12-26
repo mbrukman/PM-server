@@ -969,11 +969,11 @@ function runProcess(map, structure, runId, agent, socket) {
  * @param actionForm
  * @returns {Promise<any>}
  */
-function sendActionViaSocket(socket, action, actionForm) {
+function sendActionViaSocket(socket, param, actionForm) {
     socket.emit('add-task', actionForm);
 
     return new Promise((resolve, reject) => {
-        socket.on(action.uniqueRunId, (data) => {
+        socket.on(param.action.uniqueRunId, (data) => {
             resolve(data);
         });
     });
@@ -1071,7 +1071,8 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             versionId: 0,
             executionId: 0,
             action: action,
-            key: agent.key
+            key: agent.key,
+            settings:plugin.settings
         };
 
         let actionString = `+ ${plugin.name} - ${method.name}: `;
@@ -1095,10 +1096,11 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
 
         // will send action to agent via socket or regular request
         let p;
+        let settings = plugin.settings
         if (agent.socket) {
-            p = sendActionViaSocket(agent.socket, action, actionExecutionForm);
+            p = sendActionViaSocket(agent.socket, {action,settings}, actionExecutionForm);
         } else {
-            p = sendActionViaRequest(agent, action, actionExecutionForm);
+            p = sendActionViaRequest(agent, {action,settings}, actionExecutionForm);
         }
 
         let timeout;

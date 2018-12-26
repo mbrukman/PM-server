@@ -14,6 +14,7 @@ const router = express.Router();
 router.get("/", pluginsController.pluginsList);
 router.delete("/:id/delete", pluginsController.pluginDelete);
 router.post("/upload", upload.single('file'), pluginsController.pluginUpload);
+router.post("/:id/settings", pluginsController.addSettings);
 router.get("/:id/generate/:name", pluginsController.generatePluginParams);
 
 module.exports = router;

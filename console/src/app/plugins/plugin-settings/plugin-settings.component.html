@@ -1,0 +1,30 @@
+<div class="main pm-main-wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <h1>Settings</h1>
+            <form [formGroup]="settingsForm" (ngSubmit)="onSubmitForm(settingsForm.value)" class="settings-form">
+                <div class="form-group"  *ngFor="let param of plugin.settings; let k = index">
+                    <div [ngSwitch]="param.valueType" >
+                        <label>{{param.viewName}}
+                            <textarea [formControlName]="param.name" class="form-control" *ngSwitchCase="'text'"></textarea>
+                            <select [formControlName]="param.name" class="form-control" *ngSwitchCase="'autocomplete'">
+                                <option *ngFor="let opt of options"
+                                        [ngValue]="opt.id">{{ opt.value }}
+                                </option>
+                            </select>
+                            <select [formControlName]="param.name" class="form-control" *ngSwitchCase="'options'">
+                                <option *ngFor="let opt of param.options"
+                                        [ngValue]="opt.id">{{ opt.name }}
+                                </option>
+                            </select>
+                            <input [formControlName]="param.name" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
+                            <input [formControlName]="param.name" type="number" class="form-control" *ngSwitchCase="'int'">
+                            <input [formControlName]="param.name" type="text" class="form-control" *ngSwitchDefault>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Save</button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -31,4 +31,8 @@ export class PluginsService {
   upload(file): Observable<any> {
     return this.http.post(`${serverUrl}api/plugins/upload`, file);
   }
+
+  addSettings(pluginId,settings):Observable<any>{
+    return this.http.post(`${serverUrl}api/plugins/${pluginId}/settings`, settings);
+  }
 }

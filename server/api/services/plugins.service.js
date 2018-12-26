@@ -10,7 +10,7 @@ const agentsService = require("./agents.service");
 const models = require("../models");
 const Plugin = models.Plugin;
 const rimraf = require('rimraf')
-var pluginConfigValidationSchema = require('../validation-schema/plugin-config.schema')
+var pluginConfigValidationSchema = require('../validation-schema/plugin-config.schema');
 let pluginsPath = path.join(
   path.dirname(path.dirname(__dirname)),
   "libs",
@@ -146,6 +146,12 @@ function deployPluginFile(pluginPath, req) {
             // check the plugin type
             Plugin.findOne({ name: obj.name })
               .then(plugin => {
+                if (obj.settings)
+                obj.settings = obj.settings.map(s=>{
+                  s.valueType = s.type;
+                  delete s.type;
+                  return s;
+                })
                 if (!plugin) {
                     return Plugin.create(obj);
                 }
@@ -276,5 +282,22 @@ module.exports = {
           );
         })
     );
+  },
+
+  updateSettings:(id,settings)=>{
+    Plugin.findOne({ _id:id}, function(err, plugin) {
+      if(err){
+        throw err
+      }
+      for(let i=0, length=plugin.settings.length; i<length; i++){
+        plugin.settings[i].value = settings[Object.keys(settings)[i]]
+      }
+      plugin.save(function(err) {
+        if (err)
+            throw err
+
+      })
+    })
   }
+
 };

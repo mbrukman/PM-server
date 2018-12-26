@@ -12,6 +12,7 @@ var schema = {
     version: {type:'string'},
     imgUrl: {type:'string'},
     file:{type:'string'},
+    settings:{type:'array'},
     methods: {
       items:{  
         type:'object',

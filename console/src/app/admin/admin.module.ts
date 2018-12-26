@@ -17,6 +17,7 @@ import { GroupDynamicConditionFilterComponent } from '@agents/groups/group-dynam
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
 import { EvaluateGroupAgentComponent } from '@agents/groups/evaluate-group-agent/evaluate-group-agent.component';
 import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
+import {PluginSettingsComponent} from '@plugins/plugin-settings/plugin-settings.component'
 
 
 @NgModule({
@@ -31,6 +32,7 @@ import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
     AdminComponent,
     PluginUploadComponent,
     PluginsListComponent,
+    PluginSettingsComponent,
     AgentsListComponent,
     AddFolderComponent,
     AgentsComponent,

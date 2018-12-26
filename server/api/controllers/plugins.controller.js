@@ -87,5 +87,17 @@ module.exports = {
             winston.log('error', "Error generating plugin params", error);
             return res.status(500).send(error);
         });
+    },
+
+    addSettings:(req,res) => {
+        hooks.hookPre('plugin-settings').then(() => {
+            return pluginsService.updateSettings(req.params.id, req.body)
+        }).then((generated) => {
+            return res.json(generated);
+        }).catch(error => {
+            req.io.emit('notification', { title: 'Whoops', message: `Error adding settings to plugin`, type: 'error' });
+            winston.log('error', "Error adding settings to plugin", error);
+            return res.status(500).send(error);
+        });
     }
 };
