@@ -22,7 +22,7 @@ import { LinebreakPipe } from './pipes/linebreak.pipe';
 import { InlineEditDirective } from './directives/inline-edit.directive';
 import { InPipe } from '@shared/pipes/filterIn.pipe';
 import { RawOutputComponent } from './raw-output/raw-output.component';
-
+import { CardComponent } from './card/card.component';
 
 @NgModule({
   imports: [
@@ -52,7 +52,8 @@ import { RawOutputComponent } from './raw-output/raw-output.component';
     InlineEditDirective,
     LinebreakPipe,
     InPipe,
-    RawOutputComponent
+    RawOutputComponent,
+    CardComponent
   ],
   exports: [
     ReactiveFormsModule,
@@ -72,7 +73,8 @@ import { RawOutputComponent } from './raw-output/raw-output.component';
     InlineEditDirective,
     ConfirmComponent,
     LinebreakPipe,
-    InPipe
+    InPipe,
+    CardComponent
   ],
   entryComponents: [ConfirmComponent, RawOutputComponent]
 })

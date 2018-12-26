@@ -80,8 +80,8 @@ export class MapsService {
     return this.http.get(`${serverUrl}api/maps/${mapId}/stop-execution/${runId}`);
   }
 
-  getDistinctMapExecutionsResult() {
-    return this.http.get<any>(`${serverUrl}api/maps/results`);
+  getDistinctMapExecutionsResult(limit) {
+    return this.http.get<any>(`${serverUrl}api/maps/results/${limit}`);
   }
 
   logsList(mapId: string, runId?: string) {

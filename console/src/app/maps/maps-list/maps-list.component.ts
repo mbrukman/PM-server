@@ -18,28 +18,34 @@ export class MapsListComponent implements OnInit, OnDestroy {
   filterTerm: string;
   resultCount: number = 0;
   page: number = 1;
-  featuredMaps: Map[];
-  filterOptions : FilterOptions = new FilterOptions();
+  filterOptions: FilterOptions = new FilterOptions();
+  recentMaps: any = [];
 
   constructor(private mapsService: MapsService,
     private modalService: BsModalService) {
     this.onDataLoad = this.onDataLoad.bind(this)
   }
-  
+
 
   ngOnInit() {
     this.reloadMaps();
-
     var featureOptions = _.clone(this.filterOptions);
-    featureOptions.limit = 4;
-    this.mapsService.filterMaps(null,this.page,featureOptions).take(1).subscribe(data => {
-      if (data)
-        this.featuredMaps = data.items;
+    this.mapsService.getDistinctMapExecutionsResult(4).subscribe(executions => {
+      this.recentMaps = executions;
+      if (4 - this.recentMaps.length == 0) { return; }
+      featureOptions.limit = 4 - this.recentMaps.length;
+      featureOptions.sort = '-updatedAt'
+      this.mapsService.filterMaps(null, this.page, featureOptions).take(1).subscribe(data => {
+        if (data)
+          data.items.forEach(item => {
+            this.recentMaps.push({ map: item })
+          })
+      });
     });
   }
-  
-  reloadMaps(fields=null,page=this.page,filter=this.filterOptions){
-    this.mapReq = this.mapsService.filterMaps(fields,page,filter).subscribe(this.onDataLoad);
+
+  reloadMaps(fields = null, page = this.page, filter = this.filterOptions) {
+    this.mapReq = this.mapsService.filterMaps(fields, page, filter).subscribe(this.onDataLoad);
   }
 
   ngOnDestroy() {
@@ -56,15 +62,15 @@ export class MapsListComponent implements OnInit, OnDestroy {
       }
     }
     this.filterOptions.sort = sort
-    this.reloadMaps(fields,page,this.filterOptions)
+    this.reloadMaps(fields, page, this.filterOptions)
   }
 
   deleteMap(id) {
 
     this.mapsService.delete(id).subscribe(() => {
-      for(let i =0,lenght=this.featuredMaps.length; i<lenght;i++){
-        if(this.featuredMaps[i].id == id){
-          this.featuredMaps.splice(i,1);
+      for (let i = 0, lenght = this.recentMaps.length; i < lenght; i++) {
+        if (this.recentMaps[i].id == id) {
+          this.recentMaps.splice(i, 1);
           break;
         }
       }
@@ -73,7 +79,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
   }
 
 
-  onDataLoad(data){
+  onDataLoad(data) {
     if (!data) {
       this.maps = null;
       this.resultCount = 0;
@@ -82,23 +88,23 @@ export class MapsListComponent implements OnInit, OnDestroy {
     this.maps = data.items;
     this.resultCount = data.totalCount;
   }
-  
-  
- onConfirmDelete(id) {
-   // will be triggered by deactivate guard
-     let modal = this.modalService.show(ConfirmComponent);
-     let answers = {
-       confirm: 'Delete',
-       cancel: 'Cancel'
-     };
-     modal.content.message = 'Are you sure you want to delete? all data related to the map will get permanently lost';
-     modal.content.confirm = answers.confirm;
-     modal.content.cancel = answers.cancel;
-     modal.content.result.asObservable().subscribe(ans => {
-         if (ans === answers.confirm) {
-           this.deleteMap(id);
-         }
-      })
-       
+
+
+  onConfirmDelete(id) {
+    // will be triggered by deactivate guard
+    let modal = this.modalService.show(ConfirmComponent);
+    let answers = {
+      confirm: 'Delete',
+      cancel: 'Cancel'
+    };
+    modal.content.message = 'Are you sure you want to delete? all data related to the map will get permanently lost';
+    modal.content.confirm = answers.confirm;
+    modal.content.cancel = answers.cancel;
+    modal.content.result.asObservable().subscribe(ans => {
+      if (ans === answers.confirm) {
+        this.deleteMap(id);
+      }
+    })
+
   }
 }

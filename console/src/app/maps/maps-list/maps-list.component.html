@@ -1,17 +1,26 @@
-<div class="main pm-main-wrapper">
-  <h1 class="section-title">Maps</h1>
-  <div class="featured">
-    <app-feature [items]="featuredMaps"></app-feature>
+<div class="main">
+  <div class="head-title">
+    <h1 class="section-title">Maps</h1>
   </div>
-  <div class="filter d-flex justify-content-between align-items-end">
-    <h5 class="section-sub-title">All maps</h5>
-    
-    <div class="filters">
+  <div class="list-content">
+    <p class="executed-title">Recently maps</p>
+
+<app-card [items]="recentMaps"></app-card>
+ <div class="row">
+   <a routerLink="/maps/create" class="btn">Add a New Map</a>
+   <div class="filters">
       <div class="filter-archive">
+
+
         <label class="form-check-label">
-          <input id="archive" type="checkbox" class="form-check-input" [(ngModel)]="filterOptions.isArchived" (change)="reloadMaps()" >
+          <div class="checkbox">
+            <input id="archive" type="checkbox" class="form-check-input" [(ngModel)]="filterOptions.isArchived" (change)="reloadMaps()" >
+            <span class="checkmark"></span>
+          </div>
           Show archived maps
         </label>
+
+
       </div>
       <div class="filter-text">
         <div>
@@ -21,7 +30,7 @@
         </div>
       </div>
     </div>
-  </div>
+ </div>
 
   <p-dataTable [value]="maps" [lazy]="true" [rows]="15" [paginator]="true" [totalRecords]="resultCount"
                (onLazyLoad)="loadProjectLazy($event)"  [globalFilter]="filterTerm">
@@ -60,11 +69,12 @@
     </p-column>
     <p-column field="" header="Actions" [sortable]="true">
       <ng-template let-col let-i="rowIndex" let-map="rowData" pTemplate="body">
-        <button class="btn btn-danger" (click)="onConfirmDelete(map.id)"><i class="material-icons">delete</i></button>
+        <button class="btn garbage" (click)="onConfirmDelete(map.id)"><i class="material-icons">delete</i></button>
       </ng-template>
     </p-column>
   </p-dataTable>
-  <a routerLink="/maps/create" class="btn pm create">Add map</a>
+</div>
+
 </div>
 
 

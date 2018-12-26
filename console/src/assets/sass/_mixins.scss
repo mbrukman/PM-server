@@ -49,7 +49,71 @@
             }
           }
         }
+      
+
       }
+    }
+    .ui-paginator-page{
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      justify-content: center;
+    }
+  }
+}
+
+@mixin page-list-items {
+  .list-content{
+    padding: 18px 40px;
+    .executed-title{
+      color: #f79f2b;
+      font-size: 18px;
+    }
+    .row{
+      margin: 30px 0px;
+      display: flex;
+      justify-content: space-between;
+      .btn{
+          display: flex;
+          justify-content: center;
+          width: 155px;
+          height: 38px;
+          background: #44acdf;
+          color: white;
+      }
+    .filters {
+      display: flex;
+      align-items: center;
+      .filter-text {
+          @include searchBox();
+      }
+      .filter-archive {
+          margin-right: 28px;
+          label{
+              display: flex;
+          }
+          .checkbox{
+              width: 24px;
+              height: 24px;
+              border-radius: 3px;
+              background-color: #3f4247;
+              margin-right: 7px;
+              .form-check-input{
+                  position: absolute;
+                  opacity: 0;
+                  cursor: pointer;
+                  height: 0;
+                  width: 0;
+              }
+          }
+
+          // .checkbox input:checked {
+          //   background: red;
+          // } 
+        
+      }
+  }
     }
   }
 }
