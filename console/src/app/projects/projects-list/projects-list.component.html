@@ -13,12 +13,11 @@
     <a routerLink="/projects/create" class="btn">Add project</a>
     <div class="filters">
       <div class="filter-archive">
-        <label class="form-check-label">
-            <div class="checkbox">
-          <input id="archive" type="checkbox" class="form-check-input" (change)="reloadProjects()" [(ngModel)]="filterOptions.isArchived">
-        </div>
+        <label class="control control-checkbox">
           Show archived projects
-        </label>
+              <input type="checkbox" id="archive"  [(ngModel)]="filterOptions.isArchived" (change)="reloadMaps()">
+          <div class="control_indicator"></div>
+      </label>
       </div>
       <div class="filter-text">
         <div>

@@ -8,10 +8,10 @@
     </button>
   </div>
 
-  <p class="lead">{{project?.description}}</p>
-
+  
   <div class="list-content">
-    <p class="executed-title">Recently added</p>
+    <p class="lead">{{project?.description}}</p>
+    <p class="executed-title" *ngIf="featuredMaps?.length > 0">Recently added</p>
     <div class="featured">
       <app-feature [items]="featuredMaps"></app-feature>
     </div>
@@ -23,15 +23,14 @@
         <button class="btn" (click)="openImportModal()" *ngIf="project?.maps && project?.maps?.length > 0">Import map</button>
       </div>
 
-      <div class="filterd">
+      <div class="filterd" *ngIf="featuredMaps?.length > 0">
         <div class="filters">
           <div class="filter-archive">
-            <label class="form-check-label">
-              <div class="checkbox">
-                <input id="archive" type="checkbox" class="form-check-input" (change)="getProjectDetails()" [(ngModel)]="filterOptions.isArchived">
-              </div>
-              Show archived projects
-            </label>
+            <label class="control control-checkbox">
+              Show archived maps
+                  <input type="checkbox" id="archive"  [(ngModel)]="filterOptions.isArchived" (change)="reloadMaps()">
+              <div class="control_indicator"></div>
+          </label>
           </div>
           <div class="filter-text">
             <div>
@@ -49,7 +48,7 @@
         No maps yet.
         Go ahead and <a routerLink="/maps/create" [queryParams]="{'project': project?.id}">add a new map</a> or
 
-        <button class="btn btn-link" (click)="openImportModal()">import map</button>.
+        <button class="btn-link" (click)="openImportModal()">import map</button>.
 
       </p>
 

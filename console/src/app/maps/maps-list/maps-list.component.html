@@ -12,13 +12,11 @@
       <div class="filter-archive">
 
 
-        <label class="form-check-label">
-          <div class="checkbox">
-            <input id="archive" type="checkbox" class="form-check-input" [(ngModel)]="filterOptions.isArchived" (change)="reloadMaps()" >
-            <span class="checkmark"></span>
-          </div>
+        <label class="control control-checkbox">
           Show archived maps
-        </label>
+              <input type="checkbox" id="archive"  [(ngModel)]="filterOptions.isArchived" (change)="reloadMaps()">
+          <div class="control_indicator"></div>
+      </label>
 
 
       </div>
