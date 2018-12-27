@@ -1,9 +1,13 @@
+@import "~assets/sass/mixins";
+
 input.form-control.ng-invalid.ng-touched, textarea.form-control.ng-invalid.ng-touched {
   border: 1px solid red;
 }
-
+.header{
+  @include header();
+}
 .main {
   .map-form {
-    max-width: 850px
+    @include form()
   }
 }

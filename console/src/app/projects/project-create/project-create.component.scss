@@ -1,5 +1,11 @@
+@import "~assets/sass/mixins";
+
+.header{
+  @include header()
+}
+
 .main {
   .project-form{
-    max-width: 850px;
+    @include form()
   }
 }
