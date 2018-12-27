@@ -34,34 +34,25 @@ export class PluginSettingsComponent implements OnInit,OnDestroy{
 
     generateAutocompleteParams() {
         if (!this.plugin) return;
-        Observable.from(this.plugin.methods)
-          .filter(method => this.methodHaveParamType(method, 'autocomplete')) // check if has autocomplete
-          .flatMap(method => {
+        Observable.from(this.plugin.settings)
+          .filter(param => param.valueType == 'autocomplete') // check if has autocomplete
+          .flatMap(param => {
             return Observable.forkJoin(
-              Observable.of(method), // the method
-              this.pluginsService.generatePluginParams(this.plugin._id, method.name) // generated params
+              Observable.of(param), // the param
+              this.pluginsService.generatePluginSettingsParams(this.plugin._id)
+               // generated params
             );
           })
-          .map(data => {
-            data[1].forEach(param => {
-              data[0].params[
-                data[0].params.findIndex(o => o.name === param.name)
-              ] = param;
-            });
-            return data[0];
-          })
-          .subscribe(method => {
-            this.plugin.methods[
-              this.plugin.methods.findIndex(o => o.name === method.name)
-            ] = method;
-            this.addToMethodContext(method);
-          });
-    
-        Observable.from(this.plugin.methods)
-          .filter(method => this.methodHaveParamType(method, 'options'))
-          .subscribe(method => {
-            this.addToMethodContext(method);
-          });
+          .subscribe(data => {
+                data[1].forEach(param => {
+                    if(param.valueType == 'autocomplete'){
+                        this.plugin.settings[this.plugin.settings.findIndex(p => p.name == param.name)] = param
+                    }
+                })
+            
+        })
+            
+        
     }
 
     methodHaveParamType(method: PluginMethod, type: string): boolean {

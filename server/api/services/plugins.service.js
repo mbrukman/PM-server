@@ -253,15 +253,24 @@ module.exports = {
    * @param pluginId
    * @param methodName
    */
-  generatePluginParams: (pluginId, methodName) => {
+  generatePluginParams: (pluginId, key, type) => {
     return module.exports.getPlugin(pluginId).then(
       plugin =>
         new Promise((resolve, reject) => {
           plugin = JSON.parse(JSON.stringify(plugin));
-          let method = plugin.methods.find(o => o.name === methodName);
-          let paramsToGenerate = method.params.filter(
-            o => o.type === "autocomplete"
-          );
+          
+          let paramsToGenerate;
+          if (type=="method"){
+            let method = plugin.methods.find(o => o.name === key);
+            paramsToGenerate = method.params.filter(
+              o => o.type === "autocomplete"
+            );
+          } else if (type=="settings"){
+            paramsToGenerate = plugin.settings.filter(
+              o => o.valueType === "autocomplete"
+            );
+          }
+
           async.each(
             paramsToGenerate,
             (param, callback) => {

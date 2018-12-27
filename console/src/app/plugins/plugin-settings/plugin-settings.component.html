@@ -8,7 +8,7 @@
                         <label>{{param.viewName}}
                             <textarea [formControlName]="param.name" class="form-control" *ngSwitchCase="'text'"></textarea>
                             <select [formControlName]="param.name" class="form-control" *ngSwitchCase="'autocomplete'">
-                                <option *ngFor="let opt of options"
+                                <option *ngFor="let opt of param.options"
                                         [ngValue]="opt.id">{{ opt.value }}
                                 </option>
                             </select>

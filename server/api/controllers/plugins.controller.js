@@ -77,9 +77,21 @@ module.exports = {
      * @param req
      * @param res
      */
-    generatePluginParams: (req, res) => {
+    generatePluginMethodParams: (req, res) => {
         hooks.hookPre('plugin-generate-params').then(() => {
-            return pluginsService.generatePluginParams(req.params.id, req.params.name)
+            return pluginsService.generatePluginParams(req.params.id, req.params.name, 'method')
+        }).then((generated) => {
+            return res.json(generated);
+        }).catch(error => {
+            req.io.emit('notification', { title: 'Whoops', message: `Error deleting plugin`, type: 'error' });
+            winston.log('error', "Error generating plugin params", error);
+            return res.status(500).send(error);
+        });
+    },
+
+    generatePluginSettingsParams: (req, res) => {
+        hooks.hookPre('plugin-generate-params').then(() => {
+            return pluginsService.generatePluginParams(req.params.id, req.params.name, 'settings')
         }).then((generated) => {
             return res.json(generated);
         }).catch(error => {

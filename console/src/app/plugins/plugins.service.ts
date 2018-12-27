@@ -3,8 +3,10 @@ import { Injectable } from '@angular/core';
 import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
 import { Observable } from 'rxjs/Observable';
 import { environment } from '../../environments/environment';
+import {PluginSettings} from '@plugins/models/plugin-settings.model.ts'
 
 import { Plugin } from './models/plugin.model';
+import { PluginSettingsComponent } from './plugin-settings/plugin-settings.component';
 
 const serverUrl = environment.serverUrl;
 
@@ -24,8 +26,12 @@ export class PluginsService {
     })
   }
 
-  generatePluginParams(pluginId, methodName) {
-    return this.http.get<PluginMethodParam[]>(`${serverUrl}api/plugins/${pluginId}/generate/${methodName}`);
+  generatePluginMethodsParams(pluginId, methodName) {
+    return this.http.get<PluginMethodParam[]>(`${serverUrl}api/plugins/${pluginId}/generateMethod/${methodName}`);
+  }
+
+  generatePluginSettingsParams(pluginId){
+    return this.http.get<PluginSettings[]>(`${serverUrl}api/plugins/${pluginId}/generateSettings`);
   }
 
   upload(file): Observable<any> {

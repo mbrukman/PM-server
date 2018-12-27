@@ -7,7 +7,8 @@ export class PluginMethodParam extends Serializable implements IPluginMethodPara
   id?: string;
   _id?: string;
   name: string;
-  type: string;
+  valueType?: string;
+  type:string
   viewName?: string;
   options?: [{ id: string, name: string }];
   value?: string | { id: string, value: string } = null;
