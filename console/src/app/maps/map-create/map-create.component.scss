@@ -8,6 +8,9 @@ input.form-control.ng-invalid.ng-touched, textarea.form-control.ng-invalid.ng-to
 }
 .main {
   .map-form {
-    @include form()
+    max-width: 430px;
+    @include input();
+    @include select();
+    @include textarea();
   }
 }

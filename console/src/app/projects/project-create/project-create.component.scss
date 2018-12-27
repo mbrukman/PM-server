@@ -6,6 +6,9 @@
 
 .main {
   .project-form{
-    @include form()
+    max-width: 430px;
+    @include input();
+    @include select();
+    @include textarea();
   }
 }
