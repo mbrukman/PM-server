@@ -38,21 +38,23 @@ module.exports = {
             if (!filesPaths || filesPaths.length === 0) {
                 return res.status(204).send();
             }
-            async.each(filesPaths,
-                function (filePath, callback) {
+            Promise.all(filesPaths.map(function asyncFilesPaths(filePath){ 
+                return new Promise((resolve,reject) =>{
                     agentsService.installPluginOnAgent(filePath, agent).then(() => {
-                    }).catch((e) => {
-                        winston.log('error', "Error installing on agent", e);
-                    });
-                    callback();
-                },
-                function (error) {
-                    if (error) {
-                        winston.log('error', "Error installing plugins on agent", error);
-                    }
-                    return res.status(204).send();
-                });
-        });
+                     }).catch((e) => {
+                       winston.log('error', "Error installing on agent", e);
+                       reject(e)
+                     }); 
+                     resolve()
+                }) 
+            })).catch((error)=>{
+                if (error) {
+                    winston.log('error', "Error installing plugins on agent", error);
+                 }
+                 return res.status(204).send();
+                })
+            })
+        
     },
     /* Delete an agent */
     delete: (req, res) => {

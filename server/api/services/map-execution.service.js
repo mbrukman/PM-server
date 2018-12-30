@@ -265,7 +265,9 @@ function filterExecutionAgents(mapCode, executionContext, groups, mapAgents, exe
         let agentsStatus = Object.assign({}, agentsService.agentsStatus());
         let executionAgents = {};
         agents.forEach((agentObj) => {
-            const agentStatus = _.find(agentsStatus, (agent) => agent.id === agentObj.id);
+            const agentStatus = _.find(agentsStatus, (agent) => {
+                return agent.id === agentObj.id
+            });
             if (!agentStatus) {
                 return;
             }
@@ -282,32 +284,32 @@ function filterExecutionAgents(mapCode, executionContext, groups, mapAgents, exe
         return executionAgents;
     }
 
-    if (!executionAgents) {
+    return new Promise((resolveAgents,reject)=>{
+        if (executionAgents) return resolveAgents(executionAgents);
+
         let groupsAgents = {};
 
-        return new Promise((resolve, reject) => {
-            async.each(groups,
-                (group, callback) => {
-                    groupsAgents = Object.assign(groupsAgents, agentsService.evaluateGroupAgents(group));
-                    callback();
-                }, (error) => {
-                    resolve(Object.keys(groupsAgents).map(key => groupsAgents[key]));
-                })
-        }).then((groupsAgents) => {
-            let totalAgents = [...JSON.parse(JSON.stringify(mapAgents)), ...JSON.parse(JSON.stringify(groupsAgents))];
-            return filterLiveAgents(totalAgents);
-
-        });
-    }
-
-    return agentsService.filter({
-        $or: [
-            { _id: { $in: executionAgents.filter((id) => ObjectId.isValid(id)) } },
-            { name: { $in: executionAgents } }
-        ]
+        Promise.all(groups.map(function asyncGroup(group){ 
+            return new Promise((resolve,reject) =>{
+                groupsAgents = Object.assign(groupsAgents, agentsService.evaluateGroupAgents(group));
+                resolve();   
+            }) 
+        })).then(() => {
+            let groupsAgentsToUse = Object.keys(groupsAgents).map(key => groupsAgents[key]);
+            let totalAgents = [...JSON.parse(JSON.stringify(mapAgents)), ...JSON.parse(JSON.stringify(groupsAgentsToUse))];
+            return resolveAgents(filterLiveAgents(totalAgents));
+        })
+    }).then(executionAgents=>{
+        let agentsKeys= Object.keys(executionAgents);
+        return agentsService.filter({
+            $or: [
+                { _id: { $in: agentsKeys.map((key) => executionAgents[key]._id) }},
+                { name: { $in: agentsKeys.map((key) => executionAgents[key].name) } }
+            ]
+        })
     }).then((agents) => {
         return filterLiveAgents(agents);
-    });
+    })
 }
 
 
@@ -521,22 +523,25 @@ function validate_plugin_installation(map, structure, runId, agentKey) {
         }, []);
 
         if (filesPaths && filesPaths.length > 0) {
-            async.each(filesPaths,
-                function (filePath, callback) {
-                    agentsService.installPluginOnAgent(filePath, agents[agentKey]).then(() => {
-                    }).catch((e) => {
-                        winston.log('error', 'Error installing on agent', e);
-                    });
-                    callback();
-                },
-                function (error) {
-                    if (error) {
-                        winston.log('error', 'Error installing plugins on agent, it may be a fatal error', error);
-                    }
-                    winston.log('success', 'Done installing plugins');
-                    resolve();
-                });
-        } else {
+            Promise.all(filesPaths.map(function asyncFilesPaths(filePath){ 
+                return new Promise((resolve,reject) =>{
+                    agentsService.installPluginOnAgent(filePath, agent).then(() => {
+                     }).catch((e) => {
+                       winston.log('error', "Error installing on agent", e);
+                       reject(e)
+                     }); 
+                     resolve()
+                }) 
+            })).then(()=> {
+                winston.log('success', 'Done installing plugins');
+            }).catch((error)=>{
+                if (error) {
+                    winston.log('error', "Error installing plugins on agent", error);
+                 }
+                 return res.status(204).send();
+                })
+            }
+         else {
             resolve();
         }
     });
@@ -546,18 +551,19 @@ function startMapExecution(map, structure, runId, socket) {
     let agents = executions[runId].executionAgents;
     const startNode = findStartNode(structure);
 
-    async.each(agents, runMapFromAgent(map, structure, runId, startNode.uuid, socket), function (error) {
-    })
+    Promise.all(agents.map(function runMapFromAgent(agent){ 
+        return new Promise((resolve,reject) =>{
+            validate_plugin_installation(map, structure, runId, agent.key).then(() => {
+                runNodeSuccessors(map, structure, runId, agent, node, socket);
+                resolve();
+            })
+            .catch((e)=> {
+                reject(e)
+            });
+        }) 
+    }))
 }
 
-function runMapFromAgent(map, structure, runId, node, socket) {
-    return (agent, callback) => {
-        validate_plugin_installation(map, structure, runId, agent.key).then(() => {
-            runNodeSuccessors(map, structure, runId, agent, node, socket);
-            callback();
-        });
-    }
-}
 
 /**
  * The function checks if the agent executing a process.
