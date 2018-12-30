@@ -6,6 +6,8 @@ const winston = require('winston');
 const expressWinston = require('express-winston');
 const mongoose = require('mongoose');
 const bootstrap = require("./helpers/bootstrap").bootstrap;
+const fs = require('fs');
+const environment = require("../server/env/enviroment")
 
 const socketService = require('./api/services/socket.service');
 
@@ -14,6 +16,15 @@ const parseArgs = require('minimist')(process.argv.slice(2));
 
 const env = require('./env/enviroment');
 const app = express(); 
+
+
+if (!fs.existsSync(environment.keyPath)) {
+    winston.info("Writing pm key");
+    const createKey = require("./helpers/createKey");
+    createKey.generateKey(environment.keyPath);
+}
+
+
 
 /////////////////////
 // configurations //
@@ -91,6 +102,7 @@ const agentsApi = require("./api/routes/agents.routes");
 const projectsApi = require("./api/routes/projects.routes");
 const triggersApi = require("./api/routes/triggers.routes")
 const scheduledJobsApi =  require("./api/routes/scheduled-jobs.routes")
+const vaultsApi = require("./api/routes/vaults.routes")
 
 app.use('/api/setup', setupApi);
 app.use('/api/maps', mapsApi);
@@ -99,6 +111,9 @@ app.use('/api/agents', agentsApi);
 app.use('/api/projects', projectsApi);
 app.use('/api/triggers', triggersApi)
 app.use('/api/scheduled-jobs', scheduledJobsApi)
+app.use('/api/vaults', vaultsApi)
+
+
 
 
 // Send all other requests to the Angular app

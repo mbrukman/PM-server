@@ -17,6 +17,9 @@ import { GroupDynamicConditionFilterComponent } from '@agents/groups/group-dynam
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
 import { EvaluateGroupAgentComponent } from '@agents/groups/evaluate-group-agent/evaluate-group-agent.component';
 import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
+import { VaultComponent } from '../vault/vault/vault.component'
+import  { VaultFormComponent} from '../vault/vault-form/vault-form.component'
+import { VaultService } from 'app/vault/vault.service';
 
 
 @NgModule({
@@ -38,8 +41,10 @@ import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
     GroupDynamicConditionFilterComponent,
     InputPopupComponent,
     EvaluateGroupAgentComponent,
-    EditAgentComponent
+    EditAgentComponent,
+    VaultComponent,VaultFormComponent
   ],
-  entryComponents: [PluginUploadComponent, AddFolderComponent, InputPopupComponent, EditAgentComponent]
+  entryComponents: [PluginUploadComponent, AddFolderComponent, InputPopupComponent, EditAgentComponent,VaultFormComponent],
+  providers: [VaultService]
 })
 export class AdminModule { }
