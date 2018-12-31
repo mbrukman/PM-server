@@ -1,4 +1,3 @@
-const async = require("async");
 const winston = require("winston");
 const _ = require("lodash");
 
