@@ -295,17 +295,19 @@ module.exports = {
   },
 
   updateSettings:(id,settings)=>{
-    Plugin.findOne({ _id:id}, function(err, plugin) {
-      if(err){
-        throw err
-      }
-      for(let i=0, length=plugin.settings.length; i<length; i++){
-        plugin.settings[i].value = settings[Object.keys(settings)[i]]
-      }
-      plugin.save(function(err) {
-        if (err)
-            throw err
-
+    return new Promise((resolve,reject) => {
+      return Plugin.findOne({_id:id})
+      .then((plugin) => {
+        for(let i=0, length=plugin.settings.length; i<length; i++){
+          plugin.settings[i].value = settings[Object.keys(settings)[i]]
+        }
+        plugin.save()
+        .then((res) => {
+          resolve(res)
+        })
+        .catch((e) => {
+          reject(e)
+        })
       })
     })
   }

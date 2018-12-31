@@ -1,6 +1,8 @@
 var Ajv = require('ajv');
 var ajv = new Ajv({jsonPointers: true});
 
+const pluginParamsSceham = require('./plugin-params.schema');
+
 var schema = {
   properties:{
     name: {type:'string'},
@@ -12,7 +14,7 @@ var schema = {
     version: {type:'string'},
     imgUrl: {type:'string'},
     file:{type:'string'},
-    settings:{type:'array'},
+    settings:pluginParamsSceham,
     methods: {
       items:{  
         type:'object',
@@ -21,58 +23,10 @@ var schema = {
           viewName: {type:'string'},
           route: {type:'string'},
           actionString: {type:'string'},
-          params: 
-          {
-            items:{  
-              type:'object',
-              properties:{
-                name: {type:'string'},
-                viewName: {type:'string'},
-                type: {
-                    type:'string',
-                    enum:['string', 'int', 'float', 'options', 'autocomplete', 'file', 'text', 'boolean']
-                },
-                options:
-                {
-                  items: 
-                  {
-                    type:'object',
-                    properties:{
-                      id:{
-                        type:'string'
-                      },
-                      name:{
-                        type:'string'
-                      },
-                      type:{
-                        type:'string'
-                      }
-                    },
-                    additionalProperties: false,
-                    required:['id','name']
-                  },
-                }
-              },
-              allOf:[
-                {
-                    if:{
-                        properties:{
-                            type:{
-                                const:'options'
-                            }
-                        }
-                    },
-                    then:{
-                        required:['options']
-                    }
-                }
-            ]
-            }
-          }
+          params: pluginParamsSceham
         }
       }
     }
   }
 }
-
 module.exports= ajv.compile(schema);

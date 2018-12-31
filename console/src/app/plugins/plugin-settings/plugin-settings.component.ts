@@ -64,7 +64,7 @@ export class PluginSettingsComponent implements OnInit{
     }
 
     onSubmitForm(value){
-        this.pluginsService.addSettings(this.plugin.id,value).subscribe(() => {
+        this.pluginsService.updateSettings(this.plugin.id,value).subscribe(() => {
             this.router.navigate(['admin/plugins']);
           });
     }

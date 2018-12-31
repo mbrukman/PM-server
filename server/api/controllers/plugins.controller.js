@@ -114,7 +114,7 @@ module.exports = {
         });
     },
 
-    addSettings:(req,res) => {
+    updateSettings:(req,res) => {
         hooks.hookPre('plugin-settings').then(() => {
             return pluginsService.updateSettings(req.params.id, req.body)
         }).then((generated) => {
