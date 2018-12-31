@@ -283,29 +283,21 @@ function filterExecutionAgents(mapCode, executionContext, groups, mapAgents, exe
         return executionAgents;
     }
 
-    return new Promise((resolveAgents,reject)=>{
-        if (executionAgents) return resolveAgents(executionAgents);
-
+    if (!executionAgents){
         let groupsAgents = {};
+        groups.forEach(group => {
+            groupsAgents = Object.assign(groupsAgents, agentsService.evaluateGroupAgents(group));
+        })
+        groupsAgents = Object.keys(groupsAgents).map(key => groupsAgents[key]);
+        let totalAgents = [...JSON.parse(JSON.stringify(mapAgents)), ...JSON.parse(JSON.stringify(groupsAgents))];
+        return filterLiveAgents(totalAgents);
+    }
 
-        Promise.all(groups.map(function asyncGroup(group){ 
-            return new Promise((resolve,reject) =>{
-                groupsAgents = Object.assign(groupsAgents, agentsService.evaluateGroupAgents(group));
-                resolve();   
-            }) 
-        })).then(() => {
-            let groupsAgentsToUse = Object.keys(groupsAgents).map(key => groupsAgents[key]);
-            let totalAgents = [...JSON.parse(JSON.stringify(mapAgents)), ...JSON.parse(JSON.stringify(groupsAgentsToUse))];
-            return resolveAgents(filterLiveAgents(totalAgents));
-        })
-    }).then(executionAgents=>{
-        let agentsKeys= Object.keys(executionAgents);
-        return agentsService.filter({
-            $or: [
-                { _id: { $in: agentsKeys.map((key) => executionAgents[key]._id) }},
-                { name: { $in: agentsKeys.map((key) => executionAgents[key].name) } }
-            ]
-        })
+    return agentsService.filter({
+        $or: [
+            { _id: { $in: agentsKeys.map((key) => executionAgents[key]._id) }},
+            { name: { $in: agentsKeys.map((key) => executionAgents[key].name) } }
+        ]
     }).then((agents) => {
         return filterLiveAgents(agents);
     })
@@ -527,7 +519,6 @@ function validate_plugin_installation(map, structure, runId, agentKey) {
                     agentsService.installPluginOnAgent(filePath, agent).then(() => {
                      }).catch((e) => {
                        winston.log('error', "Error installing on agent", e);
-                       reject(e)
                      }); 
                      resolve()
                 }) 
@@ -821,8 +812,8 @@ function runProcess(map, structure, runId, agent, socket,execProcess) {
 
                 executions[runId].executionAgents[agent.key].finishTime = new Date();
                 updateExecutionContext(runId, agent.key);
-                resolve();
-                return;
+                return resolve();
+                
             }
 
         }
@@ -853,13 +844,13 @@ function runProcess(map, structure, runId, agent, socket,execProcess) {
                     executions[runId].executionAgents[agent.key].status = 'error';
                     stopExecution(map._id, runId, socket);
                     updateExecutionContext(runId, agent.key);
-                    resolve();
-                    return;
+                    return resolve();
+                    
                 }
                 updateExecutionContext(runId, agent.key);
                 runNodeSuccessors(map, structure, runId, agent, false, socket); // by passing false, no successors would be called
-                resolve();
-                return;
+                return resolve();
+                
             }
         }
 
@@ -882,17 +873,17 @@ function runProcess(map, structure, runId, agent, socket,execProcess) {
 
         process.actions.forEach((action, i) => {
             action.name = (action.name || `Action #${i + 1} `);
-            actionExecutionFunctions[`${action.name} ("${action.id}")`] ={
-                    map:map,
-                    structure:structure,
-                    runId:runId,
-                    agent:agent,
-                    process:process,
-                    processIndex:processIndex,
-                    action:_.cloneDeep(action),
-                    plugin:plugin,
-                    socket:socket
-            }
+            actionExecutionFunctions[`${action.name} ("${action.id}")`] =[
+                    map,
+                    structure,
+                    runId,
+                    agent,
+                    process,
+                    processIndex,
+                    _.cloneDeep(action),
+                    plugin,
+                    socket
+            ]
         });
 
         // updating context
@@ -902,13 +893,11 @@ function runProcess(map, structure, runId, agent, socket,execProcess) {
         });
 
         // executing actions
-        actionsTask = Object.keys(actionExecutionFunctions).map((key)=>{
+        let actionTask = Object.keys(actionExecutionFunctions).map((key) => {
             return actionExecutionFunctions[key]
         })
-        actionsTask.reduce((previousPromise,next) => {
-            return previousPromise.then(()=>{
-                return executeAction(next.map,next.structure,next.runId,next.agent,next.process,next.processIndex,next.action,next.plugin,next.socket)
-            })
+        actionTask.reduce((previousPromise,next) => {
+            return executeAction.apply(null,next)
         },Promise.resolve())
         .then((actionsResults) => {
             actionsExecutionCallback(null,actionsResults,map,structure,runId,agent,socket, processUUID,processIndex, resolve)
@@ -1050,8 +1039,8 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             }));
             updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
             executionLogService.success(runId, map._id, `'${action.name}': ${result}`, socket);
-            resolve(result)
-            return;
+            return resolve(result)
+            
         }
 
         let method = plugin.methods.find(o => o.name === action.method);
@@ -1064,8 +1053,8 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             }));
             updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
             executionLogService.success(runId, map._id, `'${action.name}': ${result}`, socket);
-            resolve(result)
-            return;
+            return resolve(result)
+           
         }
         action.method = method;
         let params = action.params ? [...action.params] : [];
@@ -1104,7 +1093,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             } catch (e) {
                 return _handleActionError({
                     stdout: actionString + '\n' + e.message
-                }, undefined, reject)
+                }, undefined,resolve, reject)
             }
 
             actionString += `${param.name}: ${action.params[param.name]}${i != params.length - 1 ? ', ' : ''}`;
@@ -1123,7 +1112,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
         let timeoutPromise;
         runAction();
 
-        function _handleActionError(result, message, cb) {
+        function _handleActionError(result, message, resolve,reject) {
             let res = result || { stdout: actionString, result: 'Error running action on agent' };
             updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
                 status: 'error',
@@ -1134,9 +1123,9 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             executionLogService.error(runId, map._id, `'${action.name}': Error running action on (${agent.name}): ${message || JSON.stringify(res)}`, socket);
 
             if (action.mandatory) {
-                cb(res);
+                reject(res);
             } else {
-                cb(null, res); // Action failed but it doesn't mater
+                resolve(res); // Action failed but it doesn't mater
             }
         }
 
@@ -1201,13 +1190,13 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                         executionLogService.create(actionExecutionLogs, socket);
                         resolve(result)
                     } else {
-                        _handleActionError(result, undefined, reject);
+                        _handleActionError(result, undefined, resolve, reject);
                     }
                 } else {
                     let result = { result: 'Timeout Error', status: 'error', stdout: actionString };
                     if (action.retries > 1) { return ['retry', result]; }
 
-                    _handleActionError(result, 'timeout error', reject);
+                    _handleActionError(result, 'timeout error', resolve, reject);
                 }
             })
                 .then((res) => {

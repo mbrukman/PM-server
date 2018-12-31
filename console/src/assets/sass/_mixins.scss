@@ -69,6 +69,14 @@
     margin-bottom: 20px
   }
 }
+
+@mixin placeholder{
+  height: 16px;
+  font-family: Roboto;
+  font-size: 14px;
+  color: #868e96;
+}
+
 @mixin input {
   input{
     height: 36px;
@@ -82,6 +90,7 @@
     color: #868e96;
   }
 }
+
 @mixin select{
   select{
     height: 36px;
@@ -95,6 +104,7 @@
     color: #868e96;
   }
 }
+
 @mixin textarea{
   textarea{
     height: 100px;
