@@ -295,8 +295,8 @@ function filterExecutionAgents(mapCode, executionContext, groups, mapAgents, exe
 
     return agentsService.filter({
         $or: [
-            { _id: { $in: agentsKeys.map((key) => executionAgents[key]._id) }},
-            { name: { $in: agentsKeys.map((key) => executionAgents[key].name) } }
+            { _id: { $in: executionAgents.filter((id) => ObjectId.isValid(id)) }},
+            { name: { $in: executionAgents } }
         ]
     }).then((agents) => {
         return filterLiveAgents(agents);
@@ -512,7 +512,6 @@ function validate_plugin_installation(map, structure, runId, agentKey) {
             }
             return total;
         }, []);
-
         if (filesPaths && filesPaths.length > 0) {
             Promise.all(filesPaths.map(function asyncFilesPaths(filePath){ 
                 return new Promise((resolve,reject) =>{
@@ -525,9 +524,7 @@ function validate_plugin_installation(map, structure, runId, agentKey) {
             })).then(()=> {
                 winston.log('success', 'Done installing plugins');
             }).catch((error)=>{
-                if (error) {
                     winston.log('error', "Error installing plugins on agent", error);
-                 }
                  return res.status(204).send();
                 })
             }
@@ -1039,7 +1036,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             }));
             updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
             executionLogService.success(runId, map._id, `'${action.name}': ${result}`, socket);
-            return resolve(result)
+            return resolve({result})
             
         }
 
@@ -1053,7 +1050,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             }));
             updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
             executionLogService.success(runId, map._id, `'${action.name}': ${result}`, socket);
-            return resolve(result)
+            return resolve({result})
            
         }
         action.method = method;
@@ -1188,7 +1185,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                         );
 
                         executionLogService.create(actionExecutionLogs, socket);
-                        resolve(result)
+                        resolve({result})
                     } else {
                         _handleActionError(result, undefined, resolve, reject);
                     }

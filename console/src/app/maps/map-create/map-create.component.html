@@ -1,6 +1,6 @@
 <div class="header">
   <h1 [hidden]="map">Create a new map</h1>
-  <h1 *ngIf="map">Update map '{{ map.name }}'</h1>
+  <h1 [hidden]="!map">Update map '{{ map?.name }}'</h1>
 </div>
 <div class="main pm-main-wrapper">
   <div class="row">

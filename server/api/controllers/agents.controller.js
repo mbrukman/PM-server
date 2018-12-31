@@ -43,7 +43,6 @@ module.exports = {
                     agentsService.installPluginOnAgent(filePath, agent).then(() => {
                      }).catch((e) => {
                        winston.log('error', "Error installing on agent", e);
-                       reject(e)
                      }); 
                      resolve()
                 }) 
