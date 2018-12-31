@@ -37,7 +37,7 @@
     <p-column field="" header="Actions" [sortable]="true">
       <ng-template let-col let-i="rowIndex" let-plugin="rowData" pTemplate="body">
         <button class="btn btn-danger" (click)="deletePlugin(plugin.id, i)"><i class="material-icons">delete</i></button>
-        <span *ngIf="plugin.settings.length > 0">
+        <span [hidden]="!plugin.settings.length > 0">
             <a [routerLink]="[plugin.id, 'settings']">
                 <i class="material-icons">settings</i>
             </a>

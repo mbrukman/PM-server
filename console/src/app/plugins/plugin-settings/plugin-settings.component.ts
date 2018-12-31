@@ -1,4 +1,4 @@
-import {Component,OnInit,OnDestroy } from '@angular/core'
+import {Component,OnInit } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {PluginsService} from '@plugins/plugins.service'
@@ -6,15 +6,15 @@ import {Plugin} from '@plugins/models/plugin.model'
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/observable/of';
 import { Observable } from 'rxjs/Observable';
-import { PluginMethod } from '@plugins/models/plugin-method.model';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+
+
 @Component({
     selector: 'app-plugin-settings',
     templateUrl: './plugin-settings.component.html',
     styleUrls: ['./plugin-settings.component.scss']
 })
 
-export class PluginSettingsComponent implements OnInit,OnDestroy{
+export class PluginSettingsComponent implements OnInit{
     settingsForm: FormGroup = new FormGroup({});
     plugin = new Plugin();
     methods: object = {};
@@ -24,8 +24,8 @@ export class PluginSettingsComponent implements OnInit,OnDestroy{
     ngOnInit(){
         
         let pluginId = this.route.snapshot.params.id
-        this.pluginsService.list().subscribe(plugins => {
-            this.plugin = plugins.find(p => p.id == pluginId);
+        this.pluginsService.getById(pluginId).subscribe(plugin =>{
+            this.plugin = plugin;
             this.initSettingsForm();
             this.generateAutocompleteParams()
             
@@ -53,27 +53,6 @@ export class PluginSettingsComponent implements OnInit,OnDestroy{
         })
             
         
-    }
-
-    methodHaveParamType(method: PluginMethod, type: string): boolean {
-        return method.params.findIndex(p => p.type === type) > -1;
-    }
-
-    addToMethodContext(method) {
-        this.methods[method.name] = method;
-        for(let i =0,length=method.params.length;i<length;i++){
-            if(method.params[i].type == 'autocomplete'){
-                for(let j = 0, length = method.params[i].options.length;j<length;j++){
-                    this.options.push(method.params[i].options[j])
-                }
-            }
-        }
-        console.log(this.options)
-      }
-      
-
-    ngOnDestroy(){
-
     }
 
     initSettingsForm() {

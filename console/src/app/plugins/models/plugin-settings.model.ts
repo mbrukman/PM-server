@@ -6,7 +6,4 @@ export class PluginSettings  {
     viewName?: string;
     options?: [{ id: string, name: string }];
     value?: string | { id: string, value: string } = null;
-    code?: boolean = null;
-    query?: object;
-    model?: string;
 }

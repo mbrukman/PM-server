@@ -224,6 +224,7 @@ module.exports = {
       );
     });
   },
+
   pluginDelete: id => {
     return Plugin.findById(id).then((obj)=>{
       if (obj.type === "executer") 

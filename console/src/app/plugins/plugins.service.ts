@@ -41,4 +41,9 @@ export class PluginsService {
   addSettings(pluginId,settings):Observable<any>{
     return this.http.post(`${serverUrl}api/plugins/${pluginId}/settings`, settings);
   }
+
+  getById(pluginId){
+    return this.http.get<Plugin>(`${serverUrl}api/plugins/${pluginId}`)
+  }
+  
 }
