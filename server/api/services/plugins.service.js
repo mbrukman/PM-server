@@ -31,7 +31,7 @@ function deletePluginOnAgent(name) {
 
 function deletePluginOnServer(name) {
   return new Promise((resolve, reject) => {
-    rimraf(`libs/plugins/${name}`, (err, res) => {
+    rimraf(`server/libs/plugins/${name}`, (err, res) => {
       if (err) return reject(err)
       else return resolve(res)
     })
@@ -129,7 +129,6 @@ function deployPluginFile(pluginPath, req) {
           fs.readFile(configPath, "utf8", (err, body) => {
             if (err) return reject("Error reading config file: ", err);
 
-
             let obj;
             try {
               obj = Object.assign({}, JSON.parse(body), { file: pluginPath });
@@ -177,6 +176,9 @@ function deployPluginFile(pluginPath, req) {
                 resolve(plugin);
               }).catch(error => {
                 winston.log("error", "Error creating plugin", error);
+                console.log("error deployPluginFile  : ",error);
+                
+
                 return reject(error);
               }).finally(() => {
                 // delete extracted tmp dir
@@ -221,11 +223,17 @@ module.exports = {
         return deletePluginOnAgent(obj.name)
       else
         return deletePluginOnServer(obj.name);
-    }).then(() => {
+    }).finally(() => {
       return Plugin.remove({ _id: id });
     })
   },
-
+  deletePluginByPath(path) {
+    return Plugin.findOne({ file: path }).then((plugin)=>{
+      if(plugin)
+        return pluginDelete(plugin.id)
+      
+    });
+  },
   getPlugin: id => {
     return Plugin.findOne({ _id: id });
   },

@@ -1,6 +1,6 @@
 <div class="mode">
   <i class="material-icons" [ngClass]="{'active': mode==='list'}" (click)="mode = 'list'">view_list</i>
-  <i class="material-icons" [ngClass]="{'active': mode==='grid'}" (click)="mode = 'grid'">view_module</i>
+  <i class="material-icons grid-icon" [ngClass]="{'active': mode==='grid'}" (click)="mode = 'grid'">view_module</i>
 </div>
 <div class="container-fluid">
   <div class="content-wrapper" [ngSwitch]="mode" *ngIf="executions">
@@ -15,7 +15,7 @@
                 <div class="project">Project: &nbsp;<a class="link" *ngIf="!isEnabled"  (click)="goToProject($event, item.map.project.id)" > {{ item.map.project.name}}</a> </div>
               </div>
               <div class="chart-wrapper">
-                <ngx-charts-pie-chart [results]="item.status" [labels]="showLabels" [scheme]="colorScheme" [doughnut]="true" [view]="[130,130]">
+                <ngx-charts-pie-chart [results]="item.status" [labels]="showLabels" [scheme]="colorScheme" [doughnut]="true" [view]="[130,130]"  [arcWidth]="0.23">
                 </ngx-charts-pie-chart>
             </div>
           </div>
