@@ -1185,7 +1185,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                         );
 
                         executionLogService.create(actionExecutionLogs, socket);
-                        resolve({result})
+                        resolve(result)
                     } else {
                         _handleActionError(result, undefined, resolve, reject);
                     }
