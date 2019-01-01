@@ -1,9 +1,10 @@
 {
-  "name": "pm-server",
-  "version": "1.0.0",
+  "name": "kaholo-server",
+  "version": "1.2.3",
   "description": "",
   "main": "app.js",
   "scripts": {
+    "spec": "speculate --name=kaholo-server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
     "build": "cd ../console && ng build",
@@ -27,11 +28,21 @@
     "mongoose": "4.13.17",
     "multer": "1.3.0",
     "node-schedule": "1.2.5",
-    "request": "2.83.0",
+    "request": "2.88.0",
     "rimraf": "2.6.2",
     "socket.io": "2.0.4",
     "unzipper": "0.9.4",
     "winston": "3.1.0",
     "winston-mongodb": "4.0.3"
+  },
+  "devDependencies": {
+    "speculate": "1.7.4"
+  },
+  "spec": {
+    "nodeVersion": "> 10.13.0",
+    "post": [
+      "sudo mkdir -p /usr/lib/static_cdn/uploads"
+    ]
   }
+  
 }

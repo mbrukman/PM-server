@@ -72,3 +72,8 @@ private.ts
 /server/libs/plugins/*
 /server/tmp
 /console/env.json
+
+#centOs
+*.service
+SOURCES
+SPECS

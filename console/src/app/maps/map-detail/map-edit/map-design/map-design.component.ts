@@ -10,18 +10,18 @@ import { Link, MapStructure, Process, ProcessViewWrapper } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { Plugin } from '@plugins/models/plugin.model';
-import { COORDINATION_TYPES } from '@maps/contants'
+import { COORDINATION_TYPES, JOINT_OPTIONS } from '@maps/constants'
 
 export const linkAttrs = {
   router: { name: 'manhattan' },
   connector: { name: 'rounded' },
   attrs: {
     '.connection': {
-      stroke: '#87939A',
+      stroke: JOINT_OPTIONS.LINK_COLOR,
       'stroke-width': 3
     },
     '.marker-target': {
-      fill: '#87939A',
+      fill: JOINT_OPTIONS.LINK_COLOR,
       d: 'M 10 0 L 0 5 L 10 10 z'
     }
   }
@@ -39,7 +39,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   mapStructure: MapStructure;
   mapStructureSubscription: Subscription;
   editing: boolean = false;
-  pluginsReq: any;
+  pluginsReq: Subscription;
   plugins: Plugin[];
   process: Process;
   link: Link;
@@ -77,6 +77,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   ngOnDestroy() {
     this.dropSubscription.unsubscribe();
     this.mapStructureSubscription.unsubscribe();
+    this.pluginsReq.unsubscribe();
     this.deselectAllCellsAndUpdateStructure();
   }
 
@@ -181,7 +182,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.link.uuid = cell.model.id;
     this.mapStructure.links.push(this.link);
 
-
     const ancestors = this.mapStructure.links.filter(link => link.targetId === this.link.targetId);
     if (ancestors.length > 1) {
       const processIndex = this.mapStructure.processes.findIndex(process => process.uuid === this.link.targetId);
@@ -202,11 +202,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   defineShape() {
     joint.shapes.devs['MyImageModel'] = joint.shapes.devs.Model.extend({
-
       markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><image class="warning"/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
-
       defaults: joint.util.deepSupplement({
-
         type: 'devs.MyImageModel',
         size: {
           width: 80,
@@ -216,10 +213,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           rect: {
             'stroke-width': '1',
             'stroke-opacity': .7,
-            stroke: '#7f7f7f',
+            stroke: JOINT_OPTIONS.RECT_STROKE_COLOR,
             rx: 3,
             ry: 3,
-            fill: '#2d3236'
+            fill: JOINT_OPTIONS.RECT_FILL_COLOR
             // 'fill-opacity': .5
           },
           circle: {
@@ -229,7 +226,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
             text: '',
             'ref-y': 5,
             'font-size': 14,
-            fill: '#bbbbbb'
+            fill: JOINT_OPTIONS.LABEL_FILL_COLOR
           },
           image: {
             'xlink:href': 'http://via.placeholder.com/350x150',
@@ -241,43 +238,20 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
             'x-alignment': 'middle',
             'y-alignment': 'middle'
           },
-
           '.inPorts circle': {
-            fill: '#c8c8c8'
+            fill: JOINT_OPTIONS.INPORT_FILL_COLOR
           },
           '.outPorts circle': {
-            fill: '#262626'
+            fill: JOINT_OPTIONS.OUTPORT_FILL_COLOR
           }
         }
       }, joint.shapes.devs.Model.prototype.defaults)
     });
 
-
     joint.shapes.devs['PMStartPoint'] = joint.shapes.devs.Model.extend({
-
-      markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
-      portMarkup: '<g class="port"><circle class="port-body"/><text class="port-label"/></g>',
-
-      defaults: joint.util.deepSupplement({
-
-        type: 'devs.PMStartPoint',
-        size: { width: 40, height: 39 },
-        outPorts: ['  '],
-        attrs: {
-          '.body': { stroke: '#3c3e41', fill: '#2c2c2c', 'rx': 6, 'ry': 6, 'opacity': 0 },
-          '.label': {
-            text: '', 'ref-y': 0.83, 'y-alignment': 'middle',
-            fill: '#f1f1f1', 'font-size': 13
-          },
-          '.port-body': { r: 7.5, stroke: 'gray', fill: '#2c2c2c', magnet: 'active' },
-          'image': {
-            'ref-x': 10, 'ref-y': 18, ref: 'rect',
-            width: 35, height: 34, 'y-alignment': 'middle',
-            'x-alignment': 'middle', 'xlink:href': 'assets/images/start.png'
-          }
-        }
-
-      }, joint.shapes.devs.Model.prototype.defaults)
+      markup: JOINT_OPTIONS.startPoint.markup,
+      portMarkup: JOINT_OPTIONS.startPoint.portMarkup,
+      defaults: joint.util.deepSupplement(JOINT_OPTIONS.startPoint.defaults, joint.shapes.devs.Model.prototype.defaults)
     });
   }
 
@@ -578,15 +552,15 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           text: text,
           'ref-y': 5,
           'font-size': 14,
-          fill: '#bbbbbb'
+          fill: JOINT_OPTIONS.LABEL_FILL_COLOR
         },
         rect: {
           'stroke-width': 1,
           'stroke-opacity': .7,
-          'stroke': '#7f7f7f',
+          'stroke': JOINT_OPTIONS.RECT_STROKE_COLOR,
           rx: 3,
           ry: 3,
-          fill: '#2d3236',
+          fill: JOINT_OPTIONS.RECT_FILL_COLOR,
           'fill-opacity': .5
         },
         image: {
@@ -601,10 +575,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         },
 
         '.inPorts circle': {
-          fill: '#c80f15'
+          fill: JOINT_OPTIONS.INPORT_FILL_COLOR
         },
         '.outPorts circle': {
-          fill: '#262626'
+          fill: JOINT_OPTIONS.OUTPORT_FILL_COLOR
         }
       }
     }

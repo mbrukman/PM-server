@@ -36,25 +36,22 @@ module.exports = {
 
     /* filter projects */
     filter: (filterOptions = {}) => {
-        let q = {};
+        let q = filterOptions.options.filter || {};
         if (filterOptions.fields) {
             // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
             Object.keys(filterOptions.fields).map(key => { filterOptions.fields[key] = { '$regex': `.*${filterOptions.fields[key]}.*` }});
             q = filterOptions.fields;
-        } else if (filterOptions.globalFilter) {
-            // if there is a global filter, expecting or condition between name and description fields
-            q = {
-                $or: [{ name: { '$regex': `.*${filterOptions.globalFilter}.*` } }, { description: { '$regex': `.*${filterOptions.globalFilter}.*` } }]
-            }
+        } 
+        
+        if(filterOptions.options.globalFilter){
+            var filterQueryOptions = [{ name: { '$regex': `.*${filterOptions.globalFilter}.*` } }, { description: { '$regex': `.*${filterOptions.globalFilter}.*` } }]
+            q.$or = filterQueryOptions;
         }
         
-        let p;
-        if(filterOptions.options.isArchived){
-            p = Project.find(q);
+        if(!filterOptions.options.isArchived){
+            q.archived = false
         }
-        else{
-            p = Project.find(q).where({archived:false});
-        }
+        let p = Project.find(q)
 
         if (filterOptions.options.sort) {
             // apply sorting by field name. for reverse, should pass with '-'.

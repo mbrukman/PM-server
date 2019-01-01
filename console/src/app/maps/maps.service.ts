@@ -132,20 +132,20 @@ export class MapsService {
 
   /* map triggers */
   createTrigger(mapId, trigger) {
-    return this.http.post<MapTrigger>(`${serverUrl}api/maps/${mapId}/triggers/create`, trigger);
+    return this.http.post<MapTrigger>(`${serverUrl}api/triggers/${mapId}`, trigger);
   }
 
   deleteTrigger(mapId, triggerId) {
     const options = { responseType: 'text' as 'json' };
-    return this.http.delete<any>(`${serverUrl}api/maps/${mapId}/triggers/${triggerId}/delete`, options);
+    return this.http.delete<any>(`${serverUrl}api/triggers/${mapId}/${triggerId}`, options);
   }
 
   triggersList(mapId) {
-    return this.http.get<MapTrigger[]>(`${serverUrl}api/maps/${mapId}/triggers`);
+    return this.http.get<MapTrigger[]>(`${serverUrl}api/triggers/${mapId}`);
   }
 
   updateTrigger(mapId, trigger) {
-    return this.http.put<MapTrigger>(`${serverUrl}api/maps/${mapId}/triggers/${trigger._id}/update`, trigger);
+    return this.http.put<MapTrigger>(`${serverUrl}api/triggers/${mapId}/${trigger._id}`, trigger);
   }
 
 }

@@ -1,2 +1,2 @@
 import * as libEnv from '../../../env.json';
-export const env = libEnv.default;
+export const env : any = libEnv;
