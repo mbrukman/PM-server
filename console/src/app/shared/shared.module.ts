@@ -22,6 +22,8 @@ import { LinebreakPipe } from './pipes/linebreak.pipe';
 import { InlineEditDirective } from './directives/inline-edit.directive';
 import { InPipe } from '@shared/pipes/filterIn.pipe';
 import { RawOutputComponent } from './raw-output/raw-output.component';
+import { VaultSelectorComponent } from './components/vault-selector/vault-selector.component'
+import {AutoCompleteModule} from 'primeng/primeng';
 
 
 @NgModule({
@@ -41,7 +43,8 @@ import { RawOutputComponent } from './raw-output/raw-output.component';
     TooltipModule.forRoot(),
     DropdownModule,
     NgxChartsModule,
-    TagInputModule
+    TagInputModule,
+    AutoCompleteModule
   ],
   declarations: [
     FilterPipe,
@@ -52,7 +55,8 @@ import { RawOutputComponent } from './raw-output/raw-output.component';
     InlineEditDirective,
     LinebreakPipe,
     InPipe,
-    RawOutputComponent
+    RawOutputComponent,
+    VaultSelectorComponent
   ],
   exports: [
     ReactiveFormsModule,
@@ -72,9 +76,10 @@ import { RawOutputComponent } from './raw-output/raw-output.component';
     InlineEditDirective,
     ConfirmComponent,
     LinebreakPipe,
-    InPipe
+    InPipe,
+    VaultSelectorComponent
   ],
-  entryComponents: [ConfirmComponent, RawOutputComponent]
+  entryComponents: [ConfirmComponent, RawOutputComponent, VaultSelectorComponent]
 })
 export class SharedModule {
 }

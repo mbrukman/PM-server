@@ -19,7 +19,6 @@ import { EvaluateGroupAgentComponent } from '@agents/groups/evaluate-group-agent
 import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
 import { VaultComponent } from '../vault/vault/vault.component'
 import  { VaultFormComponent} from '../vault/vault-form/vault-form.component'
-import { VaultService } from 'app/vault/vault.service';
 
 
 @NgModule({
@@ -44,7 +43,6 @@ import { VaultService } from 'app/vault/vault.service';
     EditAgentComponent,
     VaultComponent,VaultFormComponent
   ],
-  entryComponents: [PluginUploadComponent, AddFolderComponent, InputPopupComponent, EditAgentComponent,VaultFormComponent],
-  providers: [VaultService]
+  entryComponents: [PluginUploadComponent, AddFolderComponent, InputPopupComponent, EditAgentComponent,VaultFormComponent]
 })
 export class AdminModule { }

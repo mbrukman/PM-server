@@ -1,7 +1,7 @@
 
-export class Vault{
+export class VaultItem{
     id?: string;
-    name: string;
+    key: string;
     description?: string;
     value?: string;
 }

@@ -29,7 +29,7 @@ var schema = {
                 viewName: {type:'string'},
                 type: {
                     type:'string',
-                    enum:['string', 'int', 'float', 'options', 'autocomplete', 'file', 'text', 'boolean']
+                    enum:['string', 'int', 'float', 'options', 'autocomplete', 'file', 'text', 'boolean', 'vault']
                 },
                 options:
                 {

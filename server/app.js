@@ -19,7 +19,7 @@ const app = express();
 
 
 if (!fs.existsSync(environment.keyPath)) {
-    winston.info("Writing pm key");
+    winston.info("Writing key");
     const createKey = require("./helpers/createKey");
     createKey.generateKey(environment.keyPath);
 }
@@ -102,7 +102,7 @@ const agentsApi = require("./api/routes/agents.routes");
 const projectsApi = require("./api/routes/projects.routes");
 const triggersApi = require("./api/routes/triggers.routes")
 const scheduledJobsApi =  require("./api/routes/scheduled-jobs.routes")
-const vaultsApi = require("./api/routes/vaults.routes")
+const vaultApi = require("./api/routes/vault.routes")
 
 app.use('/api/setup', setupApi);
 app.use('/api/maps', mapsApi);
@@ -111,7 +111,7 @@ app.use('/api/agents', agentsApi);
 app.use('/api/projects', projectsApi);
 app.use('/api/triggers', triggersApi)
 app.use('/api/scheduled-jobs', scheduledJobsApi)
-app.use('/api/vaults', vaultsApi)
+app.use('/api/vault', vaultApi)
 
 
 

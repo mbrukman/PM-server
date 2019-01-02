@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap';
 import { VaultFormComponent } from '../vault-form/vault-form.component';
-import { VaultService } from '../vault.service';
-import { Vault } from '../vault.model';
+import { VaultService } from '../../shared/vault.service';
+import { VaultItem } from '../vault.model';
 
 @Component({
   selector: 'app-vault',
@@ -11,7 +11,7 @@ import { Vault } from '../vault.model';
 })
 export class VaultComponent implements OnInit {
 
-  vaults: Vault[]
+  vaultItems: VaultItem[]
   vaultsReq: any;
 
 
@@ -23,8 +23,8 @@ export class VaultComponent implements OnInit {
 
 
   requestVaults() {
-    this.vaultsReq = this.vaultService.getAll().subscribe(vaults => {
-      this.vaults = vaults;
+    this.vaultsReq = this.vaultService.getResults({}).subscribe(vault => {
+      this.vaultItems = vault;
     });
   }
 
@@ -32,17 +32,17 @@ export class VaultComponent implements OnInit {
     this.vaultsReq.unsubscribe();
   }
 
-  deleteVault(id) {
+  deleteVaultItem(id) {
     this.vaultService.delete(id).subscribe(() => {
       this.requestVaults();
     });
   }
 
-  onOpenModal(vault: Vault = null) {
+  onOpenModal(item: VaultItem = null) {
     let modal: BsModalRef;
     modal = this.modalService.show(VaultFormComponent);
-    if (vault) {
-      modal.content.vault = Object.assign({},vault);
+    if (item) {
+      modal.content.vault = Object.assign({},item);
     }
     modal.content.result.subscribe(() => {
       this.requestVaults();

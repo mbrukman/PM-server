@@ -3,8 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { BsModalRef } from 'ngx-bootstrap';
 
-import { Vault } from '../vault.model';
-import { VaultService } from '../vault.service';
+import { VaultItem } from '../vault.model';
+import { VaultService } from '../../shared/vault.service';
 import { Subscribable } from 'rxjs/Observable';
 
 @Component({
@@ -14,8 +14,8 @@ import { Subscribable } from 'rxjs/Observable';
 })
 export class VaultFormComponent implements OnInit {
 
-  vault: Vault = {
-    name: "",
+  vault: VaultItem = {
+    key: "",
     description: "",
     value: ""
   }

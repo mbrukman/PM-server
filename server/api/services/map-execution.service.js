@@ -18,6 +18,7 @@ const executionLogService = require('./execution-log.service');
 const agentsService = require('./agents.service');
 const mapsService = require('./maps.service');
 const pluginsService = require('../services/plugins.service');
+const vaultService =  require('./vault.service')
 
 let executions = {};
 let pending = {};
@@ -37,6 +38,9 @@ fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 
 
 function evaluateParam(param, context) {
     if (!param.code) {
+        if(param.type == 'vault'){
+            return vaultService.getValueByKey(param.value)
+        }
         return param.value;
     }
     return vm.runInNewContext(param.value, context);
