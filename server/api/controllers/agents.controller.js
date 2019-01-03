@@ -196,6 +196,19 @@ module.exports = {
         });
     },
 
+    updateGroup: (req, res) => {
+        hooks.hookPre('group-list', req).then(() => {
+            return agentsService.updateGroup(req.params.id, req.body);
+        }).then((group) => {
+            req.io.emit('notification', { title: 'Excellent', message: `Group was updated`, type: 'success' });
+            return res.json(group);
+        }).catch(error => {
+            req.io.emit('notification', { title: 'Whoops...', message: `Error updating group`, type: 'error' });
+            winston.log('error', "Error creating group", error);
+            res.status(500).send(error);
+        });
+    },
+
     addGroupFilters: (req, res) => {
         hooks.hookPre('group-add-filters', req).then(() => {
             return agentsService.addGroupFilters(req.params.id, req.body);
@@ -205,6 +218,19 @@ module.exports = {
         }).catch(error => {
             req.io.emit('notification', { title: 'Whoops...', message: `Error creating group`, type: 'error' });
             winston.log('error', "Error creating group", error);
+            res.status(500).send(error);
+        });
+    },
+
+    deleteFilterFromGroup: (req, res) => {
+        hooks.hookPre('group-remove-agent', req).then(() => {
+            return agentsService.deleteFilterFromGroup(req.params.groupId, req.body)
+        }).then((group) => {
+            req.io.emit('notification', { title: 'Yay!', message: `Filter removed`, type: 'success' });
+            return res.json(group);
+        }).catch(error => {
+            req.io.emit('notification', { title: 'Whoops...', message: `Error removing filter`, type: 'error' });
+            winston.log('error', "Error removing agent group", error);
             res.status(500).send(error);
         });
     },

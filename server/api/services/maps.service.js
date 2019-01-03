@@ -89,32 +89,8 @@ module.exports = {
         }
 
         let m = Map.aggregate([
-            {
-                $match:$match
-            },
-            {
-                $lookup:
-                {
-                    from:"projects",
-                    let:{ mapId:"$_id"},
-                    pipeline:[
-                        {
-                            $match:{
-                                $expr:{
-                                        $in: [ "$$mapId", "$maps" ] 
-                                }
-                            }
-                        },
-                        { 
-                            $project: 
-                            {   
-                                name:1
-                            }
-                        }
-                     ],
-                    as:"project"
-                },
-            },
+            
+            
             {
                 $lookup:
                 {

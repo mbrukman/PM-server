@@ -359,6 +359,20 @@ module.exports = {
     update: (agentId, agent) => {
         return Agent.findByIdAndUpdate(agentId, agent, { new: true });
     },
+
+    updateGroup: (groupId, groupUpdated) => {
+        return new Promise((resolve,reject) => {
+            return Group.findOne({_id:groupId}).then((group => {
+                group.name = groupUpdated.name
+                group.filters = groupUpdated.filters
+                group.save().then((res) => {
+                    resolve(res)
+                }).catch((err) => {
+                    reject(err)
+                })
+            }))
+        })
+    },
     /* exporting the agents status */
     agentsStatus: getAgentStatus,
 
@@ -422,6 +436,20 @@ module.exports = {
      */
     removeAgentFromGroups: (agentId) => {
         return Group.update({ agents: { $in: [agentId] } }, { $pull: { agents: { $in: [agentId] } } })
+    },
+
+
+    deleteFilterFromGroup: (groupId,index) => {
+        return new Promise((resolve,reject) => {
+            return Group.findOne({_id:groupId}).then((group) => {
+                group.filters.splice(index.index,1)
+                group.save().then((res) => {
+                    resolve(res);
+                }).catch((err) => {
+                    reject(err)
+                })
+            })
+        })
     },
 
     /**

@@ -1,0 +1,28 @@
+<table  class="table">
+    <thead>
+        <tr>
+        <th scope="col">Description</th>
+        <th scope="col">Field</th>
+        <th scope="col">Type</th>
+        <th scope="col">Value</th>
+        <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        <tr *ngFor="let filter of group.filters; let i = index">
+        <td class="item">
+            Description
+        </td>
+        <td class="item">{{filter.field}}</td>
+        <td class="item">{{filter.filterType}}</td>
+        <td class="item">{{filter.value}}</td>
+        <td>
+            <button class="btn btn-link" (click)="editFilter(filter,i)" tooltip="Edit" placement="bottom"><i class="material-icons">edit</i></button>
+            <button class="btn btn-link" (click)="deleteFilter(i)" tooltip="Delete" placement="bottom"><i class="material-icons">delete</i></button>
+        </td>
+        
+        </tr>
+
+    </tbody>
+</table>

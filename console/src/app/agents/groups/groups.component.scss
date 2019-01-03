@@ -1,9 +1,66 @@
 @import "~assets/sass/variables";
 
-.card-link {
-  color: $turquoise-blue !important;
-  cursor: pointer;
-  &:hover {
-    text-decoration: underline solid $turquoise-blue !important;
+.top{
+  height: 75px;
+  h5{
+    height: 21px;
+    font-size: 18px;
+    color: #f79f2b;
+  }
+  .button-group{
+    width: 108.9px;
+    height: 36px;
+    border-radius: 19px;
+    background-color:#44acdf;
+    padding: 5px;
+    margin-left: 71%;
+    span{
+      width: 90px;
+      height: 18px;
+      font-size: 15px;
+      font-weight: 500;
+      text-align: center;
+      color: #ffffff;
+      padding: 9px 11px
+    }
+  }
+}
+
+.table{
+  
+  .manage{
+    width: 20%;
+  }
+  .name{
+    margin-left: 20px;
+    height: 16px;
+    font-size: 14px;
+    color:$turquoise-blue;
+  }
+  th {
+    color:$turquoise-blue;
+    height: 21px;
+    font-size: 18px;
+    font-weight: inherit;
+    .title{
+      margin-left: 10px
+    }
+  }
+  
+  td {
+    padding: 0;
+    vertical-align: middle;
+    .btn{
+      padding: 5px
+    }
+    > div{
+      display: flex;
+      align-items: center;
+
+      > i {
+        margin-right: 7px;
+      }
+    }
+
   }
 }

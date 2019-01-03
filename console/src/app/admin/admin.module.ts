@@ -13,11 +13,13 @@ import { PluginsListComponent } from '@plugins/plugins-list/plugins-list.compone
 import { SharedModule } from '@shared/shared.module';
 import { AdminRoutingModule } from './admin-routing.module';
 import { AdminComponent } from './admin.component';
-import { GroupDynamicConditionFilterComponent } from '@agents/groups/group-dynamic-condition-filter/group-dynamic-condition-filter.component';
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
 import { EvaluateGroupAgentComponent } from '@agents/groups/evaluate-group-agent/evaluate-group-agent.component';
 import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
-
+import {EditGroupComponent} from '@agents/edit-group/edit-group.component';
+import {ConstantsListComponent} from '@agents/agents-list/constants-list/constants-list.component';
+import {GroupDynamicConditionFilterPopupComponent} from '@agents/groups/group-dynamic-condition-filter-popup/group-dynamic-condition-filter-popup.component';
+import {FilterGroupListComponent} from '@agents/groups/filter-group-list/filter-group-list.component';
 
 @NgModule({
   imports: [
@@ -35,11 +37,15 @@ import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
     AddFolderComponent,
     AgentsComponent,
     GroupsComponent,
-    GroupDynamicConditionFilterComponent,
     InputPopupComponent,
     EvaluateGroupAgentComponent,
-    EditAgentComponent
+    EditAgentComponent,
+    EditGroupComponent,
+    ConstantsListComponent,
+    GroupDynamicConditionFilterPopupComponent,
+    FilterGroupListComponent
+
   ],
-  entryComponents: [PluginUploadComponent, AddFolderComponent, InputPopupComponent, EditAgentComponent]
+  entryComponents: [PluginUploadComponent, AddFolderComponent, InputPopupComponent, EditAgentComponent, EditGroupComponent,GroupDynamicConditionFilterPopupComponent]
 })
 export class AdminModule { }

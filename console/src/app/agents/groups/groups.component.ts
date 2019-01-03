@@ -8,6 +8,7 @@ import { Group } from '@agents/models/group.model';
 import { BsModalService } from 'ngx-bootstrap';
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
 import { Agent } from '@agents/models/agent.model';
+import {EditGroupComponent} from '@agents/edit-group/edit-group.component'
 
 @Component({
   selector: 'app-groups',
@@ -22,6 +23,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
   draggedItem: any;
   draggetItemSubscription: Subscription;
   selectedGroup: Group;
+  updateReq: any;
 
   constructor(private agentsService: AgentsService, private modalService: BsModalService) {
   }
@@ -56,10 +58,12 @@ export class GroupsComponent implements OnInit, OnDestroy {
     });
   }
 
+
   ngOnDestroy() {
     if (this.groupsReq) {
       this.groupsReq.unsubscribe();
     }
+
     if (this.draggetItemSubscription) {
       this.draggetItemSubscription.unsubscribe();
     }
@@ -73,8 +77,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
    * Fired when a group tab is opened
    * @param event
    */
-  onTabOpen(event?) {
-    this.agentsService.selectGroup(event ? this.groups[event.index] : null);
+  selectGroup(group : Group) {
+    this.agentsService.selectGroup(group);
   }
 
   /**
@@ -103,6 +107,23 @@ export class GroupsComponent implements OnInit, OnDestroy {
       .filter(name => !!name) // filtering only results with a name
       .flatMap(name => this.agentsService.groupCreate({ name: name }))
       .subscribe(group => this.groups.push(group));
+  }
+
+  editGroup(index){
+    let group = this.groups[index];
+    const modal = this.modalService.show(EditGroupComponent);
+    modal.content.name = group.name;
+    modal.content.result
+      .take(1)
+      .filter(r => !!r)
+      .subscribe(r => {
+        group.name = r.name;
+        this.updateGroup(group);
+      });
+  }
+
+  updateGroup(group:Group){
+    this.updateReq = this.agentsService.updateGroupToServer(group).subscribe();
   }
 
   deleteGroup(groupIndex, groupId) {

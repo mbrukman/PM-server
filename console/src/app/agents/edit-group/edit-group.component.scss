@@ -1,6 +1,8 @@
-.row{
+@import "~assets/sass/variables";
+
+.pm-modal{
     width: 510px;
-    height: 430px;
+    height: 270px;
     border-radius: 4px;
     background-color: #2d3236;
     .modal-header{
@@ -27,9 +29,8 @@
         line-height: normal;
         letter-spacing: normal;
         color: #dddddd;
-        margin-top: 25px;
     }
-    select{
+    input{
         width: 445px;
         height: 36px;
         border-radius: 3px;

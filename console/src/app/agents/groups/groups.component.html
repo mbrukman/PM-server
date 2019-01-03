@@ -1,14 +1,43 @@
-<div class="card">
-  <div class="card-body">
-    <h5 class="">Groups</h5>
+<div>
+  <div class="top" pDraggable="dd">
+    <h5>Groups</h5>
+    <a (click)="createGroup()"><div class="button-group">
+      <span>Add Group</span>
+    </div></a>
   </div>
 
-  <div class="card-body" pDraggable="dd">
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">
+          <i class="icon-agent"></i><span class="title">All Agents</span>
+        </th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of groups; let i = index" pDroppable="dd" (onDrop)="drop(i, item.id)">
+        <td>
+          <div class="name" (click) ="selectGroup(item)">{{item.name}}</div>
+        </td>
+        <td class="manage">
+          <button class="btn btn-link" (click)="editGroup(i)" tooltip="Edit" placement="bottom"><i class="material-icons">edit</i></button>
+          <button class="btn btn-link" (click)="deleteGroup(i,item._id)" tooltip="Delete" placement="bottom"><i class="material-icons">delete</i></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <!-- <div class="card-body" pDraggable="dd">
     <a (click)="createGroup()" class="card-link">Create group</a>
     <a (click)="onTabOpen()" class="card-link">All agents</a>
-  </div>
+  </div> -->
 
-  <p-accordion
+
+
+  <!-- <p-accordion
     (onOpen)="onTabOpen($event)"
     *ngIf="groups">
     <p-accordionTab *ngFor="let item of groups; let i = index;" pDroppable="dd" (onDrop)="drop(i, item.id)">
@@ -27,5 +56,5 @@
       <br>
       <app-group-dynamic-condition-filter [group]="item"></app-group-dynamic-condition-filter>
     </p-accordionTab>
-  </p-accordion>
+  </p-accordion> -->
 </div>

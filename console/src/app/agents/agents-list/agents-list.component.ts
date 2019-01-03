@@ -1,14 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-
-import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/timer';
 import 'rxjs/add/operator/switchMap';
 import { BsModalService } from 'ngx-bootstrap';
-
+import { Subscription } from 'rxjs/Subscription';
 import { AgentsService } from '../agents.service';
 import { Agent, Group } from '@agents/models';
-import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
+
+import {GroupDynamicConditionFilterPopupComponent} from '@agents/groups/group-dynamic-condition-filter-popup/group-dynamic-condition-filter-popup.component';
 
 @Component({
   selector: 'app-agents-list',
@@ -25,8 +24,10 @@ export class AgentsListComponent implements OnInit, OnDestroy {
   items: any[];
   selectedGroupSubscription: Subscription;
   selectedGroup: Group;
+  constants : boolean = true;
 
-  constructor(private agentsService: AgentsService, private modalService: BsModalService) {
+
+  constructor(private agentsService: AgentsService,private modalService: BsModalService) {
   }
 
   ngOnInit() {
@@ -35,10 +36,21 @@ export class AgentsListComponent implements OnInit, OnDestroy {
       this.agents = agents;
     });
 
+    this.agentsService.getSelectedGroupAsObservable().subscribe((group) => {
+      this.selectedGroup = group
+    })
+
+    this.agentsService.getUpdateGroupAsObservable().subscribe((group) => {
+      this.selectedGroup = group
+    })
+    
 
     this.selectedGroupSubscription = this.agentsService
       .getSelectedGroupAsObservable()
-      .subscribe(group => this.selectedGroup = group);
+      .subscribe(group => {
+        this.selectedGroup = group;
+        this.constants = true;
+      });
 
     // get agents status to pass
 
@@ -67,33 +79,21 @@ export class AgentsListComponent implements OnInit, OnDestroy {
     }
   }
 
-  deleteAgent(agentId) {
-    this.agentsService.delete(agentId).subscribe(() => {
-      let i = this.agents.findIndex((o) => {
-        return o._id === agentId;
-      });
-      this.agents.splice(i, 1);
-    });
-  }
-
-  editAgent(agentIndex) {
-    let agent = this.agents[agentIndex];
-    const modal = this.modalService.show(EditAgentComponent);
-    modal.content.name = agent.name;
-    modal.content.attributes = agent.attributes;
+  
+  addNewFilterParam(group:Group){
+    const modal = this.modalService.show(GroupDynamicConditionFilterPopupComponent);
+    modal.content.edit = false;
     modal.content.result
       .take(1)
-      .filter(r => !!r)
-      .subscribe(r => {
-        agent.name = r.name;
-        agent.attributes = r.attributes;
-        this.updateAgent(agent);
+      .subscribe(filters => {
+        group.filters.push(filters)
+        this.agentsService.updateGroupToServer(group).subscribe((group) => {
+          this.agentsService.updateGroup(group)
+        })
       });
+    
   }
 
-  updateAgent(agent: Agent) {
-    this.updateReq = this.agentsService.update(agent).subscribe();
-  }
 
   onSelectAgent(agent) {
     this.selectedAgent = agent;
@@ -109,5 +109,12 @@ export class AgentsListComponent implements OnInit, OnDestroy {
       .subscribe(group => {
         this.agentsService.updateGroup(group);
       });
+  }
+
+  showAgents(){
+    this.constants = true;
+  }
+  showFilters(){
+    this.constants = false;
   }
 }

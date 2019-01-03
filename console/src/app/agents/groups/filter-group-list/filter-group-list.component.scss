@@ -1,0 +1,27 @@
+table{
+    td {
+        padding: 0;
+        vertical-align: middle;
+    
+        > div{
+        display: flex;
+        align-items: center;
+    
+        > i {
+            margin-right: 7px;
+        }
+        }
+    }
+    th {
+        height: 21px;
+        font-size: 18px;
+        color: #dddddd;
+        font-weight: inherit
+    }
+    .item {
+        padding-left: 18px;
+        height: 16px;
+        font-size: 14px;
+        color: #dddddd;
+    }
+}

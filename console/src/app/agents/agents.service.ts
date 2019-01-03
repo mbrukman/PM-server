@@ -22,7 +22,7 @@ export class AgentsService {
   }
 
   delete(agentId) {
-    return this.http.delete(`${serverUrl}api/agents/${agentId}/delete`, { responseType: 'text' as 'json' });
+    return this.http.delete(`${serverUrl}api/agents/${agentId}`, { responseType: 'text' as 'json' });
   }
 
   list() {
@@ -34,7 +34,7 @@ export class AgentsService {
   }
 
   update(agent) {
-    return this.http.put<Agent>(`${serverUrl}api/agents/${agent._id}/update`, agent);
+    return this.http.put<Agent>(`${serverUrl}api/agents/${agent._id}`, agent);
   }
 
   /* groups */
@@ -54,7 +54,11 @@ export class AgentsService {
    * @returns {Observable<Object>}
    */
   groupDelete(groupId: string) {
-    return this.http.delete<string>(`${serverUrl}api/agents/groups/${groupId}/delete`, { responseType: 'text' as 'json' });
+    return this.http.delete<string>(`${serverUrl}api/agents/groups/${groupId}`, { responseType: 'text' as 'json' });
+  }
+
+  deleteFilterFromGroup(groupId,index){
+    return this.http.post<Group>(`${serverUrl}api/agents/groups/${groupId}/remove-filter`, {index})
   }
 
   /**
@@ -118,6 +122,8 @@ export class AgentsService {
     this.selectedGroupSubject.next(group);
   }
 
+
+  
   /**
    * Returns observable of selected group
    * @returns {Observable<Group>}
@@ -132,6 +138,10 @@ export class AgentsService {
    */
   updateGroup(group: Group) {
     this.updatedGroup.next(group);
+  }
+
+  updateGroupToServer(group: Group){
+    return this.http.put<Group>(`${serverUrl}api/agents/groups/${group._id}`, group);
   }
 
   /**
