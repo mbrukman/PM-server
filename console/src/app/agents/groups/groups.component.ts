@@ -123,7 +123,9 @@ export class GroupsComponent implements OnInit, OnDestroy {
   }
 
   updateGroup(group:Group){
-    this.updateReq = this.agentsService.updateGroupToServer(group).subscribe();
+    this.updateReq = this.agentsService.updateGroupToServer(group).subscribe((group) => {
+      this.agentsService.updateGroup(group)
+    });
   }
 
   deleteGroup(groupIndex, groupId) {

@@ -69,14 +69,16 @@ export class ConstantsListComponent implements OnInit,OnDestroy {
     this.agentsService.removeAgentFromGroup(agentId, groupId)
       .take(1)
       .subscribe(group => {
-        this.agentsService.updateGroupToServer(group);
+        this.agentsService.updateGroupToServer(group).subscribe((group) => {
+          this.agentsService.updateGroup(group)
+        })
       });
   }
 
   dragStart($event, agent) {
     this.agentsService.dragStart(agent);
   }
-  
+
   ngOnDestroy(){
       
   }

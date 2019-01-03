@@ -43,7 +43,6 @@ export class FilterGroupListComponent implements OnInit,OnDestroy {
       .subscribe(filters => {
         this.group.filters.splice(index,1,filters)
         this.agentsService.updateGroupToServer(this.group).subscribe((group) => {
-          this.group = group;
           this.agentsService.updateGroup(group)
         })
       });
