@@ -7,6 +7,7 @@ router.post("/", mapController.filter);
 router.post("/create", mapController.create);
 // router.post("/generate", mapController.generate);
 router.get("/results/:limit", mapController.dashboard);
+router.get("/recent", mapController.recentlyMaps);
 router.get("/currentruns", mapController.currentRuns);
 router.delete("/:id", mapController.mapDelete);
 router.get("/:id", mapController.detail);

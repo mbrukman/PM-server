@@ -4,7 +4,7 @@
 </div>
 <div class="container-fluid">
   <div class="content-wrapper" [ngSwitch]="mode" *ngIf="executions">
-      <app-card [items]="executions" *ngSwitchCase="'grid'"></app-card>
+      <map-cards [maps]="executions" *ngSwitchCase="'grid'"></map-cards>
     <div class="row list-view" *ngSwitchCase="'list'">
       <p-dataTable [value]="executions.slice(0,20)" expandableRows="true" #dt (onRowClick)="dt.toggleRow($event.data)">
         <p-column field="map.name" header="Map"></p-column>

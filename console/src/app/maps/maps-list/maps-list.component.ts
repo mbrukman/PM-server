@@ -19,7 +19,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
   resultCount: number = 0;
   page: number = 1;
   filterOptions: FilterOptions = new FilterOptions();
-  recentMaps: any = [];
+  recentMaps:Map[];
 
   constructor(private mapsService: MapsService,
     private modalService: BsModalService) {
@@ -29,19 +29,10 @@ export class MapsListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.reloadMaps();
-    var featureOptions = _.clone(this.filterOptions);
-    this.mapsService.getDistinctMapExecutionsResult(4).subscribe(executions => {
-      this.recentMaps = executions;
-      if (4 - this.recentMaps.length == 0) { return; }
-      featureOptions.limit = 4 - this.recentMaps.length;
-      featureOptions.sort = '-updatedAt'
-      this.mapsService.filterMaps(null, this.page, featureOptions).take(1).subscribe(data => {
-        if (data)
-          data.items.forEach(item => {
-            this.recentMaps.push({ map: item })
-          })
-      });
-    });
+    this.mapsService.recentMaps().subscribe(maps => {
+      this.recentMaps = maps;
+    
+    })
   }
 
   reloadMaps(fields = null, page = this.page, filter = this.filterOptions) {

@@ -19,6 +19,7 @@ export class DashboardComponent implements OnInit {
     this.mapsService.getDistinctMapExecutionsResult(16).subscribe(executions => {
       this.executions = executions;
       executions.forEach(execution => {
+        Object.assign(execution,execution.map)
         let processes = [];
         execution.exec.agentsResults.forEach(agent => {
           processes = [...processes, ...agent.processes];
