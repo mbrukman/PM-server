@@ -1,6 +1,6 @@
 <div class="mode">
   <i class="material-icons" [ngClass]="{'active': mode==='list'}" (click)="mode = 'list'">view_list</i>
-  <i class="material-icons" [ngClass]="{'active': mode==='grid'}" (click)="mode = 'grid'">view_module</i>
+  <i class="material-icons grid-icon" [ngClass]="{'active': mode==='grid'}" (click)="mode = 'grid'">view_module</i>
 </div>
 <div class="container-fluid">
   <div class="content-wrapper" [ngSwitch]="mode" *ngIf="executions">

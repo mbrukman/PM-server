@@ -48,6 +48,7 @@ module.exports = {
             });
             return res.json(obj);
         }).catch(error => {
+            pluginsService.deletePluginByPath(req.file.path) 
             req.io.emit('notification', { title: 'Whoops', message: `Error while installing plugin`, type: 'error' });
             winston.log('error', "Error uploading plugin", error);
             return res.status(500).send(error);

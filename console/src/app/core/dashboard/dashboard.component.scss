@@ -3,9 +3,15 @@
 .mode {
     height: 70px;
     background-color: #25292c;
-    ;
-    padding: 28px;
+    display: flex;
+    padding: 30px 0px 40px 30px;
+    
+    .grid-icon{
+        font-size: 26px;
+        margin-top: -0.5px;
+    }
     i {
+        padding-right: 3px;
         cursor: pointer;
         &:hover {
             color: #fff;
