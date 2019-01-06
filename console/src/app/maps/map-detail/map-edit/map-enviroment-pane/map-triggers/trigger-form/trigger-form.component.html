@@ -36,7 +36,7 @@
       <div class="form-group" *ngIf="triggerForm.controls.plugin.value">
         <label for="method">Method</label>
         <select class="form-control" formControlName="method" id="method" (change)="onSelectMethod()">
-          <option disabled>Select a trigger</option>
+          <option disabled>Select a method</option>
           <option *ngFor="let method of plugin.methods" [ngValue]="method.name">
             {{method.viewName}}
           </option>
@@ -55,7 +55,7 @@
           <div [formGroupName]="i">
             <div class="row">
               <div class="col-4">{{param.value.viewName}}</div>
-              <div class="col-8" [ngSwitch]="params[i].type">
+              <div class="col-8" [ngSwitch]="params[i]?.type">
                 <select *ngSwitchCase="'options'" formControlName="value" class="form-control">
                   <option *ngFor="let option of params[i].options" [value]="option.id">{{option.name}}</option>
                 </select>

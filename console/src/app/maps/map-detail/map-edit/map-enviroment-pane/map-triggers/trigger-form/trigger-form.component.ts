@@ -60,7 +60,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
       description: new FormControl(),
       plugin: new FormControl(this.trigger ? this.trigger.plugin : null, Validators.required),
       configuration: new FormControl(this.trigger ? this.trigger.method : null),
-      method: new FormControl(this.trigger ? this.trigger.method : null, Validators.required),
+      method: new FormControl( this.trigger ? this.trigger.method : null, Validators.required),
       params: new FormArray([])
     });
   }
@@ -84,17 +84,38 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
   }
 
   onSelectTrigger() {
-    this.plugin = _.find(this.triggers, (o) => o.name === this.triggerForm.value.plugin);
+    if(this.plugin){
+      this.removeParamForm()
+      this.plugin = _.find(this.triggers, (o) => o.name === this.triggerForm.value.plugin);
+      this.method = this.plugin.methods[0] // if there is a plugin, by default the method will be the first element
+      this.addParamForm()
+    }
+    else{
+      this.plugin = _.find(this.triggers, (o) => o.name === this.triggerForm.value.plugin);
+    }
   }
 
   onSelectMethod() {
+    if(this.method){
+      this.removeParamForm()
+    }
     this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method);
     this.params = this.method.params;
-    console.log(this.method.params);
+    this.addParamForm()
+  }
+
+  addParamForm(){
     let paramsControl = <FormArray>this.triggerForm.controls['params'];
     this.method.params.forEach(param => {
       paramsControl.push(this.initParamsForm(param.value, param._id, param.viewName, param.name));
     });
+  }
+
+  removeParamForm(){
+    let paramsControl = <FormArray>this.triggerForm.controls['params'];
+      for(let i =0,length = this.method.params.length;i<length;i++){
+        paramsControl.removeAt(0)
+      }
   }
 
 }

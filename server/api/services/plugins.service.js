@@ -2,7 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const unzip = require("unzipper");
 const child_process = require("child_process");
-const async = require("async");
 const winston = require("winston");
 const del = require("del");
 const env = require("../../env/enviroment");
@@ -205,19 +204,17 @@ module.exports = {
   loadPlugins: () => {
     console.log("Loading plugins");
     fs.readdir(path.join(env.static_cdn, env.upload_path), (err, files) => {
-      async.each(
-        files,
-        function (plugin, callback) {
+      Promise.all(files.map((plugin) => {
+        return new Promise((resolve, reject) => {
           let filePath = path.join(env.static_cdn, env.upload_path, plugin);
           deployPluginFile(filePath)
             .then(() => { })
             .catch(error => {
               winston.log("error", "Error installing plugin: ", error);
             });
-          callback();
-        },
-        function (err) { }
-      );
+          resolve();
+        })
+      }))
     });
   },
   pluginDelete: id => {
@@ -256,33 +253,29 @@ module.exports = {
    * @param methodName
    */
   generatePluginParams: (pluginId, methodName) => {
-    return module.exports.getPlugin(pluginId).then(
-      plugin =>
-        new Promise((resolve, reject) => {
-          plugin = JSON.parse(JSON.stringify(plugin));
-          let method = plugin.methods.find(o => o.name === methodName);
-          let paramsToGenerate = method.params.filter(
-            o => o.type === "autocomplete"
-          );
-          async.each(
-            paramsToGenerate,
-            (param, callback) => {
-              models[param.model]
-                .find(param.query || {})
-                .select(param.propertyName)
-                .then(options => {
-                  param.options = options.map(o => ({
-                    id: o._id,
-                    value: o[param.propertyName]
-                  }));
-                  return callback();
-                });
-            },
-            error => {
-              resolve(paramsToGenerate);
-            }
-          );
-        })
-    );
+    return module.exports.getPlugin(pluginId).then(plugin => {
+
+      plugin = JSON.parse(JSON.stringify(plugin));
+      let method = plugin.methods.find(o => o.name === methodName);
+      let paramsToGenerate = method.params.filter(
+        o => o.type === "autocomplete"
+      );
+      let promises = paramsToGenerate.map(param => _generateAutocompleteParams(param))
+      return Promise.all(promises).finally(() => {
+        return paramsToGenerate;
+      })
+    });
   }
 };
+
+function _generateAutocompleteParams(param) {
+  return models[param.model]
+    .find(param.query || {})
+    .select(param.propertyName)
+    .then(options => {
+      param.options = options.map(o => ({
+        id: o._id,
+        value: o[param.propertyName]
+      }));
+    });
+}
