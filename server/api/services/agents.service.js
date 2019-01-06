@@ -36,7 +36,7 @@ const FILTER_FIELDS = Object.freeze({
 
 /* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
 let followAgentStatus = (agent) => {
-    agents[agent.key] = {};
+    agents[agent.key] = agent.toObject();
     setDefaultUrl(agent);
     let listenInterval = setInterval(() => {
         let start = new Date();
@@ -128,8 +128,15 @@ function setDefaultUrl(agent) {
  */
 function evaluateGroupAgents(group) {
     group = JSON.parse(JSON.stringify(group)); // make sure its not a mongoose document
-    let agentsCopy = JSON.parse(JSON.stringify(agents));
-    let filteredAgents = Object.keys(agentsCopy).map(key => agentsCopy[key]);
+    
+    let agentsCopy = {};
+    Object.keys(agents).map(key=>{
+        let a = Object.assign({},agents[key]);
+        delete a.socket;
+        agentsCopy[key] = a;
+    })
+    
+    let filteredAgents = Object.keys(agents).map(key => agentsCopy[key]);
     group.filters.forEach(filter => {
         filteredAgents = evaluateFilter(filter, filteredAgents);
     });
