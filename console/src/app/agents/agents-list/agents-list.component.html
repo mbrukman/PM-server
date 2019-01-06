@@ -5,13 +5,18 @@
       <app-groups [agents]="agentsStatus"></app-groups>
     </div>
     <div class="agents">
-      
+    <div *ngIf="!selectedGroup">
+      <div class="top">
+        <h5>Agent &#8594; All Agents</h5>
+      </div>
+      <app-constants-list  [agentsStatus]="agentsStatus" [agents] ="agents"></app-constants-list>
+    </div>
     <div *ngIf="selectedGroup">
       <div class="top">
         <h5>Agent &#8594; {{selectedGroup?.name}}</h5>
         <div>
           <a (click)="showAgents()"><span [ngClass]="{'selected':constants}" >Constants</span> <span class="agentsLength">({{selectedGroup?.agents?.length}})</span></a>
-          <a [ngClass]="{'selected':!constants}" (click)="showFilters()" class="filters">Filters</a>
+          <a [ngClass]="{'selected':!constants}" (click)="showFilters()" class="filters">Filters <span class="agentsLength">({{selectedGroup?.filters?.length}})</span></a>
           <button *ngIf="!constants" class="btn btn-pm button-filter" (click)="addNewFilterParam(selectedGroup)"><span>Add filter</span></button>
         </div>
       </div>

@@ -58,6 +58,9 @@ export class GroupsComponent implements OnInit, OnDestroy {
     });
   }
 
+  allAgents(){
+    this.agentsService.selectGroup(null);
+  }
 
   ngOnDestroy() {
     if (this.groupsReq) {
@@ -86,11 +89,20 @@ export class GroupsComponent implements OnInit, OnDestroy {
    * @param groupIndex
    * @param groupId
    */
+
+   onDragLeave(i){
+    document.getElementById(i).style.border = "";
+   }
+
+   allowDrop(i){
+    document.getElementById(i).style.border = "2px dashed #f79f2b"
+   }
+
   drop(groupIndex, groupId) {
+    document.getElementById(groupIndex).style.border = "";
     if ((<string[]>this.groups[groupIndex].agents).indexOf(this.draggedItem.id) > -1) {
       return;
     }
-
     this.agentsService
       .addAgentToGroup(groupId, [this.draggedItem.id])
       .take(1)

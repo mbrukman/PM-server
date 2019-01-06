@@ -11,13 +11,13 @@
     <thead>
       <tr>
         <th scope="col">
-          <i class="icon-agent"></i><span class="title">All Agents</span>
+          <i class="icon-agent"></i><span (click)="allAgents()" class="title">All Agents</span>
         </th>
         <th></th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let item of groups; let i = index" pDroppable="dd" (onDrop)="drop(i, item.id)">
+      <tr id={{i}} *ngFor="let item of groups; let i = index" pDroppable="dd" (drop)="drop(i, item.id)"  (dragover)="allowDrop(i)" (dragleave) = "onDragLeave(i)">
         <td>
           <div class="name" (click) ="selectGroup(item)">{{item.name}}</div>
         </td>
