@@ -11,16 +11,13 @@ import { Agent, Group } from '@agents/models';
 import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
 
 @Component({
-  selector: 'app-constants-list',
-  templateUrl: './constants-list.component.html',
-  styleUrls: ['./constants-list.component.scss']
+  selector: 'app-constant-agents-list',
+  templateUrl: './constant-agents-list.component.html',
+  styleUrls: ['./constant-agents-list.component.scss']
 })
-export class ConstantsListComponent implements OnInit,OnDestroy {
-    agentsStatusReq: any;
+export class ConstantAgentsListComponent implements OnInit,OnDestroy {
     selectedAgent: Agent;
-    agentsReq: any;
-    updateReq: any;
-    items: any[];
+    updateReq: Subscription;
     selectedGroupSubscription: Subscription;
     @Input('agentsStatus') agentsStatus: any;
     @Input('agents') agents: [Agent];
@@ -33,7 +30,7 @@ export class ConstantsListComponent implements OnInit,OnDestroy {
     this.agentsService.getUpdateGroupAsObservable().subscribe((group) => {
       this.group = group
     })
-  }
+  } 
   deleteAgent(agentId) {
     this.agentsService.delete(agentId).subscribe(() => {
       let i = this.agents.findIndex((o) => {
@@ -67,7 +64,6 @@ export class ConstantsListComponent implements OnInit,OnDestroy {
   }
   removeAgentFromGroup(agentId: string, groupId: string) {
     this.agentsService.removeAgentFromGroup(agentId, groupId)
-      .take(1)
       .subscribe(group => {
         this.agentsService.updateGroupToServer(group).subscribe((group) => {
           this.agentsService.updateGroup(group)

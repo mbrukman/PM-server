@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 import { Subscription } from 'rxjs/Subscription';
 
@@ -8,14 +8,14 @@ import { BsModalService } from 'ngx-bootstrap';
 
 import { AgentsService } from '../../agents.service';
 import { Agent, Group } from '@agents/models';
-import {GroupDynamicConditionFilterPopupComponent} from '@agents/groups/group-dynamic-condition-filter-popup/group-dynamic-condition-filter-popup.component'
+import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
 
 @Component({
-  selector: 'app-filter-group-list',
-  templateUrl: './filter-group-list.component.html',
-  styleUrls: ['./filter-group-list.component.scss']
+  selector: 'app-agents-group-filters-list',
+  templateUrl: './agents-group-filters-list.component.html',
+  styleUrls: ['./agents-group-filters-list.component.scss']
 })
-export class FilterGroupListComponent implements OnInit,OnDestroy {
+export class AgentsGroupFiltersListComponent implements OnInit {
     agentsStatusReq: any;
     selectedAgent: Agent;
     agentsReq: any;
@@ -33,7 +33,7 @@ export class FilterGroupListComponent implements OnInit,OnDestroy {
   }
 
   editFilter(filter,index){
-    const modal = this.modalService.show(GroupDynamicConditionFilterPopupComponent);
+    const modal = this.modalService.show(AgentsGroupUpsertFilterComponent);
     modal.content.edit = true;
     modal.content.field = filter.field;
     modal.content.type = filter.filterType;
@@ -55,7 +55,4 @@ export class FilterGroupListComponent implements OnInit,OnDestroy {
     });
   }
 
-  ngOnDestroy(){
-
-  }
 }

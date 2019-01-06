@@ -58,7 +58,7 @@ export class AgentsService {
   }
 
   deleteFilterFromGroup(groupId,index){
-    return this.http.post<Group>(`${serverUrl}api/agents/groups/${groupId}/remove-filter`, {index})
+    return this.http.delete<Group>(`${serverUrl}api/agents/groups/${groupId}/filters/${index}`);
   }
 
   /**

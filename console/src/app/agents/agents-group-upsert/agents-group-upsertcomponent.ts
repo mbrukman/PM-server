@@ -6,11 +6,11 @@ import { BsModalRef } from 'ngx-bootstrap';
 import { Group } from '@agents/models';
 
 @Component({
-  selector: 'app-edit-group',
-  templateUrl: './edit-group.component.html',
-  styleUrls: ['./edit-group.component.scss']
+  selector: 'app-agents-group-upsert',
+  templateUrl: './agents-group-upsert.component.html',
+  styleUrls: ['./agents-group-upsert.component.scss']
 })
-export class EditGroupComponent implements OnInit {
+export class AgentsGroupUpsertComponent implements OnInit {
   group: Group;
   name: string;
   result: Subject<{name: string}> = new Subject();
@@ -25,9 +25,8 @@ export class EditGroupComponent implements OnInit {
     this.result.next({ name: this.name });
     this.bsModalRef.hide();
   }
-
+ 
   onClose() {
-    this.result.next();
     this.bsModalRef.hide();
   }
 

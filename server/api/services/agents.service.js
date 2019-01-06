@@ -449,7 +449,7 @@ module.exports = {
     deleteFilterFromGroup: (groupId,index) => {
         return new Promise((resolve,reject) => {
             return Group.findOne({_id:groupId}).then((group) => {
-                group.filters.splice(index.index,1)
+                group.filters.splice(index,1)
                 group.save().then((res) => {
                     resolve(res);
                 }).catch((err) => {
@@ -466,7 +466,16 @@ module.exports = {
      * @returns {Query|*}
      */
     removeAgentFromGroup: (groupId, agentId) => {
-        return Group.findOneAndUpdate(groupId, { $pull: { agents: { $in: [agentId] } } }, { new: true });
+        return new Promise((resolve,reject) => {
+            return Group.findOne({_id:groupId}).then((group) => {
+                group.agents.splice(group.agents.findIndex(agent => agent.id == agentId),1)
+                group.save().then((res) => {
+                    resolve(res);
+                }).catch((err) => {
+                    reject(err)
+                })
+            })
+        })
     },
     /**
      * Establish a room for agents

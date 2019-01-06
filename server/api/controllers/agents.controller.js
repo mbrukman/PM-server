@@ -225,7 +225,7 @@ module.exports = {
 
     deleteFilterFromGroup: (req, res) => {
         hooks.hookPre('group-remove-agent', req).then(() => {
-            return agentsService.deleteFilterFromGroup(req.params.groupId, req.body)
+            return agentsService.deleteFilterFromGroup(req.params.groupId, req.params.index)
         }).then((group) => {
             req.io.emit('notification', { title: 'Yay!', message: `Filter removed`, type: 'success' });
             return res.json(group);

@@ -17,7 +17,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr id={{i}} *ngFor="let item of groups; let i = index" pDroppable="dd" (drop)="drop(i, item.id)"  (dragover)="allowDrop(i)" (dragleave) = "onDragLeave(i)">
+      <tr  *ngFor="let item of groups; let i = index" pDroppable="dd" (drop)="drop(i, item.id)"  (dragover)="allowDrop(i)" (dragleave) = "onDragLeave()" [ngClass]="{'drag-over':selectedDropGroupIndex == i}">
         <td>
           <div class="name" (click) ="selectGroup(item)">{{item.name}}</div>
         </td>
@@ -28,33 +28,4 @@
       </tr>
     </tbody>
   </table>
-
-
-  <!-- <div class="card-body" pDraggable="dd">
-    <a (click)="createGroup()" class="card-link">Create group</a>
-    <a (click)="onTabOpen()" class="card-link">All agents</a>
-  </div> -->
-
-
-
-  <!-- <p-accordion
-    (onOpen)="onTabOpen($event)"
-    *ngIf="groups">
-    <p-accordionTab *ngFor="let item of groups; let i = index;" pDroppable="dd" (onDrop)="drop(i, item.id)">
-      <p-header>
-        {{item.name}}
-      </p-header>
-      Drop an agent here to add it.
-      <div>
-        <button class="btn btn-pm" (click)="deleteGroup(i, item.id)">Delete group</button>
-      </div>
-      <div>
-        Constant agents: <span class="badge badge-pill badge-light">{{item?.agents?.length}}</span>
-      </div>
-      <app-evaluate-group-agent [group]="item" [agents]="agents"></app-evaluate-group-agent>
-      <hr/>
-      <br>
-      <app-group-dynamic-condition-filter [group]="item"></app-group-dynamic-condition-filter>
-    </p-accordionTab>
-  </p-accordion> -->
 </div>

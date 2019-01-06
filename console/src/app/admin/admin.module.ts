@@ -16,10 +16,10 @@ import { AdminComponent } from './admin.component';
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
 import { EvaluateGroupAgentComponent } from '@agents/groups/evaluate-group-agent/evaluate-group-agent.component';
 import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
-import {EditGroupComponent} from '@agents/edit-group/edit-group.component';
-import {ConstantsListComponent} from '@agents/agents-list/constants-list/constants-list.component';
-import {GroupDynamicConditionFilterPopupComponent} from '@agents/groups/group-dynamic-condition-filter-popup/group-dynamic-condition-filter-popup.component';
-import {FilterGroupListComponent} from '@agents/groups/filter-group-list/filter-group-list.component';
+import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-group-upsertcomponent';
+import {ConstantAgentsListComponent} from '@agents/agents-list/constant-agents-list/constant-agents-list.component';
+import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
+import {AgentsGroupFiltersListComponent} from '@agents/groups/agents-group-filters-list/agents-group-filters-list.component'
 
 @NgModule({
   imports: [
@@ -40,12 +40,12 @@ import {FilterGroupListComponent} from '@agents/groups/filter-group-list/filter-
     InputPopupComponent,
     EvaluateGroupAgentComponent,
     EditAgentComponent,
-    EditGroupComponent,
-    ConstantsListComponent,
-    GroupDynamicConditionFilterPopupComponent,
-    FilterGroupListComponent
-
+    AgentsGroupUpsertComponent,
+    ConstantAgentsListComponent,
+    AgentsGroupUpsertFilterComponent,
+    AgentsGroupFiltersListComponent
+ 
   ],
-  entryComponents: [PluginUploadComponent, AddFolderComponent, InputPopupComponent, EditAgentComponent, EditGroupComponent,GroupDynamicConditionFilterPopupComponent]
+  entryComponents: [PluginUploadComponent, AddFolderComponent, InputPopupComponent, EditAgentComponent, AgentsGroupUpsertComponent,AgentsGroupUpsertFilterComponent]
 })
 export class AdminModule { }

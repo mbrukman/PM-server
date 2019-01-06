@@ -8,11 +8,11 @@ import { Subject } from 'rxjs/Subject';
 
 
 @Component({
-  selector: 'app-group-dynamic-condition-filter-popup',
-  templateUrl: './group-dynamic-condition-filter-popup.component.html',
-  styleUrls: ['./group-dynamic-condition-filter-popup.component.scss']
+  selector: 'app-agents-group-upsert-filter',
+  templateUrl: './agents-group-upsert-filter.component.html',
+  styleUrls: ['./agents-group-upsert-filter.component.scss']
 })
-export class GroupDynamicConditionFilterPopupComponent implements OnInit {
+export class AgentsGroupUpsertFilterComponent implements OnInit {
     
   filterTypes = Object.keys(FILTER_TYPES);
   fields = Object.keys(FILTER_FIELDS);

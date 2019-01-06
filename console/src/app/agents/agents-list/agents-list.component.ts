@@ -6,8 +6,7 @@ import { BsModalService } from 'ngx-bootstrap';
 import { Subscription } from 'rxjs/Subscription';
 import { AgentsService } from '../agents.service';
 import { Agent, Group } from '@agents/models';
-
-import {GroupDynamicConditionFilterPopupComponent} from '@agents/groups/group-dynamic-condition-filter-popup/group-dynamic-condition-filter-popup.component';
+import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
 
 @Component({
   selector: 'app-agents-list',
@@ -81,7 +80,7 @@ export class AgentsListComponent implements OnInit, OnDestroy {
 
   
   addNewFilterParam(group:Group){
-    const modal = this.modalService.show(GroupDynamicConditionFilterPopupComponent);
+    const modal = this.modalService.show(AgentsGroupUpsertFilterComponent);
     modal.content.edit = false;
     modal.content.result
       .take(1)

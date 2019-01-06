@@ -8,7 +8,7 @@ import { Group } from '@agents/models/group.model';
 import { BsModalService } from 'ngx-bootstrap';
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
 import { Agent } from '@agents/models/agent.model';
-import {EditGroupComponent} from '@agents/edit-group/edit-group.component'
+import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-group-upsertcomponent'
 
 @Component({
   selector: 'app-groups',
@@ -24,6 +24,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
   draggetItemSubscription: Subscription;
   selectedGroup: Group;
   updateReq: any;
+  selectedDropGroupIndex : string;
 
   constructor(private agentsService: AgentsService, private modalService: BsModalService) {
   }
@@ -90,16 +91,16 @@ export class GroupsComponent implements OnInit, OnDestroy {
    * @param groupId
    */
 
-   onDragLeave(i){
-    document.getElementById(i).style.border = "";
+   onDragLeave(){
+    this.selectedDropGroupIndex = null
    }
 
    allowDrop(i){
-    document.getElementById(i).style.border = "2px dashed #f79f2b"
+    this.selectedDropGroupIndex = i
    }
 
   drop(groupIndex, groupId) {
-    document.getElementById(groupIndex).style.border = "";
+    this.selectedDropGroupIndex = null
     if ((<string[]>this.groups[groupIndex].agents).indexOf(this.draggedItem.id) > -1) {
       return;
     }
@@ -123,7 +124,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
 
   editGroup(index){
     let group = this.groups[index];
-    const modal = this.modalService.show(EditGroupComponent);
+    const modal = this.modalService.show(AgentsGroupUpsertComponent);
     modal.content.name = group.name;
     modal.content.result
       .take(1)
