@@ -16,7 +16,7 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.mapsService.getDistinctMapExecutionsResult(16).subscribe(executions => {
+    this.mapsService.getDistinctMapExecutionsResult().subscribe(executions => {
       this.executions = executions;
       executions.forEach(execution => {
         Object.assign(execution,execution.map)

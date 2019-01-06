@@ -52,7 +52,7 @@ module.exports = {
     },
     dashboard: (req, res) => {
         hooks.hookPre('map-dashboard', req).then(() => {
-            return mapsExecutionService.dashboard(req.params.limit)
+            return mapsExecutionService.dashboard()
         }).then(executions => {
             executions = JSON.parse(JSON.stringify(executions));
             let mapsId = executions.map(execution => execution.map.id);

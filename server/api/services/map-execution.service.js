@@ -1476,7 +1476,7 @@ module.exports = {
      * returning all maps result
      * @returns {Document|Promise|Query|*|void}
      */
-    dashboard: (limit) => {
+    dashboard: () => {
         return MapResult.aggregate([
             { $sort: { "startTime": -1 } },
             {
@@ -1488,7 +1488,7 @@ module.exports = {
                 }
             },
             { $sort: { "exec.startTime": -1 } },
-            { $limit: Number(limit) }
+            { $limit: 16 }
         ]).then(res => {
             return Map.populate(res, { path: 'map' })
         })
