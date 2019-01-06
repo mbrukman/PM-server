@@ -36,10 +36,16 @@ fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 
     libpmObjects.currentAgent = currentAgent
 });
 
-function evaluateParam(param, context) {
+function evaluateParam(param, context, typeParam) {
     if (!param.code) {
-        if(param.type == 'vault'){
-            return vaultService.getValueByKey(param.value)
+        if(typeParam == 'vault'){
+          vaultService.getValueByKey(param.value).then(val=>{
+                return val
+            }).catch(error=>{
+                console.log(error);
+            })
+           
+            
         }
         return param.value;
     }
@@ -878,8 +884,8 @@ function runProcess(map, structure, runId, agent, socket) {
 
         let plugin = executions[runId].executionContext.plugins
             .find((o) => (o.name.toString() === process.used_plugin.name) || (o.name === process.used_plugin.name));
-        let actionExecutionFunctions = {};
-
+        let actionExecutionFunctions = {}; 
+        
         process.actions.forEach((action, i) => {
             action.name = (action.name || `Action #${i + 1} `);
             actionExecutionFunctions[`${action.name} ("${action.id}")`] =
@@ -1041,7 +1047,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             return;
         }
 
-        let method = plugin.methods.find(o => o.name === action.method);
+        let method = plugin.methods.find(o => o.name === action.method); 
         if (!method) {
             const result = 'Method wasn\'t found';
             updateActionContext(runId, agent.key, process.uuid, processIndex, key, Object.assign(action, {
@@ -1060,7 +1066,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
         action.plugin = {
             name: plugin.name
         };
-
+ 
         updateActionContext(runId, agent.key, process.uuid, processIndex, key, action);
 
         executionLogService.info(runId, map._id, `'${action.name}': executing action (${agent.name})`, socket);
@@ -1087,7 +1093,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
 
             // handle wrong code
             try {
-                action.params[param.name] = evaluateParam(params[i], executions[runId].executionAgents[agent.key].executionContext);
+                action.params[param.name] = evaluateParam(params[i], executions[runId].executionAgents[agent.key].executionContext, action.method.params[i].type);
             } catch (e) {
                 return _handleActionError({
                     stdout: actionString + '\n' + e.message
@@ -1100,7 +1106,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
 
         // will send action to agent via socket or regular request
         let p;
-        if (agent.socket) {
+        if (agent.socket) {   
             p = sendActionViaSocket(agent.socket, action, actionExecutionForm);
         } else {
             p = sendActionViaRequest(agent, action, actionExecutionForm);

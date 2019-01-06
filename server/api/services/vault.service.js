@@ -23,8 +23,10 @@ module.exports = {
         return Vault.find({ key: key })
     },
     getValueByKey: (key) => {
-        getByKey(key).then(item => {
-            return _decrypt(item.value);
+        return new Promise((resolve,reject)=> {
+            Vault.findOne({ key: key }).then(item=>{
+                return resolve(_decrypt(item.value));
+            })
         })
     },
 
