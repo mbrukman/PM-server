@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 
 const winston = require('winston');
-const async = require('async');
 const request = require('request');
 const _ = require("lodash");
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -265,7 +264,9 @@ function filterExecutionAgents(mapCode, executionContext, groups, mapAgents, exe
         let agentsStatus = Object.assign({}, agentsService.agentsStatus());
         let executionAgents = {};
         agents.forEach((agentObj) => {
-            const agentStatus = _.find(agentsStatus, (agent) => agent.id === agentObj.id);
+            const agentStatus = _.find(agentsStatus, (agent) => {
+                return agent.id === agentObj.id
+            });
             if (!agentStatus) {
                 return;
             }
@@ -282,32 +283,24 @@ function filterExecutionAgents(mapCode, executionContext, groups, mapAgents, exe
         return executionAgents;
     }
 
-    if (!executionAgents) {
+    if (!executionAgents){
         let groupsAgents = {};
-
-        return new Promise((resolve, reject) => {
-            async.each(groups,
-                (group, callback) => {
-                    groupsAgents = Object.assign(groupsAgents, agentsService.evaluateGroupAgents(group));
-                    callback();
-                }, (error) => {
-                    resolve(Object.keys(groupsAgents).map(key => groupsAgents[key]));
-                })
-        }).then((groupsAgents) => {
-            let totalAgents = [...JSON.parse(JSON.stringify(mapAgents)), ...JSON.parse(JSON.stringify(groupsAgents))];
-            return filterLiveAgents(totalAgents);
-
-        });
+        groups.forEach(group => {
+            groupsAgents = Object.assign(groupsAgents, agentsService.evaluateGroupAgents(group));
+        })
+        groupsAgents = Object.keys(groupsAgents).map(key => groupsAgents[key]);
+        let totalAgents = [...JSON.parse(JSON.stringify(mapAgents)), ...JSON.parse(JSON.stringify(groupsAgents))];
+        return filterLiveAgents(totalAgents);
     }
 
     return agentsService.filter({
         $or: [
-            { _id: { $in: executionAgents.filter((id) => ObjectId.isValid(id)) } },
+            { _id: { $in: executionAgents.filter((id) => ObjectId.isValid(id)) }},
             { name: { $in: executionAgents } }
         ]
     }).then((agents) => {
         return filterLiveAgents(agents);
-    });
+    })
 }
 
 
@@ -519,45 +512,49 @@ function validate_plugin_installation(map, structure, runId, agentKey) {
             }
             return total;
         }, []);
-
         if (filesPaths && filesPaths.length > 0) {
-            async.each(filesPaths,
-                function (filePath, callback) {
-                    agentsService.installPluginOnAgent(filePath, agents[agentKey]).then(() => {
-                    }).catch((e) => {
-                        winston.log('error', 'Error installing on agent', e);
-                    });
-                    callback();
-                },
-                function (error) {
-                    if (error) {
-                        winston.log('error', 'Error installing plugins on agent, it may be a fatal error', error);
-                    }
-                    winston.log('success', 'Done installing plugins');
-                    resolve();
-                });
-        } else {
+            Promise.all(filesPaths.map(function asyncFilesPaths(filePath){ 
+                return new Promise((resolve,reject) =>{
+                    agentsService.installPluginOnAgent(filePath, agent).then(() => {
+                     }).catch((e) => {
+                       winston.log('error', "Error installing on agent", e);
+                     }); 
+                     resolve()
+                }) 
+            })).then(()=> {
+                winston.log('success', 'Done installing plugins');
+            }).catch((error)=>{
+                    winston.log('error', "Error installing plugins on agent", error);
+                 return res.status(204).send();
+                })
+            }
+         else {
             resolve();
         }
     });
 }
 
-function startMapExecution(map, structure, runId, socket) {
-    let agents = executions[runId].executionAgents;
-    const startNode = findStartNode(structure);
-
-    async.each(agents, runMapFromAgent(map, structure, runId, startNode.uuid, socket), function (error) {
+function runMapFromAgent(map, structure, runId, node, socket,agent) {
+    return new Promise((resolve, reject) => {
+        validate_plugin_installation(map, structure, runId, agent.key).then(() => {
+            runNodeSuccessors(map, structure, runId, agent, node, socket);
+            resolve();
+        });
     })
 }
 
-function runMapFromAgent(map, structure, runId, node, socket) {
-    return (agent, callback) => {
-        validate_plugin_installation(map, structure, runId, agent.key).then(() => {
-            runNodeSuccessors(map, structure, runId, agent, node, socket);
-            callback();
-        });
+function startMapExecution(map, structure, runId, socket) {
+    let agents = executions[runId].executionAgents;
+    const startNode = findStartNode(structure);
+    var promises = []
+    for(var agent in agents){
+        promises.push(runMapFromAgent(map,structure,runId,startNode.uuid,socket,agents[agent]))
     }
+    return Promise.all(promises)
+    
 }
+
+
 
 /**
  * The function checks if the agent executing a process.
@@ -720,11 +717,11 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
             process: process
         });
     });
-    async.each(nodesToRun, runProcess(map, structure, runId, agent, socket), (error) => {
-        if (error) {
-            winston.log('error', error);
-        }
-    });
+    promises = []
+    for(let i =0,length = nodesToRun.length;i<length;i++){
+        promises.push(runProcess(map,structure,runId,agent,socket,nodesToRun[i]))
+    }
+    Promise.all(promises).catch(error =>  winston.log('error', error));
 }
 
 
@@ -762,12 +759,7 @@ function runNode(map, structure, runId, agent, node, socket) {
         return;
     }
 
-
-    async.each([node], runProcess(map, structure, runId, agent, socket), (error) => {
-        if (error) {
-            winston.log("error", error);
-        }
-    });
+    runProcess(map,structure,runId,agent,socket,node).catch(error => winston.log("error", error));
 }
 
 /**
@@ -780,11 +772,11 @@ function runNode(map, structure, runId, agent, node, socket) {
  * @param socket
  * @returns {function(*=, *)}
  */
-function runProcess(map, structure, runId, agent, socket) {
-    return (execProcess, callback) => {
+function runProcess(map, structure, runId, agent, socket,execProcess) {
+    return new Promise((resolve,reject) => {
         const processUUID = execProcess.uuid;
         if (!shouldContinueExecution(runId, agent.key)) {
-            return callback();
+            return resolve();
         }
         let process = execProcess.process;
 
@@ -816,9 +808,9 @@ function runProcess(map, structure, runId, agent, socket) {
                 }
 
                 executions[runId].executionAgents[agent.key].finishTime = new Date();
-                callback();
                 updateExecutionContext(runId, agent.key);
-                return;
+                return resolve();
+                
             }
 
         }
@@ -849,13 +841,13 @@ function runProcess(map, structure, runId, agent, socket) {
                     executions[runId].executionAgents[agent.key].status = 'error';
                     stopExecution(map._id, runId, socket);
                     updateExecutionContext(runId, agent.key);
-                    callback();
-                    return;
+                    return resolve();
+                    
                 }
                 updateExecutionContext(runId, agent.key);
                 runNodeSuccessors(map, structure, runId, agent, false, socket); // by passing false, no successors would be called
-                callback();
-                return;
+                return resolve();
+                
             }
         }
 
@@ -878,8 +870,7 @@ function runProcess(map, structure, runId, agent, socket) {
 
         process.actions.forEach((action, i) => {
             action.name = (action.name || `Action #${i + 1} `);
-            actionExecutionFunctions[`${action.name} ("${action.id}")`] =
-                executeAction(
+            actionExecutionFunctions[`${action.name} ("${action.id}")`] =[
                     map,
                     structure,
                     runId,
@@ -888,7 +879,8 @@ function runProcess(map, structure, runId, agent, socket) {
                     processIndex,
                     _.cloneDeep(action),
                     plugin,
-                    socket);
+                    socket
+            ]
         });
 
         // updating context
@@ -898,71 +890,82 @@ function runProcess(map, structure, runId, agent, socket) {
         });
 
         // executing actions
-        async.series(actionExecutionFunctions, (error, actionsResults) => {
-            if (!shouldContinueExecution(runId, agent.key)) {
-                return callback();
-            }
-            let status;
-
-            if (error) {
-                winston.log('error', 'Fatal error: ', error);
-                executionLogService.error(runId, map._id, `'${process.name}': A mandatory action failed`, socket);
-                status = 'error';
-                executions[runId].executionAgents['continue'] = (error && process.mandatory);
-                updateExecutionContext(runId, agent.key);
-
-            } else {
-                let actionStatuses = [];
-                if (executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions) {
-                    actionStatuses = Object.keys(executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions)
-                        .map((actionKey) => {
-                            return executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions[actionKey].status;
-                        });
-                }
-                if (actionStatuses.indexOf('error') > -1 && actionStatuses.indexOf('success') === -1) { // if only errors - process status is error
-                    status = 'error';
-                } else if (actionStatuses.indexOf('error') > -1 && actionStatuses.indexOf('success') > -1) { // if error and success - process status is partial
-                    status = 'partial';
-                } else { // if only success - process status is success
-                    status = 'success';
-                }
-            }
-
-            if (process.postRun) {
-                executionLogService.error(runId, map._id, `'${process.name}': Running post process function`, socket);
-
-                // post run hook for link (enables user to change context)
-                let res;
-                try {
-                    res = vm.runInNewContext(process.postRun, executions[runId].executionAgents[agent.key].executionContext);
-                    updateProcessContext(runId, agent.key, processUUID, processIndex, { postRun: res });
-                    updateExecutionContext(runId, agent.key);
-
-                } catch (e) {
-                    winston.log('error', 'Error running post process function');
-                    executionLogService.error(runId, map._id, `'${process.name}': Error running post process function`, socket);
-                }
-            }
-
-            updateProcessContext(runId, agent.key, processUUID, processIndex, {
-                status: status,
-                result: actionsResults,
-                finishTime: new Date()
-            });
-            updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-            updateExecutionContext(runId, agent.key);
-
-            if (!(error && process.mandatory)) { // if the process was mandatory agent should not call other process.
-                executions[runId].executionAgents[agent.key].status = 'available';
-                setTimeout(() => {
-                    runNodeSuccessors(map, structure, runId, agent, processUUID, socket);
-                }, 0);
-            }
-            callback();
-        });
-    }
+        let actionTask = Object.keys(actionExecutionFunctions).map((key) => {
+            return actionExecutionFunctions[key]
+        })
+        actionTask.reduce((previousPromise,next) => {
+            return executeAction.apply(null,next)
+        },Promise.resolve())
+        .then((actionsResults) => {
+            actionsExecutionCallback(null,actionsResults,map,structure,runId,agent,socket, processUUID,processIndex, resolve)
+        })
+        .catch((error) => {
+            actionsExecutionCallback(error,null,map,structure,runId,agent,socket, processUUID,processIndex, resolve)
+        })
+    })
 }
 
+
+function actionsExecutionCallback(error, actionsResults, map, structure, runId, agent, socket, processUUID,processIndex, resolve){
+    if (!shouldContinueExecution(runId, agent.key)) {
+        return resolve();
+    }
+    if (error) {
+        winston.log('error', 'Fatal error: ', error);
+        executionLogService.error(runId, map._id, `'${process.name}': A mandatory action failed`, socket);
+        status = 'error';
+        executions[runId].executionAgents['continue'] = (error && process.mandatory);
+        updateExecutionContext(runId, agent.key);
+
+    } else {
+        let actionStatuses = [];
+        if (executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions) {
+            actionStatuses = Object.keys(executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions)
+                .map((actionKey) => {
+                    return executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions[actionKey].status;
+                });
+        }
+        if (actionStatuses.indexOf('error') > -1 && actionStatuses.indexOf('success') === -1) { // if only errors - process status is error
+            status = 'error';
+        } else if (actionStatuses.indexOf('error') > -1 && actionStatuses.indexOf('success') > -1) { // if error and success - process status is partial
+            status = 'partial';
+        } else { // if only success - process status is success
+            status = 'success';
+        }
+    }
+
+    if (process.postRun) {
+        executionLogService.error(runId, map._id, `'${process.name}': Running post process function`, socket);
+
+        // post run hook for link (enables user to change context)
+        let res;
+        try {
+            res = vm.runInNewContext(process.postRun, executions[runId].executionAgents[agent.key].executionContext);
+            updateProcessContext(runId, agent.key, processUUID, processIndex, { postRun: res });
+            updateExecutionContext(runId, agent.key);
+
+        } catch (e) {
+            winston.log('error', 'Error running post process function');
+            executionLogService.error(runId, map._id, `'${process.name}': Error running post process function`, socket);
+        }
+    }
+
+    updateProcessContext(runId, agent.key, processUUID, processIndex, {
+        status: status,
+        result: actionsResults,
+        finishTime: new Date()
+    });
+    updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
+    updateExecutionContext(runId, agent.key);
+
+    if (!(error && process.mandatory)) { // if the process was mandatory agent should not call other process.
+        executions[runId].executionAgents[agent.key].status = 'available';
+        setTimeout(() => {
+            runNodeSuccessors(map, structure, runId, agent, processUUID, socket);
+        }, 0);
+    }
+    resolve();
+}
 /**
  * Send action to agent via socket
  * @param socket
@@ -1017,7 +1020,7 @@ function sendActionViaRequest(agent, action, actionForm) {
 }
 
 function executeAction(map, structure, runId, agent, process, processIndex, action, plugin, socket) {
-    return (callback) => {
+    return new Promise((resolve,reject) => {
         let key = action._id;
 
         plugin = JSON.parse(JSON.stringify(plugin));
@@ -1033,8 +1036,8 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             }));
             updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
             executionLogService.success(runId, map._id, `'${action.name}': ${result}`, socket);
-            callback(null, { result });
-            return;
+            return resolve({result})
+            
         }
 
         let method = plugin.methods.find(o => o.name === action.method);
@@ -1047,8 +1050,8 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             }));
             updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
             executionLogService.success(runId, map._id, `'${action.name}': ${result}`, socket);
-            callback(null, { result });
-            return;
+            return resolve({result})
+           
         }
         action.method = method;
         let params = action.params ? [...action.params] : [];
@@ -1062,7 +1065,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
         executionLogService.info(runId, map._id, `'${action.name}': executing action (${agent.name})`, socket);
         if (!shouldContinueExecution(runId, agent.key)) {
             console.log('Should not continue');
-            return callback();
+            return resolve();
         }
 
         action.uniqueRunId = `${runId}|${processIndex}|${key}`;
@@ -1088,7 +1091,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             } catch (e) {
                 return _handleActionError({
                     stdout: actionString + '\n' + e.message
-                }, undefined, callback)
+                }, undefined,resolve, reject)
             }
 
             actionString += `${param.name}: ${action.params[param.name]}${i != params.length - 1 ? ', ' : ''}`;
@@ -1108,7 +1111,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
         let timeoutPromise;
         runAction();
 
-        function _handleActionError(result, message, cb) {
+        function _handleActionError(result, message, resolve,reject) {
             let res = result || { stdout: actionString, result: 'Error running action on agent' };
             updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
                 status: 'error',
@@ -1119,9 +1122,9 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
             executionLogService.error(runId, map._id, `'${action.name}': Error running action on (${agent.name}): ${message || JSON.stringify(res)}`, socket);
 
             if (action.mandatory) {
-                cb(res);
+                reject(res);
             } else {
-                cb(null, res); // Action failed but it doesn't mater
+                resolve(res); // Action failed but it doesn't mater
             }
         }
 
@@ -1184,15 +1187,15 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
                         );
 
                         executionLogService.create(actionExecutionLogs, socket);
-                        callback(null, result);
+                        resolve(result)
                     } else {
-                        _handleActionError(result, undefined, callback);
+                        _handleActionError(result, undefined, resolve, reject);
                     }
                 } else {
                     let result = { result: 'Timeout Error', status: 'error', stdout: actionString };
                     if (action.retries > 1) { return ['retry', result]; }
 
-                    _handleActionError(result, 'timeout error', callback);
+                    _handleActionError(result, 'timeout error', resolve, reject);
                 }
             })
                 .then((res) => {
@@ -1208,7 +1211,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
         }
 
 
-    }
+    })
 }
 
 /**

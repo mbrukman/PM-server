@@ -2,7 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const unzip = require("unzipper");
 const child_process = require("child_process");
-const async = require("async");
 const winston = require("winston");
 const del = require("del");
 const env = require("../../env/enviroment");
@@ -211,19 +210,17 @@ module.exports = {
   loadPlugins: () => {
     console.log("Loading plugins");
     fs.readdir(path.join(env.static_cdn, env.upload_path), (err, files) => {
-      async.each(
-        files,
-        function (plugin, callback) {
+      Promise.all(files.map((plugin) => {
+        return new Promise((resolve, reject) => {
           let filePath = path.join(env.static_cdn, env.upload_path, plugin);
           deployPluginFile(filePath)
             .then(() => { })
             .catch(error => {
               winston.log("error", "Error installing plugin: ", error);
             });
-          callback();
-        },
-        function (err) { }
-      );
+          resolve();
+        })
+      }))
     });
   },
 
@@ -262,62 +259,31 @@ module.exports = {
    * @param pluginId
    * @param methodName
    */
-  generatePluginParams: (pluginId, key, type) => {
-    return module.exports.getPlugin(pluginId).then(
-      plugin =>
-        new Promise((resolve, reject) => {
-          plugin = JSON.parse(JSON.stringify(plugin));
-          
-          let paramsToGenerate;
-          if (type=="method"){
-            let method = plugin.methods.find(o => o.name === key);
-            paramsToGenerate = method.params.filter(
-              o => o.type === "autocomplete"
-            );
-          } else if (type=="settings"){
-            paramsToGenerate = plugin.settings.filter(
-              o => o.valueType === "autocomplete"
-            );
-          }
+  generatePluginParams: (pluginId, methodName) => {
+    return module.exports.getPlugin(pluginId).then(plugin => {
 
-          async.each(
-            paramsToGenerate,
-            (param, callback) => {
-              models[param.model]
-                .find(param.query || {})
-                .select(param.propertyName)
-                .then(options => {
-                  param.options = options.map(o => ({
-                    id: o._id,
-                    value: o[param.propertyName]
-                  }));
-                  return callback();
-                });
-            },
-            error => {
-              resolve(paramsToGenerate);
-            }
-          );
-        })
-    );
-  },
-
-  updateSettings:(id,settings)=>{
-    return new Promise((resolve,reject) => {
-      return Plugin.findOne({_id:id})
-      .then((plugin) => {
-        for(let i=0, length=plugin.settings.length; i<length; i++){
-          plugin.settings[i].value = settings[Object.keys(settings)[i]]
-        }
-        plugin.save()
-        .then((res) => {
-          resolve(res)
-        })
-        .catch((e) => {
-          reject(e)
-        })
+      plugin = JSON.parse(JSON.stringify(plugin));
+      let method = plugin.methods.find(o => o.name === methodName);
+      let paramsToGenerate = method.params.filter(
+        o => o.type === "autocomplete"
+      );
+      let promises = paramsToGenerate.map(param => _generateAutocompleteParams(param))
+      return Promise.all(promises).finally(() => {
+        return paramsToGenerate;
       })
-    })
+    });
   }
 
 };
+
+function _generateAutocompleteParams(param) {
+  return models[param.model]
+    .find(param.query || {})
+    .select(param.propertyName)
+    .then(options => {
+      param.options = options.map(o => ({
+        id: o._id,
+        value: o[param.propertyName]
+      }));
+    });
+}

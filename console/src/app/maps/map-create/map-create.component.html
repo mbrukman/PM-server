@@ -1,8 +1,10 @@
+<div class="header">
+  <h1 [hidden]="map">Create a new map</h1>
+  <h1 [hidden]="!map">Update map '{{ map?.name }}'</h1>
+</div>
 <div class="main pm-main-wrapper">
   <div class="row">
     <div class="col-sm-12">
-      <h1 *ngIf="!map">Create a new map</h1>
-      <h1 *ngIf="map">Update map '{{ map.name }}'</h1>
       <form [formGroup]="mapForm" (ngSubmit)="onSubmitForm(mapForm.value)" class="map-form">
         <div class="form-group">
           <label for="project">Project</label>
