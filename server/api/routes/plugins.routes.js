@@ -12,9 +12,12 @@ const upload = multer(multerParams);
 
 const router = express.Router();
 router.get("/", pluginsController.pluginsList);
+router.get("/:id", pluginsController.getPlugin);
 router.delete("/:id/delete", pluginsController.pluginDelete);
 router.post("/upload", upload.single('file'), pluginsController.pluginUpload);
-router.get("/:id/generate/:name", pluginsController.generatePluginParams);
+router.post("/:id/settings", pluginsController.updateSettings);
+router.get("/:id/generateMethod/:name", pluginsController.generatePluginMethodParams);
+router.get("/:id/generateSettings", pluginsController.generatePluginSettingsParams);
 
 module.exports = router;
 

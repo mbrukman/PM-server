@@ -5,7 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AgentsComponent } from '@agents/agents/agents.component';
 import { PluginsListComponent } from '@plugins/plugins-list/plugins-list.component';
 import { AdminComponent } from './admin.component';
-
+import {PluginSettingsComponent} from '@plugins/plugin-settings/plugin-settings.component'
 const routes: Routes = [
   {
     path: '',
@@ -19,6 +19,10 @@ const routes: Routes = [
       {
         path: 'plugins',
         component: PluginsListComponent
+      },
+      {
+        path:'plugins/:id/settings',
+        component:PluginSettingsComponent
       },
       {
         path: 'agents',
