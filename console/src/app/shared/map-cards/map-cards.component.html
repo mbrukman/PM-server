@@ -1,0 +1,18 @@
+<div class="row grid-view">
+  <div class="card dashboard-card" *ngFor="let item of items"  [routerLink]="['/maps',item.id, 'results']" >
+  <div class="card-body">
+      <div class="content-card">
+        <h5 class="card-title">{{ item.name }}</h5>
+        <p class="trigger-by" *ngIf="item.exec">Trigger:  {{ item.exec.trigger }} </p>
+        <p *ngIf="item.exec">Last run: {{ item.exec.startTime | date: 'short' }}</p>
+        <p *ngIf="!item.exec">Last run: Not executed yet</p>
+        <!-- <p>Status:   {{ item.status}}</p> -->
+        <div class="project">Project: &nbsp;<a class="link"  (click)="goToProject($event, item.project.id)" > {{ item.project.name}}</a> </div>
+      </div>
+      <div class="chart-wrapper" *ngIf="item.status">
+        <ngx-charts-pie-chart [results]="item.status" [labels]="showLabels" [scheme]="colorScheme" [doughnut]="true" [view]="[130,130]">
+        </ngx-charts-pie-chart>
+    </div>
+  </div>
+</div>
+</div>

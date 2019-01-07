@@ -28,59 +28,6 @@
         display: flex;
         margin: 0;
         width: 100%;
-        .grid-view {
-            width: 100%;
-            .dashboard-card {
-
-                &:hover {
-                    background: #505358;
-                }
-
-                margin-right: 25px;
-                margin-bottom: 30px;
-                width: calc(25% - 20px);
-                max-width: 452px;
-                overflow-y: auto;
-                height: fit-content;
-                cursor: pointer;
-                &:nth-child(4n) {
-                    margin-right: 0px;
-                }
-                .card-body {
-                    display: flex;
-                    font-family: Roboto;
-                    margin: 12px 0px 10px 10px;
-                    .content-card {
-                        
-                        color: #dddddd;
-                        width: calc(100% - 130px);
-                        .card-title {
-                            font-size: 18px;
-                            line-height: 0.89;
-                            color: #44acdf;
-                            padding-bottom: 16px;
-                        }
-                        > p {
-                          white-space: nowrap;
-                          overflow: hidden;
-                          text-overflow: ellipsis;
-                        }
-                        .project {
-                            display: flex;
-                            .link {
-                                color: #44acdf;
-                            }
-                        }
-                    }
-                    .chart-wrapper {
-                        display: flex;
-                        justify-content: center;
-                        align-items: flex-start;
-                        margin-top: -20px;
-                    }
-                }
-            }
-        }
         .list-view {
             margin: 0;
             @include table();

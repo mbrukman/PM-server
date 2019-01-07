@@ -1,23 +1,23 @@
-<div class="main pm-main-wrapper">
-  <div class="row">
-    <div class="">
-      <h1 class="section-title">Projects</h1>
-      <h5 class="section-sub-title">Recently added</h5>
-    </div>
-    <div class="featured-projects">
-      <app-feature [items]="featuredProjects"></app-feature>
-    </div>
+<div class="main">
+    <div class="head-title">
+        <h1 >Projects</h1>
+      </div>
 
-  </div>
+  <div class="list-content">
+      <p class="executed-title">Recently added</p>
+      <div class="featured-projects">
+          <app-feature [items]="featuredProjects"></app-feature>
+        </div>
 
-  <div class="filter d-flex justify-content-between align-items-end">
-    <h5 class="section-sub-title">All projects</h5>
+<div class="row">
+    <a routerLink="/projects/create" class="btn">Add project</a>
     <div class="filters">
       <div class="filter-archive">
-        <label class="form-check-label">
-          <input id="archive" type="checkbox" class="form-check-input" (change)="reloadProjects()" [(ngModel)]="filterOptions.isArchived">
+        <label class="control control-checkbox">
           Show archived projects
-        </label>
+              <input type="checkbox" id="archive"  [(ngModel)]="filterOptions.isArchived" (change)="reloadMaps()">
+          <div class="control_indicator"></div>
+      </label>
       </div>
       <div class="filter-text">
         <div>
@@ -58,6 +58,6 @@
     </p-column>
   </p-dataTable>
 
-  <a routerLink="/projects/create" class="btn pm create">Add project</a>
+</div>  
 
 </div>

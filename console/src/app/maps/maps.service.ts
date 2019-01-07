@@ -17,6 +17,9 @@ export class MapsService {
   constructor(private http: HttpClient) {
   }
 
+  recentMaps(){
+    return this.http.get<[Map]>(`${serverUrl}api/maps/recent`);
+  }
   allMaps(): Observable<[Map]> {
     return this.http.get<[Map]>(`${serverUrl}api/maps`);
   }
