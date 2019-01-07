@@ -145,11 +145,11 @@ function deployPluginFile(pluginPath, req) {
             Plugin.findOne({ name: obj.name })
               .then(plugin => {
                 if (obj.settings)
-                obj.settings = obj.settings.map(s=>{
-                  s.valueType = s.type;
-                  delete s.type;
-                  return s;
-                })
+                  obj.settings = obj.settings.map(s => {
+                    s.valueType = s.type;
+                    delete s.type;
+                    return s;
+                  })
                 if (!plugin) {
                   return Plugin.create(obj);
                 }
@@ -182,8 +182,8 @@ function deployPluginFile(pluginPath, req) {
                 resolve(plugin);
               }).catch(error => {
                 winston.log("error", "Error creating plugin", error);
-                console.log("error deployPluginFile  : ",error);
-                
+                console.log("error deployPluginFile  : ", error);
+
 
                 return reject(error);
               }).finally(() => {
@@ -235,10 +235,10 @@ module.exports = {
     })
   },
   deletePluginByPath(path) {
-    return Plugin.findOne({ file: path }).then((plugin)=>{
-      if(plugin)
+    return Plugin.findOne({ file: path }).then((plugin) => {
+      if (plugin)
         return pluginDelete(plugin.id)
-      
+
     });
   },
   getPlugin: id => {
@@ -255,21 +255,12 @@ module.exports = {
     );
   },
 
-  updateSettings:(id,settings)=>{
-    return new Promise((resolve,reject) => {
-      return Plugin.findOne({_id:id})
-      .then((plugin) => {
-        for(let i=0, length=plugin.settings.length; i<length; i++){
-          plugin.settings[i].value = settings[Object.keys(settings)[i]]
-        }
-        plugin.save()
-        .then((res) => {
-          resolve(res)
-        })
-        .catch((e) => {
-          reject(e)
-        })
-      })
+  updateSettings: (id, settings) => {
+    return Plugin.findOne({ _id: id }).then((plugin) => {
+      for (let i = 0, length = plugin.settings.length; i < length; i++) {
+        plugin.settings[i].value = settings[Object.keys(settings)[i]]
+      }
+      return plugin.save();
     })
   },
   /**
