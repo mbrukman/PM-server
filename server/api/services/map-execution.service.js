@@ -1520,6 +1520,35 @@ module.exports = {
             },
             { $sort: { "exec.startTime": -1 } },
             { $limit: 16 },
+            {
+                $lookup:
+                {
+                    from: "projects",
+                    let: { mapId: "$exec.map" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ["$$mapId", "$maps"]
+                                }
+                            }
+                        },
+                        {
+                            $project:
+                            {
+                                name: 1
+                            }
+                        }
+                    ],
+                    as: "project"
+                },
+            },
+            {
+                $unwind: {
+                    "path": "$project",
+                    "preserveNullAndEmptyArrays": true
+                }
+            },
         ])
     },
 
