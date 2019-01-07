@@ -1,24 +1,11 @@
 @import "~assets/sass/mixins";
 .main {
-    .featured {
-        width: 100%;
-    }
-    .filter {
-        margin-top: 25px;
-        h5 {
-            padding-bottom: 15px;
+    font-family: Roboto;
+    @include page-list-items();
+        .garbage{
+            background: #2d3236
         }
-        .filters {
-            display: flex;
-            align-items: center;
-            .filter-text {
-                @include searchBox();
-            }
-            .filter-archive {
-                margin-right: 10px;
-            }
-        }
-    }
+
     @include table();
     .name-wrapper{
       display: flex;

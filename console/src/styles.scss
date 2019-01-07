@@ -424,6 +424,21 @@ span[contenteditable=true]{
     outline: none !important;
   }
 }
+.head-title{
+  width: 100%;
+  height: 70px;
+  background-color: #25292c;
+  display: flex;
+  align-items: center;
+  h1{
+      margin: 0px 0px 0px 22px;
+      font-size: 22px;
+      line-height: normal;
+      color: #f79f2b;
+      padding-right: 10px
+  }    
+}
+
 
 .pm-main-wrapper{
   padding : 20px 30px;
