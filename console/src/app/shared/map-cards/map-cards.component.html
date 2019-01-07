@@ -1,5 +1,5 @@
 <div class="row grid-view">
-  <div class="card dashboard-card" *ngFor="let item of items"  [routerLink]="['/maps',item.id, 'results']" >
+  <div class="card dashboard-card" *ngFor="let item of items"  [routerLink]="['/maps',(item._id || item.id), 'results']" >
   <div class="card-body">
       <div class="content-card">
         <h5 class="card-title">{{ item.name }}</h5>
