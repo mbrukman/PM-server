@@ -1,7 +1,7 @@
 
-export class VaultItem{
+export class VaultItem {
     id?: string;
-    key: string;
-    description?: string;
-    value?: string;
+    key: string = "";
+    description?: string = "";
+    value?: string = "";
 }

@@ -26,12 +26,12 @@ export class VaultSelectorComponent implements OnInit, ControlValueAccessor {
   constructor(private vaultService: VaultService) { }
 
   ngOnInit() {
-    this.vaultService.getResults(this.options).subscribe(vaultItems => {
+    this.vaultService.getVaultItems(this.options).subscribe(vaultItems => {
       this.mapResult(vaultItems)
     })
   }
 
-  onChange(){
+  onSelect(){
     this.c.controls.value = new FormControl(this.text)
     this.propagateChange(this.text);
   }
@@ -44,9 +44,9 @@ export class VaultSelectorComponent implements OnInit, ControlValueAccessor {
   }
 
   search(event) {
-    this.onChange()
+    // this.onChange()
     this.options.query = event.query;
-    this.vaultService.getResults(this.options).subscribe(vaultItems => {
+    this.vaultService.getVaultItems(this.options).subscribe(vaultItems => {
       this.mapResult(vaultItems)
     });
   }

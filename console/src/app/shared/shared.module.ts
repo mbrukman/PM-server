@@ -79,7 +79,7 @@ import {AutoCompleteModule} from 'primeng/primeng';
     InPipe,
     VaultSelectorComponent
   ],
-  entryComponents: [ConfirmComponent, RawOutputComponent, VaultSelectorComponent]
+  entryComponents: [ConfirmComponent, RawOutputComponent]
 })
 export class SharedModule {
 }

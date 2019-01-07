@@ -1,3 +1,6 @@
-.ui-autocomplete {
-display: flex !important;
+::ng-deep .ui-autocomplete {
+    display: flex !important;
+    .ui-clickable{
+        padding-bottom: 7px;
+    }
 }

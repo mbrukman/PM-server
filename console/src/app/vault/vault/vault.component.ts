@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap';
-import { VaultFormComponent } from '../vault-form/vault-form.component';
+import { UpsertVaultItemsComponent } from '../upsert-vault-items/upsert-vault-items.component';
 import { VaultService } from '../../shared/vault.service';
 import { VaultItem } from '../vault.model';
 
@@ -23,7 +23,7 @@ export class VaultComponent implements OnInit {
 
 
   requestVaults() {
-    this.vaultsReq = this.vaultService.getResults({}).subscribe(vault => {
+    this.vaultsReq = this.vaultService.getVaultItems({}).subscribe(vault => {
       this.vaultItems = vault;
     });
   }
@@ -40,7 +40,7 @@ export class VaultComponent implements OnInit {
 
   onOpenModal(item: VaultItem = null) {
     let modal: BsModalRef;
-    modal = this.modalService.show(VaultFormComponent);
+    modal = this.modalService.show(UpsertVaultItemsComponent);
     if (item) {
       modal.content.vault = Object.assign({},item);
     }

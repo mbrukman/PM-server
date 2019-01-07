@@ -8,17 +8,14 @@ import { VaultService } from '../../shared/vault.service';
 import { Subscribable } from 'rxjs/Observable';
 
 @Component({
-  selector: 'app-vault-form',
-  templateUrl: './vault-form.component.html',
-  styleUrls: ['./vault-form.component.scss']
+  selector: 'app-upsert-vault-items',
+  templateUrl: './upsert-vault-items.component.html',
+  styleUrls: ['./upsert-vault-items.component.scss']
 })
-export class VaultFormComponent implements OnInit {
+export class UpsertVaultItemsComponent implements OnInit {
 
-  vault: VaultItem = {
-    key: "",
-    description: "",
-    value: ""
-  }
+  vault : VaultItem =  new VaultItem();
+ 
   result: Subject<boolean> = new Subject();
   isRequierd :boolean = false;
 
@@ -28,14 +25,7 @@ export class VaultFormComponent implements OnInit {
   }
 
   onConfirm() {
-    let vaultResult: Subscribable<boolean>; 
-    if (this.vault.id) {
-      vaultResult = this.vaultService.update(this.vault.id, this.vault)
-    }
-    else {
-      vaultResult = this.vaultService.add(this.vault)
-    }
-    vaultResult.subscribe(() => {
+    this.vaultService.upsert(this.vault).subscribe(() => {
       this.result.next(true);
     },
       (err) => {

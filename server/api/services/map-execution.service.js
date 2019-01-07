@@ -36,20 +36,18 @@ fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 
     libpmObjects.currentAgent = currentAgent
 });
 
-function evaluateParam(param, context, typeParam) {
+async function evaluateParam(param, typeParam,context ) {
     if (!param.code) {
         if(typeParam == 'vault'){
           vaultService.getValueByKey(param.value).then(val=>{
-                return val
+                return val;
             }).catch(error=>{
                 console.log(error);
             })
-           
-            
         }
-        return param.value;
+        return new Promise.resolve(param.value);
     }
-    return vm.runInNewContext(param.value, context);
+    return new Promise.resolve(vm.runInNewContext(param.value, context));
 
 }
 
@@ -1027,7 +1025,7 @@ function sendActionViaRequest(agent, action, actionForm) {
 }
 
 function executeAction(map, structure, runId, agent, process, processIndex, action, plugin, socket) {
-    return (callback) => {
+    return  async (callback) => {
         let key = action._id;
 
         plugin = JSON.parse(JSON.stringify(plugin));
@@ -1093,7 +1091,7 @@ function executeAction(map, structure, runId, agent, process, processIndex, acti
 
             // handle wrong code
             try {
-                action.params[param.name] = evaluateParam(params[i], executions[runId].executionAgents[agent.key].executionContext, action.method.params[i].type);
+                action.params[param.name] = await evaluateParam(params[i], action.method.params[i].type, executions[runId].executionAgents[agent.key].executionContext);
             } catch (e) {
                 return _handleActionError({
                     stdout: actionString + '\n' + e.message
