@@ -10,15 +10,15 @@
         <div class="modal-body">
             <div class="form-group">
                 <label>Fields</label>
-                <select class="form-control" [(ngModel)]="field">
-                    <option *ngFor="let itemFields of fields" [value]="itemFields">{{itemFields}}</option>
+                <select class="form-control" [(ngModel)]="filter.field">
+                    <option *ngFor="let field of fields" [value]="field.id">{{field.label}}</option>
                 </select>
                 <label>Type</label>
-                <select class="form-control" [(ngModel)]="type">
-                    <option *ngFor="let itemTypes of filterTypes" [value]="itemTypes">{{itemTypes}}</option>
+                <select class="form-control" [(ngModel)]="filter.type">
+                    <option *ngFor="let filterType of filterTypes" [value]="filterType.id">{{filterType.label}}</option>
                 </select>
                 <label>Value</label>
-                <input class="form-control" [(ngModel)]="value" />
+                <input class="form-control" [(ngModel)]="filter.value" />
             </div>
         </div>
         <div class="modal-footer">

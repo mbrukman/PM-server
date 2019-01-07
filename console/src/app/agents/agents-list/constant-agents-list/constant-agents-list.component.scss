@@ -1,4 +1,9 @@
 table{
+    tbody{
+        tr{
+            cursor:grab;
+        }
+    }
     td {
         padding: 0;
         vertical-align: middle;
@@ -22,5 +27,12 @@ table{
         height: 16px;
         font-size: 14px;
         color: #dddddd;
+        .name{
+            margin-left: 15px;
+            .material-icons{
+                font-size: 13px;
+                margin-right: 13px;
+            }
+        }
     }
 }

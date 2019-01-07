@@ -17,13 +17,13 @@
       </tr>
     </thead>
     <tbody>
-      <tr  *ngFor="let item of groups; let i = index" pDroppable="dd" (drop)="drop(i, item.id)"  (dragover)="allowDrop(i)" (dragleave) = "onDragLeave()" [ngClass]="{'drag-over':selectedDropGroupIndex == i}">
+      <tr  *ngFor="let item of groups; let i = index" pDroppable="dd" (drop)="drop(i, item.id)" (mouseenter)="mouseEnter(i)" (mouseleave)="mouseLeave()" (dragover)="allowDrop(i)" (dragleave) = "onDragLeave()" [ngClass]="{'drag-over':selectedDropGroupIndex == i}">
         <td>
           <div class="name" (click) ="selectGroup(item)">{{item.name}}</div>
         </td>
         <td class="manage">
-          <button class="btn btn-link" (click)="editGroup(i)" tooltip="Edit" placement="bottom"><i class="material-icons">edit</i></button>
-          <button class="btn btn-link" (click)="deleteGroup(i,item._id)" tooltip="Delete" placement="bottom"><i class="material-icons">delete</i></button>
+          <button *ngIf="selectedGroup == item || onHover == i"  class="btn btn-link" (click)="editGroup(i)" tooltip="Edit" placement="bottom"><i class="material-icons">edit</i></button>
+          <button *ngIf="selectedGroup == item || onHover == i"  class="btn btn-link" (click)="deleteGroup(i,item._id)" tooltip="Delete" placement="bottom"><i class="material-icons">delete</i></button>
         </td>
       </tr>
     </tbody>

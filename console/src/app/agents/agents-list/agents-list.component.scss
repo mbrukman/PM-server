@@ -14,7 +14,7 @@
 
   .row{
     .groups{
-      padding-left: 0;
+      padding-left: 4px;
       padding-right: 25px;
       width: 30%;
       height: 810px;
@@ -29,18 +29,19 @@
       border-left: 1px solid #4c5156;
       height: 810px;
       .top{
-        height: 75px;
+        height: 90px;
         h5{
           height: 21px;
           font-size: 18px;
           color: #f79f2b;
-          margin-bottom: 20px
+          margin-bottom: 24px
         }
         div{
           height: 36px;
           a{
             font-size: 17px;
             color:$turquoise-blue;
+            cursor:pointer;
             .agentsLength{
               color: #f79f2b
             }

@@ -9,6 +9,7 @@ import { BsModalService } from 'ngx-bootstrap';
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
 import { Agent } from '@agents/models/agent.model';
 import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-group-upsertcomponent'
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-groups',
@@ -25,6 +26,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
   selectedGroup: Group;
   updateReq: any;
   selectedDropGroupIndex : string;
+  onHover : string;
 
   constructor(private agentsService: AgentsService, private modalService: BsModalService) {
   }
@@ -54,9 +56,21 @@ export class GroupsComponent implements OnInit, OnDestroy {
       .getDragAsObservable()
       .subscribe(item => this.draggedItem = item);
 
+    this.agentsService.getSelectedGroupAsObservable().subscribe(group => {
+      this.selectedGroup = group
+    })  
+    
     this.updatedGroupSubscription = this.agentsService.getUpdateGroupAsObservable().subscribe(group => {
       this.groups[this.groups.findIndex(o => o._id === group._id)] = group;
     });
+  }
+
+  mouseEnter(index){
+    this.onHover = index;
+  }
+
+  mouseLeave(){
+    this.onHover = null;
   }
 
   allAgents(){

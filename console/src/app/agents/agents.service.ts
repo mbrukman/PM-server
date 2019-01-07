@@ -4,7 +4,7 @@ import { environment } from '@env/environment';
 
 import { Observable } from 'rxjs/Observable';
 
-import { FilterParam, Group } from '@agents/models/group.model';
+import { AgentsGroupFilter, Group } from '@agents/models/group.model';
 import { Agent } from './models/agent.model';
 import { Subject } from 'rxjs/Subject';
 
@@ -90,10 +90,10 @@ export class AgentsService {
   /**
    * Set group filters as this list.
    * @param {string} groupId
-   * @param {[FilterParam]} filters
+   * @param {AgentsGroupFilter[]} filters
    * @returns {Observable<Object>}
    */
-  addGroupFilters(groupId: string, filters: [FilterParam]) {
+  addGroupFilters(groupId: string, filters: AgentsGroupFilter[]) {
     return this.http.post<Group>(`${serverUrl}api/agents/groups/${groupId}/add-filters`, filters);
   }
 

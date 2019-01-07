@@ -90,7 +90,6 @@ export class AgentsListComponent implements OnInit, OnDestroy {
           this.agentsService.updateGroup(group)
         })
       });
-    
   }
 
 

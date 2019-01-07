@@ -14,7 +14,6 @@ import { SharedModule } from '@shared/shared.module';
 import { AdminRoutingModule } from './admin-routing.module';
 import { AdminComponent } from './admin.component';
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
-import { EvaluateGroupAgentComponent } from '@agents/groups/evaluate-group-agent/evaluate-group-agent.component';
 import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
 import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-group-upsertcomponent';
 import {ConstantAgentsListComponent} from '@agents/agents-list/constant-agents-list/constant-agents-list.component';
@@ -38,7 +37,6 @@ import {AgentsGroupFiltersListComponent} from '@agents/groups/agents-group-filte
     AgentsComponent,
     GroupsComponent,
     InputPopupComponent,
-    EvaluateGroupAgentComponent,
     EditAgentComponent,
     AgentsGroupUpsertComponent,
     ConstantAgentsListComponent,

@@ -1,8 +1,72 @@
+@import "~assets/sass/variables";
+
+.isValid{
+    color:$turquoise-blue
+}
+
 .row{
     width: 510px;
-    height: 430px;
+    min-height: 430px;
     border-radius: 4px;
     background-color: #2d3236;
+    .buttonInside{
+        position:relative;
+        input{
+            height:35px;
+            width:100%;
+            padding-left:10px;
+            border-radius: 3px;
+            border:none;outline:none;
+        }
+        a{
+            position:absolute;
+            right: 15px;
+            top: 4px;
+            border:none;
+            height:20px;
+            width:20px;
+            border-radius:100%;
+            outline:none;
+            text-align:center;
+            font-weight:bold;
+            padding:2px;
+        }
+    }
+    .attributes{
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 10px;
+        min-height: 41px;
+        .tag{
+            background-color: #3f4247;
+            height: 28px;
+            border-radius: 3px;
+            margin-right: 13px;
+            margin-bottom: 13px;
+            position:relative;
+            span{
+                height: 17.2px;
+                font-size: 14px;
+                padding-left: 10px;
+                padding-right: 41px;
+                color: $turquoise-blue
+            }
+            a{
+                position: absolute;
+                right: 15px;
+                top: 0px;
+                border: none;
+                height: 20px;
+                width: 20px;
+                border-radius: 100%;
+                outline: none;
+                text-align: center;
+                font-weight: bold;
+                padding: 2px;
+            }
+        }
+    }
     .modal-header{
         width: 510px;
         margin-left: -16px;

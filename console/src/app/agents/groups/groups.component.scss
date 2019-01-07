@@ -1,11 +1,12 @@
 @import "~assets/sass/variables";
 
 .top{
-  height: 75px;
+  height: 90px;
   h5{
     height: 21px;
     font-size: 18px;
     color: #f79f2b;
+    margin-bottom: 18px;
   }
   .button-group{
     width: 108.9px;
@@ -33,15 +34,16 @@
 .table{
   
   .manage{
-    width: 20%;
+    width: 76px;
   }
   .name{
-    margin-left: 20px;
+    margin-left: 15px;
     height: 16px;
     font-size: 14px;
     color:$turquoise-blue;
   }
   th {
+    cursor: pointer;
     color:$turquoise-blue;
     height: 21px;
     font-size: 18px;
@@ -53,6 +55,7 @@
   }
   
   td {
+    cursor: pointer;
     padding: 0;
     vertical-align: middle;
     .btn{

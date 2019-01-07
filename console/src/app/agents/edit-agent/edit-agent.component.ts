@@ -13,13 +13,33 @@ import { Agent } from '@agents/models';
 export class EditAgentComponent implements OnInit {
   agent: Agent;
   name: string;
-  attributes: any[];
+  tag: string;
+  attributes:string[];
   result: Subject<{ name: string, attributes: string[] }> = new Subject();
+  isValid:boolean = false
 
   constructor(public bsModalRef: BsModalRef) { }
 
-  ngOnInit(): void {
+  ngOnInit() {
+    if(!this.attributes){
+      this.attributes = []
+    }
+  }
 
+  saveTag(tag:string){
+    this.attributes.push(tag)
+  }
+
+  keyUp(event,tag){
+    event.preventDefault();
+    this.isValid = event.target.value ? true : false;
+    if (event.keyCode === 13) {
+      this.saveTag(tag)
+    }
+  }
+
+  deleteTag(tagIndex){
+    this.attributes.splice(tagIndex,1)
   }
 
   onConfirm() {
@@ -27,7 +47,6 @@ export class EditAgentComponent implements OnInit {
       if (typeof (o) === 'string') {
         return o;
       }
-      return o.value;
     });
     this.result.next({ name: this.name, attributes });
     this.bsModalRef.hide();
