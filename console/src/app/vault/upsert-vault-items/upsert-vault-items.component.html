@@ -1,7 +1,8 @@
 <div class="row pm-modal">
   <div class="col-12">
     <div class="modal-header">
-      <h4>Edit agent</h4>
+      <h4 *ngIf="vault.id">Edit vault item</h4>
+      <h4 *ngIf="!vault.id">Add vault item</h4>
       <button type="button" class="close" (click)="onClose()" data-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>

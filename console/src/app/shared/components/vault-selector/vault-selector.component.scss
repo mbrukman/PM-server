@@ -1,6 +1,15 @@
 ::ng-deep .ui-autocomplete {
     display: flex !important;
+
+    input{
+        font-size: 1rem;
+        width: 90%;
+    }
     .ui-clickable{
-        padding-bottom: 7px;
+        padding-bottom: 14px;
+    }
+    .ui-autocomplete-items{
+        background-color: dimgrey;
+        // border-radius: 5px;
     }
 }
