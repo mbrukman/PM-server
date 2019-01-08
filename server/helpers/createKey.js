@@ -15,6 +15,6 @@ module.exports = {
         const keyValue = randomValueHex(32);
         mkdirp.sync(path.dirname(outputPath));
         fs.writeFileSync(outputPath, keyValue);
-        return true;
+        return keyValue;
     }
 };

@@ -19,6 +19,7 @@ import { EvaluateGroupAgentComponent } from '@agents/groups/evaluate-group-agent
 import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
 import { VaultComponent } from '../vault/vault/vault.component'
 import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-vault-items.component'
+import {PluginSettingsComponent} from '@plugins/plugin-settings/plugin-settings.component'
 
 
 @NgModule({
@@ -33,6 +34,7 @@ import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-va
     AdminComponent,
     PluginUploadComponent,
     PluginsListComponent,
+    PluginSettingsComponent,
     AgentsListComponent,
     AddFolderComponent,
     AgentsComponent,

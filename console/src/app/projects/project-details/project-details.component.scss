@@ -1,5 +1,12 @@
 @import "~assets/sass/mixins";
 .main {
+
+.head-title{
+    a{
+        margin-right: 10px;
+    }
+}
+
     .featured {
         width: 100%;
     }
@@ -15,35 +22,14 @@
     }
 
     .row {
-        a,
-        button {
-            &.create {
-                margin-top: 15px;
-                margin-right: 10px;
+        .btns{
+            display: flex;
+            a{
+                margin-right: 10px 
             }
         }
     }
-    .filter {
-        margin-top: 25px;
-        h5 {
-            padding-bottom: 15px;
-            width: 65%
-        }
-
-        .filters{
-          display: flex;
-          align-items: center;
-
-          .filter-archive{
-            margin-right: 10px;
-          }
-
-          .filter-text{
-            @include searchBox();
-          }
-        }
-
-    }
+    @include page-list-items();
 }
 
 .lead {

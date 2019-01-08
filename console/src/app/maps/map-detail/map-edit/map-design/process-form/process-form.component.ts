@@ -109,7 +109,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       .flatMap(method => {
         return Observable.forkJoin(
           Observable.of(method), // the method
-          this.pluginsService.generatePluginParams(this.processViewWrapper.plugin._id, method.name) // generated params
+          this.pluginsService.generatePluginMethodsParams(this.processViewWrapper.plugin._id, method.name) // generated params
         );
       })
       .map(data => {

@@ -25,6 +25,7 @@ import { RawOutputComponent } from './raw-output/raw-output.component';
 import { VaultSelectorComponent } from './components/vault-selector/vault-selector.component'
 import {AutoCompleteModule} from 'primeng/primeng';
 
+import { MapsCardsComponents } from './map-cards/map-cards.component';
 
 @NgModule({
   imports: [
@@ -56,7 +57,8 @@ import {AutoCompleteModule} from 'primeng/primeng';
     LinebreakPipe,
     InPipe,
     RawOutputComponent,
-    VaultSelectorComponent
+    VaultSelectorComponent,
+    MapsCardsComponents
   ],
   exports: [
     ReactiveFormsModule,
@@ -77,7 +79,8 @@ import {AutoCompleteModule} from 'primeng/primeng';
     ConfirmComponent,
     LinebreakPipe,
     InPipe,
-    VaultSelectorComponent
+    VaultSelectorComponent,
+    MapsCardsComponents
   ],
   entryComponents: [ConfirmComponent, RawOutputComponent]
 })

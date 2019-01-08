@@ -17,6 +17,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex-shrink: 0;
+
     .name-wrapper{
       i {
         margin-right: 10px;
@@ -40,31 +42,7 @@
             width: 100%;
         }
     }
-    .filter {
-        width: 100%;
-        margin-top: 25px;
-        h5 {
-            padding-bottom: 15px;
-        }
-
-        .filters{
-          display: flex;
-          align-items: center;
-
-          .filter-archive{
-            margin-right: 10px;
-          }
-
-          .filter-text{
-            @include searchBox();
-            .loadProject {
-                width: 220px;
-                height: 34px;
-            }
-          }
-        }
-
-    }
+    @include page-list-items();
 }
 
 .featured {

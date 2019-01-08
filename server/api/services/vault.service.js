@@ -3,12 +3,19 @@ const crypto = require('crypto');
 
 const Vault = require("../models/vault.model");
 const env = require('../../env/enviroment');
+const createKey = require("../../helpers/createKey");
 
 const algorithm = 'aes-256-cbc';
 const outputEncoding = 'hex';
 const IV_LENGTH = 16; // For AES, this is always 16
 
 let key;
+
+if (!fs.existsSync(env.keyPath)) {
+    key = createKey.generateKey(env.keyPath);
+} else {
+    key = fs.readFileSync(env.keyPath, 'utf-8');
+}
 
 module.exports = {
     create: (vaultItem) => {
@@ -23,10 +30,8 @@ module.exports = {
         return Vault.find({ key: key })
     },
     getValueByKey: (key) => {
-        return new Promise((resolve,reject)=> {
-            Vault.findOne({ key: key }).then(item=>{
-                return resolve(_decrypt(item.value));
-            })
+        return Vault.findOne({ key: key }).then(item=>{
+            return _decrypt(item.value);
         })
     },
 
@@ -53,13 +58,8 @@ module.exports = {
     }
 };
 
-function getKey() {
-    if (key) return key;
-    return key = fs.readFileSync(env.keyPath, 'utf-8');
-}
-
 function _encrypt(value) {
-    let encryptionKey = getKey()
+    let encryptionKey = key;
     let iv = crypto.randomBytes(IV_LENGTH);
     let cipher = crypto.createCipheriv(algorithm, Buffer.from(encryptionKey), iv);
     let encrypted = cipher.update(value);
@@ -72,7 +72,7 @@ function _decrypt(text) {
     let textParts = text.split(':');
     let iv = Buffer.from(textParts.shift(), outputEncoding);
     let encryptedText = Buffer.from(textParts.join(':'), outputEncoding);
-    let decipher = crypto.createDecipheriv(algorithm, Buffer.from(getKey()), iv);
+    let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key), iv);
     let decrypted = decipher.update(encryptedText);
     decrypted = Buffer.concat([decrypted, decipher.final()]);
     return decrypted.toString();

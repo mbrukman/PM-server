@@ -6,8 +6,6 @@ const winston = require('winston');
 const expressWinston = require('express-winston');
 const mongoose = require('mongoose');
 const bootstrap = require("./helpers/bootstrap").bootstrap;
-const fs = require('fs');
-const environment = require("../server/env/enviroment")
 
 const socketService = require('./api/services/socket.service');
 
@@ -18,11 +16,6 @@ const env = require('./env/enviroment');
 const app = express(); 
 
 
-if (!fs.existsSync(environment.keyPath)) {
-    winston.info("Writing key");
-    const createKey = require("./helpers/createKey");
-    createKey.generateKey(environment.keyPath);
-}
 
 
 

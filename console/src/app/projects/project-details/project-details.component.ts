@@ -32,6 +32,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     private modalService: BsModalService) { }
 
   ngOnInit() {
+    this.featuredMaps = null;
     this.routeReq = this.route.params.subscribe(params => {
       this.id = params['id'];
       this.getProjectDetails(true);
