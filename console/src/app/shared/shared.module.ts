@@ -22,6 +22,9 @@ import { LinebreakPipe } from './pipes/linebreak.pipe';
 import { InlineEditDirective } from './directives/inline-edit.directive';
 import { InPipe } from '@shared/pipes/filterIn.pipe';
 import { RawOutputComponent } from './raw-output/raw-output.component';
+import { VaultSelectorComponent } from './components/vault-selector/vault-selector.component'
+import {AutoCompleteModule} from 'primeng/primeng';
+
 import { MapsCardsComponents } from './map-cards/map-cards.component';
 
 @NgModule({
@@ -41,7 +44,8 @@ import { MapsCardsComponents } from './map-cards/map-cards.component';
     TooltipModule.forRoot(),
     DropdownModule,
     NgxChartsModule,
-    TagInputModule
+    TagInputModule,
+    AutoCompleteModule
   ],
   declarations: [
     FilterPipe,
@@ -53,6 +57,7 @@ import { MapsCardsComponents } from './map-cards/map-cards.component';
     LinebreakPipe,
     InPipe,
     RawOutputComponent,
+    VaultSelectorComponent,
     MapsCardsComponents
   ],
   exports: [
@@ -74,6 +79,7 @@ import { MapsCardsComponents } from './map-cards/map-cards.component';
     ConfirmComponent,
     LinebreakPipe,
     InPipe,
+    VaultSelectorComponent,
     MapsCardsComponents
   ],
   entryComponents: [ConfirmComponent, RawOutputComponent]

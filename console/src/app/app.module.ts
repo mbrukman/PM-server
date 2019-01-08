@@ -16,6 +16,7 @@ import { CalendarService } from './calendar/calendar.service';
 import { CoreModule } from './core/core.module';
 import { SetupService } from './core/setup/setup.service';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
+import { VaultService } from '@shared/vault.service';
 
 
 @NgModule({
@@ -27,7 +28,7 @@ import { IsSetUpGuard } from './core/setup/issetup.guard';
 
     AppRoutingModule
   ],
-  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SetupService, IsSetUpGuard],
+  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SetupService, IsSetUpGuard,VaultService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

@@ -15,6 +15,10 @@ const parseArgs = require('minimist')(process.argv.slice(2));
 const env = require('./env/enviroment');
 const app = express(); 
 
+
+
+
+
 /////////////////////
 // configurations //
 ///////////////////
@@ -91,6 +95,7 @@ const agentsApi = require("./api/routes/agents.routes");
 const projectsApi = require("./api/routes/projects.routes");
 const triggersApi = require("./api/routes/triggers.routes")
 const scheduledJobsApi =  require("./api/routes/scheduled-jobs.routes")
+const vaultApi = require("./api/routes/vault.routes")
 
 app.use('/api/setup', setupApi);
 app.use('/api/maps', mapsApi);
@@ -99,6 +104,9 @@ app.use('/api/agents', agentsApi);
 app.use('/api/projects', projectsApi);
 app.use('/api/triggers', triggersApi)
 app.use('/api/scheduled-jobs', scheduledJobsApi)
+app.use('/api/vault', vaultApi)
+
+
 
 
 // Send all other requests to the Angular app

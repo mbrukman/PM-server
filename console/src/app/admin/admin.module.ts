@@ -17,6 +17,8 @@ import { GroupDynamicConditionFilterComponent } from '@agents/groups/group-dynam
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
 import { EvaluateGroupAgentComponent } from '@agents/groups/evaluate-group-agent/evaluate-group-agent.component';
 import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
+import { VaultComponent } from '../vault/vault/vault.component'
+import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-vault-items.component'
 import {PluginSettingsComponent} from '@plugins/plugin-settings/plugin-settings.component'
 
 
@@ -40,8 +42,9 @@ import {PluginSettingsComponent} from '@plugins/plugin-settings/plugin-settings.
     GroupDynamicConditionFilterComponent,
     InputPopupComponent,
     EvaluateGroupAgentComponent,
-    EditAgentComponent
+    EditAgentComponent,
+    VaultComponent,UpsertVaultItemsComponent
   ],
-  entryComponents: [PluginUploadComponent, AddFolderComponent, InputPopupComponent, EditAgentComponent]
+  entryComponents: [PluginUploadComponent, AddFolderComponent, InputPopupComponent, EditAgentComponent,UpsertVaultItemsComponent]
 })
 export class AdminModule { }

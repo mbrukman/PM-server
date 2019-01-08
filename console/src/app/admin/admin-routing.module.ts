@@ -5,6 +5,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { AgentsComponent } from '@agents/agents/agents.component';
 import { PluginsListComponent } from '@plugins/plugins-list/plugins-list.component';
 import { AdminComponent } from './admin.component';
+import { VaultComponent } from 'app/vault/vault/vault.component';
+
 import {PluginSettingsComponent} from '@plugins/plugin-settings/plugin-settings.component'
 const routes: Routes = [
   {
@@ -35,6 +37,10 @@ const routes: Routes = [
       {
         path: 'calendar',
         loadChildren: '../calendar/calendar.module#CalendarModule'
+      },
+      {
+        path: 'vault',
+        component: VaultComponent
       }
     ]
   }
