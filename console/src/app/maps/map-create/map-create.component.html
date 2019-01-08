@@ -25,7 +25,7 @@
           <textarea type="text" id="description" class="form-control" placeholder="eg. This map will..."
                     formControlName="description"></textarea>
         </div>
-        <button type="submit" class="btn btn-primary btn-block" [disabled]="mapForm.invalid">{{map? 'Save': 'Create'}}</button>
+        <button type="submit" class="btn btn-blue btn-block" [disabled]="mapForm.invalid"><span>{{map? 'Save': 'Create'}}</span></button>
       </form>
     </div>
   </div>
