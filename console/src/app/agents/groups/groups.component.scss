@@ -3,16 +3,15 @@
 .top{
   height: 90px;
   h5{
-    height: 21px;
     font-size: 18px;
-    color: #f79f2b;
+    color: $kaholo-orange;
     margin-bottom: 18px;
   }
   
 }
 
 .drag-over{
-  border:2px dashed #f79f2b;
+  border:2px dashed $kaholo-orange;
 }
 
 .table{
@@ -22,14 +21,12 @@
   }
   .name{
     margin-left: 15px;
-    height: 16px;
     font-size: 14px;
     color:$turquoise-blue;
   }
   th {
     cursor: pointer;
     color:$turquoise-blue;
-    height: 21px;
     font-size: 18px;
     font-weight: inherit;
     .title{

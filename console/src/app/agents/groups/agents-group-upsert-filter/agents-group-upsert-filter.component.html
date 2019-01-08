@@ -14,7 +14,7 @@
                     <option *ngFor="let field of fields" [value]="field.id">{{field.label}}</option>
                 </select>
                 <label>Type</label>
-                <select class="form-control" [(ngModel)]="filter.type">
+                <select class="form-control" [(ngModel)]="filter.filterType">
                     <option *ngFor="let filterType of filterTypes" [value]="filterType.id">{{filterType.label}}</option>
                 </select>
                 <label>Value</label>

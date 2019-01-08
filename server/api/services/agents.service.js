@@ -368,17 +368,13 @@ module.exports = {
     },
 
     updateGroup: (groupId, groupUpdated) => {
-        return new Promise((resolve,reject) => {
-            return Group.findOne({_id:groupId}).then((group => {
-                group.name = groupUpdated.name
-                group.filters = groupUpdated.filters
-                group.save().then((res) => {
-                    resolve(res)
-                }).catch((err) => {
-                    reject(err)
-                })
-            }))
-        })
+
+        return Group.findOne({_id:groupId}).then((group => {
+            group.name = groupUpdated.name
+            group.filters = groupUpdated.filters
+            return group.save();
+        }))
+
     },
     /* exporting the agents status */
     agentsStatus: getAgentStatus,
@@ -447,15 +443,9 @@ module.exports = {
 
 
     deleteFilterFromGroup: (groupId,index) => {
-        return new Promise((resolve,reject) => {
-            return Group.findOne({_id:groupId}).then((group) => {
-                group.filters.splice(index,1)
-                group.save().then((res) => {
-                    resolve(res);
-                }).catch((err) => {
-                    reject(err)
-                })
-            })
+        return Group.findOne({_id:groupId}).then((group) => {
+            group.filters.splice(index,1);
+            return group.save();
         })
     },
 
@@ -466,15 +456,9 @@ module.exports = {
      * @returns {Query|*}
      */
     removeAgentFromGroup: (groupId, agentId) => {
-        return new Promise((resolve,reject) => {
-            return Group.findOne({_id:groupId}).then((group) => {
-                group.agents.splice(group.agents.findIndex(agent => agent.id == agentId),1)
-                group.save().then((res) => {
-                    resolve(res);
-                }).catch((err) => {
-                    reject(err)
-                })
-            })
+        return Group.findOne({_id:groupId}).then((group) => {
+            group.agents.splice(group.agents.findIndex(agent => agent.id == agentId),1)
+            return group.save();
         })
     },
     /**

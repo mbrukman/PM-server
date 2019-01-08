@@ -13,10 +13,9 @@ import { Agent } from '@agents/models';
 export class EditAgentComponent implements OnInit {
   agent: Agent;
   name: string;
-  tag: string;
+  tag: string = '';
   attributes:string[];
   result: Subject<{ name: string, attributes: string[] }> = new Subject();
-  isValid:boolean = false
 
   constructor(public bsModalRef: BsModalRef) { }
 
@@ -26,16 +25,9 @@ export class EditAgentComponent implements OnInit {
     }
   }
 
-  saveTag(tag:string){
-    this.attributes.push(tag)
-  }
-
-  keyUp(event,tag){
-    event.preventDefault();
-    this.isValid = event.target.value ? true : false;
-    if (event.keyCode === 13) {
-      this.saveTag(tag)
-    }
+  saveTag(){
+    this.attributes.push(this.tag)
+    this.tag = '';
   }
 
   deleteTag(tagIndex){

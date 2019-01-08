@@ -6,7 +6,6 @@ import { NgModule } from '@angular/core';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
 
-import { AddFolderComponent } from '@agents/agents-list/add-folder/add-folder.component';
 import { AgentsListComponent } from '@agents/agents-list/agents-list.component';
 import { PluginUploadComponent } from '@plugins/plugin-upload/plugin-upload.component';
 import { PluginsListComponent } from '@plugins/plugins-list/plugins-list.component';
@@ -36,7 +35,6 @@ import {PluginSettingsComponent} from '@plugins/plugin-settings/plugin-settings.
     PluginsListComponent,
     PluginSettingsComponent,
     AgentsListComponent,
-    AddFolderComponent,
     AgentsComponent,
     GroupsComponent,
     InputPopupComponent,
@@ -47,6 +45,6 @@ import {PluginSettingsComponent} from '@plugins/plugin-settings/plugin-settings.
     AgentsGroupFiltersListComponent
  
   ],
-  entryComponents: [PluginUploadComponent, AddFolderComponent, InputPopupComponent, EditAgentComponent, AgentsGroupUpsertComponent,AgentsGroupUpsertFilterComponent]
+  entryComponents: [PluginUploadComponent, InputPopupComponent, EditAgentComponent, AgentsGroupUpsertComponent,AgentsGroupUpsertFilterComponent]
 })
 export class AdminModule { }

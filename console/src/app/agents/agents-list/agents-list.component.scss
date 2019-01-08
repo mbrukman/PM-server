@@ -28,33 +28,40 @@
       width: 70%;
       border-left: 1px solid #4c5156;
       height: 810px;
+
       .top{
         height: 90px;
+
+        
+
         h5{
-          height: 21px;
           font-size: 18px;
-          color: #f79f2b;
+          color: $kaholo-orange;
           margin-bottom: 24px
         }
-        div{
+        .agents-group-actions{
+          display: flex;
+          justify-content: space-between;
           height: 36px;
-          a{
-            font-size: 17px;
-            color:$turquoise-blue;
-            cursor:pointer;
-            .agentsLength{
-              color: #f79f2b
+
+          .agent-tabs{
+            width: 500px;
+            a{
+              font-size: 17px;
+              color:$turquoise-blue;
+              cursor:pointer;
+              .agentsLength{
+                color: $kaholo-orange
+              }
+            }
+            .filters{
+              margin-left: 17px;
+              margin-right:60%
             }
           }
-          .filters{
-            margin-left: 17px;
-            margin-right:60%
-          }
-          
         }
       }
       th{
-        height: 21px;
         font-size: 18px;
         color: #dddddd;
         font-weight: inherit

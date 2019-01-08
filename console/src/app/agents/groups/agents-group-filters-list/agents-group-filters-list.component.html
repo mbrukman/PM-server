@@ -1,22 +1,20 @@
-<table  class="table">
+<table class="table">
     <thead>
         <tr>
-        <th scope="col">Description</th>
-        <th scope="col">Actions</th>
+            <th scope="col">Description</th>
+            <th scope="col">Actions</th>
         </tr>
     </thead>
     <tbody>
-
         <tr *ngFor="let filtersGroup of group.filters; let i = index">
-        <td class="item">
-            {{getLabelById('fields',filtersGroup.field)}} {{getLabelById('types',filtersGroup.filterType) | lowercase}} "{{filtersGroup.value}}"
-        </td>
-        <td>
-            <button class="btn btn-link" (click)="editFilter(filter,i)" tooltip="Edit" placement="bottom"><i class="material-icons">edit</i></button>
-            <button class="btn btn-link" (click)="deleteFilter(i)" tooltip="Delete" placement="bottom"><i class="material-icons">delete</i></button>
-        </td>
-        
+            <td class="description">
+                {{getLabelById('fields',filtersGroup.field)}} {{getLabelById('types',filtersGroup.filterType) |
+                lowercase}} "{{filtersGroup.value}}"
+            </td>
+            <td>
+                <button class="btn btn-link" (click)="editFilter(filtersGroup,i)" tooltip="Edit" placement="bottom"><i class="material-icons">edit</i></button>
+                <button class="btn btn-link" (click)="deleteFilter(i)" tooltip="Delete" placement="bottom"><i class="material-icons">delete</i></button>
+            </td>
         </tr>
-
     </tbody>
 </table>

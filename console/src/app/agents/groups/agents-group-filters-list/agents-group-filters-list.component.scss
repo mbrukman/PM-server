@@ -1,29 +1,18 @@
 table{
-    
-    td {
-        padding: 0;
-        vertical-align: middle;
-    
-        > div{
-        display: flex;
-        align-items: center;
-    
-        > i {
-            margin-right: 7px;
-        }
-        }
-    }
-    th {
-        
-        height: 21px;
+    th {    
         font-size: 18px;
         color: #dddddd;
         font-weight: inherit
     }
-    .item {
-        padding-left: 18px;
-        height: 16px;
-        font-size: 14px;
-        color: #dddddd;
+
+    td {
+        padding: 0;
+        vertical-align: middle;
+    
+        &.description {
+            padding-left: 18px;
+            font-size: 14px;
+            color: #dddddd;
+        }
     }
 }

@@ -1,16 +1,13 @@
 @import "~assets/sass/variables";
 
-.isValid{
-    color:$turquoise-blue
-}
-
 .row{
     width: 510px;
     min-height: 430px;
     border-radius: 4px;
     background-color: #2d3236;
-    .buttonInside{
+    .input-wrapper{
         position:relative;
+
         input{
             height:35px;
             width:100%;
@@ -18,7 +15,8 @@
             border-radius: 3px;
             border:none;outline:none;
         }
-        a{
+
+        .add-btn{
             position:absolute;
             right: 15px;
             top: 4px;
@@ -27,9 +25,10 @@
             width:20px;
             border-radius:100%;
             outline:none;
-            text-align:center;
             font-weight:bold;
             padding:2px;
+            cursor: pointer;
+            color : $turquoise-blue;
         }
     }
     .attributes{
@@ -64,6 +63,11 @@
                 text-align: center;
                 font-weight: bold;
                 padding: 2px;
+                color : $turquoise-blue;
+
+                .btn-close{
+                    cursor: pointer;
+                }
             }
         }
     }
@@ -81,15 +85,8 @@
         }
     }
     label{
-        width: 140px;
-        height: 16px;
         font-family: Roboto;
         font-size: 14px;
-        font-weight: normal;
-        font-style: normal;
-        font-stretch: normal;
-        line-height: normal;
-        letter-spacing: normal;
         color: #dddddd;
         margin-top: 25px;
     }
