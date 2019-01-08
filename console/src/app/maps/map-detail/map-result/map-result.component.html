@@ -96,7 +96,7 @@
                 <ul class="process-list">
                   <li *ngFor="let item of processesList; let i = index"
                       (click)="selectProcess(item)"
-                      [ngClass]="{'active': selectedProcess && selectedProcess[0].uuid === item.uuid && selectedProcess[0].index === item.index }">
+                      [ngClass]="{'active': selectedProcess && selectedProcess[0] && selectedProcess[0].uuid === item.uuid && selectedProcess[0].index === item.index }">
                     <app-process-list-item [item]="item"
                                            [statuses]="agProcessStatusesByProcessIndex[item.uuid][item.index]"></app-process-list-item>
 

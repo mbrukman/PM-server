@@ -1480,20 +1480,78 @@ module.exports = {
      */
     dashboard: () => {
         return MapResult.aggregate([
+            {
+                $lookup:
+                {
+                    from: "maps",
+                    let: { mapId: "$map" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$$mapId", "$_id"]
+                                }
+                            }
+                        },
+                        {
+                            $project:
+                            {
+                                name: 1,
+                                archived: 1,
+                            }
+                        }
+                    ],
+                    as: "maps",
+                },
+            },
+            {
+                $unwind: {
+                    "path": "$maps",
+                    "preserveNullAndEmptyArrays": true
+                }
+            },
+            { $match: { "maps.archived": false } },
             { $sort: { "startTime": -1 } },
             {
                 "$group":
                 {
                     _id: "$map", count: { $sum: 1 },
                     exec: { $first: "$$CURRENT" },
-                    map: { $first: "$map" },
+                    map: { $first: "$maps" },
                 }
             },
             { $sort: { "exec.startTime": -1 } },
-            { $limit: 16 }
-        ]).then(res => {
-            return Map.populate(res, { path: 'map' })
-        })
+            { $limit: 16 },
+            {
+                $lookup:
+                {
+                    from: "projects",
+                    let: { mapId: "$exec.map" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ["$$mapId", "$maps"]
+                                }
+                            }
+                        },
+                        {
+                            $project:
+                            {
+                                name: 1
+                            }
+                        }
+                    ],
+                    as: "project"
+                },
+            },
+            {
+                $unwind: {
+                    "path": "$project",
+                    "preserveNullAndEmptyArrays": true
+                }
+            },
+        ])
     },
 
     /**
