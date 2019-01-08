@@ -38,7 +38,7 @@ export class VaultComponent implements OnInit {
     });
   }
 
-  onOpenModal(item: VaultItem = null) {
+  upsertItem(item: VaultItem = null) {
     let modal: BsModalRef;
     modal = this.modalService.show(UpsertVaultItemsComponent);
     if (item) {

@@ -1,31 +1,27 @@
 <div class="main">
   <div class="section-title-wrapper">
     <h1 class="section-title">Vault</h1>
-    <button class="btn pm" (click)="onOpenModal()">add vault</button>
+    <button class="btn pm" (click)="upsertItem()">add item</button>
   </div>
 
 
   <p-dataTable [value]="vaultItems" [rows]="15" [paginator]="true" [pageLinks]="4" [globalFilter]="gb" [hidden]="!vaultItems || !vaultItems.length">
-    <p-column field="name" header="Name" [sortable]="true">
+    <p-column field="name" header="Name" [sortable]="true" [style]="{'width':'300px'}">
       <ng-template let-col let-item="rowData" pTemplate="body">
         <span>{{ item.key }}</span>
       </ng-template>
     </p-column>
     <p-column field="description" header="Description" [sortable]="true">
       <ng-template let-col let-item="rowData" pTemplate="body">
-        <span>{{ item.description | truncatechars : 70 : '' }}<span class="etc" *ngIf="plugin?.description?.length > 70">
-            ... </span></span>
+        <div class="item-description">{{item.description}}</div>
       </ng-template>
     </p-column>
-
-    <p-column field="" header="Delete">
+    <p-column field="" header="Actions" [style]="{'width':'150px', 'text-align':'center'}">
       <ng-template let-col let-i="rowIndex" let-item="rowData" pTemplate="body">
-        <button class="btn btn-link" (click)="deleteVaultItem(item.id)" tooltip="Delete" placement="bottom"><i class="material-icons">delete</i></button>
-      </ng-template>
-    </p-column>
-    <p-column field="" header="Edit">
-      <ng-template let-col let-i="rowIndex" let-item="rowData" pTemplate="body">
-        <button class="btn btn-link" (click)="onOpenModal(item)" tooltip="Edit" placement="bottom"><i class="material-icons">edit</i></button>
+        <div class="actions-wrapper">
+          <button class="btn btn-link" (click)="deleteVaultItem(item.id)" tooltip="Delete" placement="bottom"><i class="material-icons">delete</i></button>
+          <button class="btn btn-link" (click)="upsertItem(item)" tooltip="Edit" placement="bottom"><i class="material-icons">edit</i></button>
+        </div>
       </ng-template>
     </p-column>
   </p-dataTable>

@@ -3,7 +3,7 @@ const crypto = require('crypto');
 
 const Vault = require("../models/vault.model");
 const env = require('../../env/enviroment');
-const createKey = require("../../helpers/createKey");
+const createKey = require("../../helpers/create-key");
 
 const algorithm = 'aes-256-cbc';
 const outputEncoding = 'hex';

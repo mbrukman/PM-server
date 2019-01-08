@@ -11,7 +11,6 @@ module.exports = {
 
     /* generates pm file to the path specific*/
     generateKey: (outputPath) => {
-        console.log(outputPath);
         const keyValue = randomValueHex(32);
         mkdirp.sync(path.dirname(outputPath));
         fs.writeFileSync(outputPath, keyValue);

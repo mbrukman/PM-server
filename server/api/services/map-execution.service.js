@@ -38,16 +38,10 @@ fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 
 async function evaluateParam(param, typeParam, context) {
     if (!param.code) {
         if (typeParam == 'vault') {
-            return await vaultService.getValueByKey(param.value)
-            //   .then(val=>{
-            //         return val;
-            //     }).catch(error=>{
-            //         console.log(error);
-            //     })
+            return await vaultService.getValueByKey(param.value);
         }
         return param.value;
     }
-
     return vm.runInNewContext(param.value, context);
 }
 
