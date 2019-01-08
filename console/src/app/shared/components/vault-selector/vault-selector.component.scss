@@ -2,6 +2,7 @@
     display: flex !important;
 
     input{
+        height: 38px;
         font-size: 1rem;
         width: 90%;
     }
@@ -10,5 +11,9 @@
     }
     .ui-autocomplete-items{
         background-color: dimgrey;
+    }
+
+    .ui-autocomplete-dropdown.ui-button{
+        height: 38px;
     }
 }
