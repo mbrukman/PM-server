@@ -1,3 +1,4 @@
+@import "~assets/sass/mixins";
 .grid-view {
     width: 100%;
 .dashboard-card {
@@ -23,15 +24,16 @@
                 line-height: 0.89;
                 color: #44acdf;
                 padding-bottom: 16px;
+                @include ellipsis();
+                
             }
             > p {
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
+                @include ellipsis();
             }
             .project {
                 display: flex;
                 .link {
+                    @include ellipsis();
                     color: #44acdf;
                 }
             }
