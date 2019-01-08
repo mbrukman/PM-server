@@ -67,7 +67,7 @@
     </p-column>
     <p-column field="" header="Actions" [sortable]="true">
       <ng-template let-col let-i="rowIndex" let-map="rowData" pTemplate="body">
-        <button class="btn garbage" (click)="onConfirmDelete(map.id)"><i class="material-icons">delete</i></button>
+      <i class="material-icons garbage" (click)="onConfirmDelete(map.id)">delete</i>
       </ng-template>
     </p-column>
   </p-dataTable>

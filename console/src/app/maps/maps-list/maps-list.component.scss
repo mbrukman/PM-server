@@ -3,9 +3,9 @@
     font-family: Roboto;
     @include page-list-items();
         .garbage{
-            background: #2d3236
-        }
-
+          cursor: pointer;
+          padding-left: 26px;
+        }        
     @include table();
     .name-wrapper{
       display: flex;

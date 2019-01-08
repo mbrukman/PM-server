@@ -28,6 +28,10 @@
         display: flex;
         margin: 0;
         width: 100%;
+
+        map-cards{
+            width: 100%;
+        }
         .list-view {
             margin: 0;
             @include table();
