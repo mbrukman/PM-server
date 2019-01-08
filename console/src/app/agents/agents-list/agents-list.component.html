@@ -17,7 +17,7 @@
         <div>
           <a (click)="showAgents()"><span [ngClass]="{'selected':constants}" >Constants</span> <span class="agentsLength">({{selectedGroup?.agents?.length}})</span></a>
           <a [ngClass]="{'selected':!constants}" (click)="showFilters()" class="filters">Filters <span class="agentsLength">({{selectedGroup?.filters?.length}})</span></a>
-          <button [hidden]="constants" class="btn btn-pm button-filter" (click)="addNewFilterParam(selectedGroup)"><span>Add filter</span></button>
+          <button [hidden]="constants" class="btn btn-blue" (click)="addNewFilterParam(selectedGroup)"><span>Add filter</span></button>
         </div>
       </div>
       <app-constant-agents-list  [hidden]="!constants" [group]="selectedGroup" [agentsStatus]="agentsStatus" [agents] ="agents"></app-constant-agents-list>
