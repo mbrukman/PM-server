@@ -5,7 +5,7 @@
   </div>
 
 
-  <p-dataTable [value]="vaultItems" [rows]="15" [paginator]="true" [pageLinks]="4" [globalFilter]="gb" [hidden]="!vaultItems || !vaultItems.length">
+  <p-dataTable [value]="vaultItems" [rows]="15" [paginator]="true" [pageLinks]="4" [hidden]="!vaultItems || !vaultItems.length">
     <p-column field="name" header="Name" [sortable]="true" [style]="{'width':'300px'}">
       <ng-template let-col let-item="rowData" pTemplate="body">
         <span>{{ item.key }}</span>
