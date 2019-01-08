@@ -20,11 +20,11 @@ function getMapPlugins(mapStructure) {
 
 
 
-function getSort(sortString){
+function getSort(sortString) {
     var sort = {}
     if (sortString[0] == '-')
         sort[sortString.slice(1)] = -1;
-    else 
+    else
         sort[sortString] = 1;
 
     return sort;
@@ -45,23 +45,23 @@ module.exports = {
         structure.used_plugins = getMapPlugins(structure);
         return MapStructure.create(structure)
     },
-    
+
     mapDelete: id => {
         return Promise.all([
-            Project.findOne({maps:{$in:[id]}}).select('maps').then(project=>{
-                for(let i=0, length=project.maps.length; i<length; i++){
-                    if(project.maps[i]==id){
-                        project.maps.splice(i,1);
+            Project.findOne({ maps: { $in: [id] } }).select('maps').then(project => {
+                for (let i = 0, length = project.maps.length; i < length; i++) {
+                    if (project.maps[i] == id) {
+                        project.maps.splice(i, 1);
                         break;
                     }
                 }
 
                 return project.save();
             }),
-            MapExecutionLog.remove({map:id}),
-            MapResult.remove({map:id}),
-            MapStructure.remove({map:id}),
-            MapTrigger.remove({map:id}),
+            MapExecutionLog.remove({ map: id }),
+            MapResult.remove({ map: id }),
+            MapStructure.remove({ map: id }),
+            MapTrigger.remove({ map: id }),
             Map.remove({ _id: id })
         ]);
     },
@@ -74,68 +74,93 @@ module.exports = {
         let page = filterOptions.page
         if (fields) {
             // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
-            Object.keys(fields).map(key => { fields[key] = { '$regex': `.*${fields[key]}.*` }});
+            Object.keys(fields).map(key => { fields[key] = { '$regex': `.*${fields[key]}.*` } });
             q = fields;
         }
-        
+
         var $match = {};
         if (filterOptions.options.isArchived !== true)
             $match.archived = false;
-        if (filterOptions.options.globalFilter){
-            $match.$or= [
+        if (filterOptions.options.globalFilter) {
+            $match.$or = [
                 { name: { '$regex': `.*${filterOptions.options.globalFilter}.*` } },
                 { description: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }
             ]
         }
 
         let m = Map.aggregate([
-            
-            
+            {
+                $match: $match
+            },
             {
                 $lookup:
                 {
-                    from:"mapResults",
-                    let:{ mapId:"$_id"},
-                    pipeline:[
+                    from: "projects",
+                    let: { mapId: "$_id" },
+                    pipeline: [
                         {
-                            $match:{
-                                $expr:{
-                                        $eq: [ "$$mapId", "$map" ] 
+                            $match: {
+                                $expr: {
+                                    $in: ["$$mapId", "$maps"]
                                 }
                             }
                         },
                         {
-                            $limit:1
-                        },
+                            $project:
+                            {
+                                name: 1
+                            }
+                        }
+                    ],
+                    as: "project"
+                },
+            },
+            {
+                $lookup:
+                {
+                    from: "mapResults",
+                    let: { mapId: "$_id" },
+                    pipeline: [
                         {
-                            $sort:{
-                                '-finishTime':1
+                            $match: {
+                                $expr: {
+                                    $eq: ["$$mapId", "$map"]
+                                }
                             }
                         },
-                        { 
-                            $project: 
-                            {   
-                                finishTime:1
+                        {
+                            $limit: 1
+                        },
+                        {
+                            $sort: {
+                                '-finishTime': 1
+                            }
+                        },
+                        {
+                            $project:
+                            {
+                                finishTime: 1
                             }
                         }
 
-                     ],
-                    as:"latestExectionResult",
+                    ],
+                    as: "latestExectionResult",
                 },
             },
-            {$sort:getSort(sort)},
-            { $skip : page ? ((page - 1) * PAGE_SIZE) : 0 },
+            { $sort: getSort(sort) },
+            { $skip: page ? ((page - 1) * PAGE_SIZE) : 0 },
             { $limit: filterOptions.options.limit || PAGE_SIZE },
-            {$unwind:'$project'},
-            {$unwind: {
+            { $unwind: '$project' },
+            {
+                $unwind: {
                     "path": "$latestExectionResult",
                     "preserveNullAndEmptyArrays": true
                 }
             }
         ])
-        
+
         return m.then(maps => {
-            for(let i=0, mapsLength = maps.length; i<mapsLength; i++){
+            for (let i = 0, mapsLength = maps.length; i < mapsLength; i++) {
                 maps[i].id = maps[i]._id;
                 maps[i].project.id = maps[i].project._id;
                 delete maps[i]._id;
@@ -185,5 +210,77 @@ module.exports = {
         delete map.updatedAt;
         return Map.findByIdAndUpdate(mapId, map, { new: true }).populate('agents')
     },
+
+    recentMaps:()=>{
+        
+    return Map.aggregate([
+        {
+            $lookup:
+            {
+                from: "mapResults",
+                let: { mapId: "$_id" },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $eq: ["$$mapId", "$map"]
+                            }
+                        }
+                    },
+                    {
+                        $project:
+                        {
+                            startTime: 1,
+                            trigger:1,
+                            id : "$_id"
+                        }
+                    },
+                    {$sort : {startTime :-1}},
+                    {$limit : 1}
+                  
+                    
+                ],
+                    
+                as: "exec"
+            },
+           
+        },
+         {$sort : {'exec.startTime' :-1, updatedTime : -1}},
+    
+         
+         {
+                    $lookup:
+                    {
+                        from: "projects",
+                        let: { mapId: "$_id" },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $in: ["$$mapId", "$maps"]
+                                    }
+                                }
+                            },
+                            {
+                                $project:
+                                {
+                                    name: 1,
+                                    id : "$_id"
+                                }
+                            }
+                        ],
+                        as: "project"
+                    },
+                },
+                   {$limit : 4},
+                   { $unwind : "$project" },
+                   {  $unwind: {"path": "$exec", "preserveNullAndEmptyArrays": true}}
+         
+         
+        ])
+
+     
+
+    }
 
 };

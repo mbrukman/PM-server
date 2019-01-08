@@ -19,6 +19,8 @@ import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-gro
 import {ConstantAgentsListComponent} from '@agents/agents-list/constant-agents-list/constant-agents-list.component';
 import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
 import {AgentsGroupFiltersListComponent} from '@agents/groups/agents-group-filters-list/agents-group-filters-list.component'
+import {PluginSettingsComponent} from '@plugins/plugin-settings/plugin-settings.component'
+
 
 @NgModule({
   imports: [
@@ -32,6 +34,7 @@ import {AgentsGroupFiltersListComponent} from '@agents/groups/agents-group-filte
     AdminComponent,
     PluginUploadComponent,
     PluginsListComponent,
+    PluginSettingsComponent,
     AgentsListComponent,
     AddFolderComponent,
     AgentsComponent,
