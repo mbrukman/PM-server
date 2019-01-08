@@ -105,7 +105,7 @@ module.exports = {
 
     generatePluginSettingsParams: (req, res) => {
         hooks.hookPre('plugin-generate-params').then(() => {
-            return pluginsService.generatePluginParams(req.params.id, req.params.name, 'settings')
+            return pluginsService.generatePluginParams(req.params.id, null, 'settings')
         }).then((generated) => {
             return res.json(generated);
         }).catch(error => {
