@@ -1,45 +1,51 @@
 <div class="main">
-  <div class="section-title-wrapper">
+  <div class="section-title-wrapper head-title">
     <h1 class="section-title">Plugins</h1>
-    <button class="btn pm" (click)="onOpenModal()">Upload plugin</button>
+    <button class=" kh-btn-blue kh-btn btn-upload-plugin " (click)="onOpenModal()">Upload plugin</button>
   </div>
-  <div class="filter d-flex justify-content-between align-items-end">
-    <h5 class="section-sub-title">All plugins</h5>
-    <div [hidden]="!plugins || !plugins.length">
-      <i class="material-icons">search</i>
-      <input class="form-control" #gb type="text" placeholder="Filter" />
+  <div class="plugins-list">
+    <div class="filter d-flex justify-content-between align-items-end">
+      <h5 class="section-sub-title">All plugins</h5>
+      <div [hidden]="!plugins || !plugins.length">
+        <i class="material-icons">search</i>
+        <input class="form-control" #gb type="text" placeholder="Filter" />
+      </div>
     </div>
-  </div>
-
-  <div class="table-wrapper">
-    <p-dataTable [value]="plugins" [rows]="15" [paginator]="true" [pageLinks]="4" [globalFilter]="gb" [hidden]="!plugins || !plugins.length">
-      <p-column field="name" header="Name" [sortable]="true">
-        <ng-template let-col let-plugin="rowData" pTemplate="body">
-          <img [src]="plugin.fullImageUrl" class="thumbnail"> {{ plugin.name }}
-        </ng-template>
-      </p-column>
-      <p-column field="description" header="Description" [sortable]="true">
-        <ng-template let-col let-plugin="rowData" pTemplate="body">
-          <span>{{ plugin.description }}</span>
-        </ng-template>
-      </p-column>
-      <p-column field="version" header="Version" [sortable]="true">
-        <ng-template let-col let-plugin="rowData" pTemplate="body">
-          <span>{{ plugin.version }}</span>
-        </ng-template>
-      </p-column>
-      <p-column field="" header="Actions" [sortable]="true">
-        <ng-template let-col let-i="rowIndex" let-plugin="rowData" pTemplate="body">
-          <div class="actions-wrapper">
+    <div class="table-wrapper">
+      <p-dataTable
+        [value]="plugins"
+        [rows]="15"
+        [paginator]="true"
+        [pageLinks]="4"
+        [globalFilter]="gb"
+        [hidden]="!plugins || !plugins.length">
+        <p-column field="name" header="Name" [sortable]="true">
+          <ng-template let-col let-plugin="rowData" pTemplate="body">
+            <img [src]="plugin.fullImageUrl" class="thumbnail"> {{ plugin.name }}
+          </ng-template>
+        </p-column>
+        <p-column field="description" header="Description" [sortable]="true">
+          <ng-template let-col let-plugin="rowData" pTemplate="body">
+            <span>{{ plugin.description | truncatechars : 70 : '' }}<span class="etc"
+                                                                          *ngIf="plugin?.description?.length > 70"> ... </span></span>
+          </ng-template>
+        </p-column>
+        <p-column field="version" header="Version" [sortable]="true">
+          <ng-template let-col let-plugin="rowData" pTemplate="body">
+            <span>{{ plugin.version }}</span>
+          </ng-template>
+        </p-column>
+        <p-column field="" header="Actions" [sortable]="true">
+          <ng-template let-col let-i="rowIndex" let-plugin="rowData" pTemplate="body">
             <i class="material-icons garbage" (click)="deletePlugin(plugin.id, i)">delete</i>
             <span [hidden]="!plugin.settings.length > 0">
-              <a [routerLink]="[plugin.id, 'settings']">
-                <i class="material-icons">settings</i>
-              </a>
+                <a [routerLink]="[plugin.id, 'settings']">
+                    <i class="material-icons">settings</i>
+                </a>
             </span>
-          </div>
-        </ng-template>
-      </p-column>
-    </p-dataTable>
+          </ng-template>
+        </p-column>
+        </p-dataTable>
+    </div>
   </div>
 </div>

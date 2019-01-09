@@ -1,5 +1,5 @@
 @import "~assets/sass/variables";
-
+@import "~assets/sass/mixins";
 
 .selected{
   border-bottom: 2px solid #44acdf
@@ -7,12 +7,13 @@
 
 .main{
   flex-grow: 1;
-
+  
   .section-title{
     margin-bottom: 25px;
   }
 
   .row{
+    padding: 18px 40px;
     .groups{
       padding-left: 4px;
       padding-right: 25px;
