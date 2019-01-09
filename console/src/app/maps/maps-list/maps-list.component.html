@@ -9,7 +9,7 @@
       <map-cards [maps]="recentMaps"></map-cards>
     </div>
     <div class="row">
-      <a routerLink="/maps/create" class="btn">Add a New Map</a>
+      <a routerLink="/maps/create" class="btn btn-blue">Add a New Map</a>
       <div class="filters">
         <div class="filter-archive">
           <label class="control control-checkbox">
@@ -65,9 +65,11 @@
             <span>{{ ((map.updatedAt | date: 'dd/MM/yyyy HH:mm') || '')}}</span>
           </ng-template>
         </p-column>
-        <p-column field="" header="Actions" [sortable]="true">
+        <p-column field="" header="Actions" [sortable]="true" [style]="{width:'120px'}">
           <ng-template let-col let-i="rowIndex" let-map="rowData" pTemplate="body">
-            <i class="material-icons garbage" (click)="onConfirmDelete(map.id)">delete</i>
+            <div class="actions-wrapper">
+              <i class="material-icons garbage" (click)="onConfirmDelete(map.id)">delete</i>
+            </div>
           </ng-template>
         </p-column>
       </p-dataTable>

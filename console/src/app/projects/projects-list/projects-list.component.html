@@ -6,11 +6,11 @@
   <div class="list-content">
       <p class="executed-title">Recently added</p>
       <div class="featured-projects">
-          <app-feature [items]="featuredProjects"></app-feature>
+          <app-feature [items]="featuredProjects" prefix="projects"></app-feature>
         </div>
 
 <div class="row">
-    <a routerLink="/projects/create" class="btn">Add project</a>
+    <a routerLink="/projects/create" class="btn btn-blue">Add project</a>
     <div class="filters">
       <div class="filter-archive">
         <label class="control control-checkbox">
@@ -41,8 +41,7 @@
     </p-column>
     <p-column field="description" header="Description" [sortable]="true">
       <ng-template let-col let-project="rowData" pTemplate="body">
-        <span>{{ project.description | truncatechars : 70 : '' }}<span class="etc" *ngIf="project?.description?.length > 70">
-            ... </span></span>
+        <div class="ellipsis">{{ project.description }}</div>
       </ng-template>
     </p-column>
     <p-column field="createdAt" header="Created" [sortable]="true">

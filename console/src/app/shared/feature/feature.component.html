@@ -1,12 +1,9 @@
-{{ prefix }}
 <div class="featured">
   <div class="col" *ngFor="let item of items">
     <div class="card link" [routerLink]="prefix ? ['/', prefix, item.id] : [item.id]">
       <div class="card-body">
         <h4 class="card-title">{{item.name}}</h4>
-        <p class="card-text">{{ item.description | truncatechars: 110 : '' }}<span class="etc"
-                                                                                   *ngIf="item?.description?.length > 110"> ... </span>
-        </p>
+        <p class="card-text">{{item.description}}</p>
       </div>
     </div>
   </div>

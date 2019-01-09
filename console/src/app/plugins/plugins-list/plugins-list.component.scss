@@ -2,7 +2,6 @@
 
 .main {
   width : 100%;
-  @include table();
   .section-title-wrapper{
     display: flex;
     align-items: center;
@@ -12,15 +11,35 @@
       margin-right: 37px;
     }
   }
-
-  .plugin-list{
+  
+  .plugins-list{
     padding: 18px 40px;
-    .thumbnail {
-      width: 35px;
-      max-height: 45px;
-      margin-right: 8px;
+    .table-wrapper{
+      @include table();
+       
+      .thumbnail {
+        width: 35px;
+        max-height: 45px;
+        margin-right: 8px;
+      }
+  
+      .actions-wrapper{
+        display: flex;
+        padding: 0 9px;
+        text-align: center;
+        
+        > * {
+          cursor: pointer;
+        }
+  
+        .garbage {
+          margin-right: 10px;
+        }
+      }
     }
   
+    
+    
     .filter {
       h5 {
         padding-bottom: 15px;
@@ -39,3 +58,5 @@
     }
   }
 }
+  
+
