@@ -20,10 +20,9 @@
         </div>
         <div class="filter-text">
           <div>
-            <i class="material-icons" *ngIf="!filterTerm">search</i>
-            <i class="material-icons text-light" *ngIf="filterTerm" (click)="filterTerm = null">close</i>
-            <input class="form-control" [(ngModel)]="filterOptions.globalFilter" type="text" placeholder="Filter"
-              (keyup)="loadProjectLazy()" />
+            <i class="material-icons" *ngIf="!filterOptions.globalFilter">search</i>
+            <i class="material-icons text-light" *ngIf="filterOptions.globalFilter" (click)="filterOptions.globalFilter = undefined">close</i>
+            <input class="form-control" [(ngModel)]="filterOptions.globalFilter" type="text" placeholder="Filter" #globalFilter />
           </div>
         </div>
       </div>
@@ -31,7 +30,7 @@
 
     <div class="table-wrapper">
       <p-dataTable [value]="maps" [lazy]="true" [rows]="15" [paginator]="true" [totalRecords]="resultCount"
-        (onLazyLoad)="loadProjectLazy($event)" [globalFilter]="filterTerm">
+        (onLazyLoad)="loadMapsLazy($event)">
         <p-column field="name" header="Name" [sortable]="true">
           <ng-template let-col let-map="rowData" pTemplate="body">
             <div class="name-wrapper">

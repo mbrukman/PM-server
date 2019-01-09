@@ -44,7 +44,7 @@ module.exports = {
         } 
         
         if(filterOptions.options.globalFilter){
-            var filterQueryOptions = [{ name: { '$regex': `.*${filterOptions.globalFilter}.*` } }, { description: { '$regex': `.*${filterOptions.globalFilter}.*` } }]
+            var filterQueryOptions = [{ name: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }, { description: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }]
             q.$or = filterQueryOptions;
         }
         

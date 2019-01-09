@@ -21,9 +21,9 @@
       </div>
       <div class="filter-text">
         <div>
-          <i class="material-icons" *ngIf="!filterTerm">search</i>
-          <i class="material-icons" *ngIf="filterTerm" (click)="filterTerm = null">close</i>
-          <input class="form-control loadProject" [(ngModel)]="filterTerm" type="text" placeholder="Filter" (keyup)="loadProjectLazy(filterTerm)" />
+          <i class="material-icons" *ngIf="!filterOptions.globalFilter">search</i>
+          <i class="material-icons" *ngIf="filterOptions.globalFilter" (click)="filterOptions.globalFilter = null">close</i>
+          <input class="form-control loadProject" [(ngModel)]="filterOptions.globalFilter" type="text" placeholder="Filter" #globalFilter />
         </div>
       </div>
     </div>

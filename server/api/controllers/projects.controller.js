@@ -99,9 +99,6 @@ module.exports = {
         hooks.hookPre('project-filter', req).then(() => {
             return projectsService.filter(req.body);
         }).then(data => {
-            if (!data || data.totalCount === 0) {
-                return res.status(204).send();
-            }
             return res.json(data);
         }).catch((error) => {
             req.io.emit('notification', { title: 'Whoops..', message: `Error getting projects list`, type: 'error' });

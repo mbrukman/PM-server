@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Subscription, Observable } from 'rxjs';
 import * as _ from 'lodash';
 import 'rxjs/operators/take';
 import { MapsService } from '../maps.service';
@@ -14,12 +15,15 @@ import { FilterOptions } from '@shared/model/filter-options.model'
 })
 export class MapsListComponent implements OnInit, OnDestroy {
   maps: Map[];
-  mapReq: any;
-  filterTerm: string;
+  mapReq: Subscription;
   resultCount: number = 0;
   page: number = 1;
   filterOptions: FilterOptions = new FilterOptions();
   recentMaps:Map[];
+  filterKeyUpSubscribe : Subscription;
+
+  
+  @ViewChild('globalFilter') globalFilterElement : ElementRef;
 
   constructor(private mapsService: MapsService,
     private modalService: BsModalService) {
@@ -31,7 +35,12 @@ export class MapsListComponent implements OnInit, OnDestroy {
     this.reloadMaps();
     this.mapsService.recentMaps().subscribe(maps => {
       this.recentMaps = maps;
-    
+    })
+
+    this.filterKeyUpSubscribe = Observable
+    .fromEvent(this.globalFilterElement.nativeElement,'keyup')
+    .debounceTime(300).subscribe(()=>{
+      this.loadMapsLazy();
     })
   }
 
@@ -41,9 +50,10 @@ export class MapsListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.mapReq.unsubscribe();
+    this.filterKeyUpSubscribe.unsubscribe();
   }
 
-  loadProjectLazy(event?) {
+  loadMapsLazy(event?) {
     let fields, page, sort;
     if (event) {
       fields = event.filters || null;
@@ -65,7 +75,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
           break;
         }
       }
-      this.loadProjectLazy();
+      this.loadMapsLazy();
     });
   }
 
