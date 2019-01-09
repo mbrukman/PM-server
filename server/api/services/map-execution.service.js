@@ -204,7 +204,8 @@ function updateExecutionContext(runId, agentKey) {
     }
     executions[runId].executionAgents[agentKey].executionContext['processes'] = executions[runId].executionAgents[agentKey].processes;
     Object.keys(executions[runId].executionAgents).forEach(agentK => {
-        executions[runId].executionAgents[agentK].executionContext['globalContext'] = executions[runId].executionAgents;
+        if(executions[runId].executionAgents[agentK].executionContext)
+            executions[runId].executionAgents[agentK].executionContext['globalContext'] = executions[runId].executionAgents;
     });
 }
 
@@ -894,7 +895,16 @@ function runProcess(map, structure, runId, agent, socket, execProcess) {
         
         actionTask.reduce((promiseChain, next) => {
             return promiseChain.then(chainResults =>
-                executeAction.apply(null, next).then(currentResult =>{
+                executeAction.apply(null, next).catch(err=>{
+                    if (next[6].mandatory) return Promise.reject(err);
+                    
+                    if (typeof err != 'object')
+                        err =  {stdout : err};
+                    if (err instanceof Error)
+                        err =  {stdout : err.message};
+                    
+                     return _handleActionError(err, null,  agent, process , processIndex, next[6]._id, executions, next[2], next[6], next[0], next[8])
+                }).then(currentResult =>{
                     return [ ...chainResults, currentResult ]
                 })
             );
@@ -903,7 +913,7 @@ function runProcess(map, structure, runId, agent, socket, execProcess) {
                 actionsExecutionCallback(null, actionsResults, map, structure, runId, agent, socket, processUUID, processIndex, resolve)
             })
             .catch((error) => {
-                actionsExecutionCallback(error, null, map, structure, runId, agent, socket, processUUID, processIndex, resolve)
+               return actionsExecutionCallback(error, null, map, structure, runId, agent, socket, processUUID, processIndex, resolve)
             })
     })
 }
@@ -917,24 +927,27 @@ function actionsExecutionCallback(error, actionsResults, map, structure, runId, 
         winston.log('error', 'Fatal error: ', error);
         executionLogService.error(runId, map._id, `'${process.name}': A mandatory action failed`, socket);
         status = 'error';
-        executions[runId].executionAgents['continue'] = (error && process.mandatory);
+        executions[runId].executionAgents['continue'] = false;
         updateExecutionContext(runId, agent.key);
+        stopExecution(map._id, runId, socket);
+        return resolve();
 
-    } else {
-        let actionStatuses = [];
-        if (executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions) {
-            actionStatuses = Object.keys(executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions)
-                .map((actionKey) => {
-                    return executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions[actionKey].status;
-                });
-        }
-        if (actionStatuses.indexOf('error') > -1 && actionStatuses.indexOf('success') === -1) { // if only errors - process status is error
-            status = 'error';
-        } else if (actionStatuses.indexOf('error') > -1 && actionStatuses.indexOf('success') > -1) { // if error and success - process status is partial
-            status = 'partial';
-        } else { // if only success - process status is success
-            status = 'success';
-        }
+    } 
+    let actionStatuses = [];
+    if (executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions) {
+        actionStatuses = Object.keys(executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions)
+            .map((actionKey) => {
+                return executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions[actionKey].status;
+            });
+    }
+
+    if (actionStatuses.indexOf('error') > -1) { 
+        status = 'error'; // if only errors - process status is error
+        if(actionStatuses.indexOf('success') > -1)
+             status = 'partial'; // if error and success - process status is partial
+             stopIfMandatoryProcess();
+    } else { // if only success - process status is success
+        status = 'success';
     }
 
     if (process.postRun) {
@@ -961,13 +974,18 @@ function actionsExecutionCallback(error, actionsResults, map, structure, runId, 
     updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
     updateExecutionContext(runId, agent.key);
 
-    if (!(error && process.mandatory)) { // if the process was mandatory agent should not call other process.
         executions[runId].executionAgents[agent.key].status = 'available';
         setTimeout(() => {
             runNodeSuccessors(map, structure, runId, agent, processUUID, socket);
         }, 0);
-    }
     resolve();
+
+    function stopIfMandatoryProcess(){
+        if(structure.processes[processIndex].mandatory){
+            stopExecution(map._id, runId, socket);
+            return resolve();
+        }
+    }
 }
 /**
  * Send action to agent via socket
@@ -1091,7 +1109,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
         } catch (e) {
             return _handleActionError({
                 stdout: actionString + '\n' + e.message
-            }, undefined)
+            }, undefined, agent, process , processIndex, key, executions, runId, action , map, socket)
         }
 
         if (action.method.params[i].type != 'vault')
@@ -1111,23 +1129,6 @@ async function executeAction(map, structure, runId, agent, process, processIndex
     let timeout;
     let timeoutPromise;
     return runAction();
-
-    function _handleActionError(result, message) {
-        let res = result || { stdout: actionString, result: 'Error running action on agent' };
-        updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
-            status: 'error',
-            result: res,
-            finishTime: new Date()
-        });
-        updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-        executionLogService.error(runId, map._id, `'${action.name}': Error running action on (${agent.name}): ${message || JSON.stringify(res)}`, socket);
-
-        if (action.mandatory) {
-            return Promise.reject(res);
-        } else {
-            return Promise.resolve(res); // Action failed but it doesn't mater
-        }
-    }
 
     function runAction() {
         if (action.timeout || (!action.timeout && action.timeout !== 0)) { // if there is a timeout or no timeout
@@ -1190,13 +1191,13 @@ async function executeAction(map, structure, runId, agent, process, processIndex
                     executionLogService.create(actionExecutionLogs, socket);
                     return Promise.resolve(result);
                 } else {
-                    return _handleActionError(result, undefined);
+                    return _handleActionError(result, undefined, agent, process , processIndex, key, executions, runId, action, map, socket );
                 }
             } else {
                 let result = { result: 'Timeout Error', status: 'error', stdout: actionString };
                 if (action.retries > 1) { return ['retry', result]; }
 
-                return _handleActionError(result, 'timeout error');
+                return _handleActionError(result, 'timeout error', agent, process , processIndex, key, executions, runId, action, map, socket );
             }
         }).then((res) => {
             if (Array.isArray(res) && res[0] === 'retry') { // retry handling
@@ -1209,6 +1210,23 @@ async function executeAction(map, structure, runId, agent, process, processIndex
         }).catch((error) => {
             console.log("Error occurred: ", error);
         });
+    }
+}
+
+function _handleActionError(result, message , agent, process , processIndex, key, executions, runId, action, map, socket ) {
+    let res = result || { stdout: actionString, result: 'Error running action on agent' };
+    updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
+        status: 'error',
+        result: res,
+        finishTime: new Date()
+    });
+    updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
+    executionLogService.error(runId, map._id, `'${action.name}': Error running action on (${agent.name}): ${message || JSON.stringify(res)}`, socket);
+
+    if (action.mandatory) {
+        return Promise.reject(res);
+    } else {
+        return Promise.resolve(res); // Action failed but it doesn't mater
     }
 }
 
