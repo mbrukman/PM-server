@@ -13,7 +13,7 @@
     </p-column>
     <p-column field="description" header="Description" [sortable]="true">
       <ng-template let-col let-item="rowData" pTemplate="body">
-        <div class="item-description">{{item.description}}</div>
+        <div class="item-description ellipsis">{{item.description}}</div>
       </ng-template>
     </p-column>
     <p-column field="" header="Actions" [style]="{'width':'150px', 'text-align':'center'}">

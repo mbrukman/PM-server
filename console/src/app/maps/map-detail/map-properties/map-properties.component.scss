@@ -8,6 +8,13 @@
 
   .row{
     flex-grow: 1;
+
+    .form-row{
+      .map-description{
+        max-width: 100%;
+        word-break: break-word;
+      }
+    }
   }
 }
 

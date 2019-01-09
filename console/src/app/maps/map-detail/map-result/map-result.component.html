@@ -5,18 +5,17 @@
       <ul>
         <li *ngFor="let pending of pendingExecutions; let i = index" class="d-flex justify-content-between">
           <span>
-          #{{ i + 1 }} - {{ pending }}
+            #{{ i + 1 }} - {{ pending }}
           </span>
           <span>
             <i class="fa fa-stop text-danger" (click)="cancelPending(pending)"></i>
           </span>
 
         </li>
-        <li *ngFor="let execution of executionsList; let i = index" (click)="selectExecution(execution._id)"
-            class="d-flex justify-content-between"
-            [ngClass]="{'active': selectedExecution?.id === execution.id}">
+        <li *ngFor="let execution of executionsList; let i = index" (click)="selectExecution(execution._id)" class="d-flex justify-content-between"
+          [ngClass]="{'active': selectedExecution?.id === execution.id}">
           <span>
-          {{ execution.startTime | date: 'short' }}
+            {{ execution.startTime | date: 'short' }}
           </span>
           <span *ngIf="executing?.indexOf(execution.runId) > -1">
             <i class="fa fa-spinner fa-pulse fa-fw"></i>
@@ -37,7 +36,7 @@
               <div class="card-body">
                 <h5 class="card-title">Display data</h5>
                 <p-dropdown [options]="agents" (onChange)="changeAgent()" [(ngModel)]="selectedAgent" [filter]="true"
-                            [style]="{'width': '100%'}">
+                  [style]="{'width': '100%'}">
                   <ng-template let-item pTemplate="item">
                     <span style="vertical-align:middle">{{item.label}}</span>
                   </ng-template>
@@ -59,14 +58,10 @@
                     <p class="execution-detail" *ngIf="selectedExecution?.configuration">Configuration: {{
                       selectedExecution?.configuration.name}}</p>
                   </div>
-                  <div class="chart"> 
+                  <div class="chart">
                     <div class="pie-chart-parent">
-                      <ngx-charts-pie-chart
-                        [results]="agProcessesStatus"
-                        [labels]="showLabels"
-                        [scheme]="colorScheme"
-                        [doughnut]="true"
-                        [view]="view">
+                      <ngx-charts-pie-chart [results]="agProcessesStatus" [labels]="showLabels" [scheme]="colorScheme"
+                        [doughnut]="true" [view]="view">
                       </ngx-charts-pie-chart>
                     </div>
                   </div>
@@ -94,21 +89,15 @@
             <div class="card process-select bg-dark">
               <div class="card-body">
                 <ul class="process-list">
-                  <li *ngFor="let item of processesList; let i = index"
-                      (click)="selectProcess(item)"
-                      [ngClass]="{'active': selectedProcess && selectedProcess[0] && selectedProcess[0].uuid === item.uuid && selectedProcess[0].index === item.index }">
-                    <app-process-list-item [item]="item"
-                                           [statuses]="agProcessStatusesByProcessIndex[item.uuid][item.index]"></app-process-list-item>
-
+                  <li *ngFor="let item of processesList; let i = index" (click)="selectProcess(item)" [ngClass]="{'active': selectedProcess && selectedProcess[0] && selectedProcess[0].uuid === item.uuid && selectedProcess[0].index === item.index }">
+                    <app-process-list-item [item]="item" [statuses]="agProcessStatusesByProcessIndex[item.uuid][item.index]"></app-process-list-item>
                   </li>
                 </ul>
               </div>
             </div>
           </div>
           <div class="col-10" *ngIf="selectedProcess">
-            <app-process-result [process]="selectedProcess"
-                                [result]="result"
-                                [count]="result?.length"></app-process-result>
+            <app-process-result [process]="selectedProcess" [result]="result" [count]="result?.length"></app-process-result>
           </div>
         </div>
       </div>

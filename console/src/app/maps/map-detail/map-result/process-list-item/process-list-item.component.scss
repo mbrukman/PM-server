@@ -5,3 +5,16 @@
   -webkit-background-clip: text;
   background-clip: text;
 }
+
+.process{
+  display: flex;
+
+  .process-status{
+    margin-right: 4px;
+  }
+
+  .process-name{
+    margin-right: 5px;
+  }
+}
+
