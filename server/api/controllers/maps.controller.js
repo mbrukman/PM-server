@@ -53,22 +53,8 @@ module.exports = {
     dashboard: (req, res) => {
         hooks.hookPre('map-dashboard', req).then(() => {
             return mapsExecutionService.dashboard()
-        }).then(executions => {
-            executions = JSON.parse(JSON.stringify(executions));
-            let mapsId = executions.map(execution => execution.map.id);
-            return projectsService.getProjectNamesByMapsIds(mapsId).then((projects) => {
-                return { projects, executions };
-            })
         }).then((result) => {
-            result.executions.map(exec => {
-                for (let j = 0, projectsLength = result.projects.length; j < projectsLength; j++) {
-                    if (result.projects[j].maps.toString().includes(exec.map.id)) {
-                        exec.map.project = result.projects[j].toJSON();
-                        break;
-                    }
-                }
-            })
-            return res.json(result.executions);
+            return res.json(result);
         }).catch(error => {
             console.log(error);
 

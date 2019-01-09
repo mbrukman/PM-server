@@ -2,21 +2,20 @@
 .main {
     font-family: Roboto;
     @include page-list-items();
-        .garbage{
-            background: #2d3236
+    .list-content {
+        .table-wrapper {
+            @include table();
+            .garbage {
+                cursor: pointer;
+                padding-left: 26px;
+            }
+            .name-wrapper {
+                display: flex;
+                align-items: center;
+                i {
+                    margin-right: 10px;
+                }
+            }
         }
-
-    @include table();
-    .name-wrapper{
-      display: flex;
-      align-items: center;
-      i {
-        margin-right: 10px;
-      }
-    }
-
-
-    .section-sub-title {
-        width: 68%;
     }
 }

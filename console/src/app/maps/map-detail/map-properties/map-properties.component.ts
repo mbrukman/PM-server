@@ -10,7 +10,7 @@ import { ProjectsService } from '@projects/projects.service';
 import { Project } from '@projects/models/project.model';
 
 @Component({
-  selector: 'app-map-metadata',
+  selector: 'app-map-properties',
   templateUrl: './map-properties.component.html',
   styleUrls: ['./map-properties.component.scss']
 })

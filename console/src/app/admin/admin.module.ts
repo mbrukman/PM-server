@@ -18,6 +18,8 @@ import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-gro
 import {ConstantAgentsListComponent} from '@agents/agents-list/constant-agents-list/constant-agents-list.component';
 import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
 import {AgentsGroupFiltersListComponent} from '@agents/groups/agents-group-filters-list/agents-group-filters-list.component'
+import { VaultComponent } from '../vault/vault/vault.component'
+import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-vault-items.component'
 import {PluginSettingsComponent} from '@plugins/plugin-settings/plugin-settings.component'
 
 
@@ -42,9 +44,10 @@ import {PluginSettingsComponent} from '@plugins/plugin-settings/plugin-settings.
     AgentsGroupUpsertComponent,
     ConstantAgentsListComponent,
     AgentsGroupUpsertFilterComponent,
-    AgentsGroupFiltersListComponent
- 
+    AgentsGroupFiltersListComponent,
+    VaultComponent,
+    UpsertVaultItemsComponent
   ],
-  entryComponents: [PluginUploadComponent, InputPopupComponent, EditAgentComponent, AgentsGroupUpsertComponent,AgentsGroupUpsertFilterComponent]
+  entryComponents: [PluginUploadComponent, InputPopupComponent, EditAgentComponent, AgentsGroupUpsertComponent,AgentsGroupUpsertFilterComponent, UpsertVaultItemsComponent]
 })
 export class AdminModule { }

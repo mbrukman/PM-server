@@ -57,7 +57,7 @@ export class ProcessResultComponent implements OnChanges {
 
     // aggregating actions status
     let agActionsStatus = actions.reduce((total, current) => {
-      total[current.status] = (total[current.status] || 0) + 1;
+      total[current.action.status] = (total[current.action.status] || 0) + 1;
       return total;
     }, { success: 0, error: 0, stopped: 0, partial: 0 });
     

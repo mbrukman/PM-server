@@ -9,6 +9,7 @@ const Trigger       = require('./map-trigger.model');
 const Plugin        = require('./plugin.model');
 const Project       = require('./project.model');
 const ScheduledJob  = require('./scheduled-job.model');
+const Vault         = require('./vault.model')
 
 
 module.exports = {
@@ -22,5 +23,6 @@ module.exports = {
     Trigger,
     Plugin,
     Project,
-    ScheduledJob
+    ScheduledJob,
+    Vault
 };

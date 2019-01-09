@@ -131,11 +131,8 @@ p {
           background: $turquoise-blue;
         }
 
-        .process-name{
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          margin-right: 5px;
+        app-process-list-item{
+          max-width: 100%;
         }
       }
     }

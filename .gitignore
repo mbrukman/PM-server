@@ -77,3 +77,5 @@ private.ts
 *.service
 SOURCES
 SPECS
+
+*.khkey
