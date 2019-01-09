@@ -4,8 +4,8 @@
       <div class="content-card">
         <h5 class="card-title">{{ item.name }}</h5>
         <p class="trigger-by ellipsis" *ngIf="item.exec">Trigger: {{ item.exec.trigger }} </p>
-        <p class="ellipsis" *ngIf="item.exec">Last run: {{ item.exec.startTime | date: 'short' }}</p>
-        <p class="ellipsis" *ngIf="!item.exec">Last run: Not executed yet</p>
+        <p *ngIf="item.exec">Last run: {{ item.exec.startTime | date: 'short' }}</p>
+        <p *ngIf="!item.exec">Last run: Not executed yet</p>
         <!-- <p>Status:   {{ item.status}}</p> -->
         <div class="project">Project: &nbsp;<a class="link" (click)="goToProject($event, item.project._id)"> {{
             item.project.name}}</a> </div>

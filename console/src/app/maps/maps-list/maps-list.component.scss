@@ -5,9 +5,13 @@
     .list-content {
         .table-wrapper {
             @include table();
-            .garbage {
+            .actions-wrapper{
+              text-align: center;
+              width: 100%;
+              
+              .garbage {
                 cursor: pointer;
-                padding-left: 26px;
+              }
             }
             .name-wrapper {
                 display: flex;
