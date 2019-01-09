@@ -35,13 +35,26 @@ export class ProcessResultComponent implements OnChanges {
     }
   }
 
+  isObject(item){
+    return typeof item == 'object' ? true : false;
+  }
+
   expandOutput(action: ActionResultView) {
     let messages = [];
     let results = this.agActionsStatus[action.key].results;
     let msgs = [];
     results.stdout.forEach(text => { msgs.push(text)});
     results.stderr.forEach(text => { msgs.push(text)});
-    results.result.forEach(res => { msgs.push(JSON.stringify(res))});
+    
+    results.result.forEach(res => { 
+      if(typeof res == 'string'){
+        msgs.push(res)
+      }
+      else{
+        msgs.push(JSON.stringify(res))
+      }
+    });
+    
     messages.push(msgs.join('\n'));
 
     const modal = this.modalService.show(RawOutputComponent);

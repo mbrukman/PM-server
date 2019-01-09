@@ -59,7 +59,10 @@
                     </span>
                   </ng-container>
                   <ng-container *ngFor="let item of agActionsStatus[action.key]?.results?.result">
-                    <span class="raw-output-data" *ngIf="item">
+                    <span class="raw-output-data" [hidden]="isObject(item)">
+                      {{ item }} <br>
+                    </span>
+                    <span class="raw-output-data" [hidden]="!isObject(item)">
                       {{ item | json }} <br>
                     </span>
                   </ng-container>
