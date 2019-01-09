@@ -30,7 +30,7 @@
   </div>
 
   <p-dataTable [value]="projects" [lazy]="true" [rows]="15" [paginator]="true" [totalRecords]="resultCount"
-    (onLazyLoad)="loadProjectLazy($event)" [globalFilter]="filterTerm">
+    (onLazyLoad)="loadProjectLazy($event)">
     <p-column field="name" header="Name" [sortable]="true">
       <ng-template let-col let-project="rowData" pTemplate="body">
         <div class="name-wrapper">
