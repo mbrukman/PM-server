@@ -1244,6 +1244,8 @@ function formatAgentsResults(agentsResults) {
     const results = [];
     let agentKeys = Object.keys(agentsResults);
     for (let i of agentKeys) {
+        if (!agentsResults[i]) continue;
+        
         let agent = agentsResults[i];
         let agentResult = {
             processes: [],
@@ -1355,6 +1357,7 @@ function stopExecution(mapId, runId, socket) {
         executions[runId].executionContext.finishTime = d;
 
         Object.keys(executionAgents).forEach(agentKey => {
+            if (!executionAgents[agentKey]) return;
             let agent = executionAgents[agentKey];
             if (agent.status !== 'error') {
                 agent.status = 'stopped';
