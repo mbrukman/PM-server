@@ -13,13 +13,25 @@ import { Agent } from '@agents/models';
 export class EditAgentComponent implements OnInit {
   agent: Agent;
   name: string;
-  attributes: any[];
+  tag: string = '';
+  attributes:string[];
   result: Subject<{ name: string, attributes: string[] }> = new Subject();
 
   constructor(public bsModalRef: BsModalRef) { }
 
-  ngOnInit(): void {
+  ngOnInit() {
+    if(!this.attributes){
+      this.attributes = []
+    }
+  }
 
+  saveTag(){
+    this.attributes.push(this.tag)
+    this.tag = '';
+  }
+
+  deleteTag(tagIndex){
+    this.attributes.splice(tagIndex,1)
   }
 
   onConfirm() {
@@ -27,7 +39,6 @@ export class EditAgentComponent implements OnInit {
       if (typeof (o) === 'string') {
         return o;
       }
-      return o.value;
     });
     this.result.next({ name: this.name, attributes });
     this.bsModalRef.hide();

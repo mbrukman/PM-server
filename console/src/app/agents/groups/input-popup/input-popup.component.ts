@@ -19,6 +19,7 @@ export class InputPopupComponent {
   }
 
   onConfirm() {
+    
     this.result.next(this.name);
     this.onClose();
   }

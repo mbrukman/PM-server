@@ -1,17 +1,8 @@
-.table{
-  td {
-    padding: 0;
-    vertical-align: middle;
+@import "~assets/sass/variables";
 
-    > div{
-      display: flex;
-      align-items: center;
 
-      > i {
-        margin-right: 7px;
-      }
-    }
-  }
+.selected{
+  border-bottom: 2px solid #44acdf
 }
 
 .main{
@@ -22,12 +13,64 @@
   }
 
   .row{
-    .col-3{
-      padding-left: 0;
+    .groups{
+      padding-left: 4px;
+      padding-right: 25px;
+      width: 30%;
+      height: 810px;
+      margin-top: 17px
     }
 
-    .col-9{
+    .agents{
+      margin-top: 17px;
       padding-right: 0;
+      padding-left: 25px;
+      width: 70%;
+      border-left: 1px solid #4c5156;
+      height: 810px;
+
+      .top{
+        height: 90px;
+
+        
+
+        h5{
+          font-size: 18px;
+          color: $kaholo-orange;
+          margin-bottom: 24px
+        }
+        .agents-group-actions{
+          display: flex;
+          justify-content: space-between;
+          height: 36px;
+
+          .agent-tabs{
+            width: 500px;
+            a{
+              font-size: 17px;
+              color:$turquoise-blue;
+              cursor:pointer;
+              .agentsLength{
+                color: $kaholo-orange
+              }
+            }
+            .filters{
+              margin-left: 17px;
+              margin-right:60%
+            }
+          }
+        }
+      }
+      th{
+        font-size: 18px;
+        color: #dddddd;
+        font-weight: inherit
+      }
+      .item{
+        height: 16px;
+        font-size: 14px;
+        color: #dddddd;
+      }
     }
   }
 }

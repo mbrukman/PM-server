@@ -1,0 +1,38 @@
+table{
+    tbody{
+        tr{
+            cursor:grab;
+        }
+    }
+    td {
+        padding: 0;
+        vertical-align: middle;
+    
+        > div{
+        display: flex;
+        align-items: center;
+    
+        > i {
+            margin-right: 7px;
+        }
+        }
+    }
+    th {
+        height: 21px;
+        font-size: 18px;
+        color: #dddddd;
+        font-weight: inherit
+    }
+    .item {
+        height: 16px;
+        font-size: 14px;
+        color: #dddddd;
+        .name{
+            margin-left: 15px;
+            .material-icons{
+                font-size: 13px;
+                margin-right: 13px;
+            }
+        }
+    }
+}

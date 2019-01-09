@@ -8,6 +8,8 @@ import { Group } from '@agents/models/group.model';
 import { BsModalService } from 'ngx-bootstrap';
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
 import { Agent } from '@agents/models/agent.model';
+import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-group-upsertcomponent'
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-groups',
@@ -22,6 +24,9 @@ export class GroupsComponent implements OnInit, OnDestroy {
   draggedItem: any;
   draggetItemSubscription: Subscription;
   selectedGroup: Group;
+  updateReq: any;
+  selectedDropGroupIndex : string;
+  onHover : string;
 
   constructor(private agentsService: AgentsService, private modalService: BsModalService) {
   }
@@ -51,15 +56,32 @@ export class GroupsComponent implements OnInit, OnDestroy {
       .getDragAsObservable()
       .subscribe(item => this.draggedItem = item);
 
+    this.agentsService.getSelectedGroupAsObservable().subscribe(group => {
+      this.selectedGroup = group
+    })  
+    
     this.updatedGroupSubscription = this.agentsService.getUpdateGroupAsObservable().subscribe(group => {
       this.groups[this.groups.findIndex(o => o._id === group._id)] = group;
     });
+  }
+
+  mouseEnter(index){
+    this.onHover = index;
+  }
+
+  mouseLeave(){
+    this.onHover = null;
+  }
+
+  allAgents(){
+    this.agentsService.selectGroup(null);
   }
 
   ngOnDestroy() {
     if (this.groupsReq) {
       this.groupsReq.unsubscribe();
     }
+
     if (this.draggetItemSubscription) {
       this.draggetItemSubscription.unsubscribe();
     }
@@ -73,8 +95,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
    * Fired when a group tab is opened
    * @param event
    */
-  onTabOpen(event?) {
-    this.agentsService.selectGroup(event ? this.groups[event.index] : null);
+  selectGroup(group : Group) {
+    this.agentsService.selectGroup(group);
   }
 
   /**
@@ -82,11 +104,20 @@ export class GroupsComponent implements OnInit, OnDestroy {
    * @param groupIndex
    * @param groupId
    */
+
+   onDragLeave(){
+    this.selectedDropGroupIndex = null
+   }
+
+   allowDrop(i){
+    this.selectedDropGroupIndex = i
+   }
+
   drop(groupIndex, groupId) {
+    this.selectedDropGroupIndex = null
     if ((<string[]>this.groups[groupIndex].agents).indexOf(this.draggedItem.id) > -1) {
       return;
     }
-
     this.agentsService
       .addAgentToGroup(groupId, [this.draggedItem.id])
       .take(1)
@@ -103,6 +134,25 @@ export class GroupsComponent implements OnInit, OnDestroy {
       .filter(name => !!name) // filtering only results with a name
       .flatMap(name => this.agentsService.groupCreate({ name: name }))
       .subscribe(group => this.groups.push(group));
+  }
+
+  editGroup(index){
+    let group = this.groups[index];
+    const modal = this.modalService.show(AgentsGroupUpsertComponent);
+    modal.content.name = group.name;
+    modal.content.result
+      .take(1)
+      .filter(r => !!r)
+      .subscribe(r => {
+        group.name = r.name;
+        this.updateGroup(group);
+      });
+  }
+
+  updateGroup(group:Group){
+    this.updateReq = this.agentsService.updateGroupToServer(group).subscribe((group) => {
+      this.agentsService.updateGroup(group)
+    });
   }
 
   deleteGroup(groupIndex, groupId) {

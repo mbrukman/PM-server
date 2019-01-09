@@ -18,7 +18,7 @@
           <textarea type="text" id="description" class="form-control" placeholder="eg. Managing CI/CD of..."
                     formControlName="description"></textarea>
         </div>
-        <button type="submit" class="btn btn-primary btn-block" [disabled]="projectForm.invalid">{{ project? 'Save': 'Create' }}</button>
+        <button type="submit" class="btn btn-blue btn-block" [disabled]="projectForm.invalid"><span>{{ project? 'Save': 'Create' }}</span></button>
       </form>
     </div>
   </div>

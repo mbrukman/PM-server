@@ -1,0 +1,30 @@
+<div class="row pm-modal">
+    <div class="col-12">
+        <div class="modal-header">
+        <h4 *ngIf="!edit">Add Filter</h4>
+        <h4 *ngIf="edit">Edit Filter</h4>
+        <button type="button" class="close" (click)="onClose()" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Fields</label>
+                <select class="form-control" [(ngModel)]="filter.field">
+                    <option *ngFor="let field of fields" [value]="field.id">{{field.label}}</option>
+                </select>
+                <label>Type</label>
+                <select class="form-control" [(ngModel)]="filter.filterType">
+                    <option *ngFor="let filterType of filterTypes" [value]="filterType.id">{{filterType.label}}</option>
+                </select>
+                <label>Value</label>
+                <input class="form-control" [(ngModel)]="filter.value" />
+            </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-gray" (click)="onClose()"><span>Cancel</span></button>
+        <button class="btn-blue btn" (click)="onConfirm()"><span>Create</span></button>
+        </div>
+    </div>
+</div>
+      

@@ -366,6 +366,16 @@ module.exports = {
     update: (agentId, agent) => {
         return Agent.findByIdAndUpdate(agentId, agent, { new: true });
     },
+
+    updateGroup: (groupId, groupUpdated) => {
+
+        return Group.findOne({_id:groupId}).then((group => {
+            group.name = groupUpdated.name
+            group.filters = groupUpdated.filters
+            return group.save();
+        }))
+
+    },
     /* exporting the agents status */
     agentsStatus: getAgentStatus,
 
@@ -431,6 +441,14 @@ module.exports = {
         return Group.update({ agents: { $in: [agentId] } }, { $pull: { agents: { $in: [agentId] } } })
     },
 
+
+    deleteFilterFromGroup: (groupId,index) => {
+        return Group.findOne({_id:groupId}).then((group) => {
+            group.filters.splice(index,1);
+            return group.save();
+        })
+    },
+
     /**
      * Removing an agent from a group
      * @param groupId
@@ -438,7 +456,10 @@ module.exports = {
      * @returns {Query|*}
      */
     removeAgentFromGroup: (groupId, agentId) => {
-        return Group.findOneAndUpdate(groupId, { $pull: { agents: { $in: [agentId] } } }, { new: true });
+        return Group.findOne({_id:groupId}).then((group) => {
+            group.agents.splice(group.agents.findIndex(agent => agent.id == agentId),1)
+            return group.save();
+        })
     },
     /**
      * Establish a room for agents

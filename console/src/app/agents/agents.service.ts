@@ -4,7 +4,7 @@ import { environment } from '@env/environment';
 
 import { Observable } from 'rxjs/Observable';
 
-import { FilterParam, Group } from '@agents/models/group.model';
+import { AgentsGroupFilter, Group } from '@agents/models/group.model';
 import { Agent } from './models/agent.model';
 import { Subject } from 'rxjs/Subject';
 
@@ -22,7 +22,7 @@ export class AgentsService {
   }
 
   delete(agentId) {
-    return this.http.delete(`${serverUrl}api/agents/${agentId}/delete`, { responseType: 'text' as 'json' });
+    return this.http.delete(`${serverUrl}api/agents/${agentId}`, { responseType: 'text' as 'json' });
   }
 
   list() {
@@ -34,7 +34,7 @@ export class AgentsService {
   }
 
   update(agent) {
-    return this.http.put<Agent>(`${serverUrl}api/agents/${agent._id}/update`, agent);
+    return this.http.put<Agent>(`${serverUrl}api/agents/${agent._id}`, agent);
   }
 
   /* groups */
@@ -54,7 +54,11 @@ export class AgentsService {
    * @returns {Observable<Object>}
    */
   groupDelete(groupId: string) {
-    return this.http.delete<string>(`${serverUrl}api/agents/groups/${groupId}/delete`, { responseType: 'text' as 'json' });
+    return this.http.delete<string>(`${serverUrl}api/agents/groups/${groupId}`, { responseType: 'text' as 'json' });
+  }
+
+  deleteFilterFromGroup(groupId,index){
+    return this.http.delete<Group>(`${serverUrl}api/agents/groups/${groupId}/filters/${index}`);
   }
 
   /**
@@ -86,10 +90,10 @@ export class AgentsService {
   /**
    * Set group filters as this list.
    * @param {string} groupId
-   * @param {[FilterParam]} filters
+   * @param {AgentsGroupFilter[]} filters
    * @returns {Observable<Object>}
    */
-  addGroupFilters(groupId: string, filters: [FilterParam]) {
+  addGroupFilters(groupId: string, filters: AgentsGroupFilter[]) {
     return this.http.post<Group>(`${serverUrl}api/agents/groups/${groupId}/add-filters`, filters);
   }
 
@@ -118,6 +122,8 @@ export class AgentsService {
     this.selectedGroupSubject.next(group);
   }
 
+
+  
   /**
    * Returns observable of selected group
    * @returns {Observable<Group>}
@@ -132,6 +138,10 @@ export class AgentsService {
    */
   updateGroup(group: Group) {
     this.updatedGroup.next(group);
+  }
+
+  updateGroupToServer(group: Group){
+    return this.http.put<Group>(`${serverUrl}api/agents/groups/${group._id}`, group);
   }
 
   /**

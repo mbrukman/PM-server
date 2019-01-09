@@ -3,35 +3,35 @@ import { Agent } from './agent.model';
 /**
  * Filter types for dynamic filter group.
  */
-export enum FILTER_TYPES {
-  gte = 'gte',
-  gt = 'gt',
-  equal = 'equal',
-  contains = 'contains',
-  lte = 'lte',
-  lt = 'lt'
-}
 
-export enum FILTER_FIELDS {
-  hostname = 'hostname',
-  arch = 'arch',
-  alive = 'alive',
-  freeSpace = 'freeSpace',
-  respTime = 'respTime',
-  url = 'url',
-  createdAt = 'createdAt'
 
-}
+export const FILTER_TYPES = [
+  {label:'Greater Than Or Equal', id: 'gte'},
+  {label:'Greater Than', id: 'gt'},
+  {label:'Equal', id: 'equal'},
+  {label:'Contains', id: 'contains'},
+  {label:'Less Than Or Equal', id: 'lte'},
+  {label:'Less Than', id: 'lt'}
+
+]
+
+export const FILTER_FIELDS = [
+  {label: 'Hostname' , id: 'hostname'},
+  {label: 'Archive' , id: 'arch'},
+  {label: 'Alive' , id: 'alive'},
+  {label: 'Free Space' , id: 'freeSpace'},
+  {label: 'Response Time' , id: 'respTime'},
+  {label: 'Url' , id: 'url'},
+  {label: 'Created At' , id: 'createdAt'},
+]
 
 /**
  * Filter param model
  */
-export class FilterParam {
-  constructor(public field: FILTER_FIELDS, public value?: string, public filterType?: FILTER_TYPES) {
-    this.field = field;
-    this.value = value;
-    this.filterType = this.filterType || FILTER_TYPES.equal;
-  }
+export class AgentsGroupFilter {
+  field : string;
+  value : string;
+  filterType : string = 'equal';
 }
 
 export class Group {
@@ -39,7 +39,7 @@ export class Group {
   _id?: string;
   name: string;
   agents?: string[] | Agent[];
-  filters?: [FilterParam];
+  filters?: [AgentsGroupFilter];
 
 
   isPopulated?() {
