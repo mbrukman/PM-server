@@ -1,55 +1,66 @@
 @import "~assets/sass/variables";
-
-.top{
-  height: 90px;
-  h5{
-    font-size: 18px;
-    color: $kaholo-orange;
-    margin-bottom: 18px;
-  }
-  
+.top {
+    height: 90px;
+    h5 {
+        font-size: 18px;
+        color: $kaholo-orange;
+        margin-bottom: 18px;
+    }
 }
 
-.drag-over{
-  border:2px dashed $kaholo-orange;
+.drag-over {
+    border: 2px dashed $kaholo-orange;
 }
 
-.table{
-  
-  .manage{
-    width: 76px;
-  }
-  .name{
-    margin-left: 15px;
-    font-size: 14px;
-    color:$turquoise-blue;
-  }
-  th {
-    cursor: pointer;
-    color:$turquoise-blue;
-    font-size: 18px;
-    font-weight: inherit;
-    .title{
-      margin-left: 10px;
-      color:$turquoise-blue;
+.table {
+    thead {
+        th {
+            cursor: pointer;
+            color: $turquoise-blue;
+            font-size: 18px;
+            font-weight: inherit;
+            .title {
+                margin-left: 10px;
+                color: $turquoise-blue;
+            }
+        }
     }
-  }
-  
-  td {
-    cursor: pointer;
-    padding: 0;
-    vertical-align: middle;
-    .btn{
-      padding: 5px
+    tbody {
+        tr {
+            td {
+                cursor: pointer;
+                padding: 0;
+                vertical-align: middle;
+                .btn {
+                    padding: 5px
+                }
+                >div {
+                    display: flex;
+                    align-items: center;
+                    >i {
+                        margin-right: 7px;
+                    }
+                }
+                .name {
+                    margin-left: 15px;
+                    font-size: 14px;
+                    color: $turquoise-blue;
+                }
+                &.manage {
+                    width: 76px;
+                    .manage-wrapper {
+                        display: none
+                    }
+                }
+            }
+            &:hover,
+            &.selected {
+                background-color: $hover-color !important;
+                box-shadow: -4px 0px 0px 0px $turquoise-blue;
+                .manage .manage-wrapper {
+                    display: table-cell;
+                }
+            }
+        }
     }
-    > div{
-      display: flex;
-      align-items: center;
-
-      > i {
-        margin-right: 7px;
-      }
-    }
-
-  }
 }

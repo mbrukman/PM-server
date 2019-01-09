@@ -12,7 +12,7 @@ import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-gro
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
-  selector: 'app-groups',
+  selector: 'app-agents-groups',
   templateUrl: './groups.component.html',
   styleUrls: ['./groups.component.scss']
 })
@@ -26,7 +26,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
   selectedGroup: Group;
   updateReq: any;
   selectedDropGroupIndex : string;
-  onHover : string;
+  currentGroupIndex : number;
 
   constructor(private agentsService: AgentsService, private modalService: BsModalService) {
   }
@@ -65,14 +65,6 @@ export class GroupsComponent implements OnInit, OnDestroy {
     });
   }
 
-  mouseEnter(index){
-    this.onHover = index;
-  }
-
-  mouseLeave(){
-    this.onHover = null;
-  }
-
   allAgents(){
     this.agentsService.selectGroup(null);
   }
@@ -95,7 +87,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
    * Fired when a group tab is opened
    * @param event
    */
-  selectGroup(group : Group) {
+  selectGroup(group : Group, groupIndex : number) {
+    this.currentGroupIndex = groupIndex;
     this.agentsService.selectGroup(group);
   }
 
