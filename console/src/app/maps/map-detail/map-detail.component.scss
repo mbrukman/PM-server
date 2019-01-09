@@ -29,18 +29,6 @@
     padding : 0 15px;
 
     .btn {
-      padding: 5px 29px 5px 29px;
-      color: $text-color;
-      background: transparent;
-      border-radius: 20px;
-      border: 2px solid $turquoise-blue;
-      &:hover {
-        cursor: pointer;
-        background: $turquoise-blue;
-        color: $background;
-        font-weight: bolder;
-      }
-
       &.execute-btn{
         span {
           margin-left: 5px;

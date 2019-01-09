@@ -18,9 +18,9 @@
 
     <div class="row">
       <div class="btns">
-        <a routerLink="/maps/create" class="btn" [queryParams]="{'project': project?.id}" *ngIf="project?.maps && project?.maps?.length > 0">Add
+        <a routerLink="/maps/create" class="btn btn-blue" [queryParams]="{'project': project?.id}" *ngIf="project?.maps && project?.maps?.length > 0">Add
           map</a>
-        <button class="btn" (click)="openImportModal()" *ngIf="project?.maps && project?.maps?.length > 0">Import map</button>
+        <button class="btn btn-blue" (click)="openImportModal()" *ngIf="project?.maps && project?.maps?.length > 0">Import map</button>
       </div>
 
       <div class="filterd" *ngIf="featuredMaps?.length > 0">

@@ -1,5 +1,5 @@
 <div class="header">
-    <h1>Create a new project</h1>
+  <h1>Create a new project</h1>
 </div>
 <div class="main pm-main-wrapper">
   <div class="row">
@@ -7,18 +7,17 @@
       <form [formGroup]="projectForm" (ngSubmit)="onSubmitForm(projectForm.value)" class="project-form">
         <div class="form-group">
           <label>Name:</label>
-          <input type="text" id="name" class="form-control" formControlName="name"/>
-          <div
-            *ngIf="projectForm.get('name').invalid && (projectForm.get('name').touched || projectForm.get('name').touched)">
+          <input type="text" id="name" class="form-control" formControlName="name" />
+          <div *ngIf="projectForm.get('name').invalid && (projectForm.get('name').touched || projectForm.get('name').touched)">
             Name is mandatory
           </div>
         </div>
         <div class="form-group">
           <label>Description:</label>
           <textarea type="text" id="description" class="form-control" placeholder="eg. Managing CI/CD of..."
-                    formControlName="description"></textarea>
+            formControlName="description"></textarea>
         </div>
-        <button type="submit" class="btn btn-blue btn-block" [disabled]="projectForm.invalid"><span>{{ project? 'Save': 'Create' }}</span></button>
+        <button type="submit" class="btn btn-blue" [disabled]="projectForm.invalid">Create</button>
       </form>
     </div>
   </div>
