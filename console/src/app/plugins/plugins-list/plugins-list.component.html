@@ -37,12 +37,14 @@
         </p-column>
         <p-column field="" header="Actions" [sortable]="true">
           <ng-template let-col let-i="rowIndex" let-plugin="rowData" pTemplate="body">
-            <i class="material-icons garbage" (click)="deletePlugin(plugin.id, i)">delete</i>
-            <span [hidden]="!plugin.settings.length > 0">
-                <a [routerLink]="[plugin.id, 'settings']">
-                    <i class="material-icons">settings</i>
-                </a>
-            </span>
+            <div class="actions-wrapper">
+              <i class="material-icons garbage" (click)="deletePlugin(plugin.id, i)">delete</i>
+              <span [hidden]="!plugin.settings.length > 0">
+                  <a [routerLink]="[plugin.id, 'settings']">
+                      <i class="material-icons">settings</i>
+                  </a>
+              </span>
+            </div>
           </ng-template>
         </p-column>
         </p-dataTable>
