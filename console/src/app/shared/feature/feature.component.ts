@@ -12,7 +12,6 @@ export class FeatureComponent implements OnInit {
   constructor() {
   }
   ngOnInit() {
-    // console.log(this.prefix);
   }
 
 }

@@ -20,8 +20,7 @@
       </p-column>
       <p-column field="description" header="Description" [sortable]="true">
         <ng-template let-col let-plugin="rowData" pTemplate="body">
-          <span>{{ plugin.description | truncatechars : 70 : '' }}<span class="etc" *ngIf="plugin?.description?.length > 70">
-              ... </span></span>
+          <span>{{ plugin.description }}</span>
         </ng-template>
       </p-column>
       <p-column field="version" header="Version" [sortable]="true">

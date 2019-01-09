@@ -10,10 +10,10 @@
 
   
   <div class="list-content">
-    <p class="lead">{{project?.description}}</p>
+    <p class="map-description lead">{{project?.description}}</p>
     <p class="executed-title" *ngIf="featuredMaps?.length > 0">Recently added</p>
     <div class="featured">
-      <app-feature [items]="featuredMaps"></app-feature>
+      <app-feature [items]="featuredMaps" prefix="maps"></app-feature>
     </div>
 
     <div class="row">
@@ -63,8 +63,7 @@
         </p-column>
         <p-column field="description" header="Description" [sortable]="true">
           <ng-template let-col let-map="rowData" pTemplate="body">
-            <span>{{ map.description | truncatechars : 70 : '' }}<span class="etc" *ngIf="map?.description?.length > 70">
-                ... </span></span>
+            <div class="ellipsis">{{ map.description }}</div>
           </ng-template>
         </p-column>
         <p-column field="createdAt" header="Created" [sortable]="true">
