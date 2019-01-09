@@ -35,8 +35,8 @@ export class ProcessResultComponent implements OnChanges {
     }
   }
 
-  isStringOrObject(item){
-    return typeof item == 'string' ? true : false;
+  isObject(item){
+    return typeof item == 'object' ? true : false;
   }
 
   expandOutput(action: ActionResultView) {
