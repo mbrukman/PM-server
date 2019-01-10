@@ -1,8 +1,13 @@
-.pm-main-wrapper {
+.main {
+    width: 100%;
+    .header-settings{
+        margin-bottom: 15px;
+    }
     .settings-form {
-      max-width: 850px;
-      input,select{
-        width: 800px
+      width: 455px;
+      padding-left: 25px;
+      label,input,select{
+        width: 100%;
         }
     }
 }

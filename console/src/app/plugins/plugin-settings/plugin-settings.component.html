@@ -1,7 +1,9 @@
 <div class="main ">
+    <div class="section-title-wrapper head-title header-settings">
+        <h1 class="section-title">Settings</h1>
+    </div>
     <div class="row">
         <div class="col-sm-12">
-            <h1>Settings</h1>
             <form [formGroup]="settingsForm" (ngSubmit)="onSubmitForm(settingsForm.value)" class="settings-form">
                 <div class="form-group"  *ngFor="let param of plugin.settings; let k = index">
                     <div [ngSwitch]="param.valueType" >
@@ -23,7 +25,7 @@
                         </label>
                     </div>
                 </div>
-                <button type="submit" class="btn kh-btn-blue kh-btn-block"><span>Save</span></button>
+                <button type="submit" class="kh-btn-blue kh-btn"><span>Save</span></button>
             </form>
         </div>
     </div>
