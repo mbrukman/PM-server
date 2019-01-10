@@ -221,6 +221,7 @@
                   </option>
                 </select>
                 <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
+                <input formControlName="value" type="checkbox" step="any" class="form-control" *ngSwitchCase="'boolean'">
                 <input formControlName="value" type="number" class="form-control" *ngSwitchCase="'int'">
                 <input formControlName="value" type="text" class="form-control" *ngSwitchDefault>
               </div>
