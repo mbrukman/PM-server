@@ -1,7 +1,7 @@
 <table  class="table">
     <thead>
         <tr>
-        <th scope="col">Name</th>
+        <th class="header-name" scope="col">Name</th>
         <th scope="col">Url</th>
         <th scope="col">Tags</th>
         <th scope="col">Actions</th>
@@ -20,9 +20,9 @@
         <td class="item">{{item.url}}</td>
         <td class="item">{{item.attributes}}</td>
         <td>
-            <button class="btn btn-link" (click)="deleteAgent(item._id)" tooltip="Delete" placement="bottom"><i class="material-icons">delete</i></button>
-            <button class="btn btn-link" (click)="editAgent(i)" tooltip="Edit" placement="bottom"><i class="material-icons">edit</i></button>
-            <button class="btn btn-link" (click)="removeAgentFromGroup(item._id, group._id)" tooltip="Remove from group"
+            <button class="btn btn-link icons-btn" (click)="deleteAgent(item._id)" tooltip="Delete" placement="bottom"><i class="material-icons">delete</i></button>
+            <button class="btn btn-link icons-btn" (click)="editAgent(i)" tooltip="Edit" placement="bottom"><i class="material-icons">edit</i></button>
+            <button class="btn btn-link icons-btn" (click)="removeAgentFromGroup(item._id, group._id)" tooltip="Remove from group"
             placement="bottom" *ngIf="group"><i class="material-icons">close</i></button>
         </td>
         </tr>

@@ -5,8 +5,11 @@ table{
         }
     }
     td {
-        padding: 0;
+        padding: 0 15px;
         vertical-align: middle;
+        .icons-btn{
+            padding-left: 0;
+        }
     
         > div{
         display: flex;
@@ -22,6 +25,9 @@ table{
         font-size: 18px;
         color: #dddddd;
         font-weight: inherit
+    }
+    .header-name{
+        margin-left: 15px;
     }
     .item {
         height: 16px;
