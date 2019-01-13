@@ -3,14 +3,16 @@
     height: 90px;
     display: flex;
     justify-content: space-between;
+    flex-direction: column;
     h5 {
         font-size: 18px;
         color: $kaholo-orange;
         margin-bottom: 18px;
     }
-    .create-group{
-        margin-top: 40px;
+    .add-group{
+        direction: rtl;
     }
+    
 }
 
 .drag-over {
@@ -47,7 +49,6 @@
                     }
                 }
                 .name {
-                    margin-left: 15px;
                     font-size: 14px;
                     color: $turquoise-blue;
                 }
