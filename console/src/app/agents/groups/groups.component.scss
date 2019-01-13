@@ -1,10 +1,15 @@
 @import "~assets/sass/variables";
 .top {
     height: 90px;
+    display: flex;
+    justify-content: space-between;
     h5 {
         font-size: 18px;
         color: $kaholo-orange;
         margin-bottom: 18px;
+    }
+    .create-group{
+        margin-top: 40px;
     }
 }
 

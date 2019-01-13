@@ -7,12 +7,12 @@
 
 .main{
   flex-grow: 1;
-
+  font-family: "Roboto";
   .row{
     padding: 18px 40px;
     .groups{
       padding-left: 4px;
-      padding-right: 25px;
+      padding-right: 45px;
       width: 30%;
       height: 810px;
       margin-top: 17px
@@ -21,7 +21,7 @@
     .agents{
       margin-top: 17px;
       padding-right: 0;
-      padding-left: 25px;
+      padding-left: 45px;
       width: 70%;
       border-left: 1px solid #4c5156;
       height: 810px;
