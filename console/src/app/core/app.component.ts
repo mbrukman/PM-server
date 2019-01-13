@@ -8,7 +8,7 @@ import { ToastOptions, ToastyConfig, ToastyService } from 'ng2-toasty';
 import { SocketService } from '../shared/socket.service';
 import { SetupService } from '@core/setup/setup.service';
 import { MapsService } from '@maps/maps.service';
-
+import {Map} from '@maps/models/map.model';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
   title = 'app';
   search: boolean = false;
   notificationSubscription: Subscription;
-
+  currentMap: Map;
   constructor(private mapsService: MapsService,
     private router: Router,
     private socketService: SocketService,
@@ -31,13 +31,15 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.mapsService.getCurrentMap().subscribe(map => {
+      this.currentMap = map
+    })
     this.notificationSubscription = this.socketService.getNotificationAsObservable().subscribe(notification => {
       if (notification.mapId) {
-        this.mapsService.getCurrentMap().subscribe(map => {
-          if ((map) && (map.id == notification.mapId)) {
-            this.showMessage(notification)
-          }
-        });
+
+        if ((this.currentMap) && (this.currentMap.id == notification.mapId)) {
+          this.showMessage(notification)
+        }
       } else {
         this.showMessage(notification);
       }
