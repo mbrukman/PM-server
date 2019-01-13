@@ -7,7 +7,7 @@ import { IAttribute } from './attribute.interface';
 export interface IActionParam {
   id?: string;
   _id?: string;
-  value: string;
+  value: string | boolean;
   code: boolean;
   name?: string;
 
