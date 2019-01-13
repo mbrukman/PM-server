@@ -36,7 +36,7 @@
         tr {
             td {
                 cursor: pointer;
-                padding: 0;
+                padding: 0 0 0 8px;
                 vertical-align: middle;
                 .btn {
                     padding: 5px
@@ -53,7 +53,7 @@
                     color: $turquoise-blue;
                 }
                 &.manage {
-                    width: 76px;
+                    width: 84px;
                     .manage-wrapper {
                         display: none
                     }

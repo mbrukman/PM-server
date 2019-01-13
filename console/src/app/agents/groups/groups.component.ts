@@ -66,6 +66,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
   }
 
   allAgents(){
+    this.currentGroupIndex = null;
     this.agentsService.selectGroup(null);
   }
 
