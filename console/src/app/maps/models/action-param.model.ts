@@ -9,7 +9,7 @@ import { Serializable } from '@core/models/serializable.model';
 export class ActionParam extends Serializable implements IActionParam {
   id?: string;
   _id?: string;
-  value: string = undefined;
+  value: any= undefined;
   code: boolean = undefined;
   viewName?: string;
   name?: string;

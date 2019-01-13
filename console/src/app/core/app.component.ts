@@ -52,7 +52,7 @@ export class AppComponent implements OnInit {
       title: notification.title,
       msg: notification.message,
       showClose: true,
-      timeout: 5000
+      timeout: 5000 
     };
     switch (notification.type) {
       case 'default':
