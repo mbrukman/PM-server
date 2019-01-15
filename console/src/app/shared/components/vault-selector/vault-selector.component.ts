@@ -19,7 +19,7 @@ export class VaultSelectorComponent implements OnInit, ControlValueAccessor {
 
   results: string[];
   text :string = "";
-  @Input() c:FormGroup; 
+  @Input() formGroup: FormGroup; 
   options = { query: {}, fields: 'key', limit: 5 }
   propagateChange : (_: any) => { };
 
@@ -32,7 +32,7 @@ export class VaultSelectorComponent implements OnInit, ControlValueAccessor {
   }
 
   onSelect(){
-    this.c.controls.value = new FormControl(this.text)
+    this.formGroup.controls.value = new FormControl(this.text)
     this.propagateChange(this.text);
   }
 
@@ -44,7 +44,6 @@ export class VaultSelectorComponent implements OnInit, ControlValueAccessor {
   }
 
   search(event) {
-    // this.onChange()
     this.options.query = event.query;
     this.vaultService.getVaultItems(this.options).subscribe(vaultItems => {
       this.mapResult(vaultItems)
