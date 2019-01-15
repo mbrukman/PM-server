@@ -208,7 +208,7 @@
               <div class="col-6" [ngSwitch]="param.value.type" [hidden]="param.value.code">
                 <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
                 
-                <app-vault-selector *ngSwitchCase="'vault'" formControlName="value" [c]="param" ></app-vault-selector>
+                <app-vault-selector *ngSwitchCase="'vault'" formControlName="value"></app-vault-selector>
 
                 <select formControlName="value" class="form-control" *ngSwitchCase="'autocomplete'"> 
                   <option *ngFor="let opt of methods[processForm.value.actions[index].method].params[k].options"
