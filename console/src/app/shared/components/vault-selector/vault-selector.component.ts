@@ -19,7 +19,6 @@ export class VaultSelectorComponent implements OnInit, ControlValueAccessor {
 
   results: string[];
   text :string = "";
-  @Input() formGroup: FormGroup; 
   options = { query: {}, fields: 'key', limit: 5 }
   propagateChange : (_: any) => { };
 
@@ -32,7 +31,6 @@ export class VaultSelectorComponent implements OnInit, ControlValueAccessor {
   }
 
   onSelect(){
-    this.formGroup.controls.value = new FormControl(this.text)
     this.propagateChange(this.text);
   }
 
