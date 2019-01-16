@@ -10,7 +10,7 @@ import { ConfirmComponent } from '../../shared/confirm/confirm.component';
 import { ImportModalComponent } from './import-modal/import-modal.component';
 
 import { FilterOptions } from '@shared/model/filter-options.model'
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+
 
 @Component({
   selector: 'app-project-details',
