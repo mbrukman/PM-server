@@ -22,7 +22,17 @@ div {
 }
 
 div {
+  color: $greyish-text;
   .actions-dnd {
+    .edit-delete-btns{
+      border: 1px solid transparent;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: transparent;
+      line-height: 1.5;
+      color: $greyish-text;
+    }
+    
     .action-tile {
       &:hover {
         cursor: grab;
@@ -37,17 +47,37 @@ div {
     }
   }
 
+  .add-action{
+        width: 122px;
+        float: right;
+        margin: 25px 8px;
+  }
+
 }
 
-.clearfix {
-  color: $greyish-text;
-  &:hover {
-    box-shadow: none;
+::ng-deep .panel-body{
+  padding-right: 6px;
+  padding-top: 0px;
+}
+
+::ng-deep .panel-open{
+  background: #25292c;
+  .card-header{
+    border: none;
+    background: #25292c;
+  }
+  .clearfix{
+    color: $pale-blue;  
+  }
+  .arrow{
+    transform: rotate(180deg);
   }
 }
 
 .process-form {
   margin-bottom: 55px;
+  border: 1px solid #4c5156;
+  border-top: 0px;
   .action-form {
     font-size: 13px;
     padding-right: 10px;
@@ -63,19 +93,28 @@ div {
   }
 }
 
+::ng-deep .card{
+  border-bottom: 1px solid #4c5156;
+}
+
+.btn-group{
+  margin-right: 25px;
+}
+
 .dropdown-pm {
   border: 2px solid #97999b;
-  border-radius: 25px;
-  height: 21px;
-  width: 60px;
+  border-radius: 9px;
+  height: 22px;
+  width: 54px;
   text-align: center;
   line-height: initial;
   cursor: pointer;
-  font-size: 13px;
-  &:hover {
-    border-color: $turquoise-blue;
-  }
-  &[aria-expanded="true"] {
-    border-color: $turquoise-blue;
+  border-color: $pale-blue;
+  color: $pale-blue;
+
+  .fa{
+    display: flex;
+    justify-content: center;
+    font-size: 20px;
   }
 }

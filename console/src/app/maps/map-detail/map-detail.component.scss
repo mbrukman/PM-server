@@ -25,37 +25,35 @@
   }
 
   .action-buttons {
-    //flex : 0 0 30%;
-    padding : 0 15px;
-
-    .btn {
-      &.execute-btn{
-        span {
-          margin-left: 5px;
-        }
-      }
-    }
+    padding : 0 22px;
 
     > *:not(:first-child){
-      margin-left: 10px;
+      margin-left: 15px;
     }
 
     &:last-of-type{
       display: flex;
       justify-content: flex-end;
     }
+
+    select{
+      padding: 0px 6px;
+      width: 134px;
+      border-radius: 3px solid $input-bg;
+    }
+
+    .kh-btn{
+      cursor: pointer;
+      min-width: 80px;
+    }
   }
 
 }
 
-.header {
-  height: 48px;
-  padding: 15px;
-  h1 {
-    font-size: 20px;
-    line-height: 18px;
-    color: $text-color;
-
+.head-title{
+  flex-shrink: 0;
+  h1{
+    margin: 0px 0px 0px 20px;
   }
 }
 

@@ -1,8 +1,8 @@
 <div class="container">
-  <span *ngIf="!triggers || triggers?.length === 0">No triggers yet.</span>
+  <p *ngIf="!triggers || triggers?.length === 0">No Triggers Yet</p>
 
-  <div class="table-wrapper">
-    <table class="table" *ngIf="triggers?.length > 0">
+  <div class="table-wrapper" *ngIf="triggers?.length > 0">
+    <table class="table" >
       <tbody>
       <tr *ngFor="let trigger of triggers; let i = index;">
         <td>{{ trigger.name }}</td>
@@ -20,6 +20,6 @@
   </div>
 
   <div class="bottom">
-    <button type="button" class="btn btn-primary btn-block" (click)="openTriggerFormModal()">Create new trigger</button>
+    <button type="button" class="kh-btn-blue kh-btn" (click)="openTriggerFormModal()">Create New</button>
   </div>
 </div>

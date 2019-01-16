@@ -22,6 +22,14 @@
   .main {
     overflow-y: hidden;
   }
+  h3{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .material-icons{
+      cursor: pointer;
+    }
+  }
   .map-management {
     max-width: 450px;
     padding: 0;
@@ -32,17 +40,24 @@
 
 .map-controllers {
   background: $dark-background;
-  text-align: right;
+  display: flex;
+  flex-direction: row-reverse;
   padding-right: 25px;
-  .btn {
-    color: $greyish-text;
-    background: transparent;
-    padding: 5px;
-    &:hover {
-      background: rgba(254, 234, 255, 0.3);
+  .zoom{
+    border-radius: 19px;
+    margin-top: 15px;
+    border: 1px solid $unselected-env-nav;
+    padding: 0px 5px;
+    .btn {
+      color:$unselected-env-nav;
+      background: transparent;
+      padding: 5px;
       cursor: pointer;
+
+    
     }
   }
+  
 }
 
 .graph {
