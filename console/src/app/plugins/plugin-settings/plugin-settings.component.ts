@@ -7,7 +7,6 @@ import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/observable/of';
 import { Observable } from 'rxjs/Observable';
 
-
 @Component({
     selector: 'app-plugin-settings',
     templateUrl: './plugin-settings.component.html',
@@ -23,14 +22,17 @@ export class PluginSettingsComponent implements OnInit{
 
     ngOnInit(){
         
-        let pluginId = this.route.snapshot.params.id
+        let pluginId = this.route.snapshot.params.id;
         this.pluginsService.getById(pluginId).subscribe(plugin =>{
             this.plugin = plugin;
             this.initSettingsForm();
-            this.generateAutocompleteParams()
+            this.generateAutocompleteParams();
+        
             
         }) 
     }
+
+
 
     generateAutocompleteParams() {
         if (!this.plugin) return;
@@ -51,16 +53,15 @@ export class PluginSettingsComponent implements OnInit{
                 })
             
         })
-            
-        
     }
 
     initSettingsForm() {
         let controls = {};
         this.plugin.settings.forEach(param => {
-            controls[param.name] = new FormControl();
+            controls[param.name] = new FormControl(param.value);
         })
         this.settingsForm = new FormGroup(controls);
+       
     }
 
     onSubmitForm(value){
