@@ -103,7 +103,21 @@ module.exports = {
         }).catch((error) => {
             req.io.emit('notification', { title: 'Whoops..', message: `Error getting projects list`, type: 'error' });
 
-            winston.log('error', "Error creating new project", error);
+            winston.log('error', "Error getting projects list", error);
+            res.status(500).send(error);
+        })
+    },
+
+
+    filterRecentMaps: (req, res) => {
+        hooks.hookPre('project-filter-maps', req).then(() => {
+            return projectsService.filterRecentMaps(req.params.projectId);
+        }).then(data => {
+            return res.json(data);
+        }).catch((error) => {
+            req.io.emit('notification', { title: 'Whoops..', message: `Error getting recent maps`, type: 'error' });
+
+            winston.log('error', "Error getting recent maps", error);
             res.status(500).send(error);
         })
     },
