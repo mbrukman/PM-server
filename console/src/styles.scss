@@ -21,9 +21,9 @@ html, body {
   border:none;
   outline: none !important;
   cursor: pointer;
-  height: 36px;
+  height: 38px;
   border-radius: 19px;
-  padding: 5px 16px;
+  padding: 5px 22px;
   font-family: Roboto;
   font-size: 15px;
   font-weight: 500;
@@ -31,6 +31,10 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
+  &:not(:last-child){
+    margin-right: 15px !important;
+}
+ 
   
   &:not(.bs){
     min-width: 101px;
@@ -51,10 +55,16 @@ html, body {
 
   &-blue{
     background-color:#44acdf;
+    &:hover{
+      background-color:#2897ce
+    }
   }
 
   &-gray{
     background-color:#828384;
+    &:hover{
+      background-color: #737475
+    }
   }
 }
 
