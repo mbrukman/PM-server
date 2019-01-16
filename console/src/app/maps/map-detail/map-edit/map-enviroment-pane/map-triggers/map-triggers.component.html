@@ -1,7 +1,7 @@
 <div class="container">
-  <p *ngIf="!triggers || triggers?.length === 0">No Triggers Yet</p>
+  <p [hidden]="triggers?.length > 0">No Triggers Yet</p>
 
-  <div class="table-wrapper" *ngIf="triggers?.length > 0">
+  <div class="table-wrapper" [hidden]="triggers?.length? false: true">
     <table class="table" >
       <tbody>
       <tr *ngFor="let trigger of triggers; let i = index;">

@@ -55,22 +55,30 @@ div {
 
 }
 
-::ng-deep .panel-body{
-  padding-right: 6px;
-  padding-top: 0px;
-}
 
-::ng-deep .panel-open{
-  background: #25292c;
-  .card-header{
-    border: none;
+
+::ng-deep{
+
+  .panel-body{
+    padding-right: 6px;
+    padding-top: 0px;
+  }
+
+  .panel-open{
     background: #25292c;
+    .card-header{
+      border: none;
+      background: #25292c;
+    }
+    .clearfix{
+      color: $pale-blue;  
+    }
+    .arrow{
+      transform: rotate(180deg);
+    }
   }
-  .clearfix{
-    color: $pale-blue;  
-  }
-  .arrow{
-    transform: rotate(180deg);
+  .card{
+    border-bottom: 1px solid #4c5156;
   }
 }
 
@@ -91,10 +99,6 @@ div {
     margin-bottom: 10px;
     text-align: center;
   }
-}
-
-::ng-deep .card{
-  border-bottom: 1px solid #4c5156;
 }
 
 .btn-group{

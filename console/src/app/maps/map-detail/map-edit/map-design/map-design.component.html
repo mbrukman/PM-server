@@ -1,7 +1,7 @@
 <div class="wrapper row design-wrapper" #wrapper>
   <div class="main">
     <h3 class="pane-header">Design
-        <i class="material-icons" (click)="onClose()" *ngIf="editing">keyboard_arrow_right</i>
+        <i class="material-icons" (click)="onClose()" [hidden]="!editing">keyboard_arrow_right</i>
     </h3>
     <div class="map-controllers">
       <div class="zoom">
