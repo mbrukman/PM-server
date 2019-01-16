@@ -6,7 +6,6 @@ import {Plugin} from '@plugins/models/plugin.model'
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/observable/of';
 import { Observable } from 'rxjs/Observable';
-import {VaultService} from '@shared/vault.service'
 
 @Component({
     selector: 'app-plugin-settings',
@@ -19,7 +18,7 @@ export class PluginSettingsComponent implements OnInit{
     plugin = new Plugin();
     methods: object = {};
     options:any = []
-    constructor(private route: ActivatedRoute,private pluginsService: PluginsService,private router:Router, private vaultService : VaultService){}
+    constructor(private route: ActivatedRoute,private pluginsService: PluginsService,private router:Router){}
 
     ngOnInit(){
         
