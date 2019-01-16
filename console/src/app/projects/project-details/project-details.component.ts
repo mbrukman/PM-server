@@ -36,6 +36,9 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     this.routeReq = this.route.params.subscribe(params => {
       this.id = params['id'];
       this.getProjectDetails();
+      this.projectsService.filterRecentMaps(this.id).subscribe(recentMaps => {
+        this.featuredMaps = recentMaps;
+      })
     });
   }
 
@@ -45,10 +48,6 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
         this.router.navigate(['NotFound'])
       }
       this.project = project;
-      this.projectsService.filterRecentMaps(this.project.id).subscribe(recentMaps => {
-        this.featuredMaps = recentMaps;
-      })
-
     },
     error => {
       this.router.navigate(['NotFound'])
