@@ -9,27 +9,62 @@
   margin-right: 0;
 
   .main{
+    overflow-y: hidden;
     display: flex;
     flex-grow: 1;
     padding: 0;
     border-left: 1px solid $cool-grey;
     flex-direction: column;
-  }
-}
 
+    .pane-header {
+      @extend .pane-header;
+      margin-bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .material-icons{
+        cursor: pointer;
+      }
+    }
 
-.wrapper {
-  .main {
-    overflow-y: hidden;
-  }
-  h3{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    .material-icons{
-      cursor: pointer;
+    .graph {
+      background: $dark-background;
+      width : initial !important;
+      height : initial !important;
+      flex-grow: 1;
+    
+      ::ng-deep{
+        > svg {
+          .hidden{
+            visibility: hidden;
+          }
+        }
+      }
+    }
+
+    .map-controllers {
+      background: $dark-background;
+      display: flex;
+      flex-direction: row-reverse;
+      padding-right: 25px;
+      .zoom{
+        border-radius: 19px;
+        margin-top: 15px;
+        border: 1px solid $unselected-env-nav;
+        padding: 0px 5px;
+        .btn {
+          color:$unselected-env-nav;
+          background: transparent;
+          padding: 5px;
+          cursor: pointer;
+    
+        
+        }
+      }
+      
     }
   }
+
   .map-management {
     max-width: 450px;
     padding: 0;
@@ -38,54 +73,9 @@
   }
 }
 
-.map-controllers {
-  background: $dark-background;
-  display: flex;
-  flex-direction: row-reverse;
-  padding-right: 25px;
-  .zoom{
-    border-radius: 19px;
-    margin-top: 15px;
-    border: 1px solid $unselected-env-nav;
-    padding: 0px 5px;
-    .btn {
-      color:$unselected-env-nav;
-      background: transparent;
-      padding: 5px;
-      cursor: pointer;
 
-    
-    }
-  }
-  
-}
 
-.graph {
-  background: $dark-background;
-  width : initial !important;
-  height : initial !important;
-  flex-grow: 1;
 
-  ::ng-deep{
-    > svg {
-      .hidden{
-        visibility: hidden;
-      }
-    }
-  }
-}
 
-.pane-header {
-  @extend .pane-header;
-  margin-bottom: 0;
-}
 
-/* port styling */
-.available-magnet {
-  fill: green;
-}
 
-/* element styling */
-.available-cell rect {
-  stroke-dasharray: 5, 2;
-}

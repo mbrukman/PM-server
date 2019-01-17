@@ -24,14 +24,7 @@ div {
 div {
   color: $greyish-text;
   .actions-dnd {
-    .edit-delete-btns{
-      border: 1px solid transparent;
-      font-size: 1rem;
-      cursor: pointer;
-      background-color: transparent;
-      line-height: 1.5;
-      color: $greyish-text;
-    }
+    
     
     .action-tile {
       &:hover {
@@ -58,7 +51,6 @@ div {
 
 
 ::ng-deep{
-
   .panel-body{
     padding-right: 6px;
     padding-top: 0px;
@@ -106,14 +98,7 @@ div {
 }
 
 .dropdown-pm {
-  border: 2px solid #97999b;
-  border-radius: 9px;
-  height: 22px;
-  width: 54px;
-  text-align: center;
-  line-height: initial;
   cursor: pointer;
-  border-color: $pale-blue;
   color: $pale-blue;
 
   .fa{

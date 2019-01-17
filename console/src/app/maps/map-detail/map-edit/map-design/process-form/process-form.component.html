@@ -140,10 +140,9 @@
               <span *ngIf="processForm.get('actions').at(i).get('name').value">{{processForm.get('actions').at(i).get('name').value}} (#{{i + 1}})</span>
               <span *ngIf="!processForm.get('actions').at(i).get('name').value">Action #{{i + 1}}</span>
               <span>
-            <button type="button" class="edit-delete-btns" (click)="editAction(i)"><i
+            <button type="button" class="white-btns" (click)="editAction(i)"><i
               class="material-icons">mode_edit</i></button>
-            <button type="button" class="edit-delete-btns" (click)="removeAction(i)"><i
-              class="material-icons">delete</i></button>
+            <button type="button" class="white-btns" (click)="removeAction(i)"> <i class="material-icons"> delete_outline</i></button>
           </span>
             </div>
           </div>

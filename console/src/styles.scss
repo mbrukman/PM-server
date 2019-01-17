@@ -17,6 +17,16 @@ html, body {
   @extend .section-title;
 }
 
+.white-btns{
+  border: 1px solid transparent;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: transparent;
+  line-height: 1.5;
+  color: $greyish-text;
+  width: 32px;
+}
+
 .kh-btn{
   border:none;
   outline: none !important;
