@@ -24,6 +24,6 @@ export class SettingsService {
   }
 
   setupDbConnectionString(data) {
-    return this.http.post(`${serverUrl}api/setup/db`, data);
+    return this.http.post(`${serverUrl}api/settings/db`, data);
   }
 }

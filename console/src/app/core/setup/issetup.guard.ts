@@ -4,7 +4,7 @@ import { CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
 
-import { SettingsService } from './setup.service';
+import { SettingsService } from './settings.service';
 
 @Injectable()
 export class IsSetUpGuard implements CanActivate {

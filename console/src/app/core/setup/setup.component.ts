@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { SettingsService } from './setup.service';
+import { SettingsService } from './settings.service';
 import { SocketService } from '../../shared/socket.service';
 import { Router } from '@angular/router';
 
