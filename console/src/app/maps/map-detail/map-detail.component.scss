@@ -27,10 +27,6 @@
   .action-buttons {
     padding : 0 22px;
 
-    > *:not(:first-child){
-      margin-left: 15px;
-    }
-
     &:last-of-type{
       display: flex;
       justify-content: flex-end;
@@ -43,7 +39,6 @@
     }
 
     .kh-btn{
-      cursor: pointer;
       min-width: 80px;
     }
   }

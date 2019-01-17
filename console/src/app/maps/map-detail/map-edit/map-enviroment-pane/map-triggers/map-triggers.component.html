@@ -7,12 +7,8 @@
       <tr *ngFor="let trigger of triggers; let i = index;">
         <td>{{ trigger.name }}</td>
         <td>
-          <button type="button" class="white-btns" (click)="openTriggerFormModal(i)">
-            <i class="material-icons">mode_edit</i>
-          </button>
-          <button type="button" class="white-btns" (click)="removeTrigger(i)">
-            <i class="material-icons"> delete_outline</i>
-          </button>
+            <i class="material-icons pointer" (click)="openTriggerFormModal(i)">mode_edit</i>
+            <i class="material-icons pointer" (click)="removeTrigger(i)"> delete_outline</i>
         </td>
       </tr>
       </tbody>

@@ -16,15 +16,8 @@ html, body {
 .section-title {
   @extend .section-title;
 }
-
-.white-btns{
-  border: 1px solid transparent;
-  font-size: 1rem;
+.pointer{
   cursor: pointer;
-  background-color: transparent;
-  line-height: 1.5;
-  color: $greyish-text;
-  width: 32px;
 }
 
 .kh-btn{
@@ -60,7 +53,7 @@ html, body {
   }
 
   &:disabled{
-    cursor: not-allowed;
+    cursor: default;
   }
 
   &-blue{
