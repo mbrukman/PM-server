@@ -6,7 +6,7 @@ import 'rxjs/operators/filter';
 import { ToastOptions, ToastyConfig, ToastyService } from 'ng2-toasty';
 
 import { SocketService } from '../shared/socket.service';
-import { SettingsService } from '@core/setup/setup.service';
+import { SettingsService } from '@core/setup/settings.service';
 import { MapsService } from '@maps/maps.service';
 import {Map} from '@maps/models/map.model';
 
