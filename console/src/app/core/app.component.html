@@ -1,9 +1,10 @@
 <div class="row root">
-  <div class="pm-sidebar" *ngIf="setupService.setup">
+  <div class="pm-sidebar" *ngIf="settingsService.settings.isSetup">
     <div class="logo-wrapper">
       <img src="/assets/images/logo-app.svg">
     </div>
     <ul class="nav flex-column">
+      <div>
       <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
         <a class="nav-link" routerLink=""
            tooltip="Dashboard"
@@ -46,15 +47,17 @@
           <a class="dropdown-item" routerLink="/projects/create">New Project</a>
         </div>
       </li>
-
-
+    </div>
+      <div>
       <li class="nav-item">
         <a class="nav-link"
-           href="http://www.productionmap.com/production-map-user-guide/"
+           href="http://wiki.kaholo.io/"
            tooltip="Help"
            target="_blank"
            placement="right"><i class="material-icons">help_outline</i></a>
       </li>
+      <li class="version">{{settingsService.settings.version}}</li>
+    </div>
     </ul>
   </div>
   <div class="main">

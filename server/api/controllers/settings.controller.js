@@ -2,19 +2,24 @@ const fs = require('fs');
 const path = require('path');
 const winston = require('winston');
 const expressWinston = require('express-winston');
-const winstonMongo = require('winston-mongodb');
-const mongoose = require('mongoose');
 
+const mongoose = require('mongoose');
+const env = require('../../env/enviroment')
 let config = require('../../env/config');
 
 module.exports = {
-    isSetUp: (req, res) => {
+    settings: (req, res) => {
         mongoose.connect(config.dbURI, { useMongoClient: true })
         .then(() => {
-            return res.send(true);
+            return true;
         })
         .catch(() => {
-            return res.send(false)
+            return false;
+        }).then(isSetup=>{
+            res.send({
+                isSetup : isSetup,
+                version : env.version
+              })
         })
     },
 

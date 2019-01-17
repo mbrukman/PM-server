@@ -6,7 +6,7 @@ import 'rxjs/operators/filter';
 import { ToastOptions, ToastyConfig, ToastyService } from 'ng2-toasty';
 
 import { SocketService } from '../shared/socket.service';
-import { SetupService } from '@core/setup/setup.service';
+import { SettingsService } from '@core/setup/setup.service';
 import { MapsService } from '@maps/maps.service';
 import {Map} from '@maps/models/map.model';
 
@@ -23,7 +23,7 @@ export class AppComponent implements OnInit {
   constructor(private mapsService: MapsService,
     private router: Router,
     private socketService: SocketService,
-    public setupService: SetupService,
+    public settingsService: SettingsService,
     private toastyService: ToastyService,
     private toastyConfig: ToastyConfig) {
     this.toastyConfig.theme = 'material';
