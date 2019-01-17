@@ -27,16 +27,15 @@ export class UpsertVaultItemsComponent implements OnInit {
   onConfirm() {
     this.vaultService.upsert(this.vault).subscribe(() => {
       this.result.next(true);
-    },
-      (err) => {
-        console.log(err);
-        this.result.next(false);
-      })
-    this.bsModalRef.hide();
+      this.onClose();
+    },(err) => {
+      console.log(err);
+      this.result.next(false);
+      this.onClose();
+    })
   }
 
   onClose() {
-    this.result.next();
     this.bsModalRef.hide();
   }
 

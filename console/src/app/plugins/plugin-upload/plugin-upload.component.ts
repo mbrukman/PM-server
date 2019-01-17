@@ -47,7 +47,6 @@ export class PluginUploadComponent implements OnInit {
   }
 
   onClose() {
-    this.closing.next();
     this.bsModalRef.hide();
   }
 

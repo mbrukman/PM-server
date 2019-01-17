@@ -80,7 +80,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
 
   onConfirm(form) {
     this.result.next(form);
-    this.bsModalRef.hide();
+    this.onClose();
   }
 
   onSelectTrigger() {

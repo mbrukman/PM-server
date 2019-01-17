@@ -38,7 +38,7 @@ export class SelectGroupsComponent implements OnInit, OnDestroy {
 
   onConfirm(): void {
     this.result.next(this.selectedGroups);
-    this.bsModalRef.hide();
+    this.onClose();
   }
 
   nodeSelect(event) {
@@ -46,7 +46,6 @@ export class SelectGroupsComponent implements OnInit, OnDestroy {
   }
 
   onClose(): void {
-    this.result.next();
     this.bsModalRef.hide();
   }
 
