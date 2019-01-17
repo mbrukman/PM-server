@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { SetupService } from './setup.service';
+import { SettingsService } from './setup.service';
 import { SocketService } from '../../shared/socket.service';
 import { Router } from '@angular/router';
 
@@ -14,7 +14,7 @@ export class SetupComponent implements OnInit, OnDestroy {
   setupReq: any;
   error: string;
 
-  constructor(private router: Router, private setupService: SetupService, private notificationService: SocketService) {
+  constructor(private router: Router, private settingsService: SettingsService, private notificationService: SocketService) {
   }
 
   ngOnInit() {
@@ -34,7 +34,7 @@ export class SetupComponent implements OnInit, OnDestroy {
   }
 
   onSubmitForm(form) {
-    this.setupReq = this.setupService.setupDbConnectionString(form)
+    this.setupReq = this.settingsService.setupDbConnectionString(form)
       .subscribe(() => {
         this.notificationService.setNotification({
           title: 'Great! We are ready to go',
