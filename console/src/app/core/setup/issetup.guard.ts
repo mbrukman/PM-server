@@ -16,13 +16,14 @@ export class IsSetUpGuard implements CanActivate {
   }
 
   isServerSetup(): Observable<boolean> | boolean {
-    return this.settingsService.getSettings().map(res=>{
+    return this.settingsService.getSettings().map(res => {
       console.log(res);
-      
+
       if (!res.isSetup) {
         this.router.navigate(['/', 'setup']);
         return false;
       }
       return true;
     })
+  }
 }
