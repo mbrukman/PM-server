@@ -1,99 +1,86 @@
 @import "~assets/sass/variables";
 @import "~assets/sass/base";
-
-.wrapper-form{
-
-  h3 {
-    @extend .pane-header;
-    border: none;
-  }
-
-  .actions-dnd {
-    
-    
-    .action-tile {
-      &:hover {
-        cursor: grab;
-      }
-      &:active {
-        cursor: grabbing !important;
-      }
+.wrapper-form {
+    h3 {
+        @extend .pane-header;
+        border: none;
     }
-    .gu-transit {
-      background: black;
-      padding: 5px 10px 5px 20px;
+    .actions-dnd {
+        .action-tile {
+            &:hover {
+                cursor: grab;
+            }
+            &:active {
+                cursor: grabbing !important;
+            }
+        }
+        .gu-transit {
+            background: black;
+            padding: 5px 10px 5px 20px;
+        }
     }
-  }
-
-  .add-action{
+    .add-action {
         width: 122px;
         float: right;
         margin: 25px 8px;
-  }
-
-  
-    ::ng-deep{
-      .panel-body{
-      padding-right: 6px;
-      padding-top: 0px;
-      }
-
-      .panel-open{
-      background: #25292c;
-      .card-header{
-        border: none;
-        background: #25292c;
-        
-      }
-      .clearfix{
-        color: $pale-blue;  
-      }
-      .arrow{
-        transform: rotate(180deg);
-      }
-      }
-      .card{
-      border-bottom: 1px solid #4c5156;
-      }
     }
+    ::ng-deep {
+        .panel-body {
+            padding-right: 6px;
+            padding-top: 0px;
+        }
+        .panel-open {
+            background: #25292c;
+            .card-header {
+                border: none;
+                background: #25292c;
+            }
+            .clearfix {
+                color: $pale-blue;
+            }
+            .arrow {
+                transform: rotate(180deg);
+            }
+        }
+        .card {
+            border-bottom: 1px solid #4c5156;
 
-    ::ng-deep.card-header{
-      cursor: pointer;
+            &:hover{
+              box-shadow: initial;
+            }
+
+            .card-header {
+                cursor: pointer;
+            }
+        }
     }
-
-
     .process-form {
-    margin-bottom: 55px;
-
-    border-top: 0px;
-    .action-form {
-    font-size: 13px;
-    padding-right: 10px;
-    padding-left: 10px;
-    .action-params {
-      margin-bottom: 5px;
+        margin-bottom: 55px;
+        border-top: 0px;
+        .action-form {
+            font-size: 13px;
+            padding-right: 10px;
+            padding-left: 10px;
+            .action-params {
+                margin-bottom: 5px;
+            }
+        }
+        .pane-bottom {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
     }
+    .btn-group {
+        margin-right: 25px;
     }
-    .pane-bottom {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    text-align: center;
-    }
-    }
-
-    .btn-group{
-    margin-right: 25px;
-    }
-
     .dropdown-pm {
-    cursor: pointer;
-    color: $pale-blue;
-
-    .fa{
-    display: flex;
-    justify-content: center;
-    font-size: 20px;
+        cursor: pointer;
+        color: $pale-blue;
+        .fa {
+            display: flex;
+            justify-content: center;
+            font-size: 20px;
+        }
     }
-  }
-  
 }
