@@ -1,0 +1,30 @@
+<div class="main">
+  <div class="section-title-wrapper head-title header">
+    <h1 class="section-title">Vault</h1>
+    <button class="kh-btn kh-btn-blue add-item" (click)="upsertItem()">add item</button>
+  </div>
+
+  <div class="content-wrapper">
+    <p-dataTable [value]="vaultItems" [rows]="15" [paginator]="true" [pageLinks]="4" [hidden]="!vaultItems || !vaultItems.length">
+      <p-column field="name" header="Name" [sortable]="true" [style]="{'width':'300px'}">
+        <ng-template let-col let-item="rowData" pTemplate="body">
+          <span>{{ item.key }}</span>
+        </ng-template>
+      </p-column>
+      <p-column field="description" header="Description" [sortable]="true">
+        <ng-template let-col let-item="rowData" pTemplate="body">
+          <div class="item-description ellipsis">{{item.description}}</div>
+        </ng-template>
+      </p-column>
+      <p-column field="" header="Actions" [style]="{'width':'150px', 'text-align':'center'}">
+        <ng-template let-col let-i="rowIndex" let-item="rowData" pTemplate="body">
+          <div class="actions-wrapper">
+            <button class="btn btn-link" (click)="deleteVaultItem(item.id)" tooltip="Delete" placement="bottom"><i
+                class="material-icons">delete_outline</i></button>
+            <button class="btn btn-link" (click)="upsertItem(item)" tooltip="Edit" placement="bottom"><i class="material-icons">edit</i></button>
+          </div>
+        </ng-template>
+      </p-column>
+    </p-dataTable>
+  </div>
+</div>

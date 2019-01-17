@@ -1,0 +1,18 @@
+.main {
+    width: 100%;
+    .header{
+        display: flex;
+        justify-content: space-between;
+       .add-item{
+            margin-right: 37px;
+        }
+    }
+
+    .content-wrapper{
+        padding: 18px 40px;
+
+        .actions-wrapper{
+            text-align: center;
+        }
+    }
+}

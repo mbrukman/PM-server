@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { MapsService } from '../../maps/maps.service';
-import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,13 +12,14 @@ export class DashboardComponent implements OnInit {
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936']
   };
-  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute) {
+  constructor(private mapsService: MapsService) {
   }
 
   ngOnInit() {
     this.mapsService.getDistinctMapExecutionsResult().subscribe(executions => {
       this.executions = executions;
       executions.forEach(execution => {
+        Object.assign(execution,execution.map)
         let processes = [];
         execution.exec.agentsResults.forEach(agent => {
           processes = [...processes, ...agent.processes];
@@ -48,8 +48,4 @@ export class DashboardComponent implements OnInit {
   }
 
 
-  goToProject($event, id){
-    $event.stopPropagation();
-    this.router.navigate([`/projects/${id}`], { relativeTo: this.route });
-  }
 }

@@ -11,6 +11,7 @@ import { ImportModalComponent } from './import-modal/import-modal.component';
 
 import { FilterOptions } from '@shared/model/filter-options.model'
 
+
 @Component({
   selector: 'app-project-details',
   templateUrl: './project-details.component.html',
@@ -24,7 +25,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   archiveReq: any;
   filterTerm: string;
   filterOptions : FilterOptions = new FilterOptions();
-  featuredMaps: Map[];
+  featuredMaps: Map[] = [];
 
   constructor(private route: ActivatedRoute,
     private router: Router,
@@ -34,19 +35,19 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.routeReq = this.route.params.subscribe(params => {
       this.id = params['id'];
-      this.getProjectDetails(true);
+      this.getProjectDetails();
+      this.projectsService.filterRecentMaps(this.id).subscribe(recentMaps => {
+        this.featuredMaps = recentMaps;
+      })
     });
   }
 
-  getProjectDetails(init:boolean = false){
+  getProjectDetails(){
     this.projectReq = this.projectsService.detail(this.id, this.filterOptions).subscribe(project => {
       if (!project) {
         this.router.navigate(['NotFound'])
       }
       this.project = project;
-
-      if(init)
-        this.featureMaps(project.maps);
     },
     error => {
       this.router.navigate(['NotFound'])
@@ -80,14 +81,6 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  featureMaps(maps) {
-    maps = maps.sort((a, b) => {
-      const dateA = new Date(a.createdAt);
-      const dateB = new Date(b.createdAt);
-      return dateB.getTime() - dateA.getTime();
-    });
-    this.featuredMaps = maps.slice(0, 4);
-  }
 
   openImportModal() {
     const modal = this.modalService.show(ImportModalComponent);

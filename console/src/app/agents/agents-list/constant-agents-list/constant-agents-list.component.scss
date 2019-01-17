@@ -1,0 +1,40 @@
+table {
+    thead {
+        th {
+            height: 21px;
+            font-size: 18px;
+            color: #dddddd;
+            font-weight: inherit
+        }
+    }
+    tbody {
+        tr {
+            cursor: grab;
+        }
+    }
+    td {
+        padding: 0 15px;
+        vertical-align: middle;
+        .icons-btn {
+            padding-left: 0;
+        }
+        >div {
+            display: flex;
+            align-items: center;
+            >i {
+                margin-right: 7px;
+            }
+        }
+        &.item {
+            height: 16px;
+            font-size: 14px;
+            color: #dddddd;
+            .name {
+                .material-icons {
+                    font-size: 13px;
+                    margin-right: 13px;
+                }
+            }
+        }
+    }
+}

@@ -4,11 +4,11 @@ import { CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
 
-import { SetupService } from './setup.service';
+import { SettingsService } from './setup.service';
 
 @Injectable()
 export class IsSetUpGuard implements CanActivate {
-  constructor(private setupService: SetupService, private router: Router) {
+  constructor(private settingsService: SettingsService, private router: Router) {
   }
 
   canActivate(): boolean | Observable<boolean> {
@@ -16,15 +16,14 @@ export class IsSetUpGuard implements CanActivate {
   }
 
   isServerSetup(): Observable<boolean> | boolean {
-    return this.setupService.isSetup()
-      .take(1)
-      .map(isSetup => {
-        if (!isSetup) {
-          this.router.navigate(['/', 'setup']);
-        }
-        this.setupService.setup = isSetup;
-        return isSetup;
-      });
-  }
+    return this.settingsService.getSettings().map(res => {
+      console.log(res);
 
+      if (!res.isSetup) {
+        this.router.navigate(['/', 'setup']);
+        return false;
+      }
+      return true;
+    })
+  }
 }

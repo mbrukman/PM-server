@@ -13,9 +13,13 @@
           </select>
         </p>
       </div>
-      <p>
-        Description: <span placeholder="Add description..." [(inlineEdit)]="map.description" (valueChanged)="onMapUpdate()" *ngIf="map">    </span>
-      </p>
+      <div class="form-row">
+        <p class="col-4">
+          Description: 
+          <span class="map-description" placeholder="Add description..." [(inlineEdit)]="map.description" (valueChanged)="onMapUpdate()" *ngIf="map">
+          </span>
+        </p>
+      </div>
       <div class="form-row">
         <p class="col-4">
           Queue: <input type="number"

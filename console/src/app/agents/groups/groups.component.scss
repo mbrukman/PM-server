@@ -1,9 +1,72 @@
 @import "~assets/sass/variables";
+.top {
+    height: 90px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    h5 {
+        font-size: 18px;
+        color: $kaholo-orange;
+        margin-bottom: 18px;
+    }
+    .add-group{
+        direction: rtl;
+    }
+    
+}
 
-.card-link {
-  color: $turquoise-blue !important;
-  cursor: pointer;
-  &:hover {
-    text-decoration: underline solid $turquoise-blue !important;
-  }
+.drag-over {
+    border: 2px dashed $kaholo-orange;
+}
+
+.table {
+    thead {
+        th {
+            cursor: pointer;
+            color: $turquoise-blue;
+            font-size: 18px;
+            font-weight: inherit;
+            .title {
+                margin-left: 10px;
+                color: $turquoise-blue;
+            }
+        }
+    }
+    tbody {
+        tr {
+            td {
+                cursor: pointer;
+                padding: 0 0 0 8px;
+                vertical-align: middle;
+                .btn {
+                    padding: 5px
+                }
+                >div {
+                    display: flex;
+                    align-items: center;
+                    >i {
+                        margin-right: 7px;
+                    }
+                }
+                .name {
+                    font-size: 14px;
+                    color: $turquoise-blue;
+                }
+                &.manage {
+                    width: 84px;
+                    .manage-wrapper {
+                        display: none
+                    }
+                }
+            }
+            &:hover,
+            &.selected {
+                background-color: $hover-color !important;
+                box-shadow: -4px 0px 0px 0px $turquoise-blue;
+                .manage .manage-wrapper {
+                    display: table-cell;
+                }
+            }
+        }
+    }
 }

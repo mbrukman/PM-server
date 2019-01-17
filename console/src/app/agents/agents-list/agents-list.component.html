@@ -1,43 +1,33 @@
 <div class="main">
-  <h1 class="section-title">Agents</h1>
+  <div class="head-title">
+    <h1 class="section-title">Agents</h1>
+  </div>
   <div class="row">
-    <div class="col-3">
-      <app-groups [agents]="agentsStatus"></app-groups>
+    <div class="groups">
+      <app-agents-groups [agents]="agentsStatus"></app-agents-groups>
     </div>
-    <div class="col-9">
-      <h5>Agents</h5>
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Url</th>
-            <th scope="col">Tags</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-
-          <tr *ngFor="let item of agents | in: selectedGroup?.agents; let i = index" pDraggable="dd" (onDragStart)="dragStart($event, item)">
-            <td>
-              <div>
-                <i [ngClass]="{'text-success': agentsStatus[item?.id]?.alive, 'text-danger': !agentsStatus[item?.id]?.alive}"
-                  *ngIf="agentsStatus" class="material-icons">cloud_circle</i>
-                {{item.name}}
-              </div>
-            </td>
-            <td>{{item.url}}</td>
-            <td>{{item.attributes}}</td>
-            <td>
-              <button class="btn btn-link" (click)="deleteAgent(item._id)" tooltip="Delete" placement="bottom"><i class="material-icons">delete</i></button>
-              <button class="btn btn-link" (click)="editAgent(i)" tooltip="Edit" placement="bottom"><i class="material-icons">edit</i></button>
-              <button class="btn btn-link" (click)="removeAgentFromGroup(item._id, selectedGroup._id)" tooltip="Remove from group"
-                placement="bottom" *ngIf="selectedGroup"><i class="material-icons">close</i></button>
-            </td>
-          </tr>
-
-        </tbody>
-      </table>
-
+    <div class="agents">
+      <div *ngIf="!selectedGroup">
+        <div class="top">
+          <h5>Agents &#8594; All </h5>
+        </div>
+        <app-constant-agents-list [agentsStatus]="agentsStatus" [agents]="agents"></app-constant-agents-list>
+      </div>
+      <div *ngIf="selectedGroup">
+        <div class="top">
+          <h5>Agent &#8594; {{selectedGroup?.name}}</h5>
+          <div class="agents-group-actions">
+            <div class="agent-tabs">
+              <a (click)="showAgents()"><span [ngClass]="{'selected':constants}">Constants</span> <span class="agentsLength">({{selectedGroup?.agents?.length}})</span></a>
+              <a [ngClass]="{'selected':!constants}" (click)="showFilters()" class="filters">Filters <span class="agentsLength">({{selectedGroup?.filters?.length}})</span></a>
+            </div>
+            <button [hidden]="constants" class="kh-btn kh-btn-blue add-filter-btn" (click)="addNewFilterParam(selectedGroup)"><span>Add
+                filter</span></button>
+          </div>
+        </div>
+        <app-constant-agents-list [hidden]="!constants" [group]="selectedGroup" [agentsStatus]="agentsStatus" [agents]="agents"></app-constant-agents-list>
+        <app-agents-group-filters-list [hidden]="constants" [group]="selectedGroup"></app-agents-group-filters-list>
+      </div>
     </div>
   </div>
 </div>

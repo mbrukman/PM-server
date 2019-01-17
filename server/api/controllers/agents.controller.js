@@ -1,4 +1,3 @@
-const async = require("async");
 const winston = require("winston");
 const _ = require("lodash");
 
@@ -24,8 +23,9 @@ module.exports = {
             plugins = activePlugins;
             return agentsService.setDefaultUrl(agent);
         }).then(() => {
-            return agentsService.checkPluginsOnAgent(agent);
+            return agentsService.checkPluginsOnAgent(agent); 
         }).then(agentsPlugin => {
+            let currentAgent = agentsService.getByKey(agent.key);
             agentsPlugin = JSON.parse(agentsPlugin);
             // the agent plugin returns an object with keys as plugin names and version number as version: { 'cmd': '0.0.1' }
             const filesPaths = plugins.reduce((total, current) => {
@@ -38,21 +38,22 @@ module.exports = {
             if (!filesPaths || filesPaths.length === 0) {
                 return res.status(204).send();
             }
-            async.each(filesPaths,
-                function (filePath, callback) {
+            Promise.all(filesPaths.map(function asyncFilesPaths(filePath){ 
+                return new Promise((resolve,reject) =>{
                     agentsService.installPluginOnAgent(filePath, agent).then(() => {
-                    }).catch((e) => {
-                        winston.log('error', "Error installing on agent", e);
-                    });
-                    callback();
-                },
-                function (error) {
-                    if (error) {
-                        winston.log('error', "Error installing plugins on agent", error);
-                    }
-                    return res.status(204).send();
-                });
-        });
+                     }).catch((e) => {
+                       winston.log('error', "Error installing on agent", e);
+                     }); 
+                     resolve()
+                }) 
+            })).catch((error)=>{
+                if (error) {
+                    winston.log('error', "Error installing plugins on agent", error);
+                 }
+                 return res.status(204).send();
+                })
+            })
+        
     },
     /* Delete an agent */
     delete: (req, res) => {
@@ -196,6 +197,19 @@ module.exports = {
         });
     },
 
+    updateGroup: (req, res) => {
+        hooks.hookPre('group-list', req).then(() => {
+            return agentsService.updateGroup(req.params.id, req.body);
+        }).then((group) => {
+            req.io.emit('notification', { title: 'Excellent', message: `Group was updated`, type: 'success' });
+            return res.json(group);
+        }).catch(error => {
+            req.io.emit('notification', { title: 'Whoops...', message: `Error updating group`, type: 'error' });
+            winston.log('error', "Error creating group", error);
+            res.status(500).send(error);
+        });
+    },
+
     addGroupFilters: (req, res) => {
         hooks.hookPre('group-add-filters', req).then(() => {
             return agentsService.addGroupFilters(req.params.id, req.body);
@@ -205,6 +219,19 @@ module.exports = {
         }).catch(error => {
             req.io.emit('notification', { title: 'Whoops...', message: `Error creating group`, type: 'error' });
             winston.log('error', "Error creating group", error);
+            res.status(500).send(error);
+        });
+    },
+
+    deleteFilterFromGroup: (req, res) => {
+        hooks.hookPre('group-remove-agent', req).then(() => {
+            return agentsService.deleteFilterFromGroup(req.params.groupId, req.params.index)
+        }).then((group) => {
+            req.io.emit('notification', { title: 'Yay!', message: `Filter removed`, type: 'success' });
+            return res.json(group);
+        }).catch(error => {
+            req.io.emit('notification', { title: 'Whoops...', message: `Error removing filter`, type: 'error' });
+            winston.log('error', "Error removing agent group", error);
             res.status(500).send(error);
         });
     },

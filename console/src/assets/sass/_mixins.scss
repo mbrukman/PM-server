@@ -1,3 +1,5 @@
+@import "~assets/sass/variables";
+
 @mixin border-box($color, $top, $right, $bottom, $left) {
   border-style: solid;
   border-width: $top $right $bottom $left;
@@ -49,7 +51,153 @@
             }
           }
         }
+      
+
       }
+    }
+    .ui-paginator-page{
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      justify-content: center;
+    }
+  }
+}
+
+@mixin page-list-items() {
+  .list-content{
+    padding: 18px 40px;
+    .executed-title{
+      color: $kaholo-orange;
+      font-size: 18px;
+    }
+    .row{
+      margin: 30px 0px;
+      display: flex;
+      justify-content: space-between;
+    .filters {
+      display: flex;
+      align-items: center;
+      .filter-text {
+          @include searchBox();
+      }
+
+      @include checkbox();
+      .control{
+        padding-right: 30px;
+      }
+    }
+  }
+  }}
+
+
+
+
+ 
+
+  @mixin checkbox() {
+    .control {
+      display: block;
+      position: relative;
+      padding-left: 30px;
+      margin-bottom: 5px;
+      padding-top: 3px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 3px;
+      input {
+        position: absolute;
+        z-index: -1;
+        opacity: 0;
+    }
+    .control_indicator {
+      position: absolute;
+      top: 2px;
+      left: -2px;
+      height: 24px;
+      width: 24px;
+      background: #3f4247;
+      border-radius: 3px;
+      
+    }
+    input:checked ~ .control_indicator {
+        background: #2aa1c0;
+    }
+    
+    input:checked ~ .control_indicator:after {
+        display: block;
+    }  
+    .control_indicator:after {
+        box-sizing: unset;
+        content: '';
+        position: absolute;
+        display: none;
+  
+        left: 10px;
+        top: 6px;
+        width: 3px;
+        height: 8px;
+        border: solid #ffffff;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+  }
+}
+
+  
+
+@mixin header{
+  background-color: #25292c;
+  h1{
+
+    height: 25px;
+    font-family: Roboto;
+    font-size: 22px;
+    font-weight: 300;
+    color: $kaholo-orange;
+    margin-left: 44px;
+    margin-top: 25px;
+    margin-bottom: 20px
+  }
+}
+
+@mixin placeholder{
+  height: 16px;
+  font-family: Roboto;
+  font-size: 14px;
+  color: #868e96;
+}
+
+@mixin input {
+  input{
+    height: 36px;
+    border-radius: 3px;
+    background-color: #3f4247;
+    &::placeholder{
+      @include placeholder()
+    }
+  }
+}
+
+@mixin select{
+  select{
+    height: 36px;
+    border-radius: 3px;
+    background-color: #3f4247;
+    &::placeholder{
+      @include placeholder()
+    }
+  }
+}
+
+@mixin textarea{
+  textarea{
+    height: 100px;
+    border-radius: 3px;
+    background-color: #3f4247;
+    &::placeholder{
+      @include placeholder()
     }
   }
 }

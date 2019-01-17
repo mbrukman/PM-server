@@ -1,57 +1,59 @@
 @import "~assets/sass/variables";
-
 .container {
-
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  padding : 0;
-
-  table {
-    td {
-      vertical-align: middle;
-    }
-
-    &.agents-table{
-      tbody tr td{
-        &:first-of-type{
-          width: 60%;
-          padding: 0 0 0 10px;
-        }
-        &:last-of-type{
-          text-align: right;
-          padding: 0 10px 0 0;
-
-          i{
-            line-height: initial;
-          }
-        }
-      }
-    }
-  }
-
-  button {
-    align-self: center;
-    border-radius: 25px;
-    background: transparent;
-    border: 4px solid $turquoise-blue;
-    &:hover {
-      background: $turquoise-blue;
-      color: #000;
-    }
-  }
-
-  > div{
-    flex: 0 0 50%;
     display: flex;
     flex-direction: column;
-
-    &:not(:last-of-type){
-      border-bottom : 1px solid rgba(0,0,0,.1);
+    overflow-y: auto;
+    padding: 0;
+    .kh-btn {
+        width: max-content;
+        margin-left: 15px;
     }
-
-    .not-chosen{
-      padding: 10px;
+    .not-chosen {
+        margin: 15px;
     }
-  }
+    .groups {
+        >p {
+            margin-left: 15px;
+            font-size: 17px;
+            color: $pale-blue;
+        }
+        table td {
+          i {
+            font-size: 18px;
+            display: block;
+          }
+        }
+    }
+    .agents {
+        table td {
+            .dot {
+                height: 8px;
+                width: 8px;
+                background-color: #bbb;
+                border-radius: 50%;
+                &.green {
+                    background-color: #38ba24;
+                }
+                &.red {
+                    background-color: #de293f;
+                }
+            }
+        }
+    }
+    table {
+        td {
+            border: none;
+            vertical-align: middle;
+            padding-left: 15px;
+            &:first-of-type {
+                padding-right: 0px;
+                width: 20px;
+            }
+        }
+    }
+    >div {
+        flex: 0 0 50%;
+        display: flex;
+        flex-direction: column;
+    }
 }

@@ -1,0 +1,51 @@
+.grid-view {
+    width: 100%;
+
+    .dashboard-card {
+        margin-right: 25px;
+        margin-bottom: 30px;
+        width: calc(25% - 20px);
+        max-width: 452px;
+        overflow-y: auto; // height: fit-content;
+        cursor: pointer;
+
+        &:nth-child(4n) {
+            margin-right: 0px;
+        }
+
+        .card-body {
+            display: flex;
+            font-family: Roboto;
+
+            .content-card {
+                color: #dddddd;
+                width: calc(100% - 130px);
+                .card-title {
+                    font-size: 18px;
+                    line-height: 0.89;
+                    color: #44acdf;
+                    padding-bottom: 16px;
+                }
+                .project {
+                    display: flex;
+                    .link {
+                        color: #44acdf;
+                    }
+                }
+            }
+
+            .chart-wrapper {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                margin-top: -20px;
+            }
+
+            &.no-chart{
+                .content-card {
+                    width: 100%;
+                }
+            }
+        }
+    }
+}

@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
+import { Subscription, Observable } from 'rxjs'
 import 'rxjs/operators/take';
 
 @Component({
@@ -9,15 +10,18 @@ import 'rxjs/operators/take';
   templateUrl: './projects-list.component.html',
   styleUrls: ['./projects-list.component.scss']
 })
-export class ProjectsListComponent implements OnInit {
+export class ProjectsListComponent implements OnInit, OnDestroy {
   projects: Project[];
   projectsReq: any;
   featuredReq: any;
   featuredProjects: Project[];
-  filterTerm: string;
   page: number = 1;
   resultCount: number;
   filterOptions : FilterOptions = new FilterOptions();
+  filterKeyUpSubscribe : Subscription;
+  
+  @ViewChild('globalFilter') globalFilterElement : ElementRef;
+
 
   constructor(private projectsService: ProjectsService) {
     this.onDataLoad = this.onDataLoad.bind(this);
@@ -25,6 +29,11 @@ export class ProjectsListComponent implements OnInit {
 
   ngOnInit() {
     this.reloadProjects()
+
+    this.filterKeyUpSubscribe = Observable.fromEvent(this.globalFilterElement.nativeElement,'keyup')
+      .debounceTime(300).subscribe(()=>{
+        this.loadProjectLazy();
+      })
 
     let featuredFilterOptions = new FilterOptions();
     featuredFilterOptions.limit = 4;
@@ -34,11 +43,15 @@ export class ProjectsListComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(){
+    this.filterKeyUpSubscribe.unsubscribe();
+  }
+
   reloadProjects(fields=null,page=this.page,filter=this.filterOptions){
     this.projectsReq = this.projectsService.filter(fields,page,filter).subscribe(this.onDataLoad);
   }
 
-  loadProjectLazy(event) {
+  loadProjectLazy(event?) {
     let fields, page, sort;
     if (event) {
       fields = event.filters || null;

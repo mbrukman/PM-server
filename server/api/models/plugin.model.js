@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 let pluginMethodParamsSchema = new Schema({
     name: { type: String, required: true },
     viewName: String,
-    type: { type: String, enum: ['string', 'int', 'float', 'options', 'autocomplete', 'file', 'text', 'boolean'], required: true },
+    type: { type: String, enum: ['string', 'int', 'float', 'options', 'autocomplete', 'file', 'text', 'boolean', 'vault'], required: true },
     options: [{ id: String, name: String }],
     model: {
         type: String, required: function () {
@@ -28,6 +28,24 @@ let pluginMethodSchema = new Schema({
     params: [pluginMethodParamsSchema]
 });
 
+let pluginSettingsSchema = {
+    name:{ type: String, required: true },
+    valueType:String,
+    viewName: String,
+    value:{type:String,default: ''},
+    model: {
+        type: String, required: function () {
+            return this.type === 'autocomplete'
+        }
+    },
+    propertyName: {
+        type: String, required: function () {
+            return this.type === 'autocomplete'
+        }
+    },
+    query: Schema.Types.Mixed
+}
+
 let pluginSchema = new Schema({
     name: { type: String, required: true },
     type: { type: String, enum: ["server", "executer", "trigger", "module"], required: true },
@@ -38,6 +56,7 @@ let pluginSchema = new Schema({
     version: { type: String, required: true },
     imgUrl: String,
     methods: [pluginMethodSchema],
+    settings:[pluginSettingsSchema],
     file: { type: String, required: true }
 });
 

@@ -1,71 +1,78 @@
-<div class="main pm-main-wrapper">
-  <h1 class="section-title">Maps</h1>
-  <div class="featured">
-    <app-feature [items]="featuredMaps"></app-feature>
+<div class="main">
+  <div class="head-title">
+    <h1 class="section-title">Maps</h1>
   </div>
-  <div class="filter d-flex justify-content-between align-items-end">
-    <h5 class="section-sub-title">All maps</h5>
-    
-    <div class="filters">
-      <div class="filter-archive">
-        <label class="form-check-label">
-          <input id="archive" type="checkbox" class="form-check-input" [(ngModel)]="filterOptions.isArchived" (change)="reloadMaps()" >
-          Show archived maps
-        </label>
-      </div>
-      <div class="filter-text">
-        <div>
-          <i class="material-icons" *ngIf="!filterTerm">search</i>
-          <i class="material-icons text-light" *ngIf="filterTerm" (click)="filterTerm = null">close</i>
-          <input class="form-control" [(ngModel)]="filterOptions.globalFilter" type="text" placeholder="Filter" (keyup)="loadProjectLazy()" />
+  <div class="list-content">
+    <p class="executed-title">Recently maps</p>
+
+    <div class="map-cards-wrapper">
+      <map-cards [maps]="recentMaps"></map-cards>
+    </div>
+    <div class="row">
+      <a routerLink="/maps/create" class="kh-btn kh-btn-blue">Add a New Map</a>
+      <div class="filters">
+        <div class="filter-archive">
+          <label class="control control-checkbox">
+            Show archived maps
+            <input type="checkbox" id="archive" [(ngModel)]="filterOptions.isArchived" (change)="reloadMaps()">
+            <div class="control_indicator"></div>
+          </label>
+        </div>
+        <div class="filter-text">
+          <div>
+            <i class="material-icons" *ngIf="!filterOptions.globalFilter">search</i>
+            <i class="material-icons text-light" *ngIf="filterOptions.globalFilter" (click)="filterOptions.globalFilter = undefined">close</i>
+            <input class="form-control" [(ngModel)]="filterOptions.globalFilter" type="text" placeholder="Filter" #globalFilter />
+          </div>
         </div>
       </div>
     </div>
+
+    <div class="table-wrapper">
+      <p-dataTable [value]="maps" [lazy]="true" [rows]="15" [paginator]="true" [totalRecords]="resultCount"
+        (onLazyLoad)="loadMapsLazy($event)">
+        <p-column field="name" header="Name" [sortable]="true">
+          <ng-template let-col let-map="rowData" pTemplate="body">
+            <div class="name-wrapper">
+              <i class="material-icons" [hidden]="!map.archived">archive</i>
+              <a [routerLink]="map.id">{{ map.name }}</a>
+            </div>
+          </ng-template>
+        </p-column>
+        <p-column field="project.name" header="Project" [sortable]="true">
+          <ng-template let-col let-map="rowData" pTemplate="body">
+            <a [routerLink]="['../projects', map.project.id]">{{ map.project.name }}</a>
+          </ng-template>
+        </p-column>
+        <p-column field="latestExectionResult.finishTime" header="Last Run" [sortable]="true">
+          <ng-template let-col let-map="rowData" pTemplate="body">
+            <span>{{ (map.latestExectionResult?.finishTime | date: 'dd/MM/yyyy HH:mm') || '' }}</span>
+          </ng-template>
+        </p-column>
+        <p-column field="description" header="Description" [sortable]="true">
+          <ng-template let-col let-map="rowData" pTemplate="body">
+            <div class="ellipsis">{{map.description}}</div>
+          </ng-template>
+        </p-column>
+        <p-column field="createdAt" header="Created" [sortable]="true">
+          <ng-template let-col let-map="rowData" pTemplate="body">
+            <span>{{ map.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </ng-template>
+        </p-column>
+        <p-column field="updatedAt" header="Updated" [sortable]="true">
+          <ng-template let-col let-map="rowData" pTemplate="body">
+            <span>{{ ((map.updatedAt | date: 'dd/MM/yyyy HH:mm') || '')}}</span>
+          </ng-template>
+        </p-column>
+        <p-column field="" header="Actions" [sortable]="true" [style]="{width:'120px'}">
+          <ng-template let-col let-i="rowIndex" let-map="rowData" pTemplate="body">
+            <div class="actions-wrapper">
+              <i class="material-icons garbage" (click)="onConfirmDelete(map.id)">delete_outline</i>
+            </div>
+          </ng-template>
+        </p-column>
+      </p-dataTable>
+    </div>
   </div>
 
-  <p-dataTable [value]="maps" [lazy]="true" [rows]="15" [paginator]="true" [totalRecords]="resultCount"
-               (onLazyLoad)="loadProjectLazy($event)"  [globalFilter]="filterTerm">
-    <p-column field="name" header="Name" [sortable]="true">
-      <ng-template let-col let-map="rowData" pTemplate="body">
-        <div class="name-wrapper">
-          <i class="material-icons" [hidden]="!map.archived">archive</i>
-          <a [routerLink]="map.id">{{ map.name }}</a>
-        </div>
-      </ng-template>
-    </p-column>
-    <p-column field="project.name" header="Project" [sortable]="true">
-      <ng-template let-col let-map="rowData" pTemplate="body">
-        <a [routerLink] = "['../projects', map.project.id]" >{{ map.project.name }}</a>
-      </ng-template>
-    </p-column>
-    <p-column field="latestExectionResult.finishTime" header="Last Run" [sortable]="true">
-      <ng-template let-col let-map="rowData" pTemplate="body">
-        <span>{{ (map.latestExectionResult?.finishTime | date: 'dd/MM/yyyy HH:mm') || '' }}</span>
-      </ng-template>
-    </p-column>
-    <p-column field="description" header="Description" [sortable]="true">
-      <ng-template let-col let-map="rowData" pTemplate="body">
-        <span>{{ map.description | truncatechars : 70 : '' }}<span class="etc" *ngIf="map?.description?.length > 70"> ... </span></span>
-      </ng-template>
-    </p-column>
-    <p-column field="createdAt" header="Created" [sortable]="true">
-      <ng-template let-col let-map="rowData" pTemplate="body">
-        <span>{{ map.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
-      </ng-template>
-    </p-column>
-    <p-column field="updatedAt" header="Updated" [sortable]="true">
-      <ng-template let-col let-map="rowData" pTemplate="body">
-        <span>{{ ((map.updatedAt | date: 'dd/MM/yyyy HH:mm') || '')}}</span>
-      </ng-template>
-    </p-column>
-    <p-column field="" header="Actions" [sortable]="true">
-      <ng-template let-col let-i="rowIndex" let-map="rowData" pTemplate="body">
-        <button class="btn btn-danger" (click)="onConfirmDelete(map.id)"><i class="material-icons">delete</i></button>
-      </ng-template>
-    </p-column>
-  </p-dataTable>
-  <a routerLink="/maps/create" class="btn pm create">Add map</a>
 </div>
-
-
-

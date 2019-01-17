@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Subscription, Observable } from 'rxjs';
 import * as _ from 'lodash';
 import 'rxjs/operators/take';
 import { MapsService } from '../maps.service';
@@ -14,39 +15,45 @@ import { FilterOptions } from '@shared/model/filter-options.model'
 })
 export class MapsListComponent implements OnInit, OnDestroy {
   maps: Map[];
-  mapReq: any;
-  filterTerm: string;
+  mapReq: Subscription;
   resultCount: number = 0;
   page: number = 1;
-  featuredMaps: Map[];
-  filterOptions : FilterOptions = new FilterOptions();
+  filterOptions: FilterOptions = new FilterOptions();
+  recentMaps:Map[];
+  filterKeyUpSubscribe : Subscription;
+
+  
+  @ViewChild('globalFilter') globalFilterElement : ElementRef;
 
   constructor(private mapsService: MapsService,
     private modalService: BsModalService) {
     this.onDataLoad = this.onDataLoad.bind(this)
   }
-  
+
 
   ngOnInit() {
     this.reloadMaps();
+    this.mapsService.recentMaps().subscribe(maps => {
+      this.recentMaps = maps;
+    })
 
-    var featureOptions = _.clone(this.filterOptions);
-    featureOptions.limit = 4;
-    this.mapsService.filterMaps(null,this.page,featureOptions).take(1).subscribe(data => {
-      if (data)
-        this.featuredMaps = data.items;
-    });
+    this.filterKeyUpSubscribe = Observable
+    .fromEvent(this.globalFilterElement.nativeElement,'keyup')
+    .debounceTime(300).subscribe(()=>{
+      this.loadMapsLazy();
+    })
   }
-  
-  reloadMaps(fields=null,page=this.page,filter=this.filterOptions){
-    this.mapReq = this.mapsService.filterMaps(fields,page,filter).subscribe(this.onDataLoad);
+
+  reloadMaps(fields = null, page = this.page, filter = this.filterOptions) {
+    this.mapReq = this.mapsService.filterMaps(fields, page, filter).subscribe(this.onDataLoad);
   }
 
   ngOnDestroy() {
     this.mapReq.unsubscribe();
+    this.filterKeyUpSubscribe.unsubscribe();
   }
 
-  loadProjectLazy(event?) {
+  loadMapsLazy(event?) {
     let fields, page, sort;
     if (event) {
       fields = event.filters || null;
@@ -56,24 +63,24 @@ export class MapsListComponent implements OnInit, OnDestroy {
       }
     }
     this.filterOptions.sort = sort
-    this.reloadMaps(fields,page,this.filterOptions)
+    this.reloadMaps(fields, page, this.filterOptions)
   }
 
   deleteMap(id) {
 
     this.mapsService.delete(id).subscribe(() => {
-      for(let i =0,lenght=this.featuredMaps.length; i<lenght;i++){
-        if(this.featuredMaps[i].id == id){
-          this.featuredMaps.splice(i,1);
+      for (let i = 0, lenght = this.recentMaps.length; i < lenght; i++) {
+        if (this.recentMaps[i].id == id) {
+          this.recentMaps.splice(i, 1);
           break;
         }
       }
-      this.loadProjectLazy();
+      this.loadMapsLazy();
     });
   }
 
 
-  onDataLoad(data){
+  onDataLoad(data) {
     if (!data) {
       this.maps = null;
       this.resultCount = 0;
@@ -82,23 +89,23 @@ export class MapsListComponent implements OnInit, OnDestroy {
     this.maps = data.items;
     this.resultCount = data.totalCount;
   }
-  
-  
- onConfirmDelete(id) {
-   // will be triggered by deactivate guard
-     let modal = this.modalService.show(ConfirmComponent);
-     let answers = {
-       confirm: 'Delete',
-       cancel: 'Cancel'
-     };
-     modal.content.message = 'Are you sure you want to delete? all data related to the map will get permanently lost';
-     modal.content.confirm = answers.confirm;
-     modal.content.cancel = answers.cancel;
-     modal.content.result.asObservable().subscribe(ans => {
-         if (ans === answers.confirm) {
-           this.deleteMap(id);
-         }
-      })
-       
+
+
+  onConfirmDelete(id) {
+    // will be triggered by deactivate guard
+    let modal = this.modalService.show(ConfirmComponent);
+    let answers = {
+      confirm: 'Delete',
+      cancel: 'Cancel'
+    };
+    modal.content.message = 'Are you sure you want to delete? all data related to the map will get permanently lost';
+    modal.content.confirm = answers.confirm;
+    modal.content.cancel = answers.cancel;
+    modal.content.result.asObservable().subscribe(ans => {
+      if (ans === answers.confirm) {
+        this.deleteMap(id);
+      }
+    })
+
   }
 }

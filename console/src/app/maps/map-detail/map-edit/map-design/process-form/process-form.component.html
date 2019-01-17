@@ -1,3 +1,4 @@
+<div class="wrapper-form">
 <div class="d-flex justify-content-between pane-header">
   <h3>Edit
     <span *ngIf="!action">{{processViewWrapper.process?.name? processViewWrapper.process.name: 'process'}}</span>
@@ -5,15 +6,11 @@
   </h3>
   <div *ngIf="!action">
     <div class="btn-group" dropdown placement="bottom right">
-      <span class="dropdown-pm" dropdownToggle><i class="fa fa-ellipsis-h" aria-hidden="true"></i> <i
-        class="fa fa-chevron-down" aria-hidden="true"></i></span>
+      <span class="dropdown-pm" dropdownToggle><i class="fa fa-ellipsis-h" aria-hidden="true"></i></span>
       <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
         <li role="menuitem"><a class="dropdown-item" (click)="deleteProcess()">Delete</a></li>
       </ul>
     </div>
-    <button type="button" class="btn btn-link" (click)="closePane()">
-      <i class="material-icons text-light">close</i>
-    </button>
   </div>
   <div *ngIf="action">
     <button type="button" class="btn btn-link" (click)="backToProcessView()">
@@ -29,7 +26,7 @@
       <accordion-group>
         <div accordion-heading class="clearfix">
           Details
-          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
+          <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
         </div>
         <div class="form-group">
           <label for="uuid">uuid</label>
@@ -51,7 +48,7 @@
       <accordion-group>
         <div accordion-heading class="clearfix">
           Conditions
-          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
+          <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
         </div>
         <div class="form-check">
           <label class="form-check-label">
@@ -85,7 +82,7 @@
       <accordion-group>
         <div accordion-heading class="clearfix">
           Flow Control
-          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
+          <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
         </div>
 
         <div class="form-group">
@@ -111,7 +108,7 @@
       <accordion-group>
         <div accordion-heading class="clearfix">
           Hooks
-          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
+          <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
         </div>
 
         <div class="form-group">
@@ -134,10 +131,8 @@
       <accordion-group>
         <div accordion-heading class="clearfix">
           Actions
-          <span class="float-right pull-right"><i class="material-icons">keyboard_arrow_down</i></span>
+          <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
         </div>
-        <button type="button" class="btn btn-sm btn-block pm" (click)="addNewAction()">Add action
-        </button>
         <div formArrayName="actions" class="actions-dnd" [model]="processForm.controls.actions['controls']"
              (mouseup)="onMouseUp($event)" ngxDroppable>
           <div *ngFor="let action of processForm.controls.actions['controls']; let i=index" ngxDraggable
@@ -146,14 +141,13 @@
               <span *ngIf="processForm.get('actions').at(i).get('name').value">{{processForm.get('actions').at(i).get('name').value}} (#{{i + 1}})</span>
               <span *ngIf="!processForm.get('actions').at(i).get('name').value">Action #{{i + 1}}</span>
               <span>
-            <button type="button" class="btn btn-link" (click)="editAction(i)"><i
-              class="material-icons">mode_edit</i></button>
-            <button type="button" class="btn btn-link" (click)="removeAction(i)"><i
-              class="material-icons">delete</i></button>
+              <i class="material-icons pointer" (click)="editAction(i)">mode_edit</i>
+              <i class="material-icons pointer" (click)="removeAction(i)"> delete_outline</i>
           </span>
             </div>
           </div>
         </div>
+        <button type="button" class="kh-btn-blue kh-btn add-action" (click)="addNewAction()">Add action</button>
       </accordion-group>
     </accordion>
 
@@ -204,10 +198,13 @@
               <hr>
               <div class="col-2"><input formControlName="code" type="checkbox" class="form-control"></div>
               <hr>
-
+              
               <div class="col-6" [ngSwitch]="param.value.type" [hidden]="param.value.code">
                 <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
-                <select formControlName="value" class="form-control" *ngSwitchCase="'autocomplete'">
+                
+                <app-vault-selector *ngSwitchCase="'vault'" formControlName="value"></app-vault-selector>
+
+                <select formControlName="value" class="form-control" *ngSwitchCase="'autocomplete'"> 
                   <option *ngFor="let opt of methods[processForm.value.actions[index].method].params[k].options"
                           [ngValue]="opt.id">{{ opt.value }}
                   </option>
@@ -218,6 +215,7 @@
                   </option>
                 </select>
                 <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
+                <input formControlName="value" type="checkbox" class="form-control" *ngSwitchCase="'boolean'">
                 <input formControlName="value" type="number" class="form-control" *ngSwitchCase="'int'">
                 <input formControlName="value" type="text" class="form-control" *ngSwitchDefault>
               </div>
@@ -234,5 +232,6 @@
     </div>
 
   </form>
+</div>
 </div>
 

@@ -47,7 +47,7 @@ export class SelectAgentComponent implements OnInit, OnDestroy {
 
   onConfirm(): void {
     this.result.next(this.selectedAgents);
-    this.bsModalRef.hide();
+    this.onClose();
   }
 
   nodeSelect(event) {

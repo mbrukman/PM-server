@@ -6,9 +6,9 @@ import 'rxjs/operators/filter';
 import { ToastOptions, ToastyConfig, ToastyService } from 'ng2-toasty';
 
 import { SocketService } from '../shared/socket.service';
-import { SetupService } from '@core/setup/setup.service';
+import { SettingsService } from '@core/setup/setup.service';
 import { MapsService } from '@maps/maps.service';
-
+import {Map} from '@maps/models/map.model';
 
 @Component({
   selector: 'app-root',
@@ -19,11 +19,11 @@ export class AppComponent implements OnInit {
   title = 'app';
   search: boolean = false;
   notificationSubscription: Subscription;
-
+  currentMap: Map;
   constructor(private mapsService: MapsService,
     private router: Router,
     private socketService: SocketService,
-    public setupService: SetupService,
+    public settingsService: SettingsService,
     private toastyService: ToastyService,
     private toastyConfig: ToastyConfig) {
     this.toastyConfig.theme = 'material';
@@ -31,13 +31,15 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.mapsService.getCurrentMap().subscribe(map => {
+      this.currentMap = map
+    })
     this.notificationSubscription = this.socketService.getNotificationAsObservable().subscribe(notification => {
       if (notification.mapId) {
-        this.mapsService.getCurrentMap().subscribe(map => {
-          if ((map) && (map.id == notification.mapId)) {
-            this.showMessage(notification)
-          }
-        });
+
+        if ((this.currentMap) && (this.currentMap.id == notification.mapId)) {
+          this.showMessage(notification)
+        }
       } else {
         this.showMessage(notification);
       }
@@ -50,7 +52,7 @@ export class AppComponent implements OnInit {
       title: notification.title,
       msg: notification.message,
       showClose: true,
-      timeout: 5000
+      timeout: 5000 
     };
     switch (notification.type) {
       case 'default':

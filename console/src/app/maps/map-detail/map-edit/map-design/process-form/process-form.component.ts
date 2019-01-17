@@ -70,10 +70,12 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       this.processViewWrapper.process.actions.forEach((action, actionIndex) => {
         const actionControl = <FormArray>this.processForm.controls['actions'];
         actionControl.push(this.initActionController(action));
-        if (action.params && action.params.length > 0) {
-          action.params.forEach((param, i) => {
-            let pluginParam = this.processViewWrapper.plugin.methods.find(o => o.name === this.processForm.value.actions[actionIndex].method);
-            actionControl.controls[actionIndex]['controls'].params.push(PluginMethodParam.getFormGroup(pluginParam.params[i],param));
+        
+        let pluginMethod = this.processViewWrapper.plugin.methods.find(o => o.name === action.method)
+        if (pluginMethod && pluginMethod.params && pluginMethod.params.length > 0) {
+          pluginMethod.params.forEach(pluginParam => {
+            let actionParam = action.params.find(p => p.name == pluginParam.name)
+            actionControl.controls[actionIndex]['controls'].params.push(PluginMethodParam.getFormGroup( pluginParam ,actionParam));
           });
         }
       });
@@ -109,7 +111,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       .flatMap(method => {
         return Observable.forkJoin(
           Observable.of(method), // the method
-          this.pluginsService.generatePluginParams(this.processViewWrapper.plugin._id, method.name) // generated params
+          this.pluginsService.generatePluginMethodsParams(this.processViewWrapper.plugin._id, method.name) // generated params
         );
       })
       .map(data => {
@@ -221,6 +223,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       action.controls.params.push(PluginMethodParam.getFormGroup(param));
     })
   }
+
 
   /**
    * Emitting close event

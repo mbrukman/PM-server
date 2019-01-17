@@ -14,7 +14,8 @@ export class AddConfigurationComponent {
   constructor(public bsModalRef: BsModalRef) { }
 
   onClose(emit: boolean) {
-    this.result.next(emit ? this.name : null);
+    if (emit)
+      this.result.next(this.name);
     this.bsModalRef.hide();
   }
 

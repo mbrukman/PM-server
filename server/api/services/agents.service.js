@@ -36,7 +36,7 @@ const FILTER_FIELDS = Object.freeze({
 
 /* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
 let followAgentStatus = (agent) => {
-    agents[agent.key] = {};
+    agents[agent.key] = agent.toObject();
     setDefaultUrl(agent);
     let listenInterval = setInterval(() => {
         let start = new Date();
@@ -110,11 +110,11 @@ function getAgentStatus() {
 
 function setDefaultUrl(agent) {
     return new Promise((resolve, reject) => {
-        request.post(agent.publicUrl + '/api/status', { form: { key: agent.key } }, function (error, response, body) {
+        request.post(agent.url + '/api/status', { form: { key: agent.key } }, function (error, response, body) {
             if (error) {
-                agents[agent.key].defaultUrl = agent.url;
-            } else {
                 agents[agent.key].defaultUrl = agent.publicUrl;
+            } else {
+                agents[agent.key].defaultUrl = agent.url;
             }
             resolve();
         });
@@ -128,8 +128,15 @@ function setDefaultUrl(agent) {
  */
 function evaluateGroupAgents(group) {
     group = JSON.parse(JSON.stringify(group)); // make sure its not a mongoose document
-    let agentsCopy = JSON.parse(JSON.stringify(agents));
-    let filteredAgents = Object.keys(agentsCopy).map(key => agentsCopy[key]);
+    
+    let agentsCopy = {};
+    Object.keys(agents).map(key=>{
+        let a = Object.assign({},agents[key]);
+        delete a.socket;
+        agentsCopy[key] = a;
+    })
+    
+    let filteredAgents = Object.keys(agents).map(key => agentsCopy[key]);
     group.filters.forEach(filter => {
         filteredAgents = evaluateFilter(filter, filteredAgents);
     });
@@ -226,22 +233,24 @@ function addSocketIdToAgent(agentKey, socket) {
     agents[agentKey].socket = socket;
 }
 
-function sendRequestToAgent(options, agent){
-    return new Promise((resolve,reject) => {
+function sendRequestToAgent(options, agent) {
+    return new Promise((resolve, reject) => {
 
-        options.url = agent.defaultUrl + options.url;
+        options.uri = agent.defaultUrl + options.uri;
+
         options.method = options.method || 'POST';
 
-        if (options.body){
+        if (options.body) {
             options.json = true;
             options.body.key = agent.key;
         }
         else if (options.formData)
-            Object.assign(options.formData,{key : agent.key})
+            options.formData.key =  agent.key;
+        
 
         winston.log('info', "Sending request to agent");
-        request(options,(error, response, body) => {
-            if(error){ return reject(error)}
+        request(options, function (error, response, body) {
+            if (error) { return reject(error) }
             resolve(response)
         })
     })
@@ -254,7 +263,14 @@ module.exports = {
                 return Agent.create(agent)
             }
             return Agent.findByIdAndUpdate(agentObj._id, { $set: { url: agent.url, publicUrl: agent.publicUrl } });
+        }).then(agent => {
+            agents[agent.key] = agent.toJSON();
+            return agent;
         })
+    },
+    getByKey: (agentKey) => {
+        agents[agentKey].key = agentKey;
+        return agents[agentKey];
     },
     // get an object of installed plugins and versions on certain agent.
     checkPluginsOnAgent: (agent) => {
@@ -282,14 +298,14 @@ module.exports = {
             file: {
                 value: fs.createReadStream(pluginPath),
                 options: {
-                    filename: path.basename(pluginPath)
+                    filename: path.basename(pluginPath),
                 }
             }
         };
         // if there is no agents, send this plugin to all living agents
         var requestOptions = {
-            url : "/api/plugins/install",
-            formData : formData
+            uri: "/api/plugins/install",
+            formData: formData
         };
 
         if (!agent) {
@@ -298,11 +314,11 @@ module.exports = {
                 if (!agents[i].alive) {
                     continue;
                 }
-                requests.push(sendRequestToAgent(requestOptions,agents[i]));
+                requests.push(sendRequestToAgent(requestOptions, agents[i]));
             }
             return Promise.all(requests);
         } else {
-            return Promise.all([sendRequestToAgent(requestOptions,agent)]);
+            return Promise.all([sendRequestToAgent(requestOptions, agent)]);
         }
     },
 
@@ -312,13 +328,13 @@ module.exports = {
      * @param {Agent} agent 
      * @returns {Promise<result[]>}
      */
-    deletePluginOnAgent: function(name, agent) {
+    deletePluginOnAgent: function (name, agent) {
         // if there is no agents, send this plugin to all living agents
         var requestOptions = {
-            body : {name:name},
-            url : "/api/plugins/delete"
+            body: { name: name },
+            uri: "/api/plugins/delete"
         }
-        
+
         if (!agent) {
             var requests = [];
             for (let i in agents) {
@@ -326,14 +342,14 @@ module.exports = {
                     continue;
                 }
 
-                requests.push(sendRequestToAgent(requestOptions,agents[i]));
+                requests.push(sendRequestToAgent(requestOptions, agents[i]));
             }
             return Promise.all(requests);
         } else {
-            return Promise.all([sendRequestToAgent(requestOptions,agent)]);
+            return Promise.all([sendRequestToAgent(requestOptions, agent)]);
         }
     },
-    
+
     /* restarting the agents live status, and updating the status for all agents */
     restartAgentsStatus: () => {
         agents = {};
@@ -349,6 +365,16 @@ module.exports = {
     /* update an agent */
     update: (agentId, agent) => {
         return Agent.findByIdAndUpdate(agentId, agent, { new: true });
+    },
+
+    updateGroup: (groupId, groupUpdated) => {
+
+        return Group.findOne({_id:groupId}).then((group => {
+            group.name = groupUpdated.name
+            group.filters = groupUpdated.filters
+            return group.save();
+        }))
+
     },
     /* exporting the agents status */
     agentsStatus: getAgentStatus,
@@ -415,6 +441,14 @@ module.exports = {
         return Group.update({ agents: { $in: [agentId] } }, { $pull: { agents: { $in: [agentId] } } })
     },
 
+
+    deleteFilterFromGroup: (groupId,index) => {
+        return Group.findOne({_id:groupId}).then((group) => {
+            group.filters.splice(index,1);
+            return group.save();
+        })
+    },
+
     /**
      * Removing an agent from a group
      * @param groupId
@@ -422,7 +456,10 @@ module.exports = {
      * @returns {Query|*}
      */
     removeAgentFromGroup: (groupId, agentId) => {
-        return Group.findOneAndUpdate(groupId, { $pull: { agents: { $in: [agentId] } } }, { new: true });
+        return Group.findOne({_id:groupId}).then((group) => {
+            group.agents.splice(group.agents.findIndex(agent => agent.id == agentId),1)
+            return group.save();
+        })
     },
     /**
      * Establish a room for agents

@@ -1,0 +1,44 @@
+@import "~assets/sass/variables";
+
+.pm-modal{
+    width: 510px;
+    height: 270px;
+    border-radius: 4px;
+    background-color: #2d3236;
+    .modal-header{
+        width: 510px;
+        margin-left: -16px;
+        border-bottom: 1px solid #404549;
+        h4{
+            height: 25px;
+            font-family: Roboto;
+            font-size: 22px;
+            text-align: center;
+            color: #dddddd;
+            margin-left: 185px
+        }
+    }
+    label{
+        width: 140px;
+        height: 16px;
+        font-family: Roboto;
+        font-size: 14px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: normal;
+        letter-spacing: normal;
+        color: #dddddd;
+    }
+    input{
+        width: 445px;
+        height: 36px;
+        border-radius: 3px;
+        background-color: #3f4247;
+    }
+   .modal-footer{
+       margin-right: 5px;
+
+    
+   }
+}

@@ -3,6 +3,7 @@ const router = express.Router();
 
 const projectsController = require("../controllers/projects.controller");
 
+router.get("/:projectId" , projectsController.filterRecentMaps)
 router.post("/", projectsController.filter);
 router.post("/create", projectsController.create);
 router.post("/:id", projectsController.detail);

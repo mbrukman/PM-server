@@ -1,18 +1,14 @@
 <div class="container">
-  <span *ngIf="!triggers || triggers?.length === 0">No triggers yet.</span>
+  <p [hidden]="triggers?.length > 0">No Triggers Yet</p>
 
-  <div class="table-wrapper">
-    <table class="table" *ngIf="triggers?.length > 0">
+  <div class="table-wrapper" [hidden]="triggers?.length? false: true">
+    <table class="table" >
       <tbody>
       <tr *ngFor="let trigger of triggers; let i = index;">
         <td>{{ trigger.name }}</td>
         <td>
-          <button type="button" class="btn btn-link" (click)="openTriggerFormModal(i)">
-            <i class="material-icons">mode_edit</i>
-          </button>
-          <button type="button" class="btn btn-link" (click)="removeTrigger(i)">
-            <i class="material-icons">delete</i>
-          </button>
+            <i class="material-icons pointer" (click)="openTriggerFormModal(i)">mode_edit</i>
+            <i class="material-icons pointer" (click)="removeTrigger(i)"> delete_outline</i>
         </td>
       </tr>
       </tbody>
@@ -20,6 +16,6 @@
   </div>
 
   <div class="bottom">
-    <button type="button" class="btn btn-primary btn-block" (click)="openTriggerFormModal()">Create new trigger</button>
+    <button type="button" class="kh-btn-blue kh-btn" (click)="openTriggerFormModal()">Create New</button>
   </div>
 </div>

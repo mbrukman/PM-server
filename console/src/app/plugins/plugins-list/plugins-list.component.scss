@@ -2,31 +2,61 @@
 
 .main {
   width : 100%;
-  @include table();
   .section-title-wrapper{
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 10px;
-  }
-
-  .thumbnail {
-    width: 35px;
-    max-height: 45px;
-    margin-right: 8px;
-  }
-
-  .filter {
-    h5 {
-      padding-bottom: 15px;
+    .btn-upload-plugin{
+      margin-right: 37px;
     }
-
-    @include searchBox();
-
-    input {
-      width: 220px;
-      height: 34px;
+  }
+  
+  .plugins-list{
+    padding: 18px 40px;
+    .table-wrapper{
+      @include table();
+       
+      .thumbnail {
+        width: 35px;
+        max-height: 45px;
+        margin-right: 8px;
+      }
+  
+      .actions-wrapper{
+        display: flex;
+        padding: 0 9px;
+        text-align: center;
+        
+        > * {
+          cursor: pointer;
+        }
+  
+        .garbage {
+          margin-right: 10px;
+        }
+      }
     }
-
+  
+    
+    
+    .filter {
+      h5 {
+        padding-bottom: 15px;
+      }
+  
+      @include searchBox();
+  
+      input {
+        width: 220px;
+        height: 34px;
+      }
+  
+    }
+    .btn{
+      margin-right: 15px
+    }
   }
 }
+  
+
