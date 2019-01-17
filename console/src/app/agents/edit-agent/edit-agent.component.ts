@@ -41,11 +41,10 @@ export class EditAgentComponent implements OnInit {
       }
     });
     this.result.next({ name: this.name, attributes });
-    this.bsModalRef.hide();
+    this.onClose();
   }
 
   onClose() {
-    this.result.next();
     this.bsModalRef.hide();
   }
 

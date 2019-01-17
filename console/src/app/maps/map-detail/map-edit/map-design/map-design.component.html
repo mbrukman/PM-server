@@ -1,9 +1,13 @@
 <div class="wrapper row design-wrapper" #wrapper>
   <div class="main">
-    <h3 class="pane-header">Design</h3>
+    <h3 class="pane-header">Design
+        <i class="material-icons" (click)="onClose()" [hidden]="!editing">keyboard_arrow_right</i>
+    </h3>
     <div class="map-controllers">
-      <button class="btn" (click)="onScale(0.1)"><i class="icon-zoom1" aria-hidden="true"></i></button>
-      <button class="btn" (click)="onScale(-0.1)"><i class="icon-zoom2" aria-hidden="true"></i></button>
+      <div class="zoom">
+        <button class="btn" (click)="onScale(-0.1)"><i class="material-icons">zoom_out</i></button>
+        <button class="btn" (click)="onScale(0.1)"><i class="material-icons">zoom_in</i></button>
+      </div>
     </div>
     <div id="graph" class="graph"></div>
   </div>

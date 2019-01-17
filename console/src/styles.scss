@@ -16,6 +16,9 @@ html, body {
 .section-title {
   @extend .section-title;
 }
+.pointer{
+  cursor: pointer;
+}
 
 .kh-btn{
   border:none;
@@ -50,7 +53,7 @@ html, body {
   }
 
   &:disabled{
-    cursor: not-allowed;
+    cursor: default;
   }
 
   &-blue{
@@ -326,6 +329,7 @@ rect.body {
 
 .btn {
   display: inline-flex;
+  cursor: pointer;
 
   &.pm {
     padding: 7px 29px;
@@ -335,7 +339,6 @@ rect.body {
     border: 2px solid $turquoise-blue;
 
     &:hover {
-      cursor: pointer;
       background: $turquoise-blue;
       color: $background;
       font-weight: bolder;

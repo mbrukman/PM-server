@@ -62,16 +62,15 @@ ul.nav {
         height: 24px;
       }
       &:hover {
-        color: $turquoise-blue;
+        color: $kaholo-orange;
         cursor: pointer;
       }
 
     }
 
     &.active {
-      background: $selected-tab-environment;
       a.nav-link {
-        color: $turquoise-blue
+        color: $kaholo-orange;
       }
     }
   }

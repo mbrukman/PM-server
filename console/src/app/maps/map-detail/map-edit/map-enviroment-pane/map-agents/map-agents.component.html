@@ -6,31 +6,33 @@
     <table class="table agents-table" *ngIf="map?.agents?.length > 0">
       <tbody>
       <tr *ngFor="let agent of map.agents; let i = index;">
-        <td>{{ agent?.name }}</td>
         <td>
-          <i [ngClass]="{'text-success': statuses[agent?.id]?.alive, 'text-danger': !statuses[agent?.id]?.alive}"
-          *ngIf="statuses" class="material-icons">cloud_circle</i>
+          <div class="dot"  [ngClass]="{'green': statuses[agent?.id]?.alive, 'red': !statuses[agent?.id]?.alive}"
+          *ngIf="statuses"></div>
         </td>
+        <td>{{ agent?.name }}</td>
       </tr>
 
       </tbody>
     </table>
 
-    <button type="button" class="btn btn-primary" (click)="openSelectAgentsModal()">Select agents</button>
+    <button type="button" class="kh-btn-blue kh-btn" (click)="openSelectAgentsModal()">Select agents</button>
   </div>
   <div class="groups">
+    <p>Groups</p>
     <div class="not-chosen" *ngIf="!map?.groups || map?.groups?.length === 0">
       <span>No groups selected for this map</span>
     </div>
     <table class="table" *ngIf="map?.groups?.length > 0">
       <tbody>
       <tr *ngFor="let group of map.groups; let i = index;">
+        <td><i class="material-icons">settings_input_svideo</i></td>
         <td>{{ group.name }}</td>
       </tr>
 
       </tbody>
     </table>
-    <button type="button" class="btn btn-primary" (click)="openSelectGroupsModal()">Select groups</button>
+    <button type="button" class="kh-btn-blue kh-btn" (click)="openSelectGroupsModal()">Select groups</button>
 
   </div>
 </div>
