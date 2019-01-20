@@ -33,21 +33,13 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
+  color: #ffffff;
+  
   &:not(:last-child){
     margin-right: 15px !important;
-}
- 
-  
-  &:not(.bs){
-    min-width: 101px;
-    color: #ffffff;
-
-    &:hover{
-      color: #ffffff;
-    }
   }
-
-  &:hover{
+ 
+  &:hover{ 
     text-decoration: none;
   }
 
@@ -61,7 +53,8 @@ html, body {
       background-color:#2897ce
     }
     &:disabled{
-      background-color: #35627a
+      background-color: #35627a;
+      color : #698a9c;
     }
   }
 
@@ -71,7 +64,8 @@ html, body {
       background-color: #737475
     }
     &:disabled{
-      background-color: #484b4f
+      background-color: #484b4f;
+      color: #727477;
     }
   }
 }
