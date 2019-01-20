@@ -77,9 +77,10 @@
 @mixin page-list-items() {
   .list-content{
     padding: 18px 40px;
-    .executed-title{
+    .featured-title{
       color: $kaholo-orange;
       font-size: 18px;
+      font-weight: 300;
     }
     .row{
       margin: 30px 0px;
