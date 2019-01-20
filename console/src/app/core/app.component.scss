@@ -34,16 +34,25 @@
             li.nav-item {
                 margin-bottom: 15px;
                 border-radius: 5px;
-                &.active,
-                &:hover {
+
+                &.active{
                     background: $selected-nav;
                 }
+                
+                &:not(.active):hover i{
+                    opacity: 0.5;
+                }
+                
                 a.nav-link {
+                    cursor: pointer;
+                    padding: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                     color: $text-color;
                     font-size: 24px;
                     i {
-                        width: 24px;
-                        height: 24px;
+                        font-size: 21px;
                     }
                 }
             }

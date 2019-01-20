@@ -8,7 +8,7 @@
 }
 
 html, body {
-  font-family: "OpenSans";
+  font-family: "Roboto";
   height: 100%;
   @extend .main-background;
 }
@@ -27,7 +27,6 @@ html, body {
   height: 38px;
   border-radius: 19px;
   padding: 5px 22px;
-  font-family: Roboto;
   font-size: 15px;
   font-weight: 500;
   text-align: center;
@@ -61,12 +60,18 @@ html, body {
     &:hover{
       background-color:#2897ce
     }
+    &:disabled{
+      background-color: #35627a
+    }
   }
 
   &-gray{
     background-color:#828384;
     &:hover{
       background-color: #737475
+    }
+    &:disabled{
+      background-color: #484b4f
     }
   }
 }
