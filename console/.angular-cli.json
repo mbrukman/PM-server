@@ -30,6 +30,7 @@
         "../node_modules/ng2-toasty/style-material.css",
         "./assets/sass/icons.css",
         "./assets/sass/material.css",
+        "./assets/sass/roboto.css",
         "styles.scss"
       ],
       "stylePreprocessorOptions": {
