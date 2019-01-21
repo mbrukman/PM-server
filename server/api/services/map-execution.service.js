@@ -37,7 +37,7 @@ fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 
 
 async function evaluateParam(param, typeParam, context) {
     if (!param.code) {
-        if (typeParam == 'vault') {
+        if (typeParam == 'vault' && param.value) {
             return await vaultService.getValueByKey(param.value);
         }
         return param.value;
@@ -511,7 +511,7 @@ function validate_plugin_installation(map, structure, runId, agentKey) {
         let plugins = executions[runId].executionContext.plugins;
         // check if agents has the right version of the plugins.
         const filesPaths = plugins.reduce((total, current) => {
-            if (current.version !== agents[agentKey].installed_plugins[current.name]) {
+            if (agents[agentKey].alive && current.version !== agents[agentKey].installed_plugins[current.name]) {
                 total.push(current.file);
             }
             return total;
@@ -910,7 +910,7 @@ function runProcess(map, structure, runId, agent, socket, execProcess) {
             );
         }, Promise.resolve([]))
             .then((actionsResults) => {
-                actionsExecutionCallback(null, actionsResults, map, structure, runId, agent, socket, processUUID, processIndex, resolve)
+                return actionsExecutionCallback(null, actionsResults, map, structure, runId, agent, socket, processUUID, processIndex, resolve)
             })
             .catch((error) => {
                return actionsExecutionCallback(error, null, map, structure, runId, agent, socket, processUUID, processIndex, resolve)
@@ -1116,10 +1116,14 @@ async function executeAction(map, structure, runId, agent, process, processIndex
             actionString += `${param.name}: ${action.params[param.name]}${i != params.length - 1 ? ', ' : ''}`;
     }
     executionLogService.info(runId, map._id, actionString, socket);
-
-    // will send action to agent via socket or regular request
+    
     let p;
     let settings = plugin.settings
+    if(plugin.settings[0] && plugin.settings[0].valueType == 'vault'){
+        settings[0].value = await vaultService.getValueByKey(plugin.settings[0].value);
+    }
+
+    // will send action to agent via socket or regular request
     if (agent.socket) {
         p = sendActionViaSocket(agent.socket, { action, settings }, actionExecutionForm);
     } else {

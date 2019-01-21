@@ -1,6 +1,5 @@
 @import "~assets/sass/mixins";
 .main {
-    font-family: Roboto;
     @include page-list-items();
     .list-content {
         .table-wrapper {

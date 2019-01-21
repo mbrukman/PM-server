@@ -18,16 +18,16 @@
   }
 }
 @mixin table(){
+  $row-height : 53px;
   ::ng-deep p-datatable{
     .ui-datatable{
       table{
         thead{
           background-color: #2d3236;
           tr{
-            height: 53px;
+            height: $row-height;
             td{
               height: 21px;
-              font-family: Roboto;
               font-size: 18px;
               font-weight: 500;
               color: #dddddd;
@@ -38,10 +38,9 @@
           height: 1090px;
           background-color: #2d3236;
           tr{
-            height: 53px;
+            height: $row-height;
             td{
               height: 32px;
-              font-family: Roboto;
               font-size: 14px;
               color: #dddddd;
               .ui-cell-data{
@@ -51,16 +50,26 @@
             }
           }
         }
-      
-
       }
     }
-    .ui-paginator-page{
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      display: inline-flex;
-      justify-content: center;
+
+    .ui-paginator{
+      height: $row-height;
+      display: flex;
+      align-items: center;
+
+      a:not(.ui-state-disabled):not(.ui-state-active):hover{
+        background: transparent;
+        color : $greyish-text;
+      }
+
+      .ui-paginator-page{
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: inline-flex;
+        justify-content: center;
+      }
     }
   }
 }
@@ -68,9 +77,10 @@
 @mixin page-list-items() {
   .list-content{
     padding: 18px 40px;
-    .executed-title{
+    .featured-title{
       color: $kaholo-orange;
       font-size: 18px;
+      font-weight: 300;
     }
     .row{
       margin: 30px 0px;
@@ -152,7 +162,6 @@
   h1{
 
     height: 25px;
-    font-family: Roboto;
     font-size: 22px;
     font-weight: 300;
     color: $kaholo-orange;
@@ -164,7 +173,6 @@
 
 @mixin placeholder{
   height: 16px;
-  font-family: Roboto;
   font-size: 14px;
   color: #868e96;
 }

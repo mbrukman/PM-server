@@ -17,9 +17,19 @@
     .nav-item {
       display: flex;
       align-items: center;
+      
+      .nav-link{
+        font-size: 16px;
+      }
 
       &.active {
-        border-bottom: 5px solid $turquoise-blue;
+        border-bottom: 3px solid $turquoise-blue;
+      }
+
+      &:hover{
+        .nav-link{
+          color: $turquoise-blue-hover;
+        }
       }
     }
   }
