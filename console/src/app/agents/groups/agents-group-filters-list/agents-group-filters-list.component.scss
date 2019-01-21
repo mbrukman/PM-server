@@ -14,5 +14,13 @@ table{
             font-size: 14px;
             color: #dddddd;
         }
+        .icons-btn{
+            .material-icons{
+                color:#dddddd;
+            }
+            &:hover{
+                color: #dddddd;
+            }
+        }
     }
 }

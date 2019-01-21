@@ -17,6 +17,9 @@ table {
         vertical-align: middle;
         .icons-btn {
             padding-left: 0;
+            &:hover{
+                color:#dddddd;
+            }
         }
         >div {
             display: flex;
@@ -33,8 +36,12 @@ table {
                 .material-icons {
                     font-size: 13px;
                     margin-right: 13px;
+                    
                 }
             }
+        }
+        .material-icons{
+            color:#dddddd;
         }
     }
 }

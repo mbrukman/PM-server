@@ -23,12 +23,12 @@
     thead {
         th {
             cursor: pointer;
-            color: $turquoise-blue;
+            color: #44acdf;
             font-size: 18px;
             font-weight: inherit;
             .title {
                 margin-left: 10px;
-                color: $turquoise-blue;
+                color: #44acdf;
             }
         }
     }
@@ -50,19 +50,27 @@
                 }
                 .name {
                     font-size: 14px;
-                    color: $turquoise-blue;
+                    color: #44acdf;
                 }
                 &.manage {
                     width: 84px;
                     .manage-wrapper {
-                        display: none
+                        display: none;
+                        .icons-btn{
+                            .material-icons{
+                                color:#dddddd;
+                            }
+                            &:hover{
+                                color:#dddddd
+                            }
+                        }
                     }
                 }
             }
             &:hover,
             &.selected {
                 background-color: $hover-color !important;
-                box-shadow: -4px 0px 0px 0px $turquoise-blue;
+                box-shadow: -4px 0px 0px 0px #44acdf;
                 .manage .manage-wrapper {
                     display: table-cell;
                 }
