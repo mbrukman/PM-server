@@ -153,27 +153,29 @@
 
 
     <div *ngIf="action" [formGroup]="processForm.controls.actions.at(index)" class="action-form">
+      <div class="header-action">Edit Action / Add Action</div>
       <div class="form-group">
         <label for="actionName">Name</label>
         <input type="text" class="form-control" id="actionName" formControlName="name">
       </div>
       <div class="row">
-        <div class="col">
+        <div class="col timeout">
           <label>Timeout (ms)</label>
           <input type="text" class="form-control" placeholder="Timeout in ms" formControlName="timeout">
           <small class="form-text text-muted">If set to 0 won't have timeout. Defaults to 10 min.</small>
 
         </div>
-        <div class="col">
+        <div class="col retries">
           <label>Retries</label>
           <input type="text" class="form-control" placeholder="Retries" formControlName="retries">
         </div>
       </div>
       <hr>
-      <div class="form-check">
-        <label class="form-check-label">
-          <input type="checkbox" class="form-check-input" formControlName="mandatory">
+      <div class="form-check mandatory-check">
+       <label class="form-check-label control control-checkbox">
           Mandatory
+          <input type="checkbox" class="form-check-input" formControlName="mandatory">
+          <div class="control_indicator check-control"></div>
         </label>
         <small class="form-text text-muted">If the action fails the process will stop (with failure).</small>
       </div>
@@ -185,7 +187,7 @@
       </select>
 
       <div formArrayName="params">
-        <div class="row">
+        <div class="row row-title">
           <div class="col-4">Name</div>
           <div class="col-2">Code?</div>
           <div class="col-6">Value</div>
@@ -196,7 +198,12 @@
             <div class="row action-params">
               <div class="col-4">{{param.value.viewName}}</div>
               <hr>
-              <div class="col-2"><input formControlName="code" type="checkbox" class="form-control"></div>
+              <div class="col-2">
+                <label class="control control-checkbox">
+                    <input type="checkbox" class="form-control" formControlName="code">
+                    <div class="control_indicator check-control"></div>
+                </label>
+              </div>
               <hr>
               
               <div class="col-6" [ngSwitch]="param.value.type" [hidden]="param.value.code">
@@ -227,7 +234,7 @@
         </div>
       </div>
       <div class="text-center">
-        <button type="button" (click)="backToProcessView()" class="btn pm text-center">Back to process</button>
+        <button type="button" (click)="backToProcessView()" class="kh-btn kh-btn-blue ">Submit</button>
       </div>
     </div>
 
