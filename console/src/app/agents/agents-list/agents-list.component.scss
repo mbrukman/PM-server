@@ -2,7 +2,7 @@
 @import "~assets/sass/mixins";
 
 .selected{
-  border-bottom: 2px solid #44acdf
+  border-bottom: 2px solid $pale-blue
 }
 
 .main{
@@ -44,7 +44,7 @@
             width: 500px;
             a{
               font-size: 17px;
-              color:#44acdf;
+              color:$pale-blue;
               cursor:pointer;
               .agentsLength{
                 color: $kaholo-orange

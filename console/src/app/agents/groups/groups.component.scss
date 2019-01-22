@@ -23,12 +23,12 @@
     thead {
         th {
             cursor: pointer;
-            color: #44acdf;
+            color: $pale-blue;
             font-size: 18px;
             font-weight: inherit;
             .title {
                 margin-left: 10px;
-                color: #44acdf;
+                color:$pale-blue;
             }
         }
     }
@@ -50,7 +50,7 @@
                 }
                 .name {
                     font-size: 14px;
-                    color: #44acdf;
+                    color: $pale-blue;
                 }
                 &.manage {
                     width: 84px;
@@ -70,7 +70,7 @@
             &:hover,
             &.selected {
                 background-color: $hover-color !important;
-                box-shadow: -4px 0px 0px 0px #44acdf;
+                box-shadow: -4px 0px 0px 0px $pale-blue;
                 .manage .manage-wrapper {
                     display: table-cell;
                 }
