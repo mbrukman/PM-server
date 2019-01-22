@@ -6,10 +6,19 @@
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
-    <div class="modal-body">
-      <div class="ui-widget-header" style="padding:4px 10px;border-bottom: 0 none">
-        <input #gb type="text" pInputText size="50" class="form-control" placeholder="Filter">
-      </div>
+  </div>
+
+  <div class="tabs">
+    <div (click)="select($event,true)" class="title-tab active">Agents</div>
+    <div (click)="select($event, false)" class="title-tab">Group</div>
+  </div>
+
+  <div class="col-12">
+    <div class="ui-widget-header">
+      <input #gb type="text" pInputText size="50" class="form-control" placeholder="Filter">
+    </div>
+
+    <div class="modal-body"  *ngIf="isAgentTab">
       <p-dataTable [value]="agents" [globalFilter]="gb" [responsive]="true" [(selection)]="selectedAgents" dataKey="id">
         <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
         <p-column field="name" header="name" [sortable]="true">
@@ -27,6 +36,31 @@
       </p-dataTable>
 
     </div>
+
+    <div class="modal-body"  *ngIf="!isAgentTab">
+        <p-dataTable [value]="groups" [globalFilter]="gb" [responsive]="true" expandableRows="true"
+                     [(selection)]="selectedGroups"
+                     dataKey="id">
+          <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+  
+          <p-column field="name" header="name" [sortable]="true"></p-column>
+      
+          <p-column>
+              <ng-template let-group pTemplate="rowexpansion">
+                  Constant agents: {{ group.agents?.length }}
+                  <br/>
+                  Filters:
+                  <ul>
+                    <li *ngFor="let item of group.filters"><abbr title="Field">{{ item.field }}</abbr> <abbr
+                      title="Filter Type">
+                      {{ item.filterType }}</abbr> <abbr title="Value">'{{ item.value }}'</abbr></li>
+                  </ul>
+                </ng-template>
+          </p-column>
+        </p-dataTable>
+  
+      </div>
+      
     <div class="modal-footer">
       <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>
       <button class="kh-btn-blue kh-btn" (click)="onConfirm()"><span>Confirm</span></button>

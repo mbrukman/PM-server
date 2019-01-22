@@ -216,14 +216,13 @@ tr.ui-widget-content.ui-datatable-odd {
 /* primeng checkbox */
 
 .ui-chkbox-box {
-  border: 1px solid $greyish-text;
-  border-radius: 2px;
-  background-color: #dedede;
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  background-color: $input-bg;
   &.ui-state-active {
-    border: 1px solid $greyish-text;
-    border-radius: 2px;
-    background-color: #dedede;
-    color: black;
+    background-color: $pale-blue;
+    color: white;
   }
 }
 
