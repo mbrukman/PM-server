@@ -30,7 +30,7 @@
               height: 21px;
               font-size: 18px;
               font-weight: 500;
-              color: #dddddd;
+              color: $greyish-text;
             }
           }
         }
@@ -42,7 +42,7 @@
             td{
               height: 32px;
               font-size: 14px;
-              color: #dddddd;
+              color: $greyish-text;
               .ui-cell-data{
                 display: flex;
                 align-items: center;
