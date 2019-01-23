@@ -1487,8 +1487,9 @@ module.exports = {
      * getting all results for a certain map (not populated)
      * @param mapId {string}
      */
-    results: (mapId) => {
-        return MapResult.find({ map: mapId }, null, { sort: { startTime: -1 } }).select('-agentsResults')
+    results: (mapId,page) => {
+        let index = (page*25)-25;
+        return MapResult.find({ map: mapId }, null, { sort: { startTime: -1 } }).select('-agentsResults').skip(index).limit(25)
     },
     /**
      * get an id of specific result and return populated object

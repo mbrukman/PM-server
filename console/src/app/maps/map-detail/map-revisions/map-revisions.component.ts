@@ -24,6 +24,8 @@ import { FilterOptions } from '@shared/model/filter-options.model';
 export class MapRevisionsComponent implements OnInit {
   previewProcess: Process;
   structures: MapStructure[] = [];
+  structuresList: MapStructure[] = []
+  maxLengthReached:boolean = false;
   structureId: string;
   mapId: string;
   graph: joint.dia.Graph;
@@ -114,13 +116,35 @@ export class MapRevisionsComponent implements OnInit {
     });
   }
 
+  onScroll(){
+    this.page++;
+    this.mapsService.structuresList(this.mapId,this.page)
+    .subscribe(structures => {
+      if(structures.length < 25){
+        this.maxLengthReached = true
+      }
+      for(let i=0,length = structures.length;i<length;i++){
+        this.structuresList.push(structures[i])
+      }
+    })
+  }
+
   getMapStructures(page: number) {
     this.mapsService.structuresList(this.mapId, page).subscribe(structures => {
       if(structures.length)
         this.previewStructure(structures[0].id)
       if (structures && structures.length > 0) {
         this.structures = [...this.structures, ...structures];
-      } else {
+        if(structures.length < 25){
+          this.maxLengthReached = true
+        }
+        for(let i=0,length = structures.length;i<length;i++){
+          this.structuresList.push(structures[i])
+        }
+      }
+     
+        
+      else {
         this.morePages = false;
       }
     });

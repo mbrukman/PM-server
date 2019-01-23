@@ -201,10 +201,13 @@ module.exports = {
         })
     },
     structureList: (mapId, page) => {
-        if (!page) {
+        if(page){
+            let index = (page*25)-25
+            return MapStructure.find({ map: mapId }, '_id createdAt', { sort: { createdAt: -1 } }).skip(index).limit(25)
+        }
+        else{
             return MapStructure.find({ map: mapId }, '_id createdAt', { sort: { createdAt: -1 } })
         }
-        return MapStructure.find({ map: mapId }, '_id createdAt', { sort: { createdAt: -1 } }).limit(20).skip((page - 1) * 20)
     },
     update: (mapId, map) => {
         delete map.updatedAt;

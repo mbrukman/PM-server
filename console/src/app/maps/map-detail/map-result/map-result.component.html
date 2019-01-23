@@ -1,7 +1,7 @@
 <div class="main">
   <div class="execution-select-pane">
     <div class="pane-header">Executions</div>
-    <div class="execution-list">
+    <div class="execution-list" infiniteScroll [scrollWindow]="false" [infiniteScrollDisabled]="maxLengthReached" [infiniteScrollDistance]="2" [infiniteScrollThrottle]="150" (scrolled)="onScroll()">
       <ul>
         <li *ngFor="let pending of pendingExecutions; let i = index" class="d-flex justify-content-between">
           <span>

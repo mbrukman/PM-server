@@ -1,9 +1,10 @@
 <div class="main">
   <div class="row content-wrapper" >
     <div class="col-3">
-      <div class='versions' style="height: 100%; overflow-y: scroll" infiniteScroll [onScroll]="scrollCallback">
+      <div class='versions' style="height: 100%; overflow-y: scroll" infiniteScroll [scrollWindow]="false" 
+      [infiniteScrollDisabled]="maxLengthReached" [infiniteScrollDistance]="2" [infiniteScrollThrottle]="150" (scrolled)="onScroll()">
         <ul>
-          <li *ngFor="let item of structures" [class.selected]="currentStructure?.id === item?.id">
+          <li *ngFor="let item of structuresList" [class.selected]="currentStructure?.id === item?.id" >
             <span class="revision-title">{{ (item.createdAt | date: 'dd/MM/yyyy') + ' ' +  (item.createdAt | date: 'HH:mm') }}</span>
             <span>
             <button class="btn-inline-action" (click)="previewStructure(item.id)"

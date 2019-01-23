@@ -9,7 +9,7 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { NgxDnDModule } from '@swimlane/ngx-dnd';
 
 import { SharedModule } from '@shared/shared.module';
-
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { MapsRoutingModule } from './maps-routing.module';
 import { MapTriggersComponent } from './map-detail/map-edit/map-enviroment-pane/map-triggers/map-triggers.component';
 import { MapDesignComponent } from './map-detail/map-edit/map-design/map-design.component';
@@ -51,7 +51,9 @@ import { monacoConfig } from './monaco-config'
     ModalModule,
     AccordionModule,
     TooltipModule,
-    NgxDnDModule
+    NgxDnDModule,
+    InfiniteScrollModule
+    
   ],
   declarations: [
     MapDetailComponent,

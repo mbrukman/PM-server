@@ -1,6 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
-
 import { MapsService } from '@maps/maps.service';
 import { Map } from '@maps/models/map.model';
 import { IProcessList } from '@maps/interfaces/process-list.interface';
@@ -19,8 +18,9 @@ import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 })
 export class MapResultComponent implements OnInit, OnDestroy {
   map: Map;
-  executionsList: MapResult[];
+  executionsList: MapResult[] = [];
   selectedExecution: MapResult;
+  maxLengthReached: boolean = false;
   selectedExecutionReq: Subscription;
   selectedExecutionLogs: any[];
   selectedAgent: any = 'default';
@@ -36,6 +36,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   pendingMessagesSubscriptions: Subscription;
   executing: string[] = [];
   pendingExecutions: string[];
+  page:number = 1;
   processesList: IProcessList[];
   agProcessStatusesByProcessIndex: ProcessResultByProcessIndex;
   view: number[] = [200, 200];
@@ -51,10 +52,16 @@ export class MapResultComponent implements OnInit, OnDestroy {
     this.mapSubscription = this.mapsService.getCurrentMap()
       .filter(map => map)
       .do(map => this.map = map)
-      .flatMap(map => this.mapsService.executionResults(map.id)) // request execution results list
+      .flatMap(map => this.mapsService.executionResults(map.id,this.page)) // request execution results list
       .subscribe(executions => {
-        this.executionsList = executions;
-        if (executions && executions.length) {
+        if(executions.length < 25){
+          this.maxLengthReached = true
+        }
+        for(let i=0,length = executions.length;i<length;i++){
+          this.executionsList.push(executions[i])
+        }
+       
+        if (executions && executions.length) { 
           this.selectExecution(executions[0].id);
         }
       });
@@ -102,6 +109,19 @@ export class MapResultComponent implements OnInit, OnDestroy {
       });
   }
 
+  onScroll(){
+    this.page++;
+    this.mapsService.executionResults(this.map.id,this.page)
+    .subscribe(executions => {
+      if(executions.length < 25){
+        this.maxLengthReached = true
+      }
+      for(let i=0,length = executions.length;i<length;i++){
+        this.executionsList.push(executions[i])
+      }
+    })
+  }
+
   ngOnDestroy() {
     if (this.mapSubscription) {
       this.mapSubscription.unsubscribe();
@@ -117,6 +137,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     }
   }
 
+
   expandOutput(){
     let messages = []
     this.selectedExecutionLogs.forEach(item=>{messages.push(item.message)});
@@ -124,7 +145,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     modal.content.messages = messages;
   }
 
-  /**
+  /** 
    * Aggregating all processes and returning count for results graph.
    * @param results
    * @returns result
