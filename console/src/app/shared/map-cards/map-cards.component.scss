@@ -1,3 +1,4 @@
+@import "~assets/sass/variables";
 .grid-view {
     width: 100%;
 
@@ -17,7 +18,7 @@
             display: flex;
 
             .content-card {
-                color: #dddddd;
+                color: $greyish-text;
                 width: calc(100% - 130px);
                 .card-title {
                     font-size: 18px;
