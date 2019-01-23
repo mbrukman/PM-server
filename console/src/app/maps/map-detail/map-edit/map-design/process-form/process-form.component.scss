@@ -1,9 +1,18 @@
 @import "~assets/sass/variables";
 @import "~assets/sass/base";
+@import "~assets/sass/mixins";
 .wrapper-form {
     h3 {
         @extend .pane-header;
         border: none;
+    }
+    .mandatory-check{
+        display: flex;
+        justify-content: space-around;
+        @include checkbox();
+        .text-muted{
+            margin-top: 9px;
+        }
     }
     .actions-dnd {
         .action-tile {
@@ -59,11 +68,60 @@
         border-top: 0px;
         .action-form {
             font-size: 13px;
-            padding-right: 10px;
-            padding-left: 10px;
-            .action-params {
-                margin-bottom: 5px;
+            padding-right: 20px;
+            padding-left: 20px;
+            background-color: #22272c;
+            .header-action{
+                font-size: 16px;
+                color: $pale-blue;
+                padding-top: 14px;
+                padding-bottom: 17px;
             }
+
+            .timeout{
+                padding-right: 10px;
+                padding-left: 0;
+            }
+
+            .retries{
+                padding-right: 0;
+                padding-left: 10px;
+            }
+
+            .check-control{
+                margin-left: -8px;
+            }
+            .row-title{
+                padding-top: 20px;
+                font-weight: bold;
+                
+                .col-4{
+                    padding-left: 0;
+                }
+                .col-2{
+                    padding-left: 0
+                }
+                
+            }
+ 
+            .action-params {
+                margin-bottom: 12px;
+                .col-4{
+                    padding-left: 0
+                }
+                .col-2{
+                    @include checkbox();
+                }
+                .col-6{
+                    padding-right: 0;
+                }
+            }
+            .text-center{
+                direction: rtl;
+                padding-bottom: 30px;
+                padding-top: 20px;
+            }
+            
         }
         .pane-bottom {
             margin-top: 10px;
