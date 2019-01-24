@@ -17,6 +17,7 @@ import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
   styleUrls: ['./map-result.component.scss']
 })
 export class MapResultComponent implements OnInit, OnDestroy {
+  load_results = 25;
   map: Map;
   executionsList: MapResult[] = [];
   selectedExecution: MapResult;
@@ -52,18 +53,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
     this.mapSubscription = this.mapsService.getCurrentMap()
       .filter(map => map)
       .do(map => this.map = map)
-      .flatMap(map => this.mapsService.executionResults(map.id,this.page)) // request execution results list
-      .subscribe(executions => {
-        if(executions.length < 25){
-          this.maxLengthReached = true
-        }
-        for(let i=0,length = executions.length;i<length;i++){
-          this.executionsList.push(executions[i])
-        }
-       
-        if (executions && executions.length) { 
-          this.selectExecution(executions[0].id);
-        }
+      .subscribe(map => {
+        this.loadResultOnScroll(map)
       });
 
     // getting the current executions list when initiating
@@ -109,17 +100,21 @@ export class MapResultComponent implements OnInit, OnDestroy {
       });
   }
 
-  onScroll(){
-    this.page++;
-    this.mapsService.executionResults(this.map.id,this.page)
+  loadResultOnScroll(map = this.map){
+    this.mapsService.executionResults(map.id,this.page)
     .subscribe(executions => {
-      if(executions.length < 25){
+      if(executions.length < this.load_results){
         this.maxLengthReached = true
       }
       for(let i=0,length = executions.length;i<length;i++){
         this.executionsList.push(executions[i])
       }
     })
+  }
+
+  onScroll(){
+    this.page++;
+    this.loadResultOnScroll();
   }
 
   ngOnDestroy() {

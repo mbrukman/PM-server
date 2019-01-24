@@ -22,6 +22,7 @@ import { FilterOptions } from '@shared/model/filter-options.model';
   styleUrls: ['./map-revisions.component.scss']
 })
 export class MapRevisionsComponent implements OnInit {
+  load_structures = 25;
   previewProcess: Process;
   structures: MapStructure[] = [];
   structuresList: MapStructure[] = []
@@ -61,6 +62,7 @@ export class MapRevisionsComponent implements OnInit {
       this.mapId = params.id;
       this.getMapProject();
       this.getMapStructures(1);
+      this.loadStructureOnScroll();
     });
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
     this.graph = new joint.dia.Graph;
@@ -116,11 +118,10 @@ export class MapRevisionsComponent implements OnInit {
     });
   }
 
-  onScroll(){
-    this.page++;
-    this.mapsService.structuresList(this.mapId,this.page)
+  loadStructureOnScroll(mapId = this.mapId){
+    this.mapsService.structuresList(mapId,this.page)
     .subscribe(structures => {
-      if(structures.length < 25){
+      if(structures.length < this.load_structures){
         this.maxLengthReached = true
       }
       for(let i=0,length = structures.length;i<length;i++){
@@ -129,21 +130,18 @@ export class MapRevisionsComponent implements OnInit {
     })
   }
 
+  onScroll(){
+    this.page++;
+    this.loadStructureOnScroll();
+  }
+
   getMapStructures(page: number) {
     this.mapsService.structuresList(this.mapId, page).subscribe(structures => {
       if(structures.length)
         this.previewStructure(structures[0].id)
       if (structures && structures.length > 0) {
         this.structures = [...this.structures, ...structures];
-        if(structures.length < 25){
-          this.maxLengthReached = true
-        }
-        for(let i=0,length = structures.length;i<length;i++){
-          this.structuresList.push(structures[i])
-        }
       }
-     
-        
       else {
         this.morePages = false;
       }
