@@ -17,7 +17,6 @@ import { FilterPipe } from './pipes/filter.pipe';
 import { TruncatecharsPipe } from './truncatechars.pipe';
 import { FeatureComponent } from './feature/feature.component';
 import { ConfirmComponent } from './confirm/confirm.component';
-import { InfiniteScrollDirective } from './directives/infinite-scroll.directive';
 import { LinebreakPipe } from './pipes/linebreak.pipe';
 import { InlineEditDirective } from './directives/inline-edit.directive';
 import { InPipe } from '@shared/pipes/filterIn.pipe';
@@ -52,7 +51,6 @@ import { MapsCardsComponents } from './map-cards/map-cards.component';
     TruncatecharsPipe,
     FeatureComponent,
     ConfirmComponent,
-    InfiniteScrollDirective,
     InlineEditDirective,
     LinebreakPipe,
     InPipe,
@@ -74,7 +72,6 @@ import { MapsCardsComponents } from './map-cards/map-cards.component';
     DataTableModule,
     NgxChartsModule,
     DropdownModule,
-    InfiniteScrollDirective,
     InlineEditDirective,
     ConfirmComponent,
     LinebreakPipe,

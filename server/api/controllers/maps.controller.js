@@ -291,7 +291,7 @@ module.exports = {
 
     results: (req, res) => {
         hooks.hookPre('map-results-list', req).then(() => {
-            return mapsExecutionService.results(req.params.id)
+            return mapsExecutionService.results(req.params.id,req.query.page)
         }).then((results) => {
             res.json(results);
         }).catch(error => {

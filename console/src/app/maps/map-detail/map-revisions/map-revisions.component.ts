@@ -22,8 +22,10 @@ import { FilterOptions } from '@shared/model/filter-options.model';
   styleUrls: ['./map-revisions.component.scss']
 })
 export class MapRevisionsComponent implements OnInit {
+  load_structures = 25;
   previewProcess: Process;
   structures: MapStructure[] = [];
+  maxLengthReached:boolean = false;
   structureId: string;
   mapId: string;
   graph: joint.dia.Graph;
@@ -50,15 +52,13 @@ export class MapRevisionsComponent implements OnInit {
   };
   
 
-  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private modalService: BsModalService) {
-    this.scrollCallback = this.loadRevisions.bind(this);
-  }
+  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private modalService: BsModalService) {}
 
   ngOnInit() {
     this.route.parent.params.subscribe(params => {
       this.mapId = params.id;
       this.getMapProject();
-      this.getMapStructures(1);
+      this.loadStructureOnScroll(this.mapId,true);
     });
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
     this.graph = new joint.dia.Graph;
@@ -114,16 +114,27 @@ export class MapRevisionsComponent implements OnInit {
     });
   }
 
-  getMapStructures(page: number) {
-    this.mapsService.structuresList(this.mapId, page).subscribe(structures => {
-      if(structures.length)
+  loadStructureOnScroll(mapId = this.mapId,OnInit = false){
+    this.mapsService.structuresList(mapId,this.page)
+    .subscribe(structures => {
+      if(OnInit && structures.length){
         this.previewStructure(structures[0].id)
-      if (structures && structures.length > 0) {
-        this.structures = [...this.structures, ...structures];
-      } else {
-        this.morePages = false;
       }
-    });
+      if(structures.length < this.load_structures){
+        this.maxLengthReached = true
+      }
+      for(let i=0,length = structures.length;i<length;i++){
+        this.structures.push(structures[i])
+      }
+    })
+  }
+
+  onScroll(){
+    if (!this.maxLengthReached) {
+      return;
+    }
+    this.page++;
+    this.loadStructureOnScroll();
   }
 
   getMapProject() {
@@ -244,11 +255,9 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   loadRevisions() {
-    if (!this.morePages) {
-      return;
-    }
+    
     this.page++;
-    this.getMapStructures(this.page);
+    this.loadStructureOnScroll();
   }
 
   changeMode(mode: 'code' | 'design') {
