@@ -1,9 +1,9 @@
 <div class="main">
-  <div class="button-archive">
-      <button class="kh-btn kh-btn-blue" *ngIf="!map?.archived" (click)="archiveMap(true)"><i class="material-icons">archive</i>Archive</button>
-      <button class="kh-btn kh-btn-blue" *ngIf="map?.archived" (click)="archiveMap(false)"><i class="material-icons">unarchive</i>Unarchive</button>
-  </div>
   <div class="map-properties">
+    <div class="button-archive">
+        <button class="kh-btn kh-btn-blue" *ngIf="!map?.archived" (click)="archiveMap(true)"><i class="material-icons">archive</i>Archive</button>
+        <button class="kh-btn kh-btn-blue" *ngIf="map?.archived" (click)="archiveMap(false)"><i class="material-icons">unarchive</i>Unarchive</button>
+    </div>
     <div class="form-row">
       
         <p class="title">Project</p>
@@ -32,5 +32,7 @@
       
     </div>
   </div>
-  <p class="created-at" >Created at: {{ map?.createdAt | date: 'short'}}</p>
+ <div class="created-at">
+  <p>Created at: {{ map?.createdAt | date: 'short'}}</p>
+ </div>
 </div>

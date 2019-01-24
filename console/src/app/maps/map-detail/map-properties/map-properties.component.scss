@@ -8,23 +8,27 @@
   flex-grow: 1;
   padding-left: 26px;
   padding-top: 30px;
+  padding-bottom: 40px;
+  overflow: hidden;
   background-color: #22272c;
   @include input();
   @include select();
   @include textarea();
-  .button-archive{
-    margin-left: -4px;
-    .material-icons{
-      padding-right: 10px;
-    }
-  }
   .created-at{
     height: 16px;
     font-size: 14px;
     color: $greyish-text;
+    padding-bottom: 25px;
   }
   .map-properties{
-    height: 700px;
+    .button-archive{
+      margin-left: -4px;
+      .material-icons{
+        padding-right: 10px;
+      }
+    }
+    flex-grow: 1;
+    height: 100%;
     width: 430px;
     .form-row{
       display: inherit;
