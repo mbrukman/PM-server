@@ -9,8 +9,8 @@
   </div>
 
   <div class="tabs">
-    <div (click)="select($event,true)" class="title-tab active">Agents</div>
-    <div (click)="select($event, false)" class="title-tab">Group</div>
+    <div [class.active]="isAgentTab" (click)="isAgentTab = true" class="title-tab active">Agents</div>
+    <div [class.active]="!isAgentTab" (click)="isAgentTab = false" class="title-tab">Group</div>
   </div>
 
   <div class="col-12">

@@ -49,15 +49,6 @@ export class SelectAgentComponent implements OnInit, OnDestroy {
 
   }
 
-  select(event, isAgentTab) {
-
-    this.isAgentTab = isAgentTab;
-    let tablinks = document.getElementsByClassName("title-tab");
-    for (let i = 0; i < tablinks.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-    event.currentTarget.className += " active";
-  }
 
   ngOnDestroy() {
     this.agentsReq ? this.agentsReq.unsubscribe() : null;
