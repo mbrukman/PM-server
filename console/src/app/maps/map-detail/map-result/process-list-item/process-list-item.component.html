@@ -1,6 +1,6 @@
 <div class="process">
-  <span [ngSwitch]="statuses.length > 1" class="process-status">
-    <div  *ngSwitchCase="true">
+  <span class="process-status">
+    <ng-container  *ngIf="!statuses.length > 1">
         <i [hidden] = "!isAllElementEqual" class="fa fa-circle" [ngClass]="{
           'text-info': statuses[0] === 'partial',
           'text-danger': statuses[0] == 'error',
@@ -8,9 +8,9 @@
           'text-success': statuses[0] == 'success'
           }"
            aria-hidden="true" [tooltip]="tolTemplate"></i>
-        <i [hidden] = "isAllElementEqual" class="fa fa-circle rainbow" *ngSwitchDefault aria-hidden="true" [tooltip]="tolTemplate"></i>
-    </div>
-    <i *ngSwitchCase="false" class="fa fa-circle" [ngClass]="{
+        <i [hidden] = "isAllElementEqual" class="fa fa-circle rainbow" aria-hidden="true" [tooltip]="tolTemplate"></i>
+    </ng-container>
+    <i [hidden]="!statuses.length > 1" class="fa fa-circle" [ngClass]="{
       'text-info': statuses[0] === 'partial',
       'text-danger': statuses[0] == 'error',
       'text-warning': statuses[0] == 'stopped',
