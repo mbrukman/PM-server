@@ -4,7 +4,7 @@ import { Subject } from 'rxjs/Subject';
 import { BsModalRef } from 'ngx-bootstrap';
 
 import { AgentsService } from '@agents/agents.service';
-import { Agent } from '@agents/models';
+import { Agent, Group } from '@agents/models';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
@@ -14,10 +14,14 @@ import { Observable } from 'rxjs/Observable';
 })
 export class SelectAgentComponent implements OnInit, OnDestroy {
   agents: Agent[];
+  groups: Group[];
   agentsReq: any;
+  groupsReq: any;
+  selectedGroups: Agent[];
   selectedAgents: Agent[];
 
   public result: Subject<any> = new Subject();
+  isAgentTab: boolean = true;
 
 
   constructor(public bsModalRef: BsModalRef, private agentsService: AgentsService) { }
@@ -37,21 +41,28 @@ export class SelectAgentComponent implements OnInit, OnDestroy {
         this.agents = agents;
       });
 
+    this.groupsReq = this.agentsService
+      .groupsList()
+      .subscribe(groups => {
+        this.groups = groups;
+      });
+
   }
 
+
   ngOnDestroy() {
-    if (this.agentsReq) {
-      this.agentsReq.unsubscribe();
-    }
+    this.agentsReq ? this.agentsReq.unsubscribe() : null;
+    this.groupsReq ? this.groupsReq.unsubscribe() : null;
   }
 
   onConfirm(): void {
-    this.result.next(this.selectedAgents);
+    let res = { agents: this.selectedAgents, groups: this.selectedGroups }
+    this.result.next(res);
     this.onClose();
   }
 
   nodeSelect(event) {
-    this.selectedAgents.push(event.node.data);
+    this.isAgentTab ? this.selectedAgents.push(event.node.data) : this.selectedGroups.push(event.node.data);
   }
 
   onClose(): void {

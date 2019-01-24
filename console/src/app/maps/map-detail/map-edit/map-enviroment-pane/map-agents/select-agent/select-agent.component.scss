@@ -1,6 +1,49 @@
-.modal-header {
-  padding-bottom: 0;
+@import "~assets/sass/variables";
+.pm-modal{
+  display: inherit;
+  width: 607px;
+  height: 614px;
+
+  .modal-header {
+    padding-bottom: 0;
+    flex-direction: column-reverse;
+    
+    h4{
+      font-size: 22px;
+      font-weight: 300;
+      margin: auto;
+    }
+  }
+  .modal-body {
+    padding-top: 0;
+    height: 325px;
+    ::ng-deep tr:hover {
+      box-shadow: 0px 0px !important;
+    } 
+    
+  }
+  
+  .ui-widget-header{
+    width: 214px;
+    height: 36px;
+    margin: 20px;
+  } 
+  .tabs{
+    margin-top: 21px;
+    height: 33px;
+    border-bottom: 1px solid #404549;
+    display: flex;
+    color: $pale-blue;
+    justify-content: center;
+    width: 100%;
+
+    .title-tab{
+      padding: 0px 10px;
+      cursor: pointer;
+    }
+    .title-tab.active{
+      border-bottom: 2px solid;
+    }
+  }
 }
-.modal-body {
-  padding-top: 0;
-}
+
