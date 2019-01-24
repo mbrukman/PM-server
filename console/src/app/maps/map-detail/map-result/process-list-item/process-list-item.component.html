@@ -1,6 +1,6 @@
 <div class="process">
   <span class="process-status">
-    <ng-container  *ngIf="!(statuses.length > 1)">
+    <ng-container  *ngIf="statuses.length > 1">
         <i [hidden] = "!isAllElementEqual" class="fa fa-circle" [ngClass]="{
           'text-info': statuses[0] === 'partial',
           'text-danger': statuses[0] == 'error',
