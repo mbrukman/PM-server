@@ -2,7 +2,6 @@
 .pm-modal{
   display: inherit;
   width: 607px;
-  height: 614px;
 
   .modal-header {
     padding-bottom: 0;
@@ -16,10 +15,27 @@
   }
   .modal-body {
     padding-top: 0;
-    height: 325px;
-    ::ng-deep tr:hover {
+    max-height: 350px;
+    overflow: auto;
+    .row-output{
+      display: flex;
+      align-items: center;
+      .dotStatus{
+        margin-right: 10px;
+      }
+    }
+    ::ng-deep {
+      tr:hover {
       box-shadow: 0px 0px !important;
     } 
+    .ui-chkbox-box{
+      height: 24px;
+      width: 24px;
+      .fa{
+        font-size: large;
+      }
+    }
+  }
     
   }
   

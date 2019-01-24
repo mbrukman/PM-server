@@ -24,22 +24,7 @@
           }
         }
     }
-    .agents {
-        table td {
-            .dot {
-                height: 8px;
-                width: 8px;
-                background-color: #bbb;
-                border-radius: 50%;
-                &.green {
-                    background-color: #38ba24;
-                }
-                &.red {
-                    background-color: #de293f;
-                }
-            }
-        }
-    }
+    
     table {
         td {
             border: none;
