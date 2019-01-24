@@ -1,4 +1,6 @@
 @import "~assets/sass/variables";
+@import "~assets/sass/mixins";
+
 .pm-modal{
   display: inherit;
   width: 607px;
@@ -24,17 +26,13 @@
         margin-right: 10px;
       }
     }
+
+      @include p-checkbox();
+
     ::ng-deep {
       tr:hover {
       box-shadow: 0px 0px !important;
     } 
-    .ui-chkbox-box{
-      height: 24px;
-      width: 24px;
-      .fa{
-        font-size: large;
-      }
-    }
   }
     
   }

@@ -121,13 +121,13 @@ textarea {
   overflow: hidden;
 }
 
+::-webkit-scrollbar {
+  width: 0px; /* remove scrollbar space */
+  background: transparent; /* make scrollbar invisible */
+}
 .main {
   overflow-y: auto;
 
-  ::-webkit-scrollbar {
-    width: 0px; /* remove scrollbar space */
-    background: transparent; /* make scrollbar invisible */
-  }
 }
 
 .card {
