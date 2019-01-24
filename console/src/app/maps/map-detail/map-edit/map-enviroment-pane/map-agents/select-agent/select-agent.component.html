@@ -43,15 +43,15 @@
           <p-column field="name" header="name" [sortable]="true"></p-column>
       
           <p-column>
-              <ng-template let-group pTemplate="rowexpansion">
+              <ng-template let-group="rowData" pTemplate="rowexpansion">
                   Constant agents: {{ group.agents?.length }}
-                  <br/>
+                  <!-- <br/>
                   Filters:
                   <ul>
                     <li *ngFor="let item of group.filters"><abbr title="Field">{{ item.field }}</abbr> <abbr
                       title="Filter Type">
                       {{ item.filterType }}</abbr> <abbr title="Value">'{{ item.value }}'</abbr></li>
-                  </ul>
+                  </ul> -->
                 </ng-template>
           </p-column>
         </p-dataTable>
