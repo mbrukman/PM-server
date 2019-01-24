@@ -18,7 +18,13 @@
       padding-right: 10px;
     }
   }
+  .created-at{
+    height: 16px;
+    font-size: 14px;
+    color: $greyish-text;
+  }
   .map-properties{
+    height: 700px;
     width: 430px;
     .form-row{
       display: inherit;
