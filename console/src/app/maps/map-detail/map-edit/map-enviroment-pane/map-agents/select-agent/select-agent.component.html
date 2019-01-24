@@ -23,13 +23,10 @@
         <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
         <p-column field="name" header="name" [sortable]="true">
           <ng-template let-col let-agent="rowData" pTemplate="body">
-            <span>
-              <span
-                [ngClass]="{'text-success': agent.status?.alive, 'text-danger': !agent.status?.alive}">
-                  <i class="fa fa-circle" aria-hidden="true"></i>
-                </span>
+            <div class="row-output">
+                <div class="dotStatus"  [ngClass]="{'green': agent.status?.alive, 'red': !agent.status?.alive}"></div>
               {{agent.name}}
-            </span>
+            </div>
           </ng-template>
         </p-column>
         <p-column field="url" header="url" [sortable]="true"></p-column>

@@ -20,6 +20,20 @@ html, body {
   cursor: pointer;
 }
 
+.dotStatus {
+  height: 8px;
+  width: 8px;
+  background-color: #bbb;
+  border-radius: 50%;
+  &.green {
+      background-color: #38ba24;
+  }
+  &.red {
+      background-color: #de293f;
+  }
+}
+
+
 .kh-btn{
   border:none;
   outline: none !important;
@@ -107,13 +121,13 @@ textarea {
   overflow: hidden;
 }
 
+::-webkit-scrollbar {
+  width: 0px; /* remove scrollbar space */
+  background: transparent; /* make scrollbar invisible */
+}
 .main {
   overflow-y: auto;
 
-  ::-webkit-scrollbar {
-    width: 0px; /* remove scrollbar space */
-    background: transparent; /* make scrollbar invisible */
-  }
 }
 
 .card {

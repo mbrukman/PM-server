@@ -17,6 +17,22 @@
     }
   }
 }
+
+@mixin p-checkbox{
+  ::ng-deep p-dtcheckbox{
+    .ui-chkbox-box{
+      width: $checkbox-size;
+      height: $checkbox-size;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .fa{
+        font-size: large;
+      }
+    }
+  }
+}
+
 @mixin table(){
   $row-height : 53px;
   ::ng-deep p-datatable{
@@ -125,8 +141,8 @@
       position: absolute;
       top: 2px;
       left: -2px;
-      height: 24px;
-      width: 24px;
+      height: $checkbox-size;
+      width: $checkbox-size;
       background: #3f4247;
       border-radius: 3px;
       
