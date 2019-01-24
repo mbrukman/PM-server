@@ -2,10 +2,16 @@
 @import "~assets/sass/base";
 @import "~assets/sass/mixins";
 .wrapper-form {
-    h3 {
-        @extend .pane-header;
-        border: none;
+
+    .header-process{
+        padding-left: 9px;
+        padding-right: 13px;
+        h3 {
+            @extend .pane-header;
+            border: none;
+        }
     }
+
     .mandatory-check{
         display: flex;
         justify-content: space-around;
@@ -71,11 +77,15 @@
             padding-right: 20px;
             padding-left: 20px;
             background-color: #22272c;
-            .header-action{
-                font-size: 16px;
-                color: $pale-blue;
-                padding-top: 14px;
-                padding-bottom: 17px;
+            .header{
+                display: flex;
+                justify-content: space-between;
+                .header-action{
+                    font-size: 16px;
+                    color: $pale-blue;
+                    padding-top: 14px;
+                    padding-bottom: 17px;
+                }
             }
 
             .timeout{
