@@ -1,9 +1,10 @@
+@import "~assets/sass/variables";
 table {
     thead {
         th {
             height: 21px;
             font-size: 18px;
-            color: #dddddd;
+            color: $greyish-text;
             font-weight: inherit
         }
     }
@@ -17,6 +18,9 @@ table {
         vertical-align: middle;
         .icons-btn {
             padding-left: 0;
+            &:hover{
+                color:$greyish-text;
+            }
         }
         >div {
             display: flex;
@@ -28,13 +32,17 @@ table {
         &.item {
             height: 16px;
             font-size: 14px;
-            color: #dddddd;
+            color: $greyish-text;
             .name {
                 .material-icons {
                     font-size: 13px;
                     margin-right: 13px;
+                    
                 }
             }
+        }
+        .material-icons{
+            color:$greyish-text;
         }
     }
 }

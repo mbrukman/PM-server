@@ -10,6 +10,7 @@ const env = require("../../env/enviroment");
 const Agent = require("../models").Agent;
 const Group = require("../models").Group;
 
+
 const LIVE_COUNTER = env.retries; // attempts before agent will be considered dead
 const INTERVAL_TIME = env.interval_time;
 let agents = {}; // store the agents status.
@@ -36,8 +37,6 @@ const FILTER_FIELDS = Object.freeze({
 
 /* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
 let followAgentStatus = (agent) => {
-    agents[agent.key] = agent.toObject();
-    setDefaultUrl(agent);
     let listenInterval = setInterval(() => {
         let start = new Date();
 
@@ -265,7 +264,9 @@ module.exports = {
             return Agent.findByIdAndUpdate(agentObj._id, { $set: { url: agent.url, publicUrl: agent.publicUrl } });
         }).then(agent => {
             agents[agent.key] = agent.toJSON();
-            return agent;
+            return setDefaultUrl(agent).then(()=>{
+                return agent;
+            });
         })
     },
     getByKey: (agentKey) => {

@@ -1118,10 +1118,12 @@ async function executeAction(map, structure, runId, agent, process, processIndex
     executionLogService.info(runId, map._id, actionString, socket);
     
     let p;
-    let settings = plugin.settings
-    if(plugin.settings[0] && plugin.settings[0].valueType == 'vault'){
-        settings[0].value = await vaultService.getValueByKey(plugin.settings[0].value);
-    }
+    let settings = await Promise.all(plugin.settings.map(async (setting)=>{
+        if (setting.valueType == 'vault' && setting.value){
+            setting.value = await vaultService.getValueByKey(setting.value);
+        }
+        return setting;
+    }));
 
     // will send action to agent via socket or regular request
     if (agent.socket) {

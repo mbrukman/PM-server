@@ -1,21 +1,50 @@
 @import "~assets/sass/base";
 @import "~assets/sass/variables";
+@import "~assets/sass/mixins";
 
 .main {
   @extend .reset-padding;
-  display: flex;
+
   flex-grow: 1;
-
-  .row{
+  padding-left: 26px;
+  padding-top: 30px;
+  padding-bottom: 40px;
+  overflow: hidden;
+  background-color: #22272c;
+  @include input();
+  @include select();
+  @include textarea();
+  .created-at{
+    height: 16px;
+    font-size: 14px;
+    color: $greyish-text;
+    padding-bottom: 25px;
+  }
+  .map-properties{
+    .button-archive{
+      margin-left: -4px;
+      .material-icons{
+        padding-right: 10px;
+      }
+    }
     flex-grow: 1;
-
+    height: 100%;
+    width: 430px;
     .form-row{
+      display: inherit;
+      padding-top: 28px;
+      width: 100%;
+      .title{
+        margin-bottom: 15px;
+        font-size: 14px;
+        color: #dddddd;
+      }
       .map-description{
-        max-width: 100%;
-        word-break: break-word;
+        height: 100px;
       }
     }
   }
+
 }
 
 .btn {

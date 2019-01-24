@@ -1,7 +1,8 @@
+@import "~assets/sass/variables";
 table{
     th {    
         font-size: 18px;
-        color: #dddddd;
+        color: $greyish-text;
         font-weight: inherit
     }
 
@@ -12,7 +13,15 @@ table{
         &.description {
             padding-left: 18px;
             font-size: 14px;
-            color: #dddddd;
+            color: $greyish-text;
+        }
+        .icons-btn{
+            .material-icons{
+                color:$greyish-text;
+            }
+            &:hover{
+                color: $greyish-text;
+            }
         }
     }
 }
