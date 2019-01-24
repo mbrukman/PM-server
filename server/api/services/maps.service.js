@@ -201,9 +201,10 @@ module.exports = {
         })
     },
     structureList: (mapId, page) => {
+        const load_Structures = 25
         if(page){
-            let index = (page*25)-25
-            return MapStructure.find({ map: mapId }, '_id createdAt', { sort: { createdAt: -1 } }).skip(index).limit(25)
+            let index = (page*load_Structures)-load_Structures
+            return MapStructure.find({ map: mapId }, '_id createdAt', { sort: { createdAt: -1 } }).skip(index).limit(load_Structures)
         }
         else{
             return MapStructure.find({ map: mapId }, '_id createdAt', { sort: { createdAt: -1 } })

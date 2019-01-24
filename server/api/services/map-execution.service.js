@@ -1488,8 +1488,9 @@ module.exports = {
      * @param mapId {string}
      */
     results: (mapId,page) => {
-        let index = (page*25)-25;
-        return MapResult.find({ map: mapId }, null, { sort: { startTime: -1 } }).select('-agentsResults').skip(index).limit(25)
+        const load_Results = 25;
+        let index = (page*load_Results)-load_Results;
+        return MapResult.find({ map: mapId }, null, { sort: { startTime: -1 } }).select('-agentsResults').skip(index).limit(load_Results)
     },
     /**
      * get an id of specific result and return populated object
