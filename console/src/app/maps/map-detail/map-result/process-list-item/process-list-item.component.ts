@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { IProcessList } from '@maps/interfaces/process-list.interface';
 
 @Component({
@@ -6,10 +6,18 @@ import { IProcessList } from '@maps/interfaces/process-list.interface';
   templateUrl: './process-list-item.component.html',
   styleUrls: ['./process-list-item.component.scss']
 })
-export class ProcessListItemComponent {
+export class ProcessListItemComponent implements OnInit{
   @Input('item') item : IProcessList;
   @Input('statuses') statuses: string[];
+  isAllElementEqual:boolean = false;
 
   constructor() { }
+
+
+  ngOnInit(){
+    if(this.statuses.every( status => status === this.statuses[0])){
+      this.isAllElementEqual = true;
+    }
+  }
 
 }
