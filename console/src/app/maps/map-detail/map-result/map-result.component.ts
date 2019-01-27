@@ -1,6 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
-
 import { MapsService } from '@maps/maps.service';
 import { Map } from '@maps/models/map.model';
 import { IProcessList } from '@maps/interfaces/process-list.interface';
@@ -18,9 +17,11 @@ import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
   styleUrls: ['./map-result.component.scss']
 })
 export class MapResultComponent implements OnInit, OnDestroy {
+  load_results = 25;
   map: Map;
-  executionsList: MapResult[];
+  executionsList: MapResult[] = [];
   selectedExecution: MapResult;
+  maxLengthReached: boolean = false;
   selectedExecutionReq: Subscription;
   selectedExecutionLogs: any[];
   selectedAgent: any = 'default';
@@ -36,6 +37,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   pendingMessagesSubscriptions: Subscription;
   executing: string[] = [];
   pendingExecutions: string[];
+  page:number = 1;
   processesList: IProcessList[];
   agProcessStatusesByProcessIndex: ProcessResultByProcessIndex;
   view: number[] = [200, 200];
@@ -51,12 +53,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
     this.mapSubscription = this.mapsService.getCurrentMap()
       .filter(map => map)
       .do(map => this.map = map)
-      .flatMap(map => this.mapsService.executionResults(map.id)) // request execution results list
-      .subscribe(executions => {
-        this.executionsList = executions;
-        if (executions && executions.length) {
-          this.selectExecution(executions[0].id);
-        }
+      .subscribe(map => {
+        this.loadResultOnScroll(map)
       });
 
     // getting the current executions list when initiating
@@ -102,6 +100,23 @@ export class MapResultComponent implements OnInit, OnDestroy {
       });
   }
 
+  loadResultOnScroll(map = this.map){
+    this.mapsService.executionResults(map.id,this.page)
+    .subscribe(executions => {
+      if(executions.length < this.load_results){
+        this.maxLengthReached = true
+      }
+      this.executionsList.push(...executions);
+      if (this.page == 1)
+        this.selectExecution(this.executionsList[0]._id);
+    })
+  }
+
+  onScroll(){
+    this.page++;
+    this.loadResultOnScroll();
+  }
+
   ngOnDestroy() {
     if (this.mapSubscription) {
       this.mapSubscription.unsubscribe();
@@ -117,6 +132,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     }
   }
 
+
   expandOutput(){
     let messages = []
     this.selectedExecutionLogs.forEach(item=>{messages.push(item.message)});
@@ -124,7 +140,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     modal.content.messages = messages;
   }
 
-  /**
+  /** 
    * Aggregating all processes and returning count for results graph.
    * @param results
    * @returns result

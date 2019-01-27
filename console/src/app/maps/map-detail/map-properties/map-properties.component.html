@@ -1,36 +1,38 @@
 <div class="main">
-  <div class="row">
-    <div class="col-12">
-      <button class="btn pm" *ngIf="!map?.archived" (click)="archiveMap(true)">Archive <i class="material-icons">archive</i></button>
-      <button class="btn pm" *ngIf="map?.archived" (click)="archiveMap(false)">Unarchive <i class="material-icons">unarchive</i></button>
+  <div class="map-properties">
+    <div class="button-archive">
+        <button class="kh-btn kh-btn-blue" *ngIf="!map?.archived" (click)="archiveMap(true)"><i class="material-icons">archive</i>Archive</button>
+        <button class="kh-btn kh-btn-blue" *ngIf="map?.archived" (click)="archiveMap(false)"><i class="material-icons">unarchive</i>Unarchive</button>
+    </div>
+    <div class="form-row">
+      
+        <p class="title">Project</p>
+        <select class="form-control" [(ngModel)]="selectedProject" id="project" (change)="onChangeProject()">
+          <option disabled>Select a project</option>
+          <option *ngFor="let project of projects" [ngValue]="project._id">{{project.name}}</option>
+        </select>
+      
+    </div>
+    <div class="form-row">
+      
+        <p class="title">Description</p>
+        <textarea class="form-control map-description" placeholder="eg. This map will..." [(ngModel)]="map.description" (change)="onMapUpdate()" *ngIf="map"></textarea>
 
-      <div class="form-row">
-        <p class="col-4">
-          Project:
-          <select class="form-control" [(ngModel)]="selectedProject" id="project" (change)="onChangeProject()">
-            <option disabled>Select a project</option>
-            <option *ngFor="let project of projects" [ngValue]="project._id">{{project.name}}</option>
-          </select>
-        </p>
-      </div>
-      <div class="form-row">
-        <p class="col-4">
-          Description: 
-          <span class="map-description" placeholder="Add description..." [(inlineEdit)]="map.description" (valueChanged)="onMapUpdate()" *ngIf="map">
-          </span>
-        </p>
-      </div>
-      <div class="form-row">
-        <p class="col-4">
-          Queue: <input type="number"
-                        class="form-control"
-                        [(ngModel)]="map.queue"
-                        (change)="onMapUpdate()"
-                        *ngIf="map"/>
-        </p>
-      </div>
-      <hr class="my-4">
-      <p>Created at: {{ map?.createdAt | date: 'short'}}</p>
+      
+    </div>
+    <div class="form-row">
+      
+        <p class="title">Queue</p>
+        <input type="number"
+                      placeholder="eg. CI"
+                      class="form-control"
+                      [(ngModel)]="map.queue"
+                      (change)="onMapUpdate()"
+                      *ngIf="map"/>
+      
     </div>
   </div>
+ <div class="created-at">
+  <p>Created at: {{ map?.createdAt | date: 'short'}}</p>
+ </div>
 </div>

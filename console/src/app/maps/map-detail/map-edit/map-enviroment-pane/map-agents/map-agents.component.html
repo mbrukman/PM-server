@@ -7,7 +7,7 @@
       <tbody>
       <tr *ngFor="let agent of map.agents; let i = index;">
         <td>
-          <div class="dot"  [ngClass]="{'green': statuses[agent?.id]?.alive, 'red': !statuses[agent?.id]?.alive}"
+          <div class="dotStatus"  [ngClass]="{'green': statuses[agent?.id]?.alive, 'red': !statuses[agent?.id]?.alive}"
           *ngIf="statuses"></div>
         </td>
         <td>{{ agent?.name }}</td>
@@ -16,9 +16,8 @@
       </tbody>
     </table>
 
-    <button type="button" class="kh-btn-blue kh-btn" (click)="openSelectAgentsModal()">Select agents</button>
   </div>
-  <div class="groups">
+  <div class="groups" *ngIf="map?.groups?.length">
     <p>Groups</p>
     <div class="not-chosen" *ngIf="!map?.groups || map?.groups?.length === 0">
       <span>No groups selected for this map</span>
@@ -32,7 +31,7 @@
 
       </tbody>
     </table>
-    <button type="button" class="kh-btn-blue kh-btn" (click)="openSelectGroupsModal()">Select groups</button>
-
+    
   </div>
+  <button type="button" class="kh-btn-blue kh-btn" (click)="openSelectAgentsModal()">Select</button>
 </div>

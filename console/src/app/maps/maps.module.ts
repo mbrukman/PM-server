@@ -9,7 +9,7 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { NgxDnDModule } from '@swimlane/ngx-dnd';
 
 import { SharedModule } from '@shared/shared.module';
-
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { MapsRoutingModule } from './maps-routing.module';
 import { MapTriggersComponent } from './map-detail/map-edit/map-enviroment-pane/map-triggers/map-triggers.component';
 import { MapDesignComponent } from './map-detail/map-edit/map-design/map-design.component';
@@ -28,7 +28,6 @@ import { MapCreateComponent } from './map-create/map-create.component';
 import { MapEnvironmentPaneComponent } from './map-detail/map-edit/map-enviroment-pane/map-environment-pane.component';
 import { MapResultComponent } from './map-detail/map-result/map-result.component';
 import { ProcessResultComponent } from './map-detail/map-result/process-result/process-result.component';
-import { SelectGroupsComponent } from './map-detail/map-edit/map-enviroment-pane/map-agents/select-groups/select-groups.component';
 import { ProcessListItemComponent } from './map-detail/map-result/process-list-item/process-list-item.component';
 import { MapConfigurationsComponent } from './map-detail/map-configurations/map-configurations.component';
 import { AddConfigurationComponent } from './map-detail/map-configurations/add-configuration/add-configuration.component';
@@ -51,7 +50,9 @@ import { monacoConfig } from './monaco-config'
     ModalModule,
     AccordionModule,
     TooltipModule,
-    NgxDnDModule
+    NgxDnDModule,
+    InfiniteScrollModule
+    
   ],
   declarations: [
     MapDetailComponent,
@@ -72,12 +73,11 @@ import { monacoConfig } from './monaco-config'
     PluginToolboxComponent,
     MapResultComponent,
     ProcessResultComponent,
-    SelectGroupsComponent,
     ProcessListItemComponent,
     AddConfigurationComponent,
     ProcessViewComponent,
     MapDuplicateComponent,
   ],
-  entryComponents: [SelectAgentComponent, TriggerFormComponent, SelectGroupsComponent, AddConfigurationComponent,MapDuplicateComponent]
+  entryComponents: [SelectAgentComponent, TriggerFormComponent, AddConfigurationComponent,MapDuplicateComponent]
 })
 export class MapsModule {}

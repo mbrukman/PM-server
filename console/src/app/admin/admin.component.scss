@@ -9,6 +9,9 @@
   .side-nav {
     background: #25292c;
     flex : 0 0 60px;
+    .nav{
+      padding-top: 19px;
+    }
   }
   .main-content {
     flex-grow: 1;

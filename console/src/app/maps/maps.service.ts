@@ -99,8 +99,12 @@ export class MapsService {
     return this.http.get<MapResult>(`${serverUrl}api/maps/${mapId}/results/${resultId}`);
   }
 
-  executionResults(mapId) {
-    return this.http.get<MapResult[]>(`${serverUrl}api/maps/${mapId}/results`);
+  executionResults(mapId,page) {
+    let params = new HttpParams();
+    if (page) {
+      params = params.set('page', page.toString());
+    }
+    return this.http.get<MapResult[]>(`${serverUrl}api/maps/${mapId}/results`,{params:params});
   }
 
   /* map structure */

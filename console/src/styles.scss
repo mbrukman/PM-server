@@ -20,6 +20,20 @@ html, body {
   cursor: pointer;
 }
 
+.dotStatus {
+  height: 8px;
+  width: 8px;
+  background-color: #bbb;
+  border-radius: 50%;
+  &.green {
+      background-color: #38ba24;
+  }
+  &.red {
+      background-color: #de293f;
+  }
+}
+
+
 .kh-btn{
   border:none;
   outline: none !important;
@@ -107,13 +121,13 @@ textarea {
   overflow: hidden;
 }
 
+::-webkit-scrollbar {
+  width: 0px; /* remove scrollbar space */
+  background: transparent; /* make scrollbar invisible */
+}
 .main {
   overflow-y: auto;
 
-  ::-webkit-scrollbar {
-    width: 0px; /* remove scrollbar space */
-    background: transparent; /* make scrollbar invisible */
-  }
 }
 
 .card {
@@ -216,14 +230,13 @@ tr.ui-widget-content.ui-datatable-odd {
 /* primeng checkbox */
 
 .ui-chkbox-box {
-  border: 1px solid $greyish-text;
-  border-radius: 2px;
-  background-color: #dedede;
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  background-color: $input-bg;
   &.ui-state-active {
-    border: 1px solid $greyish-text;
-    border-radius: 2px;
-    background-color: #dedede;
-    color: black;
+    background-color: $pale-blue;
+    color: white;
   }
 }
 
@@ -242,7 +255,7 @@ tr.ui-widget-content.ui-datatable-odd {
 /*------*/
 
 table, .table {
-  color: #dddddd;
+  color: $greyish-text;
   font-size: 14px;
   thead {
     th {

@@ -21,11 +21,8 @@ module.exports = {
             return pluginsService.filterPlugins({ active: true, type: 'executer' });
         }).then(activePlugins => {
             plugins = activePlugins;
-            return agentsService.setDefaultUrl(agent);
-        }).then(() => {
             return agentsService.checkPluginsOnAgent(agent); 
         }).then(agentsPlugin => {
-            let currentAgent = agentsService.getByKey(agent.key);
             agentsPlugin = JSON.parse(agentsPlugin);
             // the agent plugin returns an object with keys as plugin names and version number as version: { 'cmd': '0.0.1' }
             const filesPaths = plugins.reduce((total, current) => {
