@@ -24,6 +24,9 @@
       align-items: center;
       .material-icons{
         cursor: pointer;
+        &:hover{
+          color: white;
+        }
       }
     }
 
