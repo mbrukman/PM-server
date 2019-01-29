@@ -1,9 +1,11 @@
 import { Component, Input, OnChanges } from '@angular/core';
-
+import * as _ from 'lodash';
 import * as moment from 'moment';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 import { BsModalService } from 'ngx-bootstrap';
 import { AgentResult, ProcessResult, ActionResultView } from '@maps/models';
+import { Agent } from '@agents/models/agent.model';
+
 
 
 @Component({
@@ -15,10 +17,13 @@ export class ProcessResultComponent implements OnChanges {
   @Input('process') process: ProcessResult[];
   @Input('result') result: AgentResult[];
   @Input('count') count: number;
+  @Input('aggregate') aggregate:any;
+  @Input('agents') agents:any;
   actions: ActionResultView[];
   generalInfo: ProcessResult;
   agProcessActionsStatus: any;
   agActionsStatus: any;
+  lastRowData :any = null;
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
@@ -29,7 +34,7 @@ export class ProcessResultComponent implements OnChanges {
     this.agProcessActionsStatus = null;
     this.agActionsStatus = null;
     this.generalInfo = null;
-    this.aggregateProcessActionResults(this.result);
+    this.aggregateProcessActionResults();
     if (this.process.length === 1) {
       this.generalInfo = this.result[0].processes.find(o => o.uuid === this.process[0].uuid && o.index === this.process[0].index);
     }
@@ -61,13 +66,40 @@ export class ProcessResultComponent implements OnChanges {
     modal.content.messages = messages;
   }
 
-  aggregateProcessActionResults(result) {
+  onRowUnselect(e){
+    const rowData = e.data;
+    rowData.selected = false;
+    this.lastRowData = rowData;
+  }
+
+  onRowSelect(e){
+    if(this.lastRowData && this.lastRowData.selected){
+      this.lastRowData.selected = false;
+    }
+    const rowData = e.data;
+    rowData.selected = true;
+    this.lastRowData = rowData;
+  }
+  
+  highlightSelectedRow(rowData: any, rowIndex: number){
+    return (rowData.selected) ? 'rowSelected' : 'rowUnselected';
+  }
+
+  aggregateProcessActionResults() {
     let actions = [];
     this.process.forEach(process => {
-      actions.push(...process.actions.map(a=> new ActionResultView(a,process.agentKey) ))
-      })
-    this.actions = actions;
+      let agent : Agent;
+      for(let i=0, length = this.result.length; i<length; i++){
+        if ((<Agent>(this.result[i].agent)).id == process.agentKey){
+          agent = <Agent>this.result[i].agent;
+          break;
+        }
+      }
 
+      actions.push(...process.actions.map(a=> new ActionResultView(a,agent) ))
+    })
+    this.actions = actions;
+    // this.actions.map(action => action.selected = false);
     // aggregating actions status
     let agActionsStatus = actions.reduce((total, current) => {
       total[current.action.status] = (total[current.action.status] || 0) + 1;

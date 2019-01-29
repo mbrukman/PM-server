@@ -41,6 +41,8 @@ $pane-header-background: #3f4247;
 $unselected-env-nav: #6f7172; // environment nav
 $selected-tab-environment: #2d3236; // selected environment tab
 $background: #2d3236; // table-hover
+$kh-background: #25292c;
+$kh-selected-bck: rgba(0, 0, 0, 0.3);
 // spacing
 $padding: 5px;
 
@@ -51,3 +53,6 @@ $sidebar-Width : 70px;
 
 // checkbox
 $checkbox-size : 24px;
+
+// table
+$table-row-height : 53px;

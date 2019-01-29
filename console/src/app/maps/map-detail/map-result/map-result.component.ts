@@ -25,7 +25,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
   selectedExecutionReq: Subscription;
   selectedExecutionLogs: any[];
   selectedAgent: any = 'default';
+  isAggregate: boolean;
   selectedProcess: ProcessResult[];
+  processIndex:number;
   agProcessesStatus: [{ name: string, value: number }];
   result: AgentResult[];
   agents: any;
@@ -231,9 +233,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
         return false;
       }
     });
+    this.selectedAgent = 'default';
+    this.isAggregate = this.selectedExecution.agentsResults.length > 1 ? true : false;
     if (!agentResult) { // if not found it aggregate
       this.result = this.selectedExecution.agentsResults;
     } else {
+      this.isAggregate = false;
       this.result = [agentResult];
     }
     this.generateProcessesList();
@@ -286,7 +291,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectProcess(process) {
+  selectProcess(process,i=0) {
     let processes = [];
     this.result.forEach(res => {
       res.processes.forEach(o=>{
@@ -296,6 +301,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       })
     });
     this.selectedProcess = processes;
+    this.processIndex = i;
   }
 
   stopRun(runId: string) {

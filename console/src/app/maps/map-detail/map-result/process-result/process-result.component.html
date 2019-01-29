@@ -2,13 +2,19 @@
   <div class="card-body">
     <h5 class="card-title">{{ generalInfo?.name || 'Process' }}</h5>
     <div class="row">
-      <div class="col-8">
-        <!-- <p>{{ generalInfo.description }}</p> -->
-        <p *ngIf="generalInfo">Start time: {{ generalInfo?.startTime | date: 'short' }}</p>
-        <p *ngIf="generalInfo">Finish time: {{ generalInfo?.finishTime | date: 'short' }}</p>
-        <p *ngIf="showProcessResult(generalInfo?.result)">{{ generalInfo?.result }}</p>
+      <div class="process-time">
+          <ng-container *ngIf="!aggregate">
+              <!-- <p>{{ generalInfo.description }}</p> -->
+              <p *ngIf="generalInfo">Start time: {{ generalInfo?.startTime | date: 'short' }}</p>
+              <p *ngIf="generalInfo">Finish time: {{ generalInfo?.finishTime | date: 'short' }}</p>
+              <p *ngIf="showProcessResult(generalInfo?.result)">{{ generalInfo?.result }}</p>
+            </ng-container>
+            <ng-container *ngIf="aggregate">
+                <p>Start time: Not supported in aggregate mode</p>
+                <p>Finish time: Not supported in aggregate mode</p>
+            </ng-container>
       </div>
-      <div class="col-4">
+      <div class="process-pie-charts">
         <ngx-charts-pie-chart
           [results]="agProcessActionsStatus"
           [labels]="false"
@@ -18,12 +24,24 @@
       </div>
     </div>
     <div class="row">
-      <p-dataTable [value]="actions" expandableRows="true" #dt (onRowClick)="dt.toggleRow($event.data)">
-        <p-column field="name" header="Action">
-          <ng-template let-col let-i="rowIndex" let-action="rowData" pTemplate="body">
-            {{action.name || 'Action #' + (i+1)}}
+      <p-dataTable [value]="actions" [rowStyleClass]="highlightSelectedRow"  rowExpandMode="single" [metaKeySelection]="false" 
+      selectionMode="single" expandableRows="true" #dt (onRowUnselect)="onRowUnselect($event)" 
+      (onRowSelect)="onRowSelect($event)" (onRowClick)="dt.toggleRow($event.data)">
+        <p-column *ngIf="!aggregate" [style]="{'width':'40%'}" field="name" header="Action">
+          <ng-template  let-col let-i="rowIndex" let-action="rowData" pTemplate="body">
+            <span class="ellipsis">{{action.action.name || 'Action #' + (i+1)}}</span>
           </ng-template>
         </p-column>
+        <p-column *ngIf="aggregate" [style]="{'width':'20%'}" field="name" header="Action">
+            <ng-template  let-col let-i="rowIndex" let-action="rowData" pTemplate="body">
+              <span class="ellipsis">{{action.action.name || 'Action #' + (i+1)}}</span>
+            </ng-template>
+          </p-column>
+        <p-column *ngIf="aggregate" [style]="{'width':'23%'}" field="name" header="Agent Name">
+            <ng-template let-col let-action="rowData" pTemplate="body">
+              <span class="ellipsis">{{action.agent.name}}</span>
+            </ng-template>
+          </p-column>
         <p-column field="name" header="Result">
           <ng-template let-col let-action="rowData" pTemplate="body">
             <div class="action-status" *ngIf="agActionsStatus">
@@ -37,44 +55,38 @@
         </p-column>
         <ng-template let-action pTemplate="rowexpansion">
           <div *ngIf="agActionsStatus[action.key]">
-            <div class="row">
-              <div class="col-8">
-                <div *ngIf="count === 1">
+            <div class="row-expansion">
+              <div class="col-12">
+                <div class="action-time">
                   <p>Start time: {{ agActionsStatus[action.key]?.startTime | date: 'medium' }}</p>
                   <p>Finish time: {{ agActionsStatus[action.key]?.finishTime | date: 'medium'}}</p>
                 </div>
-                <h5>Output:</h5>
-                <div class="raw-output">
-                  <div class="row-card">
-                    <i class="fas fa-arrows-alt" (click)="expandOutput(action)"></i>
+                <div class="action-output">
+                  <h5 class="action-header">Output:</h5>
+                  <div class="raw-output">
+                    <div class="row-card">
+                      <i class="material-icons" (click)="expandOutput(action)">zoom_out_map</i>
+                    </div>
+                    <ng-container *ngFor="let item of agActionsStatus[action.key]?.results?.stdout">
+                      <span class="raw-output-data" *ngIf="item">
+                        {{ item }} <br>
+                      </span>
+                    </ng-container>
+                    <ng-container *ngFor="let item of agActionsStatus[action.key]?.results?.stderr">
+                      <span class="raw-output-data" *ngIf="item">
+                        {{ item }} <br>
+                      </span>
+                    </ng-container>
+                    <ng-container *ngFor="let item of agActionsStatus[action.key]?.results?.result">
+                      <span class="raw-output-data" [hidden]="isObject(item)">
+                        {{ item }} <br>
+                      </span>
+                      <span class="raw-output-data" [hidden]="!isObject(item)">
+                        {{ item | json }} <br>
+                      </span>
+                    </ng-container>
                   </div>
-                  <ng-container *ngFor="let item of agActionsStatus[action.key]?.results?.stdout">
-                    <span class="raw-output-data" *ngIf="item">
-                      {{ item }} <br>
-                    </span>
-                  </ng-container>
-                  <ng-container *ngFor="let item of agActionsStatus[action.key]?.results?.stderr">
-                    <span class="raw-output-data" *ngIf="item">
-                      {{ item }} <br>
-                    </span>
-                  </ng-container>
-                  <ng-container *ngFor="let item of agActionsStatus[action.key]?.results?.result">
-                    <span class="raw-output-data" [hidden]="isObject(item)">
-                      {{ item }} <br>
-                    </span>
-                    <span class="raw-output-data" [hidden]="!isObject(item)">
-                      {{ item | json }} <br>
-                    </span>
-                  </ng-container>
                 </div>
-              </div>
-              <div class="col-4">
-                <ngx-charts-pie-chart
-                  [results]="agActionsStatus[action.key].status"
-                  [labels]="false"
-                  [scheme]="colorScheme"
-                  [doughnut]="true">
-                </ngx-charts-pie-chart>
               </div>
             </div>
           </div>

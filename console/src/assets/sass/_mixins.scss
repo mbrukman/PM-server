@@ -1,5 +1,12 @@
 @import "~assets/sass/variables";
 
+@mixin ellipsis(){
+  max-width: 100%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
 @mixin border-box($color, $top, $right, $bottom, $left) {
   border-style: solid;
   border-width: $top $right $bottom $left;
@@ -34,14 +41,13 @@
 }
 
 @mixin table(){
-  $row-height : 53px;
   ::ng-deep p-datatable{
     .ui-datatable{
       table{
         thead{
           background-color: #2d3236;
           tr{
-            height: $row-height;
+            height: $table-row-height;
             td{
               height: 21px;
               font-size: 18px;
@@ -54,7 +60,7 @@
           height: 1090px;
           background-color: #2d3236;
           tr{
-            height: $row-height;
+            height: $table-row-height;
             td{
               height: 32px;
               font-size: 14px;
@@ -65,12 +71,43 @@
               }
             }
           }
+          .ui-widget-content{
+            border-bottom: none;
+          }
+          tr.rowSelected  {
+            background-color: $hover-color !important;
+            box-shadow: -4px 0px 0px 0px $turquoise-blue;
+            td{
+              border-bottom: none;
+              span{
+                color: $turquoise-blue;
+              }
+            }
+          
+          }
+          tr.rowUnselected  {
+            background-color:$selected-tab-environment;
+            box-shadow: 0;
+            td{
+              border-bottom: 1px solid #4c5156;
+              span{
+                color: #dddddd;
+              }
+            }
+          }
+          tr.ui-expanded-row-content{
+            background-color: $hover-color !important;
+            box-shadow: -4px 0px 0px 0px $turquoise-blue;
+            td{
+              padding:0;
+            }
+          }
         }
       }
     }
 
     .ui-paginator{
-      height: $row-height;
+      height: $table-row-height;
       display: flex;
       align-items: center;
 
@@ -174,7 +211,7 @@
   
 
 @mixin header{
-  background-color: #25292c;
+  background-color: $kh-background;
   h1{
 
     height: 25px;
@@ -222,6 +259,50 @@
     background-color: #3f4247;
     &::placeholder{
       @include placeholder()
+    }
+  }
+}
+
+@mixin dropdown(){
+  ::ng-deep{
+    p-dropdown{
+      
+      label{
+        font-size: 14px;
+        color: #dddddd;
+        padding: 10px;
+        width: 198px;
+        padding-right: 30px;
+        @include ellipsis();
+      }
+
+      .ui-dropdown-trigger {
+        padding: 10px;
+        margin-right: 10px;
+      }
+      .ui-dropdown-panel{
+        border:1px solid $cool-grey;
+        font-size: 14px;
+      }
+      .ui-state-highlight{
+        background-color: $pale-blue;
+        color: #000000;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+      .ui-dropdown-item:not(.ui-state-highlight){
+        border-radius: 3px;
+        margin-bottom: 10px;
+        padding: 10px;
+        color: #dddddd;
+      }
+      .ui-dropdown-item:not(.ui-state-highlight):hover{
+        background-color: $pale-blue;
+        color: #000000;
+        margin-bottom: 10px;
+      }
+      
+      
     }
   }
 }

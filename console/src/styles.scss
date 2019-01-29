@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~assets/sass/variables";
 @import "~assets/sass/base";
+@import "~assets/sass/mixins";
 
 @font-face {
   font-family: "OpenSans";
@@ -272,6 +273,9 @@ table, .table {
       &:hover {
         background-color: $hover-color !important;
         box-shadow: -4px 0px 0px 0px $turquoise-blue;
+        .ui-cell-data{
+          color:#dddddd;
+        }
       }
     }
   }
@@ -494,7 +498,7 @@ span[contenteditable=true]{
 .head-title{
   width: 100%;
   height: 70px;
-  background-color: #25292c;
+  background-color: $kh-background;
   display: flex;
   align-items: center;
   h1{
@@ -522,8 +526,5 @@ span[contenteditable=true]{
 }
 
 .ellipsis{
-  max-width: 100%;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
+  @include ellipsis();
 }

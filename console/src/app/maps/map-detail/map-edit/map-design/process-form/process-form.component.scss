@@ -45,10 +45,10 @@
             padding-top: 0px;
         }
         .panel-open {
-            background: #25292c;
+            background: $kh-background;
             .card-header {
                 border: none;
-                background: #25292c;
+                background: $kh-background;
             }
             .clearfix {
                 color: $pale-blue;

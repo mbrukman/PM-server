@@ -13,7 +13,7 @@
 
         </li>
         <li *ngFor="let execution of executionsList; let i = index" (click)="selectExecution(execution._id)" class="d-flex justify-content-between"
-          [ngClass]="{'active': selectedExecution?.id === execution.id}">
+          [ngClass]="{'selected': selectedExecution?.id === execution.id}">
           <span>
             {{ execution.startTime | date: 'short' }}
           </span>
@@ -29,75 +29,77 @@
   <div class="result">
     <div class="pane-header">Results</div>
     <div class="result-content" *ngIf="selectedExecution">
-      <div class="container-fluid">
-        <div class="row card-row result-header-deck">
-          <div class="col-2">
-            <div class="card bg-dark">
-              <div class="card-body">
-                <h5 class="card-title">Display data</h5>
-                <p-dropdown [options]="agents" (onChange)="changeAgent()" [(ngModel)]="selectedAgent" [filter]="true"
-                  [style]="{'width': '100%'}">
-                  <ng-template let-item pTemplate="item">
-                    <span style="vertical-align:middle">{{item.label}}</span>
-                  </ng-template>
-                </p-dropdown>
-              </div>
+      <div class="container-fluid-process">
+        <div class="process-col">
+          <div class="bg-dark">
+            <div class="card-body">
+              <h5 class="card-title">Display data</h5>
+              <p-dropdown [options]="agents" (onChange)="changeAgent()" [(ngModel)]="selectedAgent" [filter]="true"
+                [style]="{'width': '100%'}">
+                <ng-template let-item pTemplate="item">
+                  <span style="vertical-align:middle">{{item.label}}</span>
+                </ng-template>
+              </p-dropdown>
             </div>
           </div>
-          <div class="col-5">
-            <div class="card">
+          <div class="process" *ngIf="processesList && processesList.length">
+            <div class=" process-select bg-dark">
               <div class="card-body">
-                <div class="result-overview">
-                  <div class="details">
-                    <h5 class="card-title">Execution {{ selectedExecution?.runId }}</h5>
-                    <p class="execution-detail">Start time: {{ selectedExecution?.startTime | date: 'short' }}</p>
-                    <p class="execution-detail">Finish time: {{ selectedExecution?.finishTime | date: 'short' }}</p>
-                    <p class="execution-detail">Structure: {{ selectedExecution?.structure?._id }}</p>
-                    <p class="execution-detail" *ngIf="selectedExecution?.trigger">Trigger: {{
-                      selectedExecution?.trigger }}</p>
-                    <p class="execution-detail" *ngIf="selectedExecution?.configuration">Configuration: {{
-                      selectedExecution?.configuration.name}}</p>
-                  </div>
-                  <div class="chart">
-                    <div class="pie-chart-parent">
-                      <ngx-charts-pie-chart [results]="agProcessesStatus" [labels]="showLabels" [scheme]="colorScheme"
-                        [doughnut]="true" [view]="view">
-                      </ngx-charts-pie-chart>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-5">
-            <div class="card raw-output">
-              <div class="card-body">
-                <div class="row-card">
-                  <h5 class="card-title">Raw output</h5>
-                  <i class="fas fa-arrows-alt" (click)="expandOutput()"></i>
-                </div>
-                <ul #rawOutput>
-                  <li *ngFor="let item of selectedExecutionLogs" [innerHTML]="item.message | linebreak">
+                <ul class="process-list">
+                  <li *ngFor="let item of processesList; let i = index" (click)="selectProcess(item,i)" >
+                    <app-process-list-item [ngClass]="{'selected': processIndex == i }" [item]="item" [statuses]="agProcessStatusesByProcessIndex[item.uuid][item.index]"></app-process-list-item>
                   </li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
-        <div class="row card-row" *ngIf="selectedExecution && executing?.indexOf(selectedExecution.runId) === -1">
-          <div class="col-2" *ngIf="processesList && processesList.length">
-            <div class="card process-select bg-dark">
-              <div class="card-body">
-                <ul class="process-list">
-                  <li *ngFor="let item of processesList; let i = index" (click)="selectProcess(item)" [ngClass]="{'active': selectedProcess && selectedProcess[0] && selectedProcess[0].uuid === item.uuid && selectedProcess[0].index === item.index }">
-                    <app-process-list-item [item]="item" [statuses]="agProcessStatusesByProcessIndex[item.uuid][item.index]"></app-process-list-item>
-                  </li>
-                </ul>
+        <div class="results">
+          <div class="row card-row result-header-deck ">
+            <div class="col-6">
+              <div class="card">
+                <div class="card-body">
+                  <div class="result-overview">
+                    <div class="details">
+                      <h5 class="card-title">Execution {{ selectedExecution?.runId }}</h5>
+                      <p class="execution-detail">Start time: {{ selectedExecution?.startTime | date: 'short' }}</p>
+                      <p class="execution-detail">Finish time: {{ selectedExecution?.finishTime | date: 'short' }}</p>
+                      <p class="execution-detail">Structure: {{ selectedExecution?.structure?._id }}</p>
+                      <p class="execution-detail" *ngIf="selectedExecution?.trigger">Trigger: {{
+                        selectedExecution?.trigger }}</p>
+                      <p class="execution-detail" *ngIf="selectedExecution?.configuration">Configuration: {{
+                        selectedExecution?.configuration.name}}</p>
+                    </div>
+                    <div class="chart">
+                      <div class="pie-chart-parent">
+                        <ngx-charts-pie-chart [results]="agProcessesStatus" [labels]="showLabels" [scheme]="colorScheme"
+                          [doughnut]="true" [view]="view">
+                        </ngx-charts-pie-chart>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="card raw-output">
+                <div class="card-body">
+                  <div class="row-card">
+                    <h5 class="card-title">Raw output</h5>
+                    <i class="material-icons" (click)="expandOutput()">zoom_out_map</i>
+                  </div>
+                  <ul #rawOutput>
+                    <li *ngFor="let item of selectedExecutionLogs" [innerHTML]="item.message | linebreak">
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-10" *ngIf="selectedProcess">
-            <app-process-result [process]="selectedProcess" [result]="result" [count]="result?.length"></app-process-result>
+          <div class="row card-row" *ngIf="selectedExecution && executing?.indexOf(selectedExecution.runId) === -1">
+            <div class="col-12" *ngIf="selectedProcess">
+              <app-process-result [aggregate]="isAggregate" [agents]="selectedExecution.agentsResults" [process]="selectedProcess" [result]="result" [count]="result?.length"></app-process-result>
+            </div>
           </div>
         </div>
       </div>
