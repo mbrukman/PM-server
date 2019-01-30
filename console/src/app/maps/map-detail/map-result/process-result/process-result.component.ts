@@ -21,7 +21,6 @@ export class ProcessResultComponent implements OnChanges {
   generalInfo: ProcessResult;
   agProcessActionsStatus: any;
   agActionsStatus: any;
-  lastRowData :any = null;
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
