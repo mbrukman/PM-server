@@ -16,9 +16,7 @@ import { Agent } from '@agents/models/agent.model';
 export class ProcessResultComponent implements OnChanges {
   @Input('process') process: ProcessResult[];
   @Input('result') result: AgentResult[];
-  count: number;
-  aggregate:any;
-  agents:any;
+  aggregate:boolean;
   actions: ActionResultView[];
   generalInfo: ProcessResult;
   agProcessActionsStatus: any;
@@ -31,9 +29,7 @@ export class ProcessResultComponent implements OnChanges {
   constructor(private modalService: BsModalService) { }
 
   ngOnChanges(changes) {
-    this.agents = this.result;
-    this.count = this.result.length
-    this.aggregate = this.count > 1 ? true : false;
+    this.aggregate =  this.result.length > 1 ? true : false;
     this.agProcessActionsStatus = null;
     this.agActionsStatus = null;
     this.generalInfo = null;

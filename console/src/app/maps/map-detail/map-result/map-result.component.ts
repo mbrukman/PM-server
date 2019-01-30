@@ -28,7 +28,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
   selectedExecutionReq: Subscription;
   selectedExecutionLogs: any[];
   selectedAgent: any = defaultAgentValue;
-  isAggregate: boolean;
   selectedProcess: ProcessResult[];
   processIndex:number;
   agProcessesStatus: [{ name: string, value: number }];
@@ -236,11 +235,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
         return false;
       }
     });
-    this.isAggregate = this.selectedExecution.agentsResults.length > 1 ? true : false;
     if (!agentResult) { // if not found it aggregate
       this.result = this.selectedExecution.agentsResults;
     } else {
-      this.isAggregate = false;
       this.result = [agentResult];
     }
     this.generateProcessesList();
