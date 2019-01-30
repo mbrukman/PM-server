@@ -24,19 +24,13 @@
       </div>
     </div>
     <div class="row">
-      <p-dataTable [value]="actions" [rowStyleClass]="highlightSelectedRow"  rowExpandMode="single" [metaKeySelection]="false" 
-      selectionMode="single" expandableRows="true" #dt (onRowUnselect)="onRowUnselect($event)" 
-      (onRowSelect)="onRowSelect($event)" (onRowClick)="dt.toggleRow($event.data)">
-        <p-column *ngIf="!aggregate" [style]="{'width':'40%'}" field="name" header="Action">
+      <p-dataTable [value]="actions" rowExpandMode="single" [metaKeySelection]="false" 
+      selectionMode="single" expandableRows="true" #dt (onRowClick)="dt.toggleRow($event.data)">
+        <p-column  [style]="{'width': aggregate ? '20%':'40%'}" field="name" header="Action">
           <ng-template  let-col let-i="rowIndex" let-action="rowData" pTemplate="body">
             <span class="ellipsis">{{action.action.name || 'Action #' + (i+1)}}</span>
           </ng-template>
         </p-column>
-        <p-column *ngIf="aggregate" [style]="{'width':'20%'}" field="name" header="Action">
-            <ng-template  let-col let-i="rowIndex" let-action="rowData" pTemplate="body">
-              <span class="ellipsis">{{action.action.name || 'Action #' + (i+1)}}</span>
-            </ng-template>
-          </p-column>
         <p-column *ngIf="aggregate" [style]="{'width':'23%'}" field="name" header="Agent Name">
             <ng-template let-col let-action="rowData" pTemplate="body">
               <span class="ellipsis">{{action.agent.name}}</span>

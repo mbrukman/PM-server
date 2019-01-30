@@ -16,9 +16,9 @@ import { Agent } from '@agents/models/agent.model';
 export class ProcessResultComponent implements OnChanges {
   @Input('process') process: ProcessResult[];
   @Input('result') result: AgentResult[];
-  @Input('count') count: number;
-  @Input('aggregate') aggregate:any;
-  @Input('agents') agents:any;
+  count: number;
+  aggregate:any;
+  agents:any;
   actions: ActionResultView[];
   generalInfo: ProcessResult;
   agProcessActionsStatus: any;
@@ -31,6 +31,9 @@ export class ProcessResultComponent implements OnChanges {
   constructor(private modalService: BsModalService) { }
 
   ngOnChanges(changes) {
+    this.agents = this.result;
+    this.count = this.result.length
+    this.aggregate = this.count > 1 ? true : false;
     this.agProcessActionsStatus = null;
     this.agActionsStatus = null;
     this.generalInfo = null;
@@ -66,24 +69,6 @@ export class ProcessResultComponent implements OnChanges {
     modal.content.messages = messages;
   }
 
-  onRowUnselect(e){
-    const rowData = e.data;
-    rowData.selected = false;
-    this.lastRowData = rowData;
-  }
-
-  onRowSelect(e){
-    if(this.lastRowData && this.lastRowData.selected){
-      this.lastRowData.selected = false;
-    }
-    const rowData = e.data;
-    rowData.selected = true;
-    this.lastRowData = rowData;
-  }
-  
-  highlightSelectedRow(rowData: any, rowIndex: number){
-    return (rowData.selected) ? 'rowSelected' : 'rowUnselected';
-  }
 
   aggregateProcessActionResults() {
     let actions = [];

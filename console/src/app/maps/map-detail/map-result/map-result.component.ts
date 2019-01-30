@@ -10,12 +10,15 @@ import { ProcessResultByProcessIndex } from '@maps/models';
 import { BsModalService } from 'ngx-bootstrap';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 
+const defaultAgentValue = 'default'
 
 @Component({
   selector: 'app-map-result',
   templateUrl: './map-result.component.html',
   styleUrls: ['./map-result.component.scss']
 })
+
+
 export class MapResultComponent implements OnInit, OnDestroy {
   load_results = 25;
   map: Map;
@@ -24,7 +27,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   maxLengthReached: boolean = false;
   selectedExecutionReq: Subscription;
   selectedExecutionLogs: any[];
-  selectedAgent: any = 'default';
+  selectedAgent: any = defaultAgentValue;
   isAggregate: boolean;
   selectedProcess: ProcessResult[];
   processIndex:number;
@@ -208,9 +211,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
         });
 
         if (this.agents.length > 1) { // if there is more than one agent, add an aggregated option.
-          this.agents.unshift({ label: 'Aggregate', value: 'default' });
+          this.agents.unshift({ label: 'Aggregate', value: defaultAgentValue });
         }
-
+        this.selectedAgent = defaultAgentValue;
         this.changeAgent();
       }).flatMap(result => this.mapsService.logsList((<string>result.map), result.runId)) // get the logs list for this execution
       .subscribe(logs => {
@@ -233,7 +236,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
         return false;
       }
     });
-    this.selectedAgent = 'default';
     this.isAggregate = this.selectedExecution.agentsResults.length > 1 ? true : false;
     if (!agentResult) { // if not found it aggregate
       this.result = this.selectedExecution.agentsResults;

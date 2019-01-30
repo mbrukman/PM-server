@@ -37,7 +37,7 @@
               <p-dropdown [options]="agents" (onChange)="changeAgent()" [(ngModel)]="selectedAgent" [filter]="true"
                 [style]="{'width': '100%'}">
                 <ng-template let-item pTemplate="item">
-                  <span style="vertical-align:middle">{{item.label}}</span>
+                  <span class="agent-name">{{item.label}}</span>
                 </ng-template>
               </p-dropdown>
             </div>
@@ -98,7 +98,7 @@
           </div>
           <div class="row card-row" *ngIf="selectedExecution && executing?.indexOf(selectedExecution.runId) === -1">
             <div class="col-12" *ngIf="selectedProcess">
-              <app-process-result [aggregate]="isAggregate" [agents]="selectedExecution.agentsResults" [process]="selectedProcess" [result]="result" [count]="result?.length"></app-process-result>
+              <app-process-result  [process]="selectedProcess" [result]="result"></app-process-result>
             </div>
           </div>
         </div>

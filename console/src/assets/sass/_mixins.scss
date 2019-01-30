@@ -74,7 +74,7 @@
           .ui-widget-content{
             border-bottom: none;
           }
-          tr.rowSelected  {
+          .ui-expanded-row {
             background-color: $hover-color !important;
             box-shadow: -4px 0px 0px 0px $turquoise-blue;
             td{
@@ -85,17 +85,7 @@
             }
           
           }
-          tr.rowUnselected  {
-            background-color:$selected-tab-environment;
-            box-shadow: 0;
-            td{
-              border-bottom: 1px solid #4c5156;
-              span{
-                color: #dddddd;
-              }
-            }
-          }
-          tr.ui-expanded-row-content{
+          .ui-expanded-row-content{
             background-color: $hover-color !important;
             box-shadow: -4px 0px 0px 0px $turquoise-blue;
             td{
