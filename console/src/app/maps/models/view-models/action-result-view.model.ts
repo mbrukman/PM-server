@@ -1,14 +1,10 @@
 import { ActionResult } from "../execution-result.model";
+import { Agent } from '@agents/models/agent.model';
 
 export class ActionResultView {
-    action : ActionResult;
-    agentKey : string;
     key: string;
-    
-    constructor(action : ActionResult ,  agentKey : string ){
-        this.action = action;
-        this.agentKey = agentKey
-        this.key = this.action.action + "_" + this.agentKey;
+    constructor(public action : ActionResult , public agent : Agent ){
+        this.key = this.action.action + "_" + this.agent.key;
     }
   }
 

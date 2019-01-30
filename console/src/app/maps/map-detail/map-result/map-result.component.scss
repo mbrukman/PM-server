@@ -1,13 +1,15 @@
 @import "~assets/sass/variables";
+@import "~assets/sass/mixins";
 
 
 .row-card{
   display: flex;
   justify-content: space-between;
+  cursor: pointer
 }
 
 .bg-dark {
-  background: $dark-background !important;
+  background: $kh-background !important;
 }
 
 .bg-grey {
@@ -27,6 +29,8 @@
     .execution-list {
       flex-grow: 1;
       overflow: scroll;
+      width: 229px;
+      padding: 16px 23px 0px 26px;
       ul {
         padding-left: 0;
         list-style: none;
@@ -43,10 +47,13 @@
             background: $dark-background;
           }
 
-          &.active {
-            background: $turquoise-blue;
+          &.selected {
+            background-color: $kh-selected-bck;
+            box-shadow: -4px 0px 0px 0px $pale-blue;
+            display: table-cell;
           }
-
+          
+          
         }
       }
     }
@@ -56,24 +63,125 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-
-    .result-overview{
-      display: flex;
-      flex-direction: row;
-
-      .details{
-        flex-grow: 1;
-      }
-
-      .chart{
-        width: 200px;
-        flex-shrink: 0;
-      }
-    }
-
+    height: 100%;
     .result-content{
+      height: 100%;
       flex-grow: 1;
       overflow-y: auto;
+      background-color: $kh-background;
+      .container-fluid-process{
+        display: flex;
+        height: 100%;
+        .process-col{
+          padding: 0 23px;
+          border-right: 1px solid $cool-grey;
+          height: 100%;
+          width: 292px;
+          .process{
+            height: 69%;
+          }
+          .bg-dark{
+            height: 31%;
+            padding-top: 27px;
+            .card-body{
+              padding: 0;
+              @include dropdown();
+              .card-title{
+                height: 21px;
+                font-size: 18px;
+                color: $pale-blue;
+              }
+              .agent-name{
+                vertical-align:middle
+              }
+            }
+          }
+          .process-select {
+            padding: 0;
+            .card-body {
+              padding: 0;
+              ul {
+                padding-left: 0;
+                list-style: none;
+                font-size: 14px;
+                margin-bottom: 0;
+                
+                li {
+                  display: flex;
+                  height: 41px;
+                  align-items: center;
+            
+                  .selected {
+                    background-color: $kh-selected-bck;
+                    box-shadow: -4px 0px 0px 0px $pale-blue;
+                    display: table-cell;
+               
+                  }
+                  &:hover {
+                    cursor: pointer;   
+                    background: $kh-selected-bck;             
+                  }
+          
+                  app-process-list-item{
+                    opacity: inherit;
+                    width: 100%;
+                    height: 100%;
+                    padding-top: 10px;
+                    padding-left: 10px;
+                  }
+                }
+              }
+            }
+          }
+        }
+        .results{
+          width: 100%;
+          padding: 16px 9px 0 9px;
+          .result-header-deck {
+            height: 230px;
+            .card {
+              height: 100%;
+            }
+            .card:not(:first-child) {
+              overflow-y: hidden;
+            }
+          
+            .pie-chart-parent { 
+              display: grid; 
+              overflow: hidden;
+            }
+            .result-overview{
+              display: flex;
+              flex-direction: row;
+        
+              .details{
+                flex-grow: 1;
+              }
+        
+              .chart{
+                width: 200px;
+                flex-shrink: 0;
+              }
+            }
+          }
+          .raw-output {
+            .card-body {
+          
+              .fa-arrows-alt{
+                cursor: pointer;
+              }
+          
+              ul {
+                max-height: 135px;
+                overflow-y: scroll;
+                > li {
+                  word-break: break-word;
+                }
+              }
+            }
+          }
+        }
+      }
     }
 
   }
@@ -85,20 +193,7 @@
   }
 }
 
-.result-header-deck {
-  height: 230px;
-  .card {
-    height: 100%;
-  }
-  .card:not(:first-child) {
-    overflow-y: hidden;
-  }
 
-  .pie-chart-parent { 
-    display: grid; 
-    overflow: hidden;
-  }
-}
 
 p {
   &.execution-detail {
@@ -106,56 +201,9 @@ p {
   }
 }
 
-.process-select {
-  padding: 0;
-  .card-body {
-    padding: 0;
-    ul {
-      padding-left: 0;
-      list-style: none;
-      font-size: 14px;
-      margin-bottom: 0;
 
-      li {
-        padding: 0 15px;
-        display: flex;
-        height: 41px;
-        align-items: center;
-
-        &:hover {
-          cursor: pointer;
-          background: $cool-grey;
-        }
-
-        &.active {
-          background: $turquoise-blue;
-        }
-
-        app-process-list-item{
-          max-width: 100%;
-        }
-      }
-    }
-  }
-}
 
 .card-row {
   margin-top: 15px;
 }
 
-.raw-output {
-  .card-body {
-
-    .fa-arrows-alt{
-      cursor: pointer;
-    }
-
-    ul {
-      max-height: 135px;
-      overflow-y: scroll;
-      > li {
-        word-break: break-word;
-      }
-    }
-  }
-}

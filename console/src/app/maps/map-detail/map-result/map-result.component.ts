@@ -10,12 +10,15 @@ import { ProcessResultByProcessIndex } from '@maps/models';
 import { BsModalService } from 'ngx-bootstrap';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 
+const defaultAgentValue = 'default'
 
 @Component({
   selector: 'app-map-result',
   templateUrl: './map-result.component.html',
   styleUrls: ['./map-result.component.scss']
 })
+
+
 export class MapResultComponent implements OnInit, OnDestroy {
   load_results = 25;
   map: Map;
@@ -24,8 +27,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
   maxLengthReached: boolean = false;
   selectedExecutionReq: Subscription;
   selectedExecutionLogs: any[];
-  selectedAgent: any = 'default';
+  selectedAgent: any = defaultAgentValue;
   selectedProcess: ProcessResult[];
+  processIndex:number;
   agProcessesStatus: [{ name: string, value: number }];
   result: AgentResult[];
   agents: any;
@@ -206,9 +210,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
         });
 
         if (this.agents.length > 1) { // if there is more than one agent, add an aggregated option.
-          this.agents.unshift({ label: 'Aggregate', value: 'default' });
+          this.agents.unshift({ label: 'Aggregate', value: defaultAgentValue });
         }
-
+        this.selectedAgent = defaultAgentValue;
         this.changeAgent();
       }).flatMap(result => this.mapsService.logsList((<string>result.map), result.runId)) // get the logs list for this execution
       .subscribe(logs => {
@@ -286,7 +290,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectProcess(process) {
+  selectProcess(process,i=0) {
     let processes = [];
     this.result.forEach(res => {
       res.processes.forEach(o=>{
@@ -296,6 +300,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       })
     });
     this.selectedProcess = processes;
+    this.processIndex = i;
   }
 
   stopRun(runId: string) {
