@@ -7,7 +7,7 @@
           <li *ngFor="let item of structures" [class.selected]="currentStructure?.id === item?.id"  (click)="previewStructure(item.id)">
             <span class="revision-title">{{ (item.createdAt | date: 'dd/MM/yyyy') + ' ' +  (item.createdAt | date: 'HH:mm') }}</span>
     
-            <div class="onHover">
+            <div class="revision-actions-wrapper">
               <span>
                 <button class="btn-inline-action" (click)="duplicateMap(item.id)"
                 tooltip="Save As"
