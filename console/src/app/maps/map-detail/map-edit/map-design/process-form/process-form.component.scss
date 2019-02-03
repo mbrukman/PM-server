@@ -14,7 +14,7 @@
 
     .mandatory-check{
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
         
         label.control{
             font-size: 14px;
@@ -116,9 +116,6 @@
                 padding-left: 10px;
             }
 
-            .check-control{
-                margin-left: -8px;
-            }
             .row-title{
                 padding-top: 20px;
                 font-weight: bold;
