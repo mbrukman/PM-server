@@ -40,7 +40,7 @@
   .ui-widget-header{
     width: 214px;
     height: 36px;
-    margin: 20px;
+    margin: 29px 13px;
   } 
   .tabs{
     margin-top: 21px;
@@ -53,6 +53,7 @@
 
     .title-tab{
       padding: 0px 10px;
+      margin: 0px 15px;
       cursor: pointer;
 
       &.active{
