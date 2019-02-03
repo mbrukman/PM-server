@@ -1,35 +1,31 @@
-<div class="row pm-modal">
-  <div class="col-12">
-    <div class="modal-header">
-      <h4>Edit agent</h4>
-      <button type="button" class="close" (click)="onClose()" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
+<div class="pm-modal">
+  <div class="modal-header">
+    <i class="material-icons close" (click)="onClose()">close</i>
+    <h4>Edit agent</h4>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label>Name:</label>
+      <input type="text" id="title" class="form-control" [(ngModel)]="name" />
     </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Name:</label>
-        <input type="text" id="title" class="form-control" [(ngModel)]="name"/>
+    <div class="form-group">
+      <label>Add tag</label>
+      <div class="input-wrapper">
+        <input [(ngModel)]="tag" (keyup.enter)="saveTag()">
+        <i (click)="saveTag()" [hidden]="!tag.length" class="material-icons add-btn">done</i>
       </div>
-      <div class="form-group">
-        <label>Add tag</label>
-        <div class="input-wrapper">
-          <input [(ngModel)]="tag" (keyup.enter)="saveTag()">
-          <i (click)="saveTag()" [hidden]="!tag.length" class="material-icons add-btn">done</i>
-        </div>
-        <div class="attributes">
-            <div class="tag" *ngFor="let tagInput of attributes; let i=index">
-                <span>{{tagInput}}</span>
-                <a (click)="deleteTag(i)" >
-                  <i class="material-icons btn-close">close</i>
-                </a>
-              </div>
+      <div class="attributes">
+        <div class="tag" *ngFor="let tagInput of attributes; let i=index">
+          <span>{{tagInput}}</span>
+          <a (click)="deleteTag(i)">
+            <i class="material-icons btn-close">close</i>
+          </a>
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>
-      <button type="submit" class="kh-btn-blue kh-btn" (click)="onConfirm()"><span>Save</span></button>
-    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>
+    <button type="submit" class="kh-btn-blue kh-btn" (click)="onConfirm()"><span>Save</span></button>
   </div>
 </div>

@@ -1,11 +1,8 @@
-<div class="container pm-modal">
-  <div class="modal-header">
-    <h1>{{ title }}</h1>
-    <button type="button" class="close" (click)="onAction(cancel)" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+<div class="pm-modal">
+  <div class="modal-header no-title">
+    <i class="material-icons close" (click)="onAction(cancel)">close</i>
+    <h4>{{ title }}</h4>
   </div>
-
   <div class="modal-body">
     {{ message }}
   </div>
