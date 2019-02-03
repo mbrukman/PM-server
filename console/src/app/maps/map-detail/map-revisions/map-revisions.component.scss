@@ -44,12 +44,11 @@
   overflow-y: scroll;
   ul {
     list-style: none;
-    padding: 0;
+    padding: 16px 22px 0px 22px;
     font-size: 14px;
     li {
       justify-content: space-between;
       cursor: pointer;
-      margin: 16px 22px 0px;
       padding-left: 15px;
       height: 41px;
       display: flex;
