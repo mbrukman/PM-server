@@ -30,6 +30,9 @@
       @include p-checkbox();
 
     ::ng-deep {
+      th{
+        padding: 7px;
+      }
       tr:hover {
       box-shadow: 0px 0px !important;
     } 
