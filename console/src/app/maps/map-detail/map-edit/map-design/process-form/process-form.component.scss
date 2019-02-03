@@ -33,6 +33,12 @@
             &:active {
                 cursor: grabbing !important;
             }
+
+            .action-btns {
+                i:not(:last-of-type){
+                    margin-right: 13px;
+                }
+            }
         }
         .gu-transit {
             background: black;
