@@ -8,8 +8,8 @@
   </div>
 
   <div class="modal-footer">
-    <button type="button" [hidden]="!cancel" class="btn pm" (click)="onAction(cancel)">{{ cancel }}</button>
-    <button type="submit" [hidden]="!third" class="btn pm" (click)="onAction(third)" *ngIf="third">{{ third }}</button>
-    <button type="submit" class="btn pm" (click)="onAction(confirm)">{{ confirm }}</button>
+    <button type="button" [hidden]="!cancel" class="kh-btn kh-btn-gray" (click)="onAction(cancel)">{{ cancel }}</button>
+    <button type="submit" class="kh-btn kh-btn-gray" (click)="onAction(confirm)">{{ confirm }}</button>
+    <button type="submit" [hidden]="!third" class="kh-btn-blue kh-btn" (click)="onAction(third)" *ngIf="third">{{ third }}</button>
   </div>
 </div>
