@@ -4,29 +4,26 @@
       <div class='versions' style="height: 100%; overflow-y: scroll" infiniteScroll [scrollWindow]="false" 
       [infiniteScrollDisabled]="maxLengthReached" [infiniteScrollDistance]="2" [infiniteScrollThrottle]="150" (scrolled)="onScroll()">
         <ul>
-          <li *ngFor="let item of structures" [class.selected]="currentStructure?.id === item?.id" >
+          <li *ngFor="let item of structures" [class.selected]="currentStructure?.id === item?.id"  (click)="previewStructure(item.id)">
             <span class="revision-title">{{ (item.createdAt | date: 'dd/MM/yyyy') + ' ' +  (item.createdAt | date: 'HH:mm') }}</span>
-            <span>
-            <button class="btn-inline-action" (click)="previewStructure(item.id)"
-                    tooltip="Preview"
-                    placement="right">
-            <i class="material-icons">remove_red_eye</i>
-            </button>
-            </span>
-            <span>
-            <button class="btn-inline-action" (click)="duplicateMap(item.id)"
-                    tooltip="Save As"
-                    placement="right">
-            <i class="material-icons">content_copy</i></button>
-            </span>
-            <span>
-            <button class="btn-inline-action" (click)="changeStructure(item.id)"
-                    tooltip="Revert to revision"
-                    placement="right">
-            <i class="material-icons">open_in_new</i></button>
-            </span>
-          </li>
-        </ul>
+    
+            <div class="revision-actions-wrapper">
+              <span>
+                <button class="btn-inline-action" (click)="duplicateMap(item.id)"
+                tooltip="Save As"
+                placement="right">
+                <i class="material-icons">content_copy</i></button>
+              </span>
+              <span>
+                <button class="btn-inline-action" (click)="changeStructure(item.id)"
+                tooltip="Revert to revision"
+                placement="right">
+                <i class="material-icons">open_in_new</i></button>
+              </span>
+            </div>
+            
+            </li>
+          </ul>
       </div>
     </div>
     <div class="col-9" #wrapper (window:resize)="onResize($event)">
