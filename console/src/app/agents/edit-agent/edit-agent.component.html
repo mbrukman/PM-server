@@ -14,7 +14,7 @@
         <input [(ngModel)]="tag" (keyup.enter)="saveTag()">
         <i (click)="saveTag()" [hidden]="!tag.length" class="material-icons add-btn">done</i>
       </div>
-      <div class="attributes">
+      <div class="attributes" *ngIf="attributes?.length">
         <div class="tag" *ngFor="let tagInput of attributes; let i=index">
           <span>{{tagInput}}</span>
           <a (click)="deleteTag(i)">
