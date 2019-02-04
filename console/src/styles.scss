@@ -366,25 +366,58 @@ rect.body {
     }
   }
 }
-
-.pm-modal {
+.modal-content{
   background: $background;
-  box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.75);
-  .modal-header {
-    border-bottom: 0;
-    button.close {
-      color: $text-color;
-      cursor: pointer;
+  .pm-modal {
+    background: $background;
+    border-radius: 6px;
+    box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.75);
+    .modal-header {
+      border-bottom: 0;
+      flex-direction: column;
+      border-bottom: 1px solid #404549;
+      padding: 14px 14px 0px;
+
+      &.no-title{
+        border: none;
+        position: absolute;
+        right: 40px;
+        top: 2px;
+        z-index: 1;
+        .close{
+          position: absolute;
+        }
+      }
+      
+
+      h4{
+        font-size: 22px;
+        font-weight: 300;
+        margin: auto;
+        padding-bottom: 19px;
+      }
+      .close {
+        color: $text-color;
+        cursor: pointer;
+      }
+    }
+    .modal-body {
+      padding: 53px 38px 0px;
+      border-bottom: 0;
+      &.no-button{
+        margin-bottom: 38px;
+      }
+    }
+    .modal-footer {
+      border-top: 0;
+      padding:34px 38px 38px;
+      button{
+        margin-left: 0px;
+      }
     }
   }
-  .modal-body {
-    border-bottom: 0;
-  }
-  .modal-footer {
-    border-top: 0;
-  }
 }
-
+  
 .ui-datepicker {
   background: $background;
   .ui-datepicker-header {
