@@ -3,7 +3,10 @@
     label{
         font-size: 14px;
         color: $greyish-text;
-        margin-top: 25px;
+
+        &:not(:first-of-type){
+            margin-top: 25px;
+        }
     }
     input,select{
         border-radius: 3px;
