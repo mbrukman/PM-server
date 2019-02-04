@@ -4,6 +4,9 @@ var currentAgent = {
     attributes: [{ name: "", value: "" }]
 };
 
+/**
+ * Represents the selected configuration
+ */
 var configuration = {};
 
 /**
