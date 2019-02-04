@@ -46,7 +46,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   init: boolean = false;
   scale: number = 1;
 
-  defaultContent: string;
   processViewWrapper: ProcessViewWrapper;
   @ViewChild('wrapper') wrapper: ElementRef;
 
@@ -134,7 +133,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         this.setCellSelectState(cell,false);
       });
 
-      this.defaultContent = JSON.stringify(this.graph.toJSON());
       if ((<any>(this.mapStructure)).imported) {
         delete (<any>(this.mapStructure)).imported;
         this.deselectAllCellsAndUpdateStructure();
@@ -483,6 +481,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.graph.removeCells([this.graph.getCell(this.process.uuid)]);
     this.editing = false;
     this.process = null;
+    this.mapsService.setCurrentMapStructure(this.mapStructure);
     this.deselectAllCellsAndUpdateStructure();
   }
 
@@ -591,7 +590,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   private onMapContentUpdate() {
     let graphContent = JSON.stringify(this.graph.toJSON());
-    if ((graphContent != this.defaultContent) && (this.mapStructure)) {
+    if ((graphContent != this.mapStructure.content) && (this.mapStructure)) {
       this.mapStructure.content = graphContent;
       this.mapsService.setCurrentMapStructure(this.mapStructure);
     }
