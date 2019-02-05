@@ -34,6 +34,17 @@
       display: inherit;
       padding-top: 28px;
       width: 100%;
+      .form-control{
+        border: none;
+        background-color:$dark-background ;
+        @include dropdown();
+        .dropdown{
+          width: 430px;
+        }
+        .project-name{
+          vertical-align:middle
+        }
+      }
       .title{
         margin-bottom: 15px;
         font-size: 14px;

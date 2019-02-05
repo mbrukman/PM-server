@@ -48,7 +48,9 @@ export class MapConfigurationsComponent implements OnInit {
   }
 
   addNewConfiguration() {
-    this.modalService.show(AddConfigurationComponent).content.result
+    const modal = this.modalService.show(AddConfigurationComponent);
+    modal.content.configurations = this.mapStructure.configurations;
+    modal.content.result
       .take(1)
       .filter(name => !!name)
       .subscribe(name => {

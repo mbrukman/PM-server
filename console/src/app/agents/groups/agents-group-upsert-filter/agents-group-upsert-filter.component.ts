@@ -14,6 +14,8 @@ import { Subject } from 'rxjs/Subject';
 })
 export class AgentsGroupUpsertFilterComponent implements OnInit {
   filterTypes = FILTER_TYPES;
+  filterDropDown:any;
+  fieldsDropDown:any;
   fields = FILTER_FIELDS;
   filter : AgentsGroupFilter;
   edit: boolean;
@@ -26,6 +28,13 @@ export class AgentsGroupUpsertFilterComponent implements OnInit {
 
   ngOnInit(){
     if (!this.filter) this.filter  = new AgentsGroupFilter();
+    this.fieldsDropDown = this.fields.map(field => {
+      return {label:field.label,value:field.id}
+    })
+    this.filterDropDown = this.filterTypes.map(filter => {
+      return {label:filter.label,value:filter.id}
+    })
+
   }
 
   onClose() {

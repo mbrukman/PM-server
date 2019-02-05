@@ -6,7 +6,7 @@ import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CalendarModule as AngularCalendarModule } from 'angular-calendar';
 import { CronJobsModule } from 'ngx-cron-jobs';
 import { CalendarModule as PrimeCalendarModule } from 'primeng/primeng';
-
+import {DropdownModule} from 'primeng/primeng';
 import { AddJobComponent } from './add-job/add-job.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { CalendarContainerComponent } from './calendar-container/calendar-container.component';
@@ -21,6 +21,7 @@ import { CalendarRoutingModule } from './calendar-routing.module';
   ],
   imports: [
     CommonModule,
+    DropdownModule,
     ReactiveFormsModule,
     FormsModule,
     CalendarRoutingModule,

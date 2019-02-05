@@ -79,6 +79,10 @@
     .process-form {
         margin-bottom: 55px;
         border-top: 0px;
+        .dropdown{
+            width: 100%;
+            @include dropdown();
+        } 
 
         .clearfix:hover{
             color: white;
@@ -128,7 +132,10 @@
                 }
                 
             }
- 
+            .dropdown{
+                width: 100%;
+                @include dropdown();
+            }
             .action-params {
                 margin-bottom: 12px;
                 .col-4{

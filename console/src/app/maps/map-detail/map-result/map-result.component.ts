@@ -53,6 +53,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    
     // getting current map and requesting the executions list
     this.mapSubscription = this.mapsService.getCurrentMap()
       .filter(map => map)
@@ -134,6 +135,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     if (this.mapExecutionMessagesSubscription) {
       this.mapExecutionMessagesSubscription.unsubscribe();
     }
+
   }
 
 

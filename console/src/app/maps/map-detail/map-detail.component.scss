@@ -36,7 +36,10 @@
 
   .action-buttons {
     padding : 0 22px;
-
+    .dropdown{
+      width: 100px;
+      @include dropdown();
+    }
     &:last-of-type{
       display: flex;
       justify-content: flex-end;

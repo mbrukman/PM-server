@@ -3,27 +3,40 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)">
   <div class="form-group">
     <label for="project">Project</label>
-    <select class="form-control" formControlName="project" id="project" (change)="onSelectProject()">
-      <option disabled>Select a project</option>
-      <option *ngFor="let project of projects" [ngValue]="project._id">{{project.name}}</option>
-    </select>
+    <div class="ui-grid ui-grid-responsive ui-fluid ">
+        <div class="ui-grid-row">
+            <div class="dropdown">
+                <p-dropdown id="project" formControlName="project" [options]="projectsDropDown" placeholder="Select a project" (onChange)="onSelectProject()"
+                [autoWidth]="false">
+                </p-dropdown>
+            </div>
+        </div>
+    </div>
   </div>
   <div class="form-group">
     <label for="map">Map</label>
-    <select class="form-control" formControlName="map" id="map" (change)="onSelectMap()">
-      <option disabled>Select a map</option>
-      <option *ngFor="let map of selectedProject?.maps" [ngValue]="map._id" [disabled]="!selectedProject">{{map.name}}
-      </option>
-    </select>
+    <div class="ui-grid ui-grid-responsive ui-fluid ">
+        <div class="ui-grid-row">
+            <div class="dropdown">
+                <p-dropdown id="map" formControlName="map" [options]="mapDropDown" placeholder="Select a map" (onChange)="onSelectMap()"
+                [autoWidth]="false">
+                </p-dropdown>
+            </div>
+        </div>
+    </div>
   </div>
   <div class="form-group">
     <label for="configuration">Configuration</label>
-    <select class="form-control" formControlName="configuration" id="configuration">
-      <option disabled>Select a configuration</option>
-      <option *ngFor="let item of selectedMapConfigurations" [ngValue]="item" [disabled]="!selectedMapConfigurations">
-        {{item}}
-      </option>
-    </select>
+    <div class="ui-grid ui-grid-responsive ui-fluid ">
+        <div class="ui-grid-row">
+            <div class="dropdown">
+                <p-dropdown id="configuration" formControlName="configuration" [options]="configurationsDropDown" 
+                placeholder="Select a configuration" (onChange)="onSelectMap()"
+                [autoWidth]="false">
+                </p-dropdown>
+            </div>
+        </div>
+    </div>
   </div>
 
   <div class="form-check form-check-inline">

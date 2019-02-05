@@ -7,10 +7,19 @@
     <div class="form-row">
       
         <p class="title">Project</p>
-        <select class="form-control" [(ngModel)]="selectedProject" id="project" (change)="onChangeProject()">
-          <option disabled>Select a project</option>
-          <option *ngFor="let project of projects" [ngValue]="project._id">{{project.name}}</option>
-        </select>
+        <div class="ui-grid ui-grid-responsive ui-fluid form-control">
+            <div class="ui-grid-row">
+                <div class="dropdown">
+                    <p-dropdown [options]="projects" optionLabel="name" (onChange)="onChangeProject()" [(ngModel)]="selectedProject" 
+                    [autoWidth]="false">
+                        <ng-template let-item pTemplate="item">
+                            <span class="project-name">{{item.label}}</span>
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+            </div>
+        </div>
+
       
     </div>
     <div class="form-row">

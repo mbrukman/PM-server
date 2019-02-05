@@ -10,13 +10,25 @@
         <div class="modal-body">
             <div class="form-group">
                 <label>Fields</label>
-                <select class="form-control" [(ngModel)]="filter.field">
-                    <option *ngFor="let field of fields" [value]="field.id">{{field.label}}</option>
-                </select>
+                <div class="ui-grid ui-grid-responsive ui-fluid ">
+                    <div class="ui-grid-row">
+                        <div class="dropdown">
+                            <p-dropdown [(ngModel)]="filter.field" [options]="fieldsDropDown" placeholder="Select a field" 
+                            [autoWidth]="false">
+                            </p-dropdown>
+                        </div>
+                    </div>
+                </div>
                 <label>Type</label>
-                <select class="form-control" [(ngModel)]="filter.filterType">
-                    <option *ngFor="let filterType of filterTypes" [value]="filterType.id">{{filterType.label}}</option>
-                </select>
+                <div class="ui-grid ui-grid-responsive ui-fluid ">
+                    <div class="ui-grid-row">
+                        <div class="dropdown">
+                            <p-dropdown [(ngModel)]="filter.filterType" [options]="filterDropDown" placeholder="Select a filter" 
+                            [autoWidth]="false">
+                            </p-dropdown>
+                        </div>
+                    </div>
+                </div>
                 <label>Value</label>
                 <input class="form-control" [(ngModel)]="filter.value" />
             </div>

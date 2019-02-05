@@ -78,11 +78,16 @@
 
         <div class="form-group">
           <label>Agents flow control</label>
-          <select class="form-control" formControlName="flowControl">
-            <option value="each">{{FLOW_CONTROL_TYPES.each.label}}</option>
-            <option value="wait">{{FLOW_CONTROL_TYPES.wait.label}}</option>
-            <option value="race">{{FLOW_CONTROL_TYPES.race.label}}</option>
-          </select>
+          <div class="ui-grid ui-grid-responsive ui-fluid ">
+              <div class="ui-grid-row">
+                  <div class="dropdown">
+                      <p-dropdown  [options]="flowControlDropDown" placeholder="Select a Flow control" formControlName="flowControl"  
+                      [autoWidth]="false">
+                      </p-dropdown>
+                  </div>
+              </div>
+          </div>
+
           <small class="form-text text-muted">Controlling syncing between agents.</small>
         </div>
 
@@ -177,11 +182,17 @@
         <small class="form-text text-muted">If the action fails the process will stop (with failure).</small>
       </div>
       <p class="lead">Method</p>
-      <select id="inputState" class="form-control" formControlName="method" (change)="onSelectMethod()">
-        <option [ngValue]="null" disabled selected>Select a method</option>
-        <option *ngFor="let method of this.processViewWrapper.plugin.methods" id="method._id" [ngValue]="method.name">{{method.viewName}}
-        </option>
-      </select>
+      <div class="ui-grid ui-grid-responsive ui-fluid ">
+          <div class="ui-grid-row">
+              <div class="dropdown">
+                  <p-dropdown id="inputState" [options]="methodsDropDown" placeholder="Select a Method" formControlName="method"  
+                  (onChange)="onSelectMethod()"
+                  [autoWidth]="false">
+                  </p-dropdown>
+              </div>
+          </div>
+      </div>
+
 
       <div formArrayName="params">
         <div [hidden]="!selectedMethod" class="row row-title">
@@ -207,17 +218,25 @@
                 <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
                 
                 <app-vault-selector *ngSwitchCase="'vault'" formControlName="value"></app-vault-selector>
-
-                <select formControlName="value" class="form-control" *ngSwitchCase="'autocomplete'"> 
-                  <option *ngFor="let opt of methods[processForm.value.actions[index].method].params[k].options"
-                          [ngValue]="opt.id">{{ opt.value }}
-                  </option>
-                </select>
-                <select formControlName="value" class="form-control" *ngSwitchCase="'options'">
-                  <option *ngFor="let opt of methods[processForm.value.actions[index].method].params[k].options"
-                          [ngValue]="opt.id">{{ opt.name }}
-                  </option>
-                </select>
+                <div *ngSwitchCase="'autocomplete'" class="ui-grid ui-grid-responsive ui-fluid ">
+                    <div class="ui-grid-row">
+                        <div class="dropdown">
+                            <p-dropdown [options]="methods[processForm.value.actions[index].method].params[k].options"  placeholder="Select an option" formControlName="value"  
+                            [autoWidth]="false">
+                  
+                            </p-dropdown>
+                        </div>
+                    </div>
+                </div> 
+                <div *ngSwitchCase="'options'" class="ui-grid ui-grid-responsive ui-fluid ">
+                    <div class="ui-grid-row">
+                        <div class="dropdown">
+                            <p-dropdown [options]="methods[processForm.value.actions[index].method].params[k].options"  placeholder="Select an option" formControlName="value"  
+                            [autoWidth]="false">
+                            </p-dropdown>
+                        </div>
+                    </div>
+                </div>
                 <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
                 <input formControlName="value" type="checkbox" class="form-control" *ngSwitchCase="'boolean'">
                 <input formControlName="value" type="number" class="form-control" *ngSwitchCase="'int'">

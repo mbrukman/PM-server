@@ -1,0 +1,8 @@
+@import "~assets/sass/mixins";
+
+
+@include dropdown();
+.dropdown{
+    width: 100%;
+}
+  

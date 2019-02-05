@@ -20,27 +20,43 @@
 
       <div class="form-group">
         <label for="configuration">Configuration</label>
-        <select class="form-control" id="configuration" formControlName="configuration">
-          <option *ngFor="let item of configurations" [ngValue]="item">{{ item }}</option>
-        </select>
+        <div class="ui-grid ui-grid-responsive ui-fluid ">
+            <div class="ui-grid-row">
+                <div class="dropdown">
+                    <p-dropdown id="configuration" [options]="configDropDown" optionLabel="name" formControlName="configuration"
+                    [autoWidth]="false">
+                    </p-dropdown>
+                </div>
+            </div>
+        </div>
       </div>
 
       <div class="form-group">
         <label for="plugin">Plugin</label>
-        <select class="form-control" formControlName="plugin" id="plugin" (change)="onSelectTrigger()">
-          <option disabled>Select a trigger</option>
-          <option *ngFor="let trigger of triggers" [ngValue]="trigger.name">{{trigger.name}}</option>
-        </select>
+
+        <div class="ui-grid ui-grid-responsive ui-fluid ">
+            <div class="ui-grid-row">
+                <div class="dropdown">
+                    <p-dropdown id="plugin" [options]="triggers" optionLabel="name" placeholder="Select a trigger" formControlName="plugin" (onChange)="onSelectTrigger()" 
+                    [autoWidth]="false">
+                    </p-dropdown>
+                </div>
+            </div>
+        </div>
+
       </div>
 
       <div class="form-group" *ngIf="triggerForm.controls.plugin.value">
         <label for="method">Method</label>
-        <select class="form-control" formControlName="method" id="method" (change)="onSelectMethod()">
-          <option disabled>Select a method</option>
-          <option *ngFor="let method of plugin.methods" [ngValue]="method.name">
-            {{method.viewName}}
-          </option>
-        </select>
+        <div class="ui-grid ui-grid-responsive ui-fluid ">
+            <div class="ui-grid-row">
+                <div class="dropdown">
+                    <p-dropdown id="method" [options]="plugin?.methods" optionLabel="viewName" placeholder="Select a method" formControlName="method" (onChange)="onSelectMethod()" 
+                    [autoWidth]="false">
+                    </p-dropdown>
+                </div>
+            </div>
+        </div>
       </div>
 
       <div formArrayName="params" *ngIf="triggerForm.controls.method.value">

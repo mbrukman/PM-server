@@ -1,4 +1,5 @@
 @import "~assets/sass/variables";
+@import "~assets/sass/mixins";
 
 .section-sub-title{
   padding-bottom: 0;
@@ -9,6 +10,10 @@ form {
   padding: 20px;
   background: $dark-background;
   border: 1px solid $cool-grey;
+  .dropdown{
+    width: 100%;
+    @include dropdown();
+  }
   button.pm {
     margin-top: 10px;
   }

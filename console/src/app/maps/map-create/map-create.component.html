@@ -8,10 +8,15 @@
       <form [formGroup]="mapForm" (ngSubmit)="onSubmitForm(mapForm.value)" class="map-form">
         <div class="form-group">
           <label for="project">Project</label>
-          <select class="form-control" formControlName="project" id="project">
-            <option value="" disabled>Select a project</option>
-            <option *ngFor="let project of projects" [ngValue]="project._id">{{project.name}}</option>
-          </select>
+          <div class="ui-grid ui-grid-responsive ui-fluid ">
+              <div class="ui-grid-row">
+                  <div class="dropdown">
+                      <p-dropdown id="project" [options]="projectsDropDown"  placeholder="Select an project" formControlName="project"  
+                      [autoWidth]="false">
+                      </p-dropdown>
+                  </div>
+              </div>
+          </div>
         </div>
         <div class="form-group">
           <label>Name:</label>

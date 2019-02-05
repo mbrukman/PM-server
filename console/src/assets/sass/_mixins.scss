@@ -256,43 +256,121 @@
 @mixin dropdown(){
   ::ng-deep{
     p-dropdown{
-      
-      label{
-        font-size: 14px;
-        color: #dddddd;
-        padding: 10px;
-        width: 198px;
-        padding-right: 30px;
-        @include ellipsis();
-      }
+      outline:none;
+      .ui-dropdown{
+        outline:none;
+        overflow: visible;
+        &:not(.ui-state-disabled):hover{
+          background-color: $kh-background;
+        }
 
-      .ui-dropdown-trigger {
-        padding: 10px;
-        margin-right: 10px;
+        label{
+          font-size: 14px;
+          color: $greyish-text;
+          padding-top:5px;
+          padding-left: 10px;
+          
+          height: 36px;
+          padding-right: 30px;
+          border-radius: 3px;
+          background-color: $card-background;
+          margin-bottom: 1px;
+          @include ellipsis();
+        }
+
+        .ui-dropdown-trigger {
+          padding-left: 10px;
+          padding-top: 5px;
+          margin-right: 10px;
+        }
+
+        .ui-dropdown-panel{
+          border:1px solid $cool-grey;
+          font-size: 14px;
+          height: auto;
+          max-height: 178px;
+          background-color: $dropdown-list-bck;
+          border-radius: 3px;
+          position: relative;
+          top: 0 !important;
+          .ui-dropdown-filter-container{
+            height: auto;
+            max-height: 50px;
+            padding:6px;
+            input{
+              background-color: $card-background;
+              padding: 0;
+              height: 36px;
+            }
+            span{
+              padding-top: 6px;
+            }
+          }
+
+          .ui-dropdown-items-wrapper{
+            height: auto;
+            max-height: 138px!important;
+            border-radius: 3px;
+            background-color: $dropdown-list-bck;
+            overflow-y: auto;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+            border-top:1px solid $dropdown-border;
+            position: absolute;
+            width: 100%;
+            z-index: 1;
+            .ui-dropdown-list{
+              padding:6px;
+              height: 100%;
+
+              .ui-dropdown-item{
+                height: 30px;
+                color: $greyish-text;
+                padding-left: 9px;
+                display: flex;
+                align-items: center;
+                border-radius: 3px;
+                span{
+                  @include ellipsis();
+                }
+                // not selected
+                &:not(.ui-state-highlight){
+                  color: $greyish-text;
+                  &:hover{
+                    background-color: $dropdown-item-hover;
+                  }
+                }
+        
+                // selected
+                &.ui-state-highlight{
+                  background-color: $pale-blue;
+                  color: $text-color;
+                }
+              }
+            }
+
+            &::-webkit-scrollbar {
+              width: 18px;
+            }
+            
+            &::-webkit-scrollbar-thumb {
+              border-right: 6px solid rgba(0, 0, 0, 0);
+              border-left: 6px solid rgba(0, 0, 0, 0);
+              background-clip: padding-box;
+              border-radius: 7px;
+              background-color: rgba(0, 0, 0, 0.15);
+              box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.05), inset 1px 1px 0px rgba(0, 0, 0, 0.05);
+            }
+            &::-webkit-scrollbar-button {
+              width: 0;
+              height: 0;
+              display: none;
+            }
+            &::-webkit-scrollbar-corner {
+              background-color: transparent;
+            }
+          }
+        }
       }
-      .ui-dropdown-panel{
-        border:1px solid $cool-grey;
-        font-size: 14px;
-      }
-      .ui-state-highlight{
-        background-color: $pale-blue;
-        color: #000000;
-        padding: 10px;
-        margin-bottom: 10px;
-      }
-      .ui-dropdown-item:not(.ui-state-highlight){
-        border-radius: 3px;
-        margin-bottom: 10px;
-        padding: 10px;
-        color: #dddddd;
-      }
-      .ui-dropdown-item:not(.ui-state-highlight):hover{
-        background-color: $pale-blue;
-        color: #000000;
-        margin-bottom: 10px;
-      }
-      
-      
     }
   }
 }

@@ -34,12 +34,18 @@
           <div class="bg-dark">
             <div class="card-body">
               <h5 class="card-title">Display data</h5>
-              <p-dropdown [options]="agents" (onChange)="changeAgent()" [(ngModel)]="selectedAgent" [filter]="true"
-                [style]="{'width': '100%'}">
-                <ng-template let-item pTemplate="item">
-                  <span class="agent-name">{{item.label}}</span>
-                </ng-template>
-              </p-dropdown>
+              <div class="ui-grid ui-grid-responsive ui-fluid">
+                <div class="ui-grid-row">
+                  <div class="dropdown">
+                    <p-dropdown [options]="agents" (onChange)="changeAgent()" [(ngModel)]="selectedAgent" [filter]="true"
+                    [autoWidth]="false">
+                      <ng-template let-item pTemplate="item">
+                        <span class="agent-name">{{item.label}}</span>
+                      </ng-template>
+                    </p-dropdown>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="process" *ngIf="processesList && processesList.length">
