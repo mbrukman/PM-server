@@ -5,6 +5,11 @@ var currentAgent = {
 };
 
 /**
+ * Represents the selected configuration
+ */
+var configuration = {};
+
+/**
  * Returns a process execution by the process uuid
  * @param {string} processId
  * @returns {object}

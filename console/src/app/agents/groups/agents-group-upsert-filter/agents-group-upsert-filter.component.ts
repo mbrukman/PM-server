@@ -4,7 +4,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FILTER_FIELDS, FILTER_TYPES, AgentsGroupFilter } from '@agents/models/group.model';
 
 import { BsModalRef } from 'ngx-bootstrap';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 
 @Component({

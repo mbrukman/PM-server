@@ -1,29 +1,22 @@
-<div class="row pm-modal">
-    <div class="col-12">
-      <div class="modal-header">
-        <h4>Map name</h4>
-        <button type="button" class="close" (click)="onClose()" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <input type="text" class="form-control" [(ngModel)]="optionsPopup.name">
-        </div>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-            <label class="form-check-label">
-                <input type="checkbox" class="form-check-input" [(ngModel)]="optionsPopup.isChecked">
-                Would you like to use the same agent ?
-            </label>
-          </div>
-        </div>
-      
-      <div class="modal-footer">
-        <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>
-        <button class="kh-btn-blue kh-btn" (click)="onConfirm()"><span>Confirm</span></button>
-      </div>
+<div class="pm-modal">
+  <div class="modal-header no-title">
+    <i class="material-icons close" (click)="onClose()">close</i>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+        <label>Map name</label>
+      <input type="text" class="form-control" [(ngModel)]="optionsPopup.name">
+    </div>
+    <div class="form-group">
+      <label class="form-check-label">
+      <input type="checkbox" class="form-check-input" [(ngModel)]="optionsPopup.isChecked">
+        Would you like to use the same agent ?
+      </label>
     </div>
   </div>
-  
+
+  <div class="modal-footer">
+    <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>
+    <button class="kh-btn-blue kh-btn" (click)="onConfirm()"><span>Confirm</span></button>
+  </div>
+</div>

@@ -7,6 +7,7 @@ import { CalendarService } from '../calendar.service';
 import { CronJobsConfig } from 'ngx-cron-jobs/src/app/lib/contracts/contracts';
 import { MapsService } from '@maps/maps.service';
 import { FilterOptions } from '@shared/model/filter-options.model';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-add-job',
@@ -62,10 +63,9 @@ export class AddJobComponent implements OnInit {
    */
   onSelectMap() {
     const mapId = this.form.controls.map.value;
-    this.mapsService.getMapStructure(mapId)
-      .filter(structure => !!structure)
-      .filter(structure => !!structure.configurations)
-      .subscribe(structure => {
+    this.mapsService.getMapStructure(mapId).pipe(
+      filter(structure => !!structure && !!structure.configurations),
+    ).subscribe(structure => {
         this.selectedMapConfigurations = structure.configurations.map(o => o.name);
         this.configurationsDropDown = this.selectedMapConfigurations.map(config => {
           return {label:config,value:config}

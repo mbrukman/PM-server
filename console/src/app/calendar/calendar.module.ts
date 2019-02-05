@@ -4,6 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CalendarModule as AngularCalendarModule } from 'angular-calendar';
+import { DateAdapter } from 'angular-calendar';
+import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { CronJobsModule } from 'ngx-cron-jobs';
 import { CalendarModule as PrimeCalendarModule } from 'primeng/primeng';
 import {DropdownModule} from 'primeng/primeng';
@@ -26,7 +28,8 @@ import { CalendarRoutingModule } from './calendar-routing.module';
     FormsModule,
     CalendarRoutingModule,
     // angular-calendar
-    AngularCalendarModule.forRoot(),
+    AngularCalendarModule.forRoot({provide: DateAdapter,
+      useFactory: adapterFactory}),
     // ngx-bootstrap
     PopoverModule.forRoot(),
     // ngx-cron-jobs

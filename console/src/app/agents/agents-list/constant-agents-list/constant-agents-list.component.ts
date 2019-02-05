@@ -1,14 +1,13 @@
 import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
-import 'rxjs/add/observable/timer';
-import 'rxjs/add/operator/switchMap';
 import { BsModalService } from 'ngx-bootstrap';
 
 import { AgentsService } from '../../agents.service';
 import { Agent, Group } from '@agents/models';
 import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
+import { filter, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-constant-agents-list',
@@ -45,10 +44,10 @@ export class ConstantAgentsListComponent implements OnInit,OnDestroy {
     const modal = this.modalService.show(EditAgentComponent);
     modal.content.name = agent.name;
     modal.content.attributes = agent.attributes;
-    modal.content.result
-      .take(1)
-      .filter(r => !!r)
-      .subscribe(r => {
+    modal.content.result.pipe(
+      take(1),
+      filter(r => !!r)
+    ).subscribe(r => {
         agent.name = r.name;
         agent.attributes = r.attributes;
         this.updateAgent(agent);

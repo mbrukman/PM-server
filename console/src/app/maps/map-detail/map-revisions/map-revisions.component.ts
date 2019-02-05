@@ -14,6 +14,8 @@ import { ProjectsService } from '@projects/projects.service';
 import { SocketService } from '@shared/socket.service';
 import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
 import { FilterOptions } from '@shared/model/filter-options.model';
+import { take, filter, mergeMap } from 'rxjs/operators';
+import { MapDuplicateOptions } from '@maps/models/map-duplicate-options.model';
 
 
 @Component({
@@ -216,11 +218,11 @@ export class MapRevisionsComponent implements OnInit {
 
   duplicateMap(structureId: string) {
     const modal = this.modalService.show(MapDuplicateComponent);
-    modal.content.result
-      .take(1)
-      .filter(obj => !!obj.name) // filtering only results with a name
-      .flatMap(obj =>  this.mapsService.duplicateMap(this.mapId, structureId, this.project.id,obj))
-      .subscribe(map => { this.router.navigate(['/maps', map.id]);
+    modal.content.result.pipe(
+      take(1),
+      filter(obj => !!obj.name), // filtering only results with a name
+    mergeMap(obj =>  this.mapsService.duplicateMap(this.mapId, structureId, this.project.id,<MapDuplicateOptions>obj))
+      ).subscribe(map => { this.router.navigate(['/maps', map.id]);
     });
   }
   
@@ -279,9 +281,9 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   setLatestStructure(mapId: string, structureId: string) {
-    this.mapsService.getMapStructure(mapId, structureId)
-      .take(1)
-      .subscribe(structure => {
+    this.mapsService.getMapStructure(mapId, structureId).pipe(
+    take(1)
+    ).subscribe(structure => {
         this.latestStructure = structure
         this.modifiedModel.code = structure.code;
       });

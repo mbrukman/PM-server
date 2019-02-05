@@ -1,9 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
-import 'rxjs/add/observable/timer';
-import 'rxjs/add/operator/switchMap';
 import { BsModalService } from 'ngx-bootstrap';
 import * as _ from 'lodash';
 import { AgentsService } from '../../agents.service';
@@ -11,6 +9,7 @@ import { Agent, Group } from '@agents/models';
 import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
 import {FILTER_FIELDS,FILTER_TYPES} from '@agents/models/group.model'
 import {AgentsGroupFilter} from '@agents/models/group.model'
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-agents-group-filters-list',
@@ -50,9 +49,9 @@ export class AgentsGroupFiltersListComponent implements OnInit {
     const modal = this.modalService.show(AgentsGroupUpsertFilterComponent);
     modal.content.edit = true;
     modal.content.filter = filter;
-    modal.content.result
-      .take(1)
-      .subscribe(filters => {
+    modal.content.result.pipe(
+      take(1),
+    ).subscribe(filters => {
         this.group.filters.splice(index,1,filters)
         this.agentsService.updateGroupToServer(this.group).subscribe((group) => {
           this.agentsService.updateGroup(group)

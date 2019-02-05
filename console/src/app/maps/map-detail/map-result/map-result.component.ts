@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { MapsService } from '@maps/maps.service';
 import { Map } from '@maps/models/map.model';
 import { IProcessList } from '@maps/interfaces/process-list.interface';
@@ -9,6 +9,7 @@ import { Agent } from '@agents/models/agent.model';
 import { ProcessResultByProcessIndex } from '@maps/models';
 import { BsModalService } from 'ngx-bootstrap';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
+import { filter, take, tap, mergeMap } from 'rxjs/operators';
 
 const defaultAgentValue = 'default'
 
@@ -55,17 +56,15 @@ export class MapResultComponent implements OnInit, OnDestroy {
   ngOnInit() {
     
     // getting current map and requesting the executions list
-    this.mapSubscription = this.mapsService.getCurrentMap()
-      .filter(map => map)
-      .do(map => this.map = map)
-      .subscribe(map => {
+    this.mapSubscription = this.mapsService.getCurrentMap().pipe(filter(map=>map)).subscribe(map => {
+        this.map= map;
         this.loadResultOnScroll(map)
       });
 
     // getting the current executions list when initiating
-    this.mapsService.currentExecutionList()
-      .take(1)
-      .subscribe(executions => this.executing = Object.keys(executions));
+    this.mapsService.currentExecutionList().pipe(
+      take(1)
+    ).subscribe(executions => this.executing = Object.keys(executions));
 
     // subscribing to executions updates.
     this.mapExecutionSubscription = this.socketService.getCurrentExecutionsAsObservable()
@@ -74,9 +73,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
       });
 
     // subscribing to map executions results updates.
-    this.mapExecutionResultSubscription = this.socketService.getMapExecutionResultAsObservable()
-      .filter(result => (<string>result.map) === this.map.id)
-      .subscribe(result => {
+    this.mapExecutionResultSubscription = this.socketService.getMapExecutionResultAsObservable().pipe(
+      filter(result => (<string>result.map) === this.map.id)
+    ).subscribe(result => {
         let execution = this.executionsList.find((o) => o.runId === result.runId);
         if (!execution) {
           delete result.agentsResults;
@@ -88,9 +87,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
       });
 
     // updating logs messages updates
-    this.mapExecutionMessagesSubscription = this.socketService.getMessagesAsObservable()
-      .filter(message => this.selectedExecution && (message.runId === this.selectedExecution.runId))
-      .subscribe(message => {
+    this.mapExecutionMessagesSubscription = this.socketService.getMessagesAsObservable().pipe(
+      filter(message => this.selectedExecution && (message.runId === this.selectedExecution.runId))
+    ).subscribe(message => {
         this.selectedExecutionLogs.push(message);
         this.scrollOutputToBottom();
       });
@@ -203,8 +202,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
    */
   selectExecution(executionId) {
     this.selectedProcess = null;
-    this.selectedExecutionReq = this.mapsService.executionResultDetail(this.map.id, executionId)
-      .do(result => {
+    this.selectedExecutionReq = this.mapsService.executionResultDetail(this.map.id, executionId).pipe(
+      tap(result => {
         this.selectedExecution = result;
 
         this.agents = result.agentsResults.map(agentResult => {
@@ -216,8 +215,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
         }
         this.selectedAgent = defaultAgentValue;
         this.changeAgent();
-      }).flatMap(result => this.mapsService.logsList((<string>result.map), result.runId)) // get the logs list for this execution
-      .subscribe(logs => {
+      }),
+      mergeMap(result => this.mapsService.logsList((<string>result.map), result.runId)) // get the logs list for this execution
+    ).subscribe(logs => {
         this.selectedExecutionLogs = logs;
       });
   }

@@ -4,6 +4,7 @@ import { BsModalService } from 'ngx-bootstrap';
 import { MapStructureConfiguration, MapStructure } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { AddConfigurationComponent } from '@maps/map-detail/map-configurations/add-configuration/add-configuration.component';
+import { filter, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-main-map-configurations',
@@ -37,9 +38,9 @@ export class MapConfigurationsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.mapsService.getCurrentMapStructure()
-      .filter(structure => !!structure)
-      .subscribe(structure => {
+    this.mapsService.getCurrentMapStructure().pipe(
+      filter(structure => !!structure)
+    ).subscribe(structure => {
         this.mapStructure = structure;
         if (!this.selectedConfiguration && structure.hasOwnProperty('configurations') && structure.configurations.length) {
           this.editConfiguration(0);

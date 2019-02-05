@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { BsModalRef } from 'ngx-bootstrap';
 
 import { Agent } from '@agents/models';
@@ -10,20 +10,14 @@ import { Agent } from '@agents/models';
   templateUrl: './edit-agent.component.html',
   styleUrls: ['./edit-agent.component.scss']
 })
-export class EditAgentComponent implements OnInit {
+export class EditAgentComponent{
   agent: Agent;
   name: string;
   tag: string = '';
-  attributes:string[];
+  attributes:string[] = [];
   result: Subject<{ name: string, attributes: string[] }> = new Subject();
 
   constructor(public bsModalRef: BsModalRef) { }
-
-  ngOnInit() {
-    if(!this.attributes){
-      this.attributes = []
-    }
-  }
 
   saveTag(){
     this.attributes.push(this.tag)

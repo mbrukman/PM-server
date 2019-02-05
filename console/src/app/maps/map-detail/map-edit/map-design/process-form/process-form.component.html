@@ -136,10 +136,10 @@
             <div class="d-flex justify-content-between action-tile">
               <span *ngIf="processForm.get('actions').at(i).get('name').value">{{processForm.get('actions').at(i).get('name').value}} (#{{i + 1}})</span>
               <span *ngIf="!processForm.get('actions').at(i).get('name').value">Action #{{i + 1}}</span>
-              <span>
-              <i class="material-icons pointer" (click)="editAction(i)">mode_edit</i>
-              <i class="material-icons pointer" (click)="removeAction(i)"> delete_outline</i>
-          </span>
+              <span class="action-btns">
+                <i class="material-icons pointer" (click)="editAction(i)">mode_edit</i>
+                <i class="material-icons pointer" (click)="removeAction(i)"> delete_outline</i>
+              </span>
             </div>
           </div>
         </div>

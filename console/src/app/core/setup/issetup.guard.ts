@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/take';
+import { Observable } from 'rxjs';
 
 import { SettingsService } from './settings.service';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class IsSetUpGuard implements CanActivate {
@@ -16,12 +16,15 @@ export class IsSetUpGuard implements CanActivate {
   }
 
   isServerSetup(): Observable<boolean> | boolean {
-    return this.settingsService.getSettings().map(res => {
-      if (!res.isSetup) {
-        this.router.navigate(['/', 'setup']);
-        return false;
-      }
-      return true;
-    })
+    return this.settingsService.getSettings().pipe(
+      map(res => {
+        if (!res.isSetup) {
+          this.router.navigate(['/', 'setup']);
+          return false;
+        }
+        return true;
+      })
+    )
+      
   }
 }

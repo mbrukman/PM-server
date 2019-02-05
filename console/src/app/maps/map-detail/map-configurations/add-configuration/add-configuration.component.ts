@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { BsModalRef } from 'ngx-bootstrap';
 import {MapStructureConfiguration} from '@maps/models/map-structure-configuration.model'
 

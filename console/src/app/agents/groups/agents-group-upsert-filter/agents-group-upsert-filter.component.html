@@ -1,6 +1,6 @@
-<div class="row pm-modal">
-    <div class="col-12">
-        <div class="modal-header">
+<div class="pm-modal">
+    <div class="modal-header">
+        <i class="material-icons close" (click)="onClose()">close</i>
         <h4 *ngIf="!edit">Add Filter</h4>
         <h4 *ngIf="edit">Edit Filter</h4>
         <button type="button" class="close" (click)="onClose()" data-dismiss="modal" aria-label="Close">
@@ -33,10 +33,9 @@
                 <input class="form-control" [(ngModel)]="filter.value" />
             </div>
         </div>
-        <div class="modal-footer">
+    </div>
+    <div class="modal-footer">
         <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>
         <button class="kh-btn-blue kh-btn" (click)="onConfirm()"><span>Create</span></button>
-        </div>
     </div>
 </div>
-      

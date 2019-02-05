@@ -1,9 +1,7 @@
-<div class="container pm-modal">
+<div class="pm-modal">
   <div class="modal-header">
-    <h1>Add trigger</h1>
-    <button type="button" class="close" (click)="onClose()" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+    <i class="material-icons close" (click)="onClose()">close</i>
+    <h4>Add trigger</h4>
   </div>
   <form [formGroup]="triggerForm" (ngSubmit)="onConfirm(triggerForm.value)" *ngIf="triggerForm">
     <div class="modal-body">
@@ -87,10 +85,10 @@
 
       </div>
 
-      <div class="modal-footer">
-        <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>
-        <button type="submit" class="kh-btn-blue kh-btn" [disabled]="triggerForm?.invalid"><span>Save</span></button>
-      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>
+      <button type="submit" class="kh-btn-blue kh-btn" [disabled]="triggerForm?.invalid"><span>Save</span></button>
     </div>
   </form>
 </div>

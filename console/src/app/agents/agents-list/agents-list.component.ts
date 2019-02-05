@@ -1,12 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/timer';
-import 'rxjs/add/operator/switchMap';
+
+
+
 import { BsModalService } from 'ngx-bootstrap';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { AgentsService } from '../agents.service';
 import { Agent, Group } from '@agents/models';
+import { timer } from 'rxjs';
 import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
+import { switchMap, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-agents-list',
@@ -53,10 +55,7 @@ export class AgentsListComponent implements OnInit, OnDestroy {
 
     // get agents status to pass
 
-    this.agentsStatusReq = Observable
-      .timer(0, 5000)
-      .switchMap(() => this.agentsService.status())
-      .subscribe(statuses => {
+    this.agentsStatusReq = timer(0, 5000).pipe(switchMap(() => this.agentsService.status())).subscribe(statuses => {
         this.agentsStatus = statuses;
       });
 
@@ -82,8 +81,7 @@ export class AgentsListComponent implements OnInit, OnDestroy {
   addNewFilterParam(group:Group){
     const modal = this.modalService.show(AgentsGroupUpsertFilterComponent);
     modal.content.edit = false;
-    modal.content.result
-      .take(1)
+    modal.content.result.pipe(take(1))
       .subscribe(filters => {
         group.filters.push(filters)
         this.agentsService.updateGroupToServer(group).subscribe((group) => {
@@ -102,9 +100,9 @@ export class AgentsListComponent implements OnInit, OnDestroy {
   }
 
   removeAgentFromGroup(agentId: string, groupId: string) {
-    this.agentsService.removeAgentFromGroup(agentId, groupId)
-      .take(1)
-      .subscribe(group => {
+    this.agentsService.removeAgentFromGroup(agentId, groupId).pipe(
+      take(1)
+    ).subscribe(group => {
         this.agentsService.updateGroup(group);
       });
   }

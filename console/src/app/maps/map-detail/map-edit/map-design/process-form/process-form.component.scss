@@ -14,9 +14,12 @@
 
     .mandatory-check{
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
         
-        font-size: 14px;
+        label.control{
+            font-size: 14px;
+        }
+
         @include checkbox();
         .text-muted{
             margin-top: 9px;
@@ -29,6 +32,12 @@
             }
             &:active {
                 cursor: grabbing !important;
+            }
+
+            .action-btns {
+                i:not(:last-of-type){
+                    margin-right: 13px;
+                }
             }
         }
         .gu-transit {
@@ -117,9 +126,6 @@
                 padding-left: 10px;
             }
 
-            .check-control{
-                margin-left: -8px;
-            }
             .row-title{
                 padding-top: 20px;
                 font-weight: bold;

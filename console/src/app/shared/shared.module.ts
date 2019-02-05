@@ -5,13 +5,12 @@ import { RouterModule } from '@angular/router';
 
 import { DataTableModule, DropdownModule, SharedModule as PrimeSharedModule, TreeTableModule } from 'primeng/primeng';
 import { DragDropModule } from 'primeng/dragdrop';
-import { AccordionModule as PMAccordionModule } from 'primeng/accordion';
+import { AccordionModule as PMAccordionModule } from 'primeng/accordion'; 
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { TagInputModule } from 'ngx-chips';
 
 import { FilterPipe } from './pipes/filter.pipe';
 import { TruncatecharsPipe } from './truncatechars.pipe';
@@ -43,7 +42,6 @@ import { MapsCardsComponents } from './map-cards/map-cards.component';
     TooltipModule.forRoot(),
     DropdownModule,
     NgxChartsModule,
-    TagInputModule,
     AutoCompleteModule
   ],
   declarations: [
@@ -61,7 +59,6 @@ import { MapsCardsComponents } from './map-cards/map-cards.component';
   exports: [
     ReactiveFormsModule,
     FormsModule,
-    TagInputModule,
     FilterPipe,
     TruncatecharsPipe,
     FeatureComponent,
