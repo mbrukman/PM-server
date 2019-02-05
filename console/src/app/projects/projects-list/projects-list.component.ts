@@ -2,8 +2,9 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/co
 import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
-import { Subscription, Observable } from 'rxjs'
-import 'rxjs/operators/take';
+import { Subscription, Observable, fromEvent } from 'rxjs'
+import { take } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-projects-list',
@@ -30,14 +31,16 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.reloadProjects()
 
-    this.filterKeyUpSubscribe = Observable.fromEvent(this.globalFilterElement.nativeElement,'keyup')
-      .debounceTime(300).subscribe(()=>{
+    this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(
+      debounceTime(300)
+    ).subscribe(()=>{
         this.loadProjectLazy();
       })
 
     let featuredFilterOptions = new FilterOptions();
     featuredFilterOptions.limit = 4;
-    this.projectsService.filter(null, this.page,featuredFilterOptions).take(1).subscribe(data => {
+    this.projectsService.filter(null, this.page,featuredFilterOptions).pipe(
+      take(1)).subscribe(data => {
       if (data)
         this.featuredProjects = data.items;
     });

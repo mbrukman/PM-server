@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { BsModalRef } from 'ngx-bootstrap';
 
 import { VaultItem } from '../vault.model';
 import { VaultService } from '../../shared/vault.service';
-import { Subscribable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-upsert-vault-items',

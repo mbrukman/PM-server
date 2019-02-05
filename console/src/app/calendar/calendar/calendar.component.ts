@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/takeUntil';
+import { Subject } from 'rxjs';
 import {
   addDays,
   addHours,
@@ -22,6 +21,7 @@ import { Job } from '../models/job.model';
 import { Map } from '@maps/models';
 import { BsModalService } from 'ngx-bootstrap';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
+import { takeUntil, take } from 'rxjs/operators';
 
 const colors: any = {
   // TODO: add color pallet
@@ -61,17 +61,17 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.calendarService.list()
-      .takeUntil(this.destroy$)
-      .subscribe(jobs => {
+    this.calendarService.list().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(jobs => {
         jobs.forEach(job => {
           this.addNewEvent(this.createCalendarEventFromJob(job));
         });
       });
 
-    this.calendarService.newJobAsObservable()
-      .takeUntil(this.destroy$)
-      .subscribe(job => {
+    this.calendarService.newJobAsObservable().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(job => {
         if (job) {
           this.addNewEvent(this.createCalendarEventFromJob(job));
         }
@@ -156,9 +156,9 @@ closeDayBar(){
     });
 
     if (job.type === 'once') {
-      return this.calendarService.deleteJob(job.id)
-        .take(1)
-        .subscribe(() => {
+      return this.calendarService.deleteJob(job.id).pipe(
+        take(1)
+      ).subscribe(() => {
           this.events.splice(jobIndex, 1);
           this.refreshCalendar.next();
           this.closeDayBar();
@@ -169,14 +169,14 @@ closeDayBar(){
     modal.content.confirm = DeleteOptions.delete;
     modal.content.cancel = DeleteOptions.cancel;
     modal.content.third = DeleteOptions.skip;
-    modal.content.result
-      .take(1)
-      .subscribe(result => {
+    modal.content.result.pipe(
+      take(1),
+    ).subscribe(result => {
         switch (result) {
           case DeleteOptions.delete:
-            this.calendarService.deleteJob(job.id)
-              .take(1)
-              .subscribe(() => {
+            this.calendarService.deleteJob(job.id).pipe(
+              take(1)
+            ).subscribe(() => {
                 this.events = this.events.reduce((total, current) => {
                   if ((<any>current).job.id !== job.id) {
                     total.push(current);
@@ -190,9 +190,9 @@ closeDayBar(){
             break;
           case DeleteOptions.skip:
             job.skip = true;
-            this.calendarService.updateJob(job)
-              .take(1)
-              .subscribe();
+            this.calendarService.updateJob(job).pipe(
+              take(1)
+            ).subscribe();
                 this.closeDayBar();
             break;
           default:

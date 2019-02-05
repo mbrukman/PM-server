@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import { BsModalService } from 'ngx-bootstrap/modal';
 
@@ -10,6 +10,7 @@ import { MapsService } from '../maps.service';
 import { MapStructureConfiguration, Map, MapStructure } from '@maps/models';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { SocketService } from '@shared/socket.service';
+import { filter, take } from 'rxjs/operators';
 
 
 @Component({
@@ -41,10 +42,10 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   executing: boolean;
   downloadJson: SafeUrl;
   selected: number;
-  navItems: [{
+  navItems: {
     name: string,
     routerLink: string[]
-  }];
+  }[];
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -96,9 +97,9 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       });
     });
 
-    this.mapsService.getCurrentMap()
-      .filter(map => map)
-      .subscribe(map => {
+    this.mapsService.getCurrentMap().pipe(
+      filter(map => map)
+    ).subscribe(map => {
         this.map = map;
         this.originalMap.archived = map.archived;
         if (!_.isEqual(map, this.originalMap)) {
@@ -108,9 +109,9 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure()
-      .filter(structure => !!structure)
-      .subscribe(structure => {
+    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(
+      filter(structure => !!structure)
+    ).subscribe(structure => {
         let newContent;
         let oldContent;
         if (!this.initiated) {
@@ -154,9 +155,9 @@ export class MapDetailComponent implements OnInit, OnDestroy {
 
 
     // get the current executing maps
-    this.mapsService.currentExecutionList()
-      .take(1)
-      .subscribe(executions => {
+    this.mapsService.currentExecutionList().pipe(
+      take(1)
+    ).subscribe(executions => {
         const maps = Object.keys(executions).map(key => executions[key]);
         this.executing = maps.indexOf(this.id) > -1;
       });

@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 
-import { retry } from 'rxjs/operators';
-import { Subscription } from 'rxjs/Subscription';
+import { retry, take, map, filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { AgentsService } from '@agents/agents.service';
 import { Group } from '@agents/models/group.model';
@@ -36,18 +36,17 @@ export class GroupsComponent implements OnInit, OnDestroy {
     this.groupsReq = this.agentsService
       .groupsList()
       .pipe(
-        retry(3)
-      )
-      .map(groups => {
-        let g = new Group();
-        groups.forEach(group => {
-          let gr = new Group();
-          gr = group;
-          group = gr;
-        });
-        return groups;
-      })
-      .subscribe(groups => {
+        retry(3),
+        map(groups => {
+          let g = new Group();
+          groups.forEach(group => {
+            let gr = new Group();
+            gr = group;
+            group = gr;
+          });
+          return groups;
+        })
+      ).subscribe(groups => {
         this.groups = groups;
       });
 
@@ -113,9 +112,9 @@ export class GroupsComponent implements OnInit, OnDestroy {
       return;
     }
     this.agentsService
-      .addAgentToGroup(groupId, [this.draggedItem.id])
-      .take(1)
-      .subscribe(group => this.groups[groupIndex] = group);
+      .addAgentToGroup(groupId, [this.draggedItem.id]).pipe(
+        take(1)
+      ).subscribe(group => this.groups[groupIndex] = group);
   }
 
   /**
@@ -123,10 +122,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
    */
   createGroup() {
     const modal = this.modalService.show(InputPopupComponent);
-    modal.content.result
-      .take(1)
-      .filter(name => !!name) // filtering only results with a name
-      .flatMap(name => this.agentsService.groupCreate({ name: name }))
+    modal.content.result.pipe(take(1),
+    filter(name => !!name)) // filtering only results with a name).flatMap(name => this.agentsService.groupCreate({ name: name }))
       .subscribe(group => this.groups.push(group));
   }
 
@@ -134,10 +131,10 @@ export class GroupsComponent implements OnInit, OnDestroy {
     let group = this.groups[index];
     const modal = this.modalService.show(AgentsGroupUpsertComponent);
     modal.content.name = group.name;
-    modal.content.result
-      .take(1)
-      .filter(r => !!r)
-      .subscribe(r => {
+    modal.content.result.pipe(
+      take(1),
+      filter(r => !!r)
+    ).subscribe(r => {
         group.name = r.name;
         this.updateGroup(group);
       });

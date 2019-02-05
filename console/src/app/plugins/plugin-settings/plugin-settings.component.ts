@@ -3,9 +3,8 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {PluginsService} from '@plugins/plugins.service'
 import {Plugin} from '@plugins/models/plugin.model'
-import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/observable/of';
-import { Observable } from 'rxjs/Observable';
+import { from, forkJoin, of } from 'rxjs';
+import { filter, mergeMap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-plugin-settings',
@@ -36,16 +35,15 @@ export class PluginSettingsComponent implements OnInit{
 
     generateAutocompleteParams() {
         if (!this.plugin) return;
-        Observable.from(this.plugin.settings)
-          .filter(param => param.valueType == 'autocomplete') // check if has autocomplete
-          .flatMap(param => {
-            return Observable.forkJoin(
-              Observable.of(param), // the param
-              this.pluginsService.generatePluginSettingsParams(this.plugin._id)
-               // generated params
-            );
-          })
-          .subscribe(data => {
+        from(this.plugin.settings).pipe(
+            filter(param => param.valueType == 'autocomplete'), // check if has autocomplete
+            mergeMap(param => {
+                return forkJoin(of(param), // the param
+                  this.pluginsService.generatePluginSettingsParams(this.plugin._id)
+                   // generated params
+                );
+              })
+        ).subscribe(data => {
                 data[1].forEach(param => {
                     if(param.valueType == 'autocomplete'){
                         this.plugin.settings[this.plugin.settings.findIndex(p => p.name == param.name)] = param

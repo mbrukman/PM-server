@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { BsModalRef } from 'ngx-bootstrap';
 
 import { Group } from '@agents/models';

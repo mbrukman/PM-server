@@ -4,12 +4,12 @@ import { MapsService } from '@maps/maps.service';
 import { Map } from '@maps/models/map.model';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
-import 'rxjs/add/observable/timer';
-import 'rxjs/add/operator/switchMap';
-import { Observable } from 'rxjs/Observable';
 
-import { Subscription } from 'rxjs/Subscription';
+import { timer } from 'rxjs';
+
+import { Subscription } from 'rxjs';
 import { SelectAgentComponent } from './select-agent/select-agent.component';
+import { switchMap } from 'rxjs/operators';
 
 
 @Component({
@@ -44,10 +44,9 @@ export class MapAgentsComponent implements OnInit, OnDestroy {
   }
 
   getAgentsStatus() {
-    this.agentsStatusReq = Observable
-      .timer(0, 5000)
-      .switchMap(() => this.agentsService.status())
-      .subscribe(statuses => {
+    this.agentsStatusReq = timer(0, 5000).pipe(
+      switchMap(() => this.agentsService.status())
+    ).subscribe(statuses => {
         this.statuses = statuses;
       });
   }

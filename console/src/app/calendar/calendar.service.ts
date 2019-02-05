@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Job } from './models/job.model';
 

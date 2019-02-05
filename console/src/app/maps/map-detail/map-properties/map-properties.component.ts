@@ -1,8 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/filter';
+import { Subscription } from 'rxjs';
+import { filter, tap, mergeMap } from "rxjs/operators";;
 
 import { MapsService } from '../../maps.service';
 import { Map } from '@maps/models/map.model';
@@ -26,12 +25,9 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.mapSubscription = this.mapsService.getCurrentMap()
-      .filter(map => map) // filtering empty map result
-      .do(map => this.map = map)
-      .filter(map => !this.projects)
-      .flatMap(() => this.projectsService.list(null,null,{isArchived:false,globalFilter:null,sort:'-createdAt'}))
-      .subscribe(data => {
+    this.mapSubscription = this.mapsService.getCurrentMap().pipe(
+      filter(map => map),tap(map => this.map = map),mergeMap(() => this.projectsService.list(null,null,{isArchived:false,globalFilter:null,sort:'-createdAt'}))// filtering empty map result
+    ).subscribe(data => {
         this.projects = data.items;
         let project = this.projects.find((o) => (<string[]>o.maps).indexOf(this.map.id) > -1);
         if (project) {
