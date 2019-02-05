@@ -9,7 +9,7 @@ import { Agent } from '@agents/models/agent.model';
 import { ProcessResultByProcessIndex } from '@maps/models';
 import { BsModalService } from 'ngx-bootstrap';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
-import { filter, take, tap, flatMap, map } from 'rxjs/operators';
+import { filter, take, tap, mergeMap } from 'rxjs/operators';
 
 const defaultAgentValue = 'default'
 
@@ -214,7 +214,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
         this.selectedAgent = defaultAgentValue;
         this.changeAgent();
       }),
-      flatMap(result => this.mapsService.logsList((<string>result.map), result.runId)) // get the logs list for this execution
+      mergeMap(result => this.mapsService.logsList((<string>result.map), result.runId)) // get the logs list for this execution
     ).subscribe(logs => {
         this.selectedExecutionLogs = logs;
       });

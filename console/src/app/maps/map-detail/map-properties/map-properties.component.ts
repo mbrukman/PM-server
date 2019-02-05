@@ -26,7 +26,9 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.mapSubscription = this.mapsService.getCurrentMap().pipe(
-      filter(map => map),tap(map => this.map = map),mergeMap(() => this.projectsService.list(null,null,{isArchived:false,globalFilter:null,sort:'-createdAt'}))// filtering empty map result
+      tap(map => this.map = map),
+      filter(map => map),
+      mergeMap(() => this.projectsService.list(null,null,{isArchived:false,globalFilter:null,sort:'-createdAt'}))// filtering empty map result
     ).subscribe(data => {
         this.projects = data.items;
         let project = this.projects.find((o) => (<string[]>o.maps).indexOf(this.map.id) > -1);

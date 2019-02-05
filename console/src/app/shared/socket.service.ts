@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '@env/environment';
 
 import * as io from 'socket.io-client';
-import { Subject } from 'rxjs';
-import { Observable } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 
 import { MapResult, Pending } from '@maps/models';
 

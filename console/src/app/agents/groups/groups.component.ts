@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 
-import { retry, take, map, filter } from 'rxjs/operators';
+import { retry, take, map, filter, mergeMap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import { AgentsService } from '@agents/agents.service';
@@ -122,9 +122,11 @@ export class GroupsComponent implements OnInit, OnDestroy {
    */
   createGroup() {
     const modal = this.modalService.show(InputPopupComponent);
-    modal.content.result.pipe(take(1),
-    filter(name => !!name)) // filtering only results with a name).flatMap(name => this.agentsService.groupCreate({ name: name }))
-      .subscribe(group => this.groups.push(group));
+    modal.content.result.pipe(
+      take(1),
+      filter(name => !!name),
+      mergeMap(name => this.agentsService.groupCreate({ name: name }))
+    ).subscribe(group => this.groups.push(group));
   }
 
   editGroup(index){

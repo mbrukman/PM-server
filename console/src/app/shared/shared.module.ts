@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 import { DataTableModule, DropdownModule, SharedModule as PrimeSharedModule, TreeTableModule } from 'primeng/primeng';
-import { DragDropModule } from '@angular/cdk/drag-drop';
+import { DragDropModule } from 'primeng/dragdrop';
 import { AccordionModule as PMAccordionModule } from 'primeng/accordion'; 
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';

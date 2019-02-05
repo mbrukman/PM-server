@@ -2,9 +2,8 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/co
 import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
-import { Subscription, Observable, fromEvent } from 'rxjs'
-import { take } from 'rxjs/operators';
-import { debounceTime } from 'rxjs/operators';
+import { Subscription, fromEvent } from 'rxjs'
+import { take, debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-projects-list',

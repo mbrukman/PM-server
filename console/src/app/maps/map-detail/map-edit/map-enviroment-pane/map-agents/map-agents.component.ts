@@ -5,9 +5,8 @@ import { Map } from '@maps/models/map.model';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
-import { timer } from 'rxjs';
+import { timer, Subscription } from 'rxjs';
 
-import { Subscription } from 'rxjs';
 import { SelectAgentComponent } from './select-agent/select-agent.component';
 import { switchMap } from 'rxjs/operators';
 
