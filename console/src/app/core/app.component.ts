@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/operators/filter';
+import { Subscription } from 'rxjs';
 import { ToastOptions, ToastyConfig, ToastyService } from 'ng2-toasty';
 
 import { SocketService } from '../shared/socket.service';

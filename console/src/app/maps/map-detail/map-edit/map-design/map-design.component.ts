@@ -3,7 +3,7 @@ import { AfterContentInit, Component, ElementRef, OnDestroy, OnInit, ViewChild }
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
 import * as _ from 'lodash';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 import { MapDesignService } from '../map-design.service';
 import { Link, MapStructure, Process, ProcessViewWrapper } from '@maps/models';
@@ -11,6 +11,7 @@ import { MapsService } from '@maps/maps.service';
 import { PluginsService } from '@plugins/plugins.service';
 import { Plugin } from '@plugins/models/plugin.model';
 import { COORDINATION_TYPES, JOINT_OPTIONS } from '@maps/constants'
+import { filter, tap } from 'rxjs/operators';
 
 export const linkAttrs = {
   router: { name: 'manhattan' },
@@ -63,9 +64,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
     this.dropSubscription = this.mapDesignService
-      .getDrop()
-      .filter(obj => this.isDroppedOnMap(obj.x, obj.y))
-      .subscribe(obj => {
+      .getDrop().pipe(
+        filter(obj => this.isDroppedOnMap(obj.x, obj.y))
+      ).subscribe(obj => {
         let offsetLeft = this.wrapper.nativeElement.offsetParent.offsetLeft;
         let offsetTop = this.wrapper.nativeElement.offsetParent.offsetTop;
         this.addNewProcess(obj, offsetLeft, offsetTop);
@@ -117,10 +118,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
     this.listeners();
     this.mapStructureSubscription = this.mapsService
-      .getCurrentMapStructure()
-      .do(structure => this.mapStructure = structure)
-      .filter(structure => !!structure)
-      .subscribe(structure => {
+      .getCurrentMapStructure().pipe(
+        tap(structure => this.mapStructure = structure),
+        filter(structure => !!structure)
+      ).subscribe(structure => {
         this.initMapDraw();
       });
   }

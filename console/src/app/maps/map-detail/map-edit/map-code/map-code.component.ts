@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Subscription } from "rxjs/Subscription";
+import { Subscription } from "rxjs";
 
-import { Map } from '../../../models/map.model';
 import { MapsService } from "../../../maps.service";
 import { MapStructure } from "../../../models/map-structure.model";
 

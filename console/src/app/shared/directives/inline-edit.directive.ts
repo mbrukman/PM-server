@@ -1,8 +1,7 @@
 import { AfterViewInit, Directive, ElementRef, EventEmitter, Input, OnChanges, Output, Renderer2, SimpleChanges } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { map } from 'rxjs/operators';
 import { distinctUntilChanged } from 'rxjs/operators';
-import 'rxjs/add/observable/fromEvent';
-import 'rxjs/add/operator/debounceTime';
+import { fromEvent } from 'rxjs';
 
 
 @Directive({
@@ -28,10 +27,9 @@ export class InlineEditDirective implements AfterViewInit, OnChanges {
   }
 
   registerInputEvent() {
-    this.inputEvent = Observable.fromEvent(this.elm.nativeElement, 'blur')
-      .map(e => (<any>e).target.innerText)
-      .pipe(distinctUntilChanged())
-      .subscribe(e => {
+    this.inputEvent = fromEvent(this.elm.nativeElement, 'blur').pipe(
+      map((e:any) => e.target.innerText),distinctUntilChanged()
+    ).subscribe(e => {
         this.model = e;
         this.inlineEditChange.emit(e);
         this.valueChanged.emit(e);

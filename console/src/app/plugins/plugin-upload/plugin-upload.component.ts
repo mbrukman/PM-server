@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { environment } from '../../../environments/environment';
 
-import 'rxjs/add/operator/finally';
 import { BsModalRef } from 'ngx-bootstrap';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
+import { finalize } from 'rxjs/operators'
 
 import { PluginsService } from '../plugins.service';
 
@@ -33,12 +32,12 @@ export class PluginUploadComponent implements OnInit {
     const formData = new FormData();
     formData.append('file', file);
     this.uploading = true;
-    this.pluginsService.upload(formData)
-      .finally(() => {
+    this.pluginsService.upload(formData).pipe(
+      finalize(() => {
         this.uploading = false;
         this.onClose();
       })
-      .subscribe(res => {
+    ).subscribe(res => {
           console.log(res);
         },
         error => {

@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 import { AgentsGroupFilter, Group } from '@agents/models/group.model';
 import { Agent } from './models/agent.model';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 const serverUrl = environment.serverUrl;
 
