@@ -6,10 +6,6 @@ import { DashboardComponent } from './core/dashboard/dashboard.component';
 import { SetupComponent } from './core/setup/setup.component';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
 
-import { MapsModule } from './maps/maps.module';
-import { ProjectsModule } from './projects/projects.module';
-import { AdminModule } from './admin/admin.module';
-
 const appRoutes: Routes = [
   {
     path: '',
@@ -23,20 +19,20 @@ const appRoutes: Routes = [
   // maps
   {
     path: 'maps',
-    loadChildren: ()=>MapsModule,
+    loadChildren: './maps/maps.module#MapsModule',
     canActivate: [IsSetUpGuard]
   },
   // projects
   {
     path: 'projects',
-    loadChildren: ()=>ProjectsModule,
+    loadChildren: './projects/projects.module#ProjectsModule',
     canActivate: [IsSetUpGuard]
 
   },
   // admin
   {
     path: 'admin',
-    loadChildren: ()=>AdminModule,
+    loadChildren: './admin/admin.module#AdminModule',
     canActivate: [IsSetUpGuard]
   },
   { path: '**', component: NotFoundComponent }
