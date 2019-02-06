@@ -304,19 +304,28 @@ table, .table {
 }
 
 // dropdown
-.dropdown-item {
-  color: $text-color !important;
-  background: $background;
-  &:hover {
-    color: #000 !important;
-    background: $turquoise-blue !important;
 
-  }
-}
 
 .dropdown-menu {
-  background: $selected-tab-environment;
-  color: $text-color;
+  border-radius: 3px;
+  border: 1px solid #868e96;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+  background: $kh-background;
+  padding:  9px 7px;
+  margin: 0px;
+  font-size: 14px;
+  .dropdown-item {
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+    height: 36px;
+    color: $text-color !important ;
+    &:hover {
+      border-radius: 3px;
+      color: white;
+      background: $pale-blue;
+    }
+  }
 }
 
 .menuitem {
