@@ -44,10 +44,10 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   executing: boolean;
   downloadJson: SafeUrl;
   selected: MapStructureConfiguration;
-  navItems: [{
+  navItems: {
     name: string,
     routerLink: string[]
-  }];
+  }[];
 
   constructor(private route: ActivatedRoute,
     private router: Router,

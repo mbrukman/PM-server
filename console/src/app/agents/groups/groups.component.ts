@@ -125,7 +125,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
     modal.content.result.pipe(
       take(1),
       filter(name => !!name),
-      mergeMap(name => this.agentsService.groupCreate({ name: name }))
+      mergeMap(name => this.agentsService.groupCreate(<Group>{ name: name }))
     ).subscribe(group => this.groups.push(group));
   }
 
