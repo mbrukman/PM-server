@@ -46,6 +46,7 @@
     "ngx-cron-jobs": "0.4.6",
     "ngx-infinite-scroll": "0.8.3",
     "ngx-monaco-editor": "5.0.0",
+    "node-sass": "4.11.0",
     "primeng": "7.0.5",
     "rxjs": "6.4.0",
     "rxjs-compat": "^6.4.0",
