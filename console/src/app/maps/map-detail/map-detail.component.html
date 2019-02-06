@@ -28,15 +28,15 @@
       Execute
       <span *ngIf="executing"><i class="fa fa-spinner fa-pulse fa-fw"></i></span>
     </button>
+
     
     <div  class="ui-grid ui-grid-responsive ui-fluid ">
         <div class="ui-grid-row">
             <div class="dropdown">
-                <p-dropdown [(ngModel)]="selected" [options]="mapStructure?.configurations" (onChange)="changeSelected()" 
+                <p-dropdown [(ngModel)]="selected" 
+                [options]="configurationDropDown" 
+                (onChange)="changeSelected()" 
                 [autoWidth]="false">
-                <ng-template let-configuration pTemplate="item">
-                    <span>{{configuration.name}}</span>
-                </ng-template>
                 </p-dropdown>
             </div>
         </div>

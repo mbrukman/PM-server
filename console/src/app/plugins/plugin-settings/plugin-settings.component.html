@@ -15,11 +15,16 @@
                                         [ngValue]="opt.id">{{ opt.value }}
                                 </option>
                             </select>
-                            <select [formControlName]="param.name" class="form-control" *ngSwitchCase="'options'">
-                                <option *ngFor="let opt of param.options"
-                                        [ngValue]="opt.id">{{ opt.name }}
-                                </option>
-                            </select>
+                            <div *ngSwitchCase="'options'"  class="ui-grid ui-grid-responsive ui-fluid ">
+                                <div class="ui-grid-row">
+                                    <div class="dropdown">
+                                        <p-dropdown [formControlName]="param.name"
+                                        [options]="paramOptionsDropDown[param.name]" 
+                                        [autoWidth]="false">
+                                        </p-dropdown>
+                                    </div>
+                                </div>
+                            </div>
                             <input [formControlName]="param.name" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
                             <input [formControlName]="param.name" type="number" class="form-control" *ngSwitchCase="'int'">
                             <input [formControlName]="param.name" type="text" class="form-control" *ngSwitchDefault>

@@ -286,6 +286,20 @@
           padding-left: 10px;
           padding-top: 5px;
           margin-right: 10px;
+          margin-top: -2px;
+          .pi{
+            display: inline-block;
+            font:normal normal normal 14px/1 FontAwesome;
+            -webkit-font-smoothing: antialiased;
+          }
+          .pi-chevron-down::before{
+            content: "\f078";
+            font-size: 14px;
+          }
+          .ui-dropdown-trigger-icon{
+            color:white;
+            font-size: inherit;
+          }
         }
 
         .ui-dropdown-panel{

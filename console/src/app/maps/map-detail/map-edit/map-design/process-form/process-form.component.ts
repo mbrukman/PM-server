@@ -39,7 +39,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   selectedMethod: PluginMethod;
   FLOW_CONTROL_TYPES  = FLOW_CONTROL_TYPES;
   COORDINATION_TYPES = COORDINATION_TYPES;
-  flowControlDropDown : any
+  flowControlDropDown = [];
+  coordinationDropDown = [];
   methodsDropDown:any
 
   constructor(
@@ -60,6 +61,20 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     this.flowControlDropDown = Object.keys(this.FLOW_CONTROL_TYPES).map(key => {
       return {value:this.FLOW_CONTROL_TYPES[key].id,label:this.FLOW_CONTROL_TYPES[key].label}
     })
+
+    for(let i=0,length=Object.keys(this.COORDINATION_TYPES).length;i<length;i++){
+      let indexName = Object.keys(this.COORDINATION_TYPES)[i];
+      if(indexName=='wait'){
+        if(!this.processViewWrapper.isInsideLoop){
+          this.coordinationDropDown.push({label:this.COORDINATION_TYPES[indexName].label,value:this.COORDINATION_TYPES[indexName].id})
+        }
+      }
+      else{
+        this.coordinationDropDown.push({label:this.COORDINATION_TYPES[indexName].label,value:this.COORDINATION_TYPES[indexName].id})
+      }
+    }
+
+
     this.processForm = Process.getFormGroup(this.processViewWrapper.process);
 
     this.processUpdateSubscription = this.mapDesignService

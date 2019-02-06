@@ -74,6 +74,7 @@ export class MapConfigurationsComponent implements OnInit {
     }
 
     this.selectedConfiguration = this.mapStructure.configurations[index];
+    this.updateMapStructure();
   }
 
   updateMapStructure() {

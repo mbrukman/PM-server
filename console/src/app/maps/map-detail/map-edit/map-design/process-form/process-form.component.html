@@ -93,11 +93,16 @@
 
         <div class="form-group" *ngIf="processViewWrapper.process?.coordination">
           <label>Process coordination</label>
-          <select class="form-control" formControlName="coordination">
-            <option value="wait" *ngIf="!processViewWrapper.isInsideLoop">{{COORDINATION_TYPES.wait.label}}</option>
-            <option value="race">{{COORDINATION_TYPES.race.label}}</option>
-            <option value="each">{{COORDINATION_TYPES.each.label}}</option>
-          </select>
+          <div class="ui-grid ui-grid-responsive ui-fluid ">
+              <div class="ui-grid-row">
+                  <div class="dropdown">
+                      <p-dropdown  [options]="coordinationDropDown" placeholder="Select a Coordination" formControlName="coordination"  
+                      [autoWidth]="false">
+                      </p-dropdown>
+                  </div>
+              </div>
+          </div>
+
           <small class="form-text text-muted">Controlling process sync.</small>
         </div>
       </accordion-group>

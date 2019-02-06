@@ -6,7 +6,7 @@
     <div class="ui-grid ui-grid-responsive ui-fluid ">
         <div class="ui-grid-row">
             <div class="dropdown">
-                <p-dropdown id="project" formControlName="project" [options]="projectsDropDown" placeholder="Select a project" (onChange)="onSelectProject()"
+                <p-dropdown required id="project" formControlName="project" [options]="projectsDropDown" placeholder="Select a project" (onChange)="onSelectProject()"
                 [autoWidth]="false">
                 </p-dropdown>
             </div>
@@ -18,7 +18,7 @@
     <div class="ui-grid ui-grid-responsive ui-fluid ">
         <div class="ui-grid-row">
             <div class="dropdown">
-                <p-dropdown id="map" formControlName="map" [options]="mapDropDown" placeholder="Select a map" (onChange)="onSelectMap()"
+                <p-dropdown required id="map" formControlName="map" [options]="mapDropDown" placeholder="Select a map" (onChange)="onSelectMap()"
                 [autoWidth]="false">
                 </p-dropdown>
             </div>
@@ -55,7 +55,7 @@
 
       <div class="form-group">
         <label>Date & Time:</label>
-        <p-calendar formControlName="datetime" showTime="true" hourFormat="24"></p-calendar>
+        <p-calendar required formControlName="datetime" showTime="true" hourFormat="24"></p-calendar>
       </div>
     </div>
 

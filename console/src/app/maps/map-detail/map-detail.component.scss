@@ -33,11 +33,12 @@
       }
     }
   }
+  
 
   .action-buttons {
     padding : 0 22px;
     .dropdown{
-      width: 100px;
+      width:150px;
       @include dropdown();
     }
     &:last-of-type{

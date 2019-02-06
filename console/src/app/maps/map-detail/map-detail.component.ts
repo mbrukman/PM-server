@@ -1,8 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-
-import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import { BsModalService } from 'ngx-bootstrap/modal';
 
@@ -11,7 +9,7 @@ import { MapStructureConfiguration, Map, MapStructure } from '@maps/models';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { SocketService } from '@shared/socket.service';
 import { filter, take } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 
 
 @Component({
@@ -43,6 +41,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   mapExecutionSubscription: Subscription; 
   executing: boolean;
   downloadJson: SafeUrl;
+  configurationDropDown=[];
   selected: MapStructureConfiguration;
   navItems: {
     name: string,
@@ -142,6 +141,12 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         delete compareOriginalStructure.content;
         this.structureEdited = (JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent);
         this.mapStructure = structure;
+        this.configurationDropDown = this.mapStructure.configurations.map(config => {
+          return {label:config.name, value:config}
+        })
+        if(this.configurationDropDown.length == 0){
+          this.configurationDropDown.push({label:"No config",value:''})
+        }
         this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
           return o.id === structure.id;
         });
@@ -264,7 +269,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   }
 
   executeMap() {
-    this.mapExecReq = this.mapsService.execute(this.id, (!this.selected) ? undefined : this.mapStructure.configurations[this.selected.name].name).subscribe();
+    let index = this.mapStructure.configurations.findIndex(conf => conf.name == this.selected.name)
+    this.mapExecReq = this.mapsService.execute(this.id, (!this.selected) ? undefined : this.mapStructure.configurations[index].name).subscribe();
   }
 
   saveMap() {

@@ -111,7 +111,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
         this.maxLengthReached = true
       }
       this.executionsList.push(...executions);
-      if (this.page == 1)
+      if (this.page == 1 && this.executionsList[0])
         this.selectExecution(this.executionsList[0]._id);
     })
   }

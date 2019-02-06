@@ -1,9 +1,7 @@
 <div class="pm-modal">
   <div class="modal-header">
+    <i class="material-icons close" (click)="onClose()">close</i>
     <h4>Enter configuration name</h4>
-    <button type="button" class="close" (click)="onClose()" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
   </div>
   <div class="modal-body">
     <input (keyup)=onKeyUp($event) type="text" class="form-control" [(ngModel)]="name">

@@ -4,11 +4,26 @@
     input{
         height: 38px;
         font-size: 1rem;
-        width: 90%;
+        width: 100%
     }
+
+    
     .ui-clickable{
         padding-bottom: 14px;
     }
+    .pi{
+        display: inline-block;
+        font:normal normal normal 14px/1 FontAwesome;
+        -webkit-font-smoothing: antialiased;
+      }
+    .pi-caret-down::before{
+        content: "\f0d7";
+        font-size: 14px;
+    }
+    .pi-fw{
+        text-align: center;
+    }
+
     .ui-autocomplete-items{
         background-color: dimgrey;
     }

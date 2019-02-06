@@ -17,7 +17,6 @@ import { FilterOptions } from '@shared/model/filter-options.model';
 import { take, filter, mergeMap } from 'rxjs/operators';
 import { MapDuplicateOptions } from '@maps/models/map-duplicate-options.model';
 
-
 @Component({
   selector: 'app-map-revisions',
   templateUrl: './map-revisions.component.html',
@@ -220,7 +219,7 @@ export class MapRevisionsComponent implements OnInit {
     const modal = this.modalService.show(MapDuplicateComponent);
     modal.content.result.pipe(
       take(1),
-      filter(obj => !!obj.name), // filtering only results with a name
+      filter(obj => !!(<MapDuplicateOptions>obj).name), // filtering only results with a name
     mergeMap(obj =>  this.mapsService.duplicateMap(this.mapId, structureId, this.project.id,<MapDuplicateOptions>obj))
       ).subscribe(map => { this.router.navigate(['/maps', map.id]);
     });
