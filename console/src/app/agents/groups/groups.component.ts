@@ -9,7 +9,6 @@ import { BsModalService } from 'ngx-bootstrap';
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
 import { Agent } from '@agents/models/agent.model';
 import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-group-upsertcomponent'
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-agents-groups',
@@ -125,7 +124,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
     modal.content.result.pipe(
       take(1),
       filter(name => !!name),
-      mergeMap(name => this.agentsService.groupCreate({ name: name }))
+      mergeMap(name => this.agentsService.groupCreate(<Group>{ name: name }))
     ).subscribe(group => this.groups.push(group));
   }
 

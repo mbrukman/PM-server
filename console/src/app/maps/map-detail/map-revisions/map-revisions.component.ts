@@ -220,7 +220,7 @@ export class MapRevisionsComponent implements OnInit {
     const modal = this.modalService.show(MapDuplicateComponent);
     modal.content.result.pipe(
       take(1),
-      filter(obj => !!obj.name), // filtering only results with a name
+      filter(obj => !!(<MapDuplicateOptions>obj).name), // filtering only results with a name
     mergeMap(obj =>  this.mapsService.duplicateMap(this.mapId, structureId, this.project.id,<MapDuplicateOptions>obj))
       ).subscribe(map => { this.router.navigate(['/maps', map.id]);
     });
