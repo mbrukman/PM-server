@@ -5,9 +5,6 @@ import { NotFoundComponent } from './core/not-found/not-found.component';
 import { DashboardComponent } from './core/dashboard/dashboard.component';
 import { SetupComponent } from './core/setup/setup.component';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
-import { MapsModule } from './maps/maps.module';
-export function getMapsModule(){return MapsModule}
-
 
 const appRoutes: Routes = [
   {
