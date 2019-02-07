@@ -1,8 +1,17 @@
 @import "~assets/sass/variables";
+
+.modal-header{
+    padding-top: 0 !important;
+    height: 64px;
+    .close{
+        margin:-5px -24px -28px auto;
+    }
+}
 .modal-body{
     label{
         font-size: 14px;
         color: $greyish-text;
+        margin-bottom: 14px;
 
         &:not(:first-of-type){
             margin-top: 25px;
@@ -12,4 +21,4 @@
         border-radius: 3px;
         background-color: #3f4247;
     }
-}
+} 

@@ -95,14 +95,15 @@ export class MapsListComponent implements OnInit, OnDestroy {
     // will be triggered by deactivate guard
     let modal = this.modalService.show(ConfirmComponent);
     let answers = {
-      confirm: 'Delete',
+      third: 'Delete',
       cancel: 'Cancel'
     };
     modal.content.message = 'Are you sure you want to delete? all data related to the map will get permanently lost';
-    modal.content.confirm = answers.confirm;
+    modal.content.third = answers.third;
+    modal.content.confirm = null;
     modal.content.cancel = answers.cancel;
     modal.content.result.asObservable().subscribe(ans => {
-      if (ans === answers.confirm) {
+      if (ans === answers.third) {
         this.deleteMap(id);
       }
     })
