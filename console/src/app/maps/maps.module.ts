@@ -40,19 +40,13 @@ import { monacoConfig } from './monaco-config'
     CommonModule,
     MapsRoutingModule,
     SharedModule,
-    {
-      ngModule : MonacoEditorModule,
-      providers : [
-        {provide : NGX_MONACO_EDITOR_CONFIG, useValue: monacoConfig}
-      ]
-    },
+    MonacoEditorModule.forRoot(monacoConfig),
     BsDropdownModule,
     ModalModule,
     AccordionModule,
     TooltipModule,
     NgxDnDModule,
     InfiniteScrollModule
-    
   ],
   declarations: [
     MapDetailComponent,
