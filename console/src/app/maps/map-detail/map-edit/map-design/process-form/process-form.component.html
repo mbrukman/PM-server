@@ -76,32 +76,21 @@
           <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
         </div>
 
-        <div class="form-group">
+        <div class="form-group dropdown">
           <label>Agents flow control</label>
-          <div class="ui-grid ui-grid-responsive ui-fluid ">
-              <div class="ui-grid-row">
-                  <div class="dropdown">
-                      <p-dropdown  [options]="flowControlDropDown" placeholder="Select a Flow control" formControlName="flowControl"  
+          <p-dropdown  [options]="flowControlDropDown" placeholder="Select a Flow control" formControlName="flowControl"  
                       [autoWidth]="false">
-                      </p-dropdown>
-                  </div>
-              </div>
-          </div>
+          </p-dropdown>
 
           <small class="form-text text-muted">Controlling syncing between agents.</small>
         </div>
 
-        <div class="form-group" *ngIf="processViewWrapper.process?.coordination">
+        <div class="form-group dropdown" *ngIf="processViewWrapper.process?.coordination">
           <label>Process coordination</label>
-          <div class="ui-grid ui-grid-responsive ui-fluid ">
-              <div class="ui-grid-row">
-                  <div class="dropdown">
-                      <p-dropdown  [options]="coordinationDropDown" placeholder="Select a Coordination" formControlName="coordination"  
+          <p-dropdown  [options]="coordinationDropDown" placeholder="Select a Coordination" formControlName="coordination"  
                       [autoWidth]="false">
                       </p-dropdown>
-                  </div>
-              </div>
-          </div>
+
 
           <small class="form-text text-muted">Controlling process sync.</small>
         </div>
@@ -187,16 +176,14 @@
         <small class="form-text text-muted">If the action fails the process will stop (with failure).</small>
       </div>
       <p class="lead">Method</p>
-      <div class="ui-grid ui-grid-responsive ui-fluid ">
-          <div class="ui-grid-row">
-              <div class="dropdown">
-                  <p-dropdown id="inputState" [options]="methodsDropDown" placeholder="Select a Method" formControlName="method"  
-                  (onChange)="onSelectMethod()"
-                  [autoWidth]="false">
-                  </p-dropdown>
-              </div>
-          </div>
+
+      <div class="dropdown">
+          <p-dropdown id="inputState" [options]="methodsDropDown" placeholder="Select a Method" formControlName="method"  
+          (onChange)="onSelectMethod()"
+          [autoWidth]="false">
+          </p-dropdown>
       </div>
+
 
 
       <div formArrayName="params">
@@ -219,29 +206,16 @@
               </div>
               <hr>
               
-              <div class="col-6" [ngSwitch]="param.value.type" [hidden]="param.value.code">
+              <div class="col-6 dropdown" [ngSwitch]="param.value.type" [hidden]="param.value.code">
                 <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
                 
                 <app-vault-selector *ngSwitchCase="'vault'" formControlName="value"></app-vault-selector>
-                <div *ngSwitchCase="'autocomplete'" class="ui-grid ui-grid-responsive ui-fluid ">
-                    <div class="ui-grid-row">
-                        <div class="dropdown">
-                            <p-dropdown [options]="methods[processForm.value.actions[index].method].params[k].options"  placeholder="Select an option" formControlName="value"  
+                <p-dropdown *ngSwitchCase="'autocomplete'" [options]="methods[processForm.value.actions[index].method].params[k].options"  placeholder="Select an option" formControlName="value"  
                             [autoWidth]="false">
-                  
-                            </p-dropdown>
-                        </div>
-                    </div>
-                </div> 
-                <div *ngSwitchCase="'options'" class="ui-grid ui-grid-responsive ui-fluid ">
-                    <div class="ui-grid-row">
-                        <div class="dropdown">
-                            <p-dropdown [options]="methods[processForm.value.actions[index].method].params[k].options"  placeholder="Select an option" formControlName="value"  
+                </p-dropdown>
+                <p-dropdown *ngSwitchCase="'options'" [options]="methods[processForm.value.actions[index].method].params[k].options"  placeholder="Select an option" formControlName="value"  
                             [autoWidth]="false">
-                            </p-dropdown>
-                        </div>
-                    </div>
-                </div>
+                </p-dropdown>
                 <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
                 <input formControlName="value" type="checkbox" class="form-control" *ngSwitchCase="'boolean'">
                 <input formControlName="value" type="number" class="form-control" *ngSwitchCase="'int'">

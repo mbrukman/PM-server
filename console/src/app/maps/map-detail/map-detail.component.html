@@ -20,7 +20,7 @@
     </li>
   </ul>
 
-  <div class="action-buttons">
+  <div class="action-buttons ">
     <!--<button type="button" class="btn" (click)="discardChanges()" *ngIf="edited || structureEdited" disabled>Discard</button>-->
     <button type="button" class="kh-btn-blue kh-btn" *ngIf="!edited && !structureEdited" disabled>Saved</button>
     <button type="button" class="kh-btn-blue kh-btn" (click)="saveMap()" *ngIf="edited || structureEdited">Save</button>
@@ -29,17 +29,12 @@
       <span *ngIf="executing"><i class="fa fa-spinner fa-pulse fa-fw"></i></span>
     </button>
 
-    
-    <div  class="ui-grid ui-grid-responsive ui-fluid ">
-        <div class="ui-grid-row">
-            <div class="dropdown">
-                <p-dropdown [(ngModel)]="selected" 
-                [options]="configurationDropDown" 
-                (onChange)="changeSelected()" 
-                [autoWidth]="false">
-                </p-dropdown>
-            </div>
-        </div>
+    <div class="dropdown">
+        <p-dropdown [(ngModel)]="selected" 
+        [options]="configurationDropDown" 
+        (onChange)="changeSelected()" 
+        [autoWidth]="false">
+        </p-dropdown>
     </div>
   </div>
 </div>

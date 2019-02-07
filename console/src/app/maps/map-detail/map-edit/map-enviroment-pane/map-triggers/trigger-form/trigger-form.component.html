@@ -16,45 +16,25 @@
         <textarea class="form-control" id="description" formControlName="description"></textarea>
       </div>
 
-      <div class="form-group">
+      <div class="form-group dropdown">
         <label for="configuration">Configuration</label>
-        <div class="ui-grid ui-grid-responsive ui-fluid ">
-            <div class="ui-grid-row">
-                <div class="dropdown">
-                    <p-dropdown id="configuration" [options]="configDropDown" optionLabel="name" formControlName="configuration"
+        <p-dropdown id="configuration" [options]="configDropDown" optionLabel="name" formControlName="configuration"
                     [autoWidth]="false">
-                    </p-dropdown>
-                </div>
-            </div>
-        </div>
+        </p-dropdown>
       </div>
 
-      <div class="form-group">
+      <div class="form-group dropdown">
         <label for="plugin">Plugin</label>
-
-        <div class="ui-grid ui-grid-responsive ui-fluid ">
-            <div class="ui-grid-row">
-                <div class="dropdown">
-                    <p-dropdown id="plugin" [options]="triggers" optionLabel="name" placeholder="Select a trigger" formControlName="plugin" (onChange)="onSelectTrigger()" 
+        <p-dropdown id="plugin" [options]="triggers" optionLabel="name" placeholder="Select a trigger" formControlName="plugin" (onChange)="onSelectTrigger()" 
                     [autoWidth]="false">
-                    </p-dropdown>
-                </div>
-            </div>
-        </div>
-
+          </p-dropdown>
       </div>
 
-      <div class="form-group" *ngIf="triggerForm.controls.plugin.value">
+      <div class="form-group dropdown" *ngIf="triggerForm.controls.plugin.value">
         <label for="method">Method</label>
-        <div class="ui-grid ui-grid-responsive ui-fluid ">
-            <div class="ui-grid-row">
-                <div class="dropdown">
-                    <p-dropdown id="method" [options]="plugin?.methods" optionLabel="viewName" placeholder="Select a method" formControlName="method" (onChange)="onSelectMethod()" 
+        <p-dropdown id="method" [options]="plugin?.methods" optionLabel="viewName" placeholder="Select a method" formControlName="method" (onChange)="onSelectMethod()" 
                     [autoWidth]="false">
-                    </p-dropdown>
-                </div>
-            </div>
-        </div>
+        </p-dropdown>
       </div>
 
       <div formArrayName="params" *ngIf="triggerForm.controls.method.value">
@@ -74,17 +54,12 @@
                   <option *ngFor="let option of params[i].options" [value]="option.id">{{option.name}}</option>
                 </select>
                 <input *ngSwitchDefault formControlName="value" type="text" class="form-control">
-
               </div>
             </div>
           </div>
-
           <hr>
-
         </div>
-
       </div>
-
     </div>
     <div class="modal-footer">
       <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>

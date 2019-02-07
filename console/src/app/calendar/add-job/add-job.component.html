@@ -1,42 +1,24 @@
 <h3 class="section-sub-title">Schedule a job</h3>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)">
-  <div class="form-group">
+  <div class="form-group dropdown">
     <label for="project">Project</label>
-    <div class="ui-grid ui-grid-responsive ui-fluid ">
-        <div class="ui-grid-row">
-            <div class="dropdown">
-                <p-dropdown required id="project" formControlName="project" [options]="projectsDropDown" placeholder="Select a project" (onChange)="onSelectProject()"
+    <p-dropdown required id="project" formControlName="project" [options]="projectsDropDown" placeholder="Select a project" (onChange)="onSelectProject()"
                 [autoWidth]="false">
-                </p-dropdown>
-            </div>
-        </div>
-    </div>
+    </p-dropdown>
   </div>
-  <div class="form-group">
+  <div class="form-group dropdown">
     <label for="map">Map</label>
-    <div class="ui-grid ui-grid-responsive ui-fluid ">
-        <div class="ui-grid-row">
-            <div class="dropdown">
-                <p-dropdown required id="map" formControlName="map" [options]="mapDropDown" placeholder="Select a map" (onChange)="onSelectMap()"
+    <p-dropdown required id="map" formControlName="map" [options]="mapDropDown" placeholder="Select a map" (onChange)="onSelectMap()"
                 [autoWidth]="false">
-                </p-dropdown>
-            </div>
-        </div>
-    </div>
+    </p-dropdown>
   </div>
-  <div class="form-group">
+  <div class="form-group dropdown">
     <label for="configuration">Configuration</label>
-    <div class="ui-grid ui-grid-responsive ui-fluid ">
-        <div class="ui-grid-row">
-            <div class="dropdown">
-                <p-dropdown id="configuration" formControlName="configuration" [options]="configurationsDropDown" 
+    <p-dropdown id="configuration" formControlName="configuration" [options]="configurationsDropDown" 
                 placeholder="Select a configuration" (onChange)="onSelectMap()"
                 [autoWidth]="false">
-                </p-dropdown>
-            </div>
-        </div>
-    </div>
+    </p-dropdown>
   </div>
 
   <div class="form-check form-check-inline">

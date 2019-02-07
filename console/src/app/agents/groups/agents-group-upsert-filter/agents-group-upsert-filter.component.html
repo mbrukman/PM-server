@@ -5,27 +5,16 @@
         <h4 *ngIf="edit">Edit Filter</h4>
     </div>
     <div class="modal-body">
-        <div class="form-group">
+        <div class="form-group dropdown">
             <label>Fields</label>
-            <div class="ui-grid ui-grid-responsive ui-fluid ">
-                <div class="ui-grid-row">
-                    <div class="dropdown">
-                        <p-dropdown [(ngModel)]="filter.field" [options]="fieldsDropDown" placeholder="Select a field" 
+            <p-dropdown  [(ngModel)]="filter.field" [options]="fieldsDropDown" placeholder="Select a field" 
                         [autoWidth]="false">
-                        </p-dropdown>
-                    </div>
-                </div>
-            </div>
+            </p-dropdown>
             <label>Type</label>
-            <div class="ui-grid ui-grid-responsive ui-fluid ">
-                <div class="ui-grid-row">
-                    <div class="dropdown">
-                        <p-dropdown [(ngModel)]="filter.filterType" [options]="filterDropDown" placeholder="Select a filter" 
+            <p-dropdown [(ngModel)]="filter.filterType" [options]="filterDropDown" placeholder="Select a filter" 
                         [autoWidth]="false">
-                        </p-dropdown>
-                    </div>
-                </div>
-            </div>
+            </p-dropdown>
+
             <label>Value</label>
             <input class="form-control" [(ngModel)]="filter.value" />
         </div>

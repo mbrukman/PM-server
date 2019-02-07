@@ -32,20 +32,14 @@
       <div class="container-fluid-process">
         <div class="process-col">
           <div class="bg-dark">
-            <div class="card-body">
+            <div class="card-body dropdown">
               <h5 class="card-title">Display data</h5>
-              <div class="ui-grid ui-grid-responsive ui-fluid">
-                <div class="ui-grid-row">
-                  <div class="dropdown">
-                    <p-dropdown [options]="agents" (onChange)="changeAgent()" [(ngModel)]="selectedAgent" [filter]="true"
+              <p-dropdown [options]="agents" (onChange)="changeAgent()" [(ngModel)]="selectedAgent" [filter]="true"
                     [autoWidth]="false">
                       <ng-template let-item pTemplate="item">
                         <span class="agent-name">{{item.label}}</span>
                       </ng-template>
-                    </p-dropdown>
-                  </div>
-                </div>
-              </div>
+              </p-dropdown>
             </div>
           </div>
           <div class="process" *ngIf="processesList && processesList.length">
