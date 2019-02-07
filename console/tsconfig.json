@@ -1,7 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl" : "./",
     "importHelpers": true,
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
@@ -17,6 +16,7 @@
       "es2017",
       "dom"
     ],
+    "baseUrl" : "src",
     "paths": {
       "@angular/*": [
         "../node_modules/@angular/*"
@@ -25,25 +25,25 @@
         "../node_modules/socket.io-client/dist/socket.io.slim.js"
       ],
       "@maps/*": [
-        "src/app/maps/*"
+        "app/maps/*"
       ],
       "@projects/*": [
-        "src/app/projects/*"
+        "app/projects/*"
       ],
       "@agents/*": [
-        "src/app/agents/*"
+        "app/agents/*"
       ],
       "@plugins/*": [
-        "src/app/plugins/*"
+        "app/plugins/*"
       ],
       "@shared/*": [
-        "src/app/shared/*"
+        "app/shared/*"
       ],
       "@core/*": [
-        "src/app/core/*"
+        "app/core/*"
       ],
       "@env/*": [
-        "src/environments/*"
+        "environments/*"
       ]
     },
     "module": "es2015"
