@@ -1,13 +1,13 @@
 <div class="pm-modal">
   <div class="modal-header">
     <i class="material-icons close" (click)="onClose(false)">close</i>
-    <h4>Add Configuration</h4>
+    <h4>Add new configuration</h4>
   </div>
   <div class="modal-body">
     <label>Configuration Name</label>
     <input type="text" class="form-control" [(ngModel)]="name">
   </div>
-  <div class="modal-footer">
+  <div class="modal-footer btn-config">
     <button type="button" class="kh-btn kh-btn-gray" (click)="onClose(false)"><span>Cancel</span></button>
     <button class="kh-btn-blue kh-btn" (click)="onClose(true)"><span>Confirm</span></button>
   </div>

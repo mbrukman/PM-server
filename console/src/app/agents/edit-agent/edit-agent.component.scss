@@ -1,7 +1,22 @@
 @import "~assets/sass/variables";
 
-.modal-body{
+.modal-header{
+    padding-top: 0 !important;
+    height: 64px;
+    .close{
+        margin:-5px -24px -28px auto;
+    }
+}
 
+.modal-body{
+    label{
+        margin-bottom: 14px;
+        font-size:14px;
+        color:$greyish-text
+    }
+    .form-group{
+        margin-bottom: 14px;
+    }
     .input-wrapper{
         position:relative;
 
@@ -76,4 +91,7 @@
         background-color: #3f4247;
     }
 
+}
+.btn-agent{
+    padding: 38px 38px 38px!important;
 }

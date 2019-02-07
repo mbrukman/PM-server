@@ -5,11 +5,12 @@
   display: inherit;
   width: 607px;
 
-  .modal-header {
-    padding-bottom: 0;
-  
-  
-  }
+  .modal-header{
+    padding-top: 0 !important;
+    .close{
+        margin:-5px -24px -28px auto;
+    }
+}
   .modal-body {
     padding-top: 0px;
     .data-table{
@@ -26,7 +27,7 @@
       
       @include p-checkbox();
 
-    ::ng-deep {
+    ::ng-deep { 
       th{
         padding: 7px;
       }
@@ -40,7 +41,7 @@
   .ui-widget-header{
     width: 214px;
     height: 36px;
-    margin: 29px 0px 35px
+    margin: 53px 0px 35px
   } 
   .tabs{
     margin-top: 2px;
@@ -60,5 +61,8 @@
       }
     }
   }
+}
+.btn-agent-group{
+  padding: 38px 38px 38px !important;
 }
 

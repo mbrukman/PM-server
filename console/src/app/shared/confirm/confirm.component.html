@@ -3,11 +3,11 @@
     <i class="material-icons close" (click)="onAction(cancel)">close</i>
     <h4>{{ title }}</h4>
   </div>
-  <div class="modal-body message">
+  <div class="modal-body">
     {{ message }}
   </div>
 
-  <div class="modal-footer btn">
+  <div class="modal-footer btn-confirm">
     <button type="button" [hidden]="!cancel" class="kh-btn kh-btn-gray" (click)="onAction(cancel)">{{ cancel }}</button>
     <button type="submit" [hidden]="!confirm" class="kh-btn kh-btn-gray" (click)="onAction(confirm)">{{ confirm }}</button>
     <button type="submit" [hidden]="!third" class="kh-btn-blue kh-btn" (click)="onAction(third)" *ngIf="third">{{ third }}</button>

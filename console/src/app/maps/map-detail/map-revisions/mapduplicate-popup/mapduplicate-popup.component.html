@@ -4,18 +4,20 @@
   </div>
   <div class="modal-body">
     <div class="form-group">
-        <label>Map name</label>
+      <label class="title">Map name</label>
       <input type="text" class="form-control" [(ngModel)]="optionsPopup.name">
     </div>
-    <div class="form-group">
-      <label class="form-check-label">
-      <input type="checkbox" class="form-check-input" [(ngModel)]="optionsPopup.isChecked">
-        Would you like to use the same agent ?
+    <div class="form-group checkbox">
+      <label class="control control-checkbox">
+          <input type="checkbox" class="form-control" [(ngModel)]="optionsPopup.isChecked">
+          Would you like to use the same agent ?
+          <div class="control_indicator check-control"></div>
       </label>
+
     </div>
   </div>
 
-  <div class="modal-footer">
+  <div class="modal-footer btn-duplicate">
     <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>
     <button class="kh-btn-blue kh-btn" (click)="onConfirm()"><span>Confirm</span></button>
   </div>
