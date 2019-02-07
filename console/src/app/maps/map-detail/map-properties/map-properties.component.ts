@@ -16,24 +16,31 @@ import { Project } from '@projects/models/project.model';
 export class MapPropertiesComponent implements OnInit, OnDestroy {
   map: Map;
   projects: Project[];
+  projectsDropDown = [];
   mapSubscription: Subscription;
   projectsReq: any;
   selectedProject: string;
   queue: number;
+  onInit:boolean;
 
   constructor(private mapsService: MapsService, private projectsService: ProjectsService) {
   }
 
   ngOnInit() {
+    this.onInit = true;
     this.mapSubscription = this.mapsService.getCurrentMap().pipe(
       tap(map => this.map = map),
       filter(map => map),
       mergeMap(() => this.projectsService.list(null,null,{isArchived:false,globalFilter:null,sort:'-createdAt'}))// filtering empty map result
     ).subscribe(data => {
         this.projects = data.items;
+        this.projectsDropDown = this.projects.map(project => {
+          return {label:project.name,value:project._id}
+        })
         let project = this.projects.find((o) => (<string[]>o.maps).indexOf(this.map.id) > -1);
-        if (project) {
+        if (project && this.onInit) {
           this.selectedProject = project._id;
+          this.onInit = false;
         }
       });
   }
