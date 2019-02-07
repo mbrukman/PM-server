@@ -1,97 +1,71 @@
 @import "~assets/sass/variables";
 
-.modal-header{
-    padding-top: 0 !important;
-    height: 64px;
-    .close{
-        margin:-5px -24px -28px auto;
-    }
-}
 
-.modal-body{
-    label{
-        margin-bottom: 14px;
-        font-size:14px;
-        color:$greyish-text
-    }
-    .form-group{
-        margin-bottom: 14px;
-    }
-    .input-wrapper{
-        position:relative;
 
-        input{
-            height:35px;
-            width:100%;
-            padding-left:10px;
-            border-radius: 3px;
-            border:none;outline:none;
-        }
+.input-wrapper{
+    position:relative;
 
-        .add-btn{
-            position:absolute;
-            right: 15px;
-            top: 4px;
-            border:none;
-            height:20px;
-            width:20px;
-            border-radius:100%;
-            outline:none;
-            font-weight:bold;
-            padding:2px;
-            cursor: pointer;
-            color : $turquoise-blue;
-        }
-    }
-    .attributes{
-        width: 100%;
-        display: flex;
-        flex-wrap: wrap;
-        margin-top: 10px;
-        min-height: 41px;
-        .tag{
-            background-color: #3f4247;
-            height: 28px;
-            border-radius: 3px;
-            margin-right: 13px;
-            margin-bottom: 13px;
-            position:relative;
-            span{
-                height: 17.2px;
-                font-size: 14px;
-                padding-left: 10px;
-                padding-right: 41px;
-                color: $turquoise-blue
-            }
-            a{
-                position: absolute;
-                right: 15px;
-                top: 0px;
-                border: none;
-                height: 20px;
-                width: 20px;
-                border-radius: 100%;
-                outline: none;
-                text-align: center;
-                font-weight: bold;
-                padding: 2px;
-                color : $turquoise-blue;
-
-                .btn-close{
-                    cursor: pointer;
-                }
-            }
-        }
-    }
-
-    select{
-        width: 445px;
-        height: 36px;
+    input{
+        height:35px;
+        width:100%;
+        padding-left:10px;
         border-radius: 3px;
-        background-color: #3f4247;
+        border:none;outline:none;
     }
 
+    .add-btn{
+        position:absolute;
+        right: 15px;
+        top: 4px;
+        border:none;
+        height:20px;
+        width:20px;
+        border-radius:100%;
+        outline:none;
+        font-weight:bold;
+        padding:2px;
+        cursor: pointer;
+        color : $turquoise-blue;
+    }
 }
-.btn-agent{
-    padding: 38px 38px 38px!important;
+.attributes{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    min-height: 41px;
+    .tag{
+        background-color: #3f4247;
+        height: 28px;
+        border-radius: 3px;
+        margin-right: 13px;
+        margin-bottom: 13px;
+        position:relative;
+        span{
+            height: 17.2px;
+            font-size: 14px;
+            padding-left: 10px;
+            padding-right: 41px;
+            color: $turquoise-blue
+        }
+        a{
+            position: absolute;
+            right: 15px;
+            top: 0px;
+            border: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 100%;
+            outline: none;
+            text-align: center;
+            font-weight: bold;
+            padding: 2px;
+            color : $turquoise-blue;
+
+            .btn-close{
+                cursor: pointer;
+            }
+        }
+    }
 }
+

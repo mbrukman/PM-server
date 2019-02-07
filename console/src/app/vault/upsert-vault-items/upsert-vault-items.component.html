@@ -4,7 +4,7 @@
     <h4 *ngIf="vault.id">Edit vault item</h4>
     <h4 *ngIf="!vault.id">Add vault item</h4>
   </div>
-  <div class="modal-body">
+  <div class="modal-body title">
     <div class="form-group">
       <label>Name:</label>
       <input type="text" id="title" class="form-control" [(ngModel)]="vault.key" required />
@@ -18,7 +18,7 @@
       <input type="text" id="title" class="form-control" [(ngModel)]="vault.value" [required]="!vault.id" />
     </div>
   </div>
-  <div class="modal-footer btn-vault">
+  <div class="modal-footer">
     <button type="button" class="kh-btn-blue kh-btn" (click)="onClose()">Cancel</button>
     <button type="submit" class="kh-btn kh-btn-gray" (click)="onConfirm()" [disabled]="(!vault.key || (!vault.id && !vault.value))">Save</button>
   </div>

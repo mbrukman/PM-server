@@ -3,11 +3,11 @@
     <i class="material-icons close" (click)="onClose(false)">close</i>
     <h4>Add new configuration</h4>
   </div>
-  <div class="modal-body">
+  <div class="modal-body title">
     <label>Configuration Name</label>
     <input type="text" class="form-control" [(ngModel)]="name">
   </div>
-  <div class="modal-footer btn-config">
+  <div class="modal-footer">
     <button type="button" class="kh-btn kh-btn-gray" (click)="onClose(false)"><span>Cancel</span></button>
     <button class="kh-btn-blue kh-btn" (click)="onClose(true)"><span>Confirm</span></button>
   </div>

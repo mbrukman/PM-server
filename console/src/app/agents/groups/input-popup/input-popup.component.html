@@ -3,13 +3,13 @@
     <i class="material-icons close" (click)="onClose()">close</i>
     <h4>Add Group</h4>
   </div>
-  <div class="modal-body">
+  <div class="modal-body title">
     <div class="form-group">
       <label>Group Name</label>
       <input type="text" placeholder="My Group Name" class="form-control" [(ngModel)]="name">
     </div>
   </div>
-  <div class="modal-footer btn-group">
+  <div class="modal-footer">
     <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>
     <button class="kh-btn-blue kh-btn" (click)="onConfirm()"><span>Create</span></button>
   </div>

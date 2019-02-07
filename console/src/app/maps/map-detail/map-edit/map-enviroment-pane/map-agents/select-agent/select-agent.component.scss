@@ -1,16 +1,10 @@
 @import "~assets/sass/variables";
-@import "~assets/sass/mixins";
+@import "~assets/sass/mixins"; 
 
 .pm-modal{
   display: inherit;
   width: 607px;
 
-  .modal-header{
-    padding-top: 0 !important;
-    .close{
-        margin:-5px -24px -28px auto;
-    }
-}
   .modal-body {
     padding-top: 0px;
     .data-table{

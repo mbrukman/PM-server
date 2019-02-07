@@ -3,7 +3,7 @@
     <i class="material-icons close" (click)="onClose()">close</i>
     <h4>Add new plugin</h4>
   </div>
-  <div class="modal-body plugin-select">
+  <div class="modal-body title">
     <input type="file" (change)="onPluginSelect($event)" [hidden]="uploading">
     <i class="fa fa-spinner fa-spin fa-3x fa-fw" *ngIf="uploading"></i>
   </div>

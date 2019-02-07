@@ -377,7 +377,11 @@ rect.body {
       flex-direction: column;
       border-bottom: 1px solid #404549;
       padding: 14px 14px 0px;
-
+      padding-top: 0 !important;
+      height: 64px;
+      &.agent-header{
+        height: inherit;
+      }
       &.no-title{
         border: none;
         position: absolute;
@@ -386,6 +390,7 @@ rect.body {
         z-index: 1;
         .close{
           position: absolute;
+          margin:-5px -24px -28px auto;
         }
       }
       
@@ -399,11 +404,29 @@ rect.body {
       .close {
         color: $text-color;
         cursor: pointer;
+        margin:-5px -24px -28px auto;
       }
     }
     .modal-body {
-      padding: 24px 38px 0px;
       border-bottom: 0;
+      padding: 53px 38px 0px;
+      &.title{
+        padding: 40px 38px 0px;
+      }
+      .form-group{
+        margin-bottom: 25px;
+        &.checkbox{
+          @include checkbox();
+        }
+        label{
+          color:$greyish-text;
+          margin-bottom: 14px;
+          font-size:14px;
+          &:not(:first-of-type){
+            margin-top: 25px;
+          }
+        }
+      }
       &.no-button{
         margin-bottom: 38px;
       }
@@ -411,14 +434,44 @@ rect.body {
       .form-group:last-child{
         margin-bottom: 0px; 
       }
+      .params{
+        .row{
+            .header{
+                font-size: 14px;
+                font-weight: bold;
+                color:$pale-blue;
+                padding-right: 0;
+                padding-left: 0;
+                margin-bottom: 14px;
+            }
+         }
+         .row-param{
+             margin-bottom: 25px;
+              .param-name{
+                 font-size: 14px;
+                 padding-left: 0;
+             }
+ 
+             .col-8{
+                 padding-right: 0;
+                 padding-left: 0;
+             }
+         }
+     }
 
     }
     .modal-footer {
       border-top: 0;
       padding:34px 38px 38px;
+      &.btn-confirm{
+        display: flex;
+        justify-content: flex-end;
+      }
       button{
         margin-left: 0px;
       }
+      padding: 38px 38px 38px!important;
+
     }
   }
 }
