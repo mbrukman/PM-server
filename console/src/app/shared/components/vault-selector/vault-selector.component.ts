@@ -1,6 +1,6 @@
 import { Component, OnInit, forwardRef, Input, Output } from '@angular/core';
 import { VaultService } from '@shared/vault.service'
-import { VaultItem } from 'app/vault/vault.model';
+import { VaultItem } from '@app/vault/vault.model';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormControl, FormGroup, FormArray } from '@angular/forms';
 
 @Component({

@@ -1,5 +1,5 @@
-@import "~assets/sass/variables";
-@import "~assets/sass/mixins";
+@import "~src/assets/sass/variables";
+@import "~src/assets/sass/mixins";
 
 
 .row-card{
@@ -77,11 +77,8 @@
           border-right: 1px solid $cool-grey;
           height: 100%;
           width: 292px;
-          .process{
-            height: 69%;
-          }
           .bg-dark{
-            height: 31%;
+            height: 37%;
             padding-top: 27px;
             .card-body{
               padding: 0;

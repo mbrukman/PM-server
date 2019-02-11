@@ -1,6 +1,6 @@
-@import "~assets/sass/variables";
-@import "~assets/sass/base";
-@import "~assets/sass/mixins";
+@import "~src/assets/sass/variables";
+@import "~src/assets/sass/base";
+@import "~src/assets/sass/mixins";
 .wrapper-form {
 
     .header-process{
@@ -165,6 +165,10 @@
         color: $pale-blue;
         .fa {
             font-size: 20px;
+        }
+
+        .dropdown-menu{
+            top: 80% !important;
         }
     }
 }

@@ -16,34 +16,37 @@
       "es2017",
       "dom"
     ],
-    "baseUrl": "src",
+    "baseUrl" : "./",
     "paths": {
       "@angular/*": [
-        "../node_modules/@angular/*"
+        "node_modules/@angular/*"
       ],
       "socket.io-client": [
-        "../node_modules/socket.io-client/dist/socket.io.slim.js"
+        "node_modules/socket.io-client/dist/socket.io.slim.js"
+      ],
+      "@app/*": [
+        "src/app/*"
       ],
       "@maps/*": [
-        "app/maps/*"
+        "src/app/maps/*"
       ],
       "@projects/*": [
-        "app/projects/*"
+        "src/app/projects/*"
       ],
       "@agents/*": [
-        "app/agents/*"
+        "src/app/agents/*"
       ],
       "@plugins/*": [
-        "app/plugins/*"
+        "src/app/plugins/*"
       ],
       "@shared/*": [
-        "app/shared/*"
+        "src/app/shared/*"
       ],
       "@core/*": [
-        "app/core/*"
+        "src/app/core/*"
       ],
       "@env/*": [
-        "environments/*"
+        "src/environments/*"
       ]
     },
     "module": "es2015"
