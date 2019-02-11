@@ -257,6 +257,48 @@
   }
 }
 
+@mixin autocomplete(){
+  ::ng-deep .ui-autocomplete {
+    display: flex !important;
+
+    input{
+        height: $dropdown-label-height;
+        font-size: 1rem;
+        width: 90%;
+    }
+    .ui-clickable{
+        padding-bottom: 14px;
+    }
+    .ui-autocomplete-items{
+        background-color: dimgrey;
+    }
+
+    .ui-autocomplete-dropdown.ui-button{
+        height: $dropdown-label-height;
+    }
+
+    input{
+      height: $dropdown-label-height;
+      font-size: 1rem;
+      width: 100%
+    }
+
+    .pi{
+        display: inline-block;
+        font:normal normal normal 14px/1 FontAwesome;
+        -webkit-font-smoothing: antialiased;
+      }
+    .pi-caret-down::before{
+        content: "\f0d7";
+        font-size: 14px;
+    }
+    .pi-fw{
+        text-align: center;
+    }
+
+  }
+}
+
 @mixin dropdown(){
   ::ng-deep{
     p-dropdown{
@@ -265,14 +307,14 @@
       display: inline-block;
       .ui-dropdown{
         width: 100%;
-        height: 33px;
+        height: $dropdown-label-height;
         outline:none;
         overflow: visible;
         &:not(.ui-state-disabled):hover{
           background-color: $kh-background;
         }
 
-        label{
+        .ui-dropdown-label{
           font-size: 14px;
           color: $greyish-text;
           padding-top:5px;

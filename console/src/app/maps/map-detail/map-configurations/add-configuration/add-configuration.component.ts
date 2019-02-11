@@ -16,16 +16,17 @@ export class AddConfigurationComponent {
   constructor(public bsModalRef: BsModalRef) { }
 
 
-  onKeyUp(e){
+  onConfirm() {
     this.configExist = false;
     for(let i=0, length = this.configurations.length;i<length;i++){
-      if(this.configurations[i].name == e.target.value){
-        this.configExist = true;
+      if(this.configurations[i].name == this.name){
+        this.configExist = true
+        setTimeout(()=>{
+          this.configExist = null
+        },3000);
+        break;
       }
     }
-  }
-
-  onConfirm() {
     if(!this.configExist){
       this.result.next(this.name);
       this.bsModalRef.hide();

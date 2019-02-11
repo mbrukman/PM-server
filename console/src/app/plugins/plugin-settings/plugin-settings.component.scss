@@ -9,7 +9,6 @@
       width: 455px;
       padding-left: 25px;
       .dropdown{
-          width: 100%;
           @include dropdown();
       }
       label,input,select{

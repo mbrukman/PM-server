@@ -490,7 +490,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     let index = _.findIndex(this.mapStructure.processes, (o) => {
       return o.uuid === this.process.uuid;
     });
-    console.log(process);
+
 
     this.updateNodeLabel(process.uuid, process.name || this.process.used_plugin.name);
     let updateFields = ['name', 'description', 'mandatory', 'condition', 'coordination', 'actions', 'correlateAgents', 'flowControl', 'filterAgents', 'postRun', 'preRun']

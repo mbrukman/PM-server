@@ -9,7 +9,7 @@ input.form-control.ng-invalid.ng-touched, textarea.form-control.ng-invalid.ng-to
 .main {
   .map-form {
     .dropdown{
-      width: 100%;
+
       @include dropdown();
     }
     max-width: 430px;
