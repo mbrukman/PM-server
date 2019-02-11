@@ -381,17 +381,9 @@ rect.body {
     background: $background;
     border-radius: 6px;
     box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.75);
-    .modal-header {
-      border-bottom: 0;
-      flex-direction: column;
-      border-bottom: 1px solid #404549;
-      padding: 14px 14px 0px;
-      padding-top: 0 !important;
-      height: 64px;
-      &.agent-header{
-        height: inherit;
-      }
-      &.no-title{
+    &.no-title{
+      .modal-header{
+
         border: none;
         position: absolute;
         right: 40px;
@@ -401,6 +393,23 @@ rect.body {
           position: absolute;
           margin:-5px -24px -28px auto;
         }
+      }
+    }
+    &:not(.no-title){
+      .modal-body{
+
+        padding: 40px 38px 0px;
+      }
+    }
+    .modal-header {
+      border-bottom: 0;
+      flex-direction: column;
+      border-bottom: 1px solid #404549;
+      padding: 14px 14px 0px;
+      padding-top: 0 !important;
+      height: 64px;
+      &.agent-header{
+        height: inherit;
       }
       
 
@@ -419,9 +428,7 @@ rect.body {
     .modal-body {
       border-bottom: 0;
       padding: 53px 38px 0px;
-      &.title{
-        padding: 40px 38px 0px;
-      }
+
       .form-group{
         margin-bottom: 25px;
         &.checkbox{
