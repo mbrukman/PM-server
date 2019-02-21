@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-
+import {Map} from '@maps/models/map.model'
 import { ProjectsService } from '@projects/projects.service';
 import { Project } from '@projects/models/project.model';
 import { CalendarService } from '../calendar.service';
@@ -21,6 +21,9 @@ export class AddJobComponent implements OnInit {
   projectsReq: any;
   form: FormGroup;
   cron: any;
+  projectsDropDown:any;
+  configurationsDropDown:any;
+  mapDropDown=[];
   cronConfig: CronJobsConfig = {
     multiple: false,
     quartz: false,
@@ -35,14 +38,22 @@ export class AddJobComponent implements OnInit {
     var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt'};
     this.projectsReq = this.projectsService.filter(null,null,filterOptions).subscribe(data => {
       this.projects = data.items;
+      this.projectsDropDown = this.projects.map(project => {
+        return {label:project.name,value:project._id}
+      })
     });
     this.form = this.initForm();
   }
 
   onSelectProject() {
+    this.mapDropDown = [];
     const projectId = this.form.controls.project.value;
     this.projectsService.detail(projectId,{isArchived:false,globalFilter:null,sort:'-createdAt'}).subscribe(project => {
       this.selectedProject = project;
+      for(let i =0,length=this.selectedProject.maps.length;i<length;i++){
+        let map = <Map>(this.selectedProject.maps[i]);
+        this.mapDropDown.push({label:map.name,value:map._id})
+      }
     });
 
   }
@@ -56,6 +67,9 @@ export class AddJobComponent implements OnInit {
       filter(structure => !!structure && !!structure.configurations),
     ).subscribe(structure => {
         this.selectedMapConfigurations = structure.configurations.map(o => o.name);
+        this.configurationsDropDown = this.selectedMapConfigurations.map(config => {
+          return {label:config,value:config}
+        })
       });
   }
 

@@ -49,10 +49,11 @@ export class MapConfigurationsComponent implements OnInit {
   }
 
   addNewConfiguration() {
-    this.modalService.show(AddConfigurationComponent).content.result.pipe(
-      take(1),
-      filter(name => !!name)
-    ).subscribe(name => {
+    const modal = this.modalService.show(AddConfigurationComponent);
+    modal.content.configurations = this.mapStructure.configurations;
+    modal.content.result
+      .filter(name => !!name)
+      .subscribe(name => {
         this.mapStructure.configurations.push(new MapStructureConfiguration(name, '{\n\n}'));
         this.editConfiguration(this.mapStructure.configurations.length - 1);
       });
@@ -73,6 +74,7 @@ export class MapConfigurationsComponent implements OnInit {
     }
 
     this.selectedConfiguration = this.mapStructure.configurations[index];
+    this.updateMapStructure();
   }
 
   updateMapStructure() {

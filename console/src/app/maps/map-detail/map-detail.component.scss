@@ -33,10 +33,14 @@
       }
     }
   }
+  
 
   .action-buttons {
     padding : 0 22px;
-
+    .dropdown{
+      width:150px;
+      @include dropdown();
+    }
     &:last-of-type{
       display: flex;
       justify-content: flex-end;

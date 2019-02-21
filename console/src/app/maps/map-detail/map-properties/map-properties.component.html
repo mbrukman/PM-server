@@ -4,14 +4,12 @@
         <button class="kh-btn kh-btn-blue" *ngIf="!map?.archived" (click)="archiveMap(true)"><i class="material-icons">archive</i>Archive</button>
         <button class="kh-btn kh-btn-blue" *ngIf="map?.archived" (click)="archiveMap(false)"><i class="material-icons">unarchive</i>Unarchive</button>
     </div>
-    <div class="form-row">
-      
+    <div class="form-row dropdown">  
         <p class="title">Project</p>
-        <select class="form-control" [(ngModel)]="selectedProject" id="project" (change)="onChangeProject()">
-          <option disabled>Select a project</option>
-          <option *ngFor="let project of projects" [ngValue]="project._id">{{project.name}}</option>
-        </select>
-      
+        <p-dropdown [options]="projectsDropDown" 
+        (onChange)="onChangeProject()" [(ngModel)]="selectedProject" 
+        [autoWidth]="false">
+        </p-dropdown>
     </div>
     <div class="form-row">
       

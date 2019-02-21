@@ -17,7 +17,6 @@ import { FilterOptions } from '@shared/model/filter-options.model';
 import { take, filter, mergeMap } from 'rxjs/operators';
 import { MapDuplicateOptions } from '@maps/models/map-duplicate-options.model';
 
-
 @Component({
   selector: 'app-map-revisions',
   templateUrl: './map-revisions.component.html',

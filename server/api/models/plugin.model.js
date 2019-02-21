@@ -32,6 +32,7 @@ let pluginSettingsSchema = {
     name:{ type: String, required: true },
     valueType:String,
     viewName: String,
+    options: [{ id: String, name: String }],
     value:{type:String,default: ''},
     model: {
         type: String, required: function () {

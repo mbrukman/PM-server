@@ -1,0 +1,7 @@
+@import "~src/assets/sass/variables";
+.content-wrapper{
+    height: $dropdown-label-height;
+    .config-exist{
+        color:$config-exist
+    }
+}

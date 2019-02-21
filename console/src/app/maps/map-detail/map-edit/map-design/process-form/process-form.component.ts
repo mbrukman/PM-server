@@ -39,6 +39,9 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   selectedMethod: PluginMethod;
   FLOW_CONTROL_TYPES  = FLOW_CONTROL_TYPES;
   COORDINATION_TYPES = COORDINATION_TYPES;
+  flowControlDropDown = [];
+  coordinationDropDown = [];
+  methodsDropDown:any
 
   constructor(
     private socketService: SocketService,
@@ -48,10 +51,30 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.methodsDropDown = this.processViewWrapper.plugin.methods.map(method => {
+      return {label:method.viewName,value:method.name}
+    })
     if (!this.processViewWrapper.process) {
       this.closePane();
       return;
     }
+    this.flowControlDropDown = Object.keys(this.FLOW_CONTROL_TYPES).map(key => {
+      return {value:this.FLOW_CONTROL_TYPES[key].id,label:this.FLOW_CONTROL_TYPES[key].label}
+    })
+
+    for(let i=0,length=Object.keys(this.COORDINATION_TYPES).length;i<length;i++){
+      let indexName = Object.keys(this.COORDINATION_TYPES)[i];
+      if(indexName=='wait'){
+        if(!this.processViewWrapper.isInsideLoop){
+          this.coordinationDropDown.push({label:this.COORDINATION_TYPES[indexName].label,value:this.COORDINATION_TYPES[indexName].id})
+        }
+      }
+      else{
+        this.coordinationDropDown.push({label:this.COORDINATION_TYPES[indexName].label,value:this.COORDINATION_TYPES[indexName].id})
+      }
+    }
+
+
     this.processForm = Process.getFormGroup(this.processViewWrapper.process);
 
     this.processUpdateSubscription = this.mapDesignService
@@ -135,6 +158,14 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   }
 
   addToMethodContext(method) {
+    method.params.forEach(param => {
+      if(param.options.length > 0 && param.options[0].id){
+        let options = param.options.map(opt => {
+          return {label:opt.name || opt.value ,value:opt.id}
+        })
+        param.options = options
+      }
+    })
     this.methods[method.name] = method;
   }
 
@@ -190,6 +221,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         this.action = true;
         this.index = index;
         
+       
       })
   }
 
@@ -206,6 +238,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * Called from the template once user changes a method
    */
   onSelectMethod() {
+  
     const methodName = this.processForm.value.actions[this.index].method;
     const action = this.processForm.controls['actions']['controls'][this.index];
     this.selectedMethod = this.processViewWrapper.plugin.methods.find(o => o.name === methodName);

@@ -1,8 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-
-import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import { BsModalService } from 'ngx-bootstrap/modal';
 
@@ -11,7 +9,7 @@ import { MapStructureConfiguration, Map, MapStructure } from '@maps/models';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { SocketService } from '@shared/socket.service';
 import { filter, take } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 
 
 @Component({
@@ -22,6 +20,7 @@ import { Subject } from 'rxjs';
     '(document:keydown)': 'onKeyDown($event)'
   }
 })
+
 export class MapDetailComponent implements OnInit, OnDestroy {
   id: string;
   originalMap: Map;
@@ -39,10 +38,11 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   edited: boolean = false;
   structureEdited: boolean = false;
   initiated: boolean = false;
-  mapExecutionSubscription: Subscription;
+  mapExecutionSubscription: Subscription; 
   executing: boolean;
   downloadJson: SafeUrl;
-  selected: number;
+  configurationDropDown=[];
+  selected: MapStructureConfiguration;
   navItems: {
     name: string,
     routerLink: string[]
@@ -140,8 +140,13 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         delete compareStructure.content;
         delete compareOriginalStructure.content;
         this.structureEdited = (JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent);
-
         this.mapStructure = structure;
+        this.configurationDropDown = this.mapStructure.configurations.map(config => {
+          return {label:config.name, value:config}
+        })
+        if(this.configurationDropDown.length == 0){
+          this.configurationDropDown.push({label:"No config",value:''})
+        }
         this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
           return o.id === structure.id;
         });
@@ -150,9 +155,12 @@ export class MapDetailComponent implements OnInit, OnDestroy {
 
         if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0) {
           const selected = this.mapStructure.configurations.findIndex(o => o.selected);
-          this.selected = selected !== -1 ? selected : 0;
+          this.selected = selected !== -1 ? this.mapStructure.configurations[selected] : null;
         }
+
+
       });
+
 
 
     // get the current executing maps
@@ -169,6 +177,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       this.executing = maps.indexOf(this.id) > -1;
     });
   }
+
 
   ngOnDestroy() {
     this.routeReq.unsubscribe();
@@ -260,7 +269,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   }
 
   executeMap() {
-    this.mapExecReq = this.mapsService.execute(this.id, (!this.selected || this.selected !== 0) ? undefined : this.mapStructure.configurations[this.selected].name).subscribe();
+    let index = this.mapStructure.configurations.findIndex(conf => conf.name == this.selected.name)
+    this.mapExecReq = this.mapsService.execute(this.id, (!this.selected) ? undefined : this.mapStructure.configurations[index].name).subscribe();
   }
 
   saveMap() {
@@ -365,8 +375,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
    * @param {number} index
    */
   changeSelected() {
-    this.mapStructure.configurations.forEach((configuration, i) => {
-      configuration.selected = (this.selected.toString() === i.toString());
+    this.mapStructure.configurations.forEach((configuration) => {
+      configuration.selected = (this.selected.name == configuration.name)
     });
     this.mapsService.setCurrentMapStructure(this.mapStructure);
   }
@@ -382,3 +392,6 @@ export class MapDetailComponent implements OnInit, OnDestroy {
 
 
 }
+
+  
+
