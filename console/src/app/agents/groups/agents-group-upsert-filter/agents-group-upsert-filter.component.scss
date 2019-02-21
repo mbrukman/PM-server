@@ -1,42 +1,6 @@
-@import "~src/assets/sass/variables";
 @import "~src/assets/sass/mixins";
 
-.pm-modal{
-    width: 510px;
-    height: 460px;
-    border-radius: 4px;
-    background-color: #2d3236;
-    .modal-header{
-        width: 510px;
-
-        border-bottom: 1px solid #404549;
-        h4{
-            height: 25px;
-            font-size: 22px;
-            text-align: center;
-            color: $greyish-text;
-            margin-left: 185px
-        }
-    }
-    .modal-body{
-        .dropdown{
-            @include dropdown();
-        }
-        label{
-            width: 140px;
-            font-size: 14px;
-            color: $greyish-text;
-            margin-top: 25px;
-        }
-        
-        input,select{
-
-            border-radius: 3px;
-            background-color: #3f4247;
-        }
-    }
-   .modal-footer{
-       margin-right: 5px;
-    }
-   
+.dropdown{
+    @include dropdown();
 }
+       

@@ -4,7 +4,9 @@
 .pm-modal{
   display: inherit;
   width: 607px;
-
+  .modal-header{
+    height: inherit;
+  }
   .modal-body {
     padding-top: 0px;
     .data-table{
@@ -55,8 +57,5 @@
       }
     }
   }
-}
-.btn-agent-group{
-  padding: 38px 38px 38px !important;
 }
 
