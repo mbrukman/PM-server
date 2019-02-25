@@ -1,11 +1,15 @@
 @import "~src/assets/sass/variables";
 @import "~src/assets/sass/mixins";
 
-.pm-modal{
+.modal-content-wrapper{
   display: inherit;
   width: 607px;
   .modal-header{
     height: inherit;
+    h4{
+      padding-bottom: 21px;
+      padding-top: 26px;
+    }
   }
   .modal-body {
     padding-top: 0px;

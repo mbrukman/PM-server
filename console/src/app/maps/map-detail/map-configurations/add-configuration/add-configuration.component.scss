@@ -1,7 +1,7 @@
 @import "~src/assets/sass/variables";
 .content-wrapper{
     height: 38px;
-    .config-exist{
-        color:$config-exist
+    .error-color{
+        color:$error-color
     }
 }

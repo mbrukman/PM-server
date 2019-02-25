@@ -1,4 +1,4 @@
-<div class="pm-modal">
+<div class="modal-content-wrapper">
   <div class="modal-header">
     <i class="material-icons close" (click)="onClose()">close</i>
     <h4>Enter configuration name</h4>
@@ -6,7 +6,7 @@
   <div class="modal-body">
     <div class="content-wrapper">
       <input type="text" class="form-control" [(ngModel)]="name">
-      <small *ngIf="configExist" class="config-exist">This configuration's name already exists</small>
+      <small *ngIf="configExist" class="error-color">This configuration's name already exists</small>
     </div>
   </div>
   <div class="modal-footer">

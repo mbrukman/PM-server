@@ -317,15 +317,12 @@
         .ui-dropdown-label{
           font-size: 14px;
           color: $greyish-text;
-          padding-top:5px;
           padding-left: 10px;
           display: flex;
           align-items: center;
           height: $dropdown-label-height;
-          padding-right: 30px;
           border-radius: 3px;
           background-color: $card-background;
-          margin-bottom: 1px;
           @include ellipsis();
         }
 
@@ -344,7 +341,7 @@
             color:white;
             font-size: inherit;
             display: flex;
-            align-items: center;
+            align-items: center; 
           }
         }
 
@@ -360,14 +357,22 @@
           .ui-dropdown-filter-container{
             height: auto;
             max-height: 50px;
-            padding:6px;
             input{
+              padding-left: 6px;
               background-color: $card-background;
-              padding: 0;
               height: $dropdown-label-height;
             }
             span{
-              padding-top: 6px;
+              top:17px;
+              &.pi{
+                display: inline-block;
+                font:normal normal normal 14px/1 FontAwesome;
+                -webkit-font-smoothing: antialiased;
+              }
+              &.pi-search::before{
+                content: "\f002";
+                font-size: 14px;
+              }
             }
           }
 

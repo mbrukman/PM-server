@@ -58,12 +58,14 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       this.closePane();
       return;
     }
-    this.flowControlDropDown = Object.keys(this.FLOW_CONTROL_TYPES).map(key => {
+    let flowControlType =  Object.keys(this.FLOW_CONTROL_TYPES)
+    this.flowControlDropDown = flowControlType.map(key => {
       return {value:this.FLOW_CONTROL_TYPES[key].id,label:this.FLOW_CONTROL_TYPES[key].label}
     })
 
-    for(let i=0,length=Object.keys(this.COORDINATION_TYPES).length;i<length;i++){
-      let indexName = Object.keys(this.COORDINATION_TYPES)[i];
+    let coordinationType = Object.keys(this.COORDINATION_TYPES)
+    for(let i=0,length=coordinationType.length;i<length;i++){
+      let indexName = coordinationType[i];
       if(indexName=='wait'){
         if(!this.processViewWrapper.isInsideLoop){
           this.coordinationDropDown.push({label:this.COORDINATION_TYPES[indexName].label,value:this.COORDINATION_TYPES[indexName].id})

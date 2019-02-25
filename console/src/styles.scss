@@ -377,7 +377,7 @@ rect.body {
 }
 .modal-content{
   background: $background;
-  .pm-modal {
+  .modal-content-wrapper {
     background: $background;
     border-radius: 6px;
     box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.75);
@@ -407,17 +407,20 @@ rect.body {
       padding: 14px 14px 0px;
       padding-top: 0 !important;
       height: 64px;
-
+      position: relative;
       h4{
         font-size: 22px;
         font-weight: 300;
         margin: auto;
-        padding-bottom: 19px;
       }
       .close {
+        padding: 0;
+        margin: 0;
         color: $text-color;
         cursor: pointer;
-        margin:-5px -24px -28px auto;
+        position: absolute;
+        top: 14px;
+        right: 14px;
       }
     }
     .modal-body {
@@ -426,15 +429,14 @@ rect.body {
 
       .form-group{
         margin-bottom: 25px;
-        &.checkbox{
-          @include checkbox();
-        }
         label{
           color:$greyish-text;
-          margin-bottom: 14px;
           font-size:14px;
           &:not(:first-of-type){
             margin-top: 25px;
+          }
+          &:not(.checkbox){
+            margin-bottom: 14px;
           }
         }
       }
@@ -448,13 +450,12 @@ rect.body {
     }
     .modal-footer {
       border-top: 0;
-      padding:34px 38px 38px;
+      padding: 38px 38px 38px;
       button{
         margin-left: 0px;
       }
-      padding: 38px 38px 38px!important;
 
-    }
+    } 
   }
 }
   
