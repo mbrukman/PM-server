@@ -226,7 +226,7 @@
 
 @mixin input {
   input{
-    height: 36px;
+    height: $dropdown-label-height;
     border-radius: 3px;
     background-color: #3f4247;
     &::placeholder{
@@ -237,7 +237,7 @@
 
 @mixin select{
   select{
-    height: 36px;
+    height: $dropdown-label-height;
     border-radius: 3px;
     background-color: #3f4247;
     &::placeholder{
@@ -257,46 +257,189 @@
   }
 }
 
+@mixin autocomplete(){
+  ::ng-deep .ui-autocomplete {
+    display: flex !important;
+
+    input{
+        height: $dropdown-label-height;
+        font-size: 1rem;
+        width: 90%;
+    }
+    .ui-clickable{
+        padding-bottom: 14px;
+    }
+    .ui-autocomplete-items{
+        background-color: dimgrey;
+    }
+
+    .ui-autocomplete-dropdown.ui-button{
+        height: $dropdown-label-height;
+    }
+
+    input{
+      height: $dropdown-label-height;
+      font-size: 1rem;
+      width: 100%
+    }
+
+    .pi{
+        display: inline-block;
+        font:normal normal normal 14px/1 FontAwesome;
+        -webkit-font-smoothing: antialiased;
+      }
+    .pi-caret-down::before{
+        content: "\f0d7";
+        font-size: 14px;
+    }
+    .pi-fw{
+        text-align: center;
+    }
+
+  }
+}
+
 @mixin dropdown(){
   ::ng-deep{
     p-dropdown{
-      
-      label{
-        font-size: 14px;
-        color: #dddddd;
-        padding: 10px;
-        width: 198px;
-        padding-right: 30px;
-        @include ellipsis();
-      }
+      outline:none;
+      width: 100%;
+      display: inline-block;
+      .ui-dropdown{
+        width: 100%;
+        height: $dropdown-label-height;
+        outline:none;
+        overflow: visible;
+        &:not(.ui-state-disabled):hover{
+          background-color: $kh-background;
+        }
 
-      .ui-dropdown-trigger {
-        padding: 10px;
-        margin-right: 10px;
+        .ui-dropdown-label{
+          font-size: 14px;
+          color: $greyish-text;
+          padding-left: 10px;
+          display: flex;
+          align-items: center;
+          height: $dropdown-label-height;
+          border-radius: 3px;
+          background-color: $card-background;
+          @include ellipsis();
+        }
+
+        .ui-dropdown-trigger {
+          margin-right: 10px;
+          .pi{
+            display: inline-block;
+            font:normal normal normal 14px/1 FontAwesome;
+            -webkit-font-smoothing: antialiased;
+          }
+          .pi-chevron-down::before{
+            content: "\f078";
+            font-size: 14px;
+          }
+          .ui-dropdown-trigger-icon{
+            color:white;
+            font-size: inherit;
+            display: flex;
+            align-items: center; 
+          }
+        }
+
+        .ui-dropdown-panel{
+          border:1px solid $cool-grey;
+          font-size: 14px;
+          height: auto;
+          max-height: 178px;
+          background-color: $dropdown-list-bck;
+          border-radius: 3px;
+          position: relative;
+          top: 0 !important;
+          .ui-dropdown-filter-container{
+            height: auto;
+            max-height: 50px;
+            input{
+              padding-left: 6px;
+              background-color: $card-background;
+              height: $dropdown-label-height;
+            }
+            span{
+              top:17px;
+              &.pi{
+                display: inline-block;
+                font:normal normal normal 14px/1 FontAwesome;
+                -webkit-font-smoothing: antialiased;
+              }
+              &.pi-search::before{
+                content: "\f002";
+                font-size: 14px;
+              }
+            }
+          }
+
+          .ui-dropdown-items-wrapper{
+            height: auto;
+            max-height: 138px!important;
+            border-radius: 3px;
+            background-color: $dropdown-list-bck;
+            overflow-y: auto;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+            border-top:1px solid $dropdown-border;
+            position: absolute;
+            width: 100%;
+            z-index: 1;
+            .ui-dropdown-list{
+              padding:6px;
+              height: 100%;
+
+              .ui-dropdown-item{
+                height: 30px;
+                color: $greyish-text;
+                padding-left: 9px;
+                display: flex;
+                align-items: center;
+                border-radius: 3px;
+                span{
+                  @include ellipsis();
+                }
+                // not selected
+                &:not(.ui-state-highlight){
+                  color: $greyish-text;
+                  &:hover{
+                    background-color: $dropdown-item-hover;
+                  }
+                }
+        
+                // selected
+                &.ui-state-highlight{
+                  background-color: $pale-blue;
+                  color: $text-color;
+                }
+              }
+            }
+
+            &::-webkit-scrollbar {
+              width: 18px;
+            }
+            
+            &::-webkit-scrollbar-thumb {
+              border-right: 6px solid rgba(0, 0, 0, 0);
+              border-left: 6px solid rgba(0, 0, 0, 0);
+              background-clip: padding-box;
+              border-radius: 7px;
+              background-color: rgba(0, 0, 0, 0.15);
+              box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.05), inset 1px 1px 0px rgba(0, 0, 0, 0.05);
+            }
+            &::-webkit-scrollbar-button {
+              width: 0;
+              height: 0;
+              display: none;
+            }
+            &::-webkit-scrollbar-corner {
+              background-color: transparent;
+            }
+          }
+        }
       }
-      .ui-dropdown-panel{
-        border:1px solid $cool-grey;
-        font-size: 14px;
-      }
-      .ui-state-highlight{
-        background-color: $pale-blue;
-        color: #000000;
-        padding: 10px;
-        margin-bottom: 10px;
-      }
-      .ui-dropdown-item:not(.ui-state-highlight){
-        border-radius: 3px;
-        margin-bottom: 10px;
-        padding: 10px;
-        color: #dddddd;
-      }
-      .ui-dropdown-item:not(.ui-state-highlight):hover{
-        background-color: $pale-blue;
-        color: #000000;
-        margin-bottom: 10px;
-      }
-      
-      
     }
   }
 }

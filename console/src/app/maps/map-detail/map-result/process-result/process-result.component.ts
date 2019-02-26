@@ -87,7 +87,7 @@ export class ProcessResultComponent implements OnChanges {
     }, { success: 0, error: 0, stopped: 0, partial: 0 });
     
     // formatting for chart
-    this.agProcessActionsStatus = Object.keys(agActionsStatus).map((o) => {
+    this.agProcessActionsStatus = Object.keys(agActionsStatus).map((o) => { 
       return { name: o, value: agActionsStatus[o] };
     });
     

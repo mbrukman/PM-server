@@ -318,7 +318,7 @@ table, .table {
     padding-left: 10px;
     display: flex;
     align-items: center;
-    height: 36px;
+    height: $dropdown-label-height;
     color: $text-color !important ;
     &:hover {
       border-radius: 3px;
@@ -377,17 +377,12 @@ rect.body {
 }
 .modal-content{
   background: $background;
-  .pm-modal {
+  .modal-content-wrapper {
     background: $background;
     border-radius: 6px;
     box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.75);
-    .modal-header {
-      border-bottom: 0;
-      flex-direction: column;
-      border-bottom: 1px solid #404549;
-      padding: 14px 14px 0px;
-
-      &.no-title{
+    &.no-title{
+      .modal-header{
         border: none;
         position: absolute;
         right: 40px;
@@ -395,24 +390,56 @@ rect.body {
         z-index: 1;
         .close{
           position: absolute;
+          margin:-5px -24px -28px auto;
         }
       }
-      
+    }
+    &:not(.no-title){
+      .modal-body{
 
+        padding: 40px 38px 0px;
+      }
+    }
+    .modal-header {
+      border-bottom: 0;
+      flex-direction: column;
+      border-bottom: 1px solid #404549;
+      padding: 14px 14px 0px;
+      padding-top: 0 !important;
+      height: 64px;
+      position: relative;
       h4{
         font-size: 22px;
         font-weight: 300;
         margin: auto;
-        padding-bottom: 19px;
       }
       .close {
+        padding: 0;
+        margin: 0;
         color: $text-color;
         cursor: pointer;
+        position: absolute;
+        top: 14px;
+        right: 14px;
       }
     }
     .modal-body {
-      padding: 24px 38px 0px;
       border-bottom: 0;
+      padding: 53px 38px 0px;
+
+      .form-group{
+        margin-bottom: 25px;
+        label{
+          color:$greyish-text;
+          font-size:14px;
+          &:not(:first-of-type){
+            margin-top: 25px;
+          }
+          &:not(.checkbox){
+            margin-bottom: 14px;
+          }
+        }
+      }
       &.no-button{
         margin-bottom: 38px;
       }
@@ -420,15 +447,15 @@ rect.body {
       .form-group:last-child{
         margin-bottom: 0px; 
       }
-
     }
     .modal-footer {
       border-top: 0;
-      padding:34px 38px 38px;
+      padding: 38px 38px 38px;
       button{
         margin-left: 0px;
       }
-    }
+
+    } 
   }
 }
   

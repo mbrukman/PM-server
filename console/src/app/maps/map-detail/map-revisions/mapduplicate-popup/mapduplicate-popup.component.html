@@ -1,17 +1,19 @@
-<div class="pm-modal">
-  <div class="modal-header no-title">
+<div class="modal-content-wrapper no-title">
+  <div class="modal-header">
     <i class="material-icons close" (click)="onClose()">close</i>
   </div>
   <div class="modal-body">
     <div class="form-group">
-        <label>Map name</label>
+      <label>Map name</label>
       <input type="text" class="form-control" [(ngModel)]="optionsPopup.name">
     </div>
     <div class="form-group">
-      <label class="form-check-label">
-      <input type="checkbox" class="form-check-input" [(ngModel)]="optionsPopup.isChecked">
-        Would you like to use the same agent ?
+      <label class="control control-checkbox checkbox">
+          <input type="checkbox" class="form-control" [(ngModel)]="optionsPopup.isChecked">
+          Would you like to use the same agent ?
+          <div class="control_indicator check-control"></div>
       </label>
+
     </div>
   </div>
 

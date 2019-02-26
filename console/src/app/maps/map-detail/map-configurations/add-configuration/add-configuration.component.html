@@ -1,14 +1,16 @@
-<div class="pm-modal">
+<div class="modal-content-wrapper">
   <div class="modal-header">
-    <i class="material-icons close" (click)="onClose(false)">close</i>
-    <h4>Add Configuration</h4>
+    <i class="material-icons close" (click)="onClose()">close</i>
+    <h4>Enter configuration name</h4>
   </div>
   <div class="modal-body">
-    <label>Configuration Name</label>
-    <input type="text" class="form-control" [(ngModel)]="name">
+    <div class="content-wrapper">
+      <input type="text" class="form-control" [(ngModel)]="name">
+      <small *ngIf="configExist" class="error-color">This configuration's name already exists</small>
+    </div>
   </div>
   <div class="modal-footer">
-    <button type="button" class="kh-btn kh-btn-gray" (click)="onClose(false)"><span>Cancel</span></button>
-    <button class="kh-btn-blue kh-btn" (click)="onClose(true)"><span>Confirm</span></button>
+    <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>
+    <button class="kh-btn-blue kh-btn" (click)="onConfirm()"><span>Confirm</span></button>
   </div>
 </div>

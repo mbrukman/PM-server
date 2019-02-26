@@ -1,0 +1,26 @@
+@import "~src/assets/sass/mixins";
+@include dropdown();
+.params{
+    .row{
+        .header{
+            font-size: 14px;
+            font-weight: bold;
+            color:$pale-blue;
+            padding-right: 0;
+            padding-left: 0;
+            margin-bottom: 14px;
+        }
+     }
+     .row-param{
+         margin-bottom: 25px;
+          .param-name{
+             font-size: 14px;
+             padding-left: 0;
+         }
+
+         .col-8{
+             padding-right: 0;
+             padding-left: 0;
+         }
+     }
+ }

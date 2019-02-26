@@ -16,7 +16,7 @@ export class PluginSettingsComponent implements OnInit{
     settingsForm: FormGroup = new FormGroup({});
     plugin = new Plugin();
     methods: object = {};
-    options:any = []
+    paramOptionsDropDown = {};
     constructor(private route: ActivatedRoute,private pluginsService: PluginsService,private router:Router){}
 
     ngOnInit(){
@@ -26,8 +26,14 @@ export class PluginSettingsComponent implements OnInit{
             this.plugin = plugin;
             this.initSettingsForm();
             this.generateAutocompleteParams();
-        
-            
+            for(let i=0,length=this.plugin.settings.length;i<length;i++){
+                if(this.plugin.settings[i].options.length > 0){
+                    let options = this.plugin.settings[i].options.map(opt => {
+                        return {label:opt.name,value:opt.id}
+                    })
+                    this.paramOptionsDropDown[this.plugin.settings[i].name]=options;
+                }
+            }
         }) 
     }
 
@@ -47,6 +53,7 @@ export class PluginSettingsComponent implements OnInit{
                 data[1].forEach(param => {
                     if(param.valueType == 'autocomplete'){
                         this.plugin.settings[this.plugin.settings.findIndex(p => p.name == param.name)] = param
+                        
                     }
                 })
             

@@ -20,7 +20,7 @@ export class MapCreateComponent implements OnInit, OnDestroy {
   projects: Project[];
   paramsReq: any;
   map: Map;
-
+  projectsDropDown:any;
   constructor(private mapsService: MapsService, private projectsService: ProjectsService, private router: Router, private route: ActivatedRoute) {
   }
 
@@ -43,6 +43,9 @@ export class MapCreateComponent implements OnInit, OnDestroy {
       var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt'};
       this.projectsReq = this.projectsService.filter(null,null,filterOptions).subscribe(data => {
         this.projects = data.items;
+        this.projectsDropDown = this.projects.map(project => {
+          return {label:project.name,value:project._id}
+        })
         if (params.map) {
           data.items.forEach(project => {
             const index = (<string[]>project.maps).indexOf(params.map);

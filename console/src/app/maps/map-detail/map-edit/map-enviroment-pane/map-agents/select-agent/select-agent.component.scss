@@ -1,14 +1,15 @@
 @import "~src/assets/sass/variables";
 @import "~src/assets/sass/mixins";
 
-.pm-modal{
+.modal-content-wrapper{
   display: inherit;
   width: 607px;
-
-  .modal-header {
-    padding-bottom: 0;
-  
-  
+  .modal-header{
+    height: inherit;
+    h4{
+      padding-bottom: 21px;
+      padding-top: 26px;
+    }
   }
   .modal-body {
     padding-top: 0px;
@@ -26,7 +27,7 @@
       
       @include p-checkbox();
 
-    ::ng-deep {
+    ::ng-deep { 
       th{
         padding: 7px;
       }
@@ -40,7 +41,7 @@
   .ui-widget-header{
     width: 214px;
     height: 36px;
-    margin: 29px 0px 35px
+    margin: 53px 0px 35px
   } 
   .tabs{
     margin-top: 2px;
