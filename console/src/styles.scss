@@ -435,7 +435,7 @@ rect.body {
           &:not(:first-of-type){
             margin-top: 25px;
           }
-          &:not(.checkbox){
+          &:not(.checkbox.ui-dropdown-label){
             margin-bottom: 14px;
           }
         }
