@@ -4,6 +4,7 @@ import { BsModalService } from 'ngx-bootstrap';
 import { MapStructureConfiguration, MapStructure } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { AddConfigurationComponent } from '@maps/map-detail/map-configurations/add-configuration/add-configuration.component';
+import { filter, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-main-map-configurations',
@@ -37,9 +38,9 @@ export class MapConfigurationsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.mapsService.getCurrentMapStructure()
-      .filter(structure => !!structure)
-      .subscribe(structure => {
+    this.mapsService.getCurrentMapStructure().pipe(
+      filter(structure => !!structure)
+    ).subscribe(structure => {
         this.mapStructure = structure;
         if (!this.selectedConfiguration && structure.hasOwnProperty('configurations') && structure.configurations.length) {
           this.editConfiguration(0);
@@ -48,8 +49,9 @@ export class MapConfigurationsComponent implements OnInit {
   }
 
   addNewConfiguration() {
-    this.modalService.show(AddConfigurationComponent).content.result
-      .take(1)
+    const modal = this.modalService.show(AddConfigurationComponent);
+    modal.content.configurations = this.mapStructure.configurations;
+    modal.content.result
       .filter(name => !!name)
       .subscribe(name => {
         this.mapStructure.configurations.push(new MapStructureConfiguration(name, '{\n\n}'));
@@ -72,6 +74,7 @@ export class MapConfigurationsComponent implements OnInit {
     }
 
     this.selectedConfiguration = this.mapStructure.configurations[index];
+    this.updateMapStructure();
   }
 
   updateMapStructure() {

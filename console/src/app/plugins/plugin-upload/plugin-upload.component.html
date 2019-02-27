@@ -1,15 +1,13 @@
-<div class="pm-modal">
+<div class="modal-content-wrapper">
   <div class="modal-header">
+    <i class="material-icons close" (click)="onClose()">close</i>
     <h4>Add new plugin</h4>
-    <button type="button" class="close" (click)="onClose()" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
   </div>
   <div class="modal-body">
     <input type="file" (change)="onPluginSelect($event)" [hidden]="uploading">
     <i class="fa fa-spinner fa-spin fa-3x fa-fw" *ngIf="uploading"></i>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn pm" (click)="onClose()">Cancel</button>
+    <button type="button" class="kh-btn-gray kh-btn" (click)="onClose()">Cancel</button>
   </div>
 </div>

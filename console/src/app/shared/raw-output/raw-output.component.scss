@@ -6,32 +6,23 @@
     height: 100%;
     width: 100%;
     max-width: initial;
-
-    .modal-content{
-        background-color: #ffffff00;
-    }
 }
 
-.container {
-    &.pm-modal{
-        max-width: initial;
-        max-height: 85vh;
-        overflow-y: auto;
-        width: 85vw;
-        max-width: 1300px;
 
-        .modal-header{
-            position: absolute;
-            right: 30px;
-            top: 5px;
-            z-index: 1;
-        }
+.modal-content-wrapper{
+    max-width: initial;
+    max-height: 85vh;
+    overflow-y: auto;
+    width: 85vw;
+    max-width: 1300px;
 
-        .modal-body{
-            > ul > li {
-                white-space: pre-line;
-                word-break: break-word;
-            }
+  
+
+    .modal-body{
+        > ul > li {
+            white-space: pre-line;
+            word-break: break-word;
+            margin: 0px;
         }
     }
 }

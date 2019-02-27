@@ -1,8 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-
-import { Subscription } from 'rxjs/Subscription';
 import * as _ from 'lodash';
 import { BsModalService } from 'ngx-bootstrap/modal';
 
@@ -10,16 +8,19 @@ import { MapsService } from '../maps.service';
 import { MapStructureConfiguration, Map, MapStructure } from '@maps/models';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { SocketService } from '@shared/socket.service';
+import { filter, take } from 'rxjs/operators';
+import { Subject, Subscription } from 'rxjs';
 
 
 @Component({
   selector: 'app-map-detail',
   templateUrl: './map-detail.component.html',
   styleUrls: ['./map-detail.component.scss'],
-  host : {
+  host: {
     '(document:keydown)': 'onKeyDown($event)'
   }
 })
+
 export class MapDetailComponent implements OnInit, OnDestroy {
   id: string;
   originalMap: Map;
@@ -37,21 +38,22 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   edited: boolean = false;
   structureEdited: boolean = false;
   initiated: boolean = false;
-  mapExecutionSubscription: Subscription;
+  mapExecutionSubscription: Subscription; 
   executing: boolean;
   downloadJson: SafeUrl;
-  selected: number;
-  navItems: [{
+  configurationDropDown=[];
+  selected: MapStructureConfiguration;
+  navItems: {
     name: string,
     routerLink: string[]
-  }];
+  }[];
 
   constructor(private route: ActivatedRoute,
-              private router: Router,
-              private sanitizer: DomSanitizer,
-              private mapsService: MapsService,
-              private socketService: SocketService,
-              private modalService: BsModalService) {
+    private router: Router,
+    private sanitizer: DomSanitizer,
+    private mapsService: MapsService,
+    private socketService: SocketService,
+    private modalService: BsModalService) {
 
     this.navItems = [
       { name: 'Properties', routerLink: ['properties'] },
@@ -96,9 +98,9 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       });
     });
 
-    this.mapsService.getCurrentMap()
-      .filter(map => map)
-      .subscribe(map => {
+    this.mapsService.getCurrentMap().pipe(
+      filter(map => map)
+    ).subscribe(map => {
         this.map = map;
         this.originalMap.archived = map.archived;
         if (!_.isEqual(map, this.originalMap)) {
@@ -108,9 +110,9 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure()
-      .filter(structure => !!structure)
-      .subscribe(structure => {
+    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(
+      filter(structure => !!structure)
+    ).subscribe(structure => {
         let newContent;
         let oldContent;
         if (!this.initiated) {
@@ -131,15 +133,20 @@ export class MapDetailComponent implements OnInit, OnDestroy {
                 position: c.position
               };
             });
-        } catch (e) {}
+        } catch (e) { }
 
         const compareStructure = this.cleanStructure(JSON.parse(JSON.stringify(structure)));
         const compareOriginalStructure = this.cleanStructure(JSON.parse(JSON.stringify(this.originalMapStructure)));
         delete compareStructure.content;
         delete compareOriginalStructure.content;
         this.structureEdited = (JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent);
-        
         this.mapStructure = structure;
+        this.configurationDropDown = this.mapStructure.configurations.map(config => {
+          return {label:config.name, value:config}
+        })
+        if(this.configurationDropDown.length == 0){
+          this.configurationDropDown.push({label:"No config",value:''})
+        }
         this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
           return o.id === structure.id;
         });
@@ -148,15 +155,18 @@ export class MapDetailComponent implements OnInit, OnDestroy {
 
         if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0) {
           const selected = this.mapStructure.configurations.findIndex(o => o.selected);
-          this.selected = selected !== -1 ? selected : 0;
+          this.selected = selected !== -1 ? this.mapStructure.configurations[selected] : null;
         }
+
+
       });
 
 
+
     // get the current executing maps
-    this.mapsService.currentExecutionList()
-      .take(1)
-      .subscribe(executions => {
+    this.mapsService.currentExecutionList().pipe(
+      take(1)
+    ).subscribe(executions => {
         const maps = Object.keys(executions).map(key => executions[key]);
         this.executing = maps.indexOf(this.id) > -1;
       });
@@ -167,6 +177,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       this.executing = maps.indexOf(this.id) > -1;
     });
   }
+
 
   ngOnDestroy() {
     this.routeReq.unsubscribe();
@@ -234,7 +245,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     structure.processes.forEach((process, i) => {
       delete structure.processes[i]._id;
       delete structure.processes[i].plugin;
-      structure.processes[i].used_plugin? delete structure.processes[i].used_plugin._id : null;
+      structure.processes[i].used_plugin ? delete structure.processes[i].used_plugin._id : null;
       delete structure.processes[i].createdAt;
       delete structure.createdAt;
       delete structure.updatedAt;
@@ -258,7 +269,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   }
 
   executeMap() {
-    this.mapExecReq = this.mapsService.execute(this.id, (!this.selected || this.selected!==0) ? undefined : this.mapStructure.configurations[this.selected].name).subscribe();
+    let index = this.mapStructure.configurations.findIndex(conf => conf.name == this.selected.name)
+    this.mapExecReq = this.mapsService.execute(this.id, (!this.selected) ? undefined : this.mapStructure.configurations[index].name).subscribe();
   }
 
   saveMap() {
@@ -287,7 +299,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       delete this.mapStructure.id;
       delete this.mapStructure.createdAt;
       this.mapsService.createMapStructure(this.map.id, this.mapStructure).subscribe((structure) => {
-        
+
         this.originalMapStructure = _.cloneDeep(this.mapStructure);
 
         this.structureEdited = false;
@@ -303,7 +315,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   checkConfigurationValidity(configurations: MapStructureConfiguration[]): boolean {
     for (let i = 0; i < configurations.length; i++) {
       try {
-        if (typeof(configurations[i].value) === 'string') {
+        if (typeof (configurations[i].value) === 'string') {
           configurations[i].value = JSON.parse(<string>(configurations[i].value));
         }
       } catch (e) {
@@ -326,25 +338,36 @@ export class MapDetailComponent implements OnInit, OnDestroy {
    */
   canDeactivate() {
     // will be triggered by deactivate guard
-    if (this.edited || this.structureEdited) {
-      let modal = this.modalService.show(ConfirmComponent);
-      let answers = {
-        confirm: 'Discard',
-        third: 'Save and continue',
-        cancel: 'Cancel'
-      };
-      modal.content.message = 'You have unsaved changes that will be lost by this action. Discard changes?';
-      modal.content.confirm = answers.confirm;
-      modal.content.third = answers.third;
-      modal.content.cancel = answers.cancel;
-      return modal.content.result.asObservable()
-        .do(ans => {
-          if (ans === answers.third) {
-            this.saveMap();
-          }
-        }).map(ans => ans !== answers.cancel);
+    if (!this.edited && !this.structureEdited) {
+      return true;
     }
-    return true;
+    let modal = this.modalService.show(ConfirmComponent);
+    let answers = {
+      confirm: 'Discard',
+      third: 'Save and continue',
+      cancel: 'Cancel'
+    };
+    modal.content.message = 'You have unsaved changes that will be lost by this action. Discard changes?';
+    modal.content.confirm = answers.confirm;
+    modal.content.third = answers.third;
+    modal.content.cancel = answers.cancel;
+
+    let subject = new Subject<boolean>();
+
+    this.modalService.setDismissReason('Yes');
+    this.modalService.onHide.subscribe(() => {
+      return subject.next(false)
+    })
+
+    modal.content.result.subscribe(result => {
+      if (result === answers.third) {
+        this.saveMap();
+        return subject.next(true);
+      }
+      return subject.next(result === answers.confirm);
+    })
+
+    return subject.asObservable()
   }
 
   /**
@@ -352,8 +375,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
    * @param {number} index
    */
   changeSelected() {
-    this.mapStructure.configurations.forEach((configuration, i) => {
-      configuration.selected = (this.selected.toString() === i.toString());
+    this.mapStructure.configurations.forEach((configuration) => {
+      configuration.selected = (this.selected.name == configuration.name)
     });
     this.mapsService.setCurrentMapStructure(this.mapStructure);
   }
@@ -361,11 +384,14 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   onKeyDown($event: KeyboardEvent) {
     let charCode = String.fromCharCode($event.which).toLowerCase();
     if ($event.ctrlKey && charCode === 's') {
-        // Action on Ctrl + S
-        this.saveMap();
-        $event.preventDefault();
-    } 
+      // Action on Ctrl + S
+      this.saveMap();
+      $event.preventDefault();
+    }
   }
 
 
 }
+
+  
+

@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
-@import "~assets/sass/variables";
-@import "~assets/sass/base";
+@import "~src/assets/sass/variables";
+@import "~src/assets/sass/base";
+@import "~src/assets/sass/mixins";
 
 @font-face {
   font-family: "OpenSans";
@@ -272,6 +273,9 @@ table, .table {
       &:hover {
         background-color: $hover-color !important;
         box-shadow: -4px 0px 0px 0px $turquoise-blue;
+        .ui-cell-data{
+          color:#dddddd;
+        }
       }
     }
   }
@@ -300,19 +304,28 @@ table, .table {
 }
 
 // dropdown
-.dropdown-item {
-  color: $text-color !important;
-  background: $background;
-  &:hover {
-    color: #000 !important;
-    background: $turquoise-blue !important;
 
-  }
-}
 
 .dropdown-menu {
-  background: $selected-tab-environment;
-  color: $text-color;
+  border-radius: 3px;
+  border: 1px solid #868e96;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+  background: $kh-background;
+  padding:  9px 7px;
+  margin: 0px;
+  font-size: 14px;
+  .dropdown-item {
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+    height: $dropdown-label-height;
+    color: $text-color !important ;
+    &:hover {
+      border-radius: 3px;
+      color: white;
+      background: $pale-blue;
+    }
+  }
 }
 
 .menuitem {
@@ -362,25 +375,90 @@ rect.body {
     }
   }
 }
-
-.pm-modal {
+.modal-content{
   background: $background;
-  box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.75);
-  .modal-header {
-    border-bottom: 0;
-    button.close {
-      color: $text-color;
-      cursor: pointer;
+  .modal-content-wrapper {
+    background: $background;
+    border-radius: 6px;
+    box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.75);
+    &.no-title{
+      .modal-header{
+        border: none;
+        position: absolute;
+        right: 40px;
+        top: 2px;
+        z-index: 1;
+        .close{
+          position: absolute;
+          margin:-5px -24px -28px auto;
+        }
+      }
     }
-  }
-  .modal-body {
-    border-bottom: 0;
-  }
-  .modal-footer {
-    border-top: 0;
+    &:not(.no-title){
+      .modal-body{
+
+        padding: 40px 38px 0px;
+      }
+    }
+    .modal-header {
+      border-bottom: 0;
+      flex-direction: column;
+      border-bottom: 1px solid #404549;
+      padding: 14px 14px 0px;
+      padding-top: 0 !important;
+      height: 64px;
+      position: relative;
+      h4{
+        font-size: 22px;
+        font-weight: 300;
+        margin: auto;
+      }
+      .close {
+        padding: 0;
+        margin: 0;
+        color: $text-color;
+        cursor: pointer;
+        position: absolute;
+        top: 14px;
+        right: 14px;
+      }
+    }
+    .modal-body {
+      border-bottom: 0;
+      padding: 53px 38px 0px;
+
+      .form-group{
+        margin-bottom: 25px;
+        label{
+          color:$greyish-text;
+          font-size:14px;
+          &:not(:first-of-type){
+            margin-top: 25px;
+          }
+          &:not(.checkbox.ui-dropdown-label){
+            margin-bottom: 14px;
+          }
+        }
+      }
+      &.no-button{
+        margin-bottom: 38px;
+      }
+
+      .form-group:last-child{
+        margin-bottom: 0px; 
+      }
+    }
+    .modal-footer {
+      border-top: 0;
+      padding: 38px 38px 38px;
+      button{
+        margin-left: 0px;
+      }
+
+    } 
   }
 }
-
+  
 .ui-datepicker {
   background: $background;
   .ui-datepicker-header {
@@ -494,7 +572,7 @@ span[contenteditable=true]{
 .head-title{
   width: 100%;
   height: 70px;
-  background-color: #25292c;
+  background-color: $kh-background;
   display: flex;
   align-items: center;
   h1{
@@ -522,8 +600,5 @@ span[contenteditable=true]{
 }
 
 .ellipsis{
-  max-width: 100%;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
+  @include ellipsis();
 }

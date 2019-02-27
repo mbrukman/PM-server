@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 
 import { BsModalRef } from 'ngx-bootstrap';
 import { ProjectsService } from '@projects/projects.service';
+import { mergeMap } from 'rxjs/operators';
 
 @Component({
   templateUrl: './import-modal.component.html',
@@ -26,9 +27,9 @@ export class ImportModalComponent {
       this.error = 'All fields are required';
       return ;
     }
-    this.projectsService.createMap({ name: this.name, project: this.projectId })
-      .flatMap(map => this.projectsService.createMapStructure(map.id, this.structure))
-      .subscribe(structure => {
+    this.projectsService.createMap({ name: this.name, project: this.projectId }).pipe(
+      mergeMap(map => this.projectsService.createMapStructure(map.id, this.structure))
+    ).subscribe(structure => {
         this.router.navigate(['/maps', structure.map]);
         this.onClose();
       })
@@ -44,7 +45,7 @@ export class ImportModalComponent {
     reader.onload = () => {
       const text = reader.result;
       try {
-        this.structure = JSON.parse(text);
+        this.structure = JSON.parse(text.toString());
       } catch (e) {
         this.error = e;
         return

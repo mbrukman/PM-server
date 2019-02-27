@@ -3,14 +3,12 @@
   <h3>Edit
     <span>{{processViewWrapper.process.name}}</span>
   </h3>
-  <div >
-    <div class="btn-group" dropdown placement="bottom right">
-      <span class="dropdown-pm" dropdownToggle><i class="fa fa-ellipsis-h" aria-hidden="true"></i></span>
+    <div class="dropdown-pm btn-group" dropdown placement="bottom right">
+      <span  dropdownToggle><i class="fa fa-ellipsis-h" aria-hidden="true"></i></span>
       <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
-        <li role="menuitem"><a class="dropdown-item" (click)="deleteProcess()">Delete</a></li>
+        <a class="dropdown-item" (click)="deleteProcess()">Delete</a>
       </ul>
     </div>
-  </div>
 </div>
 
 <div class="process-form">
@@ -78,23 +76,22 @@
           <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
         </div>
 
-        <div class="form-group">
+        <div class="form-group dropdown">
           <label>Agents flow control</label>
-          <select class="form-control" formControlName="flowControl">
-            <option value="each">{{FLOW_CONTROL_TYPES.each.label}}</option>
-            <option value="wait">{{FLOW_CONTROL_TYPES.wait.label}}</option>
-            <option value="race">{{FLOW_CONTROL_TYPES.race.label}}</option>
-          </select>
+          <p-dropdown  [options]="flowControlDropDown" placeholder="Select a Flow control" formControlName="flowControl"  
+                      [autoWidth]="false">
+          </p-dropdown>
+
           <small class="form-text text-muted">Controlling syncing between agents.</small>
         </div>
 
-        <div class="form-group" *ngIf="processViewWrapper.process?.coordination">
+        <div class="form-group dropdown" *ngIf="processViewWrapper.process?.coordination">
           <label>Process coordination</label>
-          <select class="form-control" formControlName="coordination">
-            <option value="wait" *ngIf="!processViewWrapper.isInsideLoop">{{COORDINATION_TYPES.wait.label}}</option>
-            <option value="race">{{COORDINATION_TYPES.race.label}}</option>
-            <option value="each">{{COORDINATION_TYPES.each.label}}</option>
-          </select>
+          <p-dropdown  [options]="coordinationDropDown" placeholder="Select a Coordination" formControlName="coordination"  
+                      [autoWidth]="false">
+                      </p-dropdown>
+
+
           <small class="form-text text-muted">Controlling process sync.</small>
         </div>
       </accordion-group>
@@ -133,10 +130,10 @@
             <div class="d-flex justify-content-between action-tile">
               <span *ngIf="processForm.get('actions').at(i).get('name').value">{{processForm.get('actions').at(i).get('name').value}} (#{{i + 1}})</span>
               <span *ngIf="!processForm.get('actions').at(i).get('name').value">Action #{{i + 1}}</span>
-              <span>
-              <i class="material-icons pointer" (click)="editAction(i)">mode_edit</i>
-              <i class="material-icons pointer" (click)="removeAction(i)"> delete_outline</i>
-          </span>
+              <span class="action-btns">
+                <i class="material-icons pointer" (click)="editAction(i)">mode_edit</i>
+                <i class="material-icons pointer" (click)="removeAction(i)"> delete_outline</i>
+              </span>
             </div>
           </div>
         </div>
@@ -148,7 +145,7 @@
     <div *ngIf="action" [formGroup]="processForm.controls.actions.at(index)" class="action-form">
       <div class="header">
         <div class="header-action">Edit Action / Add Action</div>
-        <button type="button" class="btn btn-link" (click)="backToProcessView()">
+        <button type="button" class="btn btn-link arrow-btn" (click)="backToProcessView()">
           <i class="material-icons text-light">arrow_forward</i>
         </button>
       </div>
@@ -179,14 +176,18 @@
         <small class="form-text text-muted">If the action fails the process will stop (with failure).</small>
       </div>
       <p class="lead">Method</p>
-      <select id="inputState" class="form-control" formControlName="method" (change)="onSelectMethod()">
-        <option selected disabled>Select a method</option>
-        <option *ngFor="let method of this.processViewWrapper.plugin.methods" id="method._id" [ngValue]="method.name">{{method.viewName}}
-        </option>
-      </select>
+
+      <div class="dropdown">
+          <p-dropdown id="inputState" [options]="methodsDropDown" placeholder="Select a Method" formControlName="method"  
+          (onChange)="onSelectMethod()"
+          [autoWidth]="false">
+          </p-dropdown>
+      </div>
+
+
 
       <div formArrayName="params">
-        <div class="row row-title">
+        <div [hidden]="!selectedMethod" class="row row-title">
           <div class="col-4">Name</div>
           <div class="col-2">Code?</div>
           <div class="col-6">Value</div>
@@ -205,21 +206,16 @@
               </div>
               <hr>
               
-              <div class="col-6" [ngSwitch]="param.value.type" [hidden]="param.value.code">
+              <div class="col-6 dropdown" [ngSwitch]="param.value.type" [hidden]="param.value.code">
                 <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
                 
                 <app-vault-selector *ngSwitchCase="'vault'" formControlName="value"></app-vault-selector>
-
-                <select formControlName="value" class="form-control" *ngSwitchCase="'autocomplete'"> 
-                  <option *ngFor="let opt of methods[processForm.value.actions[index].method].params[k].options"
-                          [ngValue]="opt.id">{{ opt.value }}
-                  </option>
-                </select>
-                <select formControlName="value" class="form-control" *ngSwitchCase="'options'">
-                  <option *ngFor="let opt of methods[processForm.value.actions[index].method].params[k].options"
-                          [ngValue]="opt.id">{{ opt.name }}
-                  </option>
-                </select>
+                <p-dropdown *ngSwitchCase="'autocomplete'" [options]="methods[processForm.value.actions[index].method].params[k].options"  placeholder="Select an option" formControlName="value"  
+                            [autoWidth]="false">
+                </p-dropdown>
+                <p-dropdown *ngSwitchCase="'options'" [options]="methods[processForm.value.actions[index].method].params[k].options"  placeholder="Select an option" formControlName="value"  
+                            [autoWidth]="false">
+                </p-dropdown>
                 <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
                 <input formControlName="value" type="checkbox" class="form-control" *ngSwitchCase="'boolean'">
                 <input formControlName="value" type="number" class="form-control" *ngSwitchCase="'int'">

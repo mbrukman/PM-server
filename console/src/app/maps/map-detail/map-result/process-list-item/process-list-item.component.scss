@@ -8,9 +8,13 @@
 
 .process{
   display: flex;
-
+  
   .process-status{
     margin-right: 4px;
+    .material-icons {
+      font-size: 13px;
+      margin-right: 7px;
+  }
   }
 
   .process-name{

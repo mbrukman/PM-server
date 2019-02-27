@@ -1,5 +1,5 @@
-@import "~assets/sass/base";
-@import "~assets/sass/variables";
+@import "~src/assets/sass/base";
+@import "~src/assets/sass/variables";
 
 .design-wrapper{
   display: flex;
@@ -24,6 +24,9 @@
       align-items: center;
       .material-icons{
         cursor: pointer;
+        &:hover{
+          color: white;
+        }
       }
     }
 

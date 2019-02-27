@@ -157,6 +157,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
   addPluginsToGraph() {
     let plugins = [];
     let iteration = 0;
+    const pluginHeight = 73;
     this.pluginsSearch.forEach(plugin => {
       let imageModel = new joint.shapes.devs['MyImageModel']({
         position: {
@@ -165,7 +166,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
         },
         size: {
           width: 100,
-          height: 73
+          height: pluginHeight
         },
         attrs: {
           '.label': { text: this.getPluginCubeText(plugin.name) },
@@ -185,7 +186,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
       plugins.push(imageModel);
       iteration++;
     });
-    this.stencilPaper.svg.style.height = `${iteration * 42}px`
+    this.stencilPaper.svg.style.height = `${Math.ceil(iteration/2) * (pluginHeight + 13)}px`
     this.stencilGraph.clear();
     this.stencilGraph.addCells(plugins);
   }

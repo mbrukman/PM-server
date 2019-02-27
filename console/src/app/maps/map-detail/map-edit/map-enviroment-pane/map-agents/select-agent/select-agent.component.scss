@@ -1,35 +1,36 @@
-@import "~assets/sass/variables";
-@import "~assets/sass/mixins";
+@import "~src/assets/sass/variables";
+@import "~src/assets/sass/mixins";
 
-.pm-modal{
+.modal-content-wrapper{
   display: inherit;
   width: 607px;
-
-  .modal-header {
-    padding-bottom: 0;
-    flex-direction: column-reverse;
-    
+  .modal-header{
+    height: inherit;
     h4{
-      font-size: 22px;
-      font-weight: 300;
-      margin: auto;
+      padding-bottom: 21px;
+      padding-top: 26px;
     }
   }
   .modal-body {
-    padding-top: 0;
-    max-height: 350px;
-    overflow: auto;
-    .row-output{
-      display: flex;
-      align-items: center;
-      .dotStatus{
-        margin-right: 10px;
+    padding-top: 0px;
+    .data-table{
+      max-height: 350px;
+      overflow: auto;
+      .row-output{
+        display: flex;
+        align-items: center;
+        .dotStatus{
+          margin-right: 10px;
+        }
       }
     }
-
+      
       @include p-checkbox();
 
-    ::ng-deep {
+    ::ng-deep { 
+      th{
+        padding: 7px;
+      }
       tr:hover {
       box-shadow: 0px 0px !important;
     } 
@@ -40,12 +41,11 @@
   .ui-widget-header{
     width: 214px;
     height: 36px;
-    margin: 20px;
+    margin: 53px 0px 35px
   } 
   .tabs{
-    margin-top: 21px;
+    margin-top: 2px;
     height: 33px;
-    border-bottom: 1px solid #404549;
     display: flex;
     color: $pale-blue;
     justify-content: center;
@@ -53,6 +53,7 @@
 
     .title-tab{
       padding: 0px 10px;
+      margin: 0px 15px;
       cursor: pointer;
 
       &.active{

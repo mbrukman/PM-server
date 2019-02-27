@@ -1,4 +1,4 @@
-@import "~assets/sass/variables";
+@import "~src/assets/sass/variables";
 
 .main {
   display: flex;
@@ -17,9 +17,9 @@
       justify-content: space-between;
       padding-bottom: 15px;
 
-      .btn.pm {
-        margin: 5px;
-        align-self: center;
+      .add-config{
+        width: 83%;
+        margin-left: 16px;
       }
 
       ul {

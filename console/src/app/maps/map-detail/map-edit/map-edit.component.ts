@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { BsModalService } from 'ngx-bootstrap';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 import { MapsService } from '../../maps.service';
 import { Map } from '../../models/map.model';

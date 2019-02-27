@@ -1,6 +1,6 @@
 import { AfterContentInit, Component, OnDestroy } from '@angular/core';
 
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { BsModalRef } from 'ngx-bootstrap';
@@ -18,7 +18,8 @@ import { MapTrigger } from '@maps/models';
 export class TriggerFormComponent implements AfterContentInit, OnDestroy {
   params: PluginMethodParam[];
   public result: Subject<any> = new Subject();
-  configurations: string[];
+  configurations: string[]; 
+  configDropDown:any;
   triggerForm: FormGroup;
   triggers: Plugin[];
   pluginsReq: any;
@@ -35,11 +36,14 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
       this.triggers = plugins.filter(plugin => {
         return plugin.type === 'trigger' || plugin.type === 'server' || plugin.type === 'module';
       });
+      this.configDropDown = this.configurations.map(config => {
+        return {name:config}
+      })
       if (this.triggers) {
         this.initTriggerForm();
         if (this.trigger) {
           this.onSelectTrigger();
-          this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method);
+          this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method.name);
           this.params = this.method.params;
           let paramsControl = <FormArray>this.triggerForm.controls['params'];
           this.trigger.params.forEach(param => {
@@ -85,13 +89,14 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
 
   onSelectTrigger() {
     if(this.plugin){
+  
       this.removeParamForm()
-      this.plugin = _.find(this.triggers, (o) => o.name === this.triggerForm.value.plugin);
+      this.plugin = _.find(this.triggers, (o) => o.name === this.triggerForm.value.plugin.name);
       this.method = this.plugin.methods[0] // if there is a plugin, by default the method will be the first element
       this.addParamForm()
     }
     else{
-      this.plugin = _.find(this.triggers, (o) => o.name === this.triggerForm.value.plugin);
+      this.plugin = _.find(this.triggers, (o) => o.name === this.triggerForm.value.plugin.name);
     }
   }
 
@@ -99,7 +104,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
     if(this.method){
       this.removeParamForm()
     }
-    this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method);
+    this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method.name);
     this.params = this.method.params;
     this.addParamForm()
   }

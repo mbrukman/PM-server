@@ -1,9 +1,11 @@
 import { Component, Input, OnChanges } from '@angular/core';
-
+import * as _ from 'lodash';
 import * as moment from 'moment';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 import { BsModalService } from 'ngx-bootstrap';
 import { AgentResult, ProcessResult, ActionResultView } from '@maps/models';
+import { Agent } from '@agents/models/agent.model';
+
 
 
 @Component({
@@ -14,7 +16,7 @@ import { AgentResult, ProcessResult, ActionResultView } from '@maps/models';
 export class ProcessResultComponent implements OnChanges {
   @Input('process') process: ProcessResult[];
   @Input('result') result: AgentResult[];
-  @Input('count') count: number;
+  aggregate:boolean;
   actions: ActionResultView[];
   generalInfo: ProcessResult;
   agProcessActionsStatus: any;
@@ -26,10 +28,11 @@ export class ProcessResultComponent implements OnChanges {
   constructor(private modalService: BsModalService) { }
 
   ngOnChanges(changes) {
+    this.aggregate =  this.result.length > 1 ? true : false;
     this.agProcessActionsStatus = null;
     this.agActionsStatus = null;
     this.generalInfo = null;
-    this.aggregateProcessActionResults(this.result);
+    this.aggregateProcessActionResults();
     if (this.process.length === 1) {
       this.generalInfo = this.result[0].processes.find(o => o.uuid === this.process[0].uuid && o.index === this.process[0].index);
     }
@@ -61,13 +64,22 @@ export class ProcessResultComponent implements OnChanges {
     modal.content.messages = messages;
   }
 
-  aggregateProcessActionResults(result) {
+
+  aggregateProcessActionResults() {
     let actions = [];
     this.process.forEach(process => {
-      actions.push(...process.actions.map(a=> new ActionResultView(a,process.agentKey) ))
-      })
-    this.actions = actions;
+      let agent : Agent;
+      for(let i=0, length = this.result.length; i<length; i++){
+        if ((<Agent>(this.result[i].agent)).id == process.agentKey){
+          agent = <Agent>this.result[i].agent;
+          break;
+        }
+      }
 
+      actions.push(...process.actions.map(a=> new ActionResultView(a,agent) ))
+    })
+    this.actions = actions;
+    // this.actions.map(action => action.selected = false);
     // aggregating actions status
     let agActionsStatus = actions.reduce((total, current) => {
       total[current.action.status] = (total[current.action.status] || 0) + 1;
@@ -75,7 +87,7 @@ export class ProcessResultComponent implements OnChanges {
     }, { success: 0, error: 0, stopped: 0, partial: 0 });
     
     // formatting for chart
-    this.agProcessActionsStatus = Object.keys(agActionsStatus).map((o) => {
+    this.agProcessActionsStatus = Object.keys(agActionsStatus).map((o) => { 
       return { name: o, value: agActionsStatus[o] };
     });
     

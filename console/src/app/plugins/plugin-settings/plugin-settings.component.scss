@@ -1,3 +1,5 @@
+@import "~src/assets/sass/mixins";
+
 .main {
     width: 100%;
     .header-settings{
@@ -6,6 +8,9 @@
     .settings-form {
       width: 455px;
       padding-left: 25px;
+      .dropdown{
+          @include dropdown();
+      }
       label,input,select{
         width: 100%;
         }

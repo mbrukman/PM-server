@@ -1,0 +1,7 @@
+@import "~src/assets/sass/variables";
+.content-wrapper{
+    height: 38px;
+    .error-color{
+        color:$error-color
+    }
+}

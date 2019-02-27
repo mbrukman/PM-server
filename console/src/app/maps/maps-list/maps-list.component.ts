@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Subscription, Observable } from 'rxjs';
 import * as _ from 'lodash';
-import 'rxjs/operators/take';
 import { MapsService } from '../maps.service';
 import { Map } from '../models/map.model';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { FilterOptions } from '@shared/model/filter-options.model'
+import { fromEvent } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-maps-list',
@@ -37,9 +38,8 @@ export class MapsListComponent implements OnInit, OnDestroy {
       this.recentMaps = maps;
     })
 
-    this.filterKeyUpSubscribe = Observable
-    .fromEvent(this.globalFilterElement.nativeElement,'keyup')
-    .debounceTime(300).subscribe(()=>{
+    this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(debounceTime(300))
+    .subscribe(()=>{
       this.loadMapsLazy();
     })
   }
@@ -95,14 +95,15 @@ export class MapsListComponent implements OnInit, OnDestroy {
     // will be triggered by deactivate guard
     let modal = this.modalService.show(ConfirmComponent);
     let answers = {
-      confirm: 'Delete',
+      third: 'Delete',
       cancel: 'Cancel'
     };
     modal.content.message = 'Are you sure you want to delete? all data related to the map will get permanently lost';
-    modal.content.confirm = answers.confirm;
+    modal.content.third = answers.third;
+    modal.content.confirm = null;
     modal.content.cancel = answers.cancel;
     modal.content.result.asObservable().subscribe(ans => {
-      if (ans === answers.confirm) {
+      if (ans === answers.third) {
         this.deleteMap(id);
       }
     })

@@ -1,20 +1,16 @@
-<div class="row pm-modal">
-  <div class="col-12">
-    <div class="modal-header">
-      <h4>Add Group</h4>
-      <button type="button" class="close" (click)="onClose()" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
+<div class="modal-content-wrapper">
+  <div class="modal-header">
+    <i class="material-icons close" (click)="onClose()">close</i>
+    <h4>Add Group</h4>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label>Group Name</label>
+      <input type="text" placeholder="My Group Name" class="form-control" [(ngModel)]="name">
     </div>
-    <div class="modal-body">
-      <div class="form-group">
-          <label>Group Name</label>
-          <input type="text" placeholder="My Group Name" class="form-control" [(ngModel)]="name">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>
-      <button class="kh-btn-blue kh-btn" (click)="onConfirm()"><span>Create</span></button>
-    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="kh-btn kh-btn-gray" (click)="onClose()"><span>Cancel</span></button>
+    <button class="kh-btn-blue kh-btn" (click)="onConfirm()"><span>Create</span></button>
   </div>
 </div>

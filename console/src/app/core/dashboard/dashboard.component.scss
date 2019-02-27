@@ -1,8 +1,8 @@
-@import "~assets/sass/variables";
-@import "~assets/sass/mixins";
+@import "~src/assets/sass/variables";
+@import "~src/assets/sass/mixins";
 .mode {
     height: 70px;
-    background-color: #25292c;
+    background-color: $kh-background;
     display: flex;
     padding: 30px 0px 40px 30px;
     

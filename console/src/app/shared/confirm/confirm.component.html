@@ -1,18 +1,15 @@
-<div class="container pm-modal">
+<div class="modal-content-wrapper no-title">
   <div class="modal-header">
-    <h1>{{ title }}</h1>
-    <button type="button" class="close" (click)="onAction(cancel)" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+    <i class="material-icons close" (click)="onAction(cancel)">close</i>
+    <h4>{{ title }}</h4>
   </div>
-
   <div class="modal-body">
     {{ message }}
   </div>
 
   <div class="modal-footer">
-    <button type="button" [hidden]="!cancel" class="btn pm" (click)="onAction(cancel)">{{ cancel }}</button>
-    <button type="submit" [hidden]="!third" class="btn pm" (click)="onAction(third)" *ngIf="third">{{ third }}</button>
-    <button type="submit" class="btn pm" (click)="onAction(confirm)">{{ confirm }}</button>
+    <button type="button" [hidden]="!cancel" class="kh-btn kh-btn-gray" (click)="onAction(cancel)">{{ cancel }}</button>
+    <button type="submit" [hidden]="!confirm" class="kh-btn kh-btn-gray" (click)="onAction(confirm)">{{ confirm }}</button>
+    <button type="submit" [hidden]="!third" class="kh-btn-blue kh-btn" (click)="onAction(third)" *ngIf="third">{{ third }}</button>
   </div>
 </div>

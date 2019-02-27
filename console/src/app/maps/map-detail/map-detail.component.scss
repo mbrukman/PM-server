@@ -1,6 +1,6 @@
-@import "~assets/sass/base";
-@import "~assets/sass/mixins";
-@import "~assets/sass/variables";
+@import "~src/assets/sass/base";
+@import "~src/assets/sass/mixins";
+@import "~src/assets/sass/variables";
 
 .map-nav {
   height: 70px;
@@ -33,10 +33,14 @@
       }
     }
   }
+  
 
   .action-buttons {
     padding : 0 22px;
-
+    .dropdown{
+      width:150px;
+      @include dropdown();
+    }
     &:last-of-type{
       display: flex;
       justify-content: flex-end;

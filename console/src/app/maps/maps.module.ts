@@ -34,6 +34,7 @@ import { AddConfigurationComponent } from './map-detail/map-configurations/add-c
 import { ProcessViewComponent } from './map-detail/map-revisions/process-view/process-view.component';
 import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
 import { monacoConfig } from './monaco-config' 
+import {AutoCompleteModule} from 'primeng/primeng';
 
 @NgModule({
   imports: [
@@ -51,7 +52,8 @@ import { monacoConfig } from './monaco-config'
     AccordionModule,
     TooltipModule,
     NgxDnDModule,
-    InfiniteScrollModule
+    InfiniteScrollModule,
+    AutoCompleteModule
     
   ],
   declarations: [

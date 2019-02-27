@@ -1,0 +1,4 @@
+@import "~src/assets/sass/mixins";
+.form-group{
+    @include checkbox();
+}

@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { environment } from '../../environments/environment';
 import { VaultItem } from '../vault/vault.model'
 import { Injectable } from "@angular/core";
-import { Subscribable } from "rxjs/Observable";
+import { Subscribable } from "rxjs";
 
 const serverUrl = environment.serverUrl
 

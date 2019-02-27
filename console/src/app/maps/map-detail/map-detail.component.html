@@ -20,7 +20,7 @@
     </li>
   </ul>
 
-  <div class="action-buttons">
+  <div class="action-buttons ">
     <!--<button type="button" class="btn" (click)="discardChanges()" *ngIf="edited || structureEdited" disabled>Discard</button>-->
     <button type="button" class="kh-btn-blue kh-btn" *ngIf="!edited && !structureEdited" disabled>Saved</button>
     <button type="button" class="kh-btn-blue kh-btn" (click)="saveMap()" *ngIf="edited || structureEdited">Save</button>
@@ -28,12 +28,14 @@
       Execute
       <span *ngIf="executing"><i class="fa fa-spinner fa-pulse fa-fw"></i></span>
     </button>
-    <select [(ngModel)]="selected" (change)="changeSelected()">
-      <option *ngIf="mapStructure?.configurations?.length === 0">No configs</option>
-      <option [value]="i" *ngFor="let item of mapStructure?.configurations; let i = index;">
-        {{item.name | truncatechars: 8}}
-      </option>
-    </select>
+
+    <div class="dropdown">
+        <p-dropdown [(ngModel)]="selected" 
+        [options]="configurationDropDown" 
+        (onChange)="changeSelected()" 
+        [autoWidth]="false">
+        </p-dropdown>
+    </div>
   </div>
 </div>
 

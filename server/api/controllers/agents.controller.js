@@ -43,7 +43,9 @@ module.exports = {
                      }); 
                      resolve()
                 }) 
-            })).catch((error)=>{
+            })).then(()=>{
+                res.status(200).send();
+            }).catch((error)=>{
                 if (error) {
                     winston.log('error', "Error installing plugins on agent", error);
                  }

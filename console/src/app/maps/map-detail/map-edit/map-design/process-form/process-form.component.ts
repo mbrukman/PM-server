@@ -2,12 +2,10 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { FormArray, FormGroup } from '@angular/forms';
 
 import * as _ from 'lodash';
-import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/observable/of';
 
-import { distinctUntilChanged } from 'rxjs/operators';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { distinctUntilChanged, filter, debounceTime, mergeMap, map } from 'rxjs/operators';
+import { Observable, from, of, forkJoin } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { Process, Action, ActionParam, ProcessViewWrapper } from '@maps/models';
 import { Plugin } from '@plugins/models/plugin.model';
@@ -41,6 +39,9 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   selectedMethod: PluginMethod;
   FLOW_CONTROL_TYPES  = FLOW_CONTROL_TYPES;
   COORDINATION_TYPES = COORDINATION_TYPES;
+  flowControlDropDown = [];
+  coordinationDropDown = [];
+  methodsDropDown:any
 
   constructor(
     private socketService: SocketService,
@@ -50,16 +51,38 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.methodsDropDown = this.processViewWrapper.plugin.methods.map(method => {
+      return {label:method.viewName,value:method.name}
+    })
     if (!this.processViewWrapper.process) {
       this.closePane();
       return;
     }
+    let flowControlType =  Object.keys(this.FLOW_CONTROL_TYPES)
+    this.flowControlDropDown = flowControlType.map(key => {
+      return {value:this.FLOW_CONTROL_TYPES[key].id,label:this.FLOW_CONTROL_TYPES[key].label}
+    })
+
+    let coordinationType = Object.keys(this.COORDINATION_TYPES)
+    for(let i=0,length=coordinationType.length;i<length;i++){
+      let indexName = coordinationType[i];
+      if(indexName=='wait'){
+        if(!this.processViewWrapper.isInsideLoop){
+          this.coordinationDropDown.push({label:this.COORDINATION_TYPES[indexName].label,value:this.COORDINATION_TYPES[indexName].id})
+        }
+      }
+      else{
+        this.coordinationDropDown.push({label:this.COORDINATION_TYPES[indexName].label,value:this.COORDINATION_TYPES[indexName].id})
+      }
+    }
+
+
     this.processForm = Process.getFormGroup(this.processViewWrapper.process);
 
     this.processUpdateSubscription = this.mapDesignService
-      .getUpdateProcessAsObservable()
-      .filter(process => process.uuid === this.processViewWrapper.process.uuid)
-      .subscribe(process => {
+      .getUpdateProcessAsObservable().pipe(
+        filter(process => process.uuid === this.processViewWrapper.process.uuid)
+      ).subscribe(process => {
         this.processForm.get('coordination').setValue(process.coordination);
       });
 
@@ -83,11 +106,11 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
 
 
     // subscribe to changes in form
-    this.formValueChangeSubscription = this.processForm.valueChanges
-      .debounceTime(300)
-      .pipe(distinctUntilChanged())
-      .filter(formvalue => this.processForm.valid)
-      .subscribe(formValue => {
+    this.formValueChangeSubscription = this.processForm.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      filter(formvalue => this.processForm.valid)
+    ).subscribe(formValue => {
         this.saved.emit(this.processForm.value);
       });
   }
@@ -106,15 +129,15 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    */
   generateAutocompleteParams() {
     if (!this.processViewWrapper.plugin) return;
-    Observable.from(this.processViewWrapper.plugin.methods)
-      .filter(method => this.methodHaveParamType(method, 'autocomplete')) // check if has autocomplete
-      .flatMap(method => {
-        return Observable.forkJoin(
-          Observable.of(method), // the method
+    from(this.processViewWrapper.plugin.methods).pipe(
+      filter(method => this.methodHaveParamType(method, 'autocomplete')), // check if has autocomplete
+      mergeMap(method => {
+        return forkJoin(
+          of(method), // the method
           this.pluginsService.generatePluginMethodsParams(this.processViewWrapper.plugin._id, method.name) // generated params
         );
-      })
-      .map(data => {
+      }),
+      map(data => {
         data[1].forEach(param => {
           data[0].params[
             data[0].params.findIndex(o => o.name === param.name)
@@ -122,21 +145,29 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         });
         return data[0];
       })
-      .subscribe(method => {
+    ).subscribe(method => {
         this.processViewWrapper.plugin.methods[
           this.processViewWrapper.plugin.methods.findIndex(o => o.name === method.name)
         ] = method;
         this.addToMethodContext(method);
       });
 
-    Observable.from(this.processViewWrapper.plugin.methods)
-      .filter(method => this.methodHaveParamType(method, 'options'))
-      .subscribe(method => {
+    from(this.processViewWrapper.plugin.methods).pipe(
+      filter(method => this.methodHaveParamType(method, 'options'))
+    ).subscribe(method => {
         this.addToMethodContext(method);
       });
   }
 
   addToMethodContext(method) {
+    method.params.forEach(param => {
+      if(param.options.length > 0 && param.options[0].id){
+        let options = param.options.map(opt => {
+          return {label:opt.name || opt.value ,value:opt.id}
+        })
+        param.options = options
+      }
+    })
     this.methods[method.name] = method;
   }
 
@@ -192,6 +223,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         this.action = true;
         this.index = index;
         
+       
       })
   }
 
@@ -208,6 +240,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * Called from the template once user changes a method
    */
   onSelectMethod() {
+  
     const methodName = this.processForm.value.actions[this.index].method;
     const action = this.processForm.controls['actions']['controls'][this.index];
     this.selectedMethod = this.processViewWrapper.plugin.methods.find(o => o.name === methodName);

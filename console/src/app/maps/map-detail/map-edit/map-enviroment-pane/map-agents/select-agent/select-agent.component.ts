@@ -1,11 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { Subject } from 'rxjs/Subject';
+import { Subject, of, forkJoin } from 'rxjs';
 import { BsModalRef } from 'ngx-bootstrap';
 
 import { AgentsService } from '@agents/agents.service';
 import { Agent, Group } from '@agents/models';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-select-agent',
@@ -28,14 +29,14 @@ export class SelectAgentComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.agentsReq = this.agentsService
-      .list()
-      .flatMap(agents => {
-        return Observable.forkJoin(
-          Observable.of(agents),
-          this.agentsService.status()
-        );
-      })
-      .subscribe(data => {
+      .list().pipe(
+        mergeMap(agents => {
+          return forkJoin(
+            of(agents),
+            this.agentsService.status()
+          );
+        })
+      ).subscribe(data => {
         let [agents, agentsStatus] = data;
         agents.map(agent => Object.assign(agent, { status: agentsStatus[agent.id] }));
         this.agents = agents;
