@@ -1,24 +1,13 @@
 @import "~src/assets/sass/variables";
 @import "~src/assets/sass/mixins";
 
-
-.row-card{
-  display: flex;
-  justify-content: space-between;
-  cursor: pointer
-}
-
-.bg-dark {
-  background: $kh-background !important;
-}
-
-.bg-grey {
-  background: $cool-grey !important;
-}
-
 .main {
   display: flex;
   flex-grow: 1;
+
+  .pane-header{
+    flex: 0 0 43px;
+  }
 
   .execution-select-pane {
     flex: 0 0 195px;
@@ -69,15 +58,19 @@
       flex-grow: 1;
       overflow-y: auto;
       background-color: $kh-background;
+
       .container-fluid-process{
         display: flex;
         height: 100%;
+
         .process-col{
           padding: 0 23px;
           border-right: 1px solid $cool-grey;
           height: 100%;
           width: 292px;
+
           .bg-dark{
+            background: $kh-background !important;
             margin-top: 30px;
 
             &.display-data-wrapper{
@@ -98,9 +91,9 @@
             }
           }
           .process-select {
-            padding: 0;
+            
             .card-body {
-              padding: 0;
+              
               ul {
                 padding-left: 0;
                 list-style: none;
@@ -116,11 +109,6 @@
                     background-color: $kh-selected-bck;
                     box-shadow: -4px 0px 0px 0px $pale-blue;
                     display: table-cell;
-               
-                  }
-                  &:hover {
-                    cursor: pointer;   
-                    background: $kh-selected-bck;             
                   }
           
                   app-process-list-item{
@@ -129,6 +117,12 @@
                     height: 100%;
                     padding-top: 10px;
                     padding-left: 10px;
+                  }
+
+                  
+                  &:hover {
+                    cursor: pointer;   
+                    background: $kh-selected-bck;             
                   }
                 }
               }
@@ -139,6 +133,10 @@
           width: 100%;
           padding: 0 9px;
 
+          .row{
+            margin-top: 30px;
+          }
+
           .result-header-deck {
             .card {
               height: 230px;
@@ -146,69 +144,58 @@
               .card-body{
                 height: 100%;
                 padding: 24px;
+
+                .result-overview{
+                  display: flex;
+                  flex-direction: row;
+            
+                  .details{
+                    flex-grow: 1;
+                    
+                    .execution-detail {
+                      margin-bottom: 10px;
+                    }
+                  }
+            
+                  .chart{
+                    width: 200px;
+                    flex-shrink: 0;
+                    margin-top: -10px;
+
+                    .pie-chart-parent { 
+                      display: grid; 
+                      overflow: hidden;
+                    }
+                  }
+                }
+              }
+
+              &.raw-output {
+                .card-body {
+                  
+                  .row-card{
+                    display: flex;
+                    justify-content: space-between;
+                    cursor: pointer
+                  }
+              
+                  ul {
+                    max-height: 135px;
+                    overflow-y: scroll;
+                    > li {
+                      word-break: break-word;
+                    }
+                  }
+                }
               }
               
               &:not(:first-child) {
                 overflow-y: hidden;
               }
             }
-          
-            .pie-chart-parent { 
-              display: grid; 
-              overflow: hidden;
-            }
-            .result-overview{
-              display: flex;
-              flex-direction: row;
-        
-              .details{
-                flex-grow: 1;
-              }
-        
-              .chart{
-                width: 200px;
-                flex-shrink: 0;
-                margin-top: -10px;
-              }
-            }
-          }
-          .raw-output {
-            .card-body {
-          
-              .fa-arrows-alt{
-                cursor: pointer;
-              }
-          
-              ul {
-                max-height: 135px;
-                overflow-y: scroll;
-                > li {
-                  word-break: break-word;
-                }
-              }
-            }
           }
         }
       }
     }
-
   }
-
-  .execution-select-pane, .result{
-    .pane-header{
-      flex: 0 0 43px;
-    }
-  }
-}
-
-
-
-p {
-  &.execution-detail {
-    margin-bottom: 10px;
-  }
-}
-
-.card-row {
-  margin-top: 30px;
 }
