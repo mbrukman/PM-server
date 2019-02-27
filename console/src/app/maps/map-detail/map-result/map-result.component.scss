@@ -78,8 +78,12 @@
           height: 100%;
           width: 292px;
           .bg-dark{
-            height: 37%;
-            padding-top: 27px;
+            margin-top: 30px;
+
+            &.display-data-wrapper{
+              height: 230px;
+            }
+
             .card-body{
               padding: 0;
               @include dropdown();
@@ -133,14 +137,20 @@
         }
         .results{
           width: 100%;
-          padding: 16px 9px 0 9px;
+          padding: 0 9px;
+
           .result-header-deck {
-            height: 230px;
             .card {
-              height: 100%;
-            }
-            .card:not(:first-child) {
-              overflow-y: hidden;
+              height: 230px;
+
+              .card-body{
+                height: 100%;
+                padding: 24px;
+              }
+              
+              &:not(:first-child) {
+                overflow-y: hidden;
+              }
             }
           
             .pie-chart-parent { 
@@ -158,6 +168,7 @@
               .chart{
                 width: 200px;
                 flex-shrink: 0;
+                margin-top: -10px;
               }
             }
           }
@@ -198,9 +209,6 @@ p {
   }
 }
 
-
-
 .card-row {
-  margin-top: 15px;
+  margin-top: 30px;
 }
-

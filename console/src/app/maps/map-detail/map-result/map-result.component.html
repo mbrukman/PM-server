@@ -31,7 +31,7 @@
     <div class="result-content" *ngIf="selectedExecution">
       <div class="container-fluid-process">
         <div class="process-col">
-          <div class="bg-dark">
+          <div class="bg-dark display-data-wrapper">
             <div class="card-body dropdown">
               <h5 class="card-title">Display data</h5>
               <p-dropdown [options]="agents" (onChange)="changeAgent()" [(ngModel)]="selectedAgent" [filter]="true"
