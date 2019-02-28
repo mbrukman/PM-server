@@ -11,10 +11,10 @@ const IV_LENGTH = 16; // For AES, this is always 16
 
 let key;
 
-if (!fs.existsSync(env.keyPath)) {
-    key = createKey.generateKey(env.keyPath);
+if (!fs.existsSync(env.vaultKeyPath)) {
+    key = createKey.generateKey(env.vaultKeyPath);
 } else {
-    key = fs.readFileSync(env.keyPath, 'utf-8');
+    key = fs.readFileSync(env.vaultKeyPath, 'utf-8');
 }
 
 module.exports = {
