@@ -157,6 +157,7 @@ function updateProcessContext(runId, agentKey, processKey, processIndex, process
     );
 
     executions[runId].executionAgents[agentKey].executionContext.processes = executions[runId].executionAgents[agentKey].processes;
+    executions[runId].executionAgents[agentKey].executionContext.executionId = runId;
 }
 
 /**

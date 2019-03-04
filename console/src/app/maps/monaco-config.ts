@@ -18,6 +18,6 @@ export const monacoConfig: NgxMonacoEditorConfig = {
     });
 
     // extra libraries
-    monaco.languages.typescript.javascriptDefaults.addExtraLib(env.sdk, 'kaholo/sdk.d.ts');
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(env.default.sdk, 'kaholo/sdk.d.ts');
   }
 };

@@ -283,7 +283,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       });
     }
 
-    if (this.structureEdited) {
+    if (this.structureEdited && this.mapStructure.content) {
       let content = JSON.parse(this.mapStructure.content);
       content.cells.forEach(cell => {
         if (cell.type !== 'devs.MyImageModel') {
