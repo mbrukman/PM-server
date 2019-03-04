@@ -4,10 +4,27 @@ const _ = require("lodash");
 const agentsService = require("../services/agents.service");
 const pluginsService = require("../services/plugins.service");
 const hooks = require("../../libs/hooks/hooks");
+const env = require('../../env/enviroment')
+
+const SERVER_KEY_HEADER = 'x-kaholo-server-key'
+
+
+
+
 
 module.exports = {
     /* The function will be called every time an agent is registering to the server (agent startup) */
     add: (req, res) => {
+
+        let serverKey = req.headers[SERVER_KEY_HEADER];
+        if(!serverKey){
+            return res.status(401).send('No key was provided')
+        }
+    
+         if(env.serverKey != serverKey ){
+            return res.status(401).send('Invalid key')
+        }
+
         winston.log('info', "Add new agent");
         let agent;
         let plugins;

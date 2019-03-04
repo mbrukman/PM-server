@@ -35,32 +35,14 @@ const FILTER_FIELDS = Object.freeze({
     createdAt: 'createdAt'
 });
 
-////////////////////////////
-//   Key creation 
-////////////////////////////
 
-if (!fs.existsSync(env.keyPath)) {
-    winston.info("Writing pm key");
-    const createKey = require("./helpers/create-key");
-    createKey.generateKey(env.keyPath);
-}
-
-const serverKey = fs.readFileSync(env.keyPath, 'utf-8');
-env.serverKey = serverKey;
-
-
-let req = request.defaults({  
-    headers: {
-        'X-KAHOLO-SERVER-KEY' : serverKey
-    }
-});
 
 /* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
 let followAgentStatus = (agent) => {
     let listenInterval = setInterval(() => {
         let start = new Date();
 
-        req.post(
+        request.post(
             agents[agent.key].defaultUrl + '/api/status', {
                 form: {
                     key: agent.key
@@ -130,7 +112,7 @@ function getAgentStatus() {
 
 function setDefaultUrl(agent) {
     return new Promise((resolve, reject) => {
-        req.post(agent.url + '/api/status', { form: { key: agent.key } }, function (error, response, body) {
+        request.post(agent.url + '/api/status', { form: { key: agent.key } }, function (error, response, body) {
             if (error) {
                 agents[agent.key].defaultUrl = agent.publicUrl;
             } else {
@@ -298,7 +280,7 @@ module.exports = {
     checkPluginsOnAgent: (agent) => {
         return new Promise((resolve, reject) => {
             console.log(" checkPluginsOnAgent", agents[agent.key].defaultUrl);
-            req.post(agents[agent.key].defaultUrl + '/api/plugins', { form: { key: agent.key } }, function (error, response, body) {
+            request.post(agents[agent.key].defaultUrl + '/api/plugins', { form: { key: agent.key } }, function (error, response, body) {
                 if (error || response.statusCode !== 200) {
                     resolve('{}');
                 }

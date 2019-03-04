@@ -17,6 +17,14 @@ const app = express();
 
 
 
+////////////////////////////
+//   Key creation 
+////////////////////////////
+
+if (!env.serverKey) {
+    const createKey = require("./helpers/create-key");
+    env.serverKey =  createKey.generateKey();
+}
 
 
 /////////////////////
