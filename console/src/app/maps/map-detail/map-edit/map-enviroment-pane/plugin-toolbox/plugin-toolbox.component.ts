@@ -103,8 +103,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
 
   filter(){
     this.pluginsSearch =  this.plugins.filter(plugin => {return plugin.name.toLowerCase().includes(this.searchText.toLowerCase())})
-    if(this.pluginsSearch)
-      this.addPluginsToGraph();
+    this.addPluginsToGraph();
   }
 
   flyCell(cellView, event, x, y) {
