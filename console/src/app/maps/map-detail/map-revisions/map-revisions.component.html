@@ -26,8 +26,15 @@
           </ul>
       </div>
     </div>
-    <div class="col-9" #wrapper (window:resize)="onResize($event)">
-      <div id="graph" [hidden]="viewMode !== 'design'"></div>
+    <div class="col-9">
+      <div class="content-graph current" #wrapper (window:resize)="onResize($event)" [hidden]="viewMode !== 'design'">
+        <span class="title-graph">Current</span>
+        <div id="currentGraph"></div>
+      </div>
+      <div class="content-graph" #wrapper (window:resize)="onResize($event)" [hidden]="viewMode !== 'design'">
+        <span class="title-graph">Latest</span>
+        <div id="latestGraph"></div>
+      </div>
       <div class="row code-container" id="container" *ngIf="viewMode === 'code'">
         <div class="title">
             <span class="current">Current</span>
