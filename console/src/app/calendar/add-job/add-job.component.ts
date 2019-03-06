@@ -100,19 +100,10 @@ export class AddJobComponent implements OnInit {
   }
 
   onSubmit(form) {
-
-    Object.keys(this.form.controls).forEach(key => {
-      const controlErrors = this.form.get(key).errors;
-      if (controlErrors != null) {
-            Object.keys(controlErrors).forEach(keyError => {
-              console.log('Key control: ' + key + ', keyError: ' + keyError + ', err value: ', controlErrors[keyError]);
-            });
-          }
-      });
-    // form.type === 'once' ? form.cron = null :  form.datetime = null; 
-    // this.calendarService.create(form.map, form).subscribe(job => {
-    //   this.calendarService.setNewJob(job);
-    // });
+    form.type === 'once' ? form.cron = null :  form.datetime = null; 
+    this.calendarService.create(form.map, form).subscribe(job => {
+      this.calendarService.setNewJob(job);
+    });
   }
 
   updateCron() {
