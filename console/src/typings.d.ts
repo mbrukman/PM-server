@@ -5,7 +5,7 @@ interface NodeModule {
 }
 
 declare module "*.json" {
-  const libEnv: any;
-  export default libEnv;
+  const value: any;
+  export default value;
 }
 
