@@ -10,10 +10,8 @@
         <div class="project">Project: &nbsp;<a class="link" (click)="goToProject($event, item.project._id)"> {{
             item.project.name}}</a> </div>
       </div>
-      <div class="chart-wrapper" *ngIf="item.status">
-        <ngx-charts-pie-chart [results]="item.status" [labels]="showLabels" [scheme]="colorScheme" [doughnut]="true"
-          [view]="[130,130]">
-        </ngx-charts-pie-chart>
+      <div class="chart-wrapper" *ngIf="showPieChart">
+        <app-pie-chart [execution]="item"></app-pie-chart>
       </div>
     </div>
   </div>
