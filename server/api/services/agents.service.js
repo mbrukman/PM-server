@@ -42,34 +42,35 @@ let followAgentStatus = (agent) => {
     let listenInterval = setInterval(() => {
         let start = new Date();
 
-        request.post(
-            agents[agent.key].defaultUrl + '/api/status', {
-                form: {
-                    key: agent.key
-                } 
-              
-            }, (error, response, body) => {
-                try {
-                    body = JSON.parse(body);
-                } catch (e) {
-                    body = { res: e };
-                }
-                if (!error && response.statusCode === 200) {
-                    agents[agent.key].name = agent.name;
-                    agents[agent.key].attributes = agent.attributes;
-                    agents[agent.key].alive = true;
-                    agents[agent.key].hostname = body.hostname;
-                    agents[agent.key].arch = body.arch;
-                    agents[agent.key].freeSpace = humanize.bytes(body.freeSpace);
-                    agents[agent.key].respTime = new Date() - start;
-                    agents[agent.key].url = agent.url;
-                    agents[agent.key].publicUrl = agent.publicUrl;
-                    agents[agent.key].defaultUrl = agents[agent.key].defaultUrl || '';
-                    agents[agent.key].id = agent.id;
-                    agents[agent.key].key = agent.key;
-                    agents[agent.key].installed_plugins = body.installed_plugins;
-                    agents[agent.key].liveCounter = LIVE_COUNTER;
-                } else if ((--agents[agent.key].liveCounter) === 0) {
+ 
+
+        let options = { form: { key: agent.key } }
+        options.uri = '/api/status';
+        sendRequestToAgent(options, agents[agent.key]).then(res=>{
+        
+
+            try {
+                body = JSON.parse(res.body);
+            } catch (e) {
+                body = { res: e };
+            }
+                agents[agent.key].name = agent.name;
+                agents[agent.key].attributes = agent.attributes;
+                agents[agent.key].alive = true;
+                agents[agent.key].hostname = body.hostname;
+                agents[agent.key].arch = body.arch;
+                agents[agent.key].freeSpace = humanize.bytes(body.freeSpace);
+                agents[agent.key].respTime = new Date() - start;
+                agents[agent.key].url = agent.url;
+                agents[agent.key].publicUrl = agent.publicUrl;
+                agents[agent.key].defaultUrl = agents[agent.key].defaultUrl || '';
+                agents[agent.key].id = agent.id;
+                agents[agent.key].key = agent.key;
+                agents[agent.key].installed_plugins = body.installed_plugins;
+                agents[agent.key].liveCounter = LIVE_COUNTER;
+
+            }).catch(err=>{
+                if ((--agents[agent.key].liveCounter) === 0) {
                     agents[agent.key].alive = false;
                     if (!agents[agent.key].hostname) {
                         agents[agent.key].hostname = 'unknown';
@@ -81,7 +82,7 @@ let followAgentStatus = (agent) => {
                         agents[agent.key].freeSpace = 0;
                     }
                     agents[agent.key].respTime = 0;
-                }
+                }  
             })
     }, INTERVAL_TIME);
     if (!agents[agent.key]) {
@@ -113,6 +114,9 @@ function getAgentStatus() {
 function setDefaultUrl(agent) {
     return new Promise((resolve, reject) => {
         request.post(agent.url + '/api/status', { form: { key: agent.key } }, function (error, response, body) {
+            if(response.headers['x-kaholo-server-key'] != env.serverKey){
+                return reject("Server Key does not match");
+              }
             if (error) {
                 agents[agent.key].defaultUrl = agent.publicUrl;
             } else {
@@ -253,6 +257,9 @@ function sendRequestToAgent(options, agent) {
         winston.log('info', "Sending request to agent");
         request(options, function (error, response, body) {
             if (error) { return reject(error) }
+            if(response.headers['x-kaholo-server-key'] != env.serverKey){
+                return reject("Server Key does not match");
+              }
             resolve(response)
         })
     })
@@ -279,14 +286,12 @@ module.exports = {
     // get an object of installed plugins and versions on certain agent.
     checkPluginsOnAgent: (agent) => {
         return new Promise((resolve, reject) => {
-            console.log(" checkPluginsOnAgent", agents[agent.key].defaultUrl);
-            request.post(agents[agent.key].defaultUrl + '/api/plugins', { form: { key: agent.key } }, function (error, response, body) {
-                if (error || response.statusCode !== 200) {
-                    resolve('{}');
-                }
-                resolve(body);
-
-            });
+            console.log(" checkPluginsOnAgent", agents[agent.key].defaultUrl); 
+            let options = { form: { key: agent.key } }
+            options.uri = '/api/plugins';
+            sendRequestToAgent(options, agents[agent.key]).then(res=>{
+                resolve(res.body)
+            }).catch(err=>{resolve('{}')})
         });
     },
     delete: (agentId) => {
@@ -322,7 +327,7 @@ module.exports = {
             }
             return Promise.all(requests);
         } else {
-            return Promise.all([sendRequestToAgent(requestOptions, agent)]);
+            return Promise.all([sendRequestToAgent(requestOptions, agents[agent.key])]);
         }
     },
 

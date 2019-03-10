@@ -1012,31 +1012,19 @@ function sendActionViaSocket(socket, param, actionForm) {
  * @param actionForm
  * @returns {Promise<any>}
  */
-function sendActionViaRequest(agent, action, actionForm) {
+function sendActionViaRequest(agent, action, actionForm) { 
 
     return new Promise((resolve, reject) => {
-        request.post(
-            agentsService.agentsStatus()[agent.key].defaultUrl + '/api/task/add',
-            {
-                form: actionForm
-            },
-            function (error, response, body) {
-                if (error) {
-                    if (!body) {
-                        body = { result: error };
-                    }
-                } else {
-                    try {
-                        body = JSON.parse(body);
-                    } catch (e) {
-                        // statements
-                        body = {
-                            res: e
-                        };
-                    }
-                }
-                resolve(body);
-            });
+
+        let options = { form: actionForm }
+        options.uri = '/api/task/add';
+        agentsService.sendRequestToAgent(options, agents[agent.key]).then(res=>{
+            body = JSON.parse(res.body);
+            resolve(body);
+        }).catch(err=>{
+            resolve({ result: err })
+            
+        })     
     });
 }
 
