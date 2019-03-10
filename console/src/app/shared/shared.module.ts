@@ -22,7 +22,7 @@ import { InPipe } from '@shared/pipes/filterIn.pipe';
 import { RawOutputComponent } from './raw-output/raw-output.component';
 import { VaultSelectorComponent } from './components/vault-selector/vault-selector.component'
 import {AutoCompleteModule} from 'primeng/primeng';
-import {PieChartComponent} from '@shared/components/pie-chart/pie-chart.component';
+import {ExecutionChartComponent} from '@shared/components/execution-chart/execution-chart.component';
 import { MapsCardsComponents } from './map-cards/map-cards.component';
 
 @NgModule({
@@ -55,7 +55,7 @@ import { MapsCardsComponents } from './map-cards/map-cards.component';
     RawOutputComponent,
     VaultSelectorComponent,
     MapsCardsComponents,
-    PieChartComponent
+    ExecutionChartComponent
   ],
   exports: [
     ReactiveFormsModule,
@@ -76,7 +76,7 @@ import { MapsCardsComponents } from './map-cards/map-cards.component';
     InPipe,
     VaultSelectorComponent,
     MapsCardsComponents,
-    PieChartComponent
+    ExecutionChartComponent
   ],
   entryComponents: [ConfirmComponent, RawOutputComponent]
 })

@@ -1,11 +1,11 @@
-import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import { Component,Input, OnChanges } from '@angular/core';
 
 @Component({
-  selector: 'app-pie-chart',
-  templateUrl: './pie-chart.component.html',
-  styleUrls: ['./pie-chart.component.scss']
+  selector: 'app-execution-chart',
+  templateUrl: './execution-chart.component.html',
+  styleUrls: ['./execution-chart.component.scss']
 })
-export class PieChartComponent implements OnChanges {
+export class ExecutionChartComponent implements OnChanges {
   @Input('execution') execution :any;
   @Input('isSmall') isSmall:boolean = true;
   smallSize = 150;

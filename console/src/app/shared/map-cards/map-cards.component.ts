@@ -18,7 +18,6 @@ export class  MapsCardsComponents implements OnInit {
     
   }
 
-
   goToProject($event, id){
     $event.stopPropagation();
     this.router.navigate([`/projects/${id}`], { relativeTo: this.route });
