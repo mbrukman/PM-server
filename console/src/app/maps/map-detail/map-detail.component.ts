@@ -155,7 +155,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
 
         if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0) {
           const selected = this.mapStructure.configurations.findIndex(o => o.selected);
-          this.selected = selected !== -1 ? this.mapStructure.configurations[selected] : null;
+          this.selected = selected !== -1 ? this.mapStructure.configurations[selected] : this.mapStructure.configurations[0];
+          this.changeSelected(false)
         }
 
 
@@ -374,11 +375,13 @@ export class MapDetailComponent implements OnInit, OnDestroy {
    * Updating selected configuration
    * @param {number} index
    */
-  changeSelected() {
+  changeSelected(updateMap : boolean) {
     this.mapStructure.configurations.forEach((configuration) => {
       configuration.selected = (this.selected.name == configuration.name)
     });
-    this.mapsService.setCurrentMapStructure(this.mapStructure);
+    if(updateMap){
+      this.mapsService.setCurrentMapStructure(this.mapStructure);
+    }
   }
 
   onKeyDown($event: KeyboardEvent) {
