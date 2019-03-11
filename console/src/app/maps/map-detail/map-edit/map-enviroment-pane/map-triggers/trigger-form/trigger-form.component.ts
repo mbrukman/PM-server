@@ -84,6 +84,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
 
   onConfirm(form) {
     form.plugin = form.plugin.name;
+    form.method = form.method.name;
     this.result.next(form);
     this.onClose();
   }
