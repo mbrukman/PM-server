@@ -7,7 +7,7 @@ import { Component,Input, OnChanges } from '@angular/core';
 })
 export class ExecutionChartComponent implements OnChanges {
   @Input('execution') execution :any;
-  @Input('size') size:number[] = [];
+  @Input('size') size:number[] = [200,200];
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936']
   };
