@@ -19,7 +19,7 @@
       max-height: 100%;
     }
 
-    .col-9 {
+    .col-10 {
    
       padding: 0;
       display: flex;
@@ -55,7 +55,7 @@
 
 .versions {
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   ul {
     list-style: none;
     padding: 16px 22px 0px 22px;
