@@ -1,7 +1,7 @@
 <div class="main">
   <div class="row content-wrapper" >
     <div class="col-3">
-      <div class='versions' style="height: 100%;" infiniteScroll [scrollWindow]="false" 
+      <div class="versions" infiniteScroll [scrollWindow]="false" 
       [infiniteScrollDisabled]="maxLengthReached" [infiniteScrollDistance]="2" [infiniteScrollThrottle]="150" (scrolled)="onScroll()">
         <ul>
           <li *ngFor="let item of structures" [class.selected]="currentStructure?.id === item?.id"  (click)="previewStructure(item.id)">
@@ -26,7 +26,7 @@
           </ul>
       </div>
     </div>
-    <div class="col-10">
+    <div class="graph-container">
       <div class="content-graph current" #wrapper (window:resize)="onResize($event)" [hidden]="viewMode !== 'design'">
         <span class="title-graph">Current</span>
         <div id="currentGraph"></div>

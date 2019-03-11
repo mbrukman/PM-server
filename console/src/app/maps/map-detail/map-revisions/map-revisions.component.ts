@@ -106,6 +106,10 @@ export class MapRevisionsComponent implements OnInit {
       initialPosition = { x: x * 0.75, y: y * 0.75 };
       move = true;
     });
+    this.latestPaper.on('blank:pointerdown', (event, x, y) => {
+      initialPosition = { x: x * 0.75, y: y * 0.75 };
+      move = true;
+    });
 
     $('#currentGraph').mousemove((event) => {
       if (move) {

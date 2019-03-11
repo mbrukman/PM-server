@@ -19,10 +19,11 @@
       max-height: 100%;
     }
 
-    .col-10 {
+    .graph-container {
    
       padding: 0;
       display: flex;
+      flex-grow: 1;
       .content-graph{
         display: flex;
         height: 100%;

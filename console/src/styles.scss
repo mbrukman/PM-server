@@ -127,11 +127,6 @@ textarea {
   background: transparent; /* make scrollbar invisible */
 }
 
-::-webkit-scrollbar {
-  width: 0px; /* remove scrollbar space */
-  background: transparent; /* make scrollbar invisible */
-}
-
 
 .main {
   overflow-y: auto;

@@ -1,13 +1,11 @@
 @import "~src/assets/sass/variables";
 .container {
-    display: flex;
     flex-direction: column;
     overflow-y: auto;
     padding: 0;
     .kh-btn {
         width: max-content;
         margin-left: 15px;
-        width: 90px;
     }
     .not-chosen {
         margin: 15px;
