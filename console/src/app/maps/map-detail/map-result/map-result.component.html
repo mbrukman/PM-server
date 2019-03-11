@@ -72,9 +72,7 @@
                     </div>
                     <div class="chart">
                       <div class="pie-chart-parent">
-                        <ngx-charts-pie-chart [results]="agProcessesStatus" [labels]="showLabels" [scheme]="colorScheme"
-                          [doughnut]="true" [view]="view">
-                        </ngx-charts-pie-chart>
+                          <app-execution-chart [execution]="selectedExecution"></app-execution-chart>
                       </div>
                     </div>
                   </div>

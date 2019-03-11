@@ -75,21 +75,9 @@ export class ProcessResultComponent implements OnChanges {
           break;
         }
       }
-
       actions.push(...process.actions.map(a=> new ActionResultView(a,agent) ))
     })
     this.actions = actions;
-    // this.actions.map(action => action.selected = false);
-    // aggregating actions status
-    let agActionsStatus = actions.reduce((total, current) => {
-      total[current.action.status] = (total[current.action.status] || 0) + 1;
-      return total;
-    }, { success: 0, error: 0, stopped: 0, partial: 0 });
-    
-    // formatting for chart
-    this.agProcessActionsStatus = Object.keys(agActionsStatus).map((o) => { 
-      return { name: o, value: agActionsStatus[o] };
-    });
     
     // aggregating status for each action
     let agActions = this.actions.reduce((total, current) => {
