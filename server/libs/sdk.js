@@ -4,7 +4,14 @@ var currentAgent = {
     attributes: [{ name: "", value: "" }]
 };
 
+/**	
+ * Represents the execution Id	
+ */
 var executionId;
+
+/**	
+ * Represents the selected configuration	
+ */
 var configuration;
 
 /**
