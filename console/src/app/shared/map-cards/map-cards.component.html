@@ -11,7 +11,7 @@
             item.project.name}}</a> </div>
       </div>
       <div class="chart-wrapper" *ngIf="showPieChart">
-        <app-execution-chart [execution]="item"></app-execution-chart>
+        <app-execution-chart [size]=[130,130] [execution]="item"></app-execution-chart>
       </div>
     </div>
   </div>

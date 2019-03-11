@@ -7,22 +7,23 @@ import { Component,Input, OnChanges } from '@angular/core';
 })
 export class ExecutionChartComponent implements OnChanges {
   @Input('execution') execution :any;
-  @Input('isSmall') isSmall:boolean = true;
-  smallSize = 150;
-  bigSize=200;
-  view: number[] = []
+  @Input('size') size:number[] = [];
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936']
   };
 
   ngOnChanges(){
-    this.view = this.isSmall ? [this.smallSize,this.smallSize]:[this.bigSize,this.bigSize];
     Object.assign(this.execution,this.execution.map)
     let processes = [];
     let execution = this.execution.exec ? this.execution.exec : this.execution;
-    execution.agentsResults.forEach(agent => {
-      processes = [...processes, ...agent.processes];
-    });
+    if(!execution.agentsResults){ //if the pie chart is from the process-result component
+      processes = execution 
+    }
+    else {
+      execution.agentsResults.forEach(agent => {
+        processes = [...processes, ...agent.processes];
+      });
+    }
     this.execution.status = this.aggregateProcessesStatus(processes);
   }
 

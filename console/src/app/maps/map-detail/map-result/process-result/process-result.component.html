@@ -15,14 +15,7 @@
             </ng-container>
       </div>
       <div class="process-pie-charts">
-        <ngx-charts-pie-chart
-          [results]="agProcessActionsStatus"
-          [labels]="false"
-          [scheme]="colorScheme"
-          [doughnut]="true"
-          [view]="view">
-          
-        </ngx-charts-pie-chart>
+        <app-execution-chart [size]=[130,130] [execution]="process"></app-execution-chart>
       </div>
     </div>
     <div class="row">
