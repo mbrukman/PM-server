@@ -102,32 +102,29 @@ export class MapRevisionsComponent implements OnInit {
   addPaperDrag() {
     let initialPosition = { x: 0, y: 0 };
     let move = false;
-    this.currentPaper.on('blank:pointerdown', (event, x, y) => {
+
+    let paperOnPointerDown = (event, x, y) => {
       initialPosition = { x: x * 0.75, y: y * 0.75 };
       move = true;
-    });
-    this.latestPaper.on('blank:pointerdown', (event, x, y) => {
-      initialPosition = { x: x * 0.75, y: y * 0.75 };
-      move = true;
-    });
+    };
 
-    $('#currentGraph').mousemove((event) => {
-      if (move) {
-        this.currentPaper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
-      }
-    });
-    $('#latestGraph').mousemove((event) => {
-      if (move) {
-        this.latestPaper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
-      }
-    });
+    let paperOnPointerUp = (event, x, y) => {
+      move = false;
+    };
 
-    this.currentPaper.on('blank:pointerup', (event, x, y) => {
-      move = false;
-    });
-    this.latestPaper.on('blank:pointerup', (event, x, y) => {
-      move = false;
-    });
+    let graphMouseMove = (paper) => (event)=>{
+      if (move) {
+        paper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
+      }
+    };
+
+    this.currentPaper.on('blank:pointerdown', paperOnPointerDown);
+    this.latestPaper.on('blank:pointerdown', paperOnPointerDown);
+    this.currentPaper.on('blank:pointerup', paperOnPointerUp);
+    this.latestPaper.on('blank:pointerup', paperOnPointerUp);
+
+    $('#currentGraph').mousemove(graphMouseMove(this.currentPaper));
+    $('#latestGraph').mousemove(graphMouseMove(this.latestPaper));
   }
 
   listeners() {
