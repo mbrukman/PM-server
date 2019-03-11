@@ -58,7 +58,7 @@
         }
         .raw-output {
           max-height: 140px;
-          overflow-y: scroll;
+          overflow-y: auto;
           margin-top: -26px;
         
           .raw-output-data{
