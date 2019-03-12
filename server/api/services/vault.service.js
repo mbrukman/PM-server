@@ -37,7 +37,7 @@ module.exports = {
 
     list: (options) => {
         let queryObj = {};
-        let fields = 'key description'
+        let fields = options.fields || 'key description'
         let query
         if (options.query) {
             queryObj.key = { $regex: options.query, $options: 'i' }
