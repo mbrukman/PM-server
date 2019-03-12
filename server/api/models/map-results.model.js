@@ -43,7 +43,7 @@ let mapResultSchema = new Schema({
     agentsResults: [agentResultSchema],
     startAgentsNumber: Number,
     cleanFinish: Boolean,
-    startTime: Date,
+    startTime: {type : Date, index:true},
     finishTime: Date,
     trigger: String
 });
