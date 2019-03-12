@@ -23,21 +23,20 @@
 
   <div class="form-check form-check-inline">
     <input class="form-check-input" type="radio" formControlName="type" name="type" id="type1" value="once">
-
-    <label class="form-check-label">Once</label>
+    <label class="form-check-label" for="type1">Once</label>
   </div>
   <div class="form-check form-check-inline">
     <input class="form-check-input" type="radio" formControlName="type" name="type" id="type2" value="repeated">
-    <label class="form-check-label">Repeated</label>
+    <label class="form-check-label" for="type2">Repeated</label>
   </div>
 
 
   <div [ngSwitch]="form.controls.type.value">
     <div *ngSwitchDefault>
 
-      <div class="form-group">
+      <div class="form-group datetime-wrapper">
         <label>Date & Time:</label>
-        <p-calendar required formControlName="datetime" showTime="true" hourFormat="24"></p-calendar>
+        <p-calendar formControlName="datetime" showTime="true" hourFormat="24"></p-calendar>
       </div>
     </div>
 
@@ -55,7 +54,7 @@
     </div>
   </div>
 
-  <button type="submit" class="kh-btn kh-btn-blue" [disabled]="form.invalid">Create</button>
+  <button type="submit" class="kh-btn kh-btn-blue submit-btn" [disabled]="form.invalid">Create</button>
 </form>
 
 <ng-template #popTemplate>

@@ -4,10 +4,15 @@ var currentAgent = {
     attributes: [{ name: "", value: "" }]
 };
 
-/**
- * Represents the selected configuration
+/**	
+ * Represents the execution Id	
  */
-var configuration = {};
+var executionId;
+
+/**	
+ * Represents the selected configuration	
+ */
+var configuration;
 
 /**
  * Returns a process execution by the process uuid

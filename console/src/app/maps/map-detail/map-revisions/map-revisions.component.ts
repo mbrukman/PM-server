@@ -29,8 +29,10 @@ export class MapRevisionsComponent implements OnInit {
   maxLengthReached:boolean = false;
   structureId: string;
   mapId: string;
-  graph: joint.dia.Graph;
-  paper: joint.dia.Paper;
+  currentGraph: joint.dia.Graph;
+  latestGraph: joint.dia.Graph;
+  currentPaper: joint.dia.Paper;
+  latestPaper: joint.dia.Paper;
   projectsReq: any;
   project: Project;
   scrollCallback: any;
@@ -62,17 +64,27 @@ export class MapRevisionsComponent implements OnInit {
       this.loadStructureOnScroll(this.mapId,true);
     });
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
-    this.graph = new joint.dia.Graph;
-    this.paper = new joint.dia.Paper({
-      el: $('#graph'),
+    this.currentGraph = new joint.dia.Graph;
+    this.latestGraph = new joint.dia.Graph;
+    this.currentPaper = new joint.dia.Paper({
+      el: $('#currentGraph'),
       width: this.wrapper.nativeElement.offsetWidth,
       height: this.wrapper.nativeElement.offsetHeight,
       gridSize: 1,
-      model: this.graph,
+      model: this.currentGraph, 
+      interactive: false
+    });
+    this.latestPaper = new joint.dia.Paper({
+      el: $('#latestGraph'),
+      width: this.wrapper.nativeElement.offsetWidth,
+      height: this.wrapper.nativeElement.offsetHeight,
+      gridSize: 1,
+      model: this.latestGraph, 
       interactive: false
     });
     this.defineShape();
-    this.paper.scale(0.75, 0.75);
+    this.currentPaper.scale(0.75, 0.75);
+    this.latestPaper.scale(0.75, 0.75);
     this.addPaperDrag();
     this.listeners();
   }
@@ -90,28 +102,43 @@ export class MapRevisionsComponent implements OnInit {
   addPaperDrag() {
     let initialPosition = { x: 0, y: 0 };
     let move = false;
-    this.paper.on('blank:pointerdown', (event, x, y) => {
+
+    let paperOnPointerDown = (event, x, y) => {
       initialPosition = { x: x * 0.75, y: y * 0.75 };
       move = true;
-    });
+    };
 
-    $('#graph').mousemove((event) => {
-      if (move) {
-        this.paper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
-      }
-    });
-
-    this.paper.on('blank:pointerup', (event, x, y) => {
+    let paperOnPointerUp = (event, x, y) => {
       move = false;
-    });
+    };
+
+    let graphMouseMove = (paper) => (event)=>{
+      if (move) {
+        paper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
+      }
+    };
+
+    this.currentPaper.on('blank:pointerdown', paperOnPointerDown);
+    this.latestPaper.on('blank:pointerdown', paperOnPointerDown);
+    this.currentPaper.on('blank:pointerup', paperOnPointerUp);
+    this.latestPaper.on('blank:pointerup', paperOnPointerUp);
+
+    $('#currentGraph').mousemove(graphMouseMove(this.currentPaper));
+    $('#latestGraph').mousemove(graphMouseMove(this.latestPaper));
   }
 
   listeners() {
-    this.paper.on('cell:pointerup', (cellView, evt, x, y) => {
+    this.currentPaper.on('cell:pointerup', (cellView, evt, x, y) => {
       if (cellView.model.isLink()) {
         return;
       }
       this.previewProcess = this.currentStructure.processes.find(p => p.uuid === cellView.model.id);
+    });
+    this.latestPaper.on('cell:pointerup', (cellView, evt, x, y) => {
+      if (cellView.model.isLink()) {
+        return;
+      }
+      this.previewProcess = this.latestStructure.processes.find(p => p.uuid === cellView.model.id);
     });
   }
 
@@ -230,7 +257,7 @@ export class MapRevisionsComponent implements OnInit {
     this.mapsService.getMapStructure(this.mapId, structureId)
       .subscribe(structure => {
         this.currentStructure = structure;
-        this.graph.fromJSON(JSON.parse(structure.content));
+        this.currentGraph.fromJSON(JSON.parse(structure.content));
         this.originalModel = {
           code : structure.code,
           language : 'javascript'
@@ -248,8 +275,9 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   onResize(event) {
-    // when resizing window paper size should be updated
-    this.paper.setDimensions(this.wrapper.nativeElement.offsetWidth, this.wrapper.nativeElement.offsetHeight);
+    // when resizing window currentPaper size should be updated
+    this.currentPaper.setDimensions(this.wrapper.nativeElement.offsetWidth, this.wrapper.nativeElement.offsetHeight);
+    this.latestPaper.setDimensions(this.wrapper.nativeElement.offsetWidth, this.wrapper.nativeElement.offsetHeight);
   }
 
   onVersionScroll(event) {
@@ -263,13 +291,13 @@ export class MapRevisionsComponent implements OnInit {
 
   changeMode(mode: 'code' | 'design') {
     this.viewMode = mode;
-    this.graph.clear();
+    this.currentGraph.clear();
     if (mode === 'code') {
       this.loadCodeDiff();
     } else {
       setTimeout(() => {
 
-        this.graph.fromJSON(JSON.parse(this.currentStructure.content));
+        this.currentGraph.fromJSON(JSON.parse(this.currentStructure.content));
       }, 0);
     }
   }
@@ -284,6 +312,7 @@ export class MapRevisionsComponent implements OnInit {
     take(1)
     ).subscribe(structure => {
         this.latestStructure = structure
+        this.latestGraph.fromJSON(JSON.parse(this.latestStructure.content));
         this.modifiedModel.code = structure.code;
       });
   }

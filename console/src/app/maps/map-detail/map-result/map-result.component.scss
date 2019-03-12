@@ -17,7 +17,7 @@
 
     .execution-list {
       flex-grow: 1;
-      overflow: scroll;
+      overflow-y: auto;
       width: 229px;
       padding: 16px 23px 0px 26px;
       ul {
@@ -31,7 +31,7 @@
           height: 41px;
           line-height: 41px;
 
-          &:hover {
+          &:hover { 
             cursor: pointer;
             background: $dark-background;
           }
@@ -181,7 +181,7 @@
               
                   ul {
                     max-height: 135px;
-                    overflow-y: scroll;
+                    overflow-y: auto;
                     > li {
                       word-break: break-word;
                     }

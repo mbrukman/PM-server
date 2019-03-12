@@ -8,15 +8,15 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class  MapsCardsComponents implements OnInit {
   @Input('maps') items: any[];
-  
+  @Input ('showPieChart') showPieChart = true;
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936']
   };
   constructor(private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit() {
+    
   }
-
 
   goToProject($event, id){
     $event.stopPropagation();

@@ -60,7 +60,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   constructor(private calendarService: CalendarService, private modalService: BsModalService) {
   }
 
-  ngOnInit() {
+  ngOnInit() { 
     this.calendarService.list().pipe(
       takeUntil(this.destroy$)
     ).subscribe(jobs => {

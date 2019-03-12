@@ -8,6 +8,7 @@ import { CronJobsConfig } from 'ngx-cron-jobs/src/app/lib/contracts/contracts';
 import { MapsService } from '@maps/maps.service';
 import { FilterOptions } from '@shared/model/filter-options.model';
 import { filter } from 'rxjs/operators';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-add-job',
@@ -43,6 +44,20 @@ export class AddJobComponent implements OnInit {
       })
     });
     this.form = this.initForm();
+    
+    let cronControl = this.form.get('cron');
+    let datetimeControl = this.form.get('datetime');
+    this.form.get('type').valueChanges.subscribe(type=>{
+      if(type=='once') {
+        datetimeControl.setValidators([Validators.required]);
+        cronControl.setValidators(null);
+      } else {
+        datetimeControl.setValidators(null);
+        cronControl.setValidators([Validators.required]);
+      }
+      cronControl.updateValueAndValidity();
+      datetimeControl.updateValueAndValidity();
+    })
   }
 
   onSelectProject() {
@@ -79,7 +94,7 @@ export class AddJobComponent implements OnInit {
       map: new FormControl(null, Validators.required),
       type: new FormControl('once', Validators.required),
       configuration: new FormControl(null),
-      datetime: new FormControl(null),
+      datetime: new FormControl(null,  Validators.required),
       cron: new FormControl(null)
     });
   }

@@ -16,32 +16,47 @@
       max-width: 300px;
       padding-left: inherit;
       padding-right: inherit;
+      max-height: 100%;
     }
 
-    .col-9 {
+    .graph-container {
    
       padding: 0;
-      flex: 0 0 75%;
-      flex-grow: 1;
-      max-width: initial;
       display: flex;
+      flex-grow: 1;
+      .content-graph{
+        display: flex;
+        height: 100%;
+        padding: 0;
+        flex: 0 0 50%;
+        flex-grow: 1;
+        max-width: initial;
+        flex-direction: column;
+        .title-graph{
+          padding: 10px 0;
+        }
+      }
       
       
     }
   }
 }
 
-#graph {
+#currentGraph,#latestGraph {
   background: $dark-background;
   width: initial !important;
   height: initial !important;
   flex-grow: 1;
 }
+#currentGraph{
+  border-right: 2px solid gray;
+}
+
 
 
 .versions {
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   ul {
     list-style: none;
     padding: 16px 22px 0px 22px;
@@ -89,7 +104,7 @@
 .select-mode {
   position: absolute;
   bottom: 25px;
-  right: 50%;
+  right: 36%;
   border-radius: 5px;
   background: $background;
   padding: 20px;

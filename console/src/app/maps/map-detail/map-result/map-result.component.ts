@@ -45,7 +45,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
   page:number = 1;
   processesList: IProcessList[];
   agProcessStatusesByProcessIndex: ProcessResultByProcessIndex;
-  view: number[] = [200, 200];
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
@@ -145,34 +144,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
     modal.content.messages = messages;
   }
 
-  /** 
-   * Aggregating all processes and returning count for results graph.
-   * @param results
-   * @returns result
-   */
-  aggregateProcessStatuses(results) {
-    let processes = [];
-    results.forEach(res => {
-      processes.push(...res.processes); 
-    });
-
-    let ag = processes.reduce((total, current) => {
-      if (!total[current.status]) {
-        return total;
-      }
-      total[current.status].value = (total[current.status].value || 0) + 1;
-      return total;
-    }, {
-      success: { name: 'success', value: 0 },
-      error: { name: 'error', value: 0 },
-      stopped: { name: 'stopped', value: 0 },
-      partial: { name: 'partial', value: 0 }
-    });
-    let result = Object.keys(ag).map((key) => {
-      return ag[key];
-    });
-    return <[{ name: string, value: number }]>result; 
-  }
 
   /**
    * Aggregating results status by processes indexes
@@ -243,7 +214,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
       this.result = [agentResult];
     }
     this.generateProcessesList();
-    this.agProcessesStatus = this.aggregateProcessStatuses(this.result);
     this.agProcessStatusesByProcessIndex = this.aggregateProcessStatusesByProcessIndex(this.result);
   }
 

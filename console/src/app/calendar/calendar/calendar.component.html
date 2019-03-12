@@ -27,14 +27,16 @@
   </div>
 </ng-template>
 
-<ng-template #eventTemplate let-events="events" let-locale="locale">
-  <div *ngFor="let event of events; let i = index" class="event">
-    <span [ngClass]="{'text-info': event.job.type === 'once', 'text-warning': event.job.type !== 'once'}"
-          class="text-info"><i class="material-icons">{{event.job.type === 'once' ? 'schedule' : 'repeat'}}</i></span>
-    <span>{{ event.title }}</span>
-    <span *ngIf="event.datetime">{{ event.datetime | date: 'shortTime' }}</span>
-    <span *ngIf="event.job.cron">{{ event.job.cron }}</span>
-    <span class="button delete-job"><i class="material-icons" (click)="deleteJob(event.job)">delete_outline</i></span>
+<ng-template #eventTemplate let-events="events" let-locale="locale" let-isOpen="isOpen">
+  <div class="cal-open-day-events" *ngIf="isOpen">
+    <div *ngFor="let event of events; let i = index" class="event">
+      <span [ngClass]="{'text-info': event.job.type === 'once', 'text-warning': event.job.type !== 'once'}"
+            class="text-info"><i class="material-icons">{{event.job.type === 'once' ? 'schedule' : 'repeat'}}</i></span>
+      <span>{{ event.title }}</span>
+      <span *ngIf="event.datetime">{{ event.datetime | date: 'shortTime' }}</span>
+      <span *ngIf="event.job.cron">{{ event.job.cron }}</span>
+      <span class="button delete-job"><i class="material-icons" (click)="deleteJob(event.job)">delete_outline</i></span>
+    </div>
   </div>
 </ng-template>
 

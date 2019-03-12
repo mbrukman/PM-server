@@ -361,7 +361,7 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
                 version: 0,
                 structure: structure._id
             },
-            runId: runId,
+            executionId : runId,
             startTime: new Date(),
             structure: structure._id,
             configuration: selectedConfiguration ? selectedConfiguration.value : '',
@@ -1345,7 +1345,7 @@ function summarizeExecution(map, runId, executionContext, agentsResults) {
     result.runId = runId;
     result.cleanFinish = true;
     result.agentsResults = formatAgentsResults(agentsResults);
-    return MapResult.findByIdAndUpdate(executions[executionContext.runId].resultObj, result, { new: true });
+    return MapResult.findByIdAndUpdate(executions[executionContext.executionId].resultObj, result, { new: true });
 }
 
 /**
