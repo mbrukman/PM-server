@@ -1,4 +1,5 @@
 import { Component,Input, OnChanges } from '@angular/core';
+import {MapResult, AgentResult} from '@maps/models/execution-result.model';
 
 @Component({
   selector: 'app-execution-chart',
@@ -6,25 +7,25 @@ import { Component,Input, OnChanges } from '@angular/core';
   styleUrls: ['./execution-chart.component.scss']
 })
 export class ExecutionChartComponent implements OnChanges {
-  @Input('execution') execution :any;
+  @Input('result') result :MapResult ;
   @Input('size') size:number[] = [200,200];
+  status : [{ name: string, value: number }];
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936']
   };
 
   ngOnChanges(){
-    Object.assign(this.execution,this.execution.map)
+    Object.assign(this.result,this.result.map)
     let processes = [];
-    let execution = this.execution.exec ? this.execution.exec : this.execution;
-    if(!execution.agentsResults){ //if the pie chart is from the process-result component
-      processes = execution 
+    if(!this.result.agentsResults){ 
+      this.status = this.aggregateProcessesStatus(this.result); 
     }
     else {
-      execution.agentsResults.forEach(agent => {
+      this.result.agentsResults.forEach(agent => {
         processes = [...processes, ...agent.processes];
+        this.status = this.aggregateProcessesStatus(processes);
       });
     }
-    this.execution.status = this.aggregateProcessesStatus(processes);
   }
 
   aggregateProcessesStatus(processes) {
