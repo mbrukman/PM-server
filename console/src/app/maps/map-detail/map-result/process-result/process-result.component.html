@@ -51,11 +51,11 @@
                   <p>Finish time: {{ agActionsStatus[action.key]?.finishTime | date: 'medium'}}</p>
                 </div>
                 <div class="action-output">
-                  <h5 class="action-header">Output:</h5>
+                  <div class="row-card">
+                      <h5 class="action-header">Output:</h5>
+                    <i class="material-icons" (click)="expandOutput(action)">zoom_out_map</i>
+                  </div>
                   <div class="raw-output">
-                    <div class="row-card">
-                      <i class="material-icons" (click)="expandOutput(action)">zoom_out_map</i>
-                    </div>
                     <ng-container *ngFor="let item of agActionsStatus[action.key]?.results?.stdout">
                       <span class="raw-output-data" *ngIf="item">
                         {{ item }} <br>
