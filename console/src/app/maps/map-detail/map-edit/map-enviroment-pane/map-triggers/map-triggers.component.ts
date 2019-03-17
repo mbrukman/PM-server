@@ -6,6 +6,7 @@ import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {MapsService} from '@maps/maps.service';
 import {Map, MapStructure, MapTrigger} from '@maps/models';
 import {TriggerFormComponent} from './trigger-form/trigger-form.component';
+import {ConfirmComponent} from '@shared/confirm/confirm.component';
 
 @Component({
   selector: 'app-map-triggers',
@@ -72,10 +73,24 @@ export class MapTriggersComponent implements OnInit, OnDestroy {
   }
 
   removeTrigger(index: number) {
-    let trigger = this.triggers[index];
-    this.mapsService.deleteTrigger(this.map.id, trigger.id).subscribe(() => {
-      this.triggers.splice(index, 1);
-    });
+    let modal: BsModalRef;
+    modal = this.modalService.show(ConfirmComponent);
+    let answers = {
+      message:'Are you sure to delete the trigger ?',
+
+      confirm:'Yes'
+    }
+    modal.content.message = answers.message;
+    modal.content.confirm = answers.confirm;
+    modal.content.result.asObservable().subscribe(ans => {
+      if (ans === answers.confirm) {
+        let trigger = this.triggers[index];
+        this.mapsService.deleteTrigger(this.map.id, trigger.id).subscribe(() => {
+          this.triggers.splice(index, 1);
+        });
+      }
+    })
+   
   }
 
 }
