@@ -45,7 +45,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   page:number = 1;
   processesList: IProcessList[];
   agProcessStatusesByProcessIndex: ProcessResultByProcessIndex;
-  pieChartExecution:any
+  pieChartExecution:MapResult | [ProcessResult];
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
