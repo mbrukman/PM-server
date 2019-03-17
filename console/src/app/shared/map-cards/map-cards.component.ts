@@ -18,10 +18,12 @@ export class  MapsCardsComponents implements OnInit {
   results : ProcessResult[][] = [];
 
   ngOnInit() {
-    for(let i=0,length=this.items.length;i<length;i++){
-      this.results.push([]);
-      for(let j=0,length = this.items[i].exec.agentsResults.length;j<length;j++){
-        this.results[i].push(...this.items[i].exec.agentsResults[j].processes);
+    if(this.items){
+      for(let i=0,length=this.items.length;i<length;i++){
+        this.results.push([]);
+        for(let j=0,length = this.items[i].exec.agentsResults.length;j<length;j++){
+          this.results[i].push(...this.items[i].exec.agentsResults[j].processes);
+        }
       }
     }
   }
