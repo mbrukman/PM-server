@@ -1,5 +1,5 @@
 import { Component,Input, OnChanges } from '@angular/core';
-import {MapResult, AgentResult} from '@maps/models/execution-result.model';
+import {MapResult, AgentResult, ProcessResult} from '@maps/models/execution-result.model';
 
 @Component({
   selector: 'app-execution-chart',
@@ -7,7 +7,7 @@ import {MapResult, AgentResult} from '@maps/models/execution-result.model';
   styleUrls: ['./execution-chart.component.scss']
 })
 export class ExecutionChartComponent implements OnChanges {
-  @Input('result') result :MapResult ;
+  @Input('result') result : ProcessResult[] ;
   @Input('size') size:number[] = [200,200];
   status : [{ name: string, value: number }];
   colorScheme = {
@@ -15,17 +15,7 @@ export class ExecutionChartComponent implements OnChanges {
   };
 
   ngOnChanges(){
-    Object.assign(this.result,this.result.map)
-    let processes = [];
-    if(!this.result.agentsResults){ 
-      this.status = this.aggregateProcessesStatus(this.result); 
-    }
-    else {
-      this.result.agentsResults.forEach(agent => {
-        processes = [...processes, ...agent.processes];
-        this.status = this.aggregateProcessesStatus(processes);
-      });
-    }
+    this.status = this.aggregateProcessesStatus(this.result);
   }
 
   aggregateProcessesStatus(processes) {

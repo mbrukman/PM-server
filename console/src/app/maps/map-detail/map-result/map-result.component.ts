@@ -45,7 +45,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   page:number = 1;
   processesList: IProcessList[];
   agProcessStatusesByProcessIndex: ProcessResultByProcessIndex;
-  pieChartExecution:MapResult | [ProcessResult];
+  pieChartExecution:ProcessResult[];
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
@@ -212,11 +212,15 @@ export class MapResultComponent implements OnInit, OnDestroy {
         return false;
       }
     });
+    this.pieChartExecution = [];
     if (!agentResult) { // if not found it aggregate
       this.result = this.selectedExecution.agentsResults;
-      this.pieChartExecution = this.selectedExecution;
+      this.selectedExecution.agentsResults.forEach(agent => {
+        this.pieChartExecution.push(...agent.processes);
+      })
+
     } else {
-      this.pieChartExecution = agentResult.processes;
+      this.pieChartExecution.push(...agentResult.processes);
       this.result = [agentResult];
     }
     this.generateProcessesList();
