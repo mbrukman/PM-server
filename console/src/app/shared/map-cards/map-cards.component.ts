@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ProcessResult } from '@app/maps/models';
+import {DistinctMapResult} from '@maps/models/distinct-map-result.model';
 
 @Component({
   selector: 'map-cards',
@@ -8,7 +9,7 @@ import { ProcessResult } from '@app/maps/models';
   styleUrls: ['./map-cards.component.scss']
 })
 export class  MapsCardsComponents implements OnInit {
-  @Input('maps') items: any[];
+  @Input('maps') items: DistinctMapResult[];
   @Input ('showPieChart') showPieChart = true;
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936']

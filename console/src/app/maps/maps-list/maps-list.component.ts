@@ -8,6 +8,7 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import {DistinctMapResult} from '@maps/models/distinct-map-result.model';
 
 @Component({
   selector: 'app-maps-list',
@@ -21,6 +22,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
   page: number = 1;
   filterOptions: FilterOptions = new FilterOptions();
   recentMaps:Map[];
+  mapsCards:DistinctMapResult[];
   filterKeyUpSubscribe : Subscription;
 
   
@@ -36,6 +38,10 @@ export class MapsListComponent implements OnInit, OnDestroy {
     this.reloadMaps();
     this.mapsService.recentMaps().subscribe(maps => {
       this.recentMaps = maps;
+      this.mapsCards = maps.map((map) => {
+        return new DistinctMapResult(map);
+      })
+      
     })
 
     this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(debounceTime(300))
