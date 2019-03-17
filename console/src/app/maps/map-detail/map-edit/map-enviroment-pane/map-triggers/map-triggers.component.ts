@@ -74,17 +74,16 @@ export class MapTriggersComponent implements OnInit, OnDestroy {
 
   removeTrigger(index: number) {
     let modal: BsModalRef;
+    let trigger = this.triggers[index];
     modal = this.modalService.show(ConfirmComponent);
     let answers = {
-      message:'Are you sure to delete the trigger ?',
-
       confirm:'Yes'
     }
-    modal.content.message = answers.message;
+    modal.content.title = 'Delete Trigger'
+    modal.content.message = `Are you sure you want to delete ${trigger.name}?`;
     modal.content.confirm = answers.confirm;
     modal.content.result.asObservable().subscribe(ans => {
       if (ans === answers.confirm) {
-        let trigger = this.triggers[index];
         this.mapsService.deleteTrigger(this.map.id, trigger.id).subscribe(() => {
           this.triggers.splice(index, 1);
         });
