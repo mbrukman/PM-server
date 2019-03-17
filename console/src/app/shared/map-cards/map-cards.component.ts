@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { AgentResult, ProcessResult } from '@app/maps/models';
+import { ProcessResult } from '@app/maps/models';
 
 @Component({
   selector: 'map-cards',
@@ -21,6 +21,7 @@ export class  MapsCardsComponents implements OnInit {
     if(this.items){
       for(let i=0,length=this.items.length;i<length;i++){
         this.results.push([]);
+        Object.assign(this.items[i],this.items[i].map)
         for(let j=0,length = this.items[i].exec.agentsResults.length;j<length;j++){
           this.results[i].push(...this.items[i].exec.agentsResults[j].processes);
         }
