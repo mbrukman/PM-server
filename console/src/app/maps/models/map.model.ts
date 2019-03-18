@@ -15,5 +15,4 @@ export class Map extends Serializable implements IMap {
   project:{name: String, id:String};
   latestExectionResult?: MapResult;
   queue?: number;
-  exec?:MapResult;
 }

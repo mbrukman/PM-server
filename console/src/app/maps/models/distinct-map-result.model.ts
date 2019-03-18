@@ -1,16 +1,9 @@
-import {MapResult} from '@maps/models/execution-result.model';
-import {Map} from '@maps/models/map.model';
+import {AgentResult} from '@maps/models/execution-result.model';
 
 export class DistinctMapResult{
-    map:{name:string,archived:boolean};
+    id:string;
     project:{name:String}
-    exec:MapResult;
+    exec:{trigger:string,startTime:string,agentsResults?:AgentResult[]};
     count?:number;
     name?:string;
-    constructor(public recentMap:Map){
-        this.map = { name : recentMap.name, archived :recentMap.archived},
-        this.project = {name:recentMap.project.name}
-        this.exec = recentMap.exec;
-        this.name = recentMap.name;
-    }
 }

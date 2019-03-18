@@ -21,8 +21,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
   resultCount: number = 0;
   page: number = 1;
   filterOptions: FilterOptions = new FilterOptions();
-  recentMaps:Map[];
-  mapsCards:DistinctMapResult[];
+  recentMaps:DistinctMapResult[];
   filterKeyUpSubscribe : Subscription;
 
   
@@ -38,10 +37,6 @@ export class MapsListComponent implements OnInit, OnDestroy {
     this.reloadMaps();
     this.mapsService.recentMaps().subscribe(maps => {
       this.recentMaps = maps;
-      this.mapsCards = maps.map((map) => {
-        return new DistinctMapResult(map);
-      })
-      
     })
 
     this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(debounceTime(300))

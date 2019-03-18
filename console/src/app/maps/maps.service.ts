@@ -17,7 +17,7 @@ export class MapsService {
   }
 
   recentMaps(){
-    return this.http.get<[Map]>(`${serverUrl}api/maps/recent`);
+    return this.http.get<DistinctMapResult[]>(`${serverUrl}api/maps/recent`);
   }
   allMaps(): Observable<[Map]> {
     return this.http.get<[Map]>(`${serverUrl}api/maps`);
