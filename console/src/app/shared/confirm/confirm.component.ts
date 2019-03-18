@@ -9,7 +9,7 @@ import { BsModalRef } from 'ngx-bootstrap';
   styleUrls: ['./confirm.component.scss']
 })
 export class ConfirmComponent {
-  title: string;
+  title: string = '';
   confirm: string = 'Yes';
   cancel: string = 'Cancel';
   third: string;
