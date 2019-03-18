@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 import { Project } from './models/project.model';
 import { Map } from '@maps/models/map.model';
 import { MapStructure } from '@maps/models/map-structure.model';
-import {FilterOptions} from '@shared/model/filter-options.model'
+import {FilterOptions} from '@shared/model/filter-options.model';
 
 const serverUrl = environment.serverUrl;
 

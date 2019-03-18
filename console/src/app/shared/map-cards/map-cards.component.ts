@@ -22,7 +22,6 @@ export class  MapsCardsComponents implements OnInit {
     if(this.items){
       for(let i=0,length=this.items.length;i<length;i++){
         this.results.push([]);
-        Object.assign(this.items[i],this.items[i].map)
         for(let j=0,length = this.items[i].exec.agentsResults.length;j<length;j++){
           this.results[i].push(...this.items[i].exec.agentsResults[j].processes);
         }
