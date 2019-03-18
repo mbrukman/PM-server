@@ -41,6 +41,8 @@ const processSchema = new Schema({
     used_plugin: usedPluginsSchema,
     actions: [actionSchema],
     uuid: String
+    // isLogic: Boolean,
+    // done : Boolean
 });
 
 const linkSchema = new Schema({

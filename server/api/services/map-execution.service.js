@@ -11,7 +11,6 @@ const models = require("../models");
 
 const MapResult = models.Result;
 const MapExecutionLog = models.ExecutionLog;
-const Map = models.Map;
 
 const executionLogService = require('./execution-log.service');
 const agentsService = require('./agents.service');
@@ -77,7 +76,7 @@ function findStartNode(structure) {
             return o.uuid === source;
         });
         if (index === -1) {
-            node = { type: 'start_node', uuid: source };
+            node = { type: 'start_node', uuid: source, result: "logic action" };
             return node;
         }
     }
@@ -544,9 +543,25 @@ function runMapFromAgent(map, structure, runId, node, socket, agent) {
 
 function startMapExecution(map, structure, runId, socket) {
     let agents = executions[runId].executionAgents;
-    const startNode = findStartNode(structure);
+    let startNode = findStartNode(structure);
     var promises = []
     for (var agent in agents) {
+        // nodesToRun.push({
+        //     index: addProcessToContext(runId, agent.key, successor, process),
+        //     uuid: successor,
+        //     process: process
+        // });
+
+        process = {
+            name : "start",
+            used_plugin : {name : "start map"} 
+        }
+        addProcessToContext(runId, agent, startNode.uuid, process)
+        updateProcessContext(runId, agent, startNode.uuid, 0, {
+            status: "success",
+            result:  "logic process",
+            finishTime: new Date()
+        });
         promises.push(runMapFromAgent(map, structure, runId, startNode.uuid, socket, agents[agent]))
     }
     return Promise.all(promises)
@@ -602,7 +617,7 @@ function isThisTheFirstAgentToGetToTheProcess(runId, processKey, agentKey) {
     if (executions.hasOwnProperty(runId) && executions[runId].executionContext.visitedProcesses[processKey]) {
         return executions[runId].executionContext.visitedProcesses[processKey] == agentKey;
     }
-    executions[runId].executionContext.visitedProcesses[processKey] = agentKey;
+    executions[runId].executionContext.visitedProcesses[processKey] = agentKey;  // ????
     return true;
 }
 
@@ -669,8 +684,9 @@ function runNodeSuccessors(map, structure, runId, agent, node, socket) {
             if (process.coordination === 'wait') {
                 let flag = true;
                 ancestors.forEach(ancestor => {
-                    if (!executions[runId].executionAgents[agent.key].processes.hasOwnProperty(ancestor) ||
-                        ['error', 'success', 'partial'].indexOf(executions[runId].executionAgents[agent.key].processes[ancestor][0].status) === -1) {
+                    if ((!executions[runId].executionAgents[agent.key].processes) || !executions[runId].executionAgents[agent.key].processes.hasOwnProperty(ancestor) ||
+                        !executions[runId].executionAgents[agent.key].processes[ancestor]
+                        [0].result) { // as "done" 
                         flag = false;
                     }
                 });
