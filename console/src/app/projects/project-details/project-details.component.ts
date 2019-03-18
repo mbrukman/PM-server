@@ -8,7 +8,7 @@ import { Project } from '../models/project.model';
 import { Map } from '../../maps/models/map.model';
 import { ConfirmComponent } from '../../shared/confirm/confirm.component';
 import { ImportModalComponent } from './import-modal/import-modal.component';
-
+import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
 
 
@@ -25,7 +25,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   archiveReq: any;
   filterTerm: string;
   filterOptions : FilterOptions = new FilterOptions();
-  featuredMaps: Map[] = [];
+  featuredMaps: DistinctMapResult[] = [];
 
   constructor(private route: ActivatedRoute,
     private router: Router,

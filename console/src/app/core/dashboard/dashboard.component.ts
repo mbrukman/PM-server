@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MapsService } from '../../maps/maps.service';
-import {DistinctMapResult} from '@maps/models/distinct-map-result.model';
+import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 
 @Component({
   selector: 'app-dashboard',

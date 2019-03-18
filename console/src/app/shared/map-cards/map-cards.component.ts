@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ProcessResult } from '@app/maps/models';
-import {DistinctMapResult} from '@maps/models/distinct-map-result.model';
+import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 
 @Component({
   selector: 'map-cards',

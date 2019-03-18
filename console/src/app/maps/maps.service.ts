@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { Observable, BehaviorSubject } from 'rxjs';
-import {DistinctMapResult} from '@maps/models/distinct-map-result.model';
+import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { Map, MapExecutionLogs, MapResult, MapStructure, MapTrigger } from './models';
 import {FilterOptions} from '@shared/model/filter-options.model'
 import {MapDuplicateOptions} from './models/map-duplicate-options.model'
