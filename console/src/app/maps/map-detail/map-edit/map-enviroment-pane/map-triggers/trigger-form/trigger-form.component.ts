@@ -43,7 +43,8 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
         this.initTriggerForm();
         if (this.trigger) {
           this.onSelectTrigger();
-          this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method.name);
+          let methodName = this.triggerForm.value.method.name ? this.triggerForm.value.method.name:this.triggerForm.value.method;
+          this.method = _.find(this.plugin.methods, (o) => o.name === methodName);
           this.params = this.method.params;
           let paramsControl = <FormArray>this.triggerForm.controls['params'];
           this.trigger.params.forEach(param => {
@@ -90,23 +91,25 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
   }
 
   onSelectTrigger() {
+    let pluginName = this.triggerForm.value.plugin.name ?  this.triggerForm.value.plugin.name :  this.triggerForm.value.plugin;
     if(this.plugin){
   
       this.removeParamForm()
-      this.plugin = _.find(this.triggers, (o) => o.name === this.triggerForm.value.plugin.name);
+      this.plugin = _.find(this.triggers, (o) => o.name === pluginName);
       this.method = this.plugin.methods[0] // if there is a plugin, by default the method will be the first element
       this.addParamForm()
     }
     else{
-      this.plugin = _.find(this.triggers, (o) => o.name === this.triggerForm.value.plugin.name);
+      this.plugin = _.find(this.triggers, (o) => o.name === pluginName);
     }
   }
 
   onSelectMethod() {
+    let methodName = this.triggerForm.value.method.name ? this.triggerForm.value.method.name:this.triggerForm.value.method;
     if(this.method){
       this.removeParamForm()
     }
-    this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method.name);
+    this.method = _.find(this.plugin.methods, (o) => o.name === methodName);
     this.params = this.method.params;
     this.addParamForm()
   }
