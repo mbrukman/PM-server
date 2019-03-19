@@ -9,6 +9,12 @@ var currentAgent = {
  */
 var executionId;
 
+
+/**	
+ * Represents the selected trigger	
+ */
+var trigger;
+
 /**	
  * Represents the selected configuration	
  */
