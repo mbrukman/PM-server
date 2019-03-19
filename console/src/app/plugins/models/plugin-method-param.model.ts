@@ -1,10 +1,11 @@
 import { FormGroup, FormControl } from '@angular/forms';
 
 import {IPluginMethodParam} from '../interfaces/plugin-method-param.interface';
+import { IParam } from '@shared/interfaces/param.interface';
 import { Serializable } from '@core/models/serializable.model';
 import { ActionParam } from '@maps/models';
 
-export class PluginMethodParam extends Serializable implements IPluginMethodParam {
+export class PluginMethodParam extends Serializable implements IPluginMethodParam, IParam {
   id?: string;
   _id?: string;
   name: string;

@@ -1,7 +1,8 @@
 <div class="modal-content-wrapper">
   <div class="modal-header">
     <i class="material-icons close" (click)="onClose()">close</i>
-    <h4>Add trigger</h4>
+    <h4 [hidden]="trigger">Add trigger</h4>
+    <h4 [hidden]="!trigger">Edit trigger</h4>
   </div>
   <form [formGroup]="triggerForm" (ngSubmit)="onConfirm(triggerForm.value)" *ngIf="triggerForm">
     <div class="modal-body">
@@ -27,7 +28,7 @@
         <label for="plugin">Plugin</label>
         <p-dropdown id="plugin" [options]="triggers" optionLabel="name" placeholder="Select a trigger" formControlName="plugin" (onChange)="onSelectTrigger()" 
                     [autoWidth]="false">
-          </p-dropdown>
+        </p-dropdown>
       </div>
 
       <div class="form-group dropdown" *ngIf="triggerForm.controls.plugin.value">
