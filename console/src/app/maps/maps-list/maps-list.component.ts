@@ -8,6 +8,7 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 
 @Component({
   selector: 'app-maps-list',
@@ -20,7 +21,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
   resultCount: number = 0;
   page: number = 1;
   filterOptions: FilterOptions = new FilterOptions();
-  recentMaps:Map[];
+  recentMaps:DistinctMapResult[];
   filterKeyUpSubscribe : Subscription;
 
   

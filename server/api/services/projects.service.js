@@ -74,7 +74,7 @@ module.exports = {
 
 
     filterRecentMaps: (id) => {
-        let mapResult =  MapResult.aggregate([
+        return MapResult.aggregate([
             {
                 $lookup:
                 {
@@ -106,7 +106,7 @@ module.exports = {
                 {
                     _id: "$map", count: { $sum: 1 },
                     exec: { $first: "$$CURRENT" },
-                    map: { $first: "$maps" },
+                    name: { $first: "$maps.name" },
                 }
             },
             { $sort: { "exec.startTime": -1 } },
@@ -143,15 +143,6 @@ module.exports = {
             { $limit: 4 }
 
         ])
-
-        return mapResult.then((results) => {
-            return results.map(result=>{
-                let map = result.map;
-                map.project = result.project;
-                map.exec = result.exec;
-                return map;
-            }) 
-        })
     },
 
     /* update a project */

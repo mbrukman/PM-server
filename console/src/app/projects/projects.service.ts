@@ -5,8 +5,8 @@ import { environment } from '../../environments/environment';
 import { Project } from './models/project.model';
 import { Map } from '@maps/models/map.model';
 import { MapStructure } from '@maps/models/map-structure.model';
-import {FilterOptions} from '@shared/model/filter-options.model'
-
+import {FilterOptions} from '@shared/model/filter-options.model';
+import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 const serverUrl = environment.serverUrl;
 
 @Injectable()
@@ -32,7 +32,7 @@ export class ProjectsService {
   }
 
   filterRecentMaps(projectId:string){
-    return this.http.get<any>(`${serverUrl}api/projects/${projectId}`);
+    return this.http.get<DistinctMapResult[]>(`${serverUrl}api/projects/${projectId}`);
   }
 
   list(fields?: any, page?: number, options?:FilterOptions) {

@@ -252,33 +252,42 @@ module.exports = {
          {$sort : {'exec.startTime' :-1, updatedTime : -1}},
     
          
-         {
-                    $lookup:
+        {
+            $lookup:
+            {
+                from: "projects",
+                let: { mapId: "$_id" },
+                pipeline: [
                     {
-                        from: "projects",
-                        let: { mapId: "$_id" },
-                        pipeline: [
-                            {
-                                $match: {
-                                    $expr: {
-                                        $in: ["$$mapId", "$maps"]
-                                    }
-                                }
-                            },
-                            {
-                                $project:
-                                {
-                                    name: 1,
-                                    id : "$_id"
-                                }
+                        $match: {
+                            $expr: {
+                                $in: ["$$mapId", "$maps"]
                             }
-                        ],
-                        as: "project"
+                        }
                     },
-                },
-                   {$limit : 4},
-                   { $unwind : "$project" },
-                   {  $unwind: {"path": "$exec", "preserveNullAndEmptyArrays": true}}
+                    {
+                        $project:
+                        {
+                            name: 1,
+                            id : "$_id"
+                        }
+                    }
+                ],
+                as: "project"
+            },
+        },
+        {$limit : 4},
+        { $unwind : "$project" },
+        {  $unwind: {"path": "$exec", "preserveNullAndEmptyArrays": true}},
+        {
+            "$group":
+            {
+                _id: "$_id",
+                exec: { $first: "$exec" },
+                name: { $first: "$name" },
+                project: { $first: "$project" },
+            }
+        },
          
          
         ])

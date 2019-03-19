@@ -1,6 +1,6 @@
 <div class="row grid-view">
   <div class="card dashboard-card" *ngFor="let item of items; let i = index" [routerLink]="['/maps',(item._id || item.id), 'results']">
-    <div class="card-body" [class.no-chart]="!item.status">
+    <div class="card-body" [class.no-chart]="!showPieChart">
       <div class="content-card">
         <h5 class="card-title">{{ item.name }}</h5>
         <p class="trigger-by ellipsis" *ngIf="item.exec">Trigger: {{ item.exec.trigger }} </p>

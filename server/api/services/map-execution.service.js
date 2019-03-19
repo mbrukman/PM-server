@@ -1543,9 +1543,9 @@ module.exports = {
             {
                 "$group":
                 {
-                    _id: "$map", count: { $sum: 1 },
+                    _id: "$map",
                     exec: { $first: "$$CURRENT" },
-                    map: { $first: "$maps" },
+                    name: { $first: "$maps.name" },
                 }
             },
             { $sort: { "exec.startTime": -1 } },
