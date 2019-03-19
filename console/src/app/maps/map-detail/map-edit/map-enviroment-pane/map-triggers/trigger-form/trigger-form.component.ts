@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import { PluginsService } from '@plugins/plugins.service';
 import { Plugin, PluginMethod, PluginMethodParam } from '@plugins/models';
 import { MapTrigger } from '@maps/models';
+import { IParam } from '@shared/interfaces/param.interface';
 
 @Component({
   selector: 'app-trigger-form',
@@ -44,13 +45,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
         this.onSelectTrigger(<string>this.trigger.plugin);
         this.onSelectMethod(<string>this.trigger.method);
         this.initTriggerForm();
-        let methodName = this.triggerForm.value.method.name ? this.triggerForm.value.method.name:this.triggerForm.value.method;
-        this.method = _.find(this.plugin.methods, (o) => o.name === methodName);
-        this.params = this.method.params;
-        let paramsControl = <FormArray>this.triggerForm.controls['params'];
-        this.trigger.params.forEach(param => {
-          paramsControl.push(this.initParamsForm(param.value, param.param, param.viewName, param.name));
-        });
+        this.addParamForm(this.trigger.params);
       } else {
         this.initTriggerForm();
       }
@@ -118,9 +113,10 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
     }
   }
 
-  addParamForm(){
+  addParamForm(params? : IParam[]){
     let paramsControl = <FormArray>this.triggerForm.controls['params'];
-    this.method.params.forEach(param => {
+    params = params || this.method.params;
+    params.forEach(param => {
       paramsControl.push(this.initParamsForm(param.value, param._id, param.viewName, param.name));
     });
   }
