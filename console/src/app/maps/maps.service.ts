@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { Observable, BehaviorSubject } from 'rxjs';
-
+import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { Map, MapExecutionLogs, MapResult, MapStructure, MapTrigger } from './models';
 import {FilterOptions} from '@shared/model/filter-options.model'
 import {MapDuplicateOptions} from './models/map-duplicate-options.model'
@@ -17,7 +17,7 @@ export class MapsService {
   }
 
   recentMaps(){
-    return this.http.get<[Map]>(`${serverUrl}api/maps/recent`);
+    return this.http.get<DistinctMapResult[]>(`${serverUrl}api/maps/recent`);
   }
   allMaps(): Observable<[Map]> {
     return this.http.get<[Map]>(`${serverUrl}api/maps`);
@@ -83,7 +83,7 @@ export class MapsService {
   }
 
   getDistinctMapExecutionsResult() {
-    return this.http.get<any>(`${serverUrl}api/maps/results`);
+    return this.http.get<DistinctMapResult[]>(`${serverUrl}api/maps/results`);
   }
 
   logsList(mapId: string, runId?: string) {

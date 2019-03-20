@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { AgentResult, ProcessResult } from '@app/maps/models';
+import { ProcessResult } from '@app/maps/models';
+import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 
 @Component({
   selector: 'map-cards',
@@ -8,7 +9,7 @@ import { AgentResult, ProcessResult } from '@app/maps/models';
   styleUrls: ['./map-cards.component.scss']
 })
 export class  MapsCardsComponents implements OnInit {
-  @Input('maps') items: any[];
+  @Input('maps') items: DistinctMapResult[];
   @Input ('showPieChart') showPieChart = true;
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936']
@@ -18,10 +19,12 @@ export class  MapsCardsComponents implements OnInit {
   results : ProcessResult[][] = [];
 
   ngOnInit() {
-    for(let i=0,length=this.items.length;i<length;i++){
-      this.results.push([]);
-      for(let j=0,length = this.items[i].exec.agentsResults.length;j<length;j++){
-        this.results[i].push(...this.items[i].exec.agentsResults[j].processes);
+    if(this.items){
+      for(let i=0,length=this.items.length;i<length;i++){
+        this.results.push([]);
+        for(let j=0,length = this.items[i].exec.agentsResults.length;j<length;j++){
+          this.results[i].push(...this.items[i].exec.agentsResults[j].processes);
+        }
       }
     }
   }

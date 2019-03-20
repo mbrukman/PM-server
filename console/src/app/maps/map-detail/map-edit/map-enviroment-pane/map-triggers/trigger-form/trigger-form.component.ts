@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import { PluginsService } from '@plugins/plugins.service';
 import { Plugin, PluginMethod, PluginMethodParam } from '@plugins/models';
 import { MapTrigger } from '@maps/models';
+import { IParam } from '@shared/interfaces/param.interface';
 
 @Component({
   selector: 'app-trigger-form',
@@ -39,17 +40,14 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
       this.configDropDown = this.configurations.map(config => {
         return {name:config}
       })
-      if (this.triggers) {
+      
+      if (this.trigger) {
+        this.onSelectTrigger(<string>this.trigger.plugin);
+        this.onSelectMethod(<string>this.trigger.method);
         this.initTriggerForm();
-        if (this.trigger) {
-          this.onSelectTrigger();
-          this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method.name);
-          this.params = this.method.params;
-          let paramsControl = <FormArray>this.triggerForm.controls['params'];
-          this.trigger.params.forEach(param => {
-            paramsControl.push(this.initParamsForm(param.value, param.param, param.viewName, param.name));
-          });
-        }
+        this.addParamForm(this.trigger.params);
+      } else {
+        this.initTriggerForm();
       }
     });
   }
@@ -62,9 +60,9 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
     this.triggerForm = new FormGroup({
       name: new FormControl(this.trigger ? this.trigger.name : null, Validators.required),
       description: new FormControl(),
-      plugin: new FormControl(this.trigger ? this.trigger.plugin : null, Validators.required),
+      plugin: new FormControl(this.plugin ? this.plugin : null, Validators.required),
       configuration: new FormControl(this.trigger ? this.trigger.method : null),
-      method: new FormControl( this.trigger ? this.trigger.method : null, Validators.required),
+      method: new FormControl( this.method ? this.method : null, Validators.required),
       params: new FormArray([])
     });
   }
@@ -89,31 +87,36 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
     this.onClose();
   }
 
-  onSelectTrigger() {
+  onSelectTrigger(pluginToUse? : string) {
+    let pluginName = pluginToUse ? pluginToUse : (this.triggerForm.value.plugin.name ?  this.triggerForm.value.plugin.name :  this.triggerForm.value.plugin);
     if(this.plugin){
   
       this.removeParamForm()
-      this.plugin = _.find(this.triggers, (o) => o.name === this.triggerForm.value.plugin.name);
+      this.plugin = _.find(this.triggers, (o) => o.name === pluginName);
       this.method = this.plugin.methods[0] // if there is a plugin, by default the method will be the first element
       this.addParamForm()
     }
     else{
-      this.plugin = _.find(this.triggers, (o) => o.name === this.triggerForm.value.plugin.name);
+      this.plugin = _.find(this.triggers, (o) => o.name === pluginName);
     }
   }
 
-  onSelectMethod() {
+  onSelectMethod(methodToUse? :string) {
+    let methodName = methodToUse ? methodToUse : (this.triggerForm.value.method.name ? this.triggerForm.value.method.name:this.triggerForm.value.method);
     if(this.method){
       this.removeParamForm()
     }
-    this.method = _.find(this.plugin.methods, (o) => o.name === this.triggerForm.value.method.name);
+    this.method = _.find(this.plugin.methods, (o) => o.name === methodName);
     this.params = this.method.params;
-    this.addParamForm()
+    if(this.triggerForm){
+      this.addParamForm();
+    }
   }
 
-  addParamForm(){
+  addParamForm(params? : IParam[]){
     let paramsControl = <FormArray>this.triggerForm.controls['params'];
-    this.method.params.forEach(param => {
+    params = params || this.method.params;
+    params.forEach(param => {
       paramsControl.push(this.initParamsForm(param.value, param._id, param.viewName, param.name));
     });
   }
