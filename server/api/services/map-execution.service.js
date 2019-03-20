@@ -1507,6 +1507,20 @@ module.exports = {
      */
     dashboard: () => {
         return MapResult.aggregate([
+            { 
+                $match:{
+                    archivedMap : {$ne : true}
+                }
+            },
+            { $sort: { "startTime": -1 } },
+            {
+                "$group":
+                {
+                    _id: "$map", count: { $sum: 1 },
+                    exec: { $first: "$$CURRENT" },
+                }
+            },
+            { $limit: 16 },
             {
                 $lookup:
                 {
@@ -1537,18 +1551,6 @@ module.exports = {
                     "preserveNullAndEmptyArrays": true
                 }
             },
-            { $match: { "maps.archived": false } },
-            { $sort: { "startTime": -1 } },
-            {
-                "$group":
-                {
-                    _id: "$map", count: { $sum: 1 },
-                    exec: { $first: "$$CURRENT" },
-                    map: { $first: "$maps" },
-                }
-            },
-            { $sort: { "exec.startTime": -1 } },
-            { $limit: 16 },
             {
                 $lookup:
                 {
@@ -1577,8 +1579,10 @@ module.exports = {
                     "path": "$project",
                     "preserveNullAndEmptyArrays": true
                 }
-            },
+            }
+           
         ])
+  
     },
 
     /**

@@ -1,8 +1,12 @@
 const Project = require("../models/project.model");
 const Map = require("../models/map.model");
+const MapResult = require("../models/map-results.model");
 
 function archiveMaps(mapsIds, isArchive){
     return Map.update({ _id: { $in: mapsIds } }, { archived: isArchive }, { multi: true })
+    .then(() =>{
+       return MapResult.update({map:{$in:mapsIds}}, {archivedMap:isArchive},{multi: true});
+    })
 }
 
 function archiveProject(projectId, isArchive){   

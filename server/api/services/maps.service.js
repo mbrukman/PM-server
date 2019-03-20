@@ -244,14 +244,11 @@ module.exports = {
                   
                     
                 ],
-                    
                 as: "exec"
             },
            
         },
          {$sort : {'exec.startTime' :-1, updatedTime : -1}},
-    
-         
          {
                     $lookup:
                     {
@@ -279,12 +276,6 @@ module.exports = {
                    {$limit : 4},
                    { $unwind : "$project" },
                    {  $unwind: {"path": "$exec", "preserveNullAndEmptyArrays": true}}
-         
-         
         ])
-
-     
-
     }
-
 };
