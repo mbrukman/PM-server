@@ -366,7 +366,8 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
             startTime: new Date(),
             structure: structure._id,
             configuration: selectedConfiguration ? selectedConfiguration.value : '',
-            visitedProcesses: new Set() // saving uuid of process ran by all the agents (used in flow control)
+            visitedProcesses: new Set(), // saving uuid of process ran by all the agents (used in flow control)
+            trigger:triggerReason
         };
 
         return filterExecutionAgents(mapStructure.code, executionContext, map.groups, map.agents, agents);
