@@ -74,74 +74,30 @@ module.exports = {
 
 
     filterRecentMaps: (id) => {
-        let maps= Map.aggregate([
+        return Project.aggregate([
             {
-                $lookup:
-                {
-                    from: "projects",
-                    let: { mapId: "$_id" },
-                    pipeline: [
-                        {
-                            $match: 
-                            {
-                                $expr:
-                                {
-                                     $and:
-                                    [
-                                        {$ne :["$archived", true]},
-                                        {$eq:["$_id",mongoose.Types.ObjectId(id)]},
-                                        {$in: ["$$mapId","$maps"]}
-                                    ]
-                                }       
-                            }
-                        },
-                        {
-                            $project:
-                            {
-                                name: 1,
-                                _id:0,
-                            }
-                        }
-                    ],
-                    as: "project"
-                }
-            },
-            {
-                $unwind: {
-                    "path": "$project",
-                    "preserveNullAndEmptyArrays": true
-                }
-            },
-            {
-                $match:
-                {
-                    archived:false
+                $match: {
+                    _id: mongoose.Types.ObjectId(id)
                 }
             },
             {
                 $project:
                 {
-                    name:1,
-                    project:1,
-                    
+                    name: 1,
+                    maps: 1
                 }
             },
-            {
-                $match:
-                {
-                     project:{$exists:true}
-                }
-            },
+            { "$unwind": "$maps" },
             {
                 $lookup:
                 {
                     from: "mapResults",
-                    let: { mapId: "$_id" },
+                    let: { mapId: "$maps" },
                     pipeline: [
                         {
                             $match: {
                                 $expr: {
-                                    $eq: ["$$mapId","$map"]
+                                    $eq: ["$$mapId", "$map"]
                                 }
                             }
                         },
@@ -149,35 +105,77 @@ module.exports = {
                             $project:
                             {
                                 startTime: 1,
-                                trigger:1
+                                trigger: 1
                             }
                         },
-                        {$sort:{"startTime":-1}},
-                        {$limit:1}
-                     
+                        { $sort: { "startTime": -1 } },
+                        { $limit: 1 }
+        
                     ],
                     as: "exec"
                 }
             },
             {
-                $unwind: {
+                $unwind: 
+                {
                     "path": "$exec",
                     "preserveNullAndEmptyArrays": true
                 }
             },
-            { $sort: { "exec.startTime": -1 } },
+            {
+                $lookup:
+                {
+                    from: "maps",
+                    let: { mapId: "$maps" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and:[
+                                    {
+                                    $eq: ["$$mapId", "$_id"]
+                                },
+                                {$eq:["$archived",false]}
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            $project:
+                            {
+                                _id:0,
+                                name:1
+                            }
+                        },
+        
+                    ],
+                    as: "map"
+                }
+            },
+            {
+                $unwind: 
+                {
+                    "path": "$map",
+                    "preserveNullAndEmptyArrays": true
+                }
+            },
+            {
+                $group:
+                {
+                    _id:"$maps",
+                    exec:{$first:"$exec"},
+                    project:{$first:"$name"},
+                    map:{$first:"$map"}
+                }
+            },
+            {
+                $match:{
+                    map:{$ne:null}
+                }
+            },
+            {$sort:{"exec.startTime":-1}},
             {$limit:4}
         ])
-        return maps.then((mapsQuery) => {
-            return mapsQuery.map((map) => {
-                return {
-                    _id:map._id,
-                    map:{name:map.name},
-                    exec:map.exec,
-                    project:map.project
-                }
-            })
-        })
     },
 
     /* update a project */
