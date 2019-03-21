@@ -89,8 +89,6 @@ exports.recentsMaps = function (limit,execFields=[]){
         {
             $project:$projectField
         }
-    ]).then(res=>{
-        return res;
-    })
+    ])
 }
 
