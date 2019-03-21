@@ -8,7 +8,7 @@ const MapResult = require("../models/map-results.model")
 const Project = require("../models/project.model")
 const proejctServise = require("./projects.service")
 const PAGE_SIZE = env.page_size;
-
+const shared = require("../shared/recents-maps")
 
 function getMapPlugins(mapStructure) {
     let plugins = new Set();
@@ -216,84 +216,7 @@ module.exports = {
     },
 
     recentMaps:()=>{
-        
-    return Map.aggregate([
-        {
-            $lookup:
-            {
-                from: "mapResults",
-                let: { mapId: "$_id" },
-                pipeline: [
-                    {
-                        $match: {
-                            $expr: {
-                                $eq: ["$$mapId", "$map"]
-                            }
-                        }
-                    },
-                    {
-                        $project:
-                        {
-                            startTime: 1,
-                            trigger:1,
-                            id : "$_id"
-                        }
-                    },
-                    {$sort : {startTime :-1}},
-                    {$limit : 1}
-                  
-                    
-                ],
-                    
-                as: "exec"
-            },
-           
-        },
-         {$sort : {'exec.startTime' :-1, updatedTime : -1}},
-    
-         
-        {
-            $lookup:
-            {
-                from: "projects",
-                let: { mapId: "$_id" },
-                pipeline: [
-                    {
-                        $match: {
-                            $expr: {
-                                $in: ["$$mapId", "$maps"]
-                            }
-                        }
-                    },
-                    {
-                        $project:
-                        {
-                            name: 1,
-                            id : "$_id"
-                        }
-                    }
-                ],
-                as: "project"
-            },
-        },
-        {$limit : 4},
-        { $unwind : "$project" },
-        {  $unwind: {"path": "$exec", "preserveNullAndEmptyArrays": true}},
-        {
-            "$group":
-            {
-                _id: "$_id",
-                exec: { $first: "$exec" },
-                name: { $first: "$name" },
-                project: { $first: "$project" },
-            }
-        },
-         
-         
-        ])
-
-     
-
+        return shared.recentsMaps(4,['startTime','trigger']);
     }
 
 };

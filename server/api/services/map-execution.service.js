@@ -18,6 +18,7 @@ const agentsService = require('./agents.service');
 const mapsService = require('./maps.service');
 const pluginsService = require('../services/plugins.service');
 const vaultService = require('./vault.service')
+const shared = require('../shared/recents-maps')
 
 let executions = {};
 let pending = {};
@@ -365,7 +366,7 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
             startTime: new Date(),
             structure: structure._id,
             configuration: selectedConfiguration ? selectedConfiguration.value : '',
-            visitedProcesses: new Set(),// saving uuid of process ran by all the agents (used in flow control)
+            visitedProcesses: new Set(), // saving uuid of process ran by all the agents (used in flow control)
             trigger:triggerReason
         };
 
@@ -1507,79 +1508,7 @@ module.exports = {
      * @returns {Document|Promise|Query|*|void}
      */
     dashboard: () => {
-        return MapResult.aggregate([
-            {
-                $lookup:
-                {
-                    from: "maps",
-                    let: { mapId: "$map" },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $eq: ["$$mapId", "$_id"]
-                                }
-                            }
-                        },
-                        {
-                            $project:
-                            {
-                                name: 1,
-                                archived: 1,
-                            }
-                        }
-                    ],
-                    as: "maps",
-                },
-            },
-            {
-                $unwind: {
-                    "path": "$maps",
-                    "preserveNullAndEmptyArrays": true
-                }
-            },
-            { $match: { "maps.archived": false } },
-            { $sort: { "startTime": -1 } },
-            {
-                "$group":
-                {
-                    _id: "$map",
-                    exec: { $first: "$$CURRENT" },
-                    name: { $first: "$maps.name" },
-                }
-            },
-            { $sort: { "exec.startTime": -1 } },
-            { $limit: 16 },
-            {
-                $lookup:
-                {
-                    from: "projects",
-                    let: { mapId: "$exec.map" },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $in: ["$$mapId", "$maps"]
-                                }
-                            }
-                        },
-                        {
-                            $project:
-                            {
-                                name: 1
-                            }
-                        }
-                    ],
-                    as: "project"
-                },
-            },
-            {
-                $unwind: {
-                    "path": "$project",
-                    "preserveNullAndEmptyArrays": true
-                }
-            },
-        ])
+        return shared.recentsMaps(16);
     },
 
     /**

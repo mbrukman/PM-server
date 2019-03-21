@@ -43,17 +43,18 @@ let mapResultSchema = new Schema({
     agentsResults: [agentResultSchema],
     startAgentsNumber: Number,
     cleanFinish: Boolean,
-    startTime: Date,
+    startTime: {type:Date, index:true },
     finishTime: Date,
-    trigger: String
+    trigger: String,
+    archivedMap:{type:Boolean, default:false, index: true}
 });
+
 
 mapResultSchema.set('toJSON', {
     transform: function (doc, ret, options) {
         ret.id = ret._id;
     }
 });
-
 let MapResult = mongoose.model('MapResult', mapResultSchema, 'mapResults');
 
 
