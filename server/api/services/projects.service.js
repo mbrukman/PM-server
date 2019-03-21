@@ -74,7 +74,7 @@ module.exports = {
 
 
     filterRecentMaps: (id) => {
-        return Project.aggregate([
+        let projects= Project.aggregate([
             {
                 $match: {
                     _id: mongoose.Types.ObjectId(id)
@@ -171,6 +171,16 @@ module.exports = {
             {$sort:{"exec.startTime":-1}},
             {$limit:4}
         ])
+        return projects.then((projects) => {
+            return projects.map((project) => {
+                return {
+                    _id:project._id,
+                    map:project.map,
+                    exec:project.exec,
+                    project:{name:project.project}
+                }
+            })
+        })
     },
 
     /* update a project */
