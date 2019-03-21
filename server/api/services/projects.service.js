@@ -135,7 +135,7 @@ module.exports = {
                                     {
                                     $eq: ["$$mapId", "$_id"]
                                 },
-                                {$eq:["$archived",false]}
+                                {$ne:["$archived",true]}
                                     ]
                                 }
                             }
