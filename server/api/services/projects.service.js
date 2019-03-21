@@ -156,7 +156,7 @@ module.exports = {
                 $unwind: 
                 {
                     "path": "$map",
-                    "preserveNullAndEmptyArrays": true
+                    "preserveNullAndEmptyArrays": false
                 }
             },
             {
@@ -166,11 +166,6 @@ module.exports = {
                     exec:{$first:"$exec"},
                     project:{$first:"$name"},
                     map:{$first:"$map"}
-                }
-            },
-            {
-                $match:{
-                    map:{$ne:null}
                 }
             },
             {$sort:{"exec.startTime":-1}},
