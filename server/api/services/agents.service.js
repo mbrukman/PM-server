@@ -39,7 +39,6 @@ const FILTER_FIELDS = Object.freeze({
 let followAgentStatus = (agent) => {
     let listenInterval = setInterval(() => {
         let start = new Date();
-
         request.post(
             agents[agent.key].defaultUrl + '/api/status', {
                 form: {
@@ -83,6 +82,7 @@ let followAgentStatus = (agent) => {
     }, INTERVAL_TIME);
     if (!agents[agent.key]) {
         agents[agent.key] = { alive: false, following: true };
+        agents[agent.key].defaultUrl = agent.url;
         // agents[agent.key] = { intervalId: listenInterval, alive: false, following: true };
     }
 };
