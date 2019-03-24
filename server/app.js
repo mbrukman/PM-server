@@ -93,9 +93,10 @@ const mapsApi = require("./api/routes/maps.routes");
 const pluginsApi = require("./api/routes/plugins.routes");
 const agentsApi = require("./api/routes/agents.routes");
 const projectsApi = require("./api/routes/projects.routes");
-const triggersApi = require("./api/routes/triggers.routes")
-const scheduledJobsApi =  require("./api/routes/scheduled-jobs.routes")
-const vaultApi = require("./api/routes/vault.routes")
+const triggersApi = require("./api/routes/triggers.routes");
+const scheduledJobsApi =  require("./api/routes/scheduled-jobs.routes");
+const vaultApi = require("./api/routes/vault.routes");
+const configTokenApi = require("./api/routes/config-token.routes");
 
 app.use('/api/settings', settingsApi);
 app.use('/api/maps', mapsApi);
@@ -105,7 +106,7 @@ app.use('/api/projects', projectsApi);
 app.use('/api/triggers', triggersApi)
 app.use('/api/scheduled-jobs', scheduledJobsApi)
 app.use('/api/vault', vaultApi)
-
+app.use('/api/config-token', configTokenApi)
 
 
 
