@@ -82,7 +82,7 @@ let followAgentStatus = (agent) => {
     }, INTERVAL_TIME);
     if (!agents[agent.key]) {
         agents[agent.key] = { alive: false, following: true };
-        agents[agent.key].defaultUrl = agent.url;
+        setDefaultUrl(agent);
         // agents[agent.key] = { intervalId: listenInterval, alive: false, following: true };
     }
 };
