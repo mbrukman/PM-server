@@ -1,4 +1,4 @@
-<div class="modal-content-wrapper no-title">
+<div class="modal-content-wrapper" [ngClass]="{'no-title': !title}">
   <div class="modal-header">
     <i class="material-icons close" (click)="onAction(cancel)">close</i>
     <h4>{{ title }}</h4>
@@ -9,7 +9,7 @@
 
   <div class="modal-footer">
     <button type="button" [hidden]="!cancel" class="kh-btn kh-btn-gray" (click)="onAction(cancel)">{{ cancel }}</button>
-    <button type="submit" [hidden]="!confirm" class="kh-btn kh-btn-gray" (click)="onAction(confirm)">{{ confirm }}</button>
+    <button type="submit" [hidden]="!confirm" class="kh-btn kh-btn-blue" (click)="onAction(confirm)">{{ confirm }}</button>
     <button type="submit" [hidden]="!third" class="kh-btn-blue kh-btn" (click)="onAction(third)" *ngIf="third">{{ third }}</button>
   </div>
 </div>

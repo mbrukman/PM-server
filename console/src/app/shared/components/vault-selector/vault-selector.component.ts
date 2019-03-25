@@ -19,7 +19,7 @@ export class VaultSelectorComponent implements OnInit, ControlValueAccessor {
 
   results: string[];
   text :string = "";
-  options = { query: {}, fields: 'key', limit: 5 }
+  options = { query: "", fields: 'key', limit: 5 }
   propagateChange : (_: any) => { };
 
   constructor(private vaultService: VaultService) { }

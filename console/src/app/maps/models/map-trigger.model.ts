@@ -1,9 +1,10 @@
 import { Map } from './map.model';
 import { ITriggerActionParam } from '../interfaces/map-trigger.interface';
+import { IParam } from '@shared/interfaces/param.interface';
 import { PluginMethod, PluginMethodParam } from '@plugins/models';
 
 
-export class TriggerActionParam implements ITriggerActionParam {
+export class TriggerActionParam implements ITriggerActionParam, IParam {
   value: string;
   viewName: string;
   param: string | PluginMethodParam;

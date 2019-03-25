@@ -59,7 +59,7 @@
         .raw-output {
           max-height: 140px;
           overflow-y: auto;
-          margin-top: -26px;
+         
         
           .raw-output-data{
             white-space: pre-line;
@@ -68,7 +68,7 @@
         
         .row-card{
           display: flex;
-          justify-content: flex-end;
+          justify-content: space-between;
           cursor:pointer
         }
       }

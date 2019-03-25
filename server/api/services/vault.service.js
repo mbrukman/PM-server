@@ -37,19 +37,15 @@ module.exports = {
 
     list: (options) => {
         let queryObj = {};
-        let fields = 'key description'
+        let fields = options.fields || 'key description'
         if (options.query) {
             queryObj.key = { $regex: options.query, $options: 'i' }
         }
-        if (options.fields) {
-            fields = options.fields;
-        }
-        let query = Vault.find(queryObj, fields);
+        query = Vault.find(queryObj, fields);
         if (options.limit)
             query.limit(options.limit);
 
         return query;
-
     },
     update: (vaultId, vaultItem) => {
         if (vaultItem.value)

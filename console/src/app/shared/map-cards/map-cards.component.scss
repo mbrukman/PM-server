@@ -19,7 +19,9 @@
 
             .content-card {
                 color: $greyish-text;
-                width: calc(100% - 130px);
+                width: calc(100% - 100px);
+                padding-right: 20px;
+                
                 .card-title {
                     font-size: 18px;
                     line-height: 0.89;

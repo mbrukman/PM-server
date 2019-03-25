@@ -13,7 +13,7 @@
     <p class="map-description lead">{{project?.description}}</p>
     <p class="featured-title" *ngIf="featuredMaps?.length > 0">Recently added</p>
     <div class="map-cards-wrapper">
-      <map-cards [maps]="featuredMaps"></map-cards>
+      <map-cards [maps]="featuredMaps" [showPieChart]="false"></map-cards>
     </div>
 
     <div class="row">

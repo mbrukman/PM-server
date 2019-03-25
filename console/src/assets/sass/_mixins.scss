@@ -112,6 +112,7 @@
         height: 30px;
         display: inline-flex;
         justify-content: center;
+        align-items: center;
       }
     }
   }
@@ -259,12 +260,6 @@
 @mixin autocomplete(){
   ::ng-deep .ui-autocomplete {
     display: flex !important;
-
-    input{
-        height: $dropdown-label-height;
-        font-size: 1rem;
-        width: 90%;
-    }
     .ui-clickable{
         padding-bottom: 14px;
     }
@@ -279,7 +274,8 @@
     input{
       height: $dropdown-label-height;
       font-size: 1rem;
-      width: 100%
+      width: 100%;
+      padding: .375rem .75rem;
     }
 
     .pi{

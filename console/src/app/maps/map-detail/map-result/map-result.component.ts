@@ -45,6 +45,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   page:number = 1;
   processesList: IProcessList[];
   agProcessStatusesByProcessIndex: ProcessResultByProcessIndex;
+  pieChartExecution:ProcessResult[];
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
@@ -183,8 +184,11 @@ export class MapResultComponent implements OnInit, OnDestroy {
 
         if (this.agents.length > 1) { // if there is more than one agent, add an aggregated option.
           this.agents.unshift({ label: 'Aggregate', value: defaultAgentValue });
+          this.selectedAgent = defaultAgentValue;
         }
-        this.selectedAgent = defaultAgentValue;
+        else if (this.agents.length){
+          this.selectedAgent = this.agents[0].value
+        }
         this.changeAgent();
       }),
       mergeMap(result => this.mapsService.logsList((<string>result.map), result.runId)) // get the logs list for this execution
@@ -208,9 +212,15 @@ export class MapResultComponent implements OnInit, OnDestroy {
         return false;
       }
     });
+    this.pieChartExecution = [];
     if (!agentResult) { // if not found it aggregate
       this.result = this.selectedExecution.agentsResults;
+      this.selectedExecution.agentsResults.forEach(agent => {
+        this.pieChartExecution.push(...agent.processes);
+      })
+
     } else {
+      this.pieChartExecution.push(...agentResult.processes);
       this.result = [agentResult];
     }
     this.generateProcessesList();
