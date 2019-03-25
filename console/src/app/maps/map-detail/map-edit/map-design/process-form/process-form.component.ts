@@ -52,6 +52,11 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     
+    if(this.processViewWrapper.plugin){
+      this.methodsDropDown = this.processViewWrapper.plugin.methods.map(method => {
+        return {label:method.viewName,value:method.name}
+      })
+    }
     if (!this.processViewWrapper.process) {
       this.closePane();
       return;
@@ -93,9 +98,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         actionControl.push(this.initActionController(action));
         
        if(this.processViewWrapper.plugin){
-        this.methodsDropDown = this.processViewWrapper.plugin.methods.map(method => {
-          return {label:method.viewName,value:method.name}
-        })
         let pluginMethod = this.processViewWrapper.plugin.methods.find(o => o.name === action.method)
         if (pluginMethod && pluginMethod.params && pluginMethod.params.length > 0) {
           pluginMethod.params.forEach(pluginParam => {
