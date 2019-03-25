@@ -7,5 +7,14 @@ module.exports = {
         let jwtSecret = config.serverKey
         let token =jwt.sign(payload, jwtSecret);
         res.send(token)
+    },
+
+    validateToken:(token)=> {
+        let jwtSecret = config.serverKey
+        try {
+            return jwt.verify(token, jwtSecret,{ignoreExpiration: true} );
+        } catch (err) {
+            return false;
+        }
     }
 }
