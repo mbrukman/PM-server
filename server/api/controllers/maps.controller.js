@@ -257,16 +257,18 @@ module.exports = {
     },
     /* execute a map */
     execute: (req, res) => {
-        let agents, trigger, config, token;
+        let agents, trigger, config, payload;
         if (req.body) {
             agents = req.body.agents ? req.body.agents.split(',') : null;
             trigger = req.body.trigger;
             config = req.body.config ? req.body.config : req.query.config;
-            token = configToken.validateToken(req.body.token) ? configToken.validateToken(req.body.token) : null;
+            let isValidToken = configToken.validateToken(req.body.token)
+            payload = isValidToken ? isValidToken : null;
         }
-        console.log(token);
+        let globalConfig = payload ? Object.assign(config,payload.config) : config;
+        let globalTrigger = payload ? trigger + " "+ "-"+ " "+payload.triggerMsg : trigger;
         hooks.hookPre('map-execute', req).then(() => {
-            return mapsExecutionService.execute(req.params.id, req.params.structure, null, req, config, trigger, agents);
+            return mapsExecutionService.execute(req.params.id, req.params.structure, null, req, globalConfig, globalTrigger, agents);
         }).then((r) => {
             res.json(r);
         }).catch(error => {

@@ -12,7 +12,7 @@ module.exports = {
     validateToken:(token)=> {
         let jwtSecret = config.serverKey
         try {
-            return jwt.verify(token, jwtSecret,{ignoreExpiration: true} );
+            return jwt.verify(token, jwtSecret );
         } catch (err) {
             return false;
         }
