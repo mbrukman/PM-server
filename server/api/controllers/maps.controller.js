@@ -262,11 +262,11 @@ module.exports = {
             agents = req.body.agents ? req.body.agents.split(',') : null;
             trigger = req.body.trigger;
             config = req.body.config ? req.body.config : req.query.config;
-            let isValidToken = configToken.validateToken(req.body.token)
-            payload = isValidToken ? isValidToken : null;
+            let configTokenPayload = configToken.validateAndExtractToken(req.body.token)
+            payload = configTokenPayload ? configTokenPayload : null;
         }
-        let globalConfig = payload ? Object.assign(config,payload.config) : config;
-        let globalTrigger = payload ? trigger + " "+ "-"+ " "+payload.triggerMsg : trigger;
+        let globalConfig = payload && payload.config ? Object.assign(config,payload.config) : config;
+        let globalTrigger = payload && payload.triggerMsg ? trigger + " "+ "-"+ " "+payload.triggerMsg : trigger;
         hooks.hookPre('map-execute', req).then(() => {
             return mapsExecutionService.execute(req.params.id, req.params.structure, null, req, globalConfig, globalTrigger, agents);
         }).then((r) => {
