@@ -4,12 +4,8 @@ const jwt = require('jsonwebtoken');
 module.exports = {
     createToken:(req,res)=>{
         let payload = req.body;
-        let jwtSecret = config.serverKey
-        let today = new Date();
-        let exp = new Date(today);
-        exp.setDate(today.getDate() + 7);
-        payload.exp = parseInt(exp.getTime() / 1000);
-        let token =jwt.sign(payload, jwtSecret);
+        let jwtSecret = config.serverKey;
+        let token = jwt.sign(payload, jwtSecret,{ expiresIn: "7d"} );
         res.send(token)
     },
 
