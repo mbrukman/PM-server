@@ -13,7 +13,10 @@ var executionId;
 /**	
  * Represents the selected trigger	
  */
-var trigger;
+var trigger = {
+    msg:'',
+    payload:null
+} 
 
 /**	
  * Represents the selected configuration	
