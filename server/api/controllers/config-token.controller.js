@@ -1,20 +1,9 @@
+const tokenService = require('../services/token.service');
 
-const config = require('../../env/config');
-const jwt = require('jsonwebtoken');
 module.exports = {
     createToken:(req,res)=>{
         let payload = req.body;
-        let jwtSecret = config.serverKey;
-        let token = jwt.sign(payload, jwtSecret,{ expiresIn: "7d"} );
+        let token = tokenService.createToken(payload,{ expiresIn: "7d"})
         res.send(token)
-    },
-
-    validateAndExtractToken:(token)=> {
-        let jwtSecret = config.serverKey
-        try {
-            return jwt.verify(token, jwtSecret );
-        } catch (err) {
-            return false;
-        }
     }
 }
