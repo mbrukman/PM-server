@@ -19,23 +19,7 @@ export class MapConfigurationsComponent implements OnInit {
     language: 'json'
   };
   value: string = '';
-  editor: any;
-
   constructor(private mapsService: MapsService, private modalService: BsModalService) { }
-
-  onEditorInit(editor) {
-    this.editor = editor;
-    this.formatJson();
-  }
-
-  private formatJson() {
-    if (!this.editor) {
-      return;
-    }
-    setTimeout(() => {
-      this.editor.getAction('editor.action.formatDocument').run();
-    }, 50);
-  }
 
   ngOnInit() {
     this.mapsService.getCurrentMapStructure().pipe(
@@ -67,8 +51,7 @@ export class MapConfigurationsComponent implements OnInit {
 
   editConfiguration(index: number) {
     if ((typeof this.mapStructure.configurations[index].value) === 'object') {
-      this.value = (JSON.stringify(this.mapStructure.configurations[index].value) || '');
-      this.formatJson();
+      this.value = (JSON.stringify(this.mapStructure.configurations[index].value,null,'\t') || '');
     } else {
       this.value = <string>this.mapStructure.configurations[index].value;
     }
