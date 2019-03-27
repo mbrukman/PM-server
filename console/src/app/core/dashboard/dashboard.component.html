@@ -14,11 +14,20 @@
 
           </ng-template>
         </p-column>
-        <ng-template let-item pTemplate="rowexpansion">
-          <div class="row" [routerLink]="['/maps',item.map.id, 'results']">
+        <p-column field="startTime" header="Project">
+          <ng-template let-col let-item="rowData" pTemplate="body">
+            <a [routerLink]="['../projects', item.project._id]">{{ item.project.name }}</a>
+          </ng-template>
+        </p-column>
+        <p-column field="startTime" header="Trigger">
+          <ng-template let-col let-item="rowData" pTemplate="body">
+            {{ item.exec.trigger  }}
+          </ng-template>
+        </p-column>
+        <ng-template let-item let-i="rowIndex"pTemplate="rowexpansion">
+          <div class="row" [routerLink]="['/maps',item.map._id, 'results']">
             <div class="col-4">
-              <ngx-charts-pie-chart [results]="item.status" [labels]="false" [scheme]="colorScheme" [doughnut]="true">
-              </ngx-charts-pie-chart>
+              <app-execution-chart [size]=[130,130] [result]="results[i]"></app-execution-chart>
             </div>
           </div>
         </ng-template>
