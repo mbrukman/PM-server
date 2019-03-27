@@ -3,7 +3,7 @@ import { env } from '@shared/constants'
 
 export const monacoConfig: NgxMonacoEditorConfig = {
   defaultOptions: { scrollBeyondLastLine: false }, // pass default options to be used
-  onMonacoLoad: function(){
+  onMonacoLoad: function () {
     console.log((<any>window).monaco); // here monaco object will be available as window.monaco use this function to extend monaco editor functionality.
 
     monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
@@ -18,6 +18,9 @@ export const monacoConfig: NgxMonacoEditorConfig = {
     });
 
     // extra libraries
-    monaco.languages.typescript.javascriptDefaults.addExtraLib(env.sdk, 'kaholo/sdk.d.ts');
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(env.declarations, 'kaholo/declarations.d.ts');
+
+    // extra libraries
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(env.sdk, 'kaholo/sdk.js');
   }
 };

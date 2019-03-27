@@ -46,6 +46,7 @@ let mapResultSchema = new Schema({
     startTime: {type:Date, index:true },
     finishTime: Date,
     trigger: String,
+    triggerPayload:Schema.Types.Mixed,
     archivedMap:{type:Boolean, default:false, index: true}
 });
 
