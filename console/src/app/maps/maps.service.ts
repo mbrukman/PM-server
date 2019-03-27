@@ -6,14 +6,14 @@ import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { Map, MapExecutionLogs, MapResult, MapStructure, MapTrigger } from './models';
 import {FilterOptions} from '@shared/model/filter-options.model'
 import {MapDuplicateOptions} from './models/map-duplicate-options.model'
-
+import {SettingsService} from '@core/setup/settings.service';
 const serverUrl = environment.serverUrl;
 
 @Injectable()
 export class MapsService {
   currentMap: BehaviorSubject<Map> = new BehaviorSubject<Map>(null);
   public currentMapStructure: BehaviorSubject<MapStructure> = new BehaviorSubject<MapStructure>(null);
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,private settingsService:SettingsService) {
   }
 
   recentMaps(){
@@ -74,6 +74,9 @@ export class MapsService {
     let data: any = { trigger: 'Started manually by user' };
     if (config) {
       data.config = config;
+    }
+    if(this.settingsService.configToken){
+      data.configToken = this.settingsService.configToken
     }
     return this.http.post(`${serverUrl}api/maps/${mapId}/execute`, data);
   }

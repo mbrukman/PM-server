@@ -7,6 +7,7 @@ const mapsExecutionService = require("../services/map-execution.service");
 const triggersService = require("../services/triggers.service");
 const scheduledJobsService = require("../services/scheduled-job.service");
 const hooks = require("../../libs/hooks/hooks");
+const configToken = require('../services/token.service');
 
 module.exports = {
     /* archive a map */
@@ -256,12 +257,16 @@ module.exports = {
     },
     /* execute a map */
     execute: (req, res) => {
-        let agents, trigger, config;
+        let agents, triggerRequest, configRequest, payload;
         if (req.body) {
             agents = req.body.agents ? req.body.agents.split(',') : null;
-            trigger = req.body.trigger;
-            config = req.body.config ? req.body.config : req.query.config;
+            triggerRequest = req.body.trigger;
+            configRequest = req.body.config ? req.body.config : req.query.config;
+            let configTokenPayload = configToken.validateAndExtractToken(req.body.configToken)
+            payload = configTokenPayload ? configTokenPayload : null;
         }
+        let config = payload && payload.config ? Object.assign(configRequest,payload.config) : configRequest;
+        let trigger = payload && payload.triggerMsg ? triggerRequest + " "+ "-"+ " "+payload.triggerMsg : triggerRequest;
         hooks.hookPre('map-execute', req).then(() => {
             return mapsExecutionService.execute(req.params.id, req.params.structure, null, req, config, trigger, agents);
         }).then((r) => {

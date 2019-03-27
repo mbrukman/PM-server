@@ -14,6 +14,7 @@ class Settings {
 @Injectable()
 export class SettingsService {
   public settings : Settings;
+  configToken:string
   constructor(private http: HttpClient) {}
 
   getSettings() : Observable<Settings> {
@@ -26,4 +27,6 @@ export class SettingsService {
   setupDbConnectionString(data) {
     return this.http.post(`${serverUrl}api/settings/db`, data);
   }
+
+
 }
