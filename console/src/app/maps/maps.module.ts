@@ -35,6 +35,7 @@ import { ProcessViewComponent } from './map-detail/map-revisions/process-view/pr
 import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
 import { monacoConfig } from './monaco-config' 
 import {AutoCompleteModule} from 'primeng/primeng';
+import { MapsResolver } from './maps-resolver.service';
 
 @NgModule({
   imports: [
@@ -80,6 +81,7 @@ import {AutoCompleteModule} from 'primeng/primeng';
     ProcessViewComponent,
     MapDuplicateComponent,
   ],
-  entryComponents: [SelectAgentComponent, TriggerFormComponent, AddConfigurationComponent,MapDuplicateComponent]
+  entryComponents: [SelectAgentComponent, TriggerFormComponent, AddConfigurationComponent,MapDuplicateComponent],
+  providers:[MapsResolver]
 })
 export class MapsModule {}

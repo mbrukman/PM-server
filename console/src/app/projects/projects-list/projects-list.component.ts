@@ -4,6 +4,7 @@ import { Project } from '../models/project.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { Subscription, fromEvent } from 'rxjs'
 import { take, debounceTime } from 'rxjs/operators';
+import { ActivatedRoute, Data } from '@angular/router';
 
 @Component({
   selector: 'app-projects-list',
@@ -23,13 +24,13 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
   @ViewChild('globalFilter') globalFilterElement : ElementRef;
 
 
-  constructor(private projectsService: ProjectsService) {
+  constructor(private projectsService: ProjectsService,
+    private route:ActivatedRoute) {
     this.onDataLoad = this.onDataLoad.bind(this);
   }
 
   ngOnInit() {
-    this.reloadProjects()
-
+    this.projectsResolver();
     this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(
       debounceTime(300)
     ).subscribe(()=>{
@@ -47,6 +48,13 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(){
     this.filterKeyUpSubscribe.unsubscribe();
+  }
+
+  projectsResolver(){
+    this.route.data.subscribe((data:Data) => {
+      this.projects = data['projects'].items;
+      this.resultCount = data['projects'].totalCount;
+    })
   }
 
   reloadProjects(fields=null,page=this.page,filter=this.filterOptions){

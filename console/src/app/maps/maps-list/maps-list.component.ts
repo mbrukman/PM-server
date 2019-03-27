@@ -9,6 +9,7 @@ import { FilterOptions } from '@shared/model/filter-options.model'
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
+import { Route, Data, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-maps-list',
@@ -28,13 +29,14 @@ export class MapsListComponent implements OnInit, OnDestroy {
   @ViewChild('globalFilter') globalFilterElement : ElementRef;
 
   constructor(private mapsService: MapsService,
-    private modalService: BsModalService) {
+    private modalService: BsModalService,
+    private route:ActivatedRoute) {
     this.onDataLoad = this.onDataLoad.bind(this)
   }
 
 
   ngOnInit() {
-    this.reloadMaps();
+    this.mapsResolver();
     this.mapsService.recentMaps().subscribe(maps => {
       this.recentMaps = maps;
     })
@@ -42,6 +44,13 @@ export class MapsListComponent implements OnInit, OnDestroy {
     this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(debounceTime(300))
     .subscribe(()=>{
       this.loadMapsLazy();
+    })
+  }
+
+  mapsResolver(){
+    this.route.data.subscribe((data:Data) => {
+      this.maps = data['maps'].items;
+      this.resultCount = data['maps'].totalCount;
     })
   }
 
