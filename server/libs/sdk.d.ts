@@ -4,6 +4,11 @@ declare class KaholoTrigger {
     payload: any;
 }
 
+declare class KaholoAgent {
+    name: string;
+    url: string;
+    attributes: [{ name: string ,value: string}]
+}
 declare class KaholoAction {
     server: {type: string,name: string,id: string};
     method: {

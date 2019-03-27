@@ -2,6 +2,12 @@
 /**	
  * Represents the execution Id	
  */
+/** @type {KaholoAgent} */
+var currentAgent={
+    name: '',
+    url: '',
+    attributes: [{ name: '', value: ''}]
+}
 var executionId;
 
 /** @type {KaholoTrigger} */

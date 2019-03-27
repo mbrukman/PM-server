@@ -24,13 +24,7 @@ let executions = {};
 let pending = {};
 
 let libpm = '';
-let libpmObjects = {
-    currentAgent:{
-        name: '',
-        url: '',
-        attributes: [{ name: '', value: ''}]
-    }
-}
+let libpmObjects = {}
 
 fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 'utf8', function (err, data) {
     // opens the lib_production file. this file is used for user to use overwrite custom function at map code
@@ -39,6 +33,7 @@ fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 
     }
     libpm = data;
     eval(libpm)
+    libpmObjects.currentAgent = currentAgent
 });
 
 async function evaluateParam(param, typeParam, context) {
