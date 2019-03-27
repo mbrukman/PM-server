@@ -14,7 +14,7 @@ class Settings {
 @Injectable()
 export class SettingsService {
   public settings : Settings;
-  token:string
+  configToken:string
   constructor(private http: HttpClient) {}
 
   getSettings() : Observable<Settings> {
@@ -28,11 +28,5 @@ export class SettingsService {
     return this.http.post(`${serverUrl}api/settings/db`, data);
   }
 
-  storeToken(token){
-    this.token = token;
-  }
 
-  getToken(){
-    return this.token
-  }
 }

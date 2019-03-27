@@ -75,8 +75,8 @@ export class MapsService {
     if (config) {
       data.config = config;
     }
-    if(this.settingsService.getToken()){
-      data.token = this.settingsService.getToken()
+    if(this.settingsService.configToken){
+      data.token = this.settingsService.configToken
     }
     return this.http.post(`${serverUrl}api/maps/${mapId}/execute`, data);
   }

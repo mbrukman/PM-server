@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.route.queryParams.subscribe((param) => {
       if(param.configToken){
-        this.settingsService.storeToken(param.configToken)
+        this.settingsService.configToken = param.configToken
       }
     }) 
     this.mapsService.getCurrentMap().subscribe(map => {
