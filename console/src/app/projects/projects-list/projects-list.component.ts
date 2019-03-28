@@ -4,6 +4,7 @@ import { Project } from '../models/project.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { Subscription, fromEvent } from 'rxjs'
 import { take, debounceTime } from 'rxjs/operators';
+import { ActivatedRoute, Data } from '@angular/router';
 
 @Component({
   selector: 'app-projects-list',
@@ -23,12 +24,15 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
   @ViewChild('globalFilter') globalFilterElement : ElementRef;
 
 
-  constructor(private projectsService: ProjectsService) {
+  constructor(private projectsService: ProjectsService,
+    private route:ActivatedRoute) {
     this.onDataLoad = this.onDataLoad.bind(this);
   }
 
   ngOnInit() {
-    this.reloadProjects()
+    this.route.data.subscribe((data:Data) => {
+      this.onDataLoad(data['projects']);
+    })
 
     this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(
       debounceTime(300)
