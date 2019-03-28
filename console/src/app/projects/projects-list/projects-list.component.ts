@@ -30,7 +30,10 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.projectsResolver();
+    this.route.data.subscribe((data:Data) => {
+      this.onDataLoad(data['projects']);
+    })
+
     this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(
       debounceTime(300)
     ).subscribe(()=>{
@@ -48,13 +51,6 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(){
     this.filterKeyUpSubscribe.unsubscribe();
-  }
-
-  projectsResolver(){
-    this.route.data.subscribe((data:Data) => {
-      this.projects = data['projects'].items;
-      this.resultCount = data['projects'].totalCount;
-    })
   }
 
   reloadProjects(fields=null,page=this.page,filter=this.filterOptions){

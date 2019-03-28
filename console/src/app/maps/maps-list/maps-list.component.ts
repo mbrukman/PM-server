@@ -8,8 +8,8 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
-import { Route, Data, ActivatedRoute } from '@angular/router';
+import { DistinctMapResult } from '@shared/model/distinct-map-result.model';
+import { Data, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-maps-list',
@@ -22,36 +22,32 @@ export class MapsListComponent implements OnInit, OnDestroy {
   resultCount: number = 0;
   page: number = 1;
   filterOptions: FilterOptions = new FilterOptions();
-  recentMaps:DistinctMapResult[];
-  filterKeyUpSubscribe : Subscription;
+  recentMaps: DistinctMapResult[];
+  filterKeyUpSubscribe: Subscription;
 
-  
-  @ViewChild('globalFilter') globalFilterElement : ElementRef;
+
+  @ViewChild('globalFilter') globalFilterElement: ElementRef;
 
   constructor(private mapsService: MapsService,
     private modalService: BsModalService,
-    private route:ActivatedRoute) {
+    private route: ActivatedRoute) {
     this.onDataLoad = this.onDataLoad.bind(this)
   }
 
 
   ngOnInit() {
-    this.mapsResolver();
+    this.route.data.subscribe((data: Data) => {
+      this.onDataLoad(data['maps']);
+    })
+
     this.mapsService.recentMaps().subscribe(maps => {
       this.recentMaps = maps;
     })
 
-    this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(debounceTime(300))
-    .subscribe(()=>{
-      this.loadMapsLazy();
-    })
-  }
-
-  mapsResolver(){
-    this.route.data.subscribe((data:Data) => {
-      this.maps = data['maps'].items;
-      this.resultCount = data['maps'].totalCount;
-    })
+    this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement, 'keyup').pipe(debounceTime(300))
+      .subscribe(() => {
+        this.loadMapsLazy();
+      })
   }
 
   reloadMaps(fields = null, page = this.page, filter = this.filterOptions) {

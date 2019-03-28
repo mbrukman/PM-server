@@ -3,8 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { ProjectDetailsComponent } from './project-details/project-details.component';
 import { ProjectsListComponent } from './projects-list/projects-list.component';
 import { ProjectCreateComponent } from './project-create/project-create.component';
-import { resolve } from 'path';
-import { ProjectsResolver } from './projects-resolver.service';
+import { ProjectsResolver } from './resolvers/projects-resolver.resolver';
 
 const routes: Routes = [
   {

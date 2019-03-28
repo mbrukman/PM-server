@@ -11,7 +11,7 @@ import { UnsavedGuard } from '@shared/guards/unsaved.guard';
 import { MapCreateComponent } from './map-create/map-create.component';
 import { MapResultComponent } from './map-detail/map-result/map-result.component';
 import { MapConfigurationsComponent } from "@maps/map-detail/map-configurations/map-configurations.component";
-import { MapsResolver } from './maps-resolver.service';
+import { MapsResolver } from './resolvers/maps.resolver';
 
 const routes: Routes = [
   {
