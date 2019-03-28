@@ -227,8 +227,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       this.runAction(()=>{
         this.action = true;
         this.index = index;
-        
-       
+        const methodName = this.processForm.value.actions[this.index].method;
+        this.selectedMethod = this.processViewWrapper.plugin.methods.find(o => o.name === methodName);
       })
   }
 
