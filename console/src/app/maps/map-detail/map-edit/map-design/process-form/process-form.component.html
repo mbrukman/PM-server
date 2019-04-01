@@ -1,239 +1,207 @@
 <div class="wrapper-form">
-<div class="d-flex justify-content-between pane-header header-process">
-  <h3>Edit
-    <span>{{processViewWrapper.process.name}}</span>
-  </h3>
-    <div class="dropdown-pm btn-group" dropdown placement="bottom right">
-      <span  dropdownToggle><i class="fa fa-ellipsis-h" aria-hidden="true"></i></span>
-      <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
-        <a class="dropdown-item" (click)="deleteProcess()">Delete</a>
-      </ul>
+    <div class="d-flex justify-content-between pane-header header-process">
+      <h3>Edit
+        <span>{{processViewWrapper.process.name}}</span>
+      </h3>
+        <div class="dropdown-pm btn-group" dropdown placement="bottom right">
+          <span  dropdownToggle><i class="fa fa-ellipsis-h" aria-hidden="true"></i></span>
+          <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+            <a class="dropdown-item" (click)="deleteProcess()">Delete</a>
+          </ul>
+        </div>
     </div>
-</div>
-
-<div class="process-form">
-  <form [formGroup]="processForm">
-    <accordion [closeOthers]="true" [hidden]="action">
-      <accordion-group>
-        <div accordion-heading class="clearfix">
-          Details
-          <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
-        </div>
-        <div class="form-group">
-          <label for="uuid">uuid</label>
-          <input type="text" class="form-control" id="uuid" disabled formControlName="uuid">
-        </div>
-        <div class="form-group">
-          <label for="name">Name</label>
-          <input type="text" class="form-control" id="name" formControlName="name">
-        </div>
-        <div class="form-group">
-          <label for="description">Details</label>
-          <textarea type="text" class="form-control" id="description" formControlName="description"></textarea>
-        </div>
-        <div class="form-group">
-          <label for="type">Type</label>
-          <input type="text" class="form-control" id="type" [value]="processViewWrapper.plugin?.name" disabled>
-        </div>
-      </accordion-group>
-      <accordion-group>
-        <div accordion-heading class="clearfix">
-          Conditions
-          <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
-        </div>
-        <div class="form-check">
-          <label class="form-check-label">
-            <input type="checkbox" class="form-check-input" formControlName="mandatory">
-            Mandatory
-          </label>
-          <small class="form-text text-muted">If the process fails the execution will stop.</small>
-        </div>
-        <div class="form-group">
-          <label for="condition">Condition</label>
-          <input type="text" class="form-control" id="condition" formControlName="condition">
-          <small class="form-text text-muted">Returns a boolean - determine if the process should run. You can refer to
-            map code here.
-          </small>
-        </div>
-        <!--<div class="form-check">-->
-        <!--<label class="form-check-label">-->
-        <!--<input type="checkbox" class="form-check-input" formControlName="correlateAgents">-->
-        <!--Correlate agents-->
-        <!--</label>-->
-        <!--</div>-->
-        <!--<div class="form-group">-->
-        <!--<label for="condition">Filter agents condition</label>-->
-        <!--<input type="text" class="form-control" id="filterAgents" formControlName="filterAgents">-->
-        <!--<small class="form-text text-muted">Returns a boolean - determine if the process should run. You can refer to-->
-        <!--map code here.-->
-        <!--</small>-->
-        <!--</div>-->
-      </accordion-group>
-
-      <accordion-group>
-        <div accordion-heading class="clearfix">
-          Flow Control
-          <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
-        </div>
-
-        <div class="form-group dropdown">
-          <label>Agents flow control</label>
-          <p-dropdown  [options]="flowControlDropDown" placeholder="Select a Flow control" formControlName="flowControl"  
-                      [autoWidth]="false">
-          </p-dropdown>
-
-          <small class="form-text text-muted">Controlling syncing between agents.</small>
-        </div>
-
-        <div class="form-group dropdown" *ngIf="processViewWrapper.process?.coordination">
-          <label>Process coordination</label>
-          <p-dropdown  [options]="coordinationDropDown" placeholder="Select a Coordination" formControlName="coordination"  
-                      [autoWidth]="false">
-                      </p-dropdown>
-
-
-          <small class="form-text text-muted">Controlling process sync.</small>
-        </div>
-      </accordion-group>
-      <accordion-group>
-        <div accordion-heading class="clearfix">
-          Hooks
-          <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
-        </div>
-
-        <div class="form-group">
-          <label for="preRun">Pre-run function</label>
-          <input type="text" class="form-control" id="preRun" formControlName="preRun">
-          <small class="form-text text-muted">This function will run with agent context before the process executes. The
-            result will be added to the context. Code reference available.
-          </small>
-        </div>
-        <div class="form-group">
-          <label for="postRun">Post-run function</label>
-          <input type="text" class="form-control" id="postRun"
-                 formControlName="postRun">
-          <small class="form-text text-muted">This function will run with agent context after the process finish
-            execution. The
-            result will be added to the context. Code reference available.
-          </small>
-        </div>
-      </accordion-group>
-      <accordion-group>
-        <div accordion-heading class="clearfix">
-          Actions
-          <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
-        </div>
-        <div formArrayName="actions" class="actions-dnd" [model]="processForm.controls.actions['controls']"
-             (mouseup)="onMouseUp($event)" ngxDroppable>
-          <div *ngFor="let action of processForm.controls.actions['controls']; let i=index" ngxDraggable
-               [model]="action">
-            <div class="d-flex justify-content-between action-tile">
-              <span *ngIf="processForm.get('actions').at(i).get('name').value">{{processForm.get('actions').at(i).get('name').value}} (#{{i + 1}})</span>
-              <span *ngIf="!processForm.get('actions').at(i).get('name').value">Action #{{i + 1}}</span>
-              <span class="action-btns">
-                <i class="material-icons pointer" (click)="editAction(i)">mode_edit</i>
-                <i class="material-icons pointer" (click)="removeAction(i)"> delete_outline</i>
-              </span>
+    
+    <div class="process-form">
+      <form [formGroup]="processForm">
+        <accordion [closeOthers]="true" [hidden]="action">
+          <accordion-group>
+            <div accordion-heading class="clearfix">
+              Details
+              <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
             </div>
-          </div>
-        </div>
-        <button type="button" class="kh-btn-blue kh-btn add-action" (click)="addNewAction()">Add action</button>
-      </accordion-group>
-    </accordion>
-
-
-    <div *ngIf="action" [formGroup]="processForm.controls.actions.at(index)" class="action-form">
-      <div class="header">
-        <div class="header-action">Edit Action / Add Action</div>
-        <button type="button" class="btn btn-link arrow-btn" (click)="backToProcessView()">
-          <i class="material-icons text-light">arrow_forward</i>
-        </button>
-      </div>
-
-      <div class="form-group">
-        <label for="actionName">Name</label>
-        <input type="text" class="form-control" id="actionName" formControlName="name">
-      </div>
-      <div class="row">
-        <div class="col timeout">
-          <label>Timeout (ms)</label>
-          <input type="text" class="form-control" placeholder="Timeout in ms" formControlName="timeout">
-          <small class="form-text text-muted">If set to 0 won't have timeout. Defaults to 10 min.</small>
-
-        </div>
-        <div class="col retries">
-          <label>Retries</label>
-          <input type="text" class="form-control" placeholder="Retries" formControlName="retries">
-        </div>
-      </div>
-      <hr>
-      <div class="form-check mandatory-check">
-       <label class="form-check-label control control-checkbox">
-          Mandatory
-          <input type="checkbox" class="form-check-input" formControlName="mandatory">
-          <div class="control_indicator check-control"></div>
-        </label>
-        <small class="form-text text-muted">If the action fails the process will stop (with failure).</small>
-      </div>
-      <p class="lead">Method</p>
-
-      <div class="dropdown">
-          <p-dropdown id="inputState" [options]="methodsDropDown" placeholder="Select a Method" formControlName="method"  
-          (onChange)="onSelectMethod()"
-          [autoWidth]="false">
-          </p-dropdown>
-      </div>
-
-
-
-      <div formArrayName="params">
-        <div [hidden]="!selectedMethod" class="row row-title">
-          <div class="col-4">Name</div>
-          <div class="col-2">Code?</div>
-          <div class="col-6">Value</div>
-        </div>
-        <hr>
-        <div *ngFor="let param of processForm.controls.actions.at(index).controls.params.controls; let k = index">
-          <div [formGroupName]="k">
-            <div class="row action-params">
-              <div class="col-4">{{param.value.viewName}}</div>
-              <hr>
-              <div class="col-2">
-                <label class="control control-checkbox">
-                    <input type="checkbox" class="form-control" formControlName="code">
-                    <div class="control_indicator check-control"></div>
-                </label>
-              </div>
-              <hr>
-              
-              <div class="col-6 dropdown" [ngSwitch]="param.value.type" [hidden]="param.value.code">
-                <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
-                
-                <app-vault-selector *ngSwitchCase="'vault'" formControlName="value"></app-vault-selector>
-                <p-dropdown *ngSwitchCase="'autocomplete'" [options]="methods[processForm.value.actions[index].method].params[k].options"  placeholder="Select an option" formControlName="value"  
-                            [autoWidth]="false">
-                </p-dropdown>
-                <p-dropdown *ngSwitchCase="'options'" [options]="methods[processForm.value.actions[index].method].params[k].options"  placeholder="Select an option" formControlName="value"  
-                            [autoWidth]="false">
-                </p-dropdown>
-                <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
-                <input formControlName="value" type="checkbox" class="form-control" *ngSwitchCase="'boolean'">
-                <input formControlName="value" type="number" class="form-control" *ngSwitchCase="'int'">
-                <input formControlName="value" type="text" class="form-control" *ngSwitchDefault>
-              </div>
-              <div class="col-6" [hidden]="!param.value.code">
-                <input formControlName="value" type="text" class="form-control">
+            <div class="form-group">
+              <label for="uuid">uuid</label>
+              <input type="text" class="form-control" id="uuid" disabled formControlName="uuid">
+            </div>
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" class="form-control" id="name" formControlName="name">
+            </div>
+            <div class="form-group">
+              <label for="description">Details</label>
+              <textarea type="text" class="form-control" id="description" formControlName="description"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="type">Type</label>
+              <input type="text" class="form-control" id="type" [value]="processViewWrapper.plugin?.name" disabled>
+            </div>
+          </accordion-group>
+          <accordion-group>
+            <div accordion-heading class="clearfix">
+              Conditions
+              <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
+            </div>
+            <div class="form-check">
+              <label class="form-check-label">
+                <input type="checkbox" class="form-check-input" formControlName="mandatory">
+                Mandatory
+              </label>
+              <small class="form-text text-muted">If the process fails the execution will stop.</small>
+            </div>
+            <div class="form-group">
+              <label for="condition">Condition</label>
+              <input type="text" class="form-control" id="condition" formControlName="condition">
+              <small class="form-text text-muted">Returns a boolean - determine if the process should run. You can refer to
+                map code here.
+              </small>
+            </div>
+            <!--<div class="form-check">-->
+            <!--<label class="form-check-label">-->
+            <!--<input type="checkbox" class="form-check-input" formControlName="correlateAgents">-->
+            <!--Correlate agents-->
+            <!--</label>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+            <!--<label for="condition">Filter agents condition</label>-->
+            <!--<input type="text" class="form-control" id="filterAgents" formControlName="filterAgents">-->
+            <!--<small class="form-text text-muted">Returns a boolean - determine if the process should run. You can refer to-->
+            <!--map code here.-->
+            <!--</small>-->
+            <!--</div>-->
+          </accordion-group>
+    
+          <accordion-group>
+            <div accordion-heading class="clearfix">
+              Flow Control
+              <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
+            </div>
+    
+            <div class="form-group dropdown">
+              <label>Agents flow control</label>
+              <p-dropdown  [options]="flowControlDropDown" placeholder="Select a Flow control" formControlName="flowControl"  
+                          [autoWidth]="false">
+              </p-dropdown>
+    
+              <small class="form-text text-muted">Controlling syncing between agents.</small>
+            </div>
+    
+            <div class="form-group dropdown" *ngIf="processViewWrapper.process?.coordination">
+              <label>Process coordination</label>
+              <p-dropdown  [options]="coordinationDropDown" placeholder="Select a Coordination" formControlName="coordination"  
+                          [autoWidth]="false">
+                          </p-dropdown>
+    
+    
+              <small class="form-text text-muted">Controlling process sync.</small>
+            </div>
+          </accordion-group>
+          <accordion-group>
+            <div accordion-heading class="clearfix">
+              Hooks
+              <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
+            </div>
+    
+            <div class="form-group">
+              <label for="preRun">Pre-run function</label>
+              <input type="text" class="form-control" id="preRun" formControlName="preRun">
+              <small class="form-text text-muted">This function will run with agent context before the process executes. The
+                result will be added to the context. Code reference available.
+              </small>
+            </div>
+            <div class="form-group">
+              <label for="postRun">Post-run function</label>
+              <input type="text" class="form-control" id="postRun"
+                     formControlName="postRun">
+              <small class="form-text text-muted">This function will run with agent context after the process finish
+                execution. The
+                result will be added to the context. Code reference available.
+              </small>
+            </div>
+          </accordion-group>
+          <accordion-group>
+            <div accordion-heading class="clearfix">
+              Actions
+              <span class="float-right pull-right"><i class="material-icons arrow">keyboard_arrow_down</i></span>
+            </div>
+            <div formArrayName="actions" class="actions-dnd" [model]="processForm.controls.actions['controls']"
+                 (mouseup)="onMouseUp($event)" ngxDroppable>
+              <div *ngFor="let action of processForm.controls.actions['controls']; let i=index" ngxDraggable
+                   [model]="action">
+                <div class="d-flex justify-content-between action-tile">
+                  <span *ngIf="processForm.get('actions').at(i).get('name').value">{{processForm.get('actions').at(i).get('name').value}} (#{{i + 1}})</span>
+                  <span *ngIf="!processForm.get('actions').at(i).get('name').value">Action #{{i + 1}}</span>
+                  <span class="action-btns">
+                    <i class="material-icons pointer" (click)="editAction(i)">mode_edit</i>
+                    <i class="material-icons pointer" (click)="removeAction(i)"> delete_outline</i>
+                  </span>
+                </div>
               </div>
             </div>
+            <button type="button" class="kh-btn-blue kh-btn add-action" (click)="addNewAction()">Add action</button>
+          </accordion-group>
+        </accordion>
+    
+    
+        <div *ngIf="action" [formGroup]="processForm.controls.actions.at(index)" class="action-form">
+          <div class="header">
+            <div class="header-action">Edit Action / Add Action</div>
+            <button type="button" class="btn btn-link arrow-btn" (click)="backToProcessView()">
+              <i class="material-icons text-light">arrow_forward</i>
+            </button>
+          </div>
+    
+          <div class="form-group">
+            <label for="actionName">Name</label>
+            <input type="text" class="form-control" id="actionName" formControlName="name">
+          </div>
+          <div class="row">
+            <div class="col timeout">
+              <label>Timeout (ms)</label>
+              <input type="text" class="form-control" placeholder="Timeout in ms" formControlName="timeout">
+              <small class="form-text text-muted">If set to 0 won't have timeout. Defaults to 10 min.</small>
+    
+            </div>
+            <div class="col retries">
+              <label>Retries</label>
+              <input type="text" class="form-control" placeholder="Retries" formControlName="retries">
+            </div>
+          </div>
+          <hr>
+          <div class="form-check mandatory-check">
+           <label class="form-check-label control control-checkbox">
+              Mandatory
+              <input type="checkbox" class="form-check-input" formControlName="mandatory">
+              <div class="control_indicator check-control"></div>
+            </label>
+            <small class="form-text text-muted">If the action fails the process will stop (with failure).</small>
+          </div>
+          <p class="lead">Method</p>
+    
+          <div class="dropdown">
+              <p-dropdown id="inputState" [options]="methodsDropDown" placeholder="Select a Method" formControlName="method"  
+              (onChange)="onSelectMethod()"
+              [autoWidth]="false">
+              </p-dropdown>
+          </div>
+    
+          <div formArrayName="params">
+            <div [hidden]="!selectedMethod" class="row row-title">
+              <div class="col-4">Name</div>
+              <div class="col-2">Code?</div>
+              <div class="col-6">Value</div>
+            </div>
+            <hr>
+            <div *ngIf="selectedMethod">
+                <app-params [form]="processForm.controls.actions.at(index)" [params]="methods[processForm.value.actions[index].method].params"></app-params>
+            </div>
+          </div>
+          <div class="text-center">
+            <button type="button" (click)="backToProcessView()" class="kh-btn kh-btn-blue ">Submit</button>
           </div>
         </div>
-      </div>
-      <div class="text-center">
-        <button type="button" (click)="backToProcessView()" class="kh-btn kh-btn-blue ">Submit</button>
-      </div>
+    
+      </form>
     </div>
-
-  </form>
-</div>
-</div>
-
+    </div>
+    
+    

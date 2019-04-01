@@ -258,7 +258,7 @@ module.exports = {
   updateSettings: (id, settings) => {
     return Plugin.findOne({ _id: id }).then((plugin) => {
       for (let i = 0, length = plugin.settings.length; i < length; i++) {
-        plugin.settings[i].value = settings[Object.keys(settings)[i]]
+        plugin.settings[i].value = settings[i].value
       }
       return plugin.save();
     })

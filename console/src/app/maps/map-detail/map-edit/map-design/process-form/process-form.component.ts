@@ -19,6 +19,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import {FLOW_CONTROL_TYPES, COORDINATION_TYPES}  from '@maps/constants'
 
+
 @Component({
   selector: 'app-process-form',
   templateUrl: './process-form.component.html',
@@ -41,7 +42,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   COORDINATION_TYPES = COORDINATION_TYPES;
   flowControlDropDown = [];
   coordinationDropDown = [];
-  methodsDropDown:any
+  methodsDropDown:any;
+  params:any;
 
   constructor(
     private socketService: SocketService,
@@ -201,7 +203,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     this.runAction(()=>{
       const actionControl = <FormArray>this.processForm.controls['actions'];
       actionControl.push(this.initActionController());
-      this.editAction(actionControl.length - 1); // switch to edit the new action
+      this.editAction(actionControl.length - 1,true); // switch to edit the new action
     })
   }
 
@@ -223,12 +225,13 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * Setting editing as action
    * @param {number} index
    */
-  editAction(index: number) {
+  editAction(index: number,addAction = false) {
       this.runAction(()=>{
         this.action = true;
         this.index = index;
-        
-       
+        if(!addAction){
+          this.onSelectMethod(true)
+        }
       })
   }
 
@@ -237,18 +240,24 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @param action
    * @returns {FormGroup}
    */
-  initActionController(action?: Action): FormGroup {
+   initActionController(action?: Action): FormGroup {
     return Action.getFormGroup(action);
   }
 
   /**
    * Called from the template once user changes a method
    */
-  onSelectMethod() {
+  onSelectMethod(onClear = false) {
   
     const methodName = this.processForm.value.actions[this.index].method;
     const action = this.processForm.controls['actions']['controls'][this.index];
     this.selectedMethod = this.processViewWrapper.plugin.methods.find(o => o.name === methodName);
+    if(!this.methods[methodName]){
+      this.methods[methodName]= this.processViewWrapper.plugin.methods.find((method) => method.name == methodName)
+    }
+    if(onClear){
+      return;
+    }
     this.clearFormArray(action.controls.params);
     if (!this.selectedMethod) {
       this.socketService.setNotification({

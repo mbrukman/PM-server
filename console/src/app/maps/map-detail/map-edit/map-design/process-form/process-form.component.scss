@@ -143,6 +143,14 @@
                 width: 100%;
                 @include dropdown();
             }
+            ::ng-deep{
+                app-params{
+                    .input{
+                       flex: 0 0 50%;
+                       max-width: 50%;
+                    }
+                }
+            }
             .action-params {
                 margin-bottom: 12px;
                 .col-4{
