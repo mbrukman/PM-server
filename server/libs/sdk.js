@@ -83,6 +83,15 @@ var getConfiguration = function () {
     return configuration;
 };
 
+/**
+ * Returns the vault value.
+ * @param {string} key
+ * @returns {any}
+ */
+var getVaultValue = function (key) {
+    return vault.getValueByKey(key);
+};
+
 /* represents the previous action that was running in this process
  when the action is the first one to run will be undefined */
 
