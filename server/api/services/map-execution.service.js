@@ -308,11 +308,6 @@ function filterExecutionAgents(mapCode, executionContext, groups, mapAgents, exe
     })
 }
 
-async function getVaultValue(key){
-    let res = await vaultService.getValueByKey(key);
-    return res;
-}
-
 
 /**
  * executes a map from a structure
@@ -377,7 +372,7 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
                 payload:payload
             },
             vault : {
-                getValueByKey : getVaultValue
+                getValueByKey : vaultService.getValueByKey
             }
             
         };
