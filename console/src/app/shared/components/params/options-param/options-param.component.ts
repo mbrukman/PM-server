@@ -1,4 +1,4 @@
-import { Component, OnInit,forwardRef, Input } from '@angular/core';
+import { Component, OnInit,forwardRef, Input, EventEmitter, Output } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 
 @Component({
@@ -15,6 +15,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 })
 export class OptionsParamComponent implements OnInit, ControlValueAccessor {
   @Input('options') options:any;
+  @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
   text :string = "";
   propagateChange : (_: any) => { };
   optionsDropDown:any;
@@ -34,6 +35,7 @@ export class OptionsParamComponent implements OnInit, ControlValueAccessor {
 
   onSelect(){
     this.propagateChange(this.text)
+    this.onChange.emit(this.text);
   }
 
   // interface implementation//

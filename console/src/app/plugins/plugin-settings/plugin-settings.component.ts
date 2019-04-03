@@ -16,7 +16,6 @@ export class PluginSettingsComponent implements OnInit{
     settingsForm: FormGroup = new FormGroup({});
     plugin = new Plugin();
     methods: object = {};
-    settingsParams : {options:{label:string,value:string}[]}[] = []
     constructor(private route: ActivatedRoute,private pluginsService: PluginsService,private router:Router){}
 
     ngOnInit(){

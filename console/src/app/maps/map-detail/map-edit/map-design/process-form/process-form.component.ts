@@ -59,6 +59,9 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         return {label:method.viewName,value:method.name}
       })
     }
+    this.processViewWrapper.plugin.methods.forEach((method) => {
+      this.methods[method.name] = method
+    })
     if (!this.processViewWrapper.process) {
       this.closePane();
       return;
@@ -167,14 +170,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   }
 
   addToMethodContext(method) {
-    method.params.forEach(param => {
-      if(param.options.length > 0 && param.options[0].id){
-        let options = param.options.map(opt => {
-          return {label:opt.name || opt.value ,value:opt.id}
-        })
-        param.options = options
-      }
-    })
     this.methods[method.name] = method;
   }
 
@@ -247,15 +242,12 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   /**
    * Called from the template once user changes a method
    */
-  onSelectMethod(onClear = false) {
+  onSelectMethod(clearParams = false) {
   
     const methodName = this.processForm.value.actions[this.index].method;
     const action = this.processForm.controls['actions']['controls'][this.index];
     this.selectedMethod = this.processViewWrapper.plugin.methods.find(o => o.name === methodName);
-    if(!this.methods[methodName]){
-      this.methods[methodName]= this.processViewWrapper.plugin.methods.find((method) => method.name == methodName)
-    }
-    if(onClear){
+    if(clearParams){
       return;
     }
     this.clearFormArray(action.controls.params);
