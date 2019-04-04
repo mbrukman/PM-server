@@ -1,5 +1,6 @@
 import { Component, OnInit,forwardRef, Input, EventEmitter, Output } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
+import { SelectItem } from 'primeng/primeng';
 
 @Component({
   selector: 'app-options-param',
@@ -18,7 +19,7 @@ export class OptionsParamComponent implements OnInit, ControlValueAccessor {
   @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
   text :string = "";
   propagateChange : (_: any) => { };
-  optionsDropDown:any;
+  optionsDropDown:SelectItem[] = [];
 
   constructor() { }
 

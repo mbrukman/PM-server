@@ -40,8 +40,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   selectedMethod: PluginMethod;
   FLOW_CONTROL_TYPES  = FLOW_CONTROL_TYPES;
   COORDINATION_TYPES = COORDINATION_TYPES;
-  flowControlDropDown = [];
-  coordinationDropDown = [];
+  flowControlDropDown :SelectItem[] = [];
+  coordinationDropDown :SelectItem[] = []
   methodsDropDown:SelectItem[];
 
   constructor(

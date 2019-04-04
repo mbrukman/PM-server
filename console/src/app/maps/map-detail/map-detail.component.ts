@@ -10,7 +10,7 @@ import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { SocketService } from '@shared/socket.service';
 import { filter, take } from 'rxjs/operators';
 import { Subject, Subscription } from 'rxjs';
-
+import { SelectItem } from 'primeng/primeng';
 
 @Component({
   selector: 'app-map-detail',
@@ -41,7 +41,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   mapExecutionSubscription: Subscription; 
   executing: boolean;
   downloadJson: SafeUrl;
-  configurationDropDown=[];
+  configurationDropDown:SelectItem[] = [];
   selected: MapStructureConfiguration;
   navItems: {
     name: string,
