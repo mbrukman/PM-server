@@ -83,6 +83,9 @@ var getConfiguration = function () {
     return configuration;
 };
 
+/** @type {KaholoVault} */
+var vault
+
 /* represents the previous action that was running in this process
  when the action is the first one to run will be undefined */
 
