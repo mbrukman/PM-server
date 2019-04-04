@@ -18,7 +18,7 @@ import { BsModalService } from 'ngx-bootstrap';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import {FLOW_CONTROL_TYPES, COORDINATION_TYPES}  from '@maps/constants'
-
+import { SelectItem } from 'primeng/primeng';
 
 @Component({
   selector: 'app-process-form',
@@ -42,8 +42,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   COORDINATION_TYPES = COORDINATION_TYPES;
   flowControlDropDown = [];
   coordinationDropDown = [];
-  methodsDropDown:any;
-  params:any;
+  methodsDropDown:SelectItem[];
 
   constructor(
     private socketService: SocketService,
@@ -225,7 +224,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
         this.action = true;
         this.index = index;
         if(!addAction){
-          this.onSelectMethod(true)
+          this.onSelectMethod(false)
         }
       })
   }
@@ -242,12 +241,12 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   /**
    * Called from the template once user changes a method
    */
-  onSelectMethod(clearParams = false) {
+  onSelectMethod(clearParams = true) {
   
     const methodName = this.processForm.value.actions[this.index].method;
     const action = this.processForm.controls['actions']['controls'][this.index];
     this.selectedMethod = this.processViewWrapper.plugin.methods.find(o => o.name === methodName);
-    if(clearParams){
+    if(!clearParams){
       return;
     }
     this.clearFormArray(action.controls.params);

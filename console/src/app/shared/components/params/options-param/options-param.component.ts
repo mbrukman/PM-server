@@ -33,9 +33,9 @@ export class OptionsParamComponent implements OnInit, ControlValueAccessor {
     }
   }
 
-  onSelect(){
+  onSelect(e){
     this.propagateChange(this.text)
-    this.onChange.emit(this.text);
+    this.onChange.emit(e);
   }
 
   // interface implementation//
