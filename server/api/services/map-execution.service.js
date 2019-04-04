@@ -370,7 +370,11 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
             trigger:{
                 msg:triggerReason,
                 payload:payload
+            },
+            vault : {
+                getValueByKey : vaultService.getValueByKey
             }
+            
         };
 
         return filterExecutionAgents(mapStructure.code, executionContext, map.groups, map.agents, agents);
