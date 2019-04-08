@@ -62,3 +62,11 @@ declare class KaholoLink{
     result: string;
     linkIndex: 0
 }
+
+declare class KaholoVault {
+    /**
+     * Get vault from vault by key
+     * @param key 
+     */
+    getValueByKey(key:string) : Promise<any>
+}

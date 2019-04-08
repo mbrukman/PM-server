@@ -10,7 +10,7 @@ const fs = require('fs');
  if (!config.serverKey) {
     const createKey = require("../helpers/create-key");
     config.serverKey =  createKey.generateKey();
-    fs.writeFileSync('./env/config.json', JSON.stringify(config), 'utf8'); // write it back 
+    fs.writeFileSync('./config.json', JSON.stringify(config), 'utf8'); // write it back 
 } 
 ////////////////////////////
 

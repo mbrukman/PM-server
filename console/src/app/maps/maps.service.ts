@@ -2,29 +2,30 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { Observable, BehaviorSubject } from 'rxjs';
-import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
+import { DistinctMapResult } from '@shared/model/distinct-map-result.model';
 import { Map, MapExecutionLogs, MapResult, MapStructure, MapTrigger } from './models';
-import {FilterOptions} from '@shared/model/filter-options.model'
-import {MapDuplicateOptions} from './models/map-duplicate-options.model'
-import {SettingsService} from '@core/setup/settings.service';
+import { FilterOptions } from '@shared/model/filter-options.model'
+import { MapDuplicateOptions } from './models/map-duplicate-options.model'
+import { SettingsService } from '@core/setup/settings.service';
+import { IEntityList } from '@shared/interfaces/entity-list.interface';
 const serverUrl = environment.serverUrl;
 
 @Injectable()
 export class MapsService {
   currentMap: BehaviorSubject<Map> = new BehaviorSubject<Map>(null);
   public currentMapStructure: BehaviorSubject<MapStructure> = new BehaviorSubject<MapStructure>(null);
-  constructor(private http: HttpClient,private settingsService:SettingsService) {
+  constructor(private http: HttpClient, private settingsService: SettingsService) {
   }
 
-  recentMaps(){
+  recentMaps() {
     return this.http.get<DistinctMapResult[]>(`${serverUrl}api/maps/recent`);
   }
   allMaps(): Observable<[Map]> {
     return this.http.get<[Map]>(`${serverUrl}api/maps`);
   }
 
-  archive(mapId :string, isArchive : boolean) {
-    let body = {isArchive : isArchive}
+  archive(mapId: string, isArchive: boolean) {
+    let body = { isArchive: isArchive }
     return this.http.put(`${serverUrl}api/maps/${mapId}/archive`, body);
   }
 
@@ -36,8 +37,8 @@ export class MapsService {
     return this.http.post<Map>(`${serverUrl}api/maps/create`, map);
   }
 
-  duplicateMap(mapId, structureId, projectId,options:MapDuplicateOptions) {
-    return this.http.post<Map>(`${serverUrl}api/maps/${mapId}/structure/${structureId}/duplicate`, { projectId: projectId ,options});
+  duplicateMap(mapId, structureId, projectId, options: MapDuplicateOptions) {
+    return this.http.post<Map>(`${serverUrl}api/maps/${mapId}/structure/${structureId}/duplicate`, { projectId: projectId, options });
   }
 
   getCurrentMap(): Observable<any> {
@@ -48,8 +49,8 @@ export class MapsService {
     return this.http.get<Map>(`${serverUrl}api/maps/${id}`);
   }
 
-  filterMaps(fields?: any, page?: number,options?:FilterOptions ) {
-    return this.http.post<{ items: Map[],totalCount: number}>(`${serverUrl}api/maps`, { page, fields ,options});
+  filterMaps(fields?: any, page?: number, options?: FilterOptions) {
+    return this.http.post<IEntityList<Map>>(`${serverUrl}api/maps`, { page, fields, options });
   }
 
   delete(id) {
@@ -75,7 +76,7 @@ export class MapsService {
     if (config) {
       data.config = config;
     }
-    if(this.settingsService.configToken){
+    if (this.settingsService.configToken) {
       data.configToken = this.settingsService.configToken
     }
     return this.http.post(`${serverUrl}api/maps/${mapId}/execute`, data);
@@ -101,12 +102,12 @@ export class MapsService {
     return this.http.get<MapResult>(`${serverUrl}api/maps/${mapId}/results/${resultId}`);
   }
 
-  executionResults(mapId,page) {
+  executionResults(mapId, page) {
     let params = new HttpParams();
     if (page) {
       params = params.set('page', page.toString());
     }
-    return this.http.get<MapResult[]>(`${serverUrl}api/maps/${mapId}/results`,{params:params});
+    return this.http.get<MapResult[]>(`${serverUrl}api/maps/${mapId}/results`, { params: params });
   }
 
   /* map structure */
