@@ -9,16 +9,17 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 const models = require("../models");
 
-const MapResult = models.Result;
-const MapExecutionLog = models.ExecutionLog;
-const Map = models.Map;
+const MapResult = models.MapResult;
 
-const executionLogService = require('./execution-log.service');
 const agentsService = require('./agents.service');
 const mapsService = require('./maps.service');
 const pluginsService = require('../services/plugins.service');
 const vaultService = require('./vault.service')
+const helper = require('./map-execution.helper')
+const dbUpdates = require('./map-execution-updates')
 
+
+const statusEnum = models.statusEnum
 let executions = {};
 let pending = {};
 
@@ -45,43 +46,22 @@ async function evaluateParam(param, typeParam, context) {
     return vm.runInNewContext(param.value, context);
 }
 
-function _createContext(context) {
+async function getSettingsAction(plugin){ //todo check if works!
+    return Promise.all(plugin.settings.map(async (setting) => { 
+        if (setting.valueType == 'vault' && setting.value) {
+            setting.value = await vaultService.getValueByKey(setting.value);
+        }
+        return setting;
+    }));
+}
+
+function _createContext(context) { //TODO ? 
     return {
         ...context,
         require,
         console,
         Buffer
     }
-}
-
-function createContext(mapObj, context) {
-    try {
-        vm.runInNewContext(libpm + '\n' + mapObj.code, _createContext(context));
-        return 0;
-    } catch (error) {
-        return error;
-    }
-}
-
-/**
- * returning start node for a structure
- * @param structure
- * @returns {*}
- */
-function findStartNode(structure) {
-    let node;
-    const links = structure.links;
-    for (let i = 0; i < links.length; i++) {
-        let source = links[i].sourceId;
-        let index = structure.processes.findIndex((o) => {
-            return o.uuid === source;
-        });
-        if (index === -1) {
-            node = { type: 'start_node', uuid: source };
-            return node;
-        }
-    }
-    return node
 }
 
 /**
@@ -117,25 +97,36 @@ function updatePending(socket) {
  * @param process
  * @returns {number}
  */
-function addProcessToContext(runId, agentKey, processKey, process) {
-    executions[runId].executionContext.visitedProcesses.add(processKey);
-    const processData = {
-        startTime: new Date(),
-        status: 'executing',
-        uuid: processKey,
-        name: process.name,
-        actions: {},
-        plugin: process.used_plugin.name
-    };
-    if (!executions[runId].executionAgents[agentKey].processes) {
-        executions[runId].executionAgents[agentKey].processes = {};
+function addProcessToContext(runId, agent, processUUID, process) {
+    let processes = executions[runId].executionAgents[agent.key].processes
+
+    if(!processes.numProcesses && processes.numProcesses!= 0){
+        processes.numProcesses = 0
+    }else{
+        processes.numProcesses++
     }
-    if (!executions[runId].executionAgents[agentKey].processes[processKey]) {
-        executions[runId].executionAgents[agentKey].processes[processKey] = [];
+    if (!processes[processUUID]) {
+        processes[processUUID] = [];
     }
 
-    executions[runId].executionAgents[agentKey].processes[processKey].push(processData);
-    return executions[runId].executionAgents[agentKey].processes[processKey].length - 1;
+    const processData = {
+        processId: process.id,
+        iterationIndex: processes[processUUID].length,
+        status: statusEnum.RUNNING,
+        uuid: processUUID,
+        actions: {},
+        processIndex: processes.numProcesses
+    };
+    processes[processUUID].push(processData);
+
+    let options = {
+        mapResultId: executions[runId].mapResultId,
+        agentId: agent.id,
+        processData: processData
+    }
+    dbUpdates.addProcess(options)
+
+    return processData.iterationIndex;
 }
 
 /**
@@ -146,17 +137,30 @@ function addProcessToContext(runId, agentKey, processKey, process) {
  * @param processIndex
  * @param processData
  */
-function updateProcessContext(runId, agentKey, processKey, processIndex, processData) {
-    if (!executions.hasOwnProperty(runId) || executions[runId].stop) {
-        // console.log('out out out out out out');
+function updateProcessContext(runId, agent, processUUID, iterationIndex, processData) {
+
+    if (executions[runId]) {
         return;
     }
-    executions[runId].executionAgents[agentKey].processes[processKey][processIndex] = Object.assign(
-        (executions[runId].executionAgents[agentKey].processes[processKey][processIndex] || {}),
+    if (!executions[runId].executionAgents[agent.key].processes) {
+        executions[runId].executionAgents[agent.key].processes = []
+    }
+    executions[runId].executionAgents[agent.key].processes[processUUID][iterationIndex] = Object.assign(
+        (executions[runId].executionAgents[agent.key].processes[processUUID][iterationIndex] || {}),
         processData
     );
 
-    executions[runId].executionAgents[agentKey].executionContext.processes = executions[runId].executionAgents[agentKey].processes;
+    let field = Object.keys(processData)[0]
+    let options = {
+        mapResultId: executions[runId].mapResultId,
+        agentId: agent.id,
+        processIndex: executions[runId].executionAgents[agent.key].processes[processUUID][iterationIndex].processIndex,
+        field: field,
+        value: processData[field]
+    }
+
+    dbUpdates.updateProcess(options)
+
 }
 
 /**
@@ -168,298 +172,219 @@ function updateProcessContext(runId, agentKey, processKey, processIndex, process
  * @param actionKey
  * @param actionData
  */
-function updateActionContext(runId, agentKey, processKey, processIndex, actionKey, actionData) {
-    if (!executions.hasOwnProperty(runId) || executions[runId].stop) {
+function updateActionContext(runId, agentKey, processKey, processIndex, action, actionData) {
+    if (!executions[runId]) {
         return;
     }
-    executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[actionKey] = Object.assign(
-        (executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[actionKey] || {}),
+    executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[action._id] = Object.assign(
+        (executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[action._id] || {}),
         actionData
     );
-
-    executions[runId].executionAgents[agentKey].executionContext.processes = executions[runId].executionAgents[agentKey].processes;
+    let curActionData  = executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[action._id]
 
     // If action have a result (i.e. done) set to previous action;
     if (actionData.result)
-        executions[runId].executionAgents[agentKey].executionContext.previousAction = executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[actionKey];
+        executions[runId].executionAgents[agentKey].context.previousAction = action;
     // getCurrentAgent(runId,agentKey);
-}
 
-function getCurrentAgent(agent) {
-    let obj = {};
-    Object.keys(libpmObjects.currentAgent).forEach(field => {
-        obj[field] = agent[field]
-    })
-    return obj;
-}
 
-/**
- * updating executions data with agents data.
- * @param runId
- * @param agentKey
- */
-function updateExecutionContext(runId, agentKey) {
-    if (!executions.hasOwnProperty(runId) || executions[runId].stop) {
-        return;
+    
+    // mandatory process faild. stop execution
+    if(actionData.status == statusEnum.ERROR && action.mandatory){
+        return stopExecution()
+
     }
-    executions[runId].executionAgents[agentKey].executionContext['processes'] = executions[runId].executionAgents[agentKey].processes;
-    Object.keys(executions[runId].executionAgents).forEach(agentK => {
-        if(executions[runId].executionAgents[agentK].executionContext)
-            executions[runId].executionAgents[agentK].executionContext['globalContext'] = executions[runId].executionAgents;
-    });
-}
-
-/**
- * Returns if agent should continue execution
- * @param runId
- * @param agentKey
- * @returns {boolean}
- */
-function shouldContinueExecution(runId, agentKey) {
-    return executions.hasOwnProperty(runId) && !executions[runId].stop && executions[runId].executionAgents[agentKey].continue;
-}
-
-/**
- * returns how many executions exists for map
- * @param mapId
- * @returns {number}
- */
-function countOngoingMapExecutions(mapId) {
-    if (typeof (mapId) !== 'string') {
-        mapId = mapId.toString();
+    let data = { //todo update just the new fields
+        startTime : curActionData.startTime,
+        action: curActionData.action,
+        status: curActionData.status,
+        finishTime: curActionData.finishTime,
+        result: curActionData.result,
+        retriesLeft: curActionData.retriesLeft // TODO REMEBER TO REDUCE & UPDATE AFTER RETRIES
     }
-    return Object.keys(executions).filter(runId => {
-        return executions[runId].map.toString() === mapId
-    }).length;
+    
+    let options = {
+        data: data,
+        mapResultId: executions[runId].mapResultId,
+        agentId: executions[runId].executionAgents[agentKey].id, // agent._id
+        processIndex: executions[runId].executionAgents[agentKey].processes[processKey][processIndex].processIndex,
+        actionIndex: curActionData.actionIndex
+    }
+
+    actionData.startTime? dbUpdates.addAction(options) : dbUpdates.updateAction(options)
 }
+
+
 
 /**
  * Starting a pending execution
  * @param mapId
  */
 function startPendingExecution(mapId) {
-    if (!pending.hasOwnProperty(mapId) || !pending[mapId].length) {
-        return;
-    }
-    const pendingToExecute = pending[mapId].splice(0, 1)[0];
+
+    let pendingExec = dbUpdates.getPendingExecution(mapId) 
+    if(!pendingExec){return}
+
+    // todo!!  executeMap + check
     executeFromMapStructure(
-        pendingToExecute.map,
-        pendingToExecute.structureId,
-        pendingToExecute.runId,
-        pendingToExecute.cleanWorkspace,
-        pendingToExecute.socket,
-        pendingToExecute.configurationName,
-        pendingToExecute.triggerReason,
-        pendingToExecute.agents
+        pendingExec.map,
+        pendingExec.structureId,
+        pendingExec.socket,
+        pendingExec.configurationName,
+        pendingExec.triggerReason,
+        pendingExec.runId,
+        pendingExec.agents
     );
 }
 
+
+
+
+function createAgentContext(agent, runId, executionContext, startNode, mapCode) {
+
+    let processes = {}
+    processes[startNode.uuid] = {
+        status: statusEnum.DONE,
+        startNode: true,
+    } // todo?  not in same format [uuid][0] = {data}
+
+    executions[runId].executionAgents[agent.key] = {
+
+        processes: processes,
+        context: Object.assign({}, executionContext),
+        id: agent.id,
+        startTime: new Date()
+    }
+    createContext(mapCode, runId, agent.key)
+
+    dbUpdates.addAgentResult(executions[runId].executionAgents[agent.key],  executions[runId].mapResultId)
+
+    //TODO: remove after all tests
+    // executions[runId].executionAgents[agent.key].context.currentAgent = getCurrentAgent(agent.key) // todo!!
+}
+
+function createContext(mapCode, runId, agentKey) {
+    vm.runInNewContext(libpm + '\n' + mapCode, executions[runId].executionAgents[agentKey].context); 
+    //Todo:  no need  _context caus vm have this functions ?!  
+}
+
 /**
- * filter agents for execution
- * @param mapCode
- * @param executionContext
- * @param groups
- * @param mapAgents
- * @param executionAgents
- * @returns {*}
+ * 
+ * @param {*} runId 
+ * @param {*} socket 
+ * @param {*} map 
+ * @param {*} configurationName 
+ * @param {*} structureId 
+ * @param {*} triggerReason 
  */
-function filterExecutionAgents(mapCode, executionContext, groups, mapAgents, executionAgents) {
-    function filterLiveAgents(agents) {
-        let agentsStatus = Object.assign({}, agentsService.agentsStatus());
-        let executionAgents = {};
-        agents.forEach((agentObj) => {
-            const agentStatus = _.find(agentsStatus, (agent) => {
-                return agent.id === agentObj.id
-            });
-            if (!agentStatus) {
-                return;
+function createExecutionContext(runId, socket, map, configurationName, structureId, triggerReason) {
+
+    // get number of running executions
+    const ongoingExecutions = helper.countMapExecutions(executions, map.id, statusEnum.RUNNING);
+
+    // check if more running executions than map.queue
+    const status = (map.queue && (ongoingExecutions >= map.queue)) ? statusEnum.PENDING : statusEnum.RUNNING;
+    const configuration = helper.createConfiguration(map, configurationName);
+
+    const startTime = new Date()
+
+    executions[runId] = {
+        mapId: map._id,
+        status: status,
+        executionAgents: {},
+        clientSocket: socket
+    }
+
+    let mapResult = new MapResult({
+        map: map._id,
+        runId: runId,
+        structure: structureId,
+        startTime: startTime,
+        configuration: configuration,
+        trigger: triggerReason,
+        status: status,
+        agentsResults: []
+    });
+
+    mapResult.save().then(result => {
+        socket.emit('map-execution-result', result);
+    }).catch(err => {
+        throw new Error('error occurred while creating MapResult' + err)
+    })
+
+    executions[runId].mapResultId = mapResult.id  
+    return executionContext = {
+        executionId: runId,
+        startTime: startTime,
+        structure: structureId,
+        configuration: configuration,
+        trigger: triggerReason
+    };
+}
+function savePlugins(mapStructure, runId) {
+    const names = mapStructure.used_plugins.map(plugin => plugin.name);
+    executions[runId].plugins = names
+    return pluginsService.filterPlugins({ name: { $in: names } }).then(plugins => {
+        executions[runId].plugins = plugins
+    })
+}
+
+function executeMap(mapId, structureId, socket, configurationName, triggerReason) {
+   
+
+    return mapsService.get(mapId).then((map) => {
+        if (!map) {
+            throw new Error(`Couldn't find map`);
+        }
+        if (map.archived) {
+            throw new Error('Can\'t execute archived map');
+        }
+
+        const runId = helper.guidGenerator();
+
+        // create general context and new MapResult
+        let context = createExecutionContext(runId, socket, map, configurationName, structureId, triggerReason)
+
+        agents = helper.getRelevantAgent(map.groups, map.agents)
+
+        // If not living agents, stop execution with status error
+        if (agents.length == 0) {
+            return MapResult.findByIdAndUpdate(executions[runId].mapResultId, { reason: 'no Agent alive', status: 'Error' })
+        }
+
+        // get map structure, if no structureId specified take latest
+        return mapsService.getMapStructure(map._id, structureId).then(mapStructure => {
+            if (!mapStructure) {
+                throw new Error('No structure found.');
             }
-            agentObj.status = 'available';
-            agentObj.key = agentStatus.key;
-            agentObj.continue = true;
-            agentObj.pendingProcesses = {};
-            agentObj.socket = agentsStatus[agentStatus.key].socket;
-            agentObj.executionContext = _createContext(executionContext);
-            vm.runInNewContext(libpm + '\n' + mapCode, agentObj.executionContext);
-            agentObj.executionContext.currentAgent = getCurrentAgent(agentObj);
-            executionAgents[agentStatus.key] = agentObj;
+
+            savePlugins(mapStructure, runId).then(_ => {
+
+                const startNode = helper.findStartNode(mapStructure);
+                let promises = []
+                for (let i = 0, length = agents.length; i < length; i++) {
+                    createAgentContext(agents[i], runId, context, startNode, mapStructure.code)
+                    promises.push(runMapOnAgent(map, mapStructure, runId, startNode, agents[i]))
+                }
+                Promise.all(promises).catch(err=>{ //TODO: it is emptyyy!!   because  asinc .then // == todo await? 
+                    console.error(err);
+                    
+                })         
+                // updateExecutions(socket);  //?? todo!! 
+                return runId
+            })
         });
-        return executionAgents;
-    }
+    });
 
-    if (!executionAgents) {
-        let groupsAgents = {};
-        groups.forEach(group => {
-            groupsAgents = Object.assign(groupsAgents, agentsService.evaluateGroupAgents(group));
-        })
-        groupsAgents = Object.keys(groupsAgents).map(key => groupsAgents[key]);
-        let totalAgents = [...JSON.parse(JSON.stringify(mapAgents)), ...JSON.parse(JSON.stringify(groupsAgents))];
-        return filterLiveAgents(totalAgents);
-    }
+}
 
-    return agentsService.filter({
-        $or: [
-            { _id: { $in: executionAgents.filter((id) => ObjectId.isValid(id)) } },
-            { name: { $in: executionAgents } }
-        ]
-    }).then((agents) => {
-        return filterLiveAgents(agents);
+function runMapOnAgent(map, structure, runId, startNode, agent) {
+    return helper.validate_plugin_installation(executions[runId].plugins, agent.key).then(() => {
+        return runNodeSuccessors(map, structure, runId, agent, startNode.uuid);
     })
 }
 
 
-/**
- * executes a map from a structure
- * @param map - the map object to execute
- * @param structureId - the id of the structure that is to be executed
- * @param runId - the unique runId
- * @param cleanWorkspace
- * @param socket - the socket to update
- * @param configurationName - configuration name to use
- * @param triggerReason - trigger message
- * @param agents - object of agents to run, if none will run on selected agents. should be name or id
- */
-function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configuration, triggerReason, agents) {
-    let mapResult;
-    let mapStructure;
-    let executionContext;
-    let selectedConfiguration;
-    let mapAgents = map.agents;
-
-    return mapsService.getMapStructure(map._id, structureId).then(structure => {
-        if (!structure) {
-            throw new Error('No structure found.');
-        }
-        mapStructure = structure;
-
-        if (configuration && typeof configuration != 'string') {
-            selectedConfiguration = {
-                name: 'custom',
-                value: configuration
-            }
-        } else if (mapStructure.configurations && mapStructure.configurations.length) {
-            if (configuration)
-                selectedConfiguration = configuration ? mapStructure.configurations.find(o => o.name === configuration) : mapStructure.configurations.find(o => o.selected);
-            if (!selectedConfiguration) {
-                selectedConfiguration = mapStructure.configurations[0];
-            }
-        }
-
-        if (selectedConfiguration)
-            executionLogService.error(runId, map._id, `Using '${selectedConfiguration.name}' as configuration`, socket);
-        else
-            selectedConfiguration = {};
-
-        executionContext = {
-            map: {
-                name: map.name,
-                agents: mapAgents,
-                id: map.id,
-                nodes: mapStructure.processes,
-                links: mapStructure.links,
-                code: mapStructure.code,
-                version: 0,
-                structure: structure._id
-            },
-            executionId : runId,
-            startTime: new Date(),
-            structure: structure._id,
-            configuration: selectedConfiguration ? selectedConfiguration.value : '',
-            visitedProcesses: new Set(),// saving uuid of process ran by all the agents (used in flow control)
-            trigger:triggerReason
-        };
-
-        return filterExecutionAgents(mapStructure.code, executionContext, map.groups, map.agents, agents);
-
-    }).then((executionAgents) => {
-        if (Object.keys(executionAgents).length === 0) { // exit if no live agents for this map
-            winston.log('error', 'No agents selected or no live agents');
-            executionLogService.error(runId, map._id, 'No agents selected or no live agents', socket);
-            throw new Error('No agents selected or no live agents');
-        }
-        executionContext.agents = executionAgents;
-        executions[runId] = { map: map._id, executionContext: executionContext, executionAgents: executionAgents };
-        let res = createContext(mapStructure, executionContext);
-        if (res !== 0) {
-            throw new Error('Error running map code' + res);
-        }
-
-        return MapResult.create({
-            map: map._id,
-            runId: runId,
-            structure: mapStructure._id,
-            startTime: new Date(),
-            configuration: selectedConfiguration,
-            trigger: triggerReason
-        });
-    }).then(result => {
-        socket.emit('map-execution-result', result);
-        mapResult = result;
-        executions[runId].resultObj = result._id;
-        const names = mapStructure.used_plugins.map(plugin => plugin.name);
-        return pluginsService.filterPlugins({ name: { $in: names } })
-    }).then((plugins) => {
-        executionContext.plugins = plugins;
-        startMapExecution(map, mapStructure, runId, socket);
-        updateExecutions(socket);
-        return runId;
-    }).catch((error) => {
-        winston.log('error', error);
-        if (pending.hasOwnProperty(map.id) && pending[map.id].length) {
-            startPendingExecution(map.id);
-            updatePending(socket);
-        }
-    });
-
-}
-
-
-function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, triggerReason, agents) {
-    const socket = req.io;
-
-    function guidGenerator() {
-        let S4 = function () {
-            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-        };
-        return (S4() + '-' + S4());
-    }
-
-    // TODO: add execution by sourceID
-    let runId = guidGenerator();
-    executionLogService.info(runId, mapId, triggerReason || 'Starting map execution', socket);
-
-    let map;
-
-    return mapsService.get(mapId).then((mapobj) => {
-        if (!mapobj) {
-            throw new Error(`Couldn't find map`);
-        }
-        if (mapobj.archived) {
-            throw new Error('Can\'t execute archived map');
-        }
-        map = mapobj;
-        const ongoingExecutions = countOngoingMapExecutions(mapId);
-        if (map.queue && (ongoingExecutions >= map.queue || (pending.hasOwnProperty(mapId) && pending[mapId].length))) {
-            // check if there is a queue and running maps or a pending queue for this map
-            if (!pending.hasOwnProperty(mapId)) {
-                pending[mapId] = [];
-            }
-            pending[mapId].push({
-                map,
-                structureId,
-                runId,
-                cleanWorkspace,
-                socket,
-                configurationName,
-                triggerReason,
-                agents
-            });
-            updatePending(socket);
-            return;
-        }
-        return executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configurationName, triggerReason, agents);
-    });
-}
 
 /**
  * find a process in a map structure by uuid.
@@ -470,91 +395,6 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, 
 function findProcessByUuid(uuid, structure) {
     return structure.processes.find(o => o.uuid === uuid);
 }
-
-/**
- * return ancestors for a certain node
- * @param nodeUuid
- * @param structure
- * @returns {Array} - uuid of ancestors
- */
-function findAncestors(nodeUuid, structure) {
-    let links = structure.links.filter((o) => o.targetId === nodeUuid);
-    return links.reduce((total, current) => {
-        total.push(current.sourceId);
-        return total;
-    }, []);
-}
-
-/**
- * returns successors uuids for certain node
- * @param nodeUuid
- * @param structure
- * @returns {Array}
- */
-function findSuccessors(nodeUuid, structure) {
-    let links = structure.links.filter((o) => o.sourceId === nodeUuid);
-    return links.reduce((total, current) => {
-        total.push(current.targetId);
-        return total;
-    }, []);
-}
-
-/**
- * Checks if agents have correct plugins versions, if not install them
- * @param map
- * @param structure
- * @param runId
- * @param agentKey
- */
-function validate_plugin_installation(map, structure, runId, agentKey) {
-    const agents = agentsService.agentsStatus();
-    return new Promise((resolve, reject) => {
-        let plugins = executions[runId].executionContext.plugins;
-        // check if agents has the right version of the plugins.
-        const filesPaths = plugins.reduce((total, current) => {
-            if (agents[agentKey].alive && current.version !== agents[agentKey].installed_plugins[current.name]) {
-                total.push(current.file);
-            }
-            return total;
-        }, []);
-        if (filesPaths && filesPaths.length > 0) {
-            Promise.all(filesPaths.map(function (filePath) {
-                return agentsService.installPluginOnAgent(filePath, agents[agentKey]);
-            })).then(() => {
-                winston.log('success', 'Done installing plugins');
-            }).catch((error) => {
-                winston.log('error', "Error installing plugins on agent", error);
-            }).then(() => {
-                resolve();
-            })
-        }
-        else {
-            resolve();
-        }
-    });
-}
-
-function runMapFromAgent(map, structure, runId, node, socket, agent) {
-    return new Promise((resolve, reject) => {
-        validate_plugin_installation(map, structure, runId, agent.key).then(() => {
-            runNodeSuccessors(map, structure, runId, agent, node, socket);
-            resolve();
-        });
-    })
-}
-
-function startMapExecution(map, structure, runId, socket) {
-    let agents = executions[runId].executionAgents;
-    const startNode = findStartNode(structure);
-    var promises = []
-    for (var agent in agents) {
-        promises.push(runMapFromAgent(map, structure, runId, startNode.uuid, socket, agents[agent]))
-    }
-    return Promise.all(promises)
-
-}
-
-
 
 /**
  * The function checks if the agent executing a process.
@@ -569,8 +409,8 @@ function isThereProcessExecutingOnAgent(runId, agentKey) {
     } catch (e) {
         return false;
     }
-    for (let i = processes.length - 1; i >= 0; i--) {
-        if (executions[runId].executionAgents[agentKey].processes[processes[i]].findIndex(p => p.status === 'executing') > -1) {
+    for (let i = processes.length - 1; i >= 2; i--) {
+        if (executions[runId].executionAgents[agentKey].processes[processes[i]].findIndex(p => p.status === statusEnum.RUNNING) > -1) {
             return true;
         }
     }
@@ -586,41 +426,14 @@ function areAllAgentsDone(runId) {
     const executionAgents = executions[runId].executionAgents;
 
     for (let i in executionAgents) {
-        if (!executionAgents[i].done) {
+        if (!executionAgents[i].status && agentsService.agentsStatus()[i].alive) { //todo check if works
             return false;
         }
     }
     return true;
 }
 
-/**
- *
- * @param runId
- * @param processKey
- * @returns {boolean}
- */
-function isThisTheFirstAgentToGetToTheProcess(runId, processKey, agentKey) {
-    if (executions.hasOwnProperty(runId) && executions[runId].executionContext.visitedProcesses[processKey]) {
-        return executions[runId].executionContext.visitedProcesses[processKey] == agentKey;
-    }
-    executions[runId].executionContext.visitedProcesses[processKey] = agentKey;
-    return true;
-}
 
-/**
- * Check if there is an agent that stopped
- * @param runId
- * @returns {boolean}
- */
-function areAllAgentsAlive(runId) {
-    const executionAgents = executions[runId].executionAgents;
-    for (let i in executionAgents) {
-        if (!executionAgents[i].continue) {
-            return false;
-        }
-    }
-    return true;
-}
 
 /**
  * Checking if all agents has this process pending
@@ -629,18 +442,84 @@ function areAllAgentsAlive(runId) {
  * @param agentKey
  * @returns {boolean}
  */
-function areAllAgentsWaitingToStartThis(runId, processKey, agentKey) {
+function areAllAgentsWaitingToStartThis(runId, processUUID, agentKey) {
     const executionAgents = executions[runId].executionAgents;
 
-    executionAgents[agentKey].pendingProcesses[processKey] = new Date();
+    executionAgents[agentKey].processes[processUuid].status = statusEnum.PENDING // todo add [IterationIndex]
 
     for (let i in executionAgents) {
-        if (!executionAgents[i].pendingProcesses.hasOwnProperty(processKey)) {
+        if (!executionAgents[i].process.hasOwnProperty(processUUID)) {
             return false;
         }
     }
     return true;
 }
+
+
+
+
+function checkAgentFlowCondition(runId, process, successor, map, structure, agent) {
+    if (process.flowControl === 'race') {
+        // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
+        if (!helper.isThisTheFirstAgentToGetToTheProcess(runId, successor, agent.key)) {
+            runNodeSuccessors(map, structure, runId, agent, successor);
+            return false
+        }
+
+        executions[runId].executionAgents[agentKey].processes[successor.uuid][successor.index].status = statusEnum.PENDING //todo add iteration index
+        apdateProcess() // todo create process. status pending
+        return true
+    }
+    if (process.flowControl === 'wait') {
+        // if not all agents are still alive, the wait condition will never be met, should stop the map execution
+        if (!helper.areAllAgentsAlive(executions[runId].executionAgents)) {
+            stopExecution(runId); // todo! handle this.
+            return false;
+        }
+        // if there is a wait condition, checking if it is the last agent that got here and than run all the agents
+        if (areAllAgentsWaitingToStartThis(runId, successor, agent.key)) {
+            const executionAgents = executions[runId].executionAgents;
+            for (let i in executionAgents) {
+                if (i === agent.key) {
+                    continue;
+                }
+                runProcess(map, structure, runId, executionAgents[i], successor);
+            }
+            return true
+        }
+        return false
+    }
+    return true;
+}
+
+function checkProcessCoordination(process, processes, successor, successorIdx, structure) {
+    if (process.coordination === 'wait') {
+        let res = true
+        let ancestors = helper.findAncestors(successor, structure);
+        if (ancestors.length > 1) {
+            ancestors.forEach(ancestor => { // todo == status done/error?
+                if (!processes[ancestor] || processes[ancestor][0].status == statusEnum.RUNNING) { //todo process index 0? &&  !processes[ancestor][0].actions[0].finishTime --- processes[ancestor][0].actions.lenght() insread 0 
+                    return res = false;
+                }
+            });
+
+        }
+        return res
+    }
+
+    if (process.coordination === 'race') {
+        if (processes && processes.hasOwnProperty(process.uuid)) {
+            if (successors.length - 1 == successorIdx) {
+                endRunPathResults(runId, agent, socket, map);
+            }
+            return false;
+        }
+    }
+    return true;
+
+}
+
+
 
 /**
  * Finds all successors for node and run them in parallel if meeting coordination criteria.
@@ -650,116 +529,133 @@ function areAllAgentsWaitingToStartThis(runId, processKey, agentKey) {
  * @param runId
  * @param agent
  * @param node
- * @param socket
  */
-function runNodeSuccessors(map, structure, runId, agent, node, socket) {
-    if (!shouldContinueExecution(runId, agent.key)) {
-        return;
-    }
-    const successors = node ? findSuccessors(node, structure) : [];
-    if (successors.length === 0) {
-        endRunPathResults(runId, agent, socket, map);
+function runNodeSuccessors(map, structure, runId, agent, node) {
+    if (executions[runId].status == statusEnum.ERROR || executions[runId].status == statusEnum.DONE) { return; } // status : 'Error' , 'Done'
 
+    const successors = node ? helper.findSuccessors(node, structure) : [];
+    if (successors.length === 0) {
+        return endRunPathResults(runId, agent, map);
     }
+
     let nodesToRun = [];
     successors.forEach((successor, successorIdx) => {
-        let ancestors = findAncestors(successor, structure);
         const process = findProcessByUuid(successor, structure);
-        if (ancestors.length > 1) {
-            // checking merge conditions
-            if (process.coordination === 'wait') {
-                let flag = true;
-                ancestors.forEach(ancestor => {
-                    if (!executions[runId].executionAgents[agent.key].processes.hasOwnProperty(ancestor) ||
-                        ['error', 'success', 'partial'].indexOf(executions[runId].executionAgents[agent.key].processes[ancestor][0].status) === -1) {
-                        flag = false;
-                    }
-                });
-                if (!flag) {
-                    return;
-                }
-            } else if (process.coordination === 'race') {
-                if (executions[runId].executionAgents[agent.key].processes && executions[runId].executionAgents[agent.key].processes.hasOwnProperty(process.uuid)) {
-                    if (successors.length - 1 == successorIdx) {
-                        endRunPathResults(runId, agent, socket, map);
-                    }
-                    return;
-                }
-            }
-        }
+        if (checkProcessCoordination(process, executions[runId].executionAgents[agent.key].processes, successor, successorIdx,structure) &&
+            checkAgentFlowCondition(runId, process, successor, map, structure, agent)) {
+            nodesToRun.push({
+                index: addProcessToContext(runId, agent, successor, process),
+                uuid: successor,
+                process: process
+            });
 
-        // checking agent flow condition
-        if (process.flowControl === 'race') {
-            // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
-            if (!isThisTheFirstAgentToGetToTheProcess(runId, successor, agent.key)) {
-                return runNodeSuccessors(map, structure, runId, agent, successor, socket);
-            }
-        } else if (process.flowControl === 'wait') {
-            // if not all agents are still alive, the wait condition will never be met, should stop the map execution
-            if (!areAllAgentsAlive) {
-                return stopExecution(map.id, runId, socket);
-            }
-            // if there is a wait condition, checking if it is the last agent that got here and than run all the agents
-            if (areAllAgentsWaitingToStartThis(runId, successor, agent.key)) {
-                const executionAgents = executions[runId].executionAgents;
-                for (let i in executionAgents) {
-                    if (i === agent.key) {
-                        continue;
-                    }
-                    runNode(map, structure, runId, executionAgents[i], successor, socket);
-                    delete executionAgents[i].pendingProcesses[successor] // Remove the pending process from the object.
-                }
-            }
         }
-        nodesToRun.push({
-            index: addProcessToContext(runId, agent.key, successor, process),
-            uuid: successor,
-            process: process
-        });
-    });
+    })
+
     promises = []
     for (let i = 0, length = nodesToRun.length; i < length; i++) {
-        promises.push(runProcess(map, structure, runId, agent, socket, nodesToRun[i]))
+        promises.push(runProcess(map, structure, runId, agent, nodesToRun[i]))
     }
-    Promise.all(promises).catch(error => winston.log('error', error));
-}
-
-
-function endRunPathResults(runId, agent, socket, map) {
-    if (isThereProcessExecutingOnAgent(runId, agent.key)) { return }
-    executions[runId].executionAgents[agent.key].done = true;
-    if (!areAllAgentsDone(runId)) { return }
-    executions[runId].executionContext.finishTime = new Date();
-    summarizeExecution(executions[runId].executionContext.map, runId, _.cloneDeep(executions[runId].executionContext), _.cloneDeep(executions[runId].executionAgents)).then((mapResult) => {
-        socket.emit('map-execution-result', mapResult);
+    return Promise.all(promises).catch(error => {
+        console.log(error);
+        winston.log('error', error)
     });
-    MapResult.findByIdAndUpdate(executions[runId].resultObj, { $set: { finishTime: new Date(), cleanFinish: true } }, { new: true })
-        .then((mapResult) => {
-            socket.emit('map-execution-result', mapResult);
-        });
-    delete executions[runId];
-    if (map.queue && pending.hasOwnProperty(map.id)) {
-        startPendingExecution(map.id); // starting pending execution if necessary
-        updatePending(socket);
-    }
-    updateExecutions(socket);
 }
 
-/**
- * running a certain node (without condition)
- * @param map
- * @param structure
- * @param runId
- * @param agent
- * @param node
- * @param socket
- */
-function runNode(map, structure, runId, agent, node, socket) {
-    if (!shouldContinueExecution(runId, agent.key)) {
-        return;
+function updateAgentContext(runId, agent,agentData){
+    executions[runId].executionAgents[agent.key] = Object.assign(executions[runId].executionAgents[agent.key], agentData )
+
+    let options = {
+        mapResultId: executions[runId].mapResultId,
+        agentId: agent.id,
+        data: agentData
+    }
+    dbUpdates.updateAgent(options)
+}
+
+function endRunPathResults(runId, agent, map) {
+    //sharbat
+let d = new Date();
+    if (isThereProcessExecutingOnAgent(runId, agent.key)) { return }
+  
+    let data = {
+        finishTime : d,
+        status: statusEnum.DONE
+    }
+    updateAgentContext(runId, agent,data)
+
+    if (!areAllAgentsDone(runId)) { return }
+
+    let options = {
+        mapResultId: executions[runId].mapResultId,
+        data:data,
+        socket: executions[runId].clientSocket
+    }
+    dbUpdates.updateMapReasult(options)
+
+    // socket.emit('map-execution-result', mapResult);
+    delete executions[runId];
+
+    if (map.queue) { 
+        startPendingExecution(map.id); // starting pending execution if necessary
+        updatePending(socket); // ?
+    }
+    // updateExecutions(socket); todo? 
+}
+
+// testing process condition
+function passProcessCondition(runId, agent, execProcess, mapCode) {
+    let process = execProcess.process
+    if (!process.condition) {
+        return true
+    }
+    let isProcessPassCondition, errMsg;
+    try { 
+        isProcessPassCondition = vm.runInNewContext(process.condition, executions[runId].executionAgents[agent.key].context);
+    } catch (e) {
+        errMsg = `Error running process condition: ${e.message}`;
     }
 
-    runProcess(map, structure, runId, agent, socket, node).catch(error => winston.log("error", error));
+    if (isProcessPassCondition) { return true }
+
+    winston.log('info', errMsg || "Process didn't pass condition");
+    updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, { 
+        status: errMsg || "Process didn't pass condition",
+    });
+    if (process.mandatory) { // mandatory process failed, stop executions
+        winston.log('info', "Mandatory process failed");
+        executions[runId].executionAgents[agent.key].status = statusEnum.ERROR;
+        return false;
+    }
+    return true;
+}
+
+// running process preRun function and storing it in the context
+function runProcessPreRunFunc(runId, agent, execProcess, mapCode) {
+    if (!execProcess.process.preRun) { return }
+    let res;
+    try { 
+        res = vm.runInNewContext(execProcess.process.preRun, executions[runId].executionAgents[agent.key].context);
+    } catch (e) {
+        winston.log('error', 'Error running pre process function');
+        res = 'Error running preProcess function' + res
+    }
+    updateProcessContext(runId, agent, execProcess.uuid,execProcess.index, { preRunResult: res });
+
+}
+
+// running process postRun function and storing it in the context
+function runProcessPostRunFunc(runId, agent, execProcess, mapCode) {
+    if (!execProcess.process.postRun) {return null}
+    let res;
+    try {
+        res = vm.runInNewContext(execProcess.process.postRun, executions[runId].executionAgents[agent.key].context);
+    } catch (e) {
+        winston.log('error', 'Error running post process function');
+        res = 'Error running postProcess function' + res
+    }
+    updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, { postRunResult: res, status: statusEnum.DONE});
+    
 }
 
 /**
@@ -772,221 +668,72 @@ function runNode(map, structure, runId, agent, node, socket) {
  * @param socket
  * @returns {function(*=, *)}
  */
-function runProcess(map, structure, runId, agent, socket, execProcess) {
+function runProcess(map, structure, runId, agent, execProcess) {
     return new Promise((resolve, reject) => {
-        const processUUID = execProcess.uuid;
-        if (!shouldContinueExecution(runId, agent.key)) {
-            return resolve();
+        if (!helper.isAgentShuldContinue(agent.key, executions[runId].executionAgents)) {
+            return resolve()
         }
-        let process = execProcess.process;
 
+        if (!passProcessCondition(runId, agent, execProcess, structure.code)) {
+            return stopExecution(runId);
+        }
+
+        runProcessPreRunFunc(runId, agent, execProcess, structure.code)
+
+        let process = execProcess.process;
         const processIndex = execProcess.index; // adding the process to execution context and storing index in the execution context.
 
-        // testing filter agents condition.
-        if (process.filterAgents) {
-            let res;
-            let errorMsg;
-            try {
-                res = vm.runInNewContext(process.filterAgents, executions[runId].executionAgents[agent.key].executionContext);
-
-            } catch (e) {
-                errorMsg = `'${process.name}': Error running agent filter function: ${JSON.stringify(e)}`;
-            }
-
-            if (!res) {
-                winston.log('error', (errorMsg || 'Agent didn\'t pass filter agent condition'));
-                executionLogService.error(runId, map._id, (errorMsg || `'${process.name}': agent '${agent.name}' didn't pass filter function`), socket);
-
-                updateProcessContext(runId, agent.key, processUUID, processIndex, {
-                    status: 'error',
-                    result: 'Agent didn\'t pass filter condition'
-                });
-                if (process.mandatory) {
-                    executions[runId].executionAgents[agent.key].status = 'error';
-                    executions[runId].executionAgents[agent.key].continue = false;
-                    stopExecution(map._id, runId, socket);
-                }
-
-                executions[runId].executionAgents[agent.key].finishTime = new Date();
-                updateExecutionContext(runId, agent.key);
-                return resolve();
-
-            }
-
-        }
-
-        // testing process condition
-        if (process.condition) {
-            let res;
-            let errMsg;
-            try {
-                res = vm.runInNewContext(process.condition, executions[runId].executionAgents[agent.key].executionContext);
-            } catch (e) {
-                errMsg = `Error running process condition: ${e.message}`;
-                executionLogService.error(runId, map._id, `'${process.name}': Error running process condition: ${JSON.stringify(e)}`, socket);
-            }
-
-            if (!res) { // process didn't pass condition or failed run condition function
-                winston.log('info', errMsg || "Process didn't pass condition");
-                executions[runId].executionAgents[agent.key].finishTime = new Date();
-                updateProcessContext(runId, agent.key, processUUID, processIndex, {
-                    status: "error",
-                    result: errMsg || "Process didn't pass condition",
-                    finishTime: new Date()
-
-                });
-                if (process.mandatory) { // mandatory process failed, agent should not execute more processes
-                    winston.log('info', "Mandatory process failed");
-                    executions[runId].executionAgents[agent.key].continue = false;
-                    executions[runId].executionAgents[agent.key].status = 'error';
-                    stopExecution(map._id, runId, socket);
-                    updateExecutionContext(runId, agent.key);
-                    return resolve();
-
-                }
-                updateExecutionContext(runId, agent.key);
-                runNodeSuccessors(map, structure, runId, agent, false, socket); // by passing false, no successors would be called
-                return resolve();
-
-            }
-        }
-
-        // running process preRun function and storing it in the context
-        if (process.preRun) {
-            let res;
-            try {
-                res = vm.runInNewContext(process.preRun, executions[runId].executionAgents[agent.key].executionContext);
-                updateProcessContext(runId, agent.key, processUUID, { preRun: res });
-                updateExecutionContext(runId, agent.key);
-            } catch (e) {
-                winston.log('error', 'Error running pre process function');
-                executionLogService.error(runId, map._id, `'${process.name}': error running pre-process function`, socket);
-            }
-        }
-
-        let plugin = executions[runId].executionContext.plugins
-            .find((o) => (o.name.toString() === process.used_plugin.name) || (o.name === process.used_plugin.name));
-        let actionExecutionFunctions = {};
+        let plugin = executions[runId].plugins.find(o => o.name.toString() == process.used_plugin.name || o.name == process.used_plugin.name)
+        let actionsArray = [];
 
         process.actions.forEach((action, i) => {
-            action.name = (action.name || `Action #${i + 1} `);
-            actionExecutionFunctions[`${action.name} ("${action.id}")`] = [
+            actionsArray.push([
                 map,
                 structure,
                 runId,
                 agent,
                 process,
                 processIndex,
-                _.cloneDeep(action),
-                plugin,
-                socket
-            ]
+                _.cloneDeep(action).toJSON(),
+                plugin.toJSON(),
+                executions[runId].clientSocket
+            ])
         });
 
-        // updating context
-        updateProcessContext(runId, agent.key, processUUID, processIndex, {
-            startTime: new Date(),
-            status: 'executing'
-        });
-
-        // executing actions
-        let actionTask = Object.keys(actionExecutionFunctions).map((key) => {
-            return actionExecutionFunctions[key]
-        })
-        
-        actionTask.reduce((promiseChain, next) => {
-            return promiseChain.then(chainResults =>
-                executeAction.apply(null, next).catch(err=>{
-                    if (next[6].mandatory) return Promise.reject(err);
-                    
-                    if (typeof err != 'object')
-                        err =  {stdout : err};
-                    if (err instanceof Error)
-                        err =  {stdout : err.message};
-                    
-                     return _handleActionError(err, null,  agent, process , processIndex, next[6]._id, executions, next[2], next[6], next[0], next[8])
-                }).then(currentResult =>{
-                    return [ ...chainResults, currentResult ]
+        let reduceFunc = (promiseChain, curentAction) => {
+            let actionId = (curentAction[6]._id).toString() //sharbat!! todo add actionIndex. or here or in updateAction
+            console.log(executions[runId].mapResultId); // todo delete 
+            
+            executions[runId].executionAgents[agent.key].processes[execProcess.uuid][processIndex].actions[actionId] = curentAction[6] // todo ?? maybe not needed??
+            executions[runId].executionAgents[agent.key].processes[execProcess.uuid][processIndex].actions[actionId].actionIndex = 
+            Object.keys(executions[runId].executionAgents[agent.key].processes[execProcess.uuid][processIndex].actions).length -1  // todo ?? maybe not needed??
+            return promiseChain.then(chainResults =>{
+                return executeAction.apply(null, curentAction).then(currentResult => { 
+                    return [...chainResults, currentResult]
                 })
-            );
-        }, Promise.resolve([]))
-            .then((actionsResults) => {
-                return actionsExecutionCallback(null, actionsResults, map, structure, runId, agent, socket, processUUID, processIndex, resolve)
-            })
+            });
+        }
+
+        actionsArray.reduce(reduceFunc, Promise.resolve([])).then((actionsResults) => {
+            //TODO: check amount of actions
+            return actionsExecutionCallback(map, structure, runId, agent,execProcess)
+        })
             .catch((error) => {
-               return actionsExecutionCallback(error, null, map, structure, runId, agent, socket, processUUID, processIndex, resolve)
+                console.error("error"+ error);
+                let status = statusEnum.ERROR + error
+                updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, {status: status});
             })
-    })
+    }).catch(error=> console.error(error))
 }
 
 
-function actionsExecutionCallback(error, actionsResults, map, structure, runId, agent, socket, processUUID, processIndex, resolve) {
-    if (!shouldContinueExecution(runId, agent.key)) {
-        return resolve();
+function actionsExecutionCallback(map, structure, runId, agent,execProcess) {
+    if (!executions[runId] || executions[runId].executionAgents[agent.key].status) { // status is just error or done
+        return ;
     }
-    if (error) {
-        winston.log('error', 'Fatal error: ', error);
-        executionLogService.error(runId, map._id, `'${process.name}': A mandatory action failed`, socket);
-        status = 'error';
-        executions[runId].executionAgents['continue'] = false;
-        updateExecutionContext(runId, agent.key);
-        stopExecution(map._id, runId, socket);
-        return resolve();
-
-    } 
-    let actionStatuses = [];
-    if (executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions) {
-        actionStatuses = Object.keys(executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions)
-            .map((actionKey) => {
-                return executions[runId].executionAgents[agent.key].processes[processUUID][processIndex].actions[actionKey].status;
-            });
-    }
-
-    if (actionStatuses.indexOf('error') > -1) { 
-        status = 'error'; // if only errors - process status is error
-        if(actionStatuses.indexOf('success') > -1)
-             status = 'partial'; // if error and success - process status is partial
-             stopIfMandatoryProcess();
-    } else { // if only success - process status is success
-        status = 'success';
-    }
-
-    if (process.postRun) {
-        executionLogService.error(runId, map._id, `'${process.name}': Running post process function`, socket);
-
-        // post run hook for link (enables user to change context)
-        let res;
-        try {
-            res = vm.runInNewContext(process.postRun, executions[runId].executionAgents[agent.key].executionContext);
-            updateProcessContext(runId, agent.key, processUUID, processIndex, { postRun: res });
-            updateExecutionContext(runId, agent.key);
-
-        } catch (e) {
-            winston.log('error', 'Error running post process function');
-            executionLogService.error(runId, map._id, `'${process.name}': Error running post process function`, socket);
-        }
-    }
-
-    updateProcessContext(runId, agent.key, processUUID, processIndex, {
-        status: status,
-        result: actionsResults,
-        finishTime: new Date()
-    });
-    updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-    updateExecutionContext(runId, agent.key);
-
-        executions[runId].executionAgents[agent.key].status = 'available';
-        setTimeout(() => {
-            runNodeSuccessors(map, structure, runId, agent, processUUID, socket);
-        }, 0);
-    resolve();
-
-    function stopIfMandatoryProcess(){
-        if(structure.processes[processIndex].mandatory){
-            stopExecution(map._id, runId, socket);
-            return resolve();
-        }
-    }
+    runProcessPostRunFunc(runId, agent, execProcess, structure.code)
+   
+    return runNodeSuccessors(map, structure, runId, agent, execProcess.uuid);
 }
 /**
  * Send action to agent via socket
@@ -995,11 +742,11 @@ function actionsExecutionCallback(error, actionsResults, map, structure, runId, 
  * @param actionForm
  * @returns {Promise<any>}
  */
-function sendActionViaSocket(socket, param, actionForm) {
+function sendActionViaSocket(socket, uniqueRunId, actionForm) {
     socket.emit('add-task', actionForm);
 
     return new Promise((resolve, reject) => {
-        socket.on(param.action.uniqueRunId, (data) => {
+        socket.on(uniqueRunId, (data) => {
             resolve(data);
         });
     });
@@ -1013,7 +760,7 @@ function sendActionViaSocket(socket, param, actionForm) {
  * @param actionForm
  * @returns {Promise<any>}
  */
-function sendActionViaRequest(agent, action, actionForm) {
+function sendActionViaRequest(agent, actionForm) {
 
     return new Promise((resolve, reject) => {
         request.post(
@@ -1041,96 +788,76 @@ function sendActionViaRequest(agent, action, actionForm) {
     });
 }
 
-async function executeAction(map, structure, runId, agent, process, processIndex, action, plugin, socket) {
-    let key = action._id;
-
-    plugin = JSON.parse(JSON.stringify(plugin));
-    action = JSON.parse(JSON.stringify(action));
-    action.startTime = new Date();
-    if (!action.hasOwnProperty('method') || !action.method) {
-        const result = 'No method was provided';
-        updateActionContext(runId, agent.key, process.uuid, processIndex, key, Object.assign(action, {
-            status: 'error',
-            finishTime: new Date(),
-            result: { result, status: 'error' }
-
-        }));
-        updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-        executionLogService.success(runId, map._id, `'${action.name}': ${result}`, socket);
-        return Promise.resolve({ result })
+/**
+ * return the method to use or throw error if not exist
+ * @param {*} plugin 
+ * @param {*} action 
+ */
+function getMethodAction(plugin, action) {
+    if (!action.method) {
+        throw new Error('No method was provided');
     }
 
     let method = plugin.methods.find(o => o.name === action.method);
     if (!method) {
-        const result = 'Method wasn\'t found';
-        updateActionContext(runId, agent.key, process.uuid, processIndex, key, Object.assign(action, {
-            status: 'error',
+        throw new Error('Method wasn\'t found');
+    }
+    return method
+}
+
+async function executeAction(map, structure, runId, agent, process, processIndex, action, plugin) {
+    let actionData = {
+        action: ObjectId(action._id),
+        startTime: new Date(),
+        retriesLeft: action.retries
+    }
+
+    updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData)
+    let actionString
+
+    let params = action.params || [];
+    action.params = {}
+    action.plugin = {name: plugin.name};
+    
+    try {
+        action.method = getMethodAction(plugin, action) // can throw error
+        
+        actionString = `+ ${plugin.name} - ${action.method.name}: `;
+       
+        for (let i = 0; i < params.length; i++) { // handle wrong code
+            action.params[params[i].name] = await evaluateParam(params[i], action.method.params[i].type, executions[runId].executionAgents[agent.key].context);
+            if (action.method.params[i].type != 'vault')
+                actionString += `${params[i].name}: ${action.params[params[i].name]}${i != params.length - 1 ? ', ' : ''}`;
+        }
+        
+    } catch (err) {
+        updateActionContext(runId, agent.key, process.uuid, processIndex, action, {
+            status: statusEnum.ERROR,
             finishTime: new Date(),
-            result: { result, status: 'error' }
-        }));
-        updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-        executionLogService.success(runId, map._id, `'${action.name}': ${result}`, socket);
-        return Promise.resolve({ result });
-    }
-    action.method = method;
-    let params = action.params ? [...action.params] : [];
-    action.params = {};
-    action.plugin = {
-        name: plugin.name
-    };
-
-    updateActionContext(runId, agent.key, process.uuid, processIndex, key, action);
-
-    executionLogService.info(runId, map._id, `'${action.name}': executing action (${agent.name})`, socket);
-    if (!shouldContinueExecution(runId, agent.key)) {
-        console.log('Should not continue');
-        return Promise.resolve();
+            result: { stderr: err.message}
+        }); 
+        return resolve(err.message) // continue to next action if not mandatory 
     }
 
-    action.uniqueRunId = `${runId}|${processIndex}|${key}`;
+    action.uniqueRunId = `${runId}|${processIndex}|${action._id}`;
 
+    
+    let settings = await getSettingsAction(plugin) //todo mybe savd on plugin 
+    
     const actionExecutionForm = {
         mapId: map.id,
-        versionId: 0,
-        executionId: 0,
+        versionId: 0, // todo
+        executionId: 0, //todo
         action: action,
         key: agent.key,
-        settings: plugin.settings
+        settings: settings
     };
 
-    let actionString = `+ ${plugin.name} - ${method.name}: `;
-    for (let i = 0; i < params.length; i++) {
-        let param = _.find(method.params, (o) => {
-            return o.name === params[i].name
-        });
-
-        // handle wrong code
-        try {
-            action.params[param.name] = await evaluateParam(params[i], action.method.params[i].type, executions[runId].executionAgents[agent.key].executionContext);
-        } catch (e) {
-            return _handleActionError({
-                stdout: actionString + '\n' + e.message
-            }, undefined, agent, process , processIndex, key, executions, runId, action , map, socket)
-        }
-
-        if (action.method.params[i].type != 'vault')
-            actionString += `${param.name}: ${action.params[param.name]}${i != params.length - 1 ? ', ' : ''}`;
-    }
-    executionLogService.info(runId, map._id, actionString, socket);
-    
-    let p;
-    let settings = await Promise.all(plugin.settings.map(async (setting)=>{
-        if (setting.valueType == 'vault' && setting.value){
-            setting.value = await vaultService.getValueByKey(setting.value);
-        }
-        return setting;
-    }));
-
-    // will send action to agent via socket or regular request
-    if (agent.socket) {
-        p = sendActionViaSocket(agent.socket, { action, settings }, actionExecutionForm);
+    let agentPromise;
+    if (agent.socket) {  // will send action to agent via socket or regular request
+        agentPromise = sendActionViaSocket(agent.socket, action.uniqueRunId, actionExecutionForm);
     } else {
-        p = sendActionViaRequest(agent, { action, settings }, actionExecutionForm);
+        agentPromise = sendActionViaRequest(agent, actionExecutionForm);
     }
 
     let timeout;
@@ -1138,104 +865,60 @@ async function executeAction(map, structure, runId, agent, process, processIndex
     return runAction();
 
     function runAction() {
+        const IS_TIMEOUT = "Agent Timeout";
+
         if (action.timeout || (!action.timeout && action.timeout !== 0)) { // if there is a timeout or no timeout
             timeoutPromise = new Promise((resolve, reject) => {
                 timeout = setTimeout(() => {
-                    resolve(-1);
+                    resolve(IS_TIMEOUT);
                 }, (action.timeout || 600000));
             });
         } else {
             timeoutPromise = new Promise(() => { });
         }
-        return Promise.race([p, timeoutPromise]).then((result) => { // race condition between agent action and action timeout
+
+
+        return Promise.race([agentPromise, timeoutPromise]).then((result) => { // race condition between agent action and action timeout
             clearTimeout(timeout);
-            if (result !== -1) {
+            if (result === IS_TIMEOUT){
+                let result = { result: 'Timeout Error', status: 'error', stdout: actionString };
+                if (action.retries > 1) { return ['retry', result]; }
+                let actionData = {result}
+                // return updateActionContext(result, 'timeout error', agent, process, processIndex, key, executions, runId, action, map, socket);
+                return updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData)
+            } 
+            else { 
                 if (result.status === 'error' && action.retries > 1) { return ['retry', result]; }
-                updateActionContext(runId, agent.key, process.uuid, processIndex, key, { finishTime: new Date() });
                 if (result.status === 'success') {
-                    if (result.hasOwnProperty('stdout')) {
+                    if (result.stdout) {
                         result.stdout = actionString + '\n' + result.stdout;
                     } else {
                         result.stdout = actionString;
                     }
-                    updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
-                        status: 'success',
-                        result: result
-                    });
-
-                    updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-
-                    let actionExecutionLogs = [];
-                    if (result.stdout) {
-                        actionExecutionLogs.push(
-                            {
-                                map: map._id,
-                                runId: runId,
-                                message: `'${action.name}' output: ${JSON.stringify(result.stdout)} (${agent.name})`,
-                                status: 'success'
-                            }
-                        );
-                    }
-                    if (result.stderr) {
-                        actionExecutionLogs.push(
-                            {
-                                map: map._id,
-                                runId: runId,
-                                message: `'${action.name}' errors: ${JSON.stringify(result.stderr)} (${agent.name})`,
-                                status: 'success'
-                            }
-                        );
-                    }
-                    actionExecutionLogs.push(
-                        {
-                            map: map._id,
-                            runId: runId,
-                            message: `'${action.name}' result: ${JSON.stringify(result.result)} (${agent.name})`,
-                            status: 'success'
-                        }
-                    );
-
-                    executionLogService.create(actionExecutionLogs, socket);
-                    return Promise.resolve(result);
-                } else {
-                    return _handleActionError(result, undefined, agent, process , processIndex, key, executions, runId, action, map, socket );
                 }
-            } else {
-                let result = { result: 'Timeout Error', status: 'error', stdout: actionString };
-                if (action.retries > 1) { return ['retry', result]; }
 
-                return _handleActionError(result, 'timeout error', agent, process , processIndex, key, executions, runId, action, map, socket );
-            }
+                let actionData = {
+                    finishTime: new Date(),
+                    status :  result.status,
+                    result : result 
+                }
+                updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData);
+
+                return Promise.resolve(result);
+            } 
         }).then((res) => {
             if (Array.isArray(res) && res[0] === 'retry') { // retry handling
                 action.retries--;
-                executionLogService.success(runId, map._id, `'${action.name}': Error running action on '${agent.name}'. \nRetries left: ${action.retries}`, socket);
                 return runAction();
             }
-            
+
             return res;
         }).catch((error) => {
-            console.log("Error occurred: ", error);
+            console.error("Error occurred: ", error, error.stack);
         });
     }
 }
 
-function _handleActionError(result, message , agent, process , processIndex, key, executions, runId, action, map, socket ) {
-    let res = result || { stdout: actionString, result: 'Error running action on agent' };
-    updateActionContext(runId, agent.key, process.uuid, processIndex, key, {
-        status: 'error',
-        result: res,
-        finishTime: new Date()
-    });
-    updateResultsObj(runId, _.cloneDeep(executions[runId].executionAgents));
-    executionLogService.error(runId, map._id, `'${action.name}': Error running action on (${agent.name}): ${message || JSON.stringify(res)}`, socket);
-
-    if (action.mandatory) {
-        return Promise.reject(res);
-    } else {
-        return Promise.resolve(res); // Action failed but it doesn't mater
-    }
-}
 
 /**
  * sending a kill action request to agent.
@@ -1261,181 +944,52 @@ function sendKillRequest(mapId, actionId, agentKey) {
     });
 }
 
-/**
- * Formatting the agents results and returns the formatted array
- * @param agentsResults
- */
-function formatAgentsResults(agentsResults) {
-    const results = [];
-    let agentKeys = Object.keys(agentsResults);
-    for (let i of agentKeys) {
-        if (!agentsResults[i]) continue;
-        
-        let agent = agentsResults[i];
-        let agentResult = {
-            processes: [],
-            agent: agent._id || agent.id,
-            status: agent.status === 'available' ? 'success' : agent.status,
-            startTime: agent.startTime,
-            finishTime: agent.finishTime
-        };
-        for (let j in agent.processes) {
-            let process = agent.processes[j];
 
-            process.forEach((instance, index) => {
-                let processResult = {
-                    index: index,
-                    name: instance.name,
-                    result: instance.result,
-                    uuid: instance.uuid,
-                    plugin: instance.plugin,
-                    actions: [],
-                    status: instance.status,
-                    startTime: instance.startTime,
-                    finishTime: instance.finishTime
-                };
-
-                for (let k in instance.actions) {
-                    let action = instance.actions[k];
-
-                    let actionResult = {
-                        action: k,
-                        name: action.name,
-                        startTime: action.startTime,
-                        finishTime: action.finishTime,
-                        status: action.status,
-                        result: action.result,
-                        method: action.method ? action.method.name : null
-                    };
-                    processResult.actions.push(actionResult);
-                }
-                agentResult.processes.push(processResult);
-            });
-        }
-        results.push(agentResult);
-    }
-
-    return results;
-}
-
-/**
- * Updating the result object.
- * @param runId
- * @param agentsResults
- */
-function updateResultsObj(runId, agentsResults) {
-    const results = formatAgentsResults(agentsResults);
-    MapResult.findByIdAndUpdate(executions[runId].resultObj, { $set: { agentsResults: results } }, { new: true }).then(() => {
-    });
-}
-
-/**
- * Updating the execution object with results and updating the model in the db.
- * @param map
- * @param runId
- * @param executionContext
- * @param agentsResults
- * @returns {Query} - updated result model
- */
-function summarizeExecution(map, runId, executionContext, agentsResults) {
-    let result = {};
-    result.map = map._id || map.id;
-    result.structure = executionContext.structure;
-    result.startTime = executionContext.startTime;
-    result.finishTime = executionContext.finishTime;
-    result.runId = runId;
-    result.cleanFinish = true;
-    result.agentsResults = formatAgentsResults(agentsResults);
-    return MapResult.findByIdAndUpdate(executions[executionContext.executionId].resultObj, result, { new: true });
-}
-
-/**
- * get a map id and optional runId and removes the runId or all the execution of the map.
- * @param mapId {string}
- * @param runId {string}, optional
- * @param socket
- * @returns {string[]} array of stopped runs.
- */
-function stopExecution(mapId, runId, socket) {
-    /* putting stop sign on executions */
-    let stoppedRuns = [];
-    if (runId) {
-        if (executions.hasOwnProperty(runId)) {
-            executions[runId].stop = true;
-            stoppedRuns.push(runId);
-        }
-
-    } else {
-        Object.keys(executions).forEach(key => {
-            if (executions[key].map === mapId) {
-                executions[key].stop = true;
-                stoppedRuns.push(key);
-            }
-        });
-    }
-
-    /* clean data */
+function stopExecution(runId) { 
+    //todo just go over all actions, update status and kill process
     const d = new Date();
-    stoppedRuns.forEach(runId => {
-        executionLogService.info(runId, mapId, "Got stop signal. Stopping execution", socket);
-        let executionAgents = executions[runId].executionAgents;
-        executions[runId].executionContext.finishTime = d;
-
-        Object.keys(executionAgents).forEach(agentKey => {
-            if (!executionAgents[agentKey]) return;
-            let agent = executionAgents[agentKey];
-            if (agent.status !== 'error') {
-                agent.status = 'stopped';
-                agent.finishTime = d;
-            }
-
-            if (!agent.hasOwnProperty('processes')) {
-                return;
-            }
-            Object.keys(agent.processes).forEach(processKey => {
-                let processArray = agent.processes[processKey];
-                processArray.forEach(process => {
-                    if (!process.status || process.status === 'executing') {
-                        process.status = 'stopped';
-                        process.result = 'Process stopped';
-                        process.finishTime = d;
-                    }
-                    if (process.hasOwnProperty('actions')) {
-                        Object.keys(process.actions).forEach(actionKey => {
-                            let action = process.actions[actionKey];
-                            if (!action.status || action.status === 'executing') {
-                                action.status = 'stopped';
-                                action.finishTime = d;
-                                action.result = {
-                                    status: 'stopped',
-                                    result: 'Action stopped'
-                                };
-                                sendKillRequest(executions[runId].executionContext.map.id, actionKey, agentKey);
-                            }
-                        });
+    let options, optionAction
+    
+    let executionAgents = executions[runId].executionAgents
+    Object.keys(executionAgents).forEach(agentKey => {
+        let agent = executionAgents[agentKey];
+        if (!agent) return;
+        optionAction = [] 
+        let processkeys = Object.keys(agent.processes)
+        for (let indexKey = 2 ; indexKey <processkeys.length; indexKey++) {
+            let processArray = agent.processes[processkeys[indexKey]];
+            processArray.forEach(process => {
+                Object.keys(process.actions).forEach(actionKey => {
+                    let action = process.actions[actionKey];
+                    if (!action.finishTime) {
+                        let data = {
+                            status :  statusEnum.STOPPED,
+                            finishTime : d
+                        }
+                        let option = {
+                            data:data, 
+                            processIndex:process.processIndex,
+                            actionIndex:action.actionIndex
+                        }
+                       optionAction.push(option)
+                        sendKillRequest(executions[runId].mapResultId, actionKey, agentKey); // todo! check if it works or if map.id?
                     }
                 });
-            })
-        });
-
-        summarizeExecution(
-            executions[runId].executionContext.map,
-            runId,
-            Object.assign({}, executions[runId].executionContext),
-            Object.assign({}, executions[runId].executionAgents)
-        )
-            .then((mapResult) => {
-                socket.emit('map-execution-result', mapResult);
             });
-        delete executions[runId];
-        updateExecutions(socket);
-        if (pending.hasOwnProperty(mapId) && pending[mapId].length) {
-            startPendingExecution(mapId);
-            updatePending(socket);
         }
-    }
-    );
-    return stoppedRuns;
+        options = {
+            data:optionAction,
+            agentId:agent.id,
+            mapResultId:executions[runId].mapResultId
+
+        }
+        optionAction ? dbUpdates.updateActionsInAgent(options): null 
+    });
+
+    // executions[runId].clientSocket.emit('map-execution-result', mapDtata);
+    delete executions[runId];
+    //TODO: start pending 
+    // return stoppedRuns;
 }
 
 
@@ -1482,15 +1036,15 @@ module.exports = {
      */
     logs: (mapId, resultId) => {
         let q = resultId ? { runId: resultId } : { map: mapId };
-        return MapExecutionLog.find(q)
+        return //TODO
     },
     /**
      * getting all results for a certain map (not populated)
      * @param mapId {string}
      */
-    results: (mapId,page) => {
+    results: (mapId, page) => {
         const load_Results = 25;
-        let index = (page*load_Results)-load_Results;
+        let index = (page * load_Results) - load_Results;
         return MapResult.find({ map: mapId }, null, { sort: { startTime: -1 } }).select('-agentsResults').skip(index).limit(load_Results)
     },
     /**

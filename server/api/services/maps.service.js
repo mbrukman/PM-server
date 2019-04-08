@@ -58,7 +58,6 @@ module.exports = {
 
                 return project.save();
             }),
-            MapExecutionLog.remove({ map: id }),
             MapResult.remove({ map: id }),
             MapStructure.remove({ map: id }),
             MapTrigger.remove({ map: id }),
@@ -196,8 +195,9 @@ module.exports = {
         if (structureId) {
             return MapStructure.findById(structureId)
         }
-        return MapStructure.find({ map: mapId }).then((structures) => {
-            return structures.pop();
+
+        return MapStructure.find({ map: mapId }).sort('-createdAt').limit(1).then((structures) => {
+            return structures[0];
         })
     },
     structureList: (mapId, page) => {

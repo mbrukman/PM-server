@@ -18,7 +18,7 @@ module.exports = {
     Log,
     Map,
     ExecutionLog,
-    Result,
+    ...Result,
     Structure,
     Trigger,
     Plugin,

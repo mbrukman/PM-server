@@ -245,7 +245,7 @@ module.exports = {
     },
     /* get a list of ongoing executions */
     currentRuns: (req, res) => {
-        hooks.hookPre('map-currentruns', req).then(() => {
+        hooks.hookPre('map-currentruns', req).then(() => { // todo! whay this function all the time running??
             const executions = mapsExecutionService.executions;
             return res.json(Object.keys(executions).reduce((total, current) => {
                 console.log("currentRuns : ", executions[current].map);
@@ -256,16 +256,13 @@ module.exports = {
     },
     /* execute a map */
     execute: (req, res) => {
-        let agents, trigger, config;
+        let trigger, config;
         if (req.body) {
-            agents = req.body.agents ? req.body.agents.split(',') : null;
             trigger = req.body.trigger;
             config = req.body.config ? req.body.config : req.query.config;
         }
         hooks.hookPre('map-execute', req).then(() => {
-            return mapsExecutionService.execute(req.params.id, req.params.structure, null, req, config, trigger, agents);
-        }).then((r) => {
-            res.json(r);
+            return  res.json(mapsExecutionService.execute(req.params.id, req.params.structure, req.io, config, trigger));
         }).catch(error => {
             winston.log('error', "Error executing map", error);
             req.io.emit('notification', { title: 'Error executing map', message: error.message, type: 'error', mapId: req.params.id });

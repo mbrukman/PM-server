@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// TODO add plugins installed?
 let agentSchema = new Schema({
     name: String,
     url: { type: String, required: true },

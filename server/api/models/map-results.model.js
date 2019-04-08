@@ -1,37 +1,38 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const statusEnum = {
+    RUNNING: 'running',
+    DONE: 'done',
+    PENDING: 'pending',
+    ERROR: 'error',
+    STOPPED: 'stopped'
+}
+
 let actionResultSchema = new Schema({
-    name: String,
     action: { type: Schema.Types.ObjectId, ref: 'MapStructure.processes.actions' },
-    method: { name: String, _id: {type: Schema.Types.ObjectId, ref: 'Plugin.method' }},
     status: String,
     startTime: Date,
     finishTime: Date,
-    result: Schema.Types.Mixed
+    result: Schema.Types.Mixed,
+    retriesLeft: Number 
 }, { _id: false });
 
 let processResultSchema = new Schema({
-    index: Number,
-    name: String,
+    iterationIndex: Number,
     process: { type: Schema.Types.ObjectId, ref: 'MapStructure.processes' },
-    uuid: String,
-    plugin: String,
     actions: [actionResultSchema],
-    status: String,
-    startTime: Date,
-    finishTime: Date,
-    result: Schema.Types.Mixed
+    status: String, // like process didnt pass condition
+    preRunResult: Schema.Types.Mixed,
+    postRunResult: Schema.Types.Mixed
 }, { _id: false });
 
-let agentResultSchema = new Schema({
-    name: String,
+let AgentResultSchema = new Schema({
     processes: [processResultSchema],
     agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
-    status: String,
-    startTime: Date,
-    finish: Date,
-    result: Schema.Types.Mixed
+    status: { type: String, enum: [statusEnum.DONE, statusEnum.ERROR]},  // todo? is necessary? 
+    startTime: Date, // todo? is necessary? 
+    finishTime: Date, // todo? is necessary? 
 }, { _id: false });
 
 
@@ -40,12 +41,12 @@ let mapResultSchema = new Schema({
     runId: { type: String, required: true },
     structure: { type: Schema.Types.ObjectId, ref: 'MapStructure' },
     configuration: Schema.Types.Mixed,
-    agentsResults: [agentResultSchema],
-    startAgentsNumber: Number,
-    cleanFinish: Boolean,
+    agentsResults: [AgentResultSchema],
     startTime: Date,
     finishTime: Date,
-    trigger: String
+    trigger: String,
+    status :{ type: String, enum: [statusEnum.DONE, statusEnum.ERROR,statusEnum.RUNNING, statusEnum.PENDING]},
+    reason : String // e.g. no agents 
 });
 
 mapResultSchema.set('toJSON', {
@@ -55,6 +56,13 @@ mapResultSchema.set('toJSON', {
 });
 
 let MapResult = mongoose.model('MapResult', mapResultSchema, 'mapResults');
+mongoose.model('AgentResult', AgentResultSchema, 'agentResults');
+mongoose.model('ActionResult', AgentResultSchema, 'actionResults');
 
 
-module.exports = MapResult;
+module.exports = {
+    MapResult,
+    AgentResult : AgentResultSchema,
+    ActionResult : actionResultSchema,
+    statusEnum
+};
