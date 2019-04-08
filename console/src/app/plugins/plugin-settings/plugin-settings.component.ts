@@ -24,30 +24,8 @@ export class PluginSettingsComponent implements OnInit{
         this.pluginsService.getById(pluginId).subscribe(plugin =>{
             this.plugin = plugin;
             this.initSettingsForm();
-            this.generateAutocompleteParams();  
         }) 
         
-    }
-
-    generateAutocompleteParams() {
-        if (!this.plugin) return;
-        from(this.plugin.settings).pipe(
-            filter(param => param.valueType == 'autocomplete'), // check if has autocomplete
-            mergeMap(param => {
-                return forkJoin(of(param), // the param
-                  this.pluginsService.generatePluginSettingsParams(this.plugin._id)
-                   // generated params
-                );
-              })
-        ).subscribe(data => {
-                data[1].forEach(param => {
-                    if(param.valueType == 'autocomplete'){
-                        this.plugin.settings[this.plugin.settings.findIndex(p => p.name == param.name)] = param
-                        
-                    }
-                })
-            
-        })
     }
 
     initParamsForm(value, type, viewName) {

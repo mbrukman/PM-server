@@ -38,7 +38,6 @@ export class MapsListComponent implements OnInit, OnDestroy {
     this.mapsService.recentMaps().subscribe(maps => {
       this.recentMaps = maps;
     })
-
     this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(debounceTime(300))
     .subscribe(()=>{
       this.loadMapsLazy();

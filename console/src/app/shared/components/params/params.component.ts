@@ -1,5 +1,4 @@
-import { Component, OnInit, Input, OnChanges } from '@angular/core';
-import {PluginMethodParam} from '@plugins/models/plugin-method-param.model';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 @Component({
@@ -16,6 +15,5 @@ export class ParamsComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-
   }
 }

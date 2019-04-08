@@ -16,8 +16,6 @@ router.get("/:id", pluginsController.getPlugin);
 router.delete("/:id/delete", pluginsController.pluginDelete);
 router.post("/upload", upload.single('file'), pluginsController.pluginUpload);
 router.post("/:id/settings", pluginsController.updateSettings);
-router.get("/:id/generateMethod/:name", pluginsController.generatePluginMethodParams);
-router.get("/:id/generateSettings", pluginsController.generatePluginSettingsParams);
 
 module.exports = router;
 

@@ -18,12 +18,12 @@ import { LinebreakPipe } from './pipes/linebreak.pipe';
 import { InlineEditDirective } from './directives/inline-edit.directive';
 import { InPipe } from '@shared/pipes/filterIn.pipe';
 import { RawOutputComponent } from './raw-output/raw-output.component';
-import { VaultSelectorComponent } from './components/vault-selector/vault-selector.component'
 import {AutoCompleteModule} from 'primeng/primeng';
 import {ExecutionChartComponent} from '@shared/components/execution-chart/execution-chart.component';
 import { MapsCardsComponents } from './map-cards/map-cards.component';
 import { ParamsComponent } from './components/params/params.component';
 import { OptionsParamComponent } from './components/params/options-param/options-param.component';
+import { AutocompleteComponent } from './components/params/autocomplete/autocomplete.component';
 
 
 @NgModule({
@@ -54,11 +54,11 @@ import { OptionsParamComponent } from './components/params/options-param/options
     LinebreakPipe,
     InPipe,
     RawOutputComponent,
-    VaultSelectorComponent,
     MapsCardsComponents,
     ExecutionChartComponent,
     ParamsComponent,
-    OptionsParamComponent
+    OptionsParamComponent,
+    AutocompleteComponent
 
   ],
   exports: [
@@ -78,7 +78,6 @@ import { OptionsParamComponent } from './components/params/options-param/options
     ConfirmComponent,
     LinebreakPipe,
     InPipe,
-    VaultSelectorComponent,
     MapsCardsComponents,
     ExecutionChartComponent,
     ParamsComponent

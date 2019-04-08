@@ -95,7 +95,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
 
     // this.process = new Process(this.process);
 
-    this.generateAutocompleteParams();
+
     if (this.processViewWrapper.process.actions) {
       this.processViewWrapper.process.actions.forEach((action, actionIndex) => {
         const actionControl = <FormArray>this.processForm.controls['actions'];
@@ -132,50 +132,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       this.formValueChangeSubscription.unsubscribe();
     }
   }
-
-  /**
-   * if the plugin has autocomplete method it generates them
-   */
-  generateAutocompleteParams() {
-    if (!this.processViewWrapper.plugin) return;
-    from(this.processViewWrapper.plugin.methods).pipe(
-      filter(method => this.methodHaveParamType(method, 'autocomplete')), // check if has autocomplete
-      mergeMap(method => {
-        return forkJoin(
-          of(method), // the method
-          this.pluginsService.generatePluginMethodsParams(this.processViewWrapper.plugin._id, method.name) // generated params
-        );
-      }),
-      map(data => {
-        data[1].forEach(param => {
-          data[0].params[
-            data[0].params.findIndex(o => o.name === param.name)
-          ] = param;
-        });
-        return data[0];
-      })
-    ).subscribe(method => {
-        this.processViewWrapper.plugin.methods[
-          this.processViewWrapper.plugin.methods.findIndex(o => o.name === method.name)
-        ] = method;
-        this.addToMethodContext(method);
-      });
-
-    from(this.processViewWrapper.plugin.methods).pipe(
-      filter(method => this.methodHaveParamType(method, 'options'))
-    ).subscribe(method => {
-        this.addToMethodContext(method);
-      });
-  }
-
-  addToMethodContext(method) {
-    this.methods[method.name] = method;
-  }
-
-  methodHaveParamType(method: PluginMethod, type: string): boolean {
-    return method.params.findIndex(p => p.type === type) > -1;
-  }
-
 
   runAction(action){
     if(this.processViewWrapper.plugin){

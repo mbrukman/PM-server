@@ -17,11 +17,8 @@
           
           <div class="input dropdown" [ngSwitch]="param.value.type" [hidden]="param.value.code">
             <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
-            
-            <app-vault-selector *ngSwitchCase="'vault'" formControlName="value"></app-vault-selector>
-            <p-dropdown *ngSwitchCase="'autocomplete'" [options]="params[k].options"  placeholder="Select an option" formControlName="value"  
-                        [autoWidth]="false">
-            </p-dropdown>
+            <app-autocomplete  *ngSwitchCase="'vault'" formControlName="value" [model]="'Vault'" ></app-autocomplete>
+            <app-autocomplete  *ngSwitchCase="'autocomplete'" formControlName="value" [model]="params[k].model"></app-autocomplete>
             <app-options-param *ngSwitchCase="'options'" [options]="params[k].options" formControlName="value"></app-options-param>    
             <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
             <input formControlName="value" type="checkbox" class="form-control" *ngSwitchCase="'boolean'">
