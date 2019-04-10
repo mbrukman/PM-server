@@ -6,6 +6,7 @@
     <div class="dropdown-pm btn-group" dropdown placement="bottom right">
       <span  dropdownToggle><i class="fa fa-ellipsis-h" aria-hidden="true"></i></span>
       <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+        <a class="dropdown-item" (click)="cloneProcess()">Clone</a>
         <a class="dropdown-item" (click)="deleteProcess()">Delete</a>
       </ul>
     </div>

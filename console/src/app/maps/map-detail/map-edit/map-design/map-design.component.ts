@@ -46,7 +46,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   link: Link;
   init: boolean = false;
   scale: number = 1;
-
+  cellView:any;
   processViewWrapper: ProcessViewWrapper;
   @ViewChild('wrapper') wrapper: ElementRef;
 
@@ -67,9 +67,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       .getDrop().pipe(
         filter(obj => this.isDroppedOnMap(obj.x, obj.y))
       ).subscribe(obj => {
-        let offsetLeft = this.wrapper.nativeElement.offsetParent.offsetLeft;
-        let offsetTop = this.wrapper.nativeElement.offsetParent.offsetTop;
-        this.addNewProcess(obj, offsetLeft, offsetTop);
+        this.addNewProcess(obj);
       });
 
   }
@@ -201,7 +199,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   defineShape() {
     joint.shapes.devs['MyImageModel'] = joint.shapes.devs.Model.extend({
-      markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><image class="warning"/><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
+      markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><image class="warning"/><text class="label"/><g class="p_id"/><g class="inPorts"/><g class="outPorts"/></g>',
       defaults: joint.util.deepSupplement({
         type: 'devs.MyImageModel',
         size: {
@@ -227,6 +225,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
             'font-size': 14,
             fill: JOINT_OPTIONS.LABEL_FILL_COLOR
           },
+          '.p_id': { text:''},
           image: {
             'xlink:href': 'http://via.placeholder.com/350x150',
             width: 46,
@@ -254,7 +253,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
   }
 
-  addNewProcess(obj: { x: number, y: number, cell: any }, offsetTop: number, offsetLeft: number) {
+  addNewProcess(obj: { x: number, y: number, cell: any },isClone = false) {
     const pluginDisplayName = obj.cell.model.attributes.attrs['.label'].text;
     const pluginId = obj.cell.model.attributes.attrs['.p_id'].text;
     const plugin = this.plugins.find((o) => {
@@ -263,13 +262,23 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
     let imageModel = this.getPluginCube({
       x: obj.x - (430 * this.scale) - this.paper.translate().tx,
-      y: obj.y - (240 * this.scale) - this.paper.translate().ty
-    }, pluginDisplayName, plugin.fullImageUrl);
+      y: isClone ? obj.y : obj.y - (240 * this.scale) - this.paper.translate().ty
+    }, pluginDisplayName, plugin.fullImageUrl,pluginId);
 
     this.graph.addCell(imageModel);
-    let p = new Process();
-    p.used_plugin = { name: plugin.name, version: plugin.version };
-    p.uuid = <string>imageModel.id;
+    let p;
+    if(isClone){
+      p = _.cloneDeep(this.process)
+      p.used_plugin = { name: plugin.name, version: plugin.version };
+      p.uuid = <string>imageModel.id;
+      p.name = this.process.name ? this.process.name + ' (copy)': plugin.name+ ' (copy)'
+    }
+    else{
+      this.cellView = obj.cell;
+      p = new Process();
+      p.used_plugin = { name: plugin.name, version: plugin.version };
+      p.uuid = <string>imageModel.id;
+    }
 
     if (!this.mapStructure.processes) {
       this.mapStructure.processes = [p];
@@ -315,7 +324,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           let imageModel = this.getPluginCube({
             x: ((i + 1) * 160),
             y: 200
-          }, process.name || process.used_plugin.name, plugin.fullImageUrl, process.uuid);
+          }, process.name || process.used_plugin.name, plugin.fullImageUrl,plugin.id, process.uuid);
 
           this.processViewWrapper = new ProcessViewWrapper(this.process, this.mapStructure, this.plugins)
           this.setProcessWarning(imageModel);
@@ -397,7 +406,11 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       }
     });
 
+
     this.paper.on('cell:pointerup', (cellView, evt, x, y) => {
+      if(cellView.model.attributes.type != 'link'){
+        this.cellView = cellView;
+      }
       this.deselectAllCellsAndUpdateStructure();
       if (cellView.model.isLink()) {
         let link = _.find(this.mapStructure.links, (o) => {
@@ -486,12 +499,18 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.deselectAllCellsAndUpdateStructure();
   }
 
+  onClone(){
+    let y = this.getMaximumPosition()
+    let cell = _.cloneDeep(this.cellView);
+    let processName =  cell.model.attributes.attrs['.label'].text;
+    cell.model.attributes.attrs['.label'].text=this.process.name ? this.process.name + ' (copy)': processName+ ' (copy)';
+    this.addNewProcess({x:600,y:y+100,cell:cell},true)
+  } 
+
   onSave(process) {
     let index = _.findIndex(this.mapStructure.processes, (o) => {
       return o.uuid === this.process.uuid;
     });
-
-
     this.updateNodeLabel(process.uuid, process.name || this.process.used_plugin.name);
     let updateFields = ['name', 'description', 'mandatory', 'condition', 'coordination', 'actions', 'correlateAgents', 'flowControl', 'filterAgents', 'postRun', 'preRun']
     for (let i=0, length=updateFields.length;i<length;i++){
@@ -534,13 +553,22 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     } : {}
   }
 
-  private getPluginCube(position: { x: number, y: number }, text: string, imageUrl: string, id?: string) {
+  getMaximumPosition(){
+    let modelsPositions = [];
+    this.graph.attributes.cells.models.forEach((model) => {
+     if(model.attributes.position){
+        modelsPositions.push(model.attributes.position.y)
+     }
+    })
+    return Math.max(...modelsPositions);
+  }
+  
+  private getPluginCube(position: { x: number, y: number }, text: string, imageUrl: string, pluginId,id?) {
     if (text.length > 15) {
       text = `${text.substr(0, 12)}...`;
     }
-    
     let options = {
-      id: undefined,
+      id: id ? id : undefined,
       position: position,
       size: {
         width: 100,
@@ -554,6 +582,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           'ref-y': 5,
           'font-size': 14,
           fill: JOINT_OPTIONS.LABEL_FILL_COLOR
+        },
+        '.p_id':{
+          text:pluginId
         },
         rect: {
           'stroke-width': 1,
@@ -584,8 +615,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       }
     }
 
-    if (id)
-      options.id = id;
 
     return new joint.shapes.devs['MyImageModel'](options);
   }
@@ -597,5 +626,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       this.mapsService.setCurrentMapStructure(this.mapStructure);
     }
   }
+
 
 }
