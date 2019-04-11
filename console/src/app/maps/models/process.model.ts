@@ -29,7 +29,6 @@ export class Process extends Serializable implements IProcess {
 
   constructor(json?: any) {
     super(json);
-    this.flowControl = 'each';
   }
 
   static getFormGroup(process?: Process): FormGroup {
