@@ -466,7 +466,14 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, 
             updatePending(socket);
             return;
         }
-        return executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configurationName, triggerReason, agents,payload);
+        let configValue;
+        try{
+            configValue = JSON.parse(configurationName)
+        } 
+        catch(e){
+            configValue = configurationName
+        }
+        return executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configValue, triggerReason, agents,payload);
     });
 }
 
