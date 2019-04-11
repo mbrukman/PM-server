@@ -39,6 +39,7 @@ const FILTER_FIELDS = Object.freeze({
 let followAgentStatus = (agent) => {
     let listenInterval = setInterval(() => {
         let start = new Date();
+        if(!agents[agent.key]) return;
         request.post(
             agents[agent.key].defaultUrl + '/api/status', {
                 form: {
@@ -287,7 +288,9 @@ module.exports = {
         });
     },
     delete: (agentId) => {
-        return Agent.remove({ _id: agentId })
+        return Agent.findOneAndRemove({ _id: agentId }).then((agent) => {
+            delete agents[agent.key]
+        })
     },
     /* filter the agents. if no query is passed, will return all agents */
     filter: (query = {}) => {
