@@ -97,7 +97,7 @@ function updatePending(socket) {
  * @param process
  * @returns {number}
  */
-function addProcessToContext(runId, agent, processUUID, process) {
+function createProcessContext(runId, agent, processUUID, process) {
     let processes = executions[runId].executionAgents[agent.key].processes
 
     if(!processes.numProcesses && processes.numProcesses!= 0){
@@ -444,7 +444,7 @@ function areAllAgentsDone(runId) {
 function areAllAgentsWaitingToStartThis(runId, processUUID, agent, processId) {
     const executionAgents = executions[runId].executionAgents;
 
-   addProcessToContext(runId, agent, processUUID, {id: processId, status: statusEnum.PENDING})
+   createProcessContext(runId, agent, processUUID, {id: processId, status: statusEnum.PENDING})
     
     for (let i in executionAgents) {
         if (!executionAgents[i].processes.hasOwnProperty(processUUID)) {
@@ -552,7 +552,7 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
         if (checkProcessCoordination(process, executions[runId].executionAgents[agent.key].processes, successor, successorIdx,structure) &&
             checkAgentFlowCondition(runId, process, map, structure, agent)) {
                 nodesToRun.push({
-                index: addProcessToContext(runId, agent, successor, process),
+                index: createProcessContext(runId, agent, successor, process),
                 uuid: successor,
                 process: process
             });
@@ -887,14 +887,9 @@ async function executeAction(map, structure, runId, agent, process, processIndex
         return Promise.race([agentPromise, timeoutPromise]).then((result) => { // race condition between agent action and action timeout
             clearTimeout(timeout);
             if (result === IS_TIMEOUT){
-                let result = { result: 'Timeout Error', status: 'error', stdout: actionString };
-                if (action.retries > 1) { return ['retry', result]; }
-                let actionData = {result}
-                // return updateActionContext(result, 'timeout error', agent, process, processIndex, key, executions, runId, action, map, socket);
-                return updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData)
+                return { result: 'Timeout Error', status: 'error', stdout: actionString };
             } 
-            else { 
-                if (result.status === 'error' && action.retries > 1) { return ['retry', result]; }
+            else {
                 if (result.status === 'success') {
                     if (result.stdout) {
                         result.stdout = actionString + '\n' + result.stdout;
@@ -902,23 +897,22 @@ async function executeAction(map, structure, runId, agent, process, processIndex
                         result.stdout = actionString;
                     }
                 }
-
-                let actionData = {
-                    finishTime: new Date(),
-                    status :  result.status,
-                    result : result 
-                }
-                updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData);
-
-                return Promise.resolve(result);
+                return result
             } 
-        }).then((res) => {
-            if (Array.isArray(res) && res[0] === 'retry') { // retry handling
-                action.retries--;
+        }).then((result) => {
+            let actionData = {
+                status :  result.status, // todo duplicate?? 
+                result : result 
+            }
+            if (result.status == 'error' && action.retriesLeft > 0) { // retry handling
+                actionData.retriesLeft = --action.retriesLeft
+                updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData)
                 return runAction();
             }
+            actionData.finishTime =  new Date(),
+            updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData);
+            return result;
 
-            return res;
         }).catch((error) => {
             console.error("Error occurred: ", error, error.stack);
         });
