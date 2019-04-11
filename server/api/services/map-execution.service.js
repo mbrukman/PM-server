@@ -112,10 +112,10 @@ function addProcessToContext(runId, agent, processUUID, process) {
     const processData = {
         processId: process.id,
         iterationIndex: processes[processUUID].length,
-        status: statusEnum.RUNNING,
+        status: process.status || statusEnum.RUNNING, // todo delete? 
         uuid: processUUID,
         actions: {},
-        processIndex: processes.numProcesses
+        processIndex: processes.numProcesses  // numProcesses => represents the process in the DB.  
     };
     processes[processUUID].push(processData);
 
@@ -137,20 +137,17 @@ function addProcessToContext(runId, agent, processUUID, process) {
  * @param processIndex
  * @param processData
  */
-function updateProcessContext(runId, agent, processUUID, iterationIndex, processData) {
+function updateProcessContext(runId, agent, processUUID, iterationIndex, processData, updateDB = true) { 
 
-    if (executions[runId]) {
+    if (!executions[runId]) {
         return;
-    }
-    if (!executions[runId].executionAgents[agent.key].processes) {
-        executions[runId].executionAgents[agent.key].processes = []
     }
     executions[runId].executionAgents[agent.key].processes[processUUID][iterationIndex] = Object.assign(
         (executions[runId].executionAgents[agent.key].processes[processUUID][iterationIndex] || {}),
-        processData
+        processData  
     );
 
-    let field = Object.keys(processData)[0]
+    let field = Object.keys(processData)[0] // todo generic? 
     let options = {
         mapResultId: executions[runId].mapResultId,
         agentId: agent.id,
@@ -159,7 +156,7 @@ function updateProcessContext(runId, agent, processUUID, iterationIndex, process
         value: processData[field]
     }
 
-    dbUpdates.updateProcess(options)
+    updateDB ? dbUpdates.updateProcess(options) : null
 
 }
 
@@ -380,7 +377,9 @@ function executeMap(mapId, structureId, socket, configurationName, triggerReason
 
 function runMapOnAgent(map, structure, runId, startNode, agent) {
     return helper.validate_plugin_installation(executions[runId].plugins, agent.key).then(() => {
-        return runNodeSuccessors(map, structure, runId, agent, startNode.uuid);
+        return runNodeSuccessors(map, structure, runId, agent, startNode.uuid).catch(err=>{
+            console.error(err)
+        });
     })
 }
 
@@ -442,50 +441,59 @@ function areAllAgentsDone(runId) {
  * @param agentKey
  * @returns {boolean}
  */
-function areAllAgentsWaitingToStartThis(runId, processUUID, agentKey) {
+function areAllAgentsWaitingToStartThis(runId, processUUID, agent, processId) {
     const executionAgents = executions[runId].executionAgents;
 
-    executionAgents[agentKey].processes[processUuid].status = statusEnum.PENDING // todo add [IterationIndex]
-
+   addProcessToContext(runId, agent, processUUID, {id: processId, status: statusEnum.PENDING})
+    
     for (let i in executionAgents) {
-        if (!executionAgents[i].process.hasOwnProperty(processUUID)) {
+        if (!executionAgents[i].processes.hasOwnProperty(processUUID)) {
             return false;
         }
     }
     return true;
 }
 
+function runAgentsFlowControlPendingProcesses(runId, map, structure, process){
+    const executionAgents = executions[runId].executionAgents
+    let agentsStatus = agentsService.agentsStatus()
+    for (let i in executionAgents) {
+        for(let j in executionAgents[i].processes[process.uuid]){
+            let processToRun = executionAgents[i].processes[process.uuid][j]
+            let nodeToRun = {
+                index: processToRun.iterationIndex,
+                uuid: processToRun.uuid, // todo duplicate?? in process the uuid!!
+                process: process
+            }
+            updateProcessContext(runId, agentsStatus[i], process.uuid, processToRun.iterationIndex, {status: statusEnum.RUNNING}, false)
+            runProcess(map, structure, runId, agentsStatus[i], nodeToRun); // TODO WITH PROMISE ALL? 
+        }
+    }
+}
 
 
-
-function checkAgentFlowCondition(runId, process, successor, map, structure, agent) {
+function checkAgentFlowCondition(runId, process, map, structure, agent) {
     if (process.flowControl === 'race') {
-        // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
-        if (!helper.isThisTheFirstAgentToGetToTheProcess(runId, successor, agent.key)) {
-            runNodeSuccessors(map, structure, runId, agent, successor);
+        if (!helper.isThisTheFirstAgentToGetToTheProcess(executions[runId].executionAgents, process.uuid, agent.key)) {
+            // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
+            runNodeSuccessors(map, structure, runId, agent, process.uuid);
             return false
         }
-
-        executions[runId].executionAgents[agentKey].processes[successor.uuid][successor.index].status = statusEnum.PENDING //todo add iteration index
-        apdateProcess() // todo create process. status pending
         return true
     }
-    if (process.flowControl === 'wait') {
-        // if not all agents are still alive, the wait condition will never be met, should stop the map execution
+    if (process.flowControl === 'wait') { // if not all agents are still alive, the wait condition will never be met, should stop the map execution
         if (!helper.areAllAgentsAlive(executions[runId].executionAgents)) {
-            stopExecution(runId); // todo! handle this.
+            stopExecution(runId); 
             return false;
         }
+        const agentProcesses = executions[runId].executionAgents[agent.key].processes
+        if(agentProcesses[process.uuid] && agentProcesses[process.uuid][0].status != statusEnum.PENDING){
+            return true // means all agents was here and run. (in case 2 ancestors)
+        }
+
         // if there is a wait condition, checking if it is the last agent that got here and than run all the agents
-        if (areAllAgentsWaitingToStartThis(runId, successor, agent.key)) {
-            const executionAgents = executions[runId].executionAgents;
-            for (let i in executionAgents) {
-                if (i === agent.key) {
-                    continue;
-                }
-                runProcess(map, structure, runId, executionAgents[i], successor);
-            }
-            return true
+        if (areAllAgentsWaitingToStartThis(runId, process.uuid, agent, process.id)) {
+            runAgentsFlowControlPendingProcesses(runId, map, structure, process)
         }
         return false
     }
@@ -542,8 +550,8 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
     successors.forEach((successor, successorIdx) => {
         const process = findProcessByUuid(successor, structure);
         if (checkProcessCoordination(process, executions[runId].executionAgents[agent.key].processes, successor, successorIdx,structure) &&
-            checkAgentFlowCondition(runId, process, successor, map, structure, agent)) {
-            nodesToRun.push({
+            checkAgentFlowCondition(runId, process, map, structure, agent)) {
+                nodesToRun.push({
                 index: addProcessToContext(runId, agent, successor, process),
                 uuid: successor,
                 process: process
@@ -557,7 +565,7 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
         promises.push(runProcess(map, structure, runId, agent, nodesToRun[i]))
     }
     return Promise.all(promises).catch(error => {
-        console.log(error);
+        console.error(error);
         winston.log('error', error)
     });
 }
@@ -574,8 +582,7 @@ function updateAgentContext(runId, agent,agentData){
 }
 
 function endRunPathResults(runId, agent, map) {
-    //sharbat
-let d = new Date();
+    let d = new Date();
     if (isThereProcessExecutingOnAgent(runId, agent.key)) { return }
   
     let data = {
@@ -598,9 +605,8 @@ let d = new Date();
 
     if (map.queue) { 
         startPendingExecution(map.id); // starting pending execution if necessary
-        updatePending(socket); // ?
+        updatePending(socket); // todo ?
     }
-    // updateExecutions(socket); todo? 
 }
 
 // testing process condition
@@ -715,11 +721,10 @@ function runProcess(map, structure, runId, agent, execProcess) {
         }
 
         actionsArray.reduce(reduceFunc, Promise.resolve([])).then((actionsResults) => {
-            //TODO: check amount of actions
             return actionsExecutionCallback(map, structure, runId, agent,execProcess)
         })
             .catch((error) => {
-                console.error("error"+ error);
+                console.error(error);
                 let status = statusEnum.ERROR + error
                 updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, {status: status});
             })
@@ -732,6 +737,7 @@ function actionsExecutionCallback(map, structure, runId, agent,execProcess) {
         return ;
     }
     runProcessPostRunFunc(runId, agent, execProcess, structure.code)
+    executions[runId].executionAgents[agent.key].processes[execProcess.uuid][execProcess.index].status = statusEnum.DONE // we need to update process status cause we cant know how much actions we have. 
    
     return runNodeSuccessors(map, structure, runId, agent, execProcess.uuid);
 }

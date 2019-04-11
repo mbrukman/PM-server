@@ -1,6 +1,8 @@
 const agentsService = require('./agents.service')
 const _ = require("lodash");
 
+const winston = require('winston');
+
 
 module.exports = {
     /**
@@ -55,7 +57,7 @@ module.exports = {
                 })).then(() => {
                     winston.log('success', 'Done installing plugins');
                 }).catch((error) => {
-                    winston.log('error', "Error installing plugins on agent", error);
+                    console.error('error', "Error installing plugins on agent", error);
                 }).then(() => {
                     resolve();
                 })
@@ -131,7 +133,7 @@ module.exports = {
     areAllAgentsAlive(executionAgents) {
         let agentKeys = Object.keys(executionAgents)
         agentKeys.forEach((key) => {
-            if(!isAgentShuldContinue(key, executionAgents)){
+            if(!this.isAgentShuldContinue(key, executionAgents)){
                 return false;
             }
         })
@@ -165,10 +167,9 @@ module.exports = {
     },
 
 
-    isThisTheFirstAgentToGetToTheProcess(runId, processKey, agentKey) {
-        let agentContext = executions[runId].executionAgents
-        for (let i in agentContext) {
-            if (agentContext[i].process.hasOwnProperty(processUUID)) { // && != agentKey ?
+    isThisTheFirstAgentToGetToTheProcess(executionAgents, processUUID, agentKey) {
+        for (let i in executionAgents) {
+            if (i != agentKey && executionAgents[i].processes.hasOwnProperty(processUUID)) {
                 return false;
             }
 

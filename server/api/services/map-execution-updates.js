@@ -29,7 +29,6 @@ function _runDbFunc() {
     funcs[lastElement.func](lastElement.data).then(res => {
         console.log(`func ${lastElement.func} res:`, res)
         dbQueue.pop();
-        res ? console.log(res.toJSON()) : null;
         _runDbFunc()
     }).catch(err => {
         console.error('error in ' + lastElement.func +" - "+ err);
@@ -72,7 +71,7 @@ function _updateAgent(options) {
     return MapResult.findOneAndUpdate(
         {
             '_id': ObjectId(options.mapResultId),
-            'agentResult.agent': ObjectId(options.agentId)
+            'agentsResults.agent': ObjectId(options.agentId)
         },
         { $set: toUpdate }
     )
