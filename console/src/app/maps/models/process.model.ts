@@ -39,7 +39,7 @@ export class Process extends Serializable implements IProcess {
       mandatory : new FormControl(process.mandatory),
       condition : new FormControl(process.condition),
       coordination : new FormControl(process.coordination),
-      flowControl : new FormControl(process.flowControl),
+      flowControl : new FormControl(process.flowControl || 'each'),
       preRun : new FormControl(process.preRun),
       postRun : new FormControl(process.postRun),
       correlateAgents : new FormControl(process.correlateAgents),
