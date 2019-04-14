@@ -2,7 +2,6 @@ const Map = require("../models/map.model");
 const MapStructure = require("../models").Structure;
 const Plugin = require("../models").Plugin;
 const env = require("../../env/enviroment");
-const MapExecutionLog = require("../models/map-execution-log.model")
 const MapTrigger = require("../models/map-trigger.model")
 const MapResult = require("../models/map-results.model")
 const Project = require("../models/project.model")

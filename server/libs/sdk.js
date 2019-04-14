@@ -1,8 +1,4 @@
-var currentAgent = {
-    name: "",
-    url: "",
-    attributes: [{ name: "", value: "" }]
-};
+var currentAgent;
 
 /**	
  * Represents the execution Id	

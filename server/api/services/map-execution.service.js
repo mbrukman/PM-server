@@ -33,7 +33,6 @@ fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 
     }
     libpm = data;
     eval(libpm)
-    libpmObjects.currentAgent = currentAgent
 });
 
 async function evaluateParam(param, typeParam, context) {
@@ -182,7 +181,6 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
     // If action have a result (i.e. done) set to previous action;
     if (actionData.result)
         executions[runId].executionAgents[agentKey].context.previousAction = action;
-    // getCurrentAgent(runId,agentKey);
 
 
     
@@ -197,7 +195,7 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
         status: curActionData.status,
         finishTime: curActionData.finishTime,
         result: curActionData.result,
-        retriesLeft: curActionData.retriesLeft // TODO REMEBER TO REDUCE & UPDATE AFTER RETRIES
+        retriesLeft: curActionData.retriesLeft
     }
     
     let options = {
@@ -241,7 +239,6 @@ async function startPendingExecution(mapId, socket) {
         // structure: structureId, todo ?? in sdk? 
         configuration: pendingExec.configuration,
         trigger: pendingExec.triggerReason
-
     }
 
     map = await mapsService.get(pendingExec.map)
@@ -253,8 +250,6 @@ async function startPendingExecution(mapId, socket) {
 }
 
 
-
-
 function createAgentContext(agent, runId, executionContext, startNode, mapCode) {
 
     let processes = {}
@@ -263,19 +258,22 @@ function createAgentContext(agent, runId, executionContext, startNode, mapCode) 
         startNode: true,
     } // todo?  not in same format [uuid][0] = {data}
 
+    let agentContext = {currentAgent: {
+        name: agent.name,
+        url: agent.url,
+        attributes: agent.attributes //[{ name: "", value: "" }] // todo ??  name? value?? 
+    }
+}
+   
     executions[runId].executionAgents[agent.key] = {
-
         processes: processes,
-        context: Object.assign({}, executionContext),
+        context: Object.assign(agentContext, executionContext),
         id: agent.id,
         startTime: new Date()
     }
     createContext(mapCode, runId, agent.key)
 
     dbUpdates.addAgentResult(executions[runId].executionAgents[agent.key],  executions[runId].mapResultId)
-
-    //TODO: remove after all tests
-    // executions[runId].executionAgents[agent.key].context.currentAgent = getCurrentAgent(agent.key) // todo!!
 }
 
 function createContext(mapCode, runId, agentKey) {
