@@ -2,7 +2,7 @@
   <div formArrayName="params">
     <div *ngFor="let param of form.controls.params.controls; let k = index">
       <div [formGroupName]="k">
-        <div class="row action-params">
+        <div class="row param-wrapper">
           <div class="col-4">{{param.value.viewName}}</div>
           <hr>
           <div *ngIf="code">
