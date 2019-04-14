@@ -217,20 +217,38 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
  * Starting a pending execution
  * @param mapId
  */
-function startPendingExecution(mapId) {
+async function startPendingExecution(mapId, socket) {
 
-    let pendingExec = dbUpdates.getPendingExecution(mapId) 
+    let pendingExec = await dbUpdates.getAndUpdatePendingExecution(mapId) 
     if(!pendingExec){return}
 
-    // todo!!  executeMap + check
-    executeFromMapStructure(
-        pendingExec.map,
-        pendingExec.structureId,
-        pendingExec.socket,
-        pendingExec.configurationName,
-        pendingExec.triggerReason,
-        pendingExec.runId,
-        pendingExec.agents
+
+    if(!executions[pendingExec.runId]){
+        executions[pendingExec.runId] = {
+            clientSocket : socket, // todo save global executions.socket?  
+            mapId: mapId,
+            status: statusEnum.RUNNING,
+            executionAgents: {},
+            mapResultId: pendingExec.id
+        }
+    }else{
+        executions[pendingExec.runId].status = statusEnum.RUNNING
+    }
+
+    let context = { 
+        executionId: pendingExec.runId, 
+        startTime: pendingExec.startTime,
+        // structure: structureId, todo ?? in sdk? 
+        configuration: pendingExec.configuration,
+        trigger: pendingExec.triggerReason
+
+    }
+
+    map = await mapsService.get(pendingExec.map)
+    executeMap(pendingExec.runId, 
+        map,
+        pendingExec.structureId, // @matam => todo will be always null. shuld I save the pendings maps with structureId ??
+        context
     );
 }
 
@@ -280,10 +298,10 @@ function createExecutionContext(runId, socket, map, configurationName, structure
     const ongoingExecutions = helper.countMapExecutions(executions, map.id, statusEnum.RUNNING);
 
     // check if more running executions than map.queue
-    const status = (map.queue && (ongoingExecutions >= map.queue)) ? statusEnum.PENDING : statusEnum.RUNNING;
+    const status = (map.queue && (ongoingExecutions >= map.queue)) ? statusEnum.PENDING : statusEnum.RUNNING; 
     const configuration = helper.createConfiguration(map, configurationName);
 
-    const startTime = new Date()
+    const startTime =  status == statusEnum.PENDING? null : new Date()
 
     executions[runId] = {
         mapId: map._id,
@@ -311,9 +329,9 @@ function createExecutionContext(runId, socket, map, configurationName, structure
 
     executions[runId].mapResultId = mapResult.id  
     return executionContext = {
-        executionId: runId,
+        executionId: runId, 
         startTime: startTime,
-        structure: structureId,
+        structure: structureId, // todo I think null 
         configuration: configuration,
         trigger: triggerReason
     };
@@ -326,53 +344,50 @@ function savePlugins(mapStructure, runId) {
     })
 }
 
-function executeMap(mapId, structureId, socket, configurationName, triggerReason) {
-   
+async function executeMap(runId, map, structureId, context){
+    agents = helper.getRelevantAgent(map.groups, map.agents)
 
-    return mapsService.get(mapId).then((map) => {
-        if (!map) {
-            throw new Error(`Couldn't find map`);
-        }
-        if (map.archived) {
-            throw new Error('Can\'t execute archived map');
-        }
+    // If not living agents, stop execution with status error
+    if (agents.length == 0) {
+        return MapResult.findByIdAndUpdate(executions[runId].mapResultId, { reason: 'no Agent alive', status: 'Error' })
+    }
 
-        const runId = helper.guidGenerator();
+    // get map structure, if no structureId specified take latest
+    mapStructure = await mapsService.getMapStructure(map._id, structureId)
+    if (!mapStructure) {
+        throw new Error('No structure found.');
+    }
 
-        // create general context and new MapResult
-        let context = createExecutionContext(runId, socket, map, configurationName, structureId, triggerReason)
+    await savePlugins(mapStructure, runId)
 
-        agents = helper.getRelevantAgent(map.groups, map.agents)
+    const startNode = helper.findStartNode(mapStructure);
+    let promises = []
+    for (let i = 0, length = agents.length; i < length; i++) {
+        createAgentContext(agents[i], runId, context, startNode, mapStructure.code)
+        promises.push(runMapOnAgent(map, mapStructure, runId, startNode, agents[i]))
+    }
+    Promise.all(promises).catch(err=>{
+        console.error(err);
+        
+    })         
+    // updateExecutions(socket);  //?? todo!! 
+}
 
-        // If not living agents, stop execution with status error
-        if (agents.length == 0) {
-            return MapResult.findByIdAndUpdate(executions[runId].mapResultId, { reason: 'no Agent alive', status: 'Error' })
-        }
 
-        // get map structure, if no structureId specified take latest
-        return mapsService.getMapStructure(map._id, structureId).then(mapStructure => {
-            if (!mapStructure) {
-                throw new Error('No structure found.');
-            }
+async function execute(mapId, structureId, socket, configurationName, triggerReason) {
+    map = await mapsService.get(mapId)
+    if (!map) { throw new Error(`Couldn't find map`); }
+    if (map.archived) {throw new Error('Can\'t execute archived map'); }
 
-            savePlugins(mapStructure, runId).then(_ => {
+    const runId = helper.guidGenerator();
 
-                const startNode = helper.findStartNode(mapStructure);
-                let promises = []
-                for (let i = 0, length = agents.length; i < length; i++) {
-                    createAgentContext(agents[i], runId, context, startNode, mapStructure.code)
-                    promises.push(runMapOnAgent(map, mapStructure, runId, startNode, agents[i]))
-                }
-                Promise.all(promises).catch(err=>{ //TODO: it is emptyyy!!   because  asinc .then // == todo await? 
-                    console.error(err);
-                    
-                })         
-                // updateExecutions(socket);  //?? todo!! 
-                return runId
-            })
-        });
-    });
-
+    // create general context and new MapResult
+    let context = createExecutionContext(runId, socket, map, configurationName, structureId, triggerReason)
+    if(executions[runId].status == statusEnum.PENDING){
+        return  startPendingExecution(mapId, socket) 
+    }
+    executeMap(runId, map, structureId, context)
+    return runId
 }
 
 function runMapOnAgent(map, structure, runId, startNode, agent) {
@@ -604,7 +619,7 @@ function endRunPathResults(runId, agent, map) {
     delete executions[runId];
 
     if (map.queue) { 
-        startPendingExecution(map.id); // starting pending execution if necessary
+        startPendingExecution(map.id, executions[runId].clientSocket);
         updatePending(socket); // todo ?
     }
 }
@@ -987,8 +1002,8 @@ function stopExecution(runId) {
     });
 
     // executions[runId].clientSocket.emit('map-execution-result', mapDtata);
+    startPendingExecution(executions[runId].mapId, executions[runId].clientSocket)
     delete executions[runId];
-    //TODO: start pending 
     // return stoppedRuns;
 }
 
@@ -1028,7 +1043,7 @@ module.exports = {
      * @param req {request}
      * @returns {Promise|*|Promise<T>} return an error or a runId if run started
      */
-    execute: executeMap,
+    execute: execute,
     /**
      * returning all logs for certain run or a map
      * @param mapId {string}

@@ -246,8 +246,10 @@ module.exports = {
         _insertToDB(options)
     },
 
-    async getPendingExecution(mapId){
-        return await MapResult.findOne({map: ObjectId(mapId), status: statusEnum.PENDING})
+    getAndUpdatePendingExecution(mapId){
+        return MapResult.findOneAndUpdate({map: ObjectId(mapId), status: statusEnum.PENDING},{status: statusEnum.RUNNING, startTime: new Date()}).then(res=>{
+            return res
+        })
 
     }
 

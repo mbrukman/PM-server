@@ -39,7 +39,7 @@ let AgentResultSchema = new Schema({
 let mapResultSchema = new Schema({
     map: { type: Schema.Types.ObjectId, ref: 'Map' },
     runId: { type: String, required: true },
-    structure: { type: Schema.Types.ObjectId, ref: 'MapStructure' },
+    // structure: { type: Schema.Types.ObjectId, ref: 'MapStructure' },
     configuration: Schema.Types.Mixed,
     agentsResults: [AgentResultSchema],
     startTime: Date,
