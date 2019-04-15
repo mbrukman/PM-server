@@ -9,7 +9,7 @@ let config = require('../../env/config');
 
 module.exports = {
     settings: (req, res) => {
-        mongoose.connect(config.dbURI, { useMongoClient: true })
+        mongoose.connect(config.dbURI)
         .then(() => {
             return true;
         })
@@ -30,7 +30,7 @@ module.exports = {
         }
         new Promise((resolve, reject) => {
 
-            mongoose.connect(dbDetails.uri, { useMongoClient: true })
+            mongoose.connect(dbDetails.uri)
                 .then(
                     () => {
                         let expressWinstonTranports = [

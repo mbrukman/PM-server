@@ -17,6 +17,7 @@ const pluginsService = require('../services/plugins.service');
 const vaultService = require('./vault.service')
 const helper = require('./map-execution.helper')
 const dbUpdates = require('./map-execution-updates')
+const shared = require('../shared/recents-maps')
 
 
 const statusEnum = models.statusEnum
@@ -24,7 +25,7 @@ let executions = {};
 let pending = {};
 
 let libpm = '';
-let libpmObjects = {}
+
 
 fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 'utf8', function (err, data) {
     // opens the lib_production file. this file is used for user to use overwrite custom function at map code
@@ -34,6 +35,7 @@ fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 
     libpm = data;
     eval(libpm)
 });
+
 
 async function evaluateParam(param, typeParam, context) {
     if (!param.code) {
@@ -124,6 +126,7 @@ function createProcessContext(runId, agent, processUUID, process) {
         processData: processData
     }
     dbUpdates.addProcess(options)
+    
 
     return processData.iterationIndex;
 }
@@ -238,13 +241,20 @@ async function startPendingExecution(mapId, socket) {
         startTime: pendingExec.startTime,
         // structure: structureId, todo ?? in sdk? 
         configuration: pendingExec.configuration,
-        trigger: pendingExec.triggerReason
+        trigger:{
+            msg: pendingExec.triggerReason,
+            payload:pendingExec.triggerPayload
+        },
+        vault : {
+            getValueByKey : vaultService.getValueByKey
+        }
     }
 
     map = await mapsService.get(pendingExec.map)
+    mapStructure = await mapsService.getMapStructure(map._id, pendingExec.structure) // todo check pending
     executeMap(pendingExec.runId, 
         map,
-        pendingExec.structureId, // @matam => todo will be always null. shuld I save the pendings maps with structureId ??
+        mapStructure,
         context
     );
 }
@@ -290,14 +300,14 @@ function createContext(mapCode, runId, agentKey) {
  * @param {*} structureId 
  * @param {*} triggerReason 
  */
-function createExecutionContext(runId, socket, map, configurationName, structureId, triggerReason) {
+function createExecutionContext(runId, socket, map, configurationName, structure, triggerReason, payload) {
 
     // get number of running executions
     const ongoingExecutions = helper.countMapExecutions(executions, map.id, statusEnum.RUNNING);
 
     // check if more running executions than map.queue
     const status = (map.queue && (ongoingExecutions >= map.queue)) ? statusEnum.PENDING : statusEnum.RUNNING; 
-    const configuration = helper.createConfiguration(map, configurationName);
+    const configuration = helper.createConfiguration(structure, configurationName); // todo ?? whay we need to send configuration name if we have "selected :true" on the selected configuration ???! 
 
     const startTime =  status == statusEnum.PENDING? null : new Date()
 
@@ -311,10 +321,11 @@ function createExecutionContext(runId, socket, map, configurationName, structure
     let mapResult = new MapResult({
         map: map._id,
         runId: runId,
-        structure: structureId,
+        structure: structure.id,
         startTime: startTime,
         configuration: configuration,
         trigger: triggerReason,
+        triggerPayload:payload,
         status: status,
         agentsResults: []
     });
@@ -329,9 +340,15 @@ function createExecutionContext(runId, socket, map, configurationName, structure
     return executionContext = {
         executionId: runId, 
         startTime: startTime,
-        structure: structureId, // todo I think null 
+        structure: structure.id, // todo?? needed?
         configuration: configuration,
-        trigger: triggerReason
+        trigger:{
+            msg:triggerReason,
+            payload:payload
+        },
+        vault : {
+            getValueByKey : vaultService.getValueByKey
+        }
     };
 }
 function savePlugins(mapStructure, runId) {
@@ -342,7 +359,7 @@ function savePlugins(mapStructure, runId) {
     })
 }
 
-async function executeMap(runId, map, structureId, context){
+async function executeMap(runId, map, mapStructure, context){
     agents = helper.getRelevantAgent(map.groups, map.agents)
 
     // If not living agents, stop execution with status error
@@ -350,11 +367,6 @@ async function executeMap(runId, map, structureId, context){
         return MapResult.findByIdAndUpdate(executions[runId].mapResultId, { reason: 'no Agent alive', status: 'Error' })
     }
 
-    // get map structure, if no structureId specified take latest
-    mapStructure = await mapsService.getMapStructure(map._id, structureId)
-    if (!mapStructure) {
-        throw new Error('No structure found.');
-    }
 
     await savePlugins(mapStructure, runId)
 
@@ -372,19 +384,22 @@ async function executeMap(runId, map, structureId, context){
 }
 
 
-async function execute(mapId, structureId, socket, configurationName, triggerReason) {
+async function execute(mapId, structureId, socket, configurationName, triggerReason, triggerPayload=null) {
     map = await mapsService.get(mapId)
     if (!map) { throw new Error(`Couldn't find map`); }
     if (map.archived) {throw new Error('Can\'t execute archived map'); }
+    
+    mapStructure = await mapsService.getMapStructure(map._id, structureId)
+    if (!mapStructure) { throw new Error('No structure found.');}
 
     const runId = helper.guidGenerator();
 
     // create general context and new MapResult
-    let context = createExecutionContext(runId, socket, map, configurationName, structureId, triggerReason)
+    let context = createExecutionContext(runId, socket, map, configurationName, mapStructure, triggerReason, triggerPayload)
     if(executions[runId].status == statusEnum.PENDING){
         return  startPendingExecution(mapId, socket) 
     }
-    executeMap(runId, map, structureId, context)
+    executeMap(runId, map, mapStructure, context)
     return runId
 }
 
@@ -1074,79 +1089,7 @@ module.exports = {
      * @returns {Document|Promise|Query|*|void}
      */
     dashboard: () => {
-        return MapResult.aggregate([
-            {
-                $lookup:
-                {
-                    from: "maps",
-                    let: { mapId: "$map" },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $eq: ["$$mapId", "$_id"]
-                                }
-                            }
-                        },
-                        {
-                            $project:
-                            {
-                                name: 1,
-                                archived: 1,
-                            }
-                        }
-                    ],
-                    as: "maps",
-                },
-            },
-            {
-                $unwind: {
-                    "path": "$maps",
-                    "preserveNullAndEmptyArrays": true
-                }
-            },
-            { $match: { "maps.archived": false } },
-            { $sort: { "startTime": -1 } },
-            {
-                "$group":
-                {
-                    _id: "$map",
-                    exec: { $first: "$$CURRENT" },
-                    name: { $first: "$maps.name" },
-                }
-            },
-            { $sort: { "exec.startTime": -1 } },
-            { $limit: 16 },
-            {
-                $lookup:
-                {
-                    from: "projects",
-                    let: { mapId: "$exec.map" },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $in: ["$$mapId", "$maps"]
-                                }
-                            }
-                        },
-                        {
-                            $project:
-                            {
-                                name: 1
-                            }
-                        }
-                    ],
-                    as: "project"
-                },
-            },
-            {
-                $unwind: {
-                    "path": "$project",
-                    "preserveNullAndEmptyArrays": true
-                }
-            },
-        ])
+        return shared.recentsMaps(16);
     },
 
     /**

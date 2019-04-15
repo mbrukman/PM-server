@@ -39,22 +39,24 @@ let AgentResultSchema = new Schema({
 let mapResultSchema = new Schema({
     map: { type: Schema.Types.ObjectId, ref: 'Map' },
     runId: { type: String, required: true },
-    // structure: { type: Schema.Types.ObjectId, ref: 'MapStructure' },
+    structure: { type: Schema.Types.ObjectId, ref: 'MapStructure' }, // todo? delete?
     configuration: Schema.Types.Mixed,
     agentsResults: [AgentResultSchema],
-    startTime: Date,
+    startTime: {type:Date, index:true },
     finishTime: Date,
     trigger: String,
     status :{ type: String, enum: [statusEnum.DONE, statusEnum.ERROR,statusEnum.RUNNING, statusEnum.PENDING]},
-    reason : String // e.g. no agents 
+    reason : String, // e.g. no agents
+    triggerPayload:Schema.Types.Mixed,
+    archivedMap:{type:Boolean, default:false, index: true}
 });
+
 
 mapResultSchema.set('toJSON', {
     transform: function (doc, ret, options) {
         ret.id = ret._id;
     }
 });
-
 let MapResult = mongoose.model('MapResult', mapResultSchema, 'mapResults');
 mongoose.model('AgentResult', AgentResultSchema, 'agentResults');
 mongoose.model('ActionResult', AgentResultSchema, 'actionResults');

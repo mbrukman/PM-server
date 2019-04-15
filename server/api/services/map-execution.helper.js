@@ -89,13 +89,13 @@ module.exports = {
         }
         let selectedConfiguration = {}
         if (mapStructure.configurations && mapStructure.configurations.length) {
-            selectedConfiguration = configurationName ? mapStructure.configurations.find(o => o.name === configuration) : mapStructure.configurations.find(o => o.selected);
+            selectedConfiguration = configurationName ? mapStructure.configurations.find(o => o.name === configurationName) : mapStructure.configurations.find(o => o.selected);
             if (!selectedConfiguration) {
                 selectedConfiguration = mapStructure.configurations[0];
             }
         }
 
-        return selectedConfiguration;
+        return selectedConfiguration.value;
     },
 
     /**

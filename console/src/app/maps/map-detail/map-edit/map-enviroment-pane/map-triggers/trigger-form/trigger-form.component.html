@@ -51,6 +51,7 @@
                   <option *ngFor="let option of params[i].options" [value]="option.id">{{option.name}}</option>
                 </select>
                 <input *ngSwitchDefault formControlName="value" type="text" class="form-control">
+                <app-vault-selector *ngSwitchCase="'vault'" formControlName="value"></app-vault-selector>
               </div>
             </div>
           </div>
