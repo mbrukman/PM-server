@@ -119,6 +119,8 @@ function createProcessContext(runId, agent, processUUID, process) {
         processIndex: processes.numProcesses  // numProcesses => represents the process in the DB.  
     };
     processes[processUUID].push(processData);
+    executions[runId].executionAgents[agent.key].context.processes = processes // todo !! change in every place? for sdk. @matan? 
+
 
     let options = {
         mapResultId: executions[runId].mapResultId,
@@ -208,8 +210,14 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
         processIndex: executions[runId].executionAgents[agentKey].processes[processKey][processIndex].processIndex,
         actionIndex: curActionData.actionIndex
     }
+    if(actionData.startTime){
+        executions[runId].executionAgents[agentKey].context.previousAction = executions[runId].executionAgents[agentKey].context.currentAction
+        executions[runId].executionAgents[agentKey].context.currentAction = curActionData
+        
+        return dbUpdates.addAction(options)
+    }
 
-    actionData.startTime? dbUpdates.addAction(options) : dbUpdates.updateAction(options)
+    return dbUpdates.updateAction(options)
 }
 
 
