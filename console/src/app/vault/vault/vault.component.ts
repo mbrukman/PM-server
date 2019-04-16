@@ -3,6 +3,8 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap';
 import { UpsertVaultItemsComponent } from '../upsert-vault-items/upsert-vault-items.component';
 import { VaultService } from '../../shared/vault.service';
 import { VaultItem } from '../vault.model';
+import { Title }     from '@angular/platform-browser';
+import {SeoService} from '@app/seo.service';
 
 @Component({
   selector: 'app-vault',
@@ -15,9 +17,12 @@ export class VaultComponent implements OnInit {
   vaultsReq: any;
 
 
-  constructor(private vaultService: VaultService, private modalService: BsModalService) { }
+  constructor(private vaultService: VaultService, private modalService: BsModalService,
+    private titleService: Title,
+    private seoService:SeoService) { }
 
   ngOnInit() {
+    this.titleService.setTitle(this.seoService.Vault)
     this.requestVaults();
   }
 

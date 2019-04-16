@@ -5,6 +5,8 @@ import { FilterOptions } from '@shared/model/filter-options.model'
 import { Subscription, fromEvent } from 'rxjs'
 import { take, debounceTime } from 'rxjs/operators';
 import { ActivatedRoute, Data } from '@angular/router';
+import { Title }     from '@angular/platform-browser';
+import {SeoService} from '@app/seo.service';
 
 @Component({
   selector: 'app-projects-list',
@@ -25,11 +27,14 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
 
 
   constructor(private projectsService: ProjectsService,
-    private route:ActivatedRoute) {
+    private route:ActivatedRoute,
+    private titleService: Title,
+    private seoService:SeoService) {
     this.onDataLoad = this.onDataLoad.bind(this);
   }
 
   ngOnInit() {
+    this.titleService.setTitle(this.seoService.ProjectsList)
     this.route.data.subscribe((data:Data) => {
       this.onDataLoad(data['projects']);
     })

@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule,Title } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './core/app.component';
@@ -17,7 +17,7 @@ import { CoreModule } from './core/core.module';
 import { SettingsService } from './core/setup/settings.service';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
 import { VaultService } from '@shared/vault.service';
-
+import {SeoService} from './seo.service';
 
 @NgModule({
   imports: [
@@ -28,7 +28,7 @@ import { VaultService } from '@shared/vault.service';
 
     AppRoutingModule
   ],
-  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService],
+  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

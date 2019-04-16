@@ -10,7 +10,8 @@ import { ConfirmComponent } from '../../shared/confirm/confirm.component';
 import { ImportModalComponent } from './import-modal/import-modal.component';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
-
+import { Title }     from '@angular/platform-browser';
+import {SeoService} from '@app/seo.service';
 
 @Component({
   selector: 'app-project-details',
@@ -30,7 +31,9 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute,
     private router: Router,
     private projectsService: ProjectsService,
-    private modalService: BsModalService) { }
+    private modalService: BsModalService,
+    private titleService: Title,
+    private seoService:SeoService) { }
 
   ngOnInit() {
     this.routeReq = this.route.params.subscribe(params => {
@@ -48,6 +51,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
         this.router.navigate(['NotFound'])
       }
       this.project = project;
+      this.titleService.setTitle(project.name+this.seoService.ProjectDetails)
     },
     error => {
       this.router.navigate(['NotFound'])

@@ -10,7 +10,8 @@ import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { SocketService } from '@shared/socket.service';
 import { filter, take } from 'rxjs/operators';
 import { Subject, Subscription } from 'rxjs';
-
+import { Title }     from '@angular/platform-browser';
+import {SeoService} from '@app/seo.service';
 
 @Component({
   selector: 'app-map-detail',
@@ -53,7 +54,9 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private mapsService: MapsService,
     private socketService: SocketService,
-    private modalService: BsModalService) {
+    private modalService: BsModalService,
+    private titleService: Title,
+    private seoService:SeoService) {
 
     this.navItems = [
       { name: 'Properties', routerLink: ['properties'] },
@@ -73,6 +76,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
           this.router.navigate(['NotFound']);
         }
         this.map = map;
+        this.titleService.setTitle(map.name+this.seoService.Map)
         this.originalMap = _.cloneDeep(map);
         this.mapsService.setCurrentMap(map);
         this.mapStructuresListReq = this.mapsService.structuresList(this.id).subscribe(structureList => {
