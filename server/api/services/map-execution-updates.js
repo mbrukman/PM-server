@@ -49,9 +49,10 @@ function _insertToDB(options) {
 
 function _updateMapReasult(options) {
     return MapResult.findByIdAndUpdate(options.mapResultId, { $set: options.data }, { new: true }) 
-        .then((mapResult) => {
-            return options.socket.emit('map-execution-result', mapResult);
-        });
+        // .then((mapResult) => {
+        //     options.socket.emit('map-execution-result', mapResult);
+        //     return mapResult
+        // });
 }
 
 function _addAgent(options) {

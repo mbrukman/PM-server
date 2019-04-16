@@ -1,4 +1,4 @@
-const MapResult = require("../models/map-results.model")
+const MapResult = require("../models/map-results.model").MapResult
 
 exports.recentsMaps = function (limit,execFields=[]){
     let $projectField = {

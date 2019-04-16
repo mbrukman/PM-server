@@ -69,9 +69,9 @@ function _createContext(context) { //TODO ?
  * Emitting executions values.
  * @param socket
  */
-function updateExecutions(socket) {
+function updateClientExecutions(socket) {
     let emitv = Object.keys(executions).reduce((total, current) => {
-        total[current] = executions[current].map;
+        total[current] = executions[current].mapId;
         return total;
     }, {});
     socket.emit('executions', emitv);
@@ -187,26 +187,25 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
     if (actionData.result)
         executions[runId].executionAgents[agentKey].context.previousAction = action;
 
-
-    
-    // mandatory process faild. stop execution
-    if(actionData.status == statusEnum.ERROR && action.mandatory){
-        return stopExecution()
-
+    let result = ""
+    if(actionData.status == statusEnum.ERROR && action.mandatory && !actionData.hasOwnProperty('retriesLeft')){ 
+        result = ' - Mandatory Action Faild'
     }
+
+
     let data = { //todo update just the new fields
         startTime : curActionData.startTime,
         action: curActionData.action,
-        status: curActionData.status,
+        status: curActionData.status + result,
         finishTime: curActionData.finishTime,
-        result: curActionData.result,
+        result: curActionData.result, 
         retriesLeft: curActionData.retriesLeft
     }
     
     let options = {
         data: data,
         mapResultId: executions[runId].mapResultId,
-        agentId: executions[runId].executionAgents[agentKey].id, // agent._id
+        agentId: executions[runId].executionAgents[agentKey].id,
         processIndex: executions[runId].executionAgents[agentKey].processes[processKey][processIndex].processIndex,
         actionIndex: curActionData.actionIndex
     }
@@ -217,7 +216,12 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
         return dbUpdates.addAction(options)
     }
 
-    return dbUpdates.updateAction(options)
+    dbUpdates.updateAction(options)
+        
+    // mandatory action faild. stop execution (if no have retries)
+    if(actionData.status == statusEnum.ERROR && action.mandatory && !actionData.hasOwnProperty('retriesLeft')){ 
+        return stopExecution(runId, null, null, result) 
+    }
 }
 
 
@@ -260,11 +264,34 @@ async function startPendingExecution(mapId, socket) {
 
     map = await mapsService.get(pendingExec.map)
     mapStructure = await mapsService.getMapStructure(map._id, pendingExec.structure) // todo check pending
+
+    agents = helper.getRelevantAgent(map.groups, map.agents)
+
+    // If no living agents, stop execution with status error
+    if (agents.length == 0) {
+        exitExecutionAndUpdateMapResult(runId, { reason: 'no agents alive', status: 'Error' } )
+    }
+
     executeMap(pendingExec.runId, 
         map,
         mapStructure,
+        agents,
         context
     );
+}
+
+function exitExecutionAndUpdateMapResult(runId, updateData){
+    let options = {
+        mapResultId: executions[runId].mapResultId,
+        data:updateData,
+        socket: executions[runId].clientSocket
+    }
+    dbUpdates.updateMapReasult(options)
+    MapResult.findByIdAndUpdate(executions[runId].mapResultId, updateData )
+    startPendingExecution(executions[runId].mapId, executions[runId].clientSocket)
+    let socket  = executions[runId].clientSocket
+    delete executions[runId]
+    updateClientExecutions(socket);
 }
 
 
@@ -344,6 +371,8 @@ function createExecutionContext(runId, socket, map, configurationName, structure
         throw new Error('error occurred while creating MapResult' + err)
     })
 
+    console.log("mapResultId : ", mapResult.id );
+    
     executions[runId].mapResultId = mapResult.id  
     return executionContext = {
         executionId: runId, 
@@ -367,14 +396,10 @@ function savePlugins(mapStructure, runId) {
     })
 }
 
-async function executeMap(runId, map, mapStructure, context){
-    agents = helper.getRelevantAgent(map.groups, map.agents)
 
-    // If not living agents, stop execution with status error
-    if (agents.length == 0) {
-        return MapResult.findByIdAndUpdate(executions[runId].mapResultId, { reason: 'no Agent alive', status: 'Error' })
-    }
 
+async function executeMap(runId, map, mapStructure, agents, context){
+    updateClientExecutions(executions[runId].clientSocket);
 
     await savePlugins(mapStructure, runId)
 
@@ -388,7 +413,6 @@ async function executeMap(runId, map, mapStructure, context){
         console.error(err);
         
     })         
-    // updateExecutions(socket);  //?? todo!! 
 }
 
 
@@ -396,6 +420,9 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
     map = await mapsService.get(mapId)
     if (!map) { throw new Error(`Couldn't find map`); }
     if (map.archived) {throw new Error('Can\'t execute archived map'); }
+    
+    let agents = helper.getRelevantAgent(map.groups, map.agents)
+    if(agents.length == 0){ throw new Error('No agents alive'); }
     
     mapStructure = await mapsService.getMapStructure(map._id, structureId)
     if (!mapStructure) { throw new Error('No structure found.');}
@@ -407,7 +434,7 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
     if(executions[runId].status == statusEnum.PENDING){
         return  startPendingExecution(mapId, socket) 
     }
-    executeMap(runId, map, mapStructure, context)
+    executeMap(runId, map, mapStructure, agents, context)
     return runId
 }
 
@@ -575,7 +602,7 @@ function checkProcessCoordination(process, processes, successor, successorIdx, s
  * @param node
  */
 function runNodeSuccessors(map, structure, runId, agent, node) {
-    if (executions[runId].status == statusEnum.ERROR || executions[runId].status == statusEnum.DONE) { return; } // status : 'Error' , 'Done'
+    if (!executions[runId] || executions[runId].status == statusEnum.ERROR || executions[runId].status == statusEnum.DONE) { return Promise.resolve() } // status : 'Error' , 'Done'
 
     const successors = node ? helper.findSuccessors(node, structure) : [];
     if (successors.length === 0) {
@@ -636,13 +663,15 @@ function endRunPathResults(runId, agent, map) {
     }
     dbUpdates.updateMapReasult(options)
 
-    // socket.emit('map-execution-result', mapResult);
+    let socket = executions[runId].clientSocket
     delete executions[runId];
 
     if (map.queue) { 
-        startPendingExecution(map.id, executions[runId].clientSocket);
+        startPendingExecution(map.id, socket);
         updatePending(socket); // todo ?
     }
+
+    updateClientExecutions(socket);
 }
 
 // testing process condition
@@ -744,8 +773,6 @@ function runProcess(map, structure, runId, agent, execProcess) {
 
         let reduceFunc = (promiseChain, curentAction) => {
             let actionId = (curentAction[6]._id).toString() //sharbat!! todo add actionIndex. or here or in updateAction
-            console.log(executions[runId].mapResultId); // todo delete 
-            
             executions[runId].executionAgents[agent.key].processes[execProcess.uuid][processIndex].actions[actionId] = curentAction[6] // todo ?? maybe not needed??
             executions[runId].executionAgents[agent.key].processes[execProcess.uuid][processIndex].actions[actionId].actionIndex = 
             Object.keys(executions[runId].executionAgents[agent.key].processes[execProcess.uuid][processIndex].actions).length -1  // todo ?? maybe not needed??
@@ -878,7 +905,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
             finishTime: new Date(),
             result: { stderr: err.message}
         }); 
-        return resolve(err.message) // continue to next action if not mandatory 
+        return err.message // continue to next action if not mandatory 
     }
 
     action.uniqueRunId = `${runId}|${processIndex}|${action._id}`;
@@ -981,8 +1008,10 @@ function sendKillRequest(mapId, actionId, agentKey) {
 }
 
 
-function stopExecution(runId) { 
+function stopExecution(runId, mapId=null ,  socket=null, result="") { 
     //todo just go over all actions, update status and kill process
+
+    // mapId, runId, socket => if runId null 
     const d = new Date();
     let options, optionAction
     
@@ -1021,10 +1050,7 @@ function stopExecution(runId) {
         }
         optionAction ? dbUpdates.updateActionsInAgent(options): null 
     });
-
-    // executions[runId].clientSocket.emit('map-execution-result', mapDtata);
-    startPendingExecution(executions[runId].mapId, executions[runId].clientSocket)
-    delete executions[runId];
+    exitExecutionAndUpdateMapResult(runId, {finishTime : d,  status: statusEnum.STOPPED + result } )
     // return stoppedRuns;
 }
 

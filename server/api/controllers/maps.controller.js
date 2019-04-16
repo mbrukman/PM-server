@@ -267,17 +267,20 @@ module.exports = {
         let config = payload && payload.config ? Object.assign(configRequest,payload.config) : configRequest;
         let trigger = payload && payload.triggerMsg ? triggerRequest + " "+ "-"+ " "+payload.triggerMsg : triggerRequest;
         hooks.hookPre('map-execute', req).then(() => {
-            return  res.json(mapsExecutionService.execute(req.params.id, req.params.structure, req.io, config, trigger));
+            return mapsExecutionService.execute(req.params.id, req.params.structure, req.io, config, trigger)
+        }).then(result=>{
+            return res.json(result);
         }).catch(error => {
             winston.log('error', "Error executing map", error);
             req.io.emit('notification', { title: 'Error executing map', message: error.message, type: 'error', mapId: req.params.id });
+            // todo Pending!!!? 
             return res.status(500).send(error.message);
         });
     },
 
     /* stop map execution */
     stopExecution: (req, res) => {
-        return res.json(mapsExecutionService.stop(req.params.id, req.params.runId, req.io));
+        return res.json(mapsExecutionService.stop(req.params.runId, req.params.id, req.io));
     },
 
     logs: (req, res) => {
