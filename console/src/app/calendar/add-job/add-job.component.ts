@@ -63,7 +63,7 @@ export class AddJobComponent implements OnInit {
   onSelectProject() {
     this.mapDropDown = [];
     const projectId = this.form.controls.project.value;
-    this.projectsService.detail(projectId,{isArchived:false,globalFilter:null,sort:'-createdAt'}).subscribe(project => {
+    this.projectsService.detail(projectId,null,1,{isArchived:false,globalFilter:null,sort:'-createdAt'}).subscribe(project => {
       this.selectedProject = project;
       for(let i =0,length=this.selectedProject.maps.length;i<length;i++){
         let map = <Map>(this.selectedProject.maps[i]);

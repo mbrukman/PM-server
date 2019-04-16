@@ -53,6 +53,12 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
+  onClear(){
+    this.filterOptions.globalFilter = undefined;
+    this.loadProjectLazy()
+  }
+
+
   reloadProjects(fields=null,page=this.page,filter=this.filterOptions){
     this.projectsReq = this.projectsService.filter(fields,page,filter).subscribe(this.onDataLoad);
   }

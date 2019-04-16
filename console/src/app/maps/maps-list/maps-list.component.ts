@@ -59,6 +59,12 @@ export class MapsListComponent implements OnInit, OnDestroy {
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
+  onClear(){
+    this.filterOptions.globalFilter = undefined;
+    this.loadMapsLazy()
+  }
+
+
   loadMapsLazy(event?) {
     let fields, page, sort;
     if (event) {

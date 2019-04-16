@@ -83,8 +83,8 @@ module.exports = {
             $match.archived = false;
         if (filterOptions.options.globalFilter) {
             $match.$or = [
-                { name: { '$regex': `.*${filterOptions.options.globalFilter}.*` } },
-                { description: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }
+                { name: { '$regex': new RegExp(filterOptions.options.globalFilter,'ig') } },
+                { description: { '$regex': new RegExp(filterOptions.options.globalFilter,'ig') } },
             ]
         }
 

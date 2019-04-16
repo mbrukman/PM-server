@@ -20,15 +20,73 @@ module.exports = {
     },
 
     /* get project details */
-    detail: (projectId, options) => {
+    detail: (projectId, filterOptions) => {
+        let project = Project.findOne({_id:mongoose.Types.ObjectId(projectId)})
+        let q = filterOptions.options.filter || {};
+        let projectMaps = [];
+        if (filterOptions.fields) {
+            // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
+            Object.keys(filterOptions.fields).map(key => { filterOptions.fields[key] = { '$regex': `.*${filterOptions.fields[key]}.*` } });
+            q = filterOptions.fields;
+        }
 
-        let populate = {
-            path: 'maps'
+        if (filterOptions.options.globalFilter) {
+            var filterQueryOptions = [
+                { name: { '$regex': new RegExp(filterOptions.options.globalFilter,'ig') } },
+                { description: { '$regex': new RegExp(filterOptions.options.globalFilter,'ig') } },
+            ]
+            q.$or = filterQueryOptions;
         }
-        if (!options.isArchived) {
-            populate.match = { archived: false }
+
+        if (!filterOptions.options.isArchived) {
+            q.archived = false
         }
-        return Project.findById(projectId).populate(populate)
+
+        let maps= Project.aggregate([
+            {$match:{ _id:mongoose.Types.ObjectId(projectId)}},
+            {
+                $lookup:
+                {
+                    from: "maps",
+                    let: { mapId: "$maps" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ["$_id", "$$mapId"]
+                                }
+                            }
+                        }
+                    ],
+                    as: "map"
+                }
+            },
+            {$project:{"map":1,"_id":0}},
+            {"$unwind": "$map"},
+            {$replaceRoot:{newRoot:"$map"}},
+            {$match:q}
+        ])
+        if (filterOptions.options.sort) {
+            // apply sorting by field name. for reverse, should pass with '-'.
+            maps.sort(filterOptions.options.sort)
+        }
+        if (filterOptions.page) {
+            var pageSize = filterOptions.options.limit || PAGE_SIZE;
+            // apply paging. if no paging, return all
+            maps.limit(pageSize).skip((filterOptions.page - 1) * pageSize)
+        }
+        maps.then((maps) => {
+            projectMaps.push(...maps)
+        })
+        return project.then((project) => {
+            return {
+                _id:project._id,
+                archived:project.archived,
+                maps:projectMaps
+            }
+        })
+        
+
     },
 
     /* delete a project */
@@ -46,7 +104,10 @@ module.exports = {
         }
 
         if (filterOptions.options.globalFilter) {
-            var filterQueryOptions = [{ name: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }, { description: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }]
+            var filterQueryOptions = [
+                { name: { '$regex': new RegExp(filterOptions.options.globalFilter,'ig') } },
+                { description: { '$regex': new RegExp(filterOptions.options.globalFilter,'ig') } },
+            ]
             q.$or = filterQueryOptions;
         }
 

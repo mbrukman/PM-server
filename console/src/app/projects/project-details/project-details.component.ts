@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit,ViewChild,ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { BsModalService } from 'ngx-bootstrap/modal';
@@ -10,7 +10,8 @@ import { ConfirmComponent } from '../../shared/confirm/confirm.component';
 import { ImportModalComponent } from './import-modal/import-modal.component';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
-
+import { take, debounceTime } from 'rxjs/operators';
+import { Subscription, fromEvent } from 'rxjs'
 
 @Component({
   selector: 'app-project-details',
@@ -26,7 +27,9 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   filterTerm: string;
   filterOptions : FilterOptions = new FilterOptions();
   featuredMaps: DistinctMapResult[] = [];
-
+  page: number = 1;
+  filterKeyUpSubscribe: Subscription;
+  @ViewChild('globalFilter') globalFilterElement : ElementRef;
   constructor(private route: ActivatedRoute,
     private router: Router,
     private projectsService: ProjectsService,
@@ -39,11 +42,16 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       this.projectsService.filterRecentMaps(this.id).subscribe(recentMaps => {
         this.featuredMaps = recentMaps;
       })
+      this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(
+        debounceTime(300)
+      ).subscribe(()=>{
+          this.loadProjectLazy();
+        })
     });
   }
 
-  getProjectDetails(){
-    this.projectReq = this.projectsService.detail(this.id, this.filterOptions).subscribe(project => {
+  getProjectDetails(fields=null,page=this.page,filter=this.filterOptions){
+    this.projectReq = this.projectsService.detail(this.id, fields,page,filter).subscribe(project => {
       if (!project) {
         this.router.navigate(['NotFound'])
       }
@@ -81,6 +89,23 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  onClear(){
+    this.filterOptions.globalFilter = undefined;
+    this.loadProjectLazy()
+  }
+
+  loadProjectLazy(event?) {
+    let fields, page, sort;
+    if (event) {
+      fields = event.filters || null;
+      page = event.first / 5 + 1;
+      if (event.sortField) {
+        sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
+      }
+    }
+    this.filterOptions.sort = sort
+    this.getProjectDetails(fields,page,this.filterOptions)
+  }
 
   openImportModal() {
     const modal = this.modalService.show(ImportModalComponent);

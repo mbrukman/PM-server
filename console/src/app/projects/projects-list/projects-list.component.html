@@ -22,7 +22,7 @@
       <div class="filter-text">
         <div>
           <i class="material-icons" *ngIf="!filterOptions.globalFilter">search</i>
-          <i class="material-icons" *ngIf="filterOptions.globalFilter" (click)="filterOptions.globalFilter = null">close</i>
+          <i class="material-icons" *ngIf="filterOptions.globalFilter" (click)="onClear()">close</i>
           <input class="form-control loadProject" [(ngModel)]="filterOptions.globalFilter" type="text" placeholder="Filter" #globalFilter />
         </div>
       </div>
