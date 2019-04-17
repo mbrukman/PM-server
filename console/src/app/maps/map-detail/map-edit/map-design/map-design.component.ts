@@ -67,7 +67,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       .getDrop().pipe(
         filter(obj => this.isDroppedOnMap(obj.x, obj.y))
       ).subscribe(obj => {
-        this.addNewProcess(obj);
+        this.cellView = obj.cell;
+        this.addNewProcess(obj,new Process());
       });
 
   }
@@ -253,7 +254,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
   }
 
-  addNewProcess(obj: { x: number, y: number, cell: any },isClone = false) {
+  addNewProcess(obj: { x: number, y: number, cell: any },process : Process) {
     const pluginDisplayName = obj.cell.model.attributes.attrs['.label'].text;
     const pluginId = obj.cell.model.attributes.attrs['.p_id'].text;
     const plugin = this.plugins.find((o) => {
@@ -262,28 +263,18 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
     let imageModel = this.getPluginCube({
       x: obj.x - (430 * this.scale) - this.paper.translate().tx,
-      y: isClone ? obj.y : obj.y - (240 * this.scale) - this.paper.translate().ty
+      y: obj.y - (240 * this.scale) - this.paper.translate().ty
     }, pluginDisplayName, plugin.fullImageUrl,pluginId);
 
     this.graph.addCell(imageModel);
-    let p;
-    if(isClone){
-      p = _.cloneDeep(this.process)
-      p.used_plugin = { name: plugin.name, version: plugin.version };
-      p.uuid = <string>imageModel.id;
-      p.name = this.process.name ? this.process.name + ' (copy)': plugin.name+ ' (copy)'
-    }
-    else{
-      this.cellView = obj.cell;
-      p = new Process();
-      p.used_plugin = { name: plugin.name, version: plugin.version };
-      p.uuid = <string>imageModel.id;
-    }
 
+    process.used_plugin = { name: plugin.name, version: plugin.version };
+    process.uuid = <string>imageModel.id;
+    
     if (!this.mapStructure.processes) {
-      this.mapStructure.processes = [p];
+      this.mapStructure.processes = [process];
     } else {
-      this.mapStructure.processes.push(p);
+      this.mapStructure.processes.push(process);
     }
     this.deselectAllCellsAndUpdateStructure();
     this.editProcess(this.mapStructure.processes[this.mapStructure.processes.length - 1]);
@@ -408,9 +399,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
 
     this.paper.on('cell:pointerup', (cellView, evt, x, y) => {
-      if(cellView.model.attributes.type != 'link'){
-        this.cellView = cellView;
-      }
       this.deselectAllCellsAndUpdateStructure();
       if (cellView.model.isLink()) {
         let link = _.find(this.mapStructure.links, (o) => {
@@ -420,7 +408,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           this.addNewLink(cellView);
         }
       } else {
-
+        this.cellView = cellView;
         const id = cellView.model.id;
         const process = _.find(this.mapStructure.processes, (o) => {
           return o.uuid === id;
@@ -501,10 +489,17 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   onClone(){
     let y = this.getMaximumPosition()
+    y=y + (240 * this.scale) - this.paper.translate().ty
     let cell = _.cloneDeep(this.cellView);
     let processName =  cell.model.attributes.attrs['.label'].text;
     cell.model.attributes.attrs['.label'].text=this.process.name ? this.process.name + ' (copy)': processName+ ' (copy)';
-    this.addNewProcess({x:600,y:y+100,cell:cell},true)
+    let p = _.cloneDeep(this.process);
+    const pluginId = cell.model.attributes.attrs['.p_id'].text;
+    const plugin = this.plugins.find((o) => {
+      return o._id === pluginId;
+    });
+    p.name = this.process.name ? this.process.name + ' (copy)': plugin.name+ ' (copy)'
+    this.addNewProcess({x:600,y:y+150,cell:cell},p)
   } 
 
   onSave(process) {
