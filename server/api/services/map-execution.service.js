@@ -21,6 +21,7 @@ const shared = require('../shared/recents-maps')
 
 
 const statusEnum = models.statusEnum
+let clientSocket
 let executions = {};
 let pending = {};
 
@@ -56,14 +57,6 @@ async function getSettingsAction(plugin){ //todo check if works!
     }));
 }
 
-function _createContext(context) { //TODO ? 
-    return {
-        ...context,
-        require,
-        console,
-        Buffer
-    }
-}
 
 /**
  * Emitting executions values.
@@ -312,18 +305,34 @@ function createAgentContext(agent, runId, executionContext, startNode, mapCode) 
    
     executions[runId].executionAgents[agent.key] = {
         processes: processes,
-        context: Object.assign(agentContext, executionContext),
+        context: Object.assign(agentContext, executionContext, _addFuncToCodeEnv()),
         id: agent.id,
         startTime: new Date()
     }
-    createContext(mapCode, runId, agent.key)
+    createCodeEnv(mapCode, runId, agent.key)
 
     dbUpdates.addAgentResult(executions[runId].executionAgents[agent.key],  executions[runId].mapResultId)
 }
 
-function createContext(mapCode, runId, agentKey) {
+/**
+ * Create code enviroment in context
+ * @param {*} mapCode 
+ * @param {*} runId 
+ * @param {*} agentKey 
+ */
+function createCodeEnv(mapCode, runId, agentKey) {
     vm.runInNewContext(libpm + '\n' + mapCode, executions[runId].executionAgents[agentKey].context); 
-    //Todo:  no need  _context caus vm have this functions ?!  
+}
+
+/**
+ * Add more functionalities in our code enviroment. e.g. using 'require'.
+ */
+function _addFuncToCodeEnv() { 
+    return {
+        require,
+        console,
+        Buffer
+    }
 }
 
 /**
@@ -502,12 +511,15 @@ function areAllAgentsDone(runId) {
  * @param runId
  * @param processKey
  * @param agentKey
- * @returns {boolean}
+ * @returns {boolean} return false if there is an agent that didnt get to process
  */
 function areAllAgentsWaitingToStartThis(runId, processUUID, agent, processId) {
     const executionAgents = executions[runId].executionAgents;
 
-   createProcessContext(runId, agent, processUUID, {id: processId, status: statusEnum.PENDING})
+
+    if(!executions[runId].executionAgents[agent.key].processes[processUUID][0]){ // if the process is already created.   
+        createProcessContext(runId, agent, processUUID, {id: processId, status: statusEnum.PENDING}) // todo ! think on one place to createProcessContext   
+    }
     
     for (let i in executionAgents) {
         if (!executionAgents[i].processes.hasOwnProperty(processUUID)) {
@@ -563,13 +575,15 @@ function checkAgentFlowCondition(runId, process, map, structure, agent) {
     return true;
 }
 
-function checkProcessCoordination(process, processes, successor, successorIdx, structure) {
+function checkProcessCoordination(process,runId , agent, successorIdx, structure) { 
+   let processes = executions[runId].executionAgents[agent.key].processes
     if (process.coordination === 'wait') {
         let res = true
-        let ancestors = helper.findAncestors(successor, structure);
+        let ancestors = helper.findAncestors(process.uuid, structure);
         if (ancestors.length > 1) {
             ancestors.forEach(ancestor => { // todo == status done/error?
                 if (!processes[ancestor] || processes[ancestor][0].status == statusEnum.RUNNING) { //todo process index 0? &&  !processes[ancestor][0].actions[0].finishTime --- processes[ancestor][0].actions.lenght() insread 0 
+                    createProcessContext(runId, agent, process.uuid, {id: process.id, status: statusEnum.PENDING})
                     return res = false;
                 }
             });
@@ -612,7 +626,7 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
     let nodesToRun = [];
     successors.forEach((successor, successorIdx) => {
         const process = findProcessByUuid(successor, structure);
-        if (checkProcessCoordination(process, executions[runId].executionAgents[agent.key].processes, successor, successorIdx,structure) &&
+        if (checkProcessCoordination(process, runId, agent , successorIdx,structure) &&
             checkAgentFlowCondition(runId, process, map, structure, agent)) {
                 nodesToRun.push({
                 index: createProcessContext(runId, agent, successor, process),
@@ -911,7 +925,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
     action.uniqueRunId = `${runId}|${processIndex}|${action._id}`;
 
     
-    let settings = await getSettingsAction(plugin) //todo mybe savd on plugin 
+    let settings = await getSettingsAction(plugin) //todo mybe saved on plugin 
     
     const actionExecutionForm = {
         mapId: map.id,
@@ -922,6 +936,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
         settings: settings
     };
 
+    //todo?? send here a signal to see if alive if not stop execution
     let agentPromise;
     if (agent.socket) {  // will send action to agent via socket or regular request
         agentPromise = sendActionViaSocket(agent.socket, action.uniqueRunId, actionExecutionForm);
@@ -1007,14 +1022,19 @@ function sendKillRequest(mapId, actionId, agentKey) {
     });
 }
 
-
-function stopExecution(runId, mapId=null ,  socket=null, result="") { 
-    //todo just go over all actions, update status and kill process
-
-    // mapId, runId, socket => if runId null 
+/**
+ *  Stop and Update MapResult and running actions. 
+ * @param {*} runId 
+ * @param {*} mapId 
+ * @param {*} socket 
+ * @param {string} result - the cuase to stop the execution  
+ */
+function stopExecution(runId, mapId=null ,  socket=null, result="") { // todo delete mapId? use just in endpoint stop
     const d = new Date();
     let options, optionAction
     
+    if(!executions[runId]){return  updateClientExecutions(socket);}
+
     let executionAgents = executions[runId].executionAgents
     Object.keys(executionAgents).forEach(agentKey => {
         let agent = executionAgents[agentKey];
@@ -1037,7 +1057,7 @@ function stopExecution(runId, mapId=null ,  socket=null, result="") {
                             actionIndex:action.actionIndex
                         }
                        optionAction.push(option)
-                        sendKillRequest(executions[runId].mapResultId, actionKey, agentKey); // todo! check if it works or if map.id?
+                        sendKillRequest(executions[runId].mapResultId, actionKey, agentKey);
                     }
                 });
             });
@@ -1051,7 +1071,6 @@ function stopExecution(runId, mapId=null ,  socket=null, result="") {
         optionAction ? dbUpdates.updateActionsInAgent(options): null 
     });
     exitExecutionAndUpdateMapResult(runId, {finishTime : d,  status: statusEnum.STOPPED + result } )
-    // return stoppedRuns;
 }
 
 

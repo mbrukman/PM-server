@@ -130,26 +130,29 @@ module.exports = {
         return filterLiveAgents(totalAgents);
     },
 
-    areAllAgentsAlive(executionAgents) {
+    areAllAgentsAlive(executionAgents) { // todo not updated in real time. what to do ?? 
         let agentKeys = Object.keys(executionAgents)
-        agentKeys.forEach((key) => {
+        let res = true
+        agentKeys.forEach(async(key) => {
+            // if(!await agentsService.checkAgentAlive(key)){ if I do async func the rest of agents contonus to run .
             if(!this.isAgentShuldContinue(key, executionAgents)){
-                return false;
+                return res = false;
             }
         })
-        return true;
+        return res;
     },
 
     isAgentShuldContinue(agentKey, executionAgents){
         let agentsStatus = Object.assign({}, agentsService.agentsStatus());
+        let res = true
         _.find(agentsStatus, (agent) => {
             if (agent.id === executionAgents[agentKey].id) {
                 if (!agent.alive || executionAgents[agentKey].status) {
-                    return false
+                    return res = false
                 }
             }
         })
-        return true;
+        return res;
     },
 
     /**
