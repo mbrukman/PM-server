@@ -488,8 +488,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   onClone(){
-    let y = this.getMaximumPosition()
-    y=y + (240 * this.scale) - this.paper.translate().ty
     let cell = _.cloneDeep(this.cellView);
     let processName =  cell.model.attributes.attrs['.label'].text;
     cell.model.attributes.attrs['.label'].text=this.process.name ? this.process.name + ' (copy)': processName+ ' (copy)';
@@ -499,8 +497,18 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       return o._id === pluginId;
     });
     p.name = this.process.name ? this.process.name + ' (copy)': plugin.name+ ' (copy)'
-    this.addNewProcess({x:600,y:y+150,cell:cell},p)
+    this.addNewProcess(this.getClonePosition(cell),p)
   } 
+
+  getClonePosition(cellView){
+
+    let cell =  this.graph.getCell(this.process.uuid)
+    return {
+      x:cell.attributes.position.x + (430 * this.scale) + this.paper.translate().tx + 90,
+      y:cell.attributes.position.y + (240 * this.scale) + this.paper.translate().ty + 63,
+      cell:cellView
+    }
+  }
 
   onSave(process) {
     let index = _.findIndex(this.mapStructure.processes, (o) => {
@@ -548,15 +556,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     } : {}
   }
 
-  getMaximumPosition(){
-    let modelsPositions = [];
-    this.graph.attributes.cells.models.forEach((model) => {
-     if(model.attributes.position){
-        modelsPositions.push(model.attributes.position.y)
-     }
-    })
-    return Math.max(...modelsPositions);
-  }
+
   
   private getPluginCube(position: { x: number, y: number }, text: string, imageUrl: string, pluginId,id?) {
     if (text.length > 15) {
