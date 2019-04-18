@@ -59,7 +59,7 @@ async function getSettingsAction(plugin){ //todo check if works!
 
 
 /**
- * Emitting executions values.
+ * Send to client all runIds executions that still running.
  * @param socket
  */
 function updateClientExecutions(socket) {
@@ -291,10 +291,10 @@ function exitExecutionAndUpdateMapResult(runId, updateData){
 function createAgentContext(agent, runId, executionContext, startNode, mapCode) {
 
     let processes = {}
-    processes[startNode.uuid] = {
+    processes[startNode.uuid] = [{
         status: statusEnum.DONE,
         startNode: true,
-    } // todo?  not in same format [uuid][0] = {data}
+    }] 
 
     let agentContext = {currentAgent: {
         name: agent.name,
@@ -575,7 +575,7 @@ function checkAgentFlowCondition(runId, process, map, structure, agent) {
     return true;
 }
 
-function checkProcessCoordination(process,runId , agent, successorIdx, structure) { 
+function checkProcessCoordination(process,runId , agent, successorIdx, structure, numSuccessors) { 
    let processes = executions[runId].executionAgents[agent.key].processes
     if (process.coordination === 'wait') {
         let res = true
@@ -583,7 +583,9 @@ function checkProcessCoordination(process,runId , agent, successorIdx, structure
         if (ancestors.length > 1) {
             ancestors.forEach(ancestor => { // todo == status done/error?
                 if (!processes[ancestor] || processes[ancestor][0].status == statusEnum.RUNNING) { //todo process index 0? &&  !processes[ancestor][0].actions[0].finishTime --- processes[ancestor][0].actions.lenght() insread 0 
-                    createProcessContext(runId, agent, process.uuid, {id: process.id, status: statusEnum.PENDING})
+                    if(process.flowControl == 'wait' && !executions[runId].executionAgents[agent.key].processes[process.uuid]){ // create pending process if we the first.    
+                        createProcessContext(runId, agent, process.uuid, {id: process.id, status: statusEnum.PENDING})
+                    }
                     return res = false;
                 }
             });
@@ -594,7 +596,7 @@ function checkProcessCoordination(process,runId , agent, successorIdx, structure
 
     if (process.coordination === 'race') {
         if (processes && processes.hasOwnProperty(process.uuid)) {
-            if (successors.length - 1 == successorIdx) {
+            if (numSuccessors - 1 == successorIdx) {
                 endRunPathResults(runId, agent, socket, map);
             }
             return false;
@@ -626,7 +628,7 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
     let nodesToRun = [];
     successors.forEach((successor, successorIdx) => {
         const process = findProcessByUuid(successor, structure);
-        if (checkProcessCoordination(process, runId, agent , successorIdx,structure) &&
+        if (checkProcessCoordination(process, runId, agent , successorIdx,structure, successors.length) &&
             checkAgentFlowCondition(runId, process, map, structure, agent)) {
                 nodesToRun.push({
                 index: createProcessContext(runId, agent, successor, process),
@@ -739,7 +741,7 @@ function runProcessPostRunFunc(runId, agent, execProcess, mapCode) {
         winston.log('error', 'Error running post process function');
         res = 'Error running postProcess function' + res
     }
-    updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, { postRunResult: res, status: statusEnum.DONE});
+    updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, { postRunResult: res});
     
 }
 
@@ -814,6 +816,8 @@ function actionsExecutionCallback(map, structure, runId, agent,execProcess) {
         return ;
     }
     runProcessPostRunFunc(runId, agent, execProcess, structure.code)
+    updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, {status: statusEnum.DONE}); // to add false if we dont want to save to db 
+
     executions[runId].executionAgents[agent.key].processes[execProcess.uuid][execProcess.index].status = statusEnum.DONE // we need to update process status cause we cant know how much actions we have. 
    
     return runNodeSuccessors(map, structure, runId, agent, execProcess.uuid);
