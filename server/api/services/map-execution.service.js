@@ -1119,9 +1119,31 @@ module.exports = {
      * @param mapId {string}
      * @param resultId {string}
      */
-    logs: (mapId, resultId) => {
-        let q = resultId ? { runId: resultId } : { map: mapId };
-        return //TODO
+    logs: async(mapId, resultId) => {
+        let q = resultId ? { runId: resultId } : { map: mapId }; // todo handle mapId
+        let mapResult = await MapResult.findOne(q)
+        let logs = []
+console.log(mapResult.id);
+        mapResult.agentsResults.forEach((agentResult,iAgent) => {
+            logs.push({message:"Agent #" +  iAgent + ": "})
+                agentResult.processes.forEach((process,iProcess)=>{
+                    logs.push({message:"Process #" +  iProcess + ": " + process.status})
+                    process.preRunResult ?   logs.push({message: "preRun result:" + process.preRunResult}):null
+                    process.postRunResult ?   logs.push({message: "postRun result:" + process.postRunResult}):null
+                    process.actions.forEach((action, iAction)=>{
+                        logs.push({message: "Action #" +  iAction + ": " + action.status})
+                        let keys  = Object.keys((action.result||{}))
+                        keys.forEach(k=>{
+                            action.result[k]? logs.push({message: k + ':' + action.result[k]}): null
+                        })
+                        logs.push({message: " ---  "})
+                })
+                logs.push({message: " ---  "})
+            });
+            logs.push({message: "   "})
+
+        })
+        return Promise.resolve(logs)
     },
     /**
      * getting all results for a certain map (not populated)
