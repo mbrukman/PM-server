@@ -71,16 +71,12 @@ function updateClientExecutions(socket) {
 }
 
 /**
- * Emmiting pending executions where mapId is keys and value is array of pending runIds
+ * Update client what the pending executions.
+ * mapId is keys and value is array of pending runIds
  * @param socket
  */
-function updatePending(socket) {
-    let emitv = {};
-    Object.keys(pending).forEach((mapId) => {
-        emitv[mapId] = pending[mapId].map(o => o.runId);
-    });
-
-    socket.emit('pending', emitv);
+function updateClientPending(socket) {
+    socket.emit('pending', pending);
 }
 
 /**
@@ -227,8 +223,9 @@ async function startPendingExecution(mapId, socket) {
 
     let pendingExec = await dbUpdates.getAndUpdatePendingExecution(mapId) 
     if(!pendingExec){return}
-
-
+    
+    cancelPending(mapId, pendingExec.id, socket , false); // todo maybe just delete and we create new mapResult instead updating. 
+    socket.emit('map-execution-result', pendingExec)
     if(!executions[pendingExec.runId]){
         executions[pendingExec.runId] = {
             clientSocket : socket, // todo save global executions.socket?  
@@ -254,7 +251,6 @@ async function startPendingExecution(mapId, socket) {
             getValueByKey : vaultService.getValueByKey
         }
     }
-
     map = await mapsService.get(pendingExec.map)
     mapStructure = await mapsService.getMapStructure(map._id, pendingExec.structure) // todo check pending
 
@@ -336,7 +332,7 @@ function _addFuncToCodeEnv() {
 }
 
 /**
- * 
+ *  create general context and new MapResult
  * @param {*} runId 
  * @param {*} socket 
  * @param {*} map 
@@ -355,13 +351,7 @@ function createExecutionContext(runId, socket, map, configurationName, structure
 
     const startTime =  status == statusEnum.PENDING? null : new Date()
 
-    executions[runId] = {
-        mapId: map._id,
-        status: status,
-        executionAgents: {},
-        clientSocket: socket
-    }
-
+    
     let mapResult = new MapResult({
         map: map._id,
         runId: runId,
@@ -373,16 +363,29 @@ function createExecutionContext(runId, socket, map, configurationName, structure
         status: status,
         agentsResults: []
     });
-
+    
+    console.log("mapResultId : ", mapResult.id );
+    
     mapResult.save().then(result => {
-        socket.emit('map-execution-result', result);
+        status == statusEnum.PENDING? null :  socket.emit('map-execution-result', result); // todo updade in front instead?
     }).catch(err => {
         throw new Error('error occurred while creating MapResult' + err)
     })
 
-    console.log("mapResultId : ", mapResult.id );
+    if(status == statusEnum.PENDING){
+        pending[map.id]? pending[map.id].push(runId) : pending[map.id] = [runId]
+        updateClientPending(socket)
+        return 
+    }
     
-    executions[runId].mapResultId = mapResult.id  
+    executions[runId] = {
+        mapId: map._id,
+        status: status,
+        executionAgents: {},
+        clientSocket: socket,
+        mapResultId:  mapResult.id
+    }
+    
     return executionContext = {
         executionId: runId, 
         startTime: startTime,
@@ -426,6 +429,7 @@ async function executeMap(runId, map, mapStructure, agents, context){
 
 
 async function execute(mapId, structureId, socket, configurationName, triggerReason, triggerPayload=null) {
+    clientSocket = socket;
     map = await mapsService.get(mapId)
     if (!map) { throw new Error(`Couldn't find map`); }
     if (map.archived) {throw new Error('Can\'t execute archived map'); }
@@ -438,12 +442,11 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
 
     const runId = helper.guidGenerator();
 
-    // create general context and new MapResult
+   
     let context = createExecutionContext(runId, socket, map, configurationName, mapStructure, triggerReason, triggerPayload)
-    if(executions[runId].status == statusEnum.PENDING){
-        return  startPendingExecution(mapId, socket) 
+    if(context){ // context exist if the execution is not pending
+        executeMap(runId, map, mapStructure, agents, context) 
     }
-    executeMap(runId, map, mapStructure, agents, context)
     return runId
 }
 
@@ -682,9 +685,8 @@ function endRunPathResults(runId, agent, map) {
     let socket = executions[runId].clientSocket
     delete executions[runId];
 
-    if (map.queue) { 
+    if (map.queue) {
         startPendingExecution(map.id, socket);
-        updatePending(socket); // todo ?
     }
 
     updateClientExecutions(socket);
@@ -1077,34 +1079,51 @@ function stopExecution(runId, mapId=null ,  socket=null, result="") { // todo de
     exitExecutionAndUpdateMapResult(runId, {finishTime : d,  status: statusEnum.STOPPED + result } )
 }
 
+/**
+ * get all pending execution from db and saves it globaly.
+ */
+async function rebuildPending(){
+    let allPending  = await MapResult.find({ status: statusEnum.PENDING})
+    pending = {}
+    allPending.map(pendingMap=>{
+        pending[pendingMap.map.toString()] ? pending[pendingMap.map.toString()].push(pendingMap.runId) : pending[pendingMap.map.toString()] =[pendingMap.runId]  
+    })
+    updateClientPending(clientSocket)
 
-module.exports = {
+}
+
     /**
      * removes pending execution from pending object
      * @param mapId
      * @param runId
      * @param socket
      */
-    cancelPending: (mapId, runId, socket) => {
-        return new Promise((resolve, reject) => {
-            if (!mapId || !runId) {
-                throw new Error('Not enough parameters');
+function cancelPending(mapId, runId, socket, updateDb = true){ // todo if pending but in db there null when 
+    return new Promise((resolve, reject) => {
+        if (!mapId || !runId) {
+            throw new Error('Not enough parameters');
 
-            }
-            if (!pending.hasOwnProperty(mapId)) {
-                throw new Error('No pending executions for this map');
-            }
-            const runIndex = pending[mapId].findIndex((o) => o.runId === runId);
-            if (runIndex === -1) {
-                throw new Error('No such job');
+        }
+        if (!pending.hasOwnProperty(mapId)) {
+            throw new Error('No pending executions for this map');
+        }
+        const runIndex = pending[mapId].findIndex((o) => o === runId);
+        if (runIndex === -1) {
+            throw new Error('No such job');
 
-            }
-            pending[mapId].splice(runIndex, 1);
-            updatePending(socket);
-            resolve();
-        });
+        }
+        updateDb ? MapResult.remove({map: ObjectId(mapId), status: statusEnum.PENDING}) : null
+        pending[mapId].splice(runIndex, 1);
+        updateClientPending(socket);
+        resolve();
+    });
 
-    },
+    
+}
+
+module.exports = {
+
+    cancelPending: cancelPending,
     /**
      * starting a map execution
      * @param mapId {string}
