@@ -291,7 +291,9 @@ module.exports = {
     },
     delete: (agentId) => {
         return Agent.findOneAndRemove({ _id: agentId }).then((agent) => {
-            clearInterval(agents[agent.key].intervalId)
+            if(agents[agent.key]){
+                clearInterval(agents[agent.key].intervalId)
+            }
             delete agents[agent.key]
         })
     },
