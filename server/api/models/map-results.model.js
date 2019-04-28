@@ -30,16 +30,13 @@ let processResultSchema = new Schema({
 let AgentResultSchema = new Schema({
     processes: [processResultSchema],
     agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
-    status: { type: String, enum: [statusEnum.DONE, statusEnum.ERROR]},  // todo? is necessary? 
-    startTime: Date, // todo? is necessary? 
-    finishTime: Date, // todo? is necessary? 
 }, { _id: false });
 
 
 let mapResultSchema = new Schema({
     map: { type: Schema.Types.ObjectId, ref: 'Map' },
     runId: { type: String, required: true },
-    structure: { type: Schema.Types.ObjectId, ref: 'MapStructure' }, // todo? delete?
+    structure: { type: Schema.Types.ObjectId, ref: 'MapStructure' },
     configuration: Schema.Types.Mixed,
     agentsResults: [AgentResultSchema],
     startTime: {type:Date, index:true },

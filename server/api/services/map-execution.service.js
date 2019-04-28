@@ -48,7 +48,7 @@ async function evaluateParam(param, typeParam, context) {
     return vm.runInNewContext(param.value, context);
 }
 
-async function getSettingsAction(plugin){ //todo check if works!
+async function getSettingsAction(plugin){ //sharbat check if works!
     return Promise.all(plugin.settings.map(async (setting) => { 
         if (setting.valueType == 'vault' && setting.value) {
             setting.value = await vaultService.getValueByKey(setting.value);
@@ -102,14 +102,14 @@ function createProcessContext(runId, agent, processUUID, process) {
     const processData = {
         processId: process.id,
         iterationIndex: processes[processUUID].length,
-        status: process.status || statusEnum.RUNNING, // todo delete? 
+        status: process.status || statusEnum.RUNNING,
         uuid: processUUID,
         actions: {},
         processIndex: processes.numProcesses  // numProcesses => represents the process in the DB.  
     };
     processes[processUUID].push(processData);
-    executions[runId].executionAgents[agent.key].context.processes = processes // todo !! change in every place? for sdk. @matan? 
-
+    executions[runId].executionAgents[agent.key].context.processes = processes 
+    // sharbat !! change in every place? for sdk. @matan? Move all to the context to keep once
 
     let options = {
         mapResultId: executions[runId].mapResultId,
@@ -140,7 +140,7 @@ function updateProcessContext(runId, agent, processUUID, iterationIndex, process
         processData  
     );
 
-    let field = Object.keys(processData)[0] // todo generic? 
+    let field = Object.keys(processData)[0] // sharbat generic? yes
     let options = {
         mapResultId: executions[runId].mapResultId,
         agentId: agent.id,
@@ -181,18 +181,8 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
         result = ' - Mandatory Action Faild'
     }
 
-
-    let data = { //todo update just the new fields
-        startTime : curActionData.startTime,
-        action: curActionData.action,
-        status: curActionData.status + result,
-        finishTime: curActionData.finishTime,
-        result: curActionData.result, 
-        retriesLeft: curActionData.retriesLeft
-    }
-    
     let options = {
-        data: data,
+        data: actionData,
         mapResultId: executions[runId].mapResultId,
         agentId: executions[runId].executionAgents[agentKey].id,
         processIndex: executions[runId].executionAgents[agentKey].processes[processKey][processIndex].processIndex,
@@ -224,11 +214,11 @@ async function startPendingExecution(mapId, socket) {
     let pendingExec = await dbUpdates.getAndUpdatePendingExecution(mapId) 
     if(!pendingExec){return}
     
-    cancelPending(mapId, pendingExec.id, socket , false); // todo maybe just delete and we create new mapResult instead updating. 
+    cancelPending(mapId, pendingExec.id, socket , false); //sharbat do not call cancel pending on start pending
     socket.emit('map-execution-result', pendingExec)
     if(!executions[pendingExec.runId]){
         executions[pendingExec.runId] = {
-            clientSocket : socket, // todo save global executions.socket?  
+            clientSocket : socket,
             mapId: mapId,
             status: statusEnum.RUNNING,
             executionAgents: {},
@@ -238,10 +228,12 @@ async function startPendingExecution(mapId, socket) {
         executions[pendingExec.runId].status = statusEnum.RUNNING
     }
 
+
+    // sharbat!! use the same create context method
     let context = { 
         executionId: pendingExec.runId, 
         startTime: pendingExec.startTime,
-        // structure: structureId, todo ?? in sdk? 
+        // structure: structureId, 
         configuration: pendingExec.configuration,
         trigger:{
             msg: pendingExec.triggerReason,
@@ -252,7 +244,7 @@ async function startPendingExecution(mapId, socket) {
         }
     }
     map = await mapsService.get(pendingExec.map)
-    mapStructure = await mapsService.getMapStructure(map._id, pendingExec.structure) // todo check pending
+    mapStructure = await mapsService.getMapStructure(map._id, pendingExec.structure)
 
     agents = helper.getRelevantAgent(map.groups, map.agents)
 
@@ -295,15 +287,14 @@ function createAgentContext(agent, runId, executionContext, startNode, mapCode) 
     let agentContext = {currentAgent: {
         name: agent.name,
         url: agent.url,
-        attributes: agent.attributes //[{ name: "", value: "" }] // todo ??  name? value?? 
+        attributes: agent.attributes
     }
 }
    
     executions[runId].executionAgents[agent.key] = {
         processes: processes,
-        context: Object.assign(agentContext, executionContext, _addFuncToCodeEnv()),
+        context: Object.assign(agentContext, executionContext, _addFuncsToCodeEnv()),
         id: agent.id,
-        startTime: new Date()
     }
     createCodeEnv(mapCode, runId, agent.key)
 
@@ -323,7 +314,7 @@ function createCodeEnv(mapCode, runId, agentKey) {
 /**
  * Add more functionalities in our code enviroment. e.g. using 'require'.
  */
-function _addFuncToCodeEnv() { 
+function _addFuncsToCodeEnv() { 
     return {
         require,
         console,
@@ -341,20 +332,20 @@ function _addFuncToCodeEnv() {
  * @param {*} triggerReason 
  */
 function createExecutionContext(runId, socket, map, configurationName, structure, triggerReason, payload) {
+    //sharbat 2 func - one for exec start (for both pending and not) and second to create the exec context
 
     // get number of running executions
     const ongoingExecutions = helper.countMapExecutions(executions, map.id, statusEnum.RUNNING);
 
     // check if more running executions than map.queue
     const status = (map.queue && (ongoingExecutions >= map.queue)) ? statusEnum.PENDING : statusEnum.RUNNING; 
-    const configuration = helper.createConfiguration(structure, configurationName); // todo ?? whay we need to send configuration name if we have "selected :true" on the selected configuration ???! 
+    const configuration = helper.createConfiguration(structure, configurationName);
 
     const startTime =  status == statusEnum.PENDING? null : new Date()
-
     
     let mapResult = new MapResult({
         map: map._id,
-        runId: runId,
+        runId: runId, // use map result id instead of runId (delete runId usage from everywhere)!!!!! sharbat
         structure: structure.id,
         startTime: startTime,
         configuration: configuration,
@@ -367,7 +358,7 @@ function createExecutionContext(runId, socket, map, configurationName, structure
     console.log("mapResultId : ", mapResult.id );
     
     mapResult.save().then(result => {
-        status == statusEnum.PENDING? null :  socket.emit('map-execution-result', result); // todo updade in front instead?
+        status == statusEnum.PENDING? null :  socket.emit('map-execution-result', result); // sharbat : verify same behavior as before
     }).catch(err => {
         throw new Error('error occurred while creating MapResult' + err)
     })
@@ -389,7 +380,7 @@ function createExecutionContext(runId, socket, map, configurationName, structure
     return executionContext = {
         executionId: runId, 
         startTime: startTime,
-        structure: structure.id, // todo?? needed?
+        // structure: structure.id,
         configuration: configuration,
         trigger:{
             msg:triggerReason,
@@ -400,7 +391,7 @@ function createExecutionContext(runId, socket, map, configurationName, structure
         }
     };
 }
-function savePlugins(mapStructure, runId) {
+function savePlugins(mapStructure, runId) {// sharbat change name addFunc.. 
     const names = mapStructure.used_plugins.map(plugin => plugin.name);
     executions[runId].plugins = names
     return pluginsService.filterPlugins({ name: { $in: names } }).then(plugins => {
@@ -421,10 +412,7 @@ async function executeMap(runId, map, mapStructure, agents, context){
         createAgentContext(agents[i], runId, context, startNode, mapStructure.code)
         promises.push(runMapOnAgent(map, mapStructure, runId, startNode, agents[i]))
     }
-    Promise.all(promises).catch(err=>{
-        console.error(err);
-        
-    })         
+    Promise.all(promises)
 }
 
 
@@ -453,7 +441,9 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
 function runMapOnAgent(map, structure, runId, startNode, agent) {
     return helper.validate_plugin_installation(executions[runId].plugins, agent.key).then(() => {
         return runNodeSuccessors(map, structure, runId, agent, startNode.uuid).catch(err=>{
-            console.error(err)
+            // sharbat remove all inner empty catches and verify it gets here
+            console.error(err) // winston sharbat 
+            // save the info like structure +mapId 
         });
     })
 }
@@ -500,7 +490,7 @@ function areAllAgentsDone(runId) {
     const executionAgents = executions[runId].executionAgents;
 
     for (let i in executionAgents) {
-        if (!executionAgents[i].status && agentsService.agentsStatus()[i].alive) { //todo check if works
+        if (!executionAgents[i].status && agentsService.agentsStatus()[i].alive) { //sharbat check if works
             return false;
         }
     }
@@ -521,7 +511,7 @@ function areAllAgentsWaitingToStartThis(runId, processUUID, agent, processId) {
 
 
     if(!executions[runId].executionAgents[agent.key].processes[processUUID][0]){ // if the process is already created.   
-        createProcessContext(runId, agent, processUUID, {id: processId, status: statusEnum.PENDING}) // todo ! think on one place to createProcessContext   
+        createProcessContext(runId, agent, processUUID, {id: processId, status: statusEnum.PENDING}) // sharbat ! think on one place to createProcessContext   
     }
     
     for (let i in executionAgents) {
@@ -538,13 +528,14 @@ function runAgentsFlowControlPendingProcesses(runId, map, structure, process){
     for (let i in executionAgents) {
         for(let j in executionAgents[i].processes[process.uuid]){
             let processToRun = executionAgents[i].processes[process.uuid][j]
+            //sharbat - check if all properties necessary or exists in the process
             let nodeToRun = {
                 index: processToRun.iterationIndex,
-                uuid: processToRun.uuid, // todo duplicate?? in process the uuid!!
+                uuid: processToRun.uuid, // sharbat duplicate?? in process the uuid!!
                 process: process
             }
             updateProcessContext(runId, agentsStatus[i], process.uuid, processToRun.iterationIndex, {status: statusEnum.RUNNING}, false)
-            runProcess(map, structure, runId, agentsStatus[i], nodeToRun); // TODO WITH PROMISE ALL? 
+            runProcess(map, structure, runId, agentsStatus[i], nodeToRun);
         }
     }
 }
@@ -560,17 +551,21 @@ function checkAgentFlowCondition(runId, process, map, structure, agent) {
         return true
     }
     if (process.flowControl === 'wait') { // if not all agents are still alive, the wait condition will never be met, should stop the map execution
+        //TODO: check how to handle race condition between agents status and check
         if (!helper.areAllAgentsAlive(executions[runId].executionAgents)) {
             stopExecution(runId); 
             return false;
         }
+
+
         const agentProcesses = executions[runId].executionAgents[agent.key].processes
         if(agentProcesses[process.uuid] && agentProcesses[process.uuid][0].status != statusEnum.PENDING){
             return true // means all agents was here and run. (in case 2 ancestors)
         }
-
+        
         // if there is a wait condition, checking if it is the last agent that got here and than run all the agents
         if (areAllAgentsWaitingToStartThis(runId, process.uuid, agent, process.id)) {
+            //sharbat should return true (check only) and handle this in the run method
             runAgentsFlowControlPendingProcesses(runId, map, structure, process)
         }
         return false
@@ -584,8 +579,10 @@ function checkProcessCoordination(process,runId , agent, successorIdx, structure
         let res = true
         let ancestors = helper.findAncestors(process.uuid, structure);
         if (ancestors.length > 1) {
-            ancestors.forEach(ancestor => { // todo == status done/error?
-                if (!processes[ancestor] || processes[ancestor][0].status == statusEnum.RUNNING) { //todo process index 0? &&  !processes[ancestor][0].actions[0].finishTime --- processes[ancestor][0].actions.lenght() insread 0 
+            ancestors.forEach(ancestor => {
+                // sharbat check if process iteration or action, if action , add status to process and use the process
+                if (!processes[ancestor] || processes[ancestor][0].status == statusEnum.RUNNING) {
+                    // sharbat not needed if all checks happen
                     if(process.flowControl == 'wait' && !executions[runId].executionAgents[agent.key].processes[process.uuid]){ // create pending process if we the first.    
                         createProcessContext(runId, agent, process.uuid, {id: process.id, status: statusEnum.PENDING})
                     }
@@ -599,6 +596,7 @@ function checkProcessCoordination(process,runId , agent, successorIdx, structure
 
     if (process.coordination === 'race') {
         if (processes && processes.hasOwnProperty(process.uuid)) {
+            // sharbat move this check to the run function instead of the check
             if (numSuccessors - 1 == successorIdx) {
                 endRunPathResults(runId, agent, socket, map);
             }
@@ -631,8 +629,11 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
     let nodesToRun = [];
     successors.forEach((successor, successorIdx) => {
         const process = findProcessByUuid(successor, structure);
+
+        // sharbat move checks to variables to allow both checks to run.
         if (checkProcessCoordination(process, runId, agent , successorIdx,structure, successors.length) &&
             checkAgentFlowCondition(runId, process, map, structure, agent)) {
+                
                 nodesToRun.push({
                 index: createProcessContext(runId, agent, successor, process),
                 uuid: successor,
@@ -664,16 +665,16 @@ function updateAgentContext(runId, agent,agentData){
 }
 
 function endRunPathResults(runId, agent, map) {
-    let d = new Date();
     if (isThereProcessExecutingOnAgent(runId, agent.key)) { return }
   
-    let data = {
-        finishTime : d,
-        status: statusEnum.DONE
-    }
-    updateAgentContext(runId, agent,data)
+    updateAgentContext(runId, agent,{status: statusEnum.DONE})
 
     if (!areAllAgentsDone(runId)) { return }
+
+    let data = {
+        finishTime : new Date(),
+        status: statusEnum.DONE
+    }
 
     let options = {
         mapResultId: executions[runId].mapResultId,
@@ -789,13 +790,13 @@ function runProcess(map, structure, runId, agent, execProcess) {
             ])
         });
 
-        let reduceFunc = (promiseChain, curentAction) => {
-            let actionId = (curentAction[6]._id).toString() //sharbat!! todo add actionIndex. or here or in updateAction
-            executions[runId].executionAgents[agent.key].processes[execProcess.uuid][processIndex].actions[actionId] = curentAction[6] // todo ?? maybe not needed??
-            executions[runId].executionAgents[agent.key].processes[execProcess.uuid][processIndex].actions[actionId].actionIndex = 
-            Object.keys(executions[runId].executionAgents[agent.key].processes[execProcess.uuid][processIndex].actions).length -1  // todo ?? maybe not needed??
+        let reduceFunc = (promiseChain, currentAction, index) => {
+            let actionId = (currentAction[6]._id).toString() //sharbat!! add actionIndex. or here or in updateAction
+            currentAction[6].actionIndex = index;
+            executions[runId].executionAgents[agent.key].processes[execProcess.uuid][processIndex].actions[actionId] = currentAction[6];
+            
             return promiseChain.then(chainResults =>{
-                return executeAction.apply(null, curentAction).then(currentResult => { 
+                return executeAction.apply(null, currentAction).then(currentResult => { 
                     return [...chainResults, currentResult]
                 })
             });
@@ -803,13 +804,12 @@ function runProcess(map, structure, runId, agent, execProcess) {
 
         actionsArray.reduce(reduceFunc, Promise.resolve([])).then((actionsResults) => {
             return actionsExecutionCallback(map, structure, runId, agent,execProcess)
-        })
-            .catch((error) => {
-                console.error(error);
-                let status = statusEnum.ERROR + error
+        }).catch((error) => {
+                console.error(error); //sharbat go over all console log and delete unnessasery
+                let status = statusEnum.ERROR + error // sharbat do not keep error msg on the status, keep it on reason
                 updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, {status: status});
             })
-    }).catch(error=> console.error(error))
+    }).catch((error) => {console.error(error);}) 
 }
 
 
@@ -822,7 +822,7 @@ function actionsExecutionCallback(map, structure, runId, agent,execProcess) {
 
     executions[runId].executionAgents[agent.key].processes[execProcess.uuid][execProcess.index].status = statusEnum.DONE // we need to update process status cause we cant know how much actions we have. 
    
-    return runNodeSuccessors(map, structure, runId, agent, execProcess.uuid);
+    runNodeSuccessors(map, structure, runId, agent, execProcess.uuid);
 }
 /**
  * Send action to agent via socket
@@ -931,18 +931,17 @@ async function executeAction(map, structure, runId, agent, process, processIndex
     action.uniqueRunId = `${runId}|${processIndex}|${action._id}`;
 
     
-    let settings = await getSettingsAction(plugin) //todo mybe saved on plugin 
+    let settings = await getSettingsAction(plugin);
     
     const actionExecutionForm = {
         mapId: map.id,
-        versionId: 0, // todo
-        executionId: 0, //todo
+        versionId: 0, // TODO: check if possible to remove
+        executionId: 0, //TODO: check if possible to remove
         action: action,
         key: agent.key,
         settings: settings
     };
 
-    //todo?? send here a signal to see if alive if not stop execution
     let agentPromise;
     if (agent.socket) {  // will send action to agent via socket or regular request
         agentPromise = sendActionViaSocket(agent.socket, action.uniqueRunId, actionExecutionForm);
@@ -985,7 +984,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
             } 
         }).then((result) => {
             let actionData = {
-                status :  result.status, // todo duplicate?? 
+                status :  result.status,
                 result : result 
             }
             if (result.status == 'error' && action.retriesLeft > 0) { // retry handling
@@ -996,9 +995,6 @@ async function executeAction(map, structure, runId, agent, process, processIndex
             actionData.finishTime =  new Date(),
             updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData);
             return result;
-
-        }).catch((error) => {
-            console.error("Error occurred: ", error, error.stack);
         });
     }
 }
@@ -1035,7 +1031,7 @@ function sendKillRequest(mapId, actionId, agentKey) {
  * @param {*} socket 
  * @param {string} result - the cuase to stop the execution  
  */
-function stopExecution(runId, mapId=null ,  socket=null, result="") { // todo delete mapId? use just in endpoint stop
+function stopExecution(runId, socket=null, result="") {
     const d = new Date();
     let options, optionAction
     
@@ -1098,7 +1094,7 @@ async function rebuildPending(){
      * @param runId
      * @param socket
      */
-function cancelPending(mapId, runId, socket, updateDb = true){ // todo if pending but in db there null when 
+function cancelPending(mapId, runId, socket, updateDb = true){
     return new Promise((resolve, reject) => {
         if (!mapId || !runId) {
             throw new Error('Not enough parameters');
@@ -1112,7 +1108,8 @@ function cancelPending(mapId, runId, socket, updateDb = true){ // todo if pendin
             throw new Error('No such job');
 
         }
-        updateDb ? MapResult.remove({map: ObjectId(mapId), status: statusEnum.PENDING}) : null
+        // sharbat do not remove EVER any data, just change the status to canceled
+        updateDb ? MapResult.findOneAndUpdate({map: ObjectId(mapId), status: statusEnum.PENDING}, {status: statusEnum.STOPPED}) : null
         pending[mapId].splice(runIndex, 1);
         updateClientPending(socket);
         resolve();
@@ -1138,11 +1135,10 @@ module.exports = {
      * @param mapId {string}
      * @param resultId {string}
      */
-    logs: async(mapId, resultId) => {
-        let q = resultId ? { runId: resultId } : { map: mapId }; // todo handle mapId
+    logs: async(resultId) => {
+        let q = { runId: resultId };
         let mapResult = await MapResult.findOne(q)
         let logs = []
-console.log(mapResult.id);
         mapResult.agentsResults.forEach((agentResult,iAgent) => {
             logs.push({message:"Agent #" +  iAgent + ": "})
                 agentResult.processes.forEach((process,iProcess)=>{

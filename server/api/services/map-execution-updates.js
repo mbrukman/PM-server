@@ -27,13 +27,13 @@ function _runDbFunc() {
     }
     const lastElement = dbQueue[dbQueue.length - 1]
     funcs[lastElement.func](lastElement.data).then(res => {
-        console.log(`func ${lastElement.func} res:`, res)
+        // console.log(`func ${lastElement.func} res:`, res)
         dbQueue.pop();
         _runDbFunc()
     }).catch(err => {
         console.error('error in ' + lastElement.func +" - "+ err);
         dbQueue = []
-        //todo stop exec 
+        //sharbat stop exec after 3 retires 
         
     })
 }
@@ -41,7 +41,7 @@ function _runDbFunc() {
 
 function _insertToDB(options) {
     dbQueue.unshift(options)
-    if (dbQueue.length == 1) { // todo if error continue saving
+    if (dbQueue.length == 1) { 
         _runDbFunc()
     }
     console.log('new insert', options.func);
@@ -109,7 +109,7 @@ function _updateProcess(options) {
 
 function _addAction(options) {
 
-    let pathToSet = "agentsResults.$.processes." + options.processIndex + ".actions" //todo! add to same process??! shuld be process.lengt!! Object.keys(process) 
+    let pathToSet = "agentsResults.$.processes." + options.processIndex + ".actions";
     let toUpdate = {}
     toUpdate[pathToSet] = options.data
 
@@ -125,9 +125,12 @@ function _addAction(options) {
 
 function _updateAction(options) {
     
-    let pathToSet = "agentsResults.$.processes." + options.processIndex + ".actions." + options.actionIndex
+    let pathToSet = "agentsResults.$.processes." + options.processIndex + ".actions." + options.actionIndex + "."
     let toUpdate = {}
-    toUpdate[pathToSet] = options.data
+    Object.keys(options.data).forEach(field=>{
+        let x = pathToSet + field
+        toUpdate[x] = options.data[field]
+    })
     
     return MapResult.findOneAndUpdate(
         {
@@ -248,8 +251,10 @@ module.exports = {
     },
 
     getAndUpdatePendingExecution(mapId){
-        return MapResult.findOneAndUpdate({map: ObjectId(mapId), status: statusEnum.PENDING},{status: statusEnum.RUNNING, startTime: new Date()}).then(res=>{
+        return MapResult.findOneAndUpdate({map: ObjectId(mapId), status: statusEnum.PENDING},{status: statusEnum.RUNNING, startTime: new Date()} , {new: true}).then(res=>{
             return res
+        }).catch(err=>{
+            console.error(err);
         })
 
     }

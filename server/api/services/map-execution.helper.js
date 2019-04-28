@@ -130,7 +130,7 @@ module.exports = {
         return filterLiveAgents(totalAgents);
     },
 
-    areAllAgentsAlive(executionAgents) { // todo not updated in real time. what to do ?? 
+    areAllAgentsAlive(executionAgents) {
         let agentKeys = Object.keys(executionAgents)
         let res = true
         agentKeys.forEach(async(key) => {
