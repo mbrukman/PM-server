@@ -16,7 +16,7 @@ const mapsService = require('./maps.service');
 const pluginsService = require('../services/plugins.service');
 const vaultService = require('./vault.service')
 const helper = require('./map-execution.helper')
-const dbUpdates = require('./map-execution-updates')
+const dbUpdates = require('./map-execution-updates')({stopExecution})
 const shared = require('../shared/recents-maps')
 
 
@@ -67,7 +67,7 @@ function updateClientExecutions(socket) {
         total[current] = executions[current].mapId;
         return total;
     }, {});
-    socket.emit('executions', emitv);
+    socket ? socket.emit('executions', emitv) :  clientSocket.emit('executions', emitv);
 }
 
 /**
@@ -1029,9 +1029,12 @@ function sendKillRequest(mapId, actionId, agentKey) {
  * @param {*} runId 
  * @param {*} mapId 
  * @param {*} socket 
- * @param {string} result - the cuase to stop the execution  
+ * @param {string} result - the cuase of stopping the execution  
  */
-function stopExecution(runId, socket=null, result="") {
+async function stopExecution(runId, socket=null, result="", mapResultId = null) {
+    if(!runId && mapResultId){
+        runId = (await MapResult.findOne({_id: ObjectId(mapResultId)})).runId
+    }
     const d = new Date();
     let options, optionAction
     
@@ -1139,6 +1142,7 @@ module.exports = {
         let q = { runId: resultId };
         let mapResult = await MapResult.findOne(q)
         let logs = []
+        logs.push({message: 'status: ' + mapResult.status})
         mapResult.agentsResults.forEach((agentResult,iAgent) => {
             logs.push({message:"Agent #" +  iAgent + ": "})
                 agentResult.processes.forEach((process,iProcess)=>{

@@ -1,6 +1,5 @@
 const models = require("../models");
 const MapResult = models.MapResult;
-const AgentResult = models.AgentResult;
 
 let dbQueue = []
 
@@ -20,6 +19,8 @@ var funcs = {
     updateAgent: _updateAgent,
     updateActionsInAgent: _updateActionsInAgent
 }
+let mapExecMethods
+let dbRetries = 3 
 
 function _runDbFunc() {
     if (!dbQueue.length) {
@@ -27,14 +28,18 @@ function _runDbFunc() {
     }
     const lastElement = dbQueue[dbQueue.length - 1]
     funcs[lastElement.func](lastElement.data).then(res => {
+        dbRetries = 3;
         // console.log(`func ${lastElement.func} res:`, res)
         dbQueue.pop();
         _runDbFunc()
     }).catch(err => {
         console.error('error in ' + lastElement.func +" - "+ err);
+        if(dbRetries){
+            dbRetries--;
+            return _runDbFunc()
+        }
         dbQueue = []
-        //sharbat stop exec after 3 retires 
-        
+        mapExecMethods.stopExecution(null, null, " - MongoError", lastElement.data.mapResultId)
     })
 }
 
@@ -164,101 +169,104 @@ function _updateActionsInAgent(options){
 }
 
 
-module.exports = {
-    statusEnum:statusEnum,
-
-    updateMapReasult(optionsData) {
-        let options = {
-            func: "updateMapReasult",
-            data: optionsData
+module.exports = function (methods){
+    mapExecMethods = methods
+    return {
+        statusEnum:statusEnum,
+    
+        updateMapReasult(optionsData) {
+            let options = {
+                func: "updateMapReasult",
+                data: optionsData
+            }
+            _insertToDB(options)
+        },
+    
+    
+    
+        addAgentResult(agentData, mapResultId) {
+            let data = {
+                processes: [],
+                agent: ObjectId(agentData.id),
+                startTime: agentData.startTime
+            };
+    
+            let optionsData = {
+                data: data,
+                mapResultId: mapResultId
+            }
+    
+            let options = {
+                func: "addAgent",
+                data: optionsData
+            }
+            _insertToDB(options)
+    
+        },
+    
+        updateAgent(optionsData){
+            let options = {
+                func: "updateAgent",
+                data: optionsData
+            }
+            _insertToDB(options)
+        },
+    
+    
+        updateProcess(optionsData) {
+            let options = {
+                func: "updateProcess",
+                data: optionsData
+            }
+            _insertToDB(options)
+    
+        },
+    
+        addProcess(optionsData) {
+            let options = {
+                func: "addProcess",
+                data: optionsData
+            }
+            _insertToDB(options)
+        },
+    
+    
+        addAction(optionsData) {
+            let options = {
+                func: "addAction",
+                data: optionsData
+            }
+            _insertToDB(options)
+        },
+    
+        updateAction(optionsData) {
+    
+            let options = {
+                func: "updateAction",
+                data: optionsData
+            }
+            _insertToDB(options)
+        },
+    
+        updateActionsInAgent(optionsData){
+            
+            let options = {
+                func: "updateActionsInAgent",
+                data: optionsData
+            }
+            _insertToDB(options)
+        },
+    
+        getAndUpdatePendingExecution(mapId){
+            return MapResult.findOneAndUpdate({map: ObjectId(mapId), status: statusEnum.PENDING},{status: statusEnum.RUNNING, startTime: new Date()} , {new: true}).then(res=>{
+                return res
+            }).catch(err=>{
+                console.error(err);
+            })
+    
         }
-        _insertToDB(options)
-    },
-
-
-
-    addAgentResult(agentData, mapResultId) {
-        let data = {
-            processes: [],
-            agent: ObjectId(agentData.id),
-            startTime: agentData.startTime
-        };
-
-        let optionsData = {
-            data: data,
-            mapResultId: mapResultId
-        }
-
-        let options = {
-            func: "addAgent",
-            data: optionsData
-        }
-        _insertToDB(options)
-
-    },
-
-    updateAgent(optionsData){
-        let options = {
-            func: "updateAgent",
-            data: optionsData
-        }
-        _insertToDB(options)
-    },
-
-
-    updateProcess(optionsData) {
-        let options = {
-            func: "updateProcess",
-            data: optionsData
-        }
-        _insertToDB(options)
-
-    },
-
-    addProcess(optionsData) {
-        let options = {
-            func: "addProcess",
-            data: optionsData
-        }
-        _insertToDB(options)
-    },
-
-
-    addAction(optionsData) {
-        let options = {
-            func: "addAction",
-            data: optionsData
-        }
-        _insertToDB(options)
-    },
-
-    updateAction(optionsData) {
-
-        let options = {
-            func: "updateAction",
-            data: optionsData
-        }
-        _insertToDB(options)
-    },
-
-    updateActionsInAgent(optionsData){
-        
-        let options = {
-            func: "updateActionsInAgent",
-            data: optionsData
-        }
-        _insertToDB(options)
-    },
-
-    getAndUpdatePendingExecution(mapId){
-        return MapResult.findOneAndUpdate({map: ObjectId(mapId), status: statusEnum.PENDING},{status: statusEnum.RUNNING, startTime: new Date()} , {new: true}).then(res=>{
-            return res
-        }).catch(err=>{
-            console.error(err);
-        })
-
+    
     }
-
 }
 
 
