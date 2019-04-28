@@ -48,6 +48,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   scale: number = 1;
   cellView:any;
   processViewWrapper: ProcessViewWrapper;
+  scaleX = 430;
+  scaleY = 240;
   @ViewChild('wrapper') wrapper: ElementRef;
 
   constructor(
@@ -262,8 +264,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
 
     let imageModel = this.getPluginCube({
-      x: obj.x - (430 * this.scale) - this.paper.translate().tx,
-      y: obj.y - (240 * this.scale) - this.paper.translate().ty
+      x: obj.x - (this.scaleX * this.scale) - this.paper.translate().tx,
+      y: obj.y - (this.scaleY * this.scale) - this.paper.translate().ty
     }, pluginDisplayName, plugin.fullImageUrl,pluginId);
 
     this.graph.addCell(imageModel);
@@ -496,7 +498,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     const plugin = this.plugins.find((o) => {
       return o._id === pluginId;
     });
-    p.name = this.process.name ? this.process.name + ' (copy)': plugin.name+ ' (copy)'
+    p.name = cell.model.attributes.attrs['.label'].text;
     this.addNewProcess(this.getClonePosition(cell),p)
   } 
 
@@ -504,8 +506,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
     let cell =  this.graph.getCell(this.process.uuid)
     return {
-      x:cell.attributes.position.x + (430 * this.scale) + this.paper.translate().tx + 90,
-      y:cell.attributes.position.y + (240 * this.scale) + this.paper.translate().ty + 63,
+      x:cell.attributes.position.x + (this.scaleX * this.scale) + this.paper.translate().tx + 90,// 90 and 63 represents the distance between the clone and the original process in x and y absciss respectively.
+      y:cell.attributes.position.y + (this.scaleY * this.scale) + this.paper.translate().ty + 63,
       cell:cellView
     }
   }
