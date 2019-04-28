@@ -115,23 +115,18 @@ function installPluginOnServer(pluginDir, obj) {
 }
 
 function removeOldContent(pathToStatic,pathToTmp){
-  if(pathToStatic){
-    fs.unlink(pathToStatic, function (error) {
-      if (error) {
-        winston.log("error", "Error unlinking old file");
-      } else {
-        winston.log("info", "Deleted old plugin file");
-      }
-    });
+  function deleteContent(path){
+    return path ? del([path],{force: true}) : Promise.resolve();
   }
-  if(pathToTmp){
-    del([pathToTmp]).then(() => {
-      winston.log("info", "Deleted extracted directory");
-    }).catch(err => {
-      winston.log("error", "Error deleting extracted directory");
-    });
-  }
+  Promise.all([deleteContent(pathToStatic),deleteContent(pathToTmp)])
+  .then(paths => {
+    console.log(paths)
+  })
+  .catch((err) => {
+    console.log(err)
+  })
 }
+
 
 // the function of file (should be an archived file), and process it to install plugin
 function deployPluginFile(pluginPath, req) {
@@ -173,6 +168,7 @@ function deployPluginFile(pluginPath, req) {
                 }
     
                 // check the plugin type
+                let oldFile;
                 Plugin.findOne({ name: obj.name })
                   .then(plugin => {
                     if (obj.settings)
@@ -184,10 +180,13 @@ function deployPluginFile(pluginPath, req) {
                     if (!plugin) {
                       return Plugin.create(obj);
                     }
-                    removeOldContent(plugin.file,extPath)
+                    oldFile = plugin.file;
                     return Plugin.findByIdAndUpdate(plugin._id, obj);
                   })
                   .then(plugin => {
+                    if(oldFile){
+                      removeOldContent(oldFile,extPath);
+                    }
                     if (obj.type === "executer") {
                       // copy image file
                       copyPluginImageFile(obj, extPath);
