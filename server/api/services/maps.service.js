@@ -9,6 +9,7 @@ const Project = require("../models/project.model")
 const proejctServise = require("./projects.service")
 const PAGE_SIZE = env.page_size;
 const shared = require("../shared/recents-maps")
+const mongoose = require('mongoose');
 
 function getMapPlugins(mapStructure) {
     let plugins = new Set();
@@ -87,6 +88,13 @@ module.exports = {
                 { description: { '$regex': new RegExp(filterOptions.options.globalFilter,'ig') } },
             ]
         }
+        let projectLookup;
+        if(filterOptions.options.filter){
+            projectLookup = { $and:[{$eq : ["$_id",mongoose.Types.ObjectId(filterOptions.options.filter.projectId)]},{$in: ["$$mapId", "$maps"]}] };
+        }
+        else{
+            projectLookup = {$in: ["$$mapId", "$maps"]};
+        }
 
         let m = Map.aggregate([
             {
@@ -100,9 +108,7 @@ module.exports = {
                     pipeline: [
                         {
                             $match: {
-                                $expr: {
-                                    $in: ["$$mapId", "$maps"]
-                                }
+                                $expr:projectLookup
                             }
                         },
                         {
@@ -114,6 +120,9 @@ module.exports = {
                     ],
                     as: "project"
                 },
+            },
+            {
+                "$unwind": "$project"
             },
             {
                 $lookup:

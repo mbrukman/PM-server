@@ -33,8 +33,8 @@
         </div>
         <div class="filter-text">
           <div>
-            <i class="material-icons" *ngIf="!filterOptions.globalFilter">search</i>
-            <i class="material-icons text-light" *ngIf="filterOptions.globalFilter" (click)="onClear()">close</i>
+            <i class="material-icons" [hidden]="filterOptions.globalFilter">search</i>
+            <i class="material-icons text-light pointer" [hidden]="!filterOptions.globalFilter" (click)="clearSearchFilter()">close</i>
             <input class="form-control" [(ngModel)]="filterOptions.globalFilter" type="text" placeholder="Filter" #globalFilter />
           </div>
         </div>
@@ -50,13 +50,13 @@
 
       </p>
 
-      <p-dataTable [value]="project?.maps" [rows]="15" [paginator]="true" [lazy]="true" 
-      (onLazyLoad)="loadProjectLazy($event)" *ngIf="project?.maps && project?.maps?.length > 0">
+      <p-dataTable (onLazyLoad)="loadMapsLazy($event)" [value]="maps" [rows]="15" [paginator]="true" [lazy]="true" 
+      *ngIf="project?.maps && project?.maps?.length > 0">
         <p-column field="name" header="Name" [sortable]="true">
           <ng-template let-col let-map="rowData" pTemplate="body">
             <div class="name-wrapper">
               <i class="material-icons" [hidden]="!map.archived">archive</i>
-              <a [routerLink]="['/maps', map._id]">{{ map.name }}</a>
+              <a [routerLink]="['/maps', map.id]">{{ map.name }}</a>
             </div>
           </ng-template>
         </p-column>

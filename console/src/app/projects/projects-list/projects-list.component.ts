@@ -39,21 +39,13 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
     ).subscribe(()=>{
         this.loadProjectLazy();
       })
-
-    let featuredFilterOptions = new FilterOptions();
-    featuredFilterOptions.limit = 4;
-    this.projectsService.filter(null, this.page,featuredFilterOptions).pipe(
-      take(1)).subscribe(data => {
-      if (data)
-        this.featuredProjects = data.items;
-    });
   }
 
   ngOnDestroy(){
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
-  onClear(){
+  clearSearchFilter(){
     this.filterOptions.globalFilter = undefined;
     this.loadProjectLazy()
   }
@@ -80,6 +72,7 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
     if (!data) return;
     this.projects = data.items;
     this.resultCount = data.totalCount;
+    this.featuredProjects = data.items;
   }
 
 }

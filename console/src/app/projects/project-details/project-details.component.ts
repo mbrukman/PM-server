@@ -11,7 +11,9 @@ import { ImportModalComponent } from './import-modal/import-modal.component';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { take, debounceTime } from 'rxjs/operators';
-import { Subscription, fromEvent } from 'rxjs'
+import { Subscription, fromEvent } from 'rxjs';
+import {MapsService} from '@maps/maps.service';
+import {IEntityList} from '@shared/interfaces/entity-list.interface';
 
 @Component({
   selector: 'app-project-details',
@@ -20,6 +22,7 @@ import { Subscription, fromEvent } from 'rxjs'
 })
 export class ProjectDetailsComponent implements OnInit, OnDestroy {
   project: Project;
+  maps:Map[]
   id: string;
   projectReq: any;
   routeReq: any;
@@ -33,29 +36,34 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute,
     private router: Router,
     private projectsService: ProjectsService,
-    private modalService: BsModalService) { }
+    private modalService: BsModalService,
+    private mapsService:MapsService) { }
 
   ngOnInit() {
     this.routeReq = this.route.params.subscribe(params => {
       this.id = params['id'];
-      this.getProjectDetails();
+      this.filterOptions.filter = {projectId : this.id};
+      this.getProjectDetails(null,1);
       this.projectsService.filterRecentMaps(this.id).subscribe(recentMaps => {
         this.featuredMaps = recentMaps;
       })
       this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(
         debounceTime(300)
       ).subscribe(()=>{
-          this.loadProjectLazy();
+          this.loadMapsLazy();
         })
     });
   }
 
-  getProjectDetails(fields=null,page=this.page,filter=this.filterOptions){
-    this.projectReq = this.projectsService.detail(this.id, fields,page,filter).subscribe(project => {
+  getProjectDetails(fields=null,page= 1){
+    this.projectReq = this.projectsService.detail(this.id, this.filterOptions).subscribe(project => {
       if (!project) {
         this.router.navigate(['NotFound'])
       }
       this.project = project;
+      this.mapsService.filterMaps(fields,page,this.filterOptions).subscribe(maps => {
+        this.maps = maps.items
+      })
     },
     error => {
       this.router.navigate(['NotFound'])
@@ -89,12 +97,12 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  onClear(){
+  clearSearchFilter(){
     this.filterOptions.globalFilter = undefined;
-    this.loadProjectLazy()
+    this.loadMapsLazy()
   }
 
-  loadProjectLazy(event?) {
+  loadMapsLazy(event?) {
     let fields, page, sort;
     if (event) {
       fields = event.filters || null;
@@ -104,7 +112,8 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       }
     }
     this.filterOptions.sort = sort
-    this.getProjectDetails(fields,page,this.filterOptions)
+    this.filterOptions.filter.projectId = this.id;
+    this.getProjectDetails(fields,page)
   }
 
   openImportModal() {
