@@ -331,18 +331,40 @@ function _addFuncsToCodeEnv() {
  * @param {*} structureId 
  * @param {*} triggerReason 
  */
-function createExecutionContext(runId, socket, map, configurationName, structure, triggerReason, payload) {
-    //sharbat 2 func - one for exec start (for both pending and not) and second to create the exec context
+function createExecutionContext(runId, socket, mapResult) {
+    executions[runId] = {
+        mapId: mapResult.map,
+        status: mapResult.status,
+        executionAgents: {},
+        clientSocket: socket,
+        mapResultId:  mapResult.id
+    }
+    
+    return executionContext = {
+        executionId: runId, 
+        startTime: mapResult.startTime,
+        // structure: structure.id,
+        configuration: mapResult.configuration,
+        trigger:{
+            msg:mapResult.triggerReason,
+            payload:mapResult.payload
+        },
+        vault : {
+            getValueByKey : vaultService.getValueByKey
+        }
+    };
+}
 
+
+function createMapResult(runId, socket, map, configurationName, structure, triggerReason, payload){
     // get number of running executions
     const ongoingExecutions = helper.countMapExecutions(executions, map.id, statusEnum.RUNNING);
 
     // check if more running executions than map.queue
     const status = (map.queue && (ongoingExecutions >= map.queue)) ? statusEnum.PENDING : statusEnum.RUNNING; 
-    const configuration = helper.createConfiguration(structure, configurationName);
-
+    const configuration = helper.createConfiguration(structure, configurationName);  
     const startTime =  status == statusEnum.PENDING? null : new Date()
-    
+
     let mapResult = new MapResult({
         map: map._id,
         runId: runId, // use map result id instead of runId (delete runId usage from everywhere)!!!!! sharbat
@@ -356,41 +378,12 @@ function createExecutionContext(runId, socket, map, configurationName, structure
     });
     
     console.log("mapResultId : ", mapResult.id );
-    
-    mapResult.save().then(result => {
-        status == statusEnum.PENDING? null :  socket.emit('map-execution-result', result); // sharbat : verify same behavior as before
-    }).catch(err => {
-        throw new Error('error occurred while creating MapResult' + err)
-    })
-
-    if(status == statusEnum.PENDING){
-        pending[map.id]? pending[map.id].push(runId) : pending[map.id] = [runId]
-        updateClientPending(socket)
-        return 
-    }
-    
-    executions[runId] = {
-        mapId: map._id,
-        status: status,
-        executionAgents: {},
-        clientSocket: socket,
-        mapResultId:  mapResult.id
-    }
-    
-    return executionContext = {
-        executionId: runId, 
-        startTime: startTime,
-        // structure: structure.id,
-        configuration: configuration,
-        trigger:{
-            msg:triggerReason,
-            payload:payload
-        },
-        vault : {
-            getValueByKey : vaultService.getValueByKey
-        }
-    };
+    status == statusEnum.PENDING? null :  socket.emit('map-execution-result', mapResult);
+    mapResult.save()
+   
+    return mapResult
 }
+
 function savePlugins(mapStructure, runId) {// sharbat change name addFunc.. 
     const names = mapStructure.used_plugins.map(plugin => plugin.name);
     executions[runId].plugins = names
@@ -430,11 +423,14 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
 
     const runId = helper.guidGenerator();
 
-   
-    let context = createExecutionContext(runId, socket, map, configurationName, mapStructure, triggerReason, triggerPayload)
-    if(context){ // context exist if the execution is not pending
-        executeMap(runId, map, mapStructure, agents, context) 
+    let mapResult = createMapResult(runId, socket, map, configurationName, mapStructure, triggerReason, triggerPayload)
+    if(mapResult.status == statusEnum.PENDING){
+        pending[mapResult.map]? pending[mapResult.map].push(runId) : pending[mapResult.map] = [runId]
+        updateClientPending(socket)
+        return runId
     }
+    let context = createExecutionContext(runId, socket, mapResult)
+    executeMap(runId, map, mapStructure, agents, context) 
     return runId
 }
 
