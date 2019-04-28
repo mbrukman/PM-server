@@ -494,10 +494,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     let processName =  cell.model.attributes.attrs['.label'].text;
     cell.model.attributes.attrs['.label'].text=this.process.name ? this.process.name + ' (copy)': processName+ ' (copy)';
     let p = _.cloneDeep(this.process);
-    const pluginId = cell.model.attributes.attrs['.p_id'].text;
-    const plugin = this.plugins.find((o) => {
-      return o._id === pluginId;
-    });
     p.name = cell.model.attributes.attrs['.label'].text;
     this.addNewProcess(this.getClonePosition(cell),p)
   } 
