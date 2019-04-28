@@ -10,10 +10,9 @@ import { ConfirmComponent } from '../../shared/confirm/confirm.component';
 import { ImportModalComponent } from './import-modal/import-modal.component';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
-import { take, debounceTime } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 import { Subscription, fromEvent } from 'rxjs';
 import {MapsService} from '@maps/maps.service';
-import {IEntityList} from '@shared/interfaces/entity-list.interface';
 
 @Component({
   selector: 'app-project-details',
