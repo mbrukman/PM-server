@@ -158,6 +158,10 @@ export class MapDetailComponent implements OnInit, OnDestroy {
           this.selected = selected !== -1 ? this.mapStructure.configurations[selected] : this.mapStructure.configurations[0];
           this.changeSelected(false)
         }
+        else{
+          this.selected = undefined;
+        }
+
 
 
       });
