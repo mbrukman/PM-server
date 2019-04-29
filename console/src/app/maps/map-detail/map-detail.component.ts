@@ -12,6 +12,7 @@ import { filter, take } from 'rxjs/operators';
 import { Subject, Subscription } from 'rxjs';
 
 import {SeoService,PageTitleTypes} from '@app/seo.service';
+import { SelectItem } from 'primeng/primeng';
 
 @Component({
   selector: 'app-map-detail',
@@ -42,7 +43,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   mapExecutionSubscription: Subscription; 
   executing: boolean;
   downloadJson: SafeUrl;
-  configurationDropDown=[];
+  configurationDropDown:SelectItem[] = [];
   selected: MapStructureConfiguration;
   navItems: {
     name: string,
@@ -161,6 +162,10 @@ export class MapDetailComponent implements OnInit, OnDestroy {
           this.selected = selected !== -1 ? this.mapStructure.configurations[selected] : this.mapStructure.configurations[0];
           this.changeSelected(false)
         }
+        else{
+          this.selected = undefined;
+        }
+
 
 
       });

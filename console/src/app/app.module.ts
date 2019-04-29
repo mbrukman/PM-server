@@ -18,17 +18,18 @@ import { SettingsService } from './core/setup/settings.service';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
 import { VaultService } from '@shared/vault.service';
 import {SeoService} from './seo.service';
+import { AutoCompleteService } from '@shared/components/params/autocomplete.service';
+
 
 @NgModule({
   imports: [
-    CoreModule,
+    CoreModule, 
     BrowserModule,
     BrowserAnimationsModule,
     SharedModule,
-
     AppRoutingModule
   ],
-  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService],
+  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService,AutoCompleteService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

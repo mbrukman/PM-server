@@ -258,55 +258,12 @@ module.exports = {
   updateSettings: (id, settings) => {
     return Plugin.findOne({ _id: id }).then((plugin) => {
       for (let i = 0, length = plugin.settings.length; i < length; i++) {
-        plugin.settings[i].value = settings[Object.keys(settings)[i]]
+        plugin.settings[i].value = settings[i].value
       }
       return plugin.save();
     })
   },
-  /**
-   * Generating autocomplete plugin options
-   * @param pluginId
-   * @param methodName
-   */
 
-
-  generatePluginParams: (pluginId, key, type) => {
-    return module.exports.getPlugin(pluginId).then(
-      plugin =>{
-        return new Promise((resolve, reject) => {
-          plugin = JSON.parse(JSON.stringify(plugin));
-          
-          let paramsToGenerate;
-          if (type=="method"){
-            let method = plugin.methods.find(o => o.name === key);
-            paramsToGenerate = method.params.filter(
-              o => o.type === "autocomplete"
-            );
-          } else if (type=="settings"){
-            paramsToGenerate = plugin.settings.filter(
-              o => o.valueType === "autocomplete"
-            );
-          }
-          
-          let promises = paramsToGenerate.map(param => _generateAutocompleteParams(param))
-          return Promise.all(promises).finally(() => {
-            return resolve(paramsToGenerate);
-          })
-        })
-      }
-    );
-  },
 
 };
 
-function _generateAutocompleteParams(param) {
-  return models[param.model]
-    .find(param.query || {})
-    .select(param.propertyName)
-    .then(options => {
-      param.options = options.map(o => ({
-        id: o._id,
-        value: o[param.propertyName]
-      }));
-    });
-}

@@ -16,7 +16,7 @@ module.exports = {
         }).then(agentObj => {
             // add agent to follow list
             agent = agentObj;
-            agentsService.followAgent(agent);
+         
             // deploy all plugins on agents
             return pluginsService.filterPlugins({ active: true, type: 'executer' });
         }).then(activePlugins => {
