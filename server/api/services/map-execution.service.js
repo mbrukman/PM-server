@@ -113,7 +113,6 @@ function createProcessContext(runId, agent, processUUID, process) {
         processIndex: processes.numProcesses  // numProcesses => represents the process in the DB.  
     };
     processes[processUUID].push(processData);
-    // sharbat !! change in every place? for sdk. @matan? Move all to the context to keep once
 
     let options = {
         mapResultId: executions[runId].mapResultId,
@@ -468,16 +467,10 @@ function areAllAgentsDone(runId) {
  * @param agentKey
  * @returns {boolean} return false if there is an agent that didnt get to process
  */
-function areAllAgentsWaitingToStartThis(runId, processUUID, agent, processId) {
+function areAllAgentsWaitingToStartThis(runId, agent, process) {
     const executionAgents = executions[runId].executionAgents;
-
-
-    if(!executionAgents[agent.key].context.processes[processUUID]){ // if the process is already created.   
-        createProcessContext(runId, agent, processUUID, {id: processId, status: statusEnum.PENDING}) // sharbat ! think on one place to createProcessContext   
-    }
-    
     for (let i in executionAgents) {
-        if (!executionAgents[i].context.processes.hasOwnProperty(processUUID)) {
+        if (i != agent.key && !executionAgents[i].context.processes.hasOwnProperty(process.uuid)) {
             return false;
         }
     }
@@ -490,14 +483,9 @@ function runAgentsFlowControlPendingProcesses(runId, map, structure, process){
     for (let i in executionAgents) {
         for(let j in executionAgents[i].context.processes[process.uuid]){
             let processToRun = executionAgents[i].context.processes[process.uuid][j]
-            //sharbat - check if all properties necessary or exists in the process
-            let nodeToRun = {
-                index: processToRun.iterationIndex,
-                uuid: processToRun.uuid, // sharbat duplicate?? in process the uuid!!
-                process: process
-            }
             updateProcessContext(runId, agentsStatus[i], process.uuid, processToRun.iterationIndex, {status: statusEnum.RUNNING}, false)
-            runProcess(map, structure, runId, agentsStatus[i], nodeToRun);
+            process.iterationIndex = processToRun.iterationIndex
+            runProcess(map, structure, runId, agentsStatus[i], process);
         }
     }
 }
@@ -522,7 +510,7 @@ function checkAgentFlowCondition(runId, process, map, structure, agent) {
         }
         
         // if there is a wait condition, checking if it is the last agent that got here and than run all the agents
-        return areAllAgentsWaitingToStartThis(runId, process.uuid, agent, process.id)
+        return areAllAgentsWaitingToStartThis(runId, agent, process)
     }
     return true;
 }
@@ -583,20 +571,24 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
         }
         
         // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
-        if(passProcessCoordination && !passAgentFlowCondition && process.flowControl === 'race'){
-            runNodeSuccessors(map, structure, runId, agent, process.uuid); 
-        }
+        if(passProcessCoordination && !passAgentFlowCondition){
+            if(process.flowControl === 'race'){
+                runNodeSuccessors(map, structure, runId, agent, process.uuid); 
+            }
+
+            if(process.flowControl === 'wait' && !executions[runId].executionAgents[agent.key].context.processes[process.uuid]){ // if the process is already created. 
+                process.status = statusEnum.PENDING
+                createProcessContext(runId, agent, process.uuid, process) // sharbat ! think on one place to createProcessContext   
+            }
+        } 
 
         if (passProcessCoordination && passAgentFlowCondition) {  
             if(process.flowControl === 'wait'){
                 runAgentsFlowControlPendingProcesses(runId, map, structure, process)
-            }else{
-                nodesToRun.push({
-                    index: createProcessContext(runId, agent, successor, process),
-                    uuid: successor,
-                    process: process
-                });
             }
+            
+            process.iterationIndex = createProcessContext(runId, agent, successor, process)
+            nodesToRun.push(process);
         }
     })
 
@@ -604,10 +596,11 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
     for (let i = 0, length = nodesToRun.length; i < length; i++) {
         promises.push(runProcess(map, structure, runId, agent, nodesToRun[i]))
     }
-    return Promise.all(promises).catch(error => {
-        console.error(error);
-        winston.log('error', error)
-    });
+    return Promise.all(promises)
+    // .catch(error => { ///  sharbat never get to here
+    //     console.error(error);
+    //     winston.log('error', error)
+    // });
 }
 
 function updateAgentContext(runId, agent,agentData){
@@ -650,8 +643,7 @@ function endRunPathResults(runId, agent, map) {
 }
 
 // testing process condition
-function passProcessCondition(runId, agent, execProcess, mapCode) {
-    let process = execProcess.process
+function passProcessCondition(runId, agent, process) {
     if (!process.condition) {
         return true
     }
@@ -665,7 +657,7 @@ function passProcessCondition(runId, agent, execProcess, mapCode) {
     if (isProcessPassCondition) { return true }
 
     winston.log('info', errMsg || "Process didn't pass condition");
-    updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, { 
+    updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { 
         message: errMsg || "Process didn't pass condition",
         status: statusEnum.ERROR
     });
@@ -678,30 +670,30 @@ function passProcessCondition(runId, agent, execProcess, mapCode) {
 }
 
 // running process preRun function and storing it in the context
-function runProcessPreRunFunc(runId, agent, execProcess, mapCode) {
-    if (!execProcess.process.preRun) { return }
+function runProcessPreRunFunc(runId, agent, process) {
+    if (!process.preRun) { return }
     let res;
     try { 
-        res = vm.runInNewContext(execProcess.process.preRun, executions[runId].executionAgents[agent.key].context);
+        res = vm.runInNewContext(process.preRun, executions[runId].executionAgents[agent.key].context);
     } catch (e) {
         winston.log('error', 'Error running pre process function');
         res = 'Error running preProcess function' + res
     }
-    updateProcessContext(runId, agent, execProcess.uuid,execProcess.index, { preRunResult: res });
+    updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { preRunResult: res });
 
 }
 
 // running process postRun function and storing it in the context
-function runProcessPostRunFunc(runId, agent, execProcess, mapCode) {
-    if (!execProcess.process.postRun) {return null}
+function runProcessPostRunFunc(runId, agent, process) {
+    if (!process.postRun) {return null}
     let res;
     try {
-        res = vm.runInNewContext(execProcess.process.postRun, executions[runId].executionAgents[agent.key].context);
+        res = vm.runInNewContext(process.postRun, executions[runId].executionAgents[agent.key].context);
     } catch (e) {
         winston.log('error', 'Error running post process function');
         res = 'Error running postProcess function' + res
     }
-    updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, { postRunResult: res});
+    updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { postRunResult: res});
     
 }
 
@@ -715,22 +707,20 @@ function runProcessPostRunFunc(runId, agent, execProcess, mapCode) {
  * @param socket
  * @returns {function(*=, *)}
  */
-function runProcess(map, structure, runId, agent, execProcess) {
+function runProcess(map, structure, runId, agent, process) {
     return new Promise((resolve, reject) => {
         if (!helper.isAgentShuldContinue(agent.key, executions[runId].executionAgents)) {
             return resolve()
         }
 
-        if (!passProcessCondition(runId, agent, execProcess, structure.code)) {
+        if (!passProcessCondition(runId, agent, process)) {
             return stopExecution(runId);
         }
 
-        runProcessPreRunFunc(runId, agent, execProcess, structure.code)
+        runProcessPreRunFunc(runId, agent, process)
+        
+        let plugin = executions[runId].plugins.find(o => o.name.toString() == process.used_plugin.name)
 
-        let process = execProcess.process;
-        const processIndex = execProcess.index; // adding the process to execution context and storing index in the execution context.
-
-        let plugin = executions[runId].plugins.find(o => o.name.toString() == process.used_plugin.name || o.name == process.used_plugin.name)
         let actionsArray = [];
 
         process.actions.forEach((action, i) => {
@@ -740,7 +730,7 @@ function runProcess(map, structure, runId, agent, execProcess) {
                 runId,
                 agent,
                 process,
-                processIndex,
+                process.iterationIndex,
                 _.cloneDeep(action).toJSON(),
                 plugin.toJSON(),
                 executions[runId].clientSocket
@@ -750,7 +740,7 @@ function runProcess(map, structure, runId, agent, execProcess) {
         let reduceFunc = (promiseChain, currentAction, index) => {
             let actionId = (currentAction[6]._id).toString() //sharbat!! add actionIndex. or here or in updateAction
             currentAction[6].actionIndex = index;
-            executions[runId].executionAgents[agent.key].context.processes[execProcess.uuid][processIndex].actions[actionId] = currentAction[6];
+            executions[runId].executionAgents[agent.key].context.processes[process.uuid][process.iterationIndex].actions[actionId] = currentAction[6];
             
             return promiseChain.then(chainResults =>{
                 return executeAction.apply(null, currentAction).then(currentResult => { 
@@ -760,22 +750,22 @@ function runProcess(map, structure, runId, agent, execProcess) {
         }
 
         actionsArray.reduce(reduceFunc, Promise.resolve([])).then((actionsResults) => {
-            return actionsExecutionCallback(map, structure, runId, agent,execProcess)
+            return actionsExecutionCallback(map, structure, runId, agent, process)
         }).catch((error) => {
                 console.error(error); //sharbat go over all console log and delete unnessasery
-                updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, {status: statusEnum.ERROR, message: error});
+                updateProcessContext(runId, agent, process.uuid, process.iterationIndex, {status: statusEnum.ERROR, message: error});
             })
-    }).catch((error) => {console.error(error);}) 
+    }).catch((error) => {console.error(error);}) // sharbat all errors are stack here todo here big catch?  
 }
 
 
-function actionsExecutionCallback(map, structure, runId, agent,execProcess) {
+function actionsExecutionCallback(map, structure, runId, agent, process) {
     if (!executions[runId] || executions[runId].executionAgents[agent.key].status) { // status is just error or done
         return ;
     }
-    runProcessPostRunFunc(runId, agent, execProcess, structure.code)
-    updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, {status: statusEnum.DONE});
-    runNodeSuccessors(map, structure, runId, agent, execProcess.uuid);
+    runProcessPostRunFunc(runId, agent, process)
+    updateProcessContext(runId, agent, process.uuid, process.iterationIndex, {status: statusEnum.DONE});
+    runNodeSuccessors(map, structure, runId, agent, process.uuid);
 }
 /**
  * Send action to agent via socket
