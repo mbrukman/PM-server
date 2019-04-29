@@ -10,7 +10,7 @@ import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DistinctMapResult } from '@shared/model/distinct-map-result.model';
 import { Data, ActivatedRoute } from '@angular/router';
-import { Title }     from '@angular/platform-browser';
+
 import {SeoService} from '@app/seo.service';
 
 @Component({
@@ -33,14 +33,13 @@ export class MapsListComponent implements OnInit, OnDestroy {
   constructor(private mapsService: MapsService,
     private modalService: BsModalService,
     private route: ActivatedRoute,
-    private titleService: Title,
     private seoService:SeoService) {
     this.onDataLoad = this.onDataLoad.bind(this)
   }
 
 
   ngOnInit() {
-    this.titleService.setTitle(this.seoService.MapsList)
+    this.seoService.setTitle(this.seoService.MapsList)
     this.route.data.subscribe((data: Data) => {
       this.onDataLoad(data['maps']);
     })

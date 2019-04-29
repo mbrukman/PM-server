@@ -5,12 +5,11 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 
 import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
-import { Map } from '../../maps/models/map.model';
 import { ConfirmComponent } from '../../shared/confirm/confirm.component';
 import { ImportModalComponent } from './import-modal/import-modal.component';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
-import { Title }     from '@angular/platform-browser';
+
 import {SeoService} from '@app/seo.service';
 
 @Component({
@@ -32,7 +31,6 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private projectsService: ProjectsService,
     private modalService: BsModalService,
-    private titleService: Title,
     private seoService:SeoService) { }
 
   ngOnInit() {
@@ -51,7 +49,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
         this.router.navigate(['NotFound'])
       }
       this.project = project;
-      this.titleService.setTitle(project.name+this.seoService.ProjectDetails)
+      this.seoService.setTitle(project.name+this.seoService.ProjectDetails)
     },
     error => {
       this.router.navigate(['NotFound'])

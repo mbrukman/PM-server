@@ -22,7 +22,7 @@ import { Map } from '@maps/models';
 import { BsModalService } from 'ngx-bootstrap';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { takeUntil, take } from 'rxjs/operators';
-import { Title }     from '@angular/platform-browser';
+
 import {SeoService} from '@app/seo.service';
 
 const colors: any = {
@@ -61,12 +61,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   constructor(private calendarService: CalendarService, 
     private modalService: BsModalService,
-    private titleService: Title,
     private seoService:SeoService) {
   }
 
   ngOnInit() { 
-    this.titleService.setTitle(this.seoService.Calendar)
+    this.seoService.setTitle(this.seoService.Calendar)
     this.calendarService.list().pipe(
       takeUntil(this.destroy$)
     ).subscribe(jobs => {
