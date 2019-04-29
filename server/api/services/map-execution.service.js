@@ -93,7 +93,7 @@ function updateClientPending(socket, pendingToRemove=null) {
  * @returns {number}
  */
 function createProcessContext(runId, agent, processUUID, process) {
-    let processes = executions[runId].executionAgents[agent.key].processes
+    let processes = executions[runId].executionAgents[agent.key].context.processes
 
     if(!processes.numProcesses && processes.numProcesses!= 0){
         processes.numProcesses = 0
@@ -113,7 +113,6 @@ function createProcessContext(runId, agent, processUUID, process) {
         processIndex: processes.numProcesses  // numProcesses => represents the process in the DB.  
     };
     processes[processUUID].push(processData);
-    executions[runId].executionAgents[agent.key].context.processes = processes 
     // sharbat !! change in every place? for sdk. @matan? Move all to the context to keep once
 
     let options = {
@@ -140,15 +139,15 @@ function updateProcessContext(runId, agent, processUUID, iterationIndex, process
     if (!executions[runId]) {
         return;
     }
-    executions[runId].executionAgents[agent.key].processes[processUUID][iterationIndex] = Object.assign(
-        (executions[runId].executionAgents[agent.key].processes[processUUID][iterationIndex] || {}),
+    executions[runId].executionAgents[agent.key].context.processes[processUUID][iterationIndex] = Object.assign(
+        (executions[runId].executionAgents[agent.key].context.processes[processUUID][iterationIndex] || {}),
         processData  
     );
 
     let options = {
         mapResultId: executions[runId].mapResultId,
         agentId: agent.id,
-        processIndex: executions[runId].executionAgents[agent.key].processes[processUUID][iterationIndex].processIndex,
+        processIndex: executions[runId].executionAgents[agent.key].context.processes[processUUID][iterationIndex].processIndex,
         data: processData
     }
 
@@ -169,11 +168,11 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
     if (!executions[runId]) {
         return;
     }
-    executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[action._id] = Object.assign(
-        (executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[action._id] || {}),
+    executions[runId].executionAgents[agentKey].context.processes[processKey][processIndex].actions[action._id] = Object.assign(
+        (executions[runId].executionAgents[agentKey].context.processes[processKey][processIndex].actions[action._id] || {}),
         actionData
     );
-    let curActionData  = executions[runId].executionAgents[agentKey].processes[processKey][processIndex].actions[action._id]
+    let curActionData  = executions[runId].executionAgents[agentKey].context.processes[processKey][processIndex].actions[action._id]
 
     // If action have a result (i.e. done) set to previous action;
     if (actionData.result)
@@ -188,7 +187,7 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
         data: actionData,
         mapResultId: executions[runId].mapResultId,
         agentId: executions[runId].executionAgents[agentKey].id,
-        processIndex: executions[runId].executionAgents[agentKey].processes[processKey][processIndex].processIndex,
+        processIndex: executions[runId].executionAgents[agentKey].context.processes[processKey][processIndex].processIndex,
         actionIndex: curActionData.actionIndex
     }
     if(actionData.startTime){
@@ -250,17 +249,18 @@ function createAgentContext(agent, runId, executionContext, startNode, mapCode) 
         startNode: true,
     }] 
 
-    let agentContext = {currentAgent: {
-        name: agent.name,
-        url: agent.url,
-        attributes: agent.attributes
-    }
+    let agentContext = {
+    currentAgent: {
+            name: agent.name,
+            url: agent.url,
+            attributes: agent.attributes},
+    processes: processes
+
 }
    
     executions[runId].executionAgents[agent.key] = {
-        processes: processes,
         context: Object.assign(agentContext, executionContext, _addFuncsToCodeEnv()),
-        id: agent.id,
+        id: agent.id
     }
     createCodeEnv(mapCode, runId, agent.key)
 
@@ -431,12 +431,12 @@ function findProcessByUuid(uuid, structure) {
 function isThereProcessExecutingOnAgent(runId, agentKey) {
     let processes;
     try {
-        processes = Object.keys(executions[runId].executionAgents[agentKey].processes);
+        processes = Object.keys(executions[runId].executionAgents[agentKey].context.processes);
     } catch (e) {
         return false;
     }
     for (let i = processes.length - 1; i >= 2; i--) {
-        if (executions[runId].executionAgents[agentKey].processes[processes[i]].findIndex(p => p.status === statusEnum.RUNNING) > -1) {
+        if (executions[runId].executionAgents[agentKey].context.processes[processes[i]].findIndex(p => p.status === statusEnum.RUNNING) > -1) {
             return true;
         }
     }
@@ -472,12 +472,12 @@ function areAllAgentsWaitingToStartThis(runId, processUUID, agent, processId) {
     const executionAgents = executions[runId].executionAgents;
 
 
-    if(!executionAgents[agent.key].processes[processUUID]){ // if the process is already created.   
+    if(!executionAgents[agent.key].context.processes[processUUID]){ // if the process is already created.   
         createProcessContext(runId, agent, processUUID, {id: processId, status: statusEnum.PENDING}) // sharbat ! think on one place to createProcessContext   
     }
     
     for (let i in executionAgents) {
-        if (!executionAgents[i].processes.hasOwnProperty(processUUID)) {
+        if (!executionAgents[i].context.processes.hasOwnProperty(processUUID)) {
             return false;
         }
     }
@@ -488,8 +488,8 @@ function runAgentsFlowControlPendingProcesses(runId, map, structure, process){
     const executionAgents = executions[runId].executionAgents
     let agentsStatus = agentsService.agentsStatus()
     for (let i in executionAgents) {
-        for(let j in executionAgents[i].processes[process.uuid]){
-            let processToRun = executionAgents[i].processes[process.uuid][j]
+        for(let j in executionAgents[i].context.processes[process.uuid]){
+            let processToRun = executionAgents[i].context.processes[process.uuid][j]
             //sharbat - check if all properties necessary or exists in the process
             let nodeToRun = {
                 index: processToRun.iterationIndex,
@@ -516,7 +516,7 @@ function checkAgentFlowCondition(runId, process, map, structure, agent) {
         }
 
 
-        const agentProcesses = executions[runId].executionAgents[agent.key].processes
+        const agentProcesses = executions[runId].executionAgents[agent.key].context.processes
         if(agentProcesses[process.uuid] && agentProcesses[process.uuid][0].status != statusEnum.PENDING){
             return true // means all agents was here and run. 
         }
@@ -528,7 +528,7 @@ function checkAgentFlowCondition(runId, process, map, structure, agent) {
 }
 
 function checkProcessCoordination(process,runId , agent, structure) { 
-   let processes = executions[runId].executionAgents[agent.key].processes
+   let processes = executions[runId].executionAgents[agent.key].context.processes
     if (process.coordination === 'wait') {
         let res = true
         let ancestors = helper.findAncestors(process.uuid, structure);
@@ -749,7 +749,7 @@ function runProcess(map, structure, runId, agent, execProcess) {
         let reduceFunc = (promiseChain, currentAction, index) => {
             let actionId = (currentAction[6]._id).toString() //sharbat!! add actionIndex. or here or in updateAction
             currentAction[6].actionIndex = index;
-            executions[runId].executionAgents[agent.key].processes[execProcess.uuid][processIndex].actions[actionId] = currentAction[6];
+            executions[runId].executionAgents[agent.key].context.processes[execProcess.uuid][processIndex].actions[actionId] = currentAction[6];
             
             return promiseChain.then(chainResults =>{
                 return executeAction.apply(null, currentAction).then(currentResult => { 
@@ -776,7 +776,7 @@ function actionsExecutionCallback(map, structure, runId, agent,execProcess) {
     runProcessPostRunFunc(runId, agent, execProcess, structure.code)
     updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, {status: statusEnum.DONE}); // to add false if we dont want to save to db 
 
-    executions[runId].executionAgents[agent.key].processes[execProcess.uuid][execProcess.index].status = statusEnum.DONE // we need to update process status cause we cant know how much actions we have. 
+    executions[runId].executionAgents[agent.key].context.processes[execProcess.uuid][execProcess.index].status = statusEnum.DONE // we need to update process status cause we cant know how much actions we have. 
    
     runNodeSuccessors(map, structure, runId, agent, execProcess.uuid);
 }
@@ -1001,9 +1001,9 @@ async function stopExecution(runId, socket=null, result="", mapResultId = null) 
         let agent = executionAgents[agentKey];
         if (!agent) return;
         optionAction = [] 
-        let processkeys = Object.keys(agent.processes)
+        let processkeys = Object.keys(agent.context.processes)
         for (let indexKey = 2 ; indexKey <processkeys.length; indexKey++) {
-            let processArray = agent.processes[processkeys[indexKey]];
+            let processArray = agent.context.processes[processkeys[indexKey]];
             processArray.forEach(process => {
                 Object.keys(process.actions).forEach(actionKey => {
                     let action = process.actions[actionKey];
