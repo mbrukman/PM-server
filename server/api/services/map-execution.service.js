@@ -506,7 +506,7 @@ function areAllAgentsWaitingToStartThis(runId, processUUID, agent, processId) {
     const executionAgents = executions[runId].executionAgents;
 
 
-    if(!executions[runId].executionAgents[agent.key].processes[processUUID][0]){ // if the process is already created.   
+    if(!executionAgents[agent.key].processes[processUUID]){ // if the process is already created.   
         createProcessContext(runId, agent, processUUID, {id: processId, status: statusEnum.PENDING}) // sharbat ! think on one place to createProcessContext   
     }
     
@@ -539,13 +539,9 @@ function runAgentsFlowControlPendingProcesses(runId, map, structure, process){
 
 function checkAgentFlowCondition(runId, process, map, structure, agent) {
     if (process.flowControl === 'race') {
-        if (!helper.isThisTheFirstAgentToGetToTheProcess(executions[runId].executionAgents, process.uuid, agent.key)) {
-            // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
-            runNodeSuccessors(map, structure, runId, agent, process.uuid);
-            return false
-        }
-        return true
+        return helper.isThisTheFirstAgentToGetToTheProcess(executions[runId].executionAgents, process.uuid, agent.key)
     }
+
     if (process.flowControl === 'wait') { // if not all agents are still alive, the wait condition will never be met, should stop the map execution
         //TODO: check how to handle race condition between agents status and check
         if (!helper.areAllAgentsAlive(executions[runId].executionAgents)) {
@@ -556,32 +552,23 @@ function checkAgentFlowCondition(runId, process, map, structure, agent) {
 
         const agentProcesses = executions[runId].executionAgents[agent.key].processes
         if(agentProcesses[process.uuid] && agentProcesses[process.uuid][0].status != statusEnum.PENDING){
-            return true // means all agents was here and run. (in case 2 ancestors)
+            return true // means all agents was here and run. 
         }
         
         // if there is a wait condition, checking if it is the last agent that got here and than run all the agents
-        if (areAllAgentsWaitingToStartThis(runId, process.uuid, agent, process.id)) {
-            //sharbat should return true (check only) and handle this in the run method
-            runAgentsFlowControlPendingProcesses(runId, map, structure, process)
-        }
-        return false
+        return areAllAgentsWaitingToStartThis(runId, process.uuid, agent, process.id)
     }
     return true;
 }
 
-function checkProcessCoordination(process,runId , agent, successorIdx, structure, numSuccessors) { 
+function checkProcessCoordination(process,runId , agent, structure) { 
    let processes = executions[runId].executionAgents[agent.key].processes
     if (process.coordination === 'wait') {
         let res = true
         let ancestors = helper.findAncestors(process.uuid, structure);
         if (ancestors.length > 1) {
             ancestors.forEach(ancestor => {
-                // sharbat check if process iteration or action, if action , add status to process and use the process
-                if (!processes[ancestor] || processes[ancestor][0].status == statusEnum.RUNNING) {
-                    // sharbat not needed if all checks happen
-                    if(process.flowControl == 'wait' && !executions[runId].executionAgents[agent.key].processes[process.uuid]){ // create pending process if we the first.    
-                        createProcessContext(runId, agent, process.uuid, {id: process.id, status: statusEnum.PENDING})
-                    }
+                if (!processes[ancestor] || processes[ancestor][0].status == statusEnum.RUNNING) { // if ancestor status is running retun false 
                     return res = false;
                 }
             });
@@ -591,13 +578,7 @@ function checkProcessCoordination(process,runId , agent, successorIdx, structure
     }
 
     if (process.coordination === 'race') {
-        if (processes && processes.hasOwnProperty(process.uuid)) {
-            // sharbat move this check to the run function instead of the check
-            if (numSuccessors - 1 == successorIdx) {
-                endRunPathResults(runId, agent, socket, map);
-            }
-            return false;
-        }
+        return !(processes && processes.hasOwnProperty(process.uuid)) // if process.uuid exist in process => process executed (failed in race). 
     }
     return true;
 
@@ -626,16 +607,30 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
     successors.forEach((successor, successorIdx) => {
         const process = findProcessByUuid(successor, structure);
 
-        // sharbat move checks to variables to allow both checks to run.
-        if (checkProcessCoordination(process, runId, agent , successorIdx,structure, successors.length) &&
-            checkAgentFlowCondition(runId, process, map, structure, agent)) {
-                
-                nodesToRun.push({
-                index: createProcessContext(runId, agent, successor, process),
-                uuid: successor,
-                process: process
-            });
+        let passProcessCoordination = checkProcessCoordination(process, runId, agent ,structure)
+        let passAgentFlowCondition =  checkAgentFlowCondition(runId, process, map, structure, agent)
 
+        // if it is the last ancestoer of a process
+        if (!passProcessCoordination && process.coordination === 'race' && 
+            (successors.length - 1 == successorIdx) ) { 
+            endRunPathResults(runId, agent, executions[runId].clientSocket, map);
+        }
+        
+        // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
+        if(passProcessCoordination && !passAgentFlowCondition && process.flowControl === 'race'){
+            runNodeSuccessors(map, structure, runId, agent, process.uuid); 
+        }
+
+        if (passProcessCoordination && passAgentFlowCondition) {  
+            if(process.flowControl === 'wait'){
+                runAgentsFlowControlPendingProcesses(runId, map, structure, process)
+            }else{
+                nodesToRun.push({
+                    index: createProcessContext(runId, agent, successor, process),
+                    uuid: successor,
+                    process: process
+                });
+            }
         }
     })
 
