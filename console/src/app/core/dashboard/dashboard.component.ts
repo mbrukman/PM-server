@@ -3,7 +3,7 @@ import { MapsService } from '../../maps/maps.service';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { ProcessResult } from '@app/maps/models';
 
-import {SeoService} from '@app/seo.service';
+import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,7 +19,7 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.seoService.setTitle(this.seoService.Dashboard)
+    this.seoService.setTitle(PageTitleTypes.Dashboard)
     this.mapsService.getDistinctMapExecutionsResult().subscribe(executions => {
       this.executions = executions;
       if(this.executions){

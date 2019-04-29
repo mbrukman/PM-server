@@ -6,7 +6,7 @@ import { Subscription, fromEvent } from 'rxjs'
 import { take, debounceTime } from 'rxjs/operators';
 import { ActivatedRoute, Data } from '@angular/router';
 
-import {SeoService} from '@app/seo.service';
+import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
   selector: 'app-projects-list',
@@ -33,7 +33,7 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.seoService.setTitle(this.seoService.ProjectsList)
+    this.seoService.setTitle(PageTitleTypes.ProjectsList)
     this.route.data.subscribe((data:Data) => {
       this.onDataLoad(data['projects']);
     })

@@ -5,7 +5,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap';
 import { Plugin } from '../models/plugin.model';
 import { PluginUploadComponent } from '../plugin-upload/plugin-upload.component';
 
-import {SeoService} from '@app/seo.service';
+import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
   selector: 'app-plugins-list',
@@ -23,7 +23,7 @@ export class PluginsListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.seoService.setTitle(this.seoService.Plugins)
+    this.seoService.setTitle(PageTitleTypes.Plugins)
     this.requestPlugins();
   }
 

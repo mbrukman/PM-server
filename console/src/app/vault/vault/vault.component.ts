@@ -4,7 +4,7 @@ import { UpsertVaultItemsComponent } from '../upsert-vault-items/upsert-vault-it
 import { VaultService } from '../../shared/vault.service';
 import { VaultItem } from '../vault.model';
 
-import {SeoService} from '@app/seo.service';
+import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
   selector: 'app-vault',
@@ -21,7 +21,7 @@ export class VaultComponent implements OnInit {
     private seoService:SeoService) { }
 
   ngOnInit() {
-    this.seoService.setTitle(this.seoService.Vault)
+    this.seoService.setTitle(PageTitleTypes.Vault)
     this.requestVaults();
   }
 

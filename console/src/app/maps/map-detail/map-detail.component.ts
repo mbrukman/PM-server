@@ -11,7 +11,7 @@ import { SocketService } from '@shared/socket.service';
 import { filter, take } from 'rxjs/operators';
 import { Subject, Subscription } from 'rxjs';
 
-import {SeoService} from '@app/seo.service';
+import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
   selector: 'app-map-detail',
@@ -75,7 +75,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
           this.router.navigate(['NotFound']);
         }
         this.map = map;
-        this.seoService.setTitle(map.name+this.seoService.Map)
+        this.seoService.setTitle(map.name+PageTitleTypes.Map)
         this.originalMap = _.cloneDeep(map);
         this.mapsService.setCurrentMap(map);
         this.mapStructuresListReq = this.mapsService.structuresList(this.id).subscribe(structureList => {

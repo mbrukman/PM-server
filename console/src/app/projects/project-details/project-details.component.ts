@@ -10,7 +10,7 @@ import { ImportModalComponent } from './import-modal/import-modal.component';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
 
-import {SeoService} from '@app/seo.service';
+import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
   selector: 'app-project-details',
@@ -49,7 +49,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
         this.router.navigate(['NotFound'])
       }
       this.project = project;
-      this.seoService.setTitle(project.name+this.seoService.ProjectDetails)
+      this.seoService.setTitle(project.name+PageTitleTypes.ProjectDetails)
     },
     error => {
       this.router.navigate(['NotFound'])

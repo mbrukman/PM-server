@@ -23,7 +23,7 @@ import { BsModalService } from 'ngx-bootstrap';
 import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { takeUntil, take } from 'rxjs/operators';
 
-import {SeoService} from '@app/seo.service';
+import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 const colors: any = {
   // TODO: add color pallet
@@ -65,7 +65,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() { 
-    this.seoService.setTitle(this.seoService.Calendar)
+    this.seoService.setTitle(PageTitleTypes.Calendar)
     this.calendarService.list().pipe(
       takeUntil(this.destroy$)
     ).subscribe(jobs => {

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {SeoService} from '@app/seo.service';
+import {SeoService,PageTitleTypes} from '@app/seo.service';
+
 @Component({
   selector: 'app-agents',
   templateUrl: './agents.component.html',
@@ -11,7 +12,7 @@ export class AgentsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.seoService.setTitle(this.seoService.Agents)
+    this.seoService.setTitle(PageTitleTypes.Agents)
   }
 
 }
