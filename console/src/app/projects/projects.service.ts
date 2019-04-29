@@ -24,8 +24,8 @@ export class ProjectsService {
     return this.http.post<Project>(serverUrl + 'api/projects/create', project);
   }
 
-  detail(projectId,options?:FilterOptions) {
-    return this.http.post<Project>(serverUrl + 'api/projects/' + projectId,options);
+  detail(projectId) {
+    return this.http.get<Project>(`${serverUrl}api/projects/${projectId}/detail`);
   }
 
   filter(fields?: any, page?: number, options?:FilterOptions) {

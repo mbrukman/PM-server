@@ -20,15 +20,8 @@ module.exports = {
     },
 
     /* get project details */
-    detail: (projectId, options) => {
-
-       let populate = {
-           path:'maps'
-       }
-       if(!options.isArchived){
-           populate.match = {archived:false}
-       }
-       return Project.findById(projectId).populate(populate)
+    detail: (projectId) => {
+       return Project.findById(projectId);
 
     },
 
