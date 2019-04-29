@@ -67,12 +67,13 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
     });
   }
 
-  initParamsForm(value?, id?, viewName?, name?) {
+  initParamsForm(value?, id?, viewName?, name?, type?) {
     return new FormGroup({
       value: new FormControl(value),
       param: new FormControl(id, Validators.required),
       viewName: new FormControl(viewName, Validators.required),
-      name: new FormControl(name, Validators.required)
+      name: new FormControl(name, Validators.required),
+      type: new FormControl(type, Validators.required)
     });
   }
 
@@ -117,7 +118,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
     let paramsControl = <FormArray>this.triggerForm.controls['params'];
     params = params || this.method.params;
     params.forEach(param => {
-      paramsControl.push(this.initParamsForm(param.value, param._id, param.viewName, param.name));
+      paramsControl.push(this.initParamsForm(param.value, param._id, param.viewName, param.name,param.type));
     });
   }
 

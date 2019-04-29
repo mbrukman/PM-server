@@ -6,7 +6,8 @@ let actionParamsSchema = new Schema({
     value: String,
     viewName: String,
     param: String,
-    name: String
+    name: String,
+    type:String
 });
 
 

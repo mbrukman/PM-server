@@ -1,0 +1,35 @@
+<div [formGroup]="form">
+  <div formArrayName="params">
+    <div *ngFor="let param of form.controls.params.controls; let k = index">
+      <div [formGroupName]="k">
+        <div class="row param-wrapper">
+          <div class="col-4">{{param.value.viewName}}</div>
+          <hr>
+          <div *ngIf="code">
+              <div class="col-2">
+                  <label class="control control-checkbox">
+                      <input type="checkbox" class="form-control" formControlName="code">
+                      <div class="control_indicator check-control"></div>
+                  </label>
+                </div>
+          </div>
+          <hr>
+          
+          <div class="input dropdown" [ngSwitch]="param.value.type" [hidden]="param.value.code">
+            <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
+            <app-autocomplete  *ngSwitchCase="'vault'" formControlName="value" [model]="'Vault'" ></app-autocomplete>
+            <app-autocomplete  *ngSwitchCase="'autocomplete'" formControlName="value" [model]="params[k].model"></app-autocomplete>
+            <app-options-param *ngSwitchCase="'options'" [options]="params[k].options" formControlName="value"></app-options-param>    
+            <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
+            <input formControlName="value" type="checkbox" class="form-control" *ngSwitchCase="'boolean'">
+            <input formControlName="value" type="number" class="form-control" *ngSwitchCase="'int'">
+            <input formControlName="value" type="text" class="form-control" *ngSwitchDefault>
+          </div>
+          <div class="input" [hidden]="!param.value.code">
+            <input formControlName="value" type="text" class="form-control">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

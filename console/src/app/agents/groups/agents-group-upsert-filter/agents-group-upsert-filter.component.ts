@@ -5,6 +5,7 @@ import { FILTER_FIELDS, FILTER_TYPES, AgentsGroupFilter } from '@agents/models/g
 
 import { BsModalRef } from 'ngx-bootstrap';
 import { Subject } from 'rxjs';
+import { SelectItem } from 'primeng/primeng';
 
 
 @Component({
@@ -14,8 +15,8 @@ import { Subject } from 'rxjs';
 })
 export class AgentsGroupUpsertFilterComponent implements OnInit {
   filterTypes = FILTER_TYPES;
-  filterDropDown:any;
-  fieldsDropDown:any;
+  filterDropDown:SelectItem[];
+  fieldsDropDown:SelectItem[];
   fields = FILTER_FIELDS;
   filter : AgentsGroupFilter;
   edit: boolean;

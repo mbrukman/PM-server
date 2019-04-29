@@ -10,6 +10,9 @@ let mapSchema = new Schema({
     queue: Number,
 }, { timestamps: true });
 
+mapSchema.statics.autocompleteKey = "name";
+mapSchema.statics.autocompleteValueField = "_id";
+
 mapSchema.set('toJSON', {
     transform: function (doc, ret, options) {
         ret.id = ret._id;

@@ -6,7 +6,7 @@ import { MapsService } from '../maps.service';
 import { Map } from '../models/map.model';
 import { Project } from '../../projects/models/project.model';
 import { ProjectsService } from '../../projects/projects.service';
-import { DefaultKeyValueDiffer } from '@angular/core/src/change_detection/differs/default_keyvalue_differ';
+import { SelectItem } from 'primeng/primeng';
 import { FilterOptions } from '@shared/model/filter-options.model';
 
 @Component({
@@ -20,7 +20,7 @@ export class MapCreateComponent implements OnInit, OnDestroy {
   projects: Project[];
   paramsReq: any;
   map: Map;
-  projectsDropDown:any;
+  projectsDropDown:SelectItem[];
   constructor(private mapsService: MapsService, private projectsService: ProjectsService, private router: Router, private route: ActivatedRoute) {
   }
 
