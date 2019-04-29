@@ -1,9 +1,8 @@
-import { Component, OnInit,forwardRef, Input,ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit,forwardRef, Input} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import {AutoCompleteService} from '@shared/components/params/autocomplete.service';
 import {AutoCompleteItem} from '@shared/model/autocomplete.model';
-import { debounceTime  } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
+
 
 @Component({
   selector: 'app-autocomplete',
@@ -17,26 +16,18 @@ import { Subscription } from 'rxjs';
     }
   ]
 })
-export class AutocompleteComponent implements OnInit, ControlValueAccessor,OnDestroy {
+export class AutocompleteComponent implements OnInit, ControlValueAccessor {
   @Input('model') model:string;
   results: AutoCompleteItem[];
   text: AutoCompleteItem;
   options = { query: ""}
   propagateChange : (_: any) => { };
-  autoCompleteSubscribe : Subscription;
 
   constructor(private autoCompleteService:AutoCompleteService) { }
-  @ViewChild('autoComplete') autoCompleteElement : ElementRef;
+
   ngOnInit() {
-   this.autoCompleteSubscribe = this.autoCompleteElement['completeMethod'].pipe(debounceTime(800))
-   .subscribe((event)=> {
-     this.search(event)
-   })
   }
 
-  ngOnDestroy(){
-    this.autoCompleteSubscribe.unsubscribe();
-  }
 
   onSelect(){
     this.propagateChange(this.text.id);
