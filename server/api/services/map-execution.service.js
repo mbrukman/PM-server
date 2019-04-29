@@ -62,7 +62,8 @@ async function getSettingsAction(plugin){ //sharbat check if works!
  * Send to client all runIds executions that still running.
  * @param socket
  */
-function updateClientExecutions(socket) {
+function updateClientExecutions(socket, execToDelete=null) {
+    execToDelete ? delete executions[execToDelete]: null
     let emitv = Object.keys(executions).reduce((total, current) => {
         total[current] = executions[current].mapId;
         return total;
@@ -78,9 +79,9 @@ function updateClientExecutions(socket) {
 function updateClientPending(socket, pendingToRemove=null) {
     if(pendingToRemove && pending[pendingToRemove.mapId]){
         const runIndex = pending[pendingToRemove.mapId].findIndex((o) => o === pendingToRemove.runId);
-        runIndex < 0 ? null : delete pending[pendingToRemove.mapId][runIndex]
+        runIndex < 0 ? null :  pending[pendingToRemove.mapId].splice(runIndex, 1);
     }
-    socket.emit('pending', pending);
+    pending ? socket.emit('pending', pending) : null;
 }
 
 /**
@@ -642,13 +643,12 @@ function endRunPathResults(runId, agent, map) {
     dbUpdates.updateMapReasult(options)
 
     let socket = executions[runId].clientSocket
-    delete executions[runId];
 
     if (map.queue) {
         startPendingExecution(map.id, socket);
     }
 
-    updateClientExecutions(socket);
+    updateClientExecutions(socket, runId);
 }
 
 // testing process condition
@@ -1037,8 +1037,8 @@ async function stopExecution(runId, socket=null, result="", mapResultId = null) 
     updateMapResult(executions[runId].mapResultId, {finishTime : d,  status: statusEnum.STOPPED + result }, executions[runId].clientSocket)
 
     startPendingExecution(executions[runId].mapId, executions[runId].clientSocket)
-    delete executions[runId]
-    updateClientExecutions(executions[runId].clientSocket);
+    updateClientExecutions(executions[runId].clientSocket, runId);
+    
 }
 
 /**
@@ -1060,8 +1060,8 @@ async function rebuildPending(){
      * @param runId
      * @param socket
      */
-function cancelPending(mapId, runId, socket, updateDb = true){
-    return new Promise((resolve, reject) => {
+ function cancelPending(mapId, runId, socket){
+    return new Promise(async (resolve, reject) => {
         if (!mapId || !runId) {
             throw new Error('Not enough parameters');
 
@@ -1074,8 +1074,7 @@ function cancelPending(mapId, runId, socket, updateDb = true){
             throw new Error('No such job');
 
         }
-        // sharbat do not remove EVER any data, just change the status to canceled
-        updateDb ? MapResult.findOneAndUpdate({map: ObjectId(mapId), status: statusEnum.PENDING}, {status: statusEnum.STOPPED}) : null
+        await MapResult.findOneAndUpdate({map: ObjectId(mapId), status: statusEnum.PENDING}, {status: statusEnum.CANCELED})
         pending[mapId].splice(runIndex, 1);
         updateClientPending(socket);
         resolve();
