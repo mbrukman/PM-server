@@ -114,24 +114,15 @@ function installPluginOnServer(pluginDir, obj) {
   });
 }
 
-function removeOldContent(pathtoStatic,pathToTmp){
-  deleteContent(pathtoStatic)
-    .then((paths) => {
-      winston.log("info", "deleted static file", paths);
-    })
-    .catch((error) => {
-      winston.log("error", "Error deleted extracted directory", error);
-    })
-    deleteContent(pathToTmp).then((paths) => {
-      winston.log("info", "deleted static file", paths);
-    })
-    .catch((error) => {
-      winston.log("error", "Error deleted extracted directory", error);
-    })
-}
 
 function deleteContent(path){
-  return del([path],{force: true});
+  return del([path],{force: true})
+  .then((paths) => {
+    winston.log("info", "deleted static file", paths);
+  })
+  .catch((error) => {
+    winston.log("error", "Error deleted extracted directory", error);
+  });
 }
 
 
@@ -151,7 +142,8 @@ function deployPluginFile(pluginPath, req) {
               }
             }
             catch(e){
-              removeOldContent(pluginPath,extPath);
+              deleteContent(pluginPath);
+              deleteContent(extPath);
               return reject(e)
             }
             fs.readFile(configPath, "utf8", (err, body) => {
@@ -192,7 +184,8 @@ function deployPluginFile(pluginPath, req) {
                   })
                   .then(plugin => {
                     if(oldFile){
-                      removeOldContent(oldFile,extPath);
+                      deleteContent(oldFile);
+                      deleteContent(extPath);
                     }
                     if (obj.type === "executer") {
                       // copy image file
@@ -214,20 +207,17 @@ function deployPluginFile(pluginPath, req) {
                   }).catch(error => {
                     winston.log("error", "Error creating plugin", error);
                     console.log("error deployPluginFile  : ", error);
-                    removeOldContent(pluginPath,extPath);
+                    deleteContent(pluginPath);
+                    deleteContent(extPath);
                     return reject(error);
                   }).finally(() => {
                     // delete extracted tmp dir
-                    deleteContent(extPath).then((paths) => {
-                      winston.log("info", "deleted static file", paths);
-                    })
-                    .catch((error) => {
-                      winston.log("error", "Error deleted extracted directory", error);
-                    })
+                      deleteContent(extPath);
                         });
                     }
               catch(e){
-                removeOldContent(pluginPath,extPath);
+                deleteContent(pluginPath);
+                deleteContent(extPath);
                 return reject(e)
               }
             })
@@ -262,7 +252,7 @@ module.exports = {
 
   pluginDelete: id => {
     return Plugin.findById(id).then((obj) => {
-      removeOldContent(obj.file,undefined);
+      deleteContent(obj.file);
       if (obj.type === "executer")
         return deletePluginOnAgent(obj.name)
       else
