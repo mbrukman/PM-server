@@ -134,7 +134,7 @@ function createProcessContext(runId, agent, processUUID, process) {
  * @param processIndex
  * @param processData
  */
-function updateProcessContext(runId, agent, processUUID, iterationIndex, processData, updateDB = true) { 
+function updateProcessContext(runId, agent, processUUID, iterationIndex, processData, updateDB = true) { // sharbst updateDB? delete it?
 
     if (!executions[runId]) {
         return;
@@ -666,7 +666,8 @@ function passProcessCondition(runId, agent, execProcess, mapCode) {
 
     winston.log('info', errMsg || "Process didn't pass condition");
     updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, { 
-        status: errMsg || "Process didn't pass condition",
+        message: errMsg || "Process didn't pass condition",
+        status: statusEnum.ERROR
     });
     if (process.mandatory) { // mandatory process failed, stop executions
         winston.log('info', "Mandatory process failed");
@@ -762,8 +763,7 @@ function runProcess(map, structure, runId, agent, execProcess) {
             return actionsExecutionCallback(map, structure, runId, agent,execProcess)
         }).catch((error) => {
                 console.error(error); //sharbat go over all console log and delete unnessasery
-                let status = statusEnum.ERROR + error // sharbat do not keep error msg on the status, keep it on reason
-                updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, {status: status});
+                updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, {status: statusEnum.ERROR, message: error});
             })
     }).catch((error) => {console.error(error);}) 
 }
@@ -774,10 +774,7 @@ function actionsExecutionCallback(map, structure, runId, agent,execProcess) {
         return ;
     }
     runProcessPostRunFunc(runId, agent, execProcess, structure.code)
-    updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, {status: statusEnum.DONE}); // to add false if we dont want to save to db 
-
-    executions[runId].executionAgents[agent.key].context.processes[execProcess.uuid][execProcess.index].status = statusEnum.DONE // we need to update process status cause we cant know how much actions we have. 
-   
+    updateProcessContext(runId, agent, execProcess.uuid, execProcess.index, {status: statusEnum.DONE});
     runNodeSuccessors(map, structure, runId, agent, execProcess.uuid);
 }
 /**
@@ -1107,8 +1104,9 @@ module.exports = {
             logs.push({message:"Agent #" +  iAgent + ": "})
                 agentResult.processes.forEach((process,iProcess)=>{
                     logs.push({message:"Process #" +  iProcess + ": " + process.status})
-                    process.preRunResult ?   logs.push({message: "preRun result:" + process.preRunResult}):null
-                    process.postRunResult ?   logs.push({message: "postRun result:" + process.postRunResult}):null
+                    process.message ? logs.push({message: "message: " + process.message}): null
+                    process.preRunResult ?   logs.push({message: "preRun result: " + process.preRunResult}):null
+                    process.postRunResult ?   logs.push({message: "postRun result: " + process.postRunResult}):null
                     process.actions.forEach((action, iAction)=>{
                         logs.push({message: "Action #" +  iAction + ": " + action.status})
                         let keys  = Object.keys((action.result||{}))

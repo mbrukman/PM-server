@@ -23,7 +23,8 @@ let processResultSchema = new Schema({
     iterationIndex: Number,
     process: { type: Schema.Types.ObjectId, ref: 'MapStructure.processes' },
     actions: [actionResultSchema],
-    status: String, // like process didnt pass condition
+    status: String,
+    message: Schema.Types.Mixed,
     preRunResult: Schema.Types.Mixed,
     postRunResult: Schema.Types.Mixed
 }, { _id: false });
