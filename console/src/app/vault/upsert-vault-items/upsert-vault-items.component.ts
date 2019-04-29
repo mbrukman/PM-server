@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { BsModalRef } from 'ngx-bootstrap';
 
-import { AutoCompleteItem } from '@shared/model/autocomplete.model';
+import { VaultItem } from '../vault.model';
 import { VaultService } from '../../shared/vault.service';
 
 @Component({
@@ -13,7 +13,7 @@ import { VaultService } from '../../shared/vault.service';
 })
 export class UpsertVaultItemsComponent implements OnInit {
 
-  vault : AutoCompleteItem =  new AutoCompleteItem();
+  vault : VaultItem =  new VaultItem();
  
   result: Subject<boolean> = new Subject();
   isRequierd :boolean = false;

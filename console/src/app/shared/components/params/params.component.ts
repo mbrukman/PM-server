@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormArray } from '@angular/forms';
 
 @Component({
   selector: 'app-params',
@@ -11,6 +11,10 @@ export class ParamsComponent implements OnInit {
   @Input('form') form:FormGroup;
   @Input('params') params:any[];
   @Input('code') code:boolean = true;
+
+  get paramsForm(): FormArray {
+    return <FormArray>this.form.get('params')
+  }
 
   constructor() { }
 
