@@ -70,14 +70,14 @@ module.exports = {
 
     /**
      * returns how many executions exists for map with this status
-     * @param {'Pending' / 'Running'} status 
+     * @param status 
      * @param mapId
      * @returns {number}
      */
-    countMapExecutions(executions, mapId, status) {
-        return Object.keys(executions).filter(runId => {
-            return executions[runId].mapId === mapId && executions[runId].status === status
-        }).length;
+    countMapExecutions(executions, mapId) {
+        return (Object.keys(executions).filter(runId => {
+            return executions[runId].mapId.toString() === mapId
+        })).length;
     },
 
     createConfiguration(mapStructure, configurationName) {

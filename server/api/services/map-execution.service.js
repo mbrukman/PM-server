@@ -75,7 +75,11 @@ function updateClientExecutions(socket) {
  * mapId is keys and value is array of pending runIds
  * @param socket
  */
-function updateClientPending(socket) {
+function updateClientPending(socket, pendingToRemove=null) {
+    if(pendingToRemove && pending[pendingToRemove.mapId]){
+        const runIndex = pending[pendingToRemove.mapId].findIndex((o) => o === pendingToRemove.runId);
+        runIndex < 0 ? null : delete pending[pendingToRemove.mapId][runIndex]
+    }
     socket.emit('pending', pending);
 }
 
@@ -214,65 +218,28 @@ async function startPendingExecution(mapId, socket) {
     let pendingExec = await dbUpdates.getAndUpdatePendingExecution(mapId) 
     if(!pendingExec){return}
     
-    cancelPending(mapId, pendingExec.id, socket , false); //sharbat do not call cancel pending on start pending
+    updateClientPending(socket, {mapId, runId: pendingExec.runId})
     socket.emit('map-execution-result', pendingExec)
-    if(!executions[pendingExec.runId]){
-        executions[pendingExec.runId] = {
-            clientSocket : socket,
-            mapId: mapId,
-            status: statusEnum.RUNNING,
-            executionAgents: {},
-            mapResultId: pendingExec.id
-        }
-    }else{
-        executions[pendingExec.runId].status = statusEnum.RUNNING
-    }
 
-
-    // sharbat!! use the same create context method
-    let context = { 
-        executionId: pendingExec.runId, 
-        startTime: pendingExec.startTime,
-        // structure: structureId, 
-        configuration: pendingExec.configuration,
-        trigger:{
-            msg: pendingExec.triggerReason,
-            payload:pendingExec.triggerPayload
-        },
-        vault : {
-            getValueByKey : vaultService.getValueByKey
-        }
-    }
     map = await mapsService.get(pendingExec.map)
     mapStructure = await mapsService.getMapStructure(map._id, pendingExec.structure)
 
     agents = helper.getRelevantAgent(map.groups, map.agents)
-
-    // If no living agents, stop execution with status error
-    if (agents.length == 0) {
-        exitExecutionAndUpdateMapResult(runId, { reason: 'no agents alive', status: 'Error' } )
+    if (agents.length == 0) { // If no living agents, stop execution with status error
+        return updateMapResult(pendingExec.id, { reason: 'no agents alive', status: statusEnum.ERROR }, socket )
     }
 
-    executeMap(pendingExec.runId, 
-        map,
-        mapStructure,
-        agents,
-        context
-    );
+    let context = createExecutionContext(pendingExec.runId, socket, pendingExec)
+    executeMap(pendingExec.runId, map, mapStructure, agents, context);
 }
 
-function exitExecutionAndUpdateMapResult(runId, updateData){
+function updateMapResult(mapResultId, updateData, socket){
     let options = {
-        mapResultId: executions[runId].mapResultId,
+        mapResultId: mapResultId,
         data:updateData,
-        socket: executions[runId].clientSocket
+        socket: socket // sharbat send socket to updates?  
     }
     dbUpdates.updateMapReasult(options)
-    MapResult.findByIdAndUpdate(executions[runId].mapResultId, updateData )
-    startPendingExecution(executions[runId].mapId, executions[runId].clientSocket)
-    let socket  = executions[runId].clientSocket
-    delete executions[runId]
-    updateClientExecutions(socket);
 }
 
 
@@ -358,7 +325,7 @@ function createExecutionContext(runId, socket, mapResult) {
 
 function createMapResult(runId, socket, map, configurationName, structure, triggerReason, payload){
     // get number of running executions
-    const ongoingExecutions = helper.countMapExecutions(executions, map.id, statusEnum.RUNNING);
+    const ongoingExecutions = helper.countMapExecutions(executions, map.id.toString());
 
     // check if more running executions than map.queue
     const status = (map.queue && (ongoingExecutions >= map.queue)) ? statusEnum.PENDING : statusEnum.RUNNING; 
@@ -1066,7 +1033,12 @@ async function stopExecution(runId, socket=null, result="", mapResultId = null) 
         }
         optionAction ? dbUpdates.updateActionsInAgent(options): null 
     });
-    exitExecutionAndUpdateMapResult(runId, {finishTime : d,  status: statusEnum.STOPPED + result } )
+    
+    updateMapResult(executions[runId].mapResultId, {finishTime : d,  status: statusEnum.STOPPED + result }, executions[runId].clientSocket)
+
+    startPendingExecution(executions[runId].mapId, executions[runId].clientSocket)
+    delete executions[runId]
+    updateClientExecutions(executions[runId].clientSocket);
 }
 
 /**
