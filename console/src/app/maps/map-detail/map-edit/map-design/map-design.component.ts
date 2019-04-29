@@ -492,7 +492,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   onClone(){
     let cell = _.cloneDeep(this.cellView);
     let processName =  cell.model.attributes.attrs['.label'].text;
-    cell.model.attributes.attrs['.label'].text=this.process.name ? this.process.name + ' (copy)': processName+ ' (copy)';
+    cell.model.attributes.attrs['.label'].text=processName+ ' (copy)';
     let p = _.cloneDeep(this.process);
     p.name = cell.model.attributes.attrs['.label'].text;
     this.addNewProcess(this.getClonePosition(cell),p)
@@ -529,6 +529,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     let cell = this.graph.getCell(uuid);
     cell.attr('.label/text',label);
     cell.attr('text/text', label);
+    this.cellView.model.attributes.attrs['.label'].text = cell.attributes.attrs['.label'].text
     this.onMapContentUpdate()
   }
 
