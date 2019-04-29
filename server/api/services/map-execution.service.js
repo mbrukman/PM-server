@@ -145,13 +145,11 @@ function updateProcessContext(runId, agent, processUUID, iterationIndex, process
         processData  
     );
 
-    let field = Object.keys(processData)[0] // sharbat generic? yes
     let options = {
         mapResultId: executions[runId].mapResultId,
         agentId: agent.id,
         processIndex: executions[runId].executionAgents[agent.key].processes[processUUID][iterationIndex].processIndex,
-        field: field,
-        value: processData[field]
+        data: processData
     }
 
     updateDB ? dbUpdates.updateProcess(options) : null

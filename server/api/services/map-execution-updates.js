@@ -52,6 +52,15 @@ function _insertToDB(options) {
     console.log('new insert', options.func);
 }
 
+function _getPathFiledsToUpdate(pathToSet, data){
+    let toUpdate = {}
+    Object.keys(data).forEach(field=>{
+        let x = pathToSet + field
+        toUpdate[x] = data[field]
+    })
+    return toUpdate
+}
+
 function _updateMapReasult(options) {
     return MapResult.findByIdAndUpdate(options.mapResultId, { $set: options.data }, { new: true }) 
         // .then((mapResult) => {
@@ -68,11 +77,7 @@ function _addAgent(options) {
 
 function _updateAgent(options) {
     let pathToSet = "agentsResults.$."
-    let toUpdate = {}
-    Object.keys(options.data).forEach(k=>{
-        let x = pathToSet + k
-        toUpdate[x] = options.data[k]
-    })
+    let toUpdate = _getPathFiledsToUpdate(pathToSet, options.data)
  
     return MapResult.findOneAndUpdate(
         {
@@ -100,9 +105,8 @@ function _addProcess(options) {
 
 function _updateProcess(options) {
 
-    let pathToSet = "agentsResults.$.processes." + options.processIndex + "." + options.field
-    let toUpdate = {}
-    toUpdate[pathToSet] = options.value
+    let pathToSet = "agentsResults.$.processes." + options.processIndex + "."
+    let toUpdate = _getPathFiledsToUpdate(pathToSet, options.data)
     return MapResult.findOneAndUpdate(
         {
             '_id': ObjectId(options.mapResultId),
@@ -131,12 +135,7 @@ function _addAction(options) {
 function _updateAction(options) {
     
     let pathToSet = "agentsResults.$.processes." + options.processIndex + ".actions." + options.actionIndex + "."
-    let toUpdate = {}
-    Object.keys(options.data).forEach(field=>{
-        let x = pathToSet + field
-        toUpdate[x] = options.data[field]
-    })
-    
+    let toUpdate = _getPathFiledsToUpdate(pathToSet, options.data)
     return MapResult.findOneAndUpdate(
         {
             '_id': ObjectId(options.mapResultId),
@@ -151,11 +150,8 @@ function _updateActionsInAgent(options){
 
     let toUpdate = {}
     options.data.forEach(p=>{
-        let pathToSet = "agentsResults.$.processes." + p.processIndex + ".actions." + p.actionIndex + "."
-        Object.keys(p.data).forEach(k=>{
-            let x = pathToSet + k
-            toUpdate[x] = p.data[k]
-        })
+        let pathToSet = "agentsResults.$.processes." + p.processIndex + ".actions." + p.actionIndex + ".";
+        Object.assign(toUpdate, _getPathFiledsToUpdate(pathToSet, p.data))
     })
     
     return MapResult.findOneAndUpdate(
