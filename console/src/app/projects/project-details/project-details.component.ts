@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit,ViewChild,ElementRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router,Data } from '@angular/router';
 
 import { BsModalService } from 'ngx-bootstrap/modal';
 
@@ -23,14 +23,13 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   project: Project;
   maps:Map[]
   id: string;
-  projectReq: any;
-  routeReq: any;
   archiveReq: any;
   filterTerm: string;
   filterOptions : FilterOptions = new FilterOptions();
   featuredMaps: DistinctMapResult[] = [];
   page: number = 1;
   filterKeyUpSubscribe: Subscription;
+  sort:string;
   @ViewChild('globalFilter') globalFilterElement : ElementRef;
   constructor(private route: ActivatedRoute,
     private router: Router,
@@ -39,42 +38,32 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     private mapsService:MapsService) { }
 
   ngOnInit() {
-    this.routeReq = this.route.params.subscribe(params => {
-      this.id = params['id'];
-      this.filterOptions.filter = {projectId : this.id};
-      this.getProjectDetails(null,1);
-      this.projectsService.filterRecentMaps(this.id).subscribe(recentMaps => {
-        this.featuredMaps = recentMaps;
+    this.id = this.route.snapshot.params.id;
+    this.filterOptions.filter = {};
+    this.filterOptions.filter.projectId = this.id;
+    this.route.data.subscribe((data:Data) => {
+      if (!data['projectDetails']) {
+        this.router.navigate(['NotFound'])
+      }
+      this.project = data['projectDetails'];
+    })
+    this.projectsService.filterRecentMaps(this.id).subscribe(recentMaps => {
+      this.featuredMaps = recentMaps;
+    })
+    this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(
+      debounceTime(300)
+    ).subscribe(()=>{
+        this.loadMapsLazy();
       })
-      this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(
-        debounceTime(300)
-      ).subscribe(()=>{
-          this.loadMapsLazy();
-        })
-    });
   }
 
   getProjectDetails(fields=null,page= 1){
-    this.projectReq = this.projectsService.detail(this.id, this.filterOptions).subscribe(project => {
-      if (!project) {
-        this.router.navigate(['NotFound'])
-      }
-      this.project = project;
-      this.mapsService.filterMaps(fields,page,this.filterOptions).subscribe(maps => {
-        this.maps = maps.items
-      })
-    },
-    error => {
-      this.router.navigate(['NotFound'])
-    }
-  );
+    this.mapsService.filterMaps(fields,page,this.filterOptions).subscribe(maps => {
+      this.maps = maps.items
+    })
   }
 
   ngOnDestroy() {
-    this.routeReq.unsubscribe();
-    if (this.projectReq) {
-      this.projectReq.unsubscribe();
-    }
     if (this.archiveReq) {
       this.archiveReq.unsubscribe();
     }
@@ -102,16 +91,15 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   loadMapsLazy(event?) {
-    let fields, page, sort;
+    let fields, page;
     if (event) {
       fields = event.filters || null;
       page = event.first / 5 + 1;
       if (event.sortField) {
-        sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
+        this.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.filterOptions.sort = sort
-    this.filterOptions.filter.projectId = this.id;
+    this.filterOptions.sort = this.sort
     this.getProjectDetails(fields,page)
   }
 

@@ -24,7 +24,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
   filterOptions: FilterOptions = new FilterOptions();
   recentMaps: DistinctMapResult[];
   filterKeyUpSubscribe: Subscription;
-
+  sort:string;
 
   @ViewChild('globalFilter') globalFilterElement: ElementRef;
 
@@ -66,15 +66,15 @@ export class MapsListComponent implements OnInit, OnDestroy {
 
 
   loadMapsLazy(event?) {
-    let fields, page, sort;
+    let fields, page;
     if (event) {
       fields = event.filters || null;
       page = event.first / 15 + 1;
       if (event.sortField) {
-        sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
+        this.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.filterOptions.sort = sort
+    this.filterOptions.sort = this.sort;
     this.reloadMaps(fields, page, this.filterOptions)
   }
 

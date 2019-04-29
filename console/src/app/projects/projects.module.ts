@@ -8,6 +8,7 @@ import { ProjectsListComponent } from './projects-list/projects-list.component';
 import { ProjectCreateComponent } from './project-create/project-create.component';
 import { ImportModalComponent } from './project-details/import-modal/import-modal.component';
 import { ProjectsResolver } from './resolvers/projects-resolver.resolver';
+import {ProjectDetailsResolver} from './resolvers/project-details.resolver';
 
 @NgModule({
   imports: [
@@ -21,7 +22,7 @@ import { ProjectsResolver } from './resolvers/projects-resolver.resolver';
     ProjectCreateComponent,
     ImportModalComponent
   ],
-  providers:[ProjectsResolver],
+  providers:[ProjectsResolver,ProjectDetailsResolver],
   entryComponents: [ImportModalComponent]
 })
 export class ProjectsModule {

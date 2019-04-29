@@ -20,9 +20,9 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
   resultCount: number;
   filterOptions : FilterOptions = new FilterOptions();
   filterKeyUpSubscribe : Subscription;
-  
-  @ViewChild('globalFilter') globalFilterElement : ElementRef;
+  sort:string;
 
+  @ViewChild('globalFilter') globalFilterElement : ElementRef;
 
   constructor(private projectsService: ProjectsService,
     private route:ActivatedRoute) {
@@ -56,15 +56,15 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
   }
 
   loadProjectLazy(event?) {
-    let fields, page, sort;
+    let fields, page;
     if (event) {
       fields = event.filters || null;
       page = event.first / 5 + 1;
       if (event.sortField) {
-        sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
+        this.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.filterOptions.sort = sort
+    this.filterOptions.sort = this.sort
     this.reloadProjects(fields,page,this.filterOptions)
   }
 
