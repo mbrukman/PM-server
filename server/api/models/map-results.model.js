@@ -6,7 +6,7 @@ const statusEnum = {
     DONE: 'done',
     PENDING: 'pending',
     ERROR: 'error',
-    STOPPED: 'stopped', 
+    STOPPED: 'stopped',
     CANCELED: 'canceled'
 }
 
@@ -16,7 +16,7 @@ let actionResultSchema = new Schema({
     startTime: Date,
     finishTime: Date,
     result: Schema.Types.Mixed,
-    retriesLeft: Number 
+    retriesLeft: Number
 }, { _id: false });
 
 let processResultSchema = new Schema({
@@ -41,13 +41,13 @@ let mapResultSchema = new Schema({
     structure: { type: Schema.Types.ObjectId, ref: 'MapStructure' },
     configuration: Schema.Types.Mixed,
     agentsResults: [AgentResultSchema],
-    startTime: {type:Date, index:true },
+    startTime: { type: Date, index: true },
     finishTime: Date,
     trigger: String,
-    status :{ type: String, enum: [statusEnum.DONE, statusEnum.ERROR,statusEnum.RUNNING, statusEnum.PENDING]},
-    reason : String, // e.g. no agents
-    triggerPayload:Schema.Types.Mixed,
-    archivedMap:{type:Boolean, default:false, index: true}
+    status: { type: String, enum: [statusEnum.DONE, statusEnum.ERROR, statusEnum.RUNNING, statusEnum.PENDING] },
+    reason: String, // e.g. no agents
+    triggerPayload: Schema.Types.Mixed,
+    archivedMap: { type: Boolean, default: false, index: true }
 });
 
 
@@ -63,7 +63,7 @@ mongoose.model('ActionResult', AgentResultSchema, 'actionResults');
 
 module.exports = {
     MapResult,
-    AgentResult : AgentResultSchema,
-    ActionResult : actionResultSchema,
+    AgentResult: AgentResultSchema,
+    ActionResult: actionResultSchema,
     statusEnum
 };
