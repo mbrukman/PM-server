@@ -552,7 +552,6 @@ function checkProcessCoordination(process, runId, agent, structure) {
  * @param node
  */
 function runNodeSuccessors(map, structure, runId, agent, node) {
-    winston.log('error', "==============");
     if (!executions[runId] || executions[runId].status == statusEnum.ERROR || executions[runId].status == statusEnum.DONE) { return Promise.resolve() } // status : 'Error' , 'Done'
 
     const successors = node ? helper.findSuccessors(node, structure) : [];
@@ -679,7 +678,6 @@ function runProcessPreRunFunc(runId, agent, process) {
     try {
         res = vm.runInNewContext(process.preRun, executions[runId].executionAgents[agent.key].context);
     } catch (e) {
-        winston.log('error', 'Error running pre process function');
         res = 'Error running preProcess function' + res
     }
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { preRunResult: res });
@@ -693,7 +691,6 @@ function runProcessPostRunFunc(runId, agent, process) {
     try {
         res = vm.runInNewContext(process.postRun, executions[runId].executionAgents[agent.key].context);
     } catch (e) {
-        winston.log('error', 'Error running post process function');
         res = 'Error running postProcess function' + res
     }
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { postRunResult: res });
