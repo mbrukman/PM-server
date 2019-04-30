@@ -312,8 +312,8 @@ function createExecutionContext(runId, socket, mapResult) {
         // structure: structure.id,
         configuration: mapResult.configuration,
         trigger: {
-            msg: mapResult.triggerReason,
-            payload: mapResult.payload
+            msg: mapResult.trigger,
+            payload: mapResult.triggerPayload
         },
         vault: {
             getValueByKey: vaultService.getValueByKey
@@ -403,6 +403,7 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
 function runMapOnAgent(map, structure, runId, startNode, agent) {
     return helper.validate_plugin_installation(executions[runId].plugins, agent.key).then(() => {
         return runNodeSuccessors(map, structure, runId, agent, startNode.uuid).catch(err => {
+            winston.log('error', error);
             // sharbat remove all inner empty catches and verify it gets here
             console.error(err) // winston sharbat 
             // save the info like structure +mapId 
@@ -551,6 +552,7 @@ function checkProcessCoordination(process, runId, agent, structure) {
  * @param node
  */
 function runNodeSuccessors(map, structure, runId, agent, node) {
+    winston.log('error', "==============");
     if (!executions[runId] || executions[runId].status == statusEnum.ERROR || executions[runId].status == statusEnum.DONE) { return Promise.resolve() } // status : 'Error' , 'Done'
 
     const successors = node ? helper.findSuccessors(node, structure) : [];
@@ -753,10 +755,11 @@ function runProcess(map, structure, runId, agent, process) {
         actionsArray.reduce(reduceFunc, Promise.resolve([])).then((actionsResults) => {
             return actionsExecutionCallback(map, structure, runId, agent, process)
         }).catch((error) => {
+            winston.log('error', error);
             console.error(error); //sharbat go over all console log and delete unnessasery
             updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.ERROR, message: error.message });
         })
-    }).catch((error) => { console.error(error); }) // sharbat all errors are stack here todo here big catch?  
+    }).catch((error) => {  winston.log('error', error); console.error(error); }) // sharbat all errors are stack here todo here big catch?  
 }
 
 
@@ -867,7 +870,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
         updateActionContext(runId, agent.key, process.uuid, processIndex, action, {
             status: statusEnum.ERROR,
             finishTime: new Date(),
-            result: { stderr: err.message } //sharbat just msg? or stack too?
+            result: { stderr: err.message }
         });
         console.error(err);
         return err.message // continue to next action if not mandatory 
