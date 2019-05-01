@@ -67,6 +67,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     if (this.archiveReq) {
       this.archiveReq.unsubscribe();
     }
+    this.filterKeyUpSubscribe.unsubscribe();
   }
 
   archiveProject(doArchive: boolean) {
