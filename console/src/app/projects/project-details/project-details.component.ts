@@ -44,9 +44,6 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     this.filterOptions.filter = {};
     this.filterOptions.filter.projectId = this.id;
     this.route.data.subscribe((data:Data) => {
-      if (!data['projectDetails']) {
-        this.router.navigate(['NotFound'])
-      }
       this.project = data['projectDetails'];
       this.seoService.setTitle(this.project.name+PageTitleTypes.ProjectDetails)
     })
@@ -60,7 +57,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       })
   }
 
-  getProjectDetails(fields=null,page= 1){
+  getMaps(fields=null,page= 1){
     this.mapsService.filterMaps(fields,page,this.filterOptions).subscribe(maps => {
       this.maps = maps.items
     })
@@ -103,7 +100,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.getProjectDetails(fields,page)
+    this.getMaps(fields,page)
   }
 
   openImportModal() {
