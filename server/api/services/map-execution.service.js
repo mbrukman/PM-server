@@ -323,7 +323,7 @@ function createExecutionContext(runId, socket, mapResult) {
 }
 
 
-function createMapResult(runId, socket, map, configurationName, structure, triggerReason, payload) {
+async function createMapResult(runId, socket, map, configurationName, structure, triggerReason, payload) {
     // get number of running executions
     const ongoingExecutions = helper.countMapExecutions(executions, map.id.toString());
 
@@ -346,7 +346,7 @@ function createMapResult(runId, socket, map, configurationName, structure, trigg
 
     console.log("mapResultId : ", mapResult.id);
     status == statusEnum.PENDING ? null : socket.emit('map-execution-result', mapResult);
-    mapResult.save()
+    await mapResult.save()
 
     return mapResult
 }
@@ -381,16 +381,21 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
     map = await mapsService.get(mapId)
     if (!map) { throw new Error(`Couldn't find map`); }
     if (map.archived) { throw new Error('Can\'t execute archived map'); }
-
-    let agents = helper.getRelevantAgent(map.groups, map.agents)
-    if (agents.length == 0) { throw new Error('No agents alive'); }
-
+   
     mapStructure = await mapsService.getMapStructure(map._id, structureId)
     if (!mapStructure) { throw new Error('No structure found.'); }
-
-    const runId = helper.guidGenerator();
-
-    let mapResult = createMapResult(runId, socket, map, configurationName, mapStructure, triggerReason, triggerPayload)
+    
+    let agents = helper.getRelevantAgent(map.groups, map.agents)
+   
+    if (agents.length == 0 && triggerReason == "Started manually by user") { throw new Error('No agents alive'); }
+    let runId = helper.guidGenerator();
+    let mapResult = await createMapResult(runId, socket, map, configurationName, mapStructure, triggerReason, triggerPayload)
+     
+    if (agents.length == 0){ // in case of trigger or schedules task we create mapResult and save the error. 
+        await MapResult.findOneAndUpdate({_id: ObjectId(mapResult.id)}, {$set: {'reason': "No agents alive"}} )
+        return
+    }
+    
     if (mapResult.status == statusEnum.PENDING) {
         pending[mapResult.map] ? pending[mapResult.map].push(runId) : pending[mapResult.map] = [runId]
         updateClientPending(socket)
