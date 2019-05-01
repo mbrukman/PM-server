@@ -26,7 +26,9 @@ let processResultSchema = new Schema({
     status: String,
     message: Schema.Types.Mixed,
     preRunResult: Schema.Types.Mixed,
-    postRunResult: Schema.Types.Mixed
+    postRunResult: Schema.Types.Mixed,
+    startTime: Date, 
+    finishTime: Date,
 }, { _id: false });
 
 let AgentResultSchema = new Schema({

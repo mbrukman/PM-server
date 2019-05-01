@@ -92,6 +92,7 @@ function _addProcess(options) {
     processReasult = {
         iterationIndex: options.processData.iterationIndex,
         process: options.processData.processId,
+        startTime: options.processData.startTime,
         actions: []
     }
     return MapResult.findOneAndUpdate(

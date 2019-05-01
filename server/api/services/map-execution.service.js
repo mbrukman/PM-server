@@ -110,6 +110,7 @@ function createProcessContext(runId, agent, processUUID, process) {
         status: process.status || statusEnum.RUNNING,
         uuid: processUUID,
         actions: {},
+        startTime : new Date(), 
         processIndex: processes.numProcesses  // numProcesses => represents the process in the DB.  
     };
     processes[processUUID].push(processData);
@@ -485,7 +486,7 @@ function runAgentsFlowControlPendingProcesses(runId, map, structure, process) {
     for (let i in executionAgents) {
         for (let j in executionAgents[i].context.processes[process.uuid]) {
             let processToRun = executionAgents[i].context.processes[process.uuid][j]
-            updateProcessContext(runId, agentsStatus[i], process.uuid, processToRun.iterationIndex, { status: statusEnum.RUNNING }, false)
+            updateProcessContext(runId, agentsStatus[i], process.uuid, processToRun.iterationIndex, { status: statusEnum.RUNNING, startTime: new Date() }, false)
             process.iterationIndex = processToRun.iterationIndex
             runProcess(map, structure, runId, agentsStatus[i], process);
         }
@@ -661,7 +662,8 @@ function passProcessCondition(runId, agent, process) {
     winston.log('info', errMsg || "Process didn't pass condition");
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, {
         message: errMsg || "Process didn't pass condition",
-        status: statusEnum.ERROR
+        status: statusEnum.ERROR, 
+        finishTime: new Date()
     });
     if (process.mandatory) { // mandatory process failed, stop executions
         winston.log('info', "Mandatory process failed");
@@ -754,7 +756,7 @@ function runProcess(map, structure, runId, agent, process) {
         }).catch((error) => {
             winston.log('error', error);
             console.error(error); //sharbat go over all console log and delete unnessasery
-            updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.ERROR, message: error.message });
+            updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.ERROR, message: error.message, finishTime: new Date() });
         })
     }).catch((error) => {  winston.log('error', error); console.error(error); }) // sharbat all errors are stack here todo here big catch?  
 }
@@ -765,7 +767,7 @@ function actionsExecutionCallback(map, structure, runId, agent, process) {
         return;
     }
     runProcessPostRunFunc(runId, agent, process)
-    updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.DONE });
+    updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.DONE, finishTime: new Date() });
     runNodeSuccessors(map, structure, runId, agent, process.uuid);
 }
 /**
@@ -994,6 +996,9 @@ async function stopExecution(runId, socket = null, result = "", mapResultId = nu
         for (let indexKey = 2; indexKey < processkeys.length; indexKey++) {
             let processArray = agent.context.processes[processkeys[indexKey]];
             processArray.forEach(process => {
+                if(!process.actions){
+                    return 
+                }
                 Object.keys(process.actions).forEach(actionKey => {
                     let action = process.actions[actionKey];
                     if (!action.finishTime) {

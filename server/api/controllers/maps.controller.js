@@ -5,7 +5,6 @@ const archiveService = require("../services/archive.service");
 const projectsService = require("../services/projects.service");
 const mapsExecutionService = require("../services/map-execution.service");
 const triggersService = require("../services/triggers.service");
-const scheduledJobsService = require("../services/scheduled-job.service");
 const hooks = require("../../libs/hooks/hooks");
 const configToken = require('../services/token.service');
 
@@ -62,9 +61,9 @@ module.exports = {
         })
     },
     recentlyMaps: (req, res) => {
-        mapsService.recentMaps().then(recentMaps =>{
+        mapsService.recentMaps().then(recentMaps => {
             return res.json(recentMaps);
-        }).catch(error =>{
+        }).catch(error => {
             return res.status(500).json(error);
         })
 
@@ -246,7 +245,8 @@ module.exports = {
     },
     /* get a list of ongoing executions */
     currentRuns: (req, res) => {
-        hooks.hookPre('map-currentruns', req).then(() => { // todo! whay this function all the time running??
+        //TODO: check what fires this function lots of times
+        hooks.hookPre('map-currentruns', req).then(() => {
             const executions = mapsExecutionService.executions;
             return res.json(Object.keys(executions).reduce((total, current) => {
                 console.log("currentRuns : ", executions[current].map);
@@ -257,35 +257,34 @@ module.exports = {
     },
     /* execute a map */
     execute: (req, res) => {
-        let  triggerRequest, configRequest, payload;
+        let triggerRequest, configRequest, payload;
         if (req.body) {
             triggerRequest = req.body.trigger;
             configRequest = req.body.config ? req.body.config : req.query.config;
             let configTokenPayload = configToken.validateAndExtractToken(req.body.configToken)
             payload = configTokenPayload ? configTokenPayload : null;
         }
-        let config = payload && payload.config ? Object.assign(configRequest,payload.config) : configRequest;
-        let trigger = payload && payload.triggerMsg ? triggerRequest + " "+ "-"+ " "+payload.triggerMsg : triggerRequest;
+        let config = payload && payload.config ? Object.assign(configRequest, payload.config) : configRequest;
+        let trigger = payload && payload.triggerMsg ? triggerRequest + " " + "-" + " " + payload.triggerMsg : triggerRequest;
         hooks.hookPre('map-execute', req).then(() => {
             return mapsExecutionService.execute(req.params.id, req.params.structure, req.io, config, trigger)
-        }).then(result=>{
+        }).then(result => {
             return res.json(result);
         }).catch(error => {
             winston.log('error', "Error executing map", error);
             req.io.emit('notification', { title: 'Error executing map', message: error.message, type: 'error', mapId: req.params.id });
-            // todo Pending!!!? 
             return res.status(500).send(error.message);
         });
     },
 
     /* stop map execution */
     stopExecution: (req, res) => {
-        return res.json(mapsExecutionService.stop(req.params.runId, req.params.id, req.io, ' - manually by user'));
+        return res.json(mapsExecutionService.stop(req.params.runId, req.io, ' - manually by user'));
     },
 
     logs: (req, res) => {
         hooks.hookPre('map-logs-list', req).then(() => {
-            return mapsExecutionService.logs(req.params.id, req.params.resultId);
+            return mapsExecutionService.logs(req.params.resultId);
         }).then((results) => {
             res.json(results);
         }).catch(error => {
@@ -296,7 +295,7 @@ module.exports = {
 
     results: (req, res) => {
         hooks.hookPre('map-results-list', req).then(() => {
-            return mapsExecutionService.results(req.params.id,req.query.page)
+            return mapsExecutionService.results(req.params.id, req.query.page)
         }).then((results) => {
             res.json(results);
         }).catch(error => {
@@ -315,12 +314,43 @@ module.exports = {
     resultDetail: (req, res) => {
         hooks.hookPre('map-results-detail').then(() => {
             return mapsExecutionService.detail(req.params.resultId);
-        }).then(result => {
+        }).then(async execResult=>{
+            let structure = await mapsService.getMapStructure(execResult.map, execResult.structure)
+            let processNames = {}
+            structure.processes.map(process=> processNames[process.id] = process.name)
+return {execResult,  processNames};
+        }).then(objRes=> {
+            let result = objRes.execResult
             if (!result) {
                 res.status(204);
             }
-            return res.json(result);
+            let newResult = result.toJSON()
+            result.agentsResults.forEach((agentResult, agentIndex) => {
+                agentResult.processes.forEach((process, processIndex) => {
+                    process = process.toJSON();
+                    let processResult = []
+                    let statuses = [];
+                    process.actions.forEach(action => {
+                        statuses.push(action.status)
+                        processResult.push(action.result)
+                    })
+                    let processStatus = 'error'
+                    let mapS = {}
+                    statuses.map(s => { mapS[s] = 1 })
+                    if (mapS['error'] && mapS['success']) { processStatus = 'partial' }
+                    else if (!mapS['error']) { processStatus = 'success' }
+
+                    process.status = processStatus
+                    process.index = process.iterationIndex;
+                    process.result = processResult
+                    process.uuid = process.process.toString()
+                    process.name = objRes.processNames[process.uuid]
+                    newResult.agentsResults[agentIndex].processes[processIndex] = process
+                })
+            })
+            return res.json(newResult);
         }).catch(error => {
+            console.error(error);
             winston.log('error', "Error getting execution result", error);
             req.io.emit('notification', {
                 title: 'Whoops...',
