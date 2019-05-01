@@ -20,7 +20,6 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
   resultCount: number;
   filterOptions : FilterOptions = new FilterOptions();
   filterKeyUpSubscribe : Subscription;
-  sort:string;
 
   @ViewChild('globalFilter') globalFilterElement : ElementRef;
 
@@ -61,10 +60,9 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
       fields = event.filters || null;
       page = event.first / 5 + 1;
       if (event.sortField) {
-        this.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
+        this.filterOptions.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.filterOptions.sort = this.sort
     this.reloadProjects(fields,page,this.filterOptions)
   }
 

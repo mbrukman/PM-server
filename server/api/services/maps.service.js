@@ -89,7 +89,7 @@ module.exports = {
             ]
         }
         let projectLookup;
-        if(filterOptions.options.filter){
+        if(filterOptions.options.filter && filterOptions.options.filter.projectId){
             projectLookup = { $and:[{$eq : ["$_id",mongoose.Types.ObjectId(filterOptions.options.filter.projectId)]},{$in: ["$$mapId", "$maps"]}] };
         }
         else{

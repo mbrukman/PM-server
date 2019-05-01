@@ -29,7 +29,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   featuredMaps: DistinctMapResult[] = [];
   page: number = 1;
   filterKeyUpSubscribe: Subscription;
-  sort:string;
+
   @ViewChild('globalFilter') globalFilterElement : ElementRef;
   constructor(private route: ActivatedRoute,
     private router: Router,
@@ -96,10 +96,10 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       fields = event.filters || null;
       page = event.first / 5 + 1;
       if (event.sortField) {
-        this.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
+        this.filterOptions.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.filterOptions.sort = this.sort
+
     this.getProjectDetails(fields,page)
   }
 
