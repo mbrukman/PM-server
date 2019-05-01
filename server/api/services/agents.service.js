@@ -50,7 +50,7 @@ let followAgentStatus = (agent) => {
                 } catch (e) {
                     body = { res: e };
                 }
-                if (!error && response.statusCode === 200) {
+                if (!error && response.statusCode === 200 && agents[agent.key]) {
                     agents[agent.key].name = agent.name;
                     agents[agent.key].attributes = agent.attributes;
                     agents[agent.key].alive = true;
@@ -65,7 +65,7 @@ let followAgentStatus = (agent) => {
                     agents[agent.key].key = agent.key;
                     agents[agent.key].installed_plugins = body.installed_plugins;
                     agents[agent.key].liveCounter = LIVE_COUNTER;
-                } else if ((--agents[agent.key].liveCounter) === 0) {
+                } else if ( agents[agent.key] && (--agents[agent.key].liveCounter) === 0) {
                     agents[agent.key].alive = false;
                     if (!agents[agent.key].hostname) {
                         agents[agent.key].hostname = 'unknown';
@@ -81,7 +81,10 @@ let followAgentStatus = (agent) => {
             })
     }, INTERVAL_TIME);
     if (!agents[agent.key]) {
-        agents[agent.key] = { alive: false, following: true };
+        agents[agent.key] = agent.toJSON();
+        agents[agent.key].alive = false;
+        agents[agent.key].following = true;
+        agents[agent.key].intervalId = listenInterval;
         setDefaultUrl(agent);
         // agents[agent.key] = { intervalId: listenInterval, alive: false, following: true };
     }
@@ -263,7 +266,7 @@ module.exports = {
             }
             return Agent.findByIdAndUpdate(agentObj._id, { $set: { url: agent.url, publicUrl: agent.publicUrl } });
         }).then(agent => {
-            agents[agent.key] = agent.toJSON();
+            followAgentStatus(agent)
             return setDefaultUrl(agent).then(()=>{
                 return agent;
             });
@@ -287,7 +290,12 @@ module.exports = {
         });
     },
     delete: (agentId) => {
-        return Agent.remove({ _id: agentId })
+        return Agent.findOneAndRemove({ _id: agentId }).then((agent) => {
+            if(agents[agent.key]){
+                clearInterval(agents[agent.key].intervalId)
+            }
+            delete agents[agent.key]
+        })
     },
     /* filter the agents. if no query is passed, will return all agents */
     filter: (query = {}) => {

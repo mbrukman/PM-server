@@ -3,5 +3,6 @@ export interface IParam {
   name: string,
   viewName?: string,
   value?: string | { id: string, value: string };
+  type?:string
 }
 

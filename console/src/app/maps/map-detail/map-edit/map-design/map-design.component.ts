@@ -124,6 +124,13 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         filter(structure => !!structure)
       ).subscribe(structure => {
         this.initMapDraw();
+        for(let i=0,length=structure.processes.length;i<length;i++){
+          this.plugins.forEach((plugin)=> {
+            if(plugin.name == structure.processes[i].used_plugin.name){
+              this.updateNodePid(structure.processes[i].uuid,plugin.id)
+            }
+          })
+        }
       });
   }
 
@@ -531,6 +538,12 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     cell.attr('text/text', label);
     this.cellView.model.attributes.attrs['.label'].text = cell.attributes.attrs['.label'].text
     this.onMapContentUpdate()
+  }
+
+  updateNodePid(uuid:string,id:string){
+    let cell = this.graph.getCell(uuid);
+    cell.attr('.p_id/text',id);
+    this.onMapContentUpdate();
   }
 
   onScale(scale) {

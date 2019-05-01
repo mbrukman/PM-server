@@ -37,26 +37,12 @@
                     [autoWidth]="false">
         </p-dropdown>
       </div>
-      <div class="params" formArrayName="params" *ngIf="triggerForm.controls.method.value">
+      <div class="params" *ngIf="triggerForm.controls.method.value">
         <div class="row">
           <div class="col-4 header">Name</div>
           <div class="col-8 header">Value</div>
         </div>
-        <div class="row-param" *ngFor="let param of triggerForm.controls.params.controls; let i = index">
-          <div [formGroupName]="i">
-            <div class="row ">
-              <div class="col-4 param-name">{{param.value.viewName}}</div>
-              <div class="col-8" [ngSwitch]="params[i]?.type">
-                <select *ngSwitchCase="'options'" formControlName="value" class="form-control">
-                  <option *ngFor="let option of params[i].options" [value]="option.id">{{option.name}}</option>
-                </select>
-                <input *ngSwitchDefault formControlName="value" type="text" class="form-control">
-                <app-vault-selector *ngSwitchCase="'vault'" formControlName="value"></app-vault-selector>
-              </div>
-            </div>
-          </div>
-          <hr>
-        </div>
+        <app-params [form]="triggerForm"  [code]="false" [params]="params"></app-params>
       </div>
     </div>
     <div class="modal-footer">
