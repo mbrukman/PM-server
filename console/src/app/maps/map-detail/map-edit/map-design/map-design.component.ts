@@ -125,12 +125,15 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       ).subscribe(structure => {
         this.initMapDraw();
         for(let i=0,length=structure.processes.length;i<length;i++){
-          this.plugins.forEach((plugin)=> {
-            if(plugin.name == structure.processes[i].used_plugin.name){
-              this.updateNodePid(structure.processes[i].uuid,plugin.id)
+          let imageProcess = this.graph.getCell(structure.processes[i].uuid)
+          for(let j =0,length = this.plugins.length;j<length;j++){
+            if(imageProcess.attributes.attrs['.p_id'].text == '' && this.plugins[j].name == structure.processes[i].used_plugin.name){
+              this.updateNodePid(structure.processes[i].uuid,this.plugins[j].id);
+              break;
             }
-          })
+          }
         }
+        this.onMapContentUpdate()
       });
   }
 
@@ -543,7 +546,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   updateNodePid(uuid:string,id:string){
     let cell = this.graph.getCell(uuid);
     cell.attr('.p_id/text',id);
-    this.onMapContentUpdate();
   }
 
   onScale(scale) {
