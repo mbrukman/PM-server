@@ -8,7 +8,7 @@ import { CronJobsConfig } from 'ngx-cron-jobs/src/app/lib/contracts/contracts';
 import { MapsService } from '@maps/maps.service';
 import { FilterOptions } from '@shared/model/filter-options.model';
 import { filter } from 'rxjs/operators';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { SelectItem } from 'primeng/primeng';
 
 @Component({
   selector: 'app-add-job',
@@ -22,8 +22,8 @@ export class AddJobComponent implements OnInit {
   projectsReq: any;
   form: FormGroup;
   cron: any;
-  projectsDropDown:any;
-  configurationsDropDown:any;
+  projectsDropDown:SelectItem[];
+  configurationsDropDown:SelectItem[];
   mapDropDown=[];
   cronConfig: CronJobsConfig = {
     multiple: false,

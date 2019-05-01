@@ -8,12 +8,13 @@
     .settings-form {
       width: 455px;
       padding-left: 25px;
-      .dropdown{
-          @include dropdown();
+      ::ng-deep{
+          app-params{
+              .param-wrapper{
+                  margin-bottom: 18px;
+              }
+          }
       }
-      label,input,select{
-        width: 100%;
-        }
     }
 }
   

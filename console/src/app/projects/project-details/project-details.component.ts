@@ -5,7 +5,6 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 
 import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
-import { Map } from '../../maps/models/map.model';
 import { ConfirmComponent } from '../../shared/confirm/confirm.component';
 import { ImportModalComponent } from './import-modal/import-modal.component';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
@@ -13,6 +12,8 @@ import { FilterOptions } from '@shared/model/filter-options.model'
 import { debounceTime } from 'rxjs/operators';
 import { Subscription, fromEvent } from 'rxjs';
 import {MapsService} from '@maps/maps.service';
+import {Map} from '@maps/models/map.model';
+import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
   selector: 'app-project-details',
@@ -35,7 +36,8 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private projectsService: ProjectsService,
     private modalService: BsModalService,
-    private mapsService:MapsService) { }
+    private mapsService:MapsService,
+    private seoService:SeoService) { }
 
   ngOnInit() {
     this.id = this.route.snapshot.params.id;
@@ -46,6 +48,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
         this.router.navigate(['NotFound'])
       }
       this.project = data['projectDetails'];
+      this.seoService.setTitle(this.project.name+PageTitleTypes.ProjectDetails)
     })
     this.projectsService.filterRecentMaps(this.id).subscribe(recentMaps => {
       this.featuredMaps = recentMaps;
