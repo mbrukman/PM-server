@@ -35,18 +35,6 @@ module.exports = {
         })
     },
 
-    list: (options) => {
-        let queryObj = {};
-        let fields = options.fields || 'key description'
-        if (options.query) {
-            queryObj.key = { $regex: options.query, $options: 'i' }
-        }
-        query = Vault.find(queryObj, fields);
-        if (options.limit)
-            query.limit(options.limit);
-
-        return query;
-    },
     update: (vaultId, vaultItem) => {
         if (vaultItem.value)
             vaultItem.value = _encrypt(vaultItem.value);

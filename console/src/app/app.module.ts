@@ -17,18 +17,18 @@ import { CoreModule } from './core/core.module';
 import { SettingsService } from './core/setup/settings.service';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
 import { VaultService } from '@shared/vault.service';
+import { AutoCompleteService } from '@shared/components/params/autocomplete.service';
 
 
 @NgModule({
   imports: [
-    CoreModule,
+    CoreModule, 
     BrowserModule,
     BrowserAnimationsModule,
     SharedModule,
-
     AppRoutingModule
   ],
-  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService],
+  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,AutoCompleteService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

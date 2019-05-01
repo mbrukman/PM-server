@@ -1,0 +1,32 @@
+@import "~src/assets/sass/variables";
+@import "~src/assets/sass/base";
+@import "~src/assets/sass/mixins";
+
+.param-wrapper{
+     margin-bottom: 12px;
+    .col-4{
+        padding-left: 0
+    }
+    .col-2{
+        margin-right: 8px;
+        @include checkbox();
+    }
+    .input{
+        &.dropdown{
+            width: 100%;
+            @include dropdown();
+        }
+        padding-right: 0;
+    }
+}
+.row-trigger{
+    margin-bottom: 25px!important;
+     .param-name{
+        font-size: 14px;
+    }
+
+    .col-8{
+        padding-right: 0;
+        padding-left: 0;
+    }
+}

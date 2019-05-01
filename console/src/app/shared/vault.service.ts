@@ -1,6 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { environment } from '../../environments/environment';
-import { VaultItem } from '../vault/vault.model'
+import { AutoCompleteItem } from '@shared/model/autocomplete.model';
+import { VaultItem } from '../vault/vault.model';
 import { Injectable } from "@angular/core";
 import { Subscribable } from "rxjs";
 
@@ -16,7 +17,7 @@ export class VaultService {
     }
 
     getVaultItems(options) {
-        return this.http.put<VaultItem[]>(`${serverUrl}api/vault`, { options: options })
+        return this.http.put<AutoCompleteItem[]>(`${serverUrl}api/vault`, { options: options })
     }
 
     add(item: VaultItem) {

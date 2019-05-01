@@ -8,6 +8,9 @@ let projectSchema = new Schema({
     maps: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Map' }]
 }, { timestamps: true });
 
+projectSchema.statics.autocompleteKey = "name";
+projectSchema.statics.autocompleteValueField = "_id";
+
 projectSchema.set('toJSON', {
     transform: function (doc, ret, options) {
         ret.id = ret._id;
