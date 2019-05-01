@@ -4,6 +4,8 @@ import { UpsertVaultItemsComponent } from '../upsert-vault-items/upsert-vault-it
 import { VaultService } from '../../shared/vault.service';
 import { AutoCompleteItem } from '@shared/model/autocomplete.model';
 
+import {SeoService,PageTitleTypes} from '@app/seo.service';
+
 @Component({
   selector: 'app-vault',
   templateUrl: './vault.component.html',
@@ -15,9 +17,11 @@ export class VaultComponent implements OnInit {
   vaultsReq: any;
 
 
-  constructor(private vaultService: VaultService, private modalService: BsModalService) { }
+  constructor(private vaultService: VaultService, private modalService: BsModalService,
+    private seoService:SeoService) { }
 
   ngOnInit() {
+    this.seoService.setTitle(PageTitleTypes.Vault)
     this.requestVaults();
   }
 

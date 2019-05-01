@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule,Title } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './core/app.component';
@@ -17,6 +17,7 @@ import { CoreModule } from './core/core.module';
 import { SettingsService } from './core/setup/settings.service';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
 import { VaultService } from '@shared/vault.service';
+import {SeoService} from './seo.service';
 import { AutoCompleteService } from '@shared/components/params/autocomplete.service';
 
 
@@ -28,7 +29,7 @@ import { AutoCompleteService } from '@shared/components/params/autocomplete.serv
     SharedModule,
     AppRoutingModule
   ],
-  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,AutoCompleteService],
+  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService,AutoCompleteService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
