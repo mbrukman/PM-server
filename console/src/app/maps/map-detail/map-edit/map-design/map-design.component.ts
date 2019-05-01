@@ -126,7 +126,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         this.initMapDraw();
         for(let i=0,length=structure.processes.length;i<length;i++){
           let imageProcess = this.graph.getCell(structure.processes[i].uuid)
-          for(let j =0,length = this.plugins.length;j<length;j++){
+          for(let j =0,pluginsLength = this.plugins.length;j<pluginsLength;j++){
             if(imageProcess.attributes.attrs['.p_id'].text == '' && this.plugins[j].name == structure.processes[i].used_plugin.name){
               this.updateNodePid(structure.processes[i].uuid,this.plugins[j].id);
               break;
