@@ -22,9 +22,8 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
   resultCount: number;
   filterOptions : FilterOptions = new FilterOptions();
   filterKeyUpSubscribe : Subscription;
-  
-  @ViewChild('globalFilter') globalFilterElement : ElementRef;
 
+  @ViewChild('globalFilter') globalFilterElement : ElementRef;
 
   constructor(private projectsService: ProjectsService,
     private route:ActivatedRoute,
@@ -43,34 +42,31 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
     ).subscribe(()=>{
         this.loadProjectLazy();
       })
-
-    let featuredFilterOptions = new FilterOptions();
-    featuredFilterOptions.limit = 4;
-    this.projectsService.filter(null, this.page,featuredFilterOptions).pipe(
-      take(1)).subscribe(data => {
-      if (data)
-        this.featuredProjects = data.items;
-    });
   }
 
   ngOnDestroy(){
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
+  clearSearchFilter(){
+    this.filterOptions.globalFilter = undefined;
+    this.loadProjectLazy()
+  }
+
+
   reloadProjects(fields=null,page=this.page,filter=this.filterOptions){
     this.projectsReq = this.projectsService.filter(fields,page,filter).subscribe(this.onDataLoad);
   }
 
   loadProjectLazy(event?) {
-    let fields, page, sort;
+    let fields, page;
     if (event) {
       fields = event.filters || null;
       page = event.first / 5 + 1;
       if (event.sortField) {
-        sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
+        this.filterOptions.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.filterOptions.sort = sort
     this.reloadProjects(fields,page,this.filterOptions)
   }
 
@@ -78,6 +74,7 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
     if (!data) return;
     this.projects = data.items;
     this.resultCount = data.totalCount;
+    this.featuredProjects = data.items;
   }
 
 }

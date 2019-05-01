@@ -1209,7 +1209,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
                 } else {
                     return _handleActionError(result, undefined, agent, process , processIndex, key, executions, runId, action, map, socket );
                 }
-            } else {
+                } else {
                 let result = { result: 'Timeout Error', status: 'error', stdout: actionString };
                 if (action.retries > 1) { return ['retry', result]; }
 

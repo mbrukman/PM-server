@@ -20,15 +20,9 @@ module.exports = {
     },
 
     /* get project details */
-    detail: (projectId, options) => {
+    detail: (projectId) => {
+       return Project.findById(projectId);
 
-        let populate = {
-            path: 'maps'
-        }
-        if (!options.isArchived) {
-            populate.match = { archived: false }
-        }
-        return Project.findById(projectId).populate(populate)
     },
 
     /* delete a project */
@@ -46,7 +40,10 @@ module.exports = {
         }
 
         if (filterOptions.options.globalFilter) {
-            var filterQueryOptions = [{ name: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }, { description: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }]
+            var filterQueryOptions = [
+                { name: { '$regex': new RegExp(filterOptions.options.globalFilter,'ig') } },
+                { description: { '$regex': new RegExp(filterOptions.options.globalFilter,'ig') } },
+            ]
             q.$or = filterQueryOptions;
         }
 

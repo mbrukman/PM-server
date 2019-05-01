@@ -4,6 +4,7 @@ import { ProjectDetailsComponent } from './project-details/project-details.compo
 import { ProjectsListComponent } from './projects-list/projects-list.component';
 import { ProjectCreateComponent } from './project-create/project-create.component';
 import { ProjectsResolver } from './resolvers/projects-resolver.resolver';
+import {ProjectDetailsResolver} from './resolvers/project-details.resolver';
 
 const routes: Routes = [
   {
@@ -21,7 +22,8 @@ const routes: Routes = [
   },
   {
     path: ':id',
-    component: ProjectDetailsComponent
+    component: ProjectDetailsComponent,
+    resolve:{projectDetails:ProjectDetailsResolver}
   },
 ];
 

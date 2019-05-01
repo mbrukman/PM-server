@@ -23,23 +23,21 @@
         <button class="kh-btn kh-btn-blue" (click)="openImportModal()" *ngIf="project?.maps && project?.maps?.length > 0">Import map</button>
       </div>
 
-      <div class="filterd" *ngIf="featuredMaps?.length > 0">
-        <div class="filters">
-          <div class="filter-archive">
-            <label class="control control-checkbox">
-              Show archived maps
-                  <input type="checkbox" id="archive"  [(ngModel)]="filterOptions.isArchived" (change)="reloadMaps()">
-              <div class="control_indicator"></div>
+      <div class="filters">
+        <div class="filter-archive">
+          <label class="control control-checkbox">
+            Show archived maps
+            <input type="checkbox" id="archive" [(ngModel)]="filterOptions.isArchived" (change)="getMaps()">
+            <div class="control_indicator"></div>
           </label>
-          </div>
-          <div class="filter-text">
-            <div>
-              <i class="material-icons">search</i>
-              <input #gb class="form-control" type="text" placeholder="Filter" />
-            </div>
+        </div>
+        <div class="filter-text">
+          <div>
+            <i class="material-icons" [hidden]="filterOptions.globalFilter">search</i>
+            <i class="material-icons text-light pointer" [hidden]="!filterOptions.globalFilter" (click)="clearSearchFilter()">close</i>
+            <input class="form-control" [(ngModel)]="filterOptions.globalFilter" type="text" placeholder="Filter" #globalFilter />
           </div>
         </div>
-
       </div>
     </div>
 
@@ -52,7 +50,8 @@
 
       </p>
 
-      <p-dataTable [value]="project?.maps" [rows]="15" [paginator]="true" [pageLinks]="4" [globalFilter]="gb" *ngIf="project?.maps && project?.maps?.length > 0">
+      <p-dataTable (onLazyLoad)="loadMapsLazy($event)" [value]="maps" [rows]="15" [paginator]="true" [lazy]="true" 
+      *ngIf="project?.maps && project?.maps?.length > 0">
         <p-column field="name" header="Name" [sortable]="true">
           <ng-template let-col let-map="rowData" pTemplate="body">
             <div class="name-wrapper">
