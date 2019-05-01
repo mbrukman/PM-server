@@ -114,6 +114,18 @@ function installPluginOnServer(pluginDir, obj) {
   });
 }
 
+
+function deleteContent(path){
+  return del([path],{force: true})
+  .then((paths) => {
+    winston.log("info", "deleted static file", paths);
+  })
+  .catch((error) => {
+    winston.log("error", "Error deleted extracted directory", error);
+  });
+}
+
+
 // the function of file (should be an archived file), and process it to install plugin
 function deployPluginFile(pluginPath, req) {
   return new Promise((resolve, reject) => {
@@ -122,79 +134,93 @@ function deployPluginFile(pluginPath, req) {
     fs.createReadStream(pluginPath)
       .pipe(unzip.Extract({ path: extPath }))
       .on("finish", () => {
-        let configPath = path.join(extPath, "config.json");
+        let configPath =  path.join(extPath, "config.json");
         fs.exists(configPath, exists => {
-          if (!exists) return reject("No config file found!");
-
-          fs.readFile(configPath, "utf8", (err, body) => {
-            if (err) return reject("Error reading config file: ", err);
-
-            let obj;
-            try {
-              obj = Object.assign({}, JSON.parse(body), { file: pluginPath });
-            } catch (e) {
-              return reject("Error parsing config file: ", e);
+            try{
+              if (!exists){
+                throw "No config file found!"
+              }
             }
-
-            var valid = pluginConfigValidationSchema(obj)
-            if (!valid) {
-              return reject(err)
+            catch(e){
+              deleteContent(pluginPath);
+              deleteContent(extPath);
+              return reject(e)
             }
-
-            // check the plugin type
-            Plugin.findOne({ name: obj.name })
-              .then(plugin => {
-                if (obj.settings)
-                  obj.settings = obj.settings.map(s => {
-                    s.valueType = s.type;
-                    delete s.type;
-                    return s;
-                  })
-                if (!plugin) {
-                  return Plugin.create(obj);
+            fs.readFile(configPath, "utf8", (err, body) => {
+              try{
+                if (err) {
+                  throw "Error reading config file: "+ err
                 }
-                fs.unlink(plugin.file, function (error) {
-                  if (error) {
-                    winston.log("error", "Error unlinking old file");
-                  } else {
-                    winston.log("info", "Deleted old plugin file");
-                  }
-                });
-                return Plugin.findByIdAndUpdate(plugin._id, obj);
-              })
-              .then(plugin => {
-                if (obj.type === "executer") {
-                  // copy image file
-                  copyPluginImageFile(obj, extPath);
-                  installPluginOnAgent(pluginPath, obj);
-                  return plugin;
-                } else if (
-                  obj.type === "trigger" ||
-                  obj.type === "module" ||
-                  obj.type === "server"
-                ) {
-                  installPluginOnServer(pluginPath, obj).then(() => {
-                    loadModule(plugin, req.app);
-                    return plugin;
-                  });
-                } else return reject("No type was provided for this plugin");
-              }).then(plugin => {
-                resolve(plugin);
-              }).catch(error => {
-                winston.log("error", "Error creating plugin", error);
-                console.log("error deployPluginFile  : ", error);
-
-
-                return reject(error);
-              }).finally(() => {
-                // delete extracted tmp dir
-                del([extPath]).then(() => {
-                  winston.log("info", "Deleted extracted directory");
-                }).catch(err => {
-                  winston.log("error", "Error deleting extracted directory");
-                });
-              });
-          });
+    
+                let obj;
+  
+                try {
+                  obj = Object.assign({}, JSON.parse(body), { file: pluginPath });
+                } catch (e) {
+                  throw "Error parsing config file: "+e;
+                }
+                
+  
+                var valid = pluginConfigValidationSchema(obj)
+                if (!valid) {
+                  throw err
+                }
+    
+                // check the plugin type
+                let oldFile;
+                Plugin.findOne({ name: obj.name })
+                  .then(plugin => {
+                    if (obj.settings)
+                      obj.settings = obj.settings.map(s => {
+                        s.valueType = s.type;
+                        delete s.type;
+                        return s;
+                      })
+                    if (!plugin) {
+                      return Plugin.create(obj);
+                    }
+                    oldFile = plugin.file;
+                    return Plugin.findByIdAndUpdate(plugin._id, obj);
+                  })
+                  .then(plugin => {
+                    if(oldFile){
+                      deleteContent(oldFile);
+                      deleteContent(extPath);
+                    }
+                    if (obj.type === "executer") {
+                      // copy image file
+                      copyPluginImageFile(obj, extPath);
+                      installPluginOnAgent(pluginPath, obj);
+                      return plugin;
+                    } else if (
+                      obj.type === "trigger" ||
+                      obj.type === "module" ||
+                      obj.type === "server"
+                    ) {
+                      installPluginOnServer(pluginPath, obj).then(() => {
+                        loadModule(plugin, req.app);
+                        return plugin;
+                      });
+                    } else return reject("No type was provided for this plugin");
+                  }).then(plugin => {
+                    resolve(plugin);
+                  }).catch(error => {
+                    winston.log("error", "Error creating plugin", error);
+                    console.log("error deployPluginFile  : ", error);
+                    deleteContent(pluginPath);
+                    deleteContent(extPath);
+                    return reject(error);
+                  }).finally(() => {
+                    // delete extracted tmp dir
+                      deleteContent(extPath);
+                        });
+                    }
+              catch(e){
+                deleteContent(pluginPath);
+                deleteContent(extPath);
+                return reject(e)
+              }
+            })
         });
       });
   });
@@ -226,6 +252,7 @@ module.exports = {
 
   pluginDelete: id => {
     return Plugin.findById(id).then((obj) => {
+      deleteContent(obj.file);
       if (obj.type === "executer")
         return deletePluginOnAgent(obj.name)
       else
