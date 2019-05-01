@@ -3,7 +3,7 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap';
 import { UpsertVaultItemsComponent } from '../upsert-vault-items/upsert-vault-items.component';
 import { VaultService } from '../../shared/vault.service';
 import { AutoCompleteItem } from '@shared/model/autocomplete.model';
-
+import {VaultItem} from '../vault.model';
 import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
@@ -13,7 +13,7 @@ import {SeoService,PageTitleTypes} from '@app/seo.service';
 })
 export class VaultComponent implements OnInit {
 
-  vaultItems: AutoCompleteItem[]
+  vaultItems: VaultItem[]
   vaultsReq: any;
 
 
@@ -27,7 +27,7 @@ export class VaultComponent implements OnInit {
 
 
   requestVaults() {
-    this.vaultsReq = this.vaultService.getVaultItems({}).subscribe(vault => {
+    this.vaultsReq = this.vaultService.getVaultItems().subscribe(vault => {
       this.vaultItems = vault;
     });
   }
