@@ -37,6 +37,14 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
       this.onDataLoad(data['projects']);
     })
 
+    let featuredFilterOptions = new FilterOptions();	
+    featuredFilterOptions.limit = 4;	
+    this.projectsService.filter(null, this.page,featuredFilterOptions).pipe(	
+      take(1)).subscribe(data => {	
+      if (data)	
+        this.featuredProjects = data.items;	
+    });
+
     this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(
       debounceTime(300)
     ).subscribe(()=>{
@@ -74,7 +82,6 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
     if (!data) return;
     this.projects = data.items;
     this.resultCount = data.totalCount;
-    this.featuredProjects = data.items;
   }
 
 }
