@@ -13,7 +13,7 @@
   </div>
   <div class="map-management col-4" *ngIf="editing">
     <app-process-form [processViewWrapper]="processViewWrapper" (saved)="onSave($event)" (close)="onClose($event)"
-                      (delete)="onDelete($event)"></app-process-form>
+                      (delete)="onDelete($event)" (clone)="onClone($event)"></app-process-form>
   </div>
 
 </div>
