@@ -372,7 +372,10 @@ async function executeMap(runId, map, mapStructure, agents, context) {
         createAgentContext(agents[i], runId, context, startNode, mapStructure.code)
         promises.push(runMapOnAgent(map, mapStructure, runId, startNode, agents[i]))
     }
-    Promise.all(promises)
+    Promise.all(promises).catch(err => {
+        winston.log('error', "structureId: " + mapStructure.id +   err);
+        console.error(err) // TODO: delete 
+    });
 }
 
 
@@ -408,12 +411,7 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
 
 function runMapOnAgent(map, structure, runId, startNode, agent) {
     return helper.validate_plugin_installation(executions[runId].plugins, agent.key).then(() => {
-        return runNodeSuccessors(map, structure, runId, agent, startNode.uuid).catch(err => {
-            winston.log('error', error);
-            // sharbat remove all inner empty catches and verify it gets here
-            console.error(err) // winston sharbat 
-            // save the info like structure +mapId 
-        });
+        return runNodeSuccessors(map, structure, runId, agent, startNode.uuid)
     })
 }
 
@@ -459,7 +457,7 @@ function areAllAgentsDone(runId) {
     const executionAgents = executions[runId].executionAgents;
 
     for (let i in executionAgents) {
-        if (!executionAgents[i].status && agentsService.agentsStatus()[i].alive) { //sharbat check if works
+        if (!executionAgents[i].status && agentsService.agentsStatus()[i].alive) { 
             return false;
         }
     }
@@ -605,10 +603,6 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
         promises.push(runProcess(map, structure, runId, agent, nodesToRun[i]))
     }
     return Promise.all(promises)
-    // .catch(error => { ///  sharbat never get to here
-    //     console.error(error);
-    //     winston.log('error', error)
-    // });
 }
 
 function updateAgentContext(runId, agent, agentData) {
@@ -664,7 +658,6 @@ function passProcessCondition(runId, agent, process) {
 
     if (isProcessPassCondition) { return true }
 
-    winston.log('info', errMsg || "Process didn't pass condition");
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, {
         message: errMsg || "Process didn't pass condition",
         status: statusEnum.ERROR, 
@@ -729,7 +722,7 @@ function runProcess(map, structure, runId, agent, process) {
         let plugin = executions[runId].plugins.find(o => o.name.toString() == process.used_plugin.name)
 
         let actionsArray = [];
-
+    
         process.actions.forEach((action, i) => {
             actionsArray.push([
                 map,
@@ -745,7 +738,7 @@ function runProcess(map, structure, runId, agent, process) {
         });
 
         let reduceFunc = (promiseChain, currentAction, index) => {
-            let actionId = (currentAction[6]._id).toString() //sharbat!! add actionIndex. or here or in updateAction
+            let actionId = (currentAction[6]._id).toString() 
             currentAction[6].actionIndex = index;
             executions[runId].executionAgents[agent.key].context.processes[process.uuid][process.iterationIndex].actions[actionId] = currentAction[6];
 
@@ -760,10 +753,10 @@ function runProcess(map, structure, runId, agent, process) {
             return actionsExecutionCallback(map, structure, runId, agent, process)
         }).catch((error) => {
             winston.log('error', error);
-            console.error(error); //sharbat go over all console log and delete unnessasery
+            console.error(error); //TODO: go over all console log and delete unnessasery
             updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.ERROR, message: error.message, finishTime: new Date() });
         })
-    }).catch((error) => {  winston.log('error', error); console.error(error); }) // sharbat all errors are stack here todo here big catch?  
+    })
 }
 
 

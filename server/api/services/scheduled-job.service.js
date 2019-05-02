@@ -27,7 +27,7 @@ module.exports = {
                             });
                             return;
                         }
-                        mapsExecutionService.execute(job.map, null, socket, job.configuration, 'Started by schedules task');// todo?? why this executed? 
+                       mapsExecutionService.execute(job.map, null, socket, job.configuration, 'Started by schedules task').catch(err=>{console.error(err);})
                     })
             });
     },
