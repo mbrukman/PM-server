@@ -54,6 +54,34 @@ module.exports = {
         hooks.hookPre('map-dashboard', req).then(() => {
             return mapsExecutionService.dashboard()
         }).then((result) => {
+
+            result.forEach((item,index)=>{
+
+                let newExec = Object.assign(item.exec)  
+                item.exec.agentsResults.forEach((agentResult, agentIndex) => {
+                    agentResult.processes.forEach((process, processIndex) => {
+                    process = Object.assign(process)   
+                    let processResult = []
+                    let statuses = [];
+                    process.actions.forEach(action => {
+                        statuses.push(action.status)
+                        processResult.push(action.result)
+                    })
+                    let processStatus = 'error'
+                    let mapS = {}
+                    statuses.map(s => { mapS[s] = 1 })
+                    if (mapS['error'] && mapS['success']) { processStatus = 'partial' }
+                    else if (!mapS['error']) { processStatus = 'success' }
+                    
+                    process.status = processStatus
+                    process.index = process.iterationIndex;
+                    process.result = processResult
+                    newExec.agentsResults[agentIndex].processes[processIndex] = process
+                })
+            })
+            result[index].exec = newExec
+        })
+            
             return res.json(result);
         }).catch(error => {
             console.log(error);
@@ -315,17 +343,20 @@ module.exports = {
         hooks.hookPre('map-results-detail').then(() => {
             return mapsExecutionService.detail(req.params.resultId);
         }).then(async execResult=>{
+
+            if (!execResult)
+                throw "No result found";
+
+            if(!execResult.status){
+                return execResult
+            }
+
             let structure = await mapsService.getMapStructure(execResult.map, execResult.structure)
             let processNames = {}
-            structure.processes.map(process=> processNames[process.id] = process.name)
-return {execResult,  processNames};
-        }).then(objRes=> {
-            let result = objRes.execResult
-            if (!result) {
-                res.status(204);
-            }
-            let newResult = result.toJSON()
-            result.agentsResults.forEach((agentResult, agentIndex) => {
+            structure.processes.forEach(process=> processNames[process.id] = process.name);
+
+            let newResult = execResult.toJSON()
+            execResult.agentsResults.forEach((agentResult, agentIndex) => {
                 agentResult.processes.forEach((process, processIndex) => {
                     process = process.toJSON();
                     let processResult = []
@@ -344,11 +375,15 @@ return {execResult,  processNames};
                     process.index = process.iterationIndex;
                     process.result = processResult
                     process.uuid = process.process.toString()
-                    process.name = objRes.processNames[process.uuid]
+                    process.name = processNames[process.uuid]
                     newResult.agentsResults[agentIndex].processes[processIndex] = process
                 })
             })
-            return res.json(newResult);
+
+            return newResult;
+            
+        }).then(execResult=> {
+            return res.json(execResult);
         }).catch(error => {
             console.error(error);
             winston.log('error', "Error getting execution result", error);

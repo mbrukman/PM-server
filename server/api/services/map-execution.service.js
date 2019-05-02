@@ -724,6 +724,7 @@ function runProcess(map, structure, runId, agent, process) {
         let actionsArray = [];
     
         process.actions.forEach((action, i) => {
+            action.name = (action.name || `Action #${i + 1} `);
             actionsArray.push([
                 map,
                 structure,
@@ -819,6 +820,11 @@ function sendActionViaRequest(agent, actionForm) {
                 resolve(body);
             });
     });
+}
+
+function _updateRawOutput(msg){
+    clientSocket.emit('notification', msg);
+    clientSocket.emit('update', msg);
 }
 
 /**
@@ -937,7 +943,14 @@ async function executeAction(map, structure, runId, agent, process, processIndex
                 updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData)
                 return runAction();
             }
-            actionData.finishTime = new Date(),
+            actionData.finishTime = new Date();
+            let logMsg = {
+                map: map._id,
+                runId: runId,
+                message: `'${action.name}' result: ${JSON.stringify(result)} (${agent.name})`,
+                status: 'success'
+            }
+            _updateRawOutput(logMsg)
                 updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData);
             return result;
         });

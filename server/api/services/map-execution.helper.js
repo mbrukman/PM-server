@@ -80,16 +80,28 @@ module.exports = {
         })).length;
     },
 
-    createConfiguration(mapStructure, configurationName) {
-        if (configurationName && typeof configurationName != 'string') {
-            return {
-                name: 'custom',
-                value: configurationName
+    createConfiguration(mapStructure, configuration) {
+
+        if(configuration){
+            if (typeof configuration != 'string'){
+                return {
+                    name: 'custom',
+                    value: configuration
+                }
+            } else {
+                try{
+                    let parsedConfiguration = JSON.parse(configuration);
+                    return {
+                        name: 'custom',
+                        value: parsedConfiguration
+                    }
+                }catch(err){}
             }
-        }
+        } 
+
         let selectedConfiguration = {}
         if (mapStructure.configurations && mapStructure.configurations.length) {
-            selectedConfiguration = configurationName ? mapStructure.configurations.find(o => o.name === configurationName) : mapStructure.configurations.find(o => o.selected);
+            selectedConfiguration = configuration ? mapStructure.configurations.find(o => o.name === configuration) : mapStructure.configurations.find(o => o.selected);
             if (!selectedConfiguration) {
                 selectedConfiguration = mapStructure.configurations[0];
             }
