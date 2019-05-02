@@ -12,9 +12,8 @@ import { PluginsService } from '@plugins/plugins.service';
 import { Plugin } from '@plugins/models/plugin.model';
 import { COORDINATION_TYPES, JOINT_OPTIONS } from '@maps/constants'
 import { filter, tap } from 'rxjs/operators';
-import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
-import { BsModalService } from 'ngx-bootstrap';
-import { ConfirmComponent } from '@shared/confirm/confirm.component';
+
+
 
 export const linkAttrs = {
   router: { name: 'manhattan' },
@@ -46,7 +45,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   pluginsReq: Subscription;
   plugins: Plugin[];
   process: Process;
-  bsModalRef: BsModalRef;
   link: Link;
   init: boolean = false;
   scale: number = 1;
@@ -59,8 +57,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   constructor(
     private mapsService: MapsService,
     private pluginsService: PluginsService,
-    private mapDesignService: MapDesignService,
-    private modalService: BsModalService) { }
+    private mapDesignService: MapDesignService) { }
 
   ngOnInit() {
     this.defineShape();
@@ -277,15 +274,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     const plugin = this.plugins.find((o) => {
       return o._id === pluginId;
     });
-
-    if(!plugin) {
-      this.bsModalRef = this.modalService.show(ConfirmComponent);
-      this.bsModalRef.content.title = 'Plugin missing'
-      this.bsModalRef.content.message = `This process uses the plugin ${this.processViewWrapper.process.used_plugin.name} which have been removed.\nPlease reinstall the plugin to enable cloning.`;
-      this.bsModalRef.content.cancel = null;
-      this.bsModalRef.content.confirm = 'Confirm';
-      return;
-    };
 
     let imageModel = this.getPluginCube({
       x: obj.x - (this.scaleX * this.scale) - this.paper.translate().tx,
