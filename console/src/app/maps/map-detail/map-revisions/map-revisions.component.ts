@@ -33,7 +33,6 @@ export class MapRevisionsComponent implements OnInit {
   latestGraph: joint.dia.Graph;
   currentPaper: joint.dia.Paper;
   latestPaper: joint.dia.Paper;
-  projectsReq: any;
   project: Project;
   scrollCallback: any;
   page: number = 1;
@@ -168,7 +167,7 @@ export class MapRevisionsComponent implements OnInit {
   getMapProject() {
     let mapIdFilter = {maps:{$in:[this.mapId]}}
     var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt',filter:mapIdFilter};
-    this.projectsReq = this.projectsService.filter(null,null,filterOptions).subscribe(data => {
+    this.projectsService.filter(null,null,filterOptions).subscribe(data => {
       data.items.forEach(project => {
         if ((<string[]>project.maps).indexOf(this.mapId) > -1) {
           this.project = project;

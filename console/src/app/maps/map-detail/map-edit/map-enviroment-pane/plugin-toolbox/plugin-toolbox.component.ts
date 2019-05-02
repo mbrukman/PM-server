@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
@@ -12,12 +12,11 @@ import { MapDesignService } from '../../map-design.service';
   templateUrl: './plugin-toolbox.component.html',
   styleUrls: ['./plugin-toolbox.component.scss']
 })
-export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
+export class PluginToolboxComponent implements AfterViewInit {
   stencilGraph: joint.dia.Graph;
   stencilPaper: joint.dia.Paper;
 
   plugins: Plugin[];
-  pluginsReq: any;
   pluginCell: any;
   pluginsSearch : Plugin[];
   searchText : string;
@@ -87,7 +86,7 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
       )
     });
 
-    this.pluginsReq = this.pluginsService.list().subscribe(plugins => {
+    this.pluginsService.list().subscribe(plugins => {
       this.plugins = plugins.filter(plugin => {
         return plugin.type === 'executer';
       });
@@ -189,9 +188,5 @@ export class PluginToolboxComponent implements AfterViewInit, OnDestroy {
     this.stencilPaper.svg.style.height = `${Math.ceil(iteration/2) * (pluginHeight + 13)}px`
     this.stencilGraph.clear();
     this.stencilGraph.addCells(plugins);
-  }
-
-  ngOnDestroy() {
-    this.pluginsReq.unsubscribe();
   }
 }

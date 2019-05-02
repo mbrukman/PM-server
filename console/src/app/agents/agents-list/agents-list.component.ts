@@ -20,8 +20,6 @@ export class AgentsListComponent implements OnInit, OnDestroy {
   agentsStatusReq: any;
   agents: [Agent];
   selectedAgent: Agent;
-  agentsReq: any;
-  updateReq: any;
   items: any[];
   selectedGroupSubscription: Subscription;
   selectedGroup: Group;
@@ -33,7 +31,7 @@ export class AgentsListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.agentsReq = this.agentsService.list().subscribe(agents => {
+    this.agentsService.list().subscribe(agents => {
       this.agents = agents;
     });
 
@@ -66,12 +64,6 @@ export class AgentsListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.agentsReq) {
-      this.agentsReq.unsubscribe();
-    }
-    if (this.updateReq) {
-      this.updateReq.unsubscribe();
-    }
     if (this.agentsStatusReq) {
       this.agentsStatusReq.unsubscribe();
     }

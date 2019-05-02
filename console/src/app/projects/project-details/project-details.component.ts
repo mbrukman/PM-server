@@ -24,7 +24,6 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   project: Project;
   maps:Map[]
   id: string;
-  archiveReq: any;
   filterTerm: string;
   filterOptions : FilterOptions = new FilterOptions();
   featuredMaps: DistinctMapResult[] = [];
@@ -64,9 +63,6 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.archiveReq) {
-      this.archiveReq.unsubscribe();
-    }
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
@@ -81,7 +77,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     modal.content.confirm = 'Yes, archive';
     modal.content.result.subscribe(result => {
       if (result) {
-        this.archiveReq = this.projectsService.archive(this.id, true).subscribe(() => { this.project.archived = true; });
+        this.projectsService.archive(this.id, true).subscribe(() => { this.project.archived = true; });
       }
     });
   }

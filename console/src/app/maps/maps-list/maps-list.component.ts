@@ -20,13 +20,12 @@ import {SeoService,PageTitleTypes} from '@app/seo.service';
 })
 export class MapsListComponent implements OnInit, OnDestroy {
   maps: Map[];
-  mapReq: Subscription;
   resultCount: number = 0;
   page: number = 1;
   filterOptions: FilterOptions = new FilterOptions();
   recentMaps: DistinctMapResult[];
   filterKeyUpSubscribe: Subscription;
-
+  isInit:boolean=true;
 
   @ViewChild('globalFilter') globalFilterElement: ElementRef;
 
@@ -55,11 +54,10 @@ export class MapsListComponent implements OnInit, OnDestroy {
   }
 
   reloadMaps(fields = null, page = this.page, filter = this.filterOptions) {
-    this.mapReq = this.mapsService.filterMaps(fields, page, filter).subscribe(this.onDataLoad);
+    this.mapsService.filterMaps(fields, page, filter).subscribe(this.onDataLoad);
   }
 
   ngOnDestroy() {
-    this.mapReq.unsubscribe();
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
@@ -77,6 +75,10 @@ export class MapsListComponent implements OnInit, OnDestroy {
       if (event.sortField) {
         this.filterOptions.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
+    }
+    if(this.isInit){
+      this.isInit=false;
+      return;
     }
     this.reloadMaps(fields, page, this.filterOptions)
   }
