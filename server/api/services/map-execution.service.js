@@ -333,12 +333,24 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
         }
         mapStructure = structure;
 
-        if (configuration && typeof configuration != 'string') {
-            selectedConfiguration = {
-                name: 'custom',
-                value: configuration
+        if(configuration){
+            if (typeof configuration != 'string'){
+                selectedConfiguration = {
+                    name: 'custom',
+                    value: configuration
+                }
+            } else {
+                try{
+                    let parsedConfiguration = JSON.parse(configuration);
+                    selectedConfiguration = {
+                        name: 'custom',
+                        value: parsedConfiguration
+                    }
+                }catch(err){}
             }
-        } else if (mapStructure.configurations && mapStructure.configurations.length) {
+        }
+
+        if (!selectedConfiguration && mapStructure.configurations && mapStructure.configurations.length) {
             if (configuration)
                 selectedConfiguration = configuration ? mapStructure.configurations.find(o => o.name === configuration) : mapStructure.configurations.find(o => o.selected);
             if (!selectedConfiguration) {
@@ -466,6 +478,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, 
             updatePending(socket);
             return;
         }
+        
         return executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configurationName, triggerReason, agents,payload);
     });
 }
