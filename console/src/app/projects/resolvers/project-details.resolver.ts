@@ -8,7 +8,6 @@ import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class ProjectDetailsResolver implements Resolve<Project>{
-    proj:Project
     constructor(private projectsService: ProjectsService,private router: Router,) { };
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Project>{
