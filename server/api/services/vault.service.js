@@ -25,6 +25,9 @@ module.exports = {
     delete: (vaultId) => {
         return Vault.remove({ _id: vaultId })
     },
+    list: () => {
+        return Vault.find({}).select({key:1,description:1})
+    },
 
     getByKey: (key) => {
         return Vault.find({ key: key })

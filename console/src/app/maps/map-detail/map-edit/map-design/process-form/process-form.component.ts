@@ -30,6 +30,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   @Output() saved: EventEmitter<any> = new EventEmitter<any>();
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
+  @Output() clone: EventEmitter<any> = new EventEmitter<any>();
   formValueChangeSubscription: Subscription;
   processUpdateSubscription: Subscription;
   processForm: FormGroup;
@@ -231,6 +232,10 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    */
   deleteProcess() {
     this.delete.emit();
+  }
+
+  cloneProcess(){
+    this.clone.emit();
   }
 
   /**

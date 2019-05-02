@@ -39,6 +39,7 @@ const FILTER_FIELDS = Object.freeze({
 let followAgentStatus = (agent) => {
     let listenInterval = setInterval(() => {
         let start = new Date();
+        if(!agents[agent.key]) return;
         request.post(
             agents[agent.key].defaultUrl + '/api/status', {
                 form: {
@@ -237,9 +238,8 @@ function addSocketIdToAgent(agentKey, socket) {
 
 function sendRequestToAgent(options, agent) {
     return new Promise((resolve, reject) => {
-
+        options = Object.assign({},options);
         options.uri = agent.defaultUrl + options.uri;
-
         options.method = options.method || 'POST';
 
         if (options.body) {

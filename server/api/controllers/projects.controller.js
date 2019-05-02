@@ -64,7 +64,7 @@ module.exports = {
     /* get project details */
     detail: (req, res) => {
         hooks.hookPre('project-detail', req).then(() => {
-            return projectsService.detail(req.params.id,req.body);
+            return projectsService.detail(req.params.id);
         }).then(project => {
             res.json(project);
         }).catch((error) => {

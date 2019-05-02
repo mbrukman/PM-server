@@ -16,8 +16,8 @@ export class VaultService {
         return this.http.delete<boolean>(`${serverUrl}api/vault/${id}`);
     }
 
-    getVaultItems(options) {
-        return this.http.put<AutoCompleteItem[]>(`${serverUrl}api/vault`, { options: options })
+    getVaultItems() {
+        return this.http.get<VaultItem[]>(`${serverUrl}api/vault`)
     }
 
     add(item: VaultItem) {
