@@ -20,7 +20,8 @@ export class ProjectDetailsResolver implements Resolve<Project>{
         }).pipe(
             catchError(error => {
                 this.router.navigate(['NotFound'])
-                  return of(error)
+                   throw error;
+                  
                 })
         )
     }
