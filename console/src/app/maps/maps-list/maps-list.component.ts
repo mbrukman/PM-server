@@ -26,7 +26,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
   filterOptions: FilterOptions = new FilterOptions();
   recentMaps: DistinctMapResult[];
   filterKeyUpSubscribe: Subscription;
-
+  isInit:boolean=true;
 
   @ViewChild('globalFilter') globalFilterElement: ElementRef;
 
@@ -59,7 +59,9 @@ export class MapsListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.mapReq.unsubscribe();
+    if(this.mapReq){
+      this.mapReq.unsubscribe();
+    }
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
@@ -77,6 +79,10 @@ export class MapsListComponent implements OnInit, OnDestroy {
       if (event.sortField) {
         this.filterOptions.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
+    }
+    if(this.isInit){
+      this.isInit=false;
+      return;
     }
     this.reloadMaps(fields, page, this.filterOptions)
   }

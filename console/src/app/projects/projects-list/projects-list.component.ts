@@ -22,6 +22,7 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
   resultCount: number;
   filterOptions : FilterOptions = new FilterOptions();
   filterKeyUpSubscribe : Subscription;
+  isInit:boolean=true;
 
   @ViewChild('globalFilter') globalFilterElement : ElementRef;
 
@@ -74,6 +75,10 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
       if (event.sortField) {
         this.filterOptions.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
+    }
+    if(this.isInit){
+      this.isInit=false;
+      return;
     }
     this.reloadProjects(fields,page,this.filterOptions)
   }
