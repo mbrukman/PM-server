@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { PluginsService } from '../plugins.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap';
 
@@ -12,9 +12,8 @@ import {SeoService,PageTitleTypes} from '@app/seo.service';
   templateUrl: './plugins-list.component.html',
   styleUrls: ['./plugins-list.component.scss']
 })
-export class PluginsListComponent implements OnInit, OnDestroy {
+export class PluginsListComponent implements OnInit {
   plugins: Plugin[];
-  pluginsReq: any;
   filterTerm: string;
 
   constructor(private pluginsService: PluginsService, 
@@ -28,13 +27,9 @@ export class PluginsListComponent implements OnInit, OnDestroy {
   }
 
   requestPlugins() {
-    this.pluginsReq = this.pluginsService.list().subscribe(plugins => {
+    this.pluginsService.list().subscribe(plugins => {
       this.plugins = plugins;
     });
-  }
-
-  ngOnDestroy() {
-    this.pluginsReq.unsubscribe();
   }
 
   deletePlugin(id, index) {

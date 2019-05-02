@@ -15,8 +15,6 @@ import {SeoService,PageTitleTypes} from '@app/seo.service';
 })
 export class ProjectsListComponent implements OnInit, OnDestroy {
   projects: Project[];
-  projectsReq: any;
-  featuredReq: any;
   featuredProjects: Project[];
   page: number = 1;
   resultCount: number;
@@ -64,7 +62,7 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
 
 
   reloadProjects(fields=null,page=this.page,filter=this.filterOptions){
-    this.projectsReq = this.projectsService.filter(fields,page,filter).subscribe(this.onDataLoad);
+    this.projectsService.filter(fields,page,filter).subscribe(this.onDataLoad);
   }
 
   loadProjectLazy(event?) {

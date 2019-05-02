@@ -19,7 +19,6 @@ export class AddJobComponent implements OnInit {
   selectedMapConfigurations: string[];
   projects: Project[];
   selectedProject: Project;
-  projectsReq: any;
   form: FormGroup;
   cron: any;
   projectsDropDown:SelectItem[];
@@ -37,7 +36,7 @@ export class AddJobComponent implements OnInit {
 
   ngOnInit() {
     var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt'};
-    this.projectsReq = this.projectsService.filter(null,null,filterOptions).subscribe(data => {
+    this.projectsService.filter(null,null,filterOptions).subscribe(data => {
       this.projects = data.items;
       this.projectsDropDown = this.projects.map(project => {
         return {label:project.name,value:project._id}

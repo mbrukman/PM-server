@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { SettingsService } from './settings.service';
 import { SocketService } from '../../shared/socket.service';
@@ -9,9 +9,8 @@ import { Router } from '@angular/router';
   templateUrl: './setup.component.html',
   styleUrls: ['./setup.component.scss']
 })
-export class SetupComponent implements OnInit, OnDestroy {
+export class SetupComponent implements OnInit {
   URIForm: FormGroup;
-  setupReq: any;
   error: string;
 
   constructor(private router: Router, private settingsService: SettingsService, private notificationService: SocketService) {
@@ -21,12 +20,6 @@ export class SetupComponent implements OnInit, OnDestroy {
     this.initiateForm();
   }
 
-  ngOnDestroy() {
-    if (this.setupReq) {
-      this.setupReq.unsubscribe();
-    }
-  }
-
   initiateForm() {
     this.URIForm = new FormGroup({
       uri: new FormControl(null, Validators.required)
@@ -34,8 +27,7 @@ export class SetupComponent implements OnInit, OnDestroy {
   }
 
   onSubmitForm(form) {
-    this.setupReq = this.settingsService.setupDbConnectionString(form)
-      .subscribe(() => {
+    this.settingsService.setupDbConnectionString(form).subscribe(() => {
         this.notificationService.setNotification({
           title: 'Great! We are ready to go',
           msg: 'DB is now connected'

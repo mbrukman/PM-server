@@ -16,7 +16,6 @@ import { FilterOptions } from '@shared/model/filter-options.model';
 })
 export class MapCreateComponent implements OnInit, OnDestroy {
   mapForm: FormGroup;
-  projectsReq: any;
   projects: Project[];
   paramsReq: any;
   map: Map;
@@ -41,7 +40,7 @@ export class MapCreateComponent implements OnInit, OnDestroy {
         this.initMapForm();
       }
       var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt'};
-      this.projectsReq = this.projectsService.filter(null,null,filterOptions).subscribe(data => {
+      this.projectsService.filter(null,null,filterOptions).subscribe(data => {
         this.projects = data.items;
         this.projectsDropDown = this.projects.map(project => {
           return {label:project.name,value:project._id}
@@ -60,7 +59,6 @@ export class MapCreateComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.projectsReq.unsubscribe();
     this.paramsReq.unsubscribe();
   }
 

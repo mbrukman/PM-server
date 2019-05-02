@@ -18,7 +18,6 @@ export class MapEditComponent implements OnInit, OnDestroy {
   mapStructure: MapStructure;
   map: Map;
   mapSubscription: Subscription;
-  mapStructureSubscription: Subscription;
   activeTab: any;
 
   envTabs = [
@@ -40,15 +39,13 @@ export class MapEditComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().subscribe(structure => {
+    this.mapsService.getCurrentMapStructure().subscribe(structure => {
       this.mapStructure = structure;
     });
   }
 
   ngOnDestroy() {
     this.mapSubscription.unsubscribe();
-    this.mapStructureSubscription.unsubscribe();
-
   }
 
   closeTabs() {

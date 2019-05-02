@@ -26,7 +26,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
   executionsList: MapResult[] = [];
   selectedExecution: MapResult;
   maxLengthReached: boolean = false;
-  selectedExecutionReq: Subscription;
   selectedExecutionLogs: any[];
   selectedAgent: any = defaultAgentValue;
   selectedProcess: ProcessResult[];
@@ -174,7 +173,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
    */
   selectExecution(executionId) {
     this.selectedProcess = null;
-    this.selectedExecutionReq = this.mapsService.executionResultDetail(this.map.id, executionId).pipe(
+    this.mapsService.executionResultDetail(this.map.id, executionId).pipe(
       tap(result => {
         this.selectedExecution = result;
 

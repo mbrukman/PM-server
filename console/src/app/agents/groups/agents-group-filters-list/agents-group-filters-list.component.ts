@@ -19,10 +19,7 @@ import { take } from 'rxjs/operators';
 export class AgentsGroupFiltersListComponent implements OnInit {
     fields = FILTER_FIELDS;
     types = FILTER_TYPES
-    agentsStatusReq: any;
     selectedAgent: Agent;
-    agentsReq: any;
-    updateReq: any;
     items: any[];
     selectedGroupSubscription: Subscription;
     // filtersGroups: AgentsGroupFilter[];
