@@ -13,6 +13,8 @@ import { Plugin } from '@plugins/models/plugin.model';
 import { COORDINATION_TYPES, JOINT_OPTIONS } from '@maps/constants'
 import { filter, tap } from 'rxjs/operators';
 
+
+
 export const linkAttrs = {
   router: { name: 'manhattan' },
   connector: { name: 'rounded' },

@@ -56,12 +56,10 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     
     if(this.processViewWrapper.plugin){
       this.methodsDropDown = this.processViewWrapper.plugin.methods.map(method => {
+        this.methods[method.name] = method
         return {label:method.viewName,value:method.name}
       })
     }
-    this.processViewWrapper.plugin.methods.forEach((method) => {
-      this.methods[method.name] = method
-    })
     if (!this.processViewWrapper.process) {
       this.closePane();
       return;
