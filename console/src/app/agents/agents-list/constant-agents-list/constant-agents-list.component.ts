@@ -16,7 +16,6 @@ import { filter, take } from 'rxjs/operators';
 })
 export class ConstantAgentsListComponent implements OnInit,OnDestroy {
     selectedAgent: Agent;
-    updateReq: Subscription;
     selectedGroupSubscription: Subscription;
     @Input('agentsStatus') agentsStatus: any;
     @Input('agents') agents: [Agent];
@@ -55,7 +54,7 @@ export class ConstantAgentsListComponent implements OnInit,OnDestroy {
   }
 
   updateAgent(agent: Agent) {
-    this.updateReq = this.agentsService.update(agent).subscribe();
+    this.agentsService.update(agent).subscribe();
   }
 
   onSelectAgent(agent) {

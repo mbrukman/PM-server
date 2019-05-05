@@ -13,6 +13,8 @@ import { Plugin } from '@plugins/models/plugin.model';
 import { COORDINATION_TYPES, JOINT_OPTIONS } from '@maps/constants'
 import { filter, tap } from 'rxjs/operators';
 
+
+
 export const linkAttrs = {
   router: { name: 'manhattan' },
   connector: { name: 'rounded' },
@@ -40,7 +42,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   mapStructure: MapStructure;
   mapStructureSubscription: Subscription;
   editing: boolean = false;
-  pluginsReq: Subscription;
   plugins: Plugin[];
   process: Process;
   link: Link;
@@ -59,7 +60,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   ngOnInit() {
     this.defineShape();
-    this.pluginsReq = this.pluginsService.list().subscribe(plugins => {
+    this.pluginsService.list().subscribe(plugins => {
       this.plugins = plugins;
       this.initMapDraw();
     });
@@ -78,7 +79,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   ngOnDestroy() {
     this.dropSubscription.unsubscribe();
     this.mapStructureSubscription.unsubscribe();
-    this.pluginsReq.unsubscribe();
     this.deselectAllCellsAndUpdateStructure();
   }
 

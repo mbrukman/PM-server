@@ -16,11 +16,11 @@
       <map-cards [maps]="featuredMaps" [showPieChart]="false"></map-cards>
     </div>
 
-    <div class="row">
+    <div class="row" [hidden]="!project || !project.maps || !project.maps.length">
       <div class="btns">
-        <a routerLink="/maps/create" class="kh-btn kh-btn-blue" [queryParams]="{'project': project?.id}" *ngIf="project?.maps && project?.maps?.length > 0">Add
+        <a routerLink="/maps/create" class="kh-btn kh-btn-blue" [queryParams]="{'project': project?.id}">Add
           map</a>
-        <button class="kh-btn kh-btn-blue" (click)="openImportModal()" *ngIf="project?.maps && project?.maps?.length > 0">Import map</button>
+        <button class="kh-btn kh-btn-blue" (click)="openImportModal()">Import map</button>
       </div>
 
       <div class="filters">

@@ -19,7 +19,6 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
   projects: Project[];
   projectsDropDown:SelectItem[] = [];
   mapSubscription: Subscription;
-  projectsReq: any;
   selectedProject: string;
   queue: number;
   onInit:boolean;

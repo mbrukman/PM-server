@@ -14,8 +14,6 @@ import {SeoService,PageTitleTypes} from '@app/seo.service';
 export class VaultComponent implements OnInit {
 
   vaultItems: VaultItem[]
-  vaultsReq: any;
-
 
   constructor(private vaultService: VaultService, private modalService: BsModalService,
     private seoService:SeoService) { }
@@ -27,13 +25,9 @@ export class VaultComponent implements OnInit {
 
 
   requestVaults() {
-    this.vaultsReq = this.vaultService.getVaultItems().subscribe(vault => {
+    this.vaultService.getVaultItems().subscribe(vault => {
       this.vaultItems = vault;
     });
-  }
-
-  ngOnDestroy() {
-    this.vaultsReq.unsubscribe();
   }
 
   deleteVaultItem(id) {

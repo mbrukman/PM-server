@@ -327,6 +327,10 @@ table, .table {
       color: white;
       background: $pale-blue;
     }
+    &.disabled{
+      pointer-events: none;
+      color:#727477!important;
+    }
   }
 }
 
