@@ -136,12 +136,12 @@ module.exports = {
                             }
                         },
                         {
-                            $limit: 1
+                            $sort: {
+                                'finishTime': -1
+                            }
                         },
                         {
-                            $sort: {
-                                '-finishTime': 1
-                            }
+                            $limit: 1
                         },
                         {
                             $project:

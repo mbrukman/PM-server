@@ -62,13 +62,14 @@ export class AddJobComponent implements OnInit {
   onSelectProject() {
     this.mapDropDown = [];
     const projectId = this.form.controls.project.value;
-    this.projectsService.detail(projectId).subscribe(project => {
-      this.selectedProject = project;
-      for(let i =0,length=this.selectedProject.maps.length;i<length;i++){
-        let map = <Map>(this.selectedProject.maps[i]);
-        this.mapDropDown.push({label:map.name,value:map._id})
+    let filterOptions = new FilterOptions();
+    filterOptions.filter = {};
+    filterOptions.filter.projectId = projectId;
+    this.mapsService.filterMaps(null,null,filterOptions).subscribe(maps => {
+      for(let i =0,length=maps.items.length;i<length;i++){
+        this.mapDropDown.push({label:maps.items[i].name,value:maps.items[i].id})
       }
-    });
+    })
 
   }
 
