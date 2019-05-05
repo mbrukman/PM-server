@@ -17,13 +17,10 @@ import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-gro
 })
 export class GroupsComponent implements OnInit, OnDestroy {
   @Input('agents') agents: Agent[];
-  groupsReq: any;
-  updatedGroupSubscription: Subscription;
   groups: Group[];
   draggedItem: any;
   draggetItemSubscription: Subscription;
   selectedGroup: Group;
-  updateReq: any;
   selectedDropGroupIndex : string;
   currentGroupIndex : number;
 
@@ -32,9 +29,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // getting groups list
-    this.groupsReq = this.agentsService
-      .groupsList()
-      .pipe(
+    this.agentsService.groupsList().pipe(
         retry(3),
         map(groups => {
           let g = new Group();
@@ -58,7 +53,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
       this.selectedGroup = group
     })  
     
-    this.updatedGroupSubscription = this.agentsService.getUpdateGroupAsObservable().subscribe(group => {
+    this.agentsService.getUpdateGroupAsObservable().subscribe(group => {
       this.groups[this.groups.findIndex(o => o._id === group._id)] = group;
     });
   }
@@ -69,16 +64,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.groupsReq) {
-      this.groupsReq.unsubscribe();
-    }
-
     if (this.draggetItemSubscription) {
       this.draggetItemSubscription.unsubscribe();
-    }
-
-    if (this.updatedGroupSubscription) {
-      this.updatedGroupSubscription.unsubscribe();
     }
   }
 
@@ -142,7 +129,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
   }
 
   updateGroup(group:Group){
-    this.updateReq = this.agentsService.updateGroupToServer(group).subscribe((group) => {
+    this.agentsService.updateGroupToServer(group).subscribe((group) => {
       this.agentsService.updateGroup(group)
     });
   }

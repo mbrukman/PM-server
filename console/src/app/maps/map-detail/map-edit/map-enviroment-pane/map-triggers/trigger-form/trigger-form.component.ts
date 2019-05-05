@@ -1,4 +1,4 @@
-import { AfterContentInit, Component, OnDestroy } from '@angular/core';
+import { AfterContentInit, Component } from '@angular/core';
 
 import { Subject } from 'rxjs';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -16,14 +16,13 @@ import { IParam } from '@shared/interfaces/param.interface';
   templateUrl: './trigger-form.component.html',
   styleUrls: ['./trigger-form.component.scss']
 })
-export class TriggerFormComponent implements AfterContentInit, OnDestroy {
+export class TriggerFormComponent implements AfterContentInit {
   params: PluginMethodParam[];
   public result: Subject<any> = new Subject();
   configurations: string[]; 
   configDropDown:any;
   triggerForm: FormGroup;
   triggers: Plugin[];
-  pluginsReq: any;
   trigger: MapTrigger;
   method: PluginMethod;
   plugin: Plugin;
@@ -33,7 +32,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
   }
 
   ngAfterContentInit() {
-    this.pluginsReq = this.pluginsService.list().subscribe(plugins => {
+    this.pluginsService.list().subscribe(plugins => {
       this.triggers = plugins.filter(plugin => {
         return plugin.type === 'trigger' || plugin.type === 'server' || plugin.type === 'module';
       });
@@ -52,10 +51,6 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    this.pluginsReq.unsubscribe();
-  }
-
   initTriggerForm() {
     this.triggerForm = new FormGroup({
       name: new FormControl(this.trigger ? this.trigger.name : null, Validators.required),
@@ -67,12 +62,13 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
     });
   }
 
-  initParamsForm(value?, id?, viewName?, name?) {
+  initParamsForm(value?, id?, viewName?, name?, type?) {
     return new FormGroup({
       value: new FormControl(value),
       param: new FormControl(id, Validators.required),
       viewName: new FormControl(viewName, Validators.required),
-      name: new FormControl(name, Validators.required)
+      name: new FormControl(name, Validators.required),
+      type: new FormControl(type, Validators.required)
     });
   }
 
@@ -117,7 +113,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
     let paramsControl = <FormArray>this.triggerForm.controls['params'];
     params = params || this.method.params;
     params.forEach(param => {
-      paramsControl.push(this.initParamsForm(param.value, param._id, param.viewName, param.name));
+      paramsControl.push(this.initParamsForm(param.value, param._id, param.viewName, param.name,param.type));
     });
   }
 

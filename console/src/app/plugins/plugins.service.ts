@@ -28,13 +28,6 @@ export class PluginsService {
     }))
   }
 
-  generatePluginMethodsParams(pluginId, methodName) {
-    return this.http.get<PluginMethodParam[]>(`${serverUrl}api/plugins/${pluginId}/generateMethod/${methodName}`);
-  }
-
-  generatePluginSettingsParams(pluginId){
-    return this.http.get<PluginSettings[]>(`${serverUrl}api/plugins/${pluginId}/generateSettings`);
-  }
 
   upload(file): Observable<any> {
     return this.http.post(`${serverUrl}api/plugins/upload`, file);

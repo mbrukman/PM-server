@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnDestroy, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { MapsService } from '../maps/maps.service';
 import { Map } from '../maps/models/map.model';
 import { Project } from '../projects/models/project.model';
@@ -11,30 +11,19 @@ import { FilterOptions } from '@shared/model/filter-options.model';
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent implements OnDestroy, OnInit {
+export class SearchComponent implements OnInit {
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
   query: string;
   maps: Map[];
   projects: Project[];
   timeout: any;
   loading: boolean = false;
-  mapReq: any;
-  projectReq: any;
 
   constructor(private mapsService: MapsService, private projectsService: ProjectsService) {
   }
 
   ngOnInit() {
     this.onKeyUp(5)
-  }
-
-  ngOnDestroy() {
-    if (this.mapReq) {
-      this.mapReq.unsubscribe();
-    }
-    if (this.projectReq) {
-      this.projectReq.unsubscribe();
-    }
   }
 
   onKeyUp(limit ?: number ) {
@@ -47,11 +36,11 @@ export class SearchComponent implements OnDestroy, OnInit {
       }
       
       this.loading = true;
-      this.mapReq = this.mapsService.filterMaps(null, null, filterOptions).subscribe(data => {
+      this.mapsService.filterMaps(null, null, filterOptions).subscribe(data => {
         this.maps = data.items;
         this.loading = false;
       });
-      this.projectReq = this.projectsService.filter(null, null, filterOptions).subscribe(data => {
+      this.projectsService.filter(null, null, filterOptions).subscribe(data => {
         this.projects = data.items;
         this.loading = false;
       });

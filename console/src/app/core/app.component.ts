@@ -8,6 +8,7 @@ import { SocketService } from '../shared/socket.service';
 import { SettingsService } from '@core/setup/settings.service';
 import { MapsService } from '@maps/maps.service';
 import {Map} from '@maps/models/map.model';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -24,12 +25,18 @@ export class AppComponent implements OnInit {
     private socketService: SocketService,
     public settingsService: SettingsService,
     private toastyService: ToastyService,
-    private toastyConfig: ToastyConfig) {
+    private toastyConfig: ToastyConfig,
+    private route:ActivatedRoute) {
     this.toastyConfig.theme = 'material';
     this.toastyConfig.position = 'bottom-center';
   }
 
   ngOnInit() {
+    this.route.queryParams.subscribe((param) => {
+      if(param.configToken){
+        this.settingsService.configToken = param.configToken
+      }
+    }) 
     this.mapsService.getCurrentMap().subscribe(map => {
       this.currentMap = map
     })

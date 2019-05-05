@@ -7,6 +7,7 @@ import { Map } from '@maps/models/map.model';
 import { MapStructure } from '@maps/models/map-structure.model';
 import {FilterOptions} from '@shared/model/filter-options.model';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
+import {IEntityList} from '@shared/interfaces/entity-list.interface';
 const serverUrl = environment.serverUrl;
 
 @Injectable()
@@ -23,20 +24,20 @@ export class ProjectsService {
     return this.http.post<Project>(serverUrl + 'api/projects/create', project);
   }
 
-  detail(projectId,options?:FilterOptions) {
-    return this.http.post<Project>(serverUrl + 'api/projects/' + projectId,options);
+  detail(projectId) {
+    return this.http.get<Project>(`${serverUrl}api/projects/${projectId}/detail`);
   }
 
   filter(fields?: any, page?: number, options?:FilterOptions) {
-    return this.http.post<{ totalCount: number, items: Project[] }>(`${serverUrl}api/projects`, { page, fields ,options});
+    return this.http.post<IEntityList<Project>>(`${serverUrl}api/projects`, { page, fields ,options});
   }
 
   filterRecentMaps(projectId:string){
     return this.http.get<DistinctMapResult[]>(`${serverUrl}api/projects/${projectId}`);
-  }
+  } 
 
   list(fields?: any, page?: number, options?:FilterOptions) {
-    return this.http.post<{ totalCount: number, items: Project[] }>(serverUrl + 'api/projects',{fields,page,options});
+    return this.http.post<IEntityList<Project>>(serverUrl + 'api/projects',{fields,page,options});
   }
 
   update(projectId, project) {

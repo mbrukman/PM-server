@@ -27,6 +27,7 @@ exports.recentsMaps = function (limit,execFields=[]){
                 exec: { $first: "$$CURRENT" },
             }
         },
+        { $sort: { "exec.startTime": -1 } },
         { $limit: limit },
         {
             $lookup:

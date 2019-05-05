@@ -9,6 +9,7 @@ const Project = require("../models/project.model")
 const proejctServise = require("./projects.service")
 const PAGE_SIZE = env.page_size;
 const shared = require("../shared/recents-maps")
+const mongoose = require('mongoose');
 
 function getMapPlugins(mapStructure) {
     let plugins = new Set();
@@ -83,9 +84,16 @@ module.exports = {
             $match.archived = false;
         if (filterOptions.options.globalFilter) {
             $match.$or = [
-                { name: { '$regex': `.*${filterOptions.options.globalFilter}.*` } },
-                { description: { '$regex': `.*${filterOptions.options.globalFilter}.*` } }
+                { name: { '$regex': new RegExp(filterOptions.options.globalFilter,'ig') } },
+                { description: { '$regex': new RegExp(filterOptions.options.globalFilter,'ig') } },
             ]
+        }
+        let projectLookup;
+        if(filterOptions.options.filter && filterOptions.options.filter.projectId){
+            projectLookup = { $and:[{$eq : ["$_id",mongoose.Types.ObjectId(filterOptions.options.filter.projectId)]},{$in: ["$$mapId", "$maps"]}] };
+        }
+        else{
+            projectLookup = {$in: ["$$mapId", "$maps"]};
         }
 
         let m = Map.aggregate([
@@ -100,9 +108,7 @@ module.exports = {
                     pipeline: [
                         {
                             $match: {
-                                $expr: {
-                                    $in: ["$$mapId", "$maps"]
-                                }
+                                $expr:projectLookup
                             }
                         },
                         {
@@ -114,6 +120,9 @@ module.exports = {
                     ],
                     as: "project"
                 },
+            },
+            {
+                "$unwind": "$project"
             },
             {
                 $lookup:
@@ -129,12 +138,12 @@ module.exports = {
                             }
                         },
                         {
-                            $limit: 1
+                            $sort: {
+                                'finishTime': -1
+                            }
                         },
                         {
-                            $sort: {
-                                '-finishTime': 1
-                            }
+                            $limit: 1
                         },
                         {
                             $project:
@@ -200,6 +209,7 @@ module.exports = {
             return structures.pop();
         })
     },
+    
     structureList: (mapId, page) => {
         const load_Structures = 25
         if(page){
@@ -210,6 +220,7 @@ module.exports = {
             return MapStructure.find({ map: mapId }, '_id createdAt', { sort: { createdAt: -1 } })
         }
     },
+
     update: (mapId, map) => { 
         delete map.updatedAt;
         return Map.findByIdAndUpdate(mapId, map, { new: true }).populate('agents')

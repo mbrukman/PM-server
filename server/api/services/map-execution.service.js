@@ -320,7 +320,7 @@ function filterExecutionAgents(mapCode, executionContext, groups, mapAgents, exe
  * @param triggerReason - trigger message
  * @param agents - object of agents to run, if none will run on selected agents. should be name or id
  */
-function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configuration, triggerReason, agents) {
+function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configuration, triggerReason, agents,payload=null) {
     let mapResult;
     let mapStructure;
     let executionContext;
@@ -333,12 +333,24 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
         }
         mapStructure = structure;
 
-        if (configuration && typeof configuration != 'string') {
-            selectedConfiguration = {
-                name: 'custom',
-                value: configuration
+        if(configuration){
+            if (typeof configuration != 'string'){
+                selectedConfiguration = {
+                    name: 'custom',
+                    value: configuration
+                }
+            } else {
+                try{
+                    let parsedConfiguration = JSON.parse(configuration);
+                    selectedConfiguration = {
+                        name: 'custom',
+                        value: parsedConfiguration
+                    }
+                }catch(err){}
             }
-        } else if (mapStructure.configurations && mapStructure.configurations.length) {
+        }
+
+        if (!selectedConfiguration && mapStructure.configurations && mapStructure.configurations.length) {
             if (configuration)
                 selectedConfiguration = configuration ? mapStructure.configurations.find(o => o.name === configuration) : mapStructure.configurations.find(o => o.selected);
             if (!selectedConfiguration) {
@@ -367,7 +379,14 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
             structure: structure._id,
             configuration: selectedConfiguration ? selectedConfiguration.value : '',
             visitedProcesses: new Set(), // saving uuid of process ran by all the agents (used in flow control)
-            trigger:triggerReason
+            trigger:{
+                msg:triggerReason,
+                payload:payload
+            },
+            vault : {
+                getValueByKey : vaultService.getValueByKey
+            }
+            
         };
 
         return filterExecutionAgents(mapStructure.code, executionContext, map.groups, map.agents, agents);
@@ -391,7 +410,8 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
             structure: mapStructure._id,
             startTime: new Date(),
             configuration: selectedConfiguration,
-            trigger: triggerReason
+            trigger: triggerReason,
+            triggerPayload:payload
         });
     }).then(result => {
         socket.emit('map-execution-result', result);
@@ -415,9 +435,8 @@ function executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket
 }
 
 
-function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, triggerReason, agents) {
+function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, triggerReason, agents,payload=null) {
     const socket = req.io;
-
     function guidGenerator() {
         let S4 = function () {
             return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
@@ -440,6 +459,7 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, 
         }
         map = mapobj;
         const ongoingExecutions = countOngoingMapExecutions(mapId);
+        
         if (map.queue && (ongoingExecutions >= map.queue || (pending.hasOwnProperty(mapId) && pending[mapId].length))) {
             // check if there is a queue and running maps or a pending queue for this map
             if (!pending.hasOwnProperty(mapId)) {
@@ -458,7 +478,8 @@ function executeMap(mapId, structureId, cleanWorkspace, req, configurationName, 
             updatePending(socket);
             return;
         }
-        return executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configurationName, triggerReason, agents);
+        
+        return executeFromMapStructure(map, structureId, runId, cleanWorkspace, socket, configurationName, triggerReason, agents,payload);
     });
 }
 
@@ -1201,7 +1222,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
                 } else {
                     return _handleActionError(result, undefined, agent, process , processIndex, key, executions, runId, action, map, socket );
                 }
-            } else {
+                } else {
                 let result = { result: 'Timeout Error', status: 'error', stdout: actionString };
                 if (action.retries > 1) { return ['retry', result]; }
 

@@ -1,6 +1,18 @@
 const path = require("path");
 const config = require("./config");
 const package = require("../package.json")
+const fs = require('fs');
+
+ ////////////////////////////
+//   Key creation 
+////////////////////////////
+
+ if (!config.serverKey) {
+    const createKey = require("../helpers/create-key");
+    config.serverKey =  createKey.generateKey();
+    fs.writeFileSync('./config.json', JSON.stringify(config), 'utf8'); // write it back 
+} 
+////////////////////////////
 
 let version = package.version;
 let keyPath = {keyPath: path.join(__dirname, '.khkey')};

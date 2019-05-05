@@ -8,7 +8,7 @@ import { CronJobsConfig } from 'ngx-cron-jobs/src/app/lib/contracts/contracts';
 import { MapsService } from '@maps/maps.service';
 import { FilterOptions } from '@shared/model/filter-options.model';
 import { filter } from 'rxjs/operators';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { SelectItem } from 'primeng/primeng';
 
 @Component({
   selector: 'app-add-job',
@@ -19,11 +19,10 @@ export class AddJobComponent implements OnInit {
   selectedMapConfigurations: string[];
   projects: Project[];
   selectedProject: Project;
-  projectsReq: any;
   form: FormGroup;
   cron: any;
-  projectsDropDown:any;
-  configurationsDropDown:any;
+  projectsDropDown:SelectItem[];
+  configurationsDropDown:SelectItem[];
   mapDropDown=[];
   cronConfig: CronJobsConfig = {
     multiple: false,
@@ -37,7 +36,7 @@ export class AddJobComponent implements OnInit {
 
   ngOnInit() {
     var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt'};
-    this.projectsReq = this.projectsService.filter(null,null,filterOptions).subscribe(data => {
+    this.projectsService.filter(null,null,filterOptions).subscribe(data => {
       this.projects = data.items;
       this.projectsDropDown = this.projects.map(project => {
         return {label:project.name,value:project._id}
@@ -63,13 +62,14 @@ export class AddJobComponent implements OnInit {
   onSelectProject() {
     this.mapDropDown = [];
     const projectId = this.form.controls.project.value;
-    this.projectsService.detail(projectId,{isArchived:false,globalFilter:null,sort:'-createdAt'}).subscribe(project => {
-      this.selectedProject = project;
-      for(let i =0,length=this.selectedProject.maps.length;i<length;i++){
-        let map = <Map>(this.selectedProject.maps[i]);
-        this.mapDropDown.push({label:map.name,value:map._id})
+    let filterOptions = new FilterOptions();
+    filterOptions.filter = {};
+    filterOptions.filter.projectId = projectId;
+    this.mapsService.filterMaps(null,null,filterOptions).subscribe(maps => {
+      for(let i =0,length=maps.items.length;i<length;i++){
+        this.mapDropDown.push({label:maps.items[i].name,value:maps.items[i].id})
       }
-    });
+    })
 
   }
 

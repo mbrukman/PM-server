@@ -64,13 +64,13 @@ module.exports = {
     /* get project details */
     detail: (req, res) => {
         hooks.hookPre('project-detail', req).then(() => {
-            return projectsService.detail(req.params.id,req.body);
+            return projectsService.detail(req.params.id);
         }).then(project => {
             res.json(project);
         }).catch((error) => {
-            req.io.emit('notification', { title: 'Whoops..', message: `Error getting project details`, type: 'error' });
+            // req.io.emit('notification', { title: 'Whoops..', message: `Error getting project details`, type: 'error' });
             winston.log('error', "Error getting project's details", error);
-            res.status(500).send(error);
+            res.status(404).send(error);
         });
     },
 

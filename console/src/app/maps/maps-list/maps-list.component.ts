@@ -8,7 +8,10 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
+import { DistinctMapResult } from '@shared/model/distinct-map-result.model';
+import { Data, ActivatedRoute } from '@angular/router';
+
+import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
   selector: 'app-maps-list',
@@ -17,53 +20,66 @@ import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 })
 export class MapsListComponent implements OnInit, OnDestroy {
   maps: Map[];
-  mapReq: Subscription;
   resultCount: number = 0;
   page: number = 1;
   filterOptions: FilterOptions = new FilterOptions();
-  recentMaps:DistinctMapResult[];
-  filterKeyUpSubscribe : Subscription;
+  recentMaps: DistinctMapResult[];
+  filterKeyUpSubscribe: Subscription;
+  isInit:boolean=true;
 
-  
-  @ViewChild('globalFilter') globalFilterElement : ElementRef;
+  @ViewChild('globalFilter') globalFilterElement: ElementRef;
 
   constructor(private mapsService: MapsService,
-    private modalService: BsModalService) {
+    private modalService: BsModalService,
+    private route: ActivatedRoute,
+    private seoService:SeoService) {
     this.onDataLoad = this.onDataLoad.bind(this)
   }
 
 
   ngOnInit() {
-    this.reloadMaps();
+    this.seoService.setTitle(PageTitleTypes.MapsList)
+    this.route.data.subscribe((data: Data) => {
+      this.onDataLoad(data['maps']);
+    })
+
     this.mapsService.recentMaps().subscribe(maps => {
       this.recentMaps = maps;
     })
 
-    this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(debounceTime(300))
-    .subscribe(()=>{
-      this.loadMapsLazy();
-    })
+    this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement, 'keyup').pipe(debounceTime(300))
+      .subscribe(() => {
+        this.loadMapsLazy();
+      })
   }
 
   reloadMaps(fields = null, page = this.page, filter = this.filterOptions) {
-    this.mapReq = this.mapsService.filterMaps(fields, page, filter).subscribe(this.onDataLoad);
+    this.mapsService.filterMaps(fields, page, filter).subscribe(this.onDataLoad);
   }
 
   ngOnDestroy() {
-    this.mapReq.unsubscribe();
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
+  clearSearchFilter(){
+    this.filterOptions.globalFilter = undefined;
+    this.loadMapsLazy()
+  }
+
+
   loadMapsLazy(event?) {
-    let fields, page, sort;
+    let fields, page;
     if (event) {
       fields = event.filters || null;
       page = event.first / 15 + 1;
       if (event.sortField) {
-        sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
+        this.filterOptions.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.filterOptions.sort = sort
+    if(this.isInit){
+      this.isInit=false;
+      return;
+    }
     this.reloadMaps(fields, page, this.filterOptions)
   }
 

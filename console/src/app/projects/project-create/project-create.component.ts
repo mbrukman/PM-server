@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
@@ -13,14 +14,14 @@ import { Project } from '../models/project.model';
 })
 export class ProjectCreateComponent implements OnInit, OnDestroy {
   projectForm: FormGroup;
-  paramsReq: any;
   project: Project;
+  queryParamsReq : Subscription
 
   constructor(private projectsService: ProjectsService, private router: Router, private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    this.paramsReq = this.route.queryParams.subscribe(params => {
+    this.queryParamsReq = this.route.queryParams.subscribe(params => {
       console.log(params);
       if (params && params.project) {
         this.projectsService.detail(params.project).subscribe(project => {
@@ -39,10 +40,6 @@ export class ProjectCreateComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    this.paramsReq.unsubscribe();
-  }
-
   setFormData(data: { name: string, description: string }) {
     this.projectForm.setValue({ name: data.name || null, description: data.description || null });
   }
@@ -58,6 +55,10 @@ export class ProjectCreateComponent implements OnInit, OnDestroy {
       });
     }
 
+  }
+
+  ngOnDestroy() {
+    this.queryParamsReq.unsubscribe();
   }
 
 }

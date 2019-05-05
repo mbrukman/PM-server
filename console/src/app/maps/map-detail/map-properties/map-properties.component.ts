@@ -7,6 +7,7 @@ import { MapsService } from '../../maps.service';
 import { Map } from '@maps/models/map.model';
 import { ProjectsService } from '@projects/projects.service';
 import { Project } from '@projects/models/project.model';
+import { SelectItem } from 'primeng/primeng';
 
 @Component({
   selector: 'app-map-properties',
@@ -16,9 +17,8 @@ import { Project } from '@projects/models/project.model';
 export class MapPropertiesComponent implements OnInit, OnDestroy {
   map: Map;
   projects: Project[];
-  projectsDropDown = [];
+  projectsDropDown:SelectItem[] = [];
   mapSubscription: Subscription;
-  projectsReq: any;
   selectedProject: string;
   queue: number;
   onInit:boolean;

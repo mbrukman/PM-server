@@ -6,7 +6,7 @@ import { MapsService } from '../maps.service';
 import { Map } from '../models/map.model';
 import { Project } from '../../projects/models/project.model';
 import { ProjectsService } from '../../projects/projects.service';
-import { DefaultKeyValueDiffer } from '@angular/core/src/change_detection/differs/default_keyvalue_differ';
+import { SelectItem } from 'primeng/primeng';
 import { FilterOptions } from '@shared/model/filter-options.model';
 
 @Component({
@@ -16,11 +16,10 @@ import { FilterOptions } from '@shared/model/filter-options.model';
 })
 export class MapCreateComponent implements OnInit, OnDestroy {
   mapForm: FormGroup;
-  projectsReq: any;
   projects: Project[];
   paramsReq: any;
   map: Map;
-  projectsDropDown:any;
+  projectsDropDown:SelectItem[];
   constructor(private mapsService: MapsService, private projectsService: ProjectsService, private router: Router, private route: ActivatedRoute) {
   }
 
@@ -41,7 +40,7 @@ export class MapCreateComponent implements OnInit, OnDestroy {
         this.initMapForm();
       }
       var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt'};
-      this.projectsReq = this.projectsService.filter(null,null,filterOptions).subscribe(data => {
+      this.projectsService.filter(null,null,filterOptions).subscribe(data => {
         this.projects = data.items;
         this.projectsDropDown = this.projects.map(project => {
           return {label:project.name,value:project._id}
@@ -60,7 +59,6 @@ export class MapCreateComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.projectsReq.unsubscribe();
     this.paramsReq.unsubscribe();
   }
 

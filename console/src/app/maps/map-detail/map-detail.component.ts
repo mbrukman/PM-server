@@ -11,6 +11,8 @@ import { SocketService } from '@shared/socket.service';
 import { filter, take } from 'rxjs/operators';
 import { Subject, Subscription } from 'rxjs';
 
+import {SeoService,PageTitleTypes} from '@app/seo.service';
+import { SelectItem } from 'primeng/primeng';
 
 @Component({
   selector: 'app-map-detail',
@@ -26,11 +28,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   originalMap: Map;
   map: Map;
   routeReq: any;
-  mapReq: any;
-  mapExecReq: any;
   mapStructure: MapStructure;
-  mapStructureReq: any;
-  mapStructuresListReq: any;
   structuresList: MapStructure[] = [];
   structureIndex: number;
   originalMapStructure: MapStructure;
@@ -41,7 +39,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   mapExecutionSubscription: Subscription; 
   executing: boolean;
   downloadJson: SafeUrl;
-  configurationDropDown=[];
+  configurationDropDown:SelectItem[] = [];
   selected: MapStructureConfiguration;
   navItems: {
     name: string,
@@ -53,7 +51,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private mapsService: MapsService,
     private socketService: SocketService,
-    private modalService: BsModalService) {
+    private modalService: BsModalService,
+    private seoService:SeoService) {
 
     this.navItems = [
       { name: 'Properties', routerLink: ['properties'] },
@@ -68,17 +67,18 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.routeReq = this.route.params.subscribe(params => {
       this.id = params['id'];
-      this.mapReq = this.mapsService.getMap(this.id).subscribe(map => {
+      this.mapsService.getMap(this.id).subscribe(map => {
         if (!map) {
           this.router.navigate(['NotFound']);
         }
         this.map = map;
+        this.seoService.setTitle(map.name+PageTitleTypes.Map)
         this.originalMap = _.cloneDeep(map);
         this.mapsService.setCurrentMap(map);
-        this.mapStructuresListReq = this.mapsService.structuresList(this.id).subscribe(structureList => {
+        this.mapsService.structuresList(this.id).subscribe(structureList => {
           this.structuresList = structureList;
         });
-        this.mapStructureReq = this.mapsService.getMapStructure(this.id).subscribe(structure => {
+        this.mapsService.getMapStructure(this.id).subscribe(structure => {
 
           if (structure === null) {
             structure = new MapStructure();
@@ -158,6 +158,10 @@ export class MapDetailComponent implements OnInit, OnDestroy {
           this.selected = selected !== -1 ? this.mapStructure.configurations[selected] : this.mapStructure.configurations[0];
           this.changeSelected(false)
         }
+        else{
+          this.selected = undefined;
+        }
+
 
 
       });
@@ -182,13 +186,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.routeReq.unsubscribe();
-    this.mapReq.unsubscribe();
-    if (this.mapStructureReq) {
-      this.mapStructureReq.unsubscribe();
-    }
-    if (this.mapExecReq) {
-      this.mapExecReq.unsubscribe();
-    }
+    
     this.mapsService.clearCurrentMap();
     this.mapsService.clearCurrentMapStructure();
     this.mapExecutionSubscription.unsubscribe();
@@ -271,7 +269,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
 
   executeMap() {
     let index = this.mapStructure.configurations.findIndex(conf => conf.name == this.selected.name)
-    this.mapExecReq = this.mapsService.execute(this.id, (!this.selected) ? undefined : this.mapStructure.configurations[index].name).subscribe();
+    this.mapsService.execute(this.id, (!this.selected) ? undefined : this.mapStructure.configurations[index].name).subscribe();
   }
 
   saveMap() {

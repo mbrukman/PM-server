@@ -22,7 +22,7 @@ module.exports = {
     },
 
     vaultList: (req, res) => {
-        vaultsService.list(req.body.options).then(x => {
+        vaultsService.list().then(x => {
             return res.send(x)
         });
     },

@@ -7,6 +7,9 @@ let vaultSchema = new Schema({
     value : { type: String, required: true },
 });
 
+vaultSchema.statics.autocompleteKey = "key";
+vaultSchema.statics.autocompleteValueField = "key";
+
 vaultSchema.set('toJSON', {
     transform: function (doc, ret, options) {
         ret.id = ret._id;

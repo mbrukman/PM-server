@@ -4,6 +4,9 @@ import { Project } from '../models/project.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { Subscription, fromEvent } from 'rxjs'
 import { take, debounceTime } from 'rxjs/operators';
+import { ActivatedRoute, Data } from '@angular/router';
+
+import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
   selector: 'app-projects-list',
@@ -12,57 +15,69 @@ import { take, debounceTime } from 'rxjs/operators';
 })
 export class ProjectsListComponent implements OnInit, OnDestroy {
   projects: Project[];
-  projectsReq: any;
-  featuredReq: any;
   featuredProjects: Project[];
   page: number = 1;
   resultCount: number;
   filterOptions : FilterOptions = new FilterOptions();
   filterKeyUpSubscribe : Subscription;
-  
+  isInit:boolean=true;
+
   @ViewChild('globalFilter') globalFilterElement : ElementRef;
 
-
-  constructor(private projectsService: ProjectsService) {
+  constructor(private projectsService: ProjectsService,
+    private route:ActivatedRoute,
+    private seoService:SeoService) {
     this.onDataLoad = this.onDataLoad.bind(this);
   }
 
   ngOnInit() {
-    this.reloadProjects()
+    this.seoService.setTitle(PageTitleTypes.ProjectsList)
+    this.route.data.subscribe((data:Data) => {
+      this.onDataLoad(data['projects']);
+    })
+
+    let featuredFilterOptions = new FilterOptions();	
+    featuredFilterOptions.limit = 4;	
+    this.projectsService.filter(null, this.page,featuredFilterOptions).pipe(	
+      take(1)).subscribe(data => {	
+      if (data)	
+        this.featuredProjects = data.items;	
+    });
 
     this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement,'keyup').pipe(
       debounceTime(300)
     ).subscribe(()=>{
         this.loadProjectLazy();
       })
-
-    let featuredFilterOptions = new FilterOptions();
-    featuredFilterOptions.limit = 4;
-    this.projectsService.filter(null, this.page,featuredFilterOptions).pipe(
-      take(1)).subscribe(data => {
-      if (data)
-        this.featuredProjects = data.items;
-    });
   }
 
   ngOnDestroy(){
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
+  clearSearchFilter(){
+    this.filterOptions.globalFilter = undefined;
+    this.loadProjectLazy()
+  }
+
+
   reloadProjects(fields=null,page=this.page,filter=this.filterOptions){
-    this.projectsReq = this.projectsService.filter(fields,page,filter).subscribe(this.onDataLoad);
+    this.projectsService.filter(fields,page,filter).subscribe(this.onDataLoad);
   }
 
   loadProjectLazy(event?) {
-    let fields, page, sort;
+    let fields, page;
     if (event) {
       fields = event.filters || null;
       page = event.first / 5 + 1;
       if (event.sortField) {
-        sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
+        this.filterOptions.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    this.filterOptions.sort = sort
+    if(this.isInit){
+      this.isInit=false;
+      return;
+    }
     this.reloadProjects(fields,page,this.filterOptions)
   }
 

@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap';
 import { UpsertVaultItemsComponent } from '../upsert-vault-items/upsert-vault-items.component';
 import { VaultService } from '../../shared/vault.service';
-import { VaultItem } from '../vault.model';
+import { AutoCompleteItem } from '@shared/model/autocomplete.model';
+import {VaultItem} from '../vault.model';
+import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
   selector: 'app-vault',
@@ -12,24 +14,20 @@ import { VaultItem } from '../vault.model';
 export class VaultComponent implements OnInit {
 
   vaultItems: VaultItem[]
-  vaultsReq: any;
 
-
-  constructor(private vaultService: VaultService, private modalService: BsModalService) { }
+  constructor(private vaultService: VaultService, private modalService: BsModalService,
+    private seoService:SeoService) { }
 
   ngOnInit() {
+    this.seoService.setTitle(PageTitleTypes.Vault)
     this.requestVaults();
   }
 
 
   requestVaults() {
-    this.vaultsReq = this.vaultService.getVaultItems({}).subscribe(vault => {
+    this.vaultService.getVaultItems().subscribe(vault => {
       this.vaultItems = vault;
     });
-  }
-
-  ngOnDestroy() {
-    this.vaultsReq.unsubscribe();
   }
 
   deleteVaultItem(id) {
@@ -38,7 +36,7 @@ export class VaultComponent implements OnInit {
     });
   }
 
-  upsertItem(item: VaultItem = null) {
+  upsertItem(item: AutoCompleteItem = null) {
     let modal: BsModalRef;
     modal = this.modalService.show(UpsertVaultItemsComponent);
     if (item) {

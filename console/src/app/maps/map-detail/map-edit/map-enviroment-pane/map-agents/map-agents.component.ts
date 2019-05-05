@@ -1,11 +1,12 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { timer, Subscription } from 'rxjs';
+
 import { AgentsService } from '@agents/agents.service';
-import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MapsService } from '@maps/maps.service';
 import { Map } from '@maps/models/map.model';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
-import { timer, Subscription } from 'rxjs';
 
 import { SelectAgentComponent } from './select-agent/select-agent.component';
 import { switchMap } from 'rxjs/operators';
@@ -16,30 +17,20 @@ import { switchMap } from 'rxjs/operators';
   templateUrl: './map-agents.component.html',
   styleUrls: ['./map-agents.component.scss']
 })
-export class MapAgentsComponent implements OnInit, OnDestroy {
+export class MapAgentsComponent implements OnInit, OnDestroy{
   map: Map;
   statuses: any;
-  mapSubscription: Subscription;
-  agentsStatusReq: any;
-
+  agentsStatusReq : Subscription
+  
   constructor(private modalService: BsModalService, private mapsService: MapsService, private agentsService: AgentsService) {
   }
 
   ngOnInit() {
-    this.mapSubscription = this.mapsService.getCurrentMap()
+    this.mapsService.getCurrentMap()
       .subscribe(map => {
         this.map = map;
         this.getAgentsStatus();
       });
-  }
-
-  ngOnDestroy() {
-    if (this.mapSubscription) {
-      this.mapSubscription.unsubscribe();
-    }
-    if (this.agentsStatusReq) {
-      this.agentsStatusReq.unsubscribe();
-    }
   }
 
   getAgentsStatus() {
@@ -60,5 +51,11 @@ export class MapAgentsComponent implements OnInit, OnDestroy {
       this.map.groups = result.groups;
       this.mapsService.setCurrentMap(this.map);
     });
+  }
+
+  ngOnDestroy() {
+    if (this.agentsStatusReq) {
+      this.agentsStatusReq.unsubscribe();
+    }
   }
 }

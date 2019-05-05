@@ -1,18 +1,16 @@
-var currentAgent = {
-    name: "",
-    url: "",
-    attributes: [{ name: "", value: "" }]
-};
 
 /**	
  * Represents the execution Id	
  */
+/** @type {KaholoAgent} */
+var currentAgent={
+    name: '',
+    url: '',
+    attributes: [{ name: '', value: ''}]
+}
 var executionId;
 
-
-/**	
- * Represents the selected trigger	
- */
+/** @type {KaholoTrigger} */
 var trigger;
 
 /**	
@@ -85,76 +83,30 @@ var getConfiguration = function () {
     return configuration;
 };
 
+/** @type {KaholoVault} */
+var vault
+
 /* represents the previous action that was running in this process
  when the action is the first one to run will be undefined */
-var previousAction = {
-    "server": {
-        "type": "",
-        "name": "",
-        "id": ""
-    },
-    "method": {
-        "params": [
-            {
-                "name": "",
-                "type": "",
-                "id": ""
-            }
-        ],
-        "agent": {
-            "type": "",
-            "id": ""
-        },
-        "name": "",
-        "actionString": "",
-        "createdAt": "",
-        "updatedAt": "",
-        "id": ""
-    },
-    "params": {},
-    "name": "",
-    "timeout": 0,
-    "timeunit": 0,
-    "retries": 0,
-    "mandatory": false,
-    "suspend": false,
-    "result": "",
-    "status": 0,
-    "id": 0,
-    "order": 0,
-    "lastUpdate": ""
-};
 
-// /* represents the current running action */
-var currentAction = previousAction;
+ // /* represents the current running action */
+/** @type {KaholoAction} */
+var currentAction;
 
-// /* represents the current running process */
-var currentProcess = {
-    "id": 0,
-    "name": "",
-    "description": "",
-    "order": 0,
-    "default_execution": false,
-    "mandatory": false,
-    "actions": [
-        currentAction
-    ],
-    "result": ""
-};
+/** @type {KaholoAction} */
+var previousAction;
 
-var previouseProcess = currentProcess;
+/* represents the current running process */
+/** @type {KaholoProcess} */
+var previouseProcess;
+
+/** @type {KaholoProcess} */
+var currentProcess;
 
 /* represents the previous link result (not the prcess) */
-var previousLink = {
-    "id": "",
-    "sourceId": "",
-    "targetId": "",
-    "processes": [
-        currentProcess
-    ],
-    "result": "",
-    "linkIndex": 0
-};
+/** @type {KaholoLink} */
+var previousLink;
 
 /* represents the current Link */
-var currentLink = previousLink;
+/** @type {KaholoLink} */
+var currentLink;

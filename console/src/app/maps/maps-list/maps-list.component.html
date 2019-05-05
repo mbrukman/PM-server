@@ -20,8 +20,8 @@
         </div>
         <div class="filter-text">
           <div>
-            <i class="material-icons" *ngIf="!filterOptions.globalFilter">search</i>
-            <i class="material-icons text-light" *ngIf="filterOptions.globalFilter" (click)="filterOptions.globalFilter = undefined">close</i>
+            <i class="material-icons" [hidden]="filterOptions.globalFilter">search</i>
+            <i class="material-icons text-light pointer" [hidden]="!filterOptions.globalFilter" (click)="clearSearchFilter()">close</i>
             <input class="form-control" [(ngModel)]="filterOptions.globalFilter" type="text" placeholder="Filter" #globalFilter />
           </div>
         </div>
