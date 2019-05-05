@@ -3,7 +3,7 @@ import { AfterContentInit, Component, ElementRef, OnDestroy, OnInit, ViewChild }
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
 import * as _ from 'lodash';
-
+import { Subscription } from 'rxjs';
 
 import { MapDesignService } from '../map-design.service';
 import { Link, MapStructure, Process, ProcessViewWrapper } from '@maps/models';
@@ -39,9 +39,11 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   graph: joint.dia.Graph;
   paper: joint.dia.Paper;
   mapStructure: MapStructure;
+  dropSubscription: Subscription;
   editing: boolean = false;
   plugins: Plugin[];
   process: Process;
+  mapStructureSubscription: Subscription;
   link: Link;
   init: boolean = false;
   scale: number = 1;
@@ -65,7 +67,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
 
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
-    this.mapDesignService
+    this.dropSubscription = this.mapDesignService
       .getDrop().pipe(
         filter(obj => this.isDroppedOnMap(obj.x, obj.y))
       ).subscribe(obj => {
@@ -76,6 +78,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.dropSubscription.unsubscribe();	
+    this.mapStructureSubscription.unsubscribe();
     this.deselectAllCellsAndUpdateStructure();
   }
 
@@ -117,7 +121,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
  getCurrentMapStructure(){
-  this.mapsService.getCurrentMapStructure().pipe(
+  this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(
     tap(structure => this.mapStructure = structure),
     filter(structure => !!structure)
   ).subscribe(structure => {
