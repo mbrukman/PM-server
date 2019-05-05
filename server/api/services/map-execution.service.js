@@ -104,6 +104,8 @@ function createProcessContext(runId, agent, processUUID, process) {
         processes[processUUID] = [];
     }
 
+    process.name = process.name || 'Process #' + (processes.numProcesses+1)
+
     const processData = {
         processId: process.id,
         iterationIndex: processes[processUUID].length,
@@ -181,6 +183,11 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
     let result = ""
     if (actionData.status == statusEnum.ERROR && action.mandatory && !actionData.hasOwnProperty('retriesLeft')) {
         result = ' - Mandatory Action Faild'
+        actionData.result.result += result 
+
+        
+        let msg = `result: ${JSON.stringify(result)}`
+        _updateRawOutput(map._id, runId, msg, 'success')
     }
 
     let options = {
@@ -201,7 +208,7 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
 
     // mandatory action faild. stop execution (if no have retries)
     if (actionData.status == statusEnum.ERROR && action.mandatory && !actionData.hasOwnProperty('retriesLeft')) {
-        return stopExecution(runId, null, null, result)
+        return stopExecution(runId, null, result)
     }
 }
 
@@ -235,7 +242,7 @@ function updateMapResult(mapResultId, updateData, socket) {
     let options = {
         mapResultId: mapResultId,
         data: updateData,
-        socket: socket // sharbat send socket to updates?  
+        socket: socket
     }
     dbUpdates.updateMapReasult(options)
 }
@@ -822,9 +829,17 @@ function sendActionViaRequest(agent, actionForm) {
     });
 }
 
-function _updateRawOutput(msg){
-    clientSocket.emit('notification', msg);
-    clientSocket.emit('update', msg);
+function _updateRawOutput(mapId, runId, msg, status){
+
+    let logMsg = {
+        map: mapId,
+        runId: runId,
+        message: msg,
+        status: status
+    }
+
+    clientSocket.emit('notification', logMsg);
+    clientSocket.emit('update', logMsg);
 }
 
 /**
@@ -944,14 +959,9 @@ async function executeAction(map, structure, runId, agent, process, processIndex
                 return runAction();
             }
             actionData.finishTime = new Date();
-            let logMsg = {
-                map: map._id,
-                runId: runId,
-                message: `'${action.name}' result: ${JSON.stringify(result)} (${agent.name})`,
-                status: 'success'
-            }
-            _updateRawOutput(logMsg)
-                updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData);
+       let msg = `'${process.name} ' - '${action.name}' result: ${JSON.stringify(result)} (${agent.name})`
+            _updateRawOutput(map._id, runId, msg, 'success')
+            updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData);
             return result;
         });
     }
@@ -1109,14 +1119,14 @@ module.exports = {
         let logs = []
         logs.push({ message: 'status: ' + mapResult.status })
         mapResult.agentsResults.forEach((agentResult, iAgent) => {
-            logs.push({ message: "Agent #" + iAgent + ": " })
+            logs.push({ message: "Agent #" + (iAgent+1) + ": " })
             agentResult.processes.forEach((process, iProcess) => {
-                logs.push({ message: "Process #" + iProcess + ": " + process.status })
+                logs.push({ message: "Process #" + (iProcess+1)  + ": " + process.status })
                 process.message ? logs.push({ message: "message: " + process.message }) : null
                 process.preRunResult ? logs.push({ message: "preRun result: " + process.preRunResult }) : null
                 process.postRunResult ? logs.push({ message: "postRun result: " + process.postRunResult }) : null
                 process.actions.forEach((action, iAction) => {
-                    logs.push({ message: "Action #" + iAction + ": " + action.status })
+                    logs.push({ message: "Action #" + (iAction+1) + ": " + action.status })
                     let keys = Object.keys((action.result || {}))
                     keys.forEach(k => {
                         action.result[k] ? logs.push({ message: k + ':' + action.result[k] }) : null

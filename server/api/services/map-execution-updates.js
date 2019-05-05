@@ -63,10 +63,10 @@ function _getPathFiledsToUpdate(pathToSet, data) {
 
 function _updateMapReasult(options) {
     return MapResult.findByIdAndUpdate(options.mapResultId, { $set: options.data }, { new: true })
-    // .then((mapResult) => {
-    //     options.socket.emit('map-execution-result', mapResult);
-    //     return mapResult
-    // });
+    .then((mapResult) => {
+        options.socket.emit('map-execution-result', mapResult);
+        return mapResult
+    });
 }
 
 function _addAgent(options) {
