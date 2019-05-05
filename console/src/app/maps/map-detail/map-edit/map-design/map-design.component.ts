@@ -3,7 +3,7 @@ import { AfterContentInit, Component, ElementRef, OnDestroy, OnInit, ViewChild }
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
 import * as _ from 'lodash';
-import { Subscription } from 'rxjs';
+
 
 import { MapDesignService } from '../map-design.service';
 import { Link, MapStructure, Process, ProcessViewWrapper } from '@maps/models';
@@ -36,11 +36,9 @@ export const linkAttrs = {
   styleUrls: ['./map-design.component.scss']
 })
 export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
-  dropSubscription: Subscription;
   graph: joint.dia.Graph;
   paper: joint.dia.Paper;
   mapStructure: MapStructure;
-  mapStructureSubscription: Subscription;
   editing: boolean = false;
   plugins: Plugin[];
   process: Process;
@@ -63,10 +61,11 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.pluginsService.list().subscribe(plugins => {
       this.plugins = plugins;
       this.initMapDraw();
+      this.getCurrentMapStructure();
     });
 
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
-    this.dropSubscription = this.mapDesignService
+    this.mapDesignService
       .getDrop().pipe(
         filter(obj => this.isDroppedOnMap(obj.x, obj.y))
       ).subscribe(obj => {
@@ -77,8 +76,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.dropSubscription.unsubscribe();
-    this.mapStructureSubscription.unsubscribe();
     this.deselectAllCellsAndUpdateStructure();
   }
 
@@ -116,26 +113,27 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         return true;
       }
     });
-
     this.listeners();
-    this.mapStructureSubscription = this.mapsService
-      .getCurrentMapStructure().pipe(
-        tap(structure => this.mapStructure = structure),
-        filter(structure => !!structure)
-      ).subscribe(structure => {
-        this.initMapDraw();
-        for(let i=0,length=structure.processes.length;i<length;i++){
-          let imageProcess = this.graph.getCell(structure.processes[i].uuid)
-          for(let j =0,pluginsLength = this.plugins.length;j<pluginsLength;j++){
-            if(imageProcess.attributes.attrs['.p_id'].text == '' && this.plugins[j].name == structure.processes[i].used_plugin.name){
-              this.updateNodePid(structure.processes[i].uuid,this.plugins[j].id);
-              break;
-            }
-          }
-        }
-        this.onMapContentUpdate()
-      });
   }
+
+ getCurrentMapStructure(){
+  this.mapsService.getCurrentMapStructure().pipe(
+    tap(structure => this.mapStructure = structure),
+    filter(structure => !!structure)
+  ).subscribe(structure => {
+    this.initMapDraw();
+    for(let i=0,length=structure.processes.length;i<length;i++){
+      let imageProcess = this.graph.getCell(structure.processes[i].uuid)
+      for(let j =0,pluginsLength = this.plugins.length;j<pluginsLength;j++){
+        if((imageProcess.attributes.attrs['.p_id'].text == '' || imageProcess.attributes.attrs['.p_id'].text != this.plugins[j].id) && this.plugins[j].name == structure.processes[i].used_plugin.name){
+          this.updateNodePid(structure.processes[i].uuid,this.plugins[j].id);
+          break;
+        }
+      }
+    }
+    this.onMapContentUpdate()
+  });
+ }
 
   initMapDraw() {
     if (!this.init && this.plugins && this.mapStructure) {
