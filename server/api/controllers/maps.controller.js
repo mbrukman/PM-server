@@ -278,7 +278,7 @@ module.exports = {
             const executions = mapsExecutionService.executions;
             return res.json(Object.keys(executions).reduce((total, current) => {
                 console.log("currentRuns : ", executions[current].map);
-                total[current] = executions[current].map;
+                total[current] = executions[current].mapId;
                 return total;
             }, {}));
         });
@@ -381,7 +381,7 @@ module.exports = {
             })
 
             return newResult;
-            
+
         }).then(execResult=> {
             return res.json(execResult);
         }).catch(error => {

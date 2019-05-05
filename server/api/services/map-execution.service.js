@@ -107,7 +107,7 @@ function createProcessContext(runId, agent, processUUID, process) {
     process.name = process.name || 'Process #' + (processes.numProcesses + 1)
 
     const processData = {
-        processId: process.id,
+        processId: process.id || process._id.toString(),
         iterationIndex: processes[processUUID].length,
         status: process.status || statusEnum.RUNNING,
         uuid: processUUID,
@@ -503,7 +503,8 @@ function runAgentsFlowControlPendingProcesses(runId, map, structure, process) {
     for (let i in executionAgents) {
         for (let j in executionAgents[i].context.processes[process.uuid]) {
             let processToRun = executionAgents[i].context.processes[process.uuid][j]
-            updateProcessContext(runId, agentsStatus[i], process.uuid, processToRun.iterationIndex, { status: statusEnum.RUNNING, startTime: new Date() }, false)
+            if(processToRun.status != statusEnum.PENDING){return} // e.g. 1 agent
+            updateProcessContext(runId, agentsStatus[i], process.uuid, processToRun.iterationIndex, { status: statusEnum.RUNNING, startTime: new Date() })
             process.iterationIndex = processToRun.iterationIndex
             runProcess(map, structure, runId, agentsStatus[i], process);
         }
@@ -579,7 +580,8 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
 
     let nodesToRun = [];
     successors.forEach((successor, successorIdx) => {
-        const process = findProcessByUuid(successor, structure);
+        let  process = findProcessByUuid(successor, structure);
+        process = Object.assign({},process.toObject())
 
         let passProcessCoordination = checkProcessCoordination(process, runId, agent, structure)
         let passAgentFlowCondition = checkAgentFlowCondition(runId, process, map, structure, agent)
@@ -746,7 +748,7 @@ function runProcess(map, structure, runId, agent, process) {
                 agent,
                 process,
                 process.iterationIndex,
-                _.cloneDeep(action).toJSON(),
+                _.cloneDeep(action),
                 plugin.toJSON(),
                 executions[runId].clientSocket
             ])
@@ -1120,7 +1122,7 @@ module.exports = {
      * @param mapId {string}
      * @param resultId {string}
      */
-    logs: async (resultId) => {
+    logs: async (resultId) => { 
         let q = { runId: resultId };
         let mapResult = await MapResult.findOne(q)
         let logs = []

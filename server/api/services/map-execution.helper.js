@@ -146,7 +146,6 @@ module.exports = {
         let agentKeys = Object.keys(executionAgents)
         let res = true
         agentKeys.forEach(async(key) => {
-            // if(!await agentsService.checkAgentAlive(key)){ if I do async func the rest of agents contonus to run .
             if(!this.isAgentShuldContinue(key, executionAgents)){
                 return res = false;
             }
@@ -184,7 +183,7 @@ module.exports = {
 
     isThisTheFirstAgentToGetToTheProcess(executionAgents, processUUID, agentKey) {
         for (let i in executionAgents) {
-            if (i != agentKey && executionAgents[i].processes.hasOwnProperty(processUUID)) {
+            if (i != agentKey && executionAgents[i].context.processes.hasOwnProperty(processUUID)) {
                 return false;
             }
 
