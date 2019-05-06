@@ -2,6 +2,7 @@ const agentsService = require('./agents.service')
 const _ = require("lodash");
 
 const winston = require('winston');
+const IS_TIMEOUT = "Agent Timeout";
 
 
 module.exports = {
@@ -16,7 +17,7 @@ module.exports = {
     },
 
     /**
-     * returning start node for a structure
+     * returns the start node of a structure
      * @param structure
      * @returns {*}
      */
@@ -33,7 +34,7 @@ module.exports = {
         }
     },
 
-    /**
+/**
 * Checks if agents have correct plugins versions, if not install them
 * @param map
 * @param structure
@@ -80,6 +81,11 @@ module.exports = {
         })).length;
     },
 
+    /**
+     * create configuration
+     * @param {*} mapStructure 
+     * @param {string/Object} configuration 
+     */
     createConfiguration(mapStructure, configuration) {
 
         if(configuration){
@@ -153,6 +159,11 @@ module.exports = {
         return res;
     },
 
+    /**
+     * Return false if agent dead or has an error
+     * @param {*} agentKey 
+     * @param {*} executionAgents 
+     */
     isAgentShuldContinue(agentKey, executionAgents){
         let agentsStatus = Object.assign({}, agentsService.agentsStatus());
         let res = true
@@ -164,6 +175,23 @@ module.exports = {
             }
         })
         return res;
+    },
+
+    IS_TIMEOUT:IS_TIMEOUT,
+
+    /**
+     * Return timeout function  
+     * @param {*} action 
+     */
+    getTimeOutFunc(action){
+        if (action.timeout || (!action.timeout && action.timeout !== 0)) { // if there is a timeout or no timeout
+            return new Promise((resolve, reject) => {
+                timeout = setTimeout(() => {
+                    resolve(IS_TIMEOUT);
+                }, (action.timeout || 600000));
+            });
+        }
+        return new Promise(() => { });
     },
 
     /**

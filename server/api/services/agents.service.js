@@ -239,7 +239,7 @@ function addSocketIdToAgent(agentKey, socket) {
 function sendRequestToAgent(options, agent) {
     return new Promise((resolve, reject) => {
         options = Object.assign({},options);
-        options.uri = agent.defaultUrl + options.uri;
+        options.uri = agents[agent.key].defaultUrl + options.uri;
         options.method = options.method || 'POST';
 
         if (options.body) {
