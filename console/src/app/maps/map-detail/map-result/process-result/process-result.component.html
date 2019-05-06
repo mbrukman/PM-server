@@ -14,8 +14,11 @@
                 <p>Finish time: Not supported in aggregate mode</p>
             </ng-container>
       </div>
-      <div class="process-pie-charts">
+      <div class="process-pie-charts" *ngIf='isRan'>
         <app-execution-chart [size]=[130,130] [result]="process"></app-execution-chart>
+      </div>
+      <div *ngIf="!isRan">
+        <ngx-charts-pie-chart [view]=[130,130]  [results]="yellowChart" [labels]="false" [scheme]="colorScheme" [doughnut]="true"></ngx-charts-pie-chart>
       </div>
     </div>
     <div class="row">

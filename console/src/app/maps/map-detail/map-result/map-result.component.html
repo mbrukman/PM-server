@@ -71,7 +71,7 @@
                         selectedExecution?.configuration.name}}</p>
                     </div>
                     <div class="chart">
-                      <div class="pie-chart-parent">
+                      <div class="pie-chart-parent" *ngIf="isProcessRan">
                           <app-execution-chart [result]="pieChartExecution"></app-execution-chart>
                       </div>
                     </div>

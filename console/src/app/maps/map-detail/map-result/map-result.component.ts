@@ -45,6 +45,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   processesList: IProcessList[];
   agProcessStatusesByProcessIndex: ProcessResultByProcessIndex;
   pieChartExecution:ProcessResult[];
+  isProcessRan : boolean = true;
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
@@ -162,7 +163,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
       if (!total[current.uuid].hasOwnProperty(current.index)) {
         total[current.uuid][current.index] = [];
       }
-      total[current.uuid][current.index].push(current.status);
+      if(typeof current.result == 'string'){
+        total[current.uuid][current.index].push('skipped')
+      }
+      else{
+        total[current.uuid][current.index].push(current.status);
+      }
       return total;
     }, {});
   }
@@ -211,21 +217,31 @@ export class MapResultComponent implements OnInit, OnDestroy {
         return false;
       }
     });
+    
     this.pieChartExecution = [];
     if (!agentResult) { // if not found it aggregate
       this.result = this.selectedExecution.agentsResults;
       this.selectedExecution.agentsResults.forEach(agent => {
+        this.checkIfProcessDidntRun(agent)
         this.pieChartExecution.push(...agent.processes);
       })
 
     } else {
       this.pieChartExecution.push(...agentResult.processes);
       this.result = [agentResult];
+      this.checkIfProcessDidntRun(agentResult)
     }
     this.generateProcessesList();
     this.agProcessStatusesByProcessIndex = this.aggregateProcessStatusesByProcessIndex(this.result);
   }
 
+  checkIfProcessDidntRun(agent:AgentResult){
+    agent.processes.forEach((process) => {
+      if(typeof process.result == 'string'){
+        this.isProcessRan = false
+      }
+    })
+  }
   /**
    * Aggregates the results to generate processes list.
    */
@@ -255,6 +271,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       total[current.uuid] = (total[current.uuid] || 0) + 1;
       return total;
     }, {});
+
     this.processesList = processesList
       .sort(sortByDate)
       .map(o => {
@@ -262,7 +279,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
           name: (o.name) || 'Process #' + (Object.keys(overall).indexOf(o.uuid) + 1),
           index: o.index,
           uuid: o.uuid,
-          overall: overall[o.uuid]
+          overall: overall[o.uuid],
         };
       });
 
