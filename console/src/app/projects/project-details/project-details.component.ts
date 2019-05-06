@@ -2,10 +2,9 @@ import { Component, OnDestroy, OnInit,ViewChild,ElementRef } from '@angular/core
 import { ActivatedRoute, Router,Data } from '@angular/router';
 
 import { BsModalService } from 'ngx-bootstrap/modal';
-
 import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
-import { ConfirmComponent } from '../../shared/confirm/confirm.component';
+import { PopupService } from '../../shared/services/popup.service';
 import { ImportModalComponent } from './import-modal/import-modal.component';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
@@ -34,9 +33,10 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute,
     private router: Router,
     private projectsService: ProjectsService,
-    private modalService: BsModalService,
+    private popupService: PopupService,
     private mapsService:MapsService,
-    private seoService:SeoService) { }
+    private seoService:SeoService,
+    private modalService:BsModalService) { }
 
   ngOnInit() {
     this.id = this.route.snapshot.params.id;
@@ -71,12 +71,10 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   private archiveOn() {
-    let modal = this.modalService.show(ConfirmComponent);
-    modal.content.title = 'Archive this project?';
-    modal.content.message = 'When archiving a project, all the maps will be archived as well.';
-    modal.content.confirm = 'Yes, archive';
-    modal.content.result.subscribe(result => {
-      if (result) {
+    let confirm = 'Yes, archive';
+    this.popupService.openConfirm('Archive this project?','When archiving a project, all the maps will be archived as well.',confirm,null,null)
+    .subscribe(result => {
+      if (result == confirm) {
         this.projectsService.archive(this.id, true).subscribe(() => { this.project.archived = true; });
       }
     });

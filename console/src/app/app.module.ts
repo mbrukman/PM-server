@@ -19,6 +19,7 @@ import { IsSetUpGuard } from './core/setup/issetup.guard';
 import { VaultService } from '@shared/vault.service';
 import {SeoService} from './seo.service';
 import { AutoCompleteService } from '@shared/components/params/autocomplete.service';
+import {PopupService} from '@shared/services/popup.service';
 
 
 @NgModule({
@@ -29,7 +30,7 @@ import { AutoCompleteService } from '@shared/components/params/autocomplete.serv
     SharedModule,
     AppRoutingModule
   ],
-  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService,AutoCompleteService],
+  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService,AutoCompleteService,PopupService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
