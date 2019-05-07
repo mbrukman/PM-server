@@ -4,7 +4,7 @@
         <i [hidden] = "!isAllElementEqual" class="material-icons" [ngClass]="{
           'text-info': statuses[0] === 'partial',
           'text-danger': statuses[0] == 'error',
-          'text-warning': statuses[0] == 'stopped',
+          'text-warning': isWarning(statuses[0]),
           'text-success': statuses[0] == 'success'
           }"
            aria-hidden="true" [tooltip]="tolTemplate">fiber_manual_record</i>
@@ -13,7 +13,7 @@
     <i [hidden]="statuses.length > 1" class="material-icons" [ngClass]="{
       'text-info': statuses[0] === 'partial',
       'text-danger': statuses[0] == 'error',
-      'text-warning': statuses[0] == 'stopped',
+      'text-warning': isWarning(statuses[0]),
       'text-success': statuses[0] == 'success'
       }"
        aria-hidden="true" [tooltip]="statuses[0]">fiber_manual_record</i>
@@ -27,7 +27,7 @@
     <i class="fa fa-circle" [ngClass]="{
          'text-info': status === 'partial',
          'text-danger': status == 'error',
-         'text-warning': status == 'stopped',
+         'text-warning': isWarning(status),
          'text-success': status == 'success'
          }"
       aria-hidden="true"></i>

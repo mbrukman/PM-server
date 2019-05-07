@@ -11,6 +11,7 @@ export class ProcessListItemComponent implements OnInit{
   @Input('statuses') statuses: string[];
   isAllElementEqual:boolean = false;
 
+
   constructor() { }
 
 
@@ -18,6 +19,10 @@ export class ProcessListItemComponent implements OnInit{
     if(this.statuses.every( status => status === this.statuses[0])){
       this.isAllElementEqual = true;
     }
+  }
+
+  isWarning(status){
+    return status == 'stopped' || status == 'skipped'
   }
 
 }

@@ -10,6 +10,7 @@ import { ProcessResultByProcessIndex } from '@maps/models';
 import { BsModalService } from 'ngx-bootstrap';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 import { filter, take, tap, mergeMap } from 'rxjs/operators';
+import * as _ from 'lodash';
 
 const defaultAgentValue = 'default'
 
@@ -162,7 +163,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
       if (!total[current.uuid].hasOwnProperty(current.index)) {
         total[current.uuid][current.index] = [];
       }
-      total[current.uuid][current.index].push(current.status);
+      if(typeof current.result == 'string'){
+        total[current.uuid][current.index].push('skipped')
+      }
+      else{
+        total[current.uuid][current.index].push(current.status);
+      }
       return total;
     }, {});
   }
@@ -211,20 +217,21 @@ export class MapResultComponent implements OnInit, OnDestroy {
         return false;
       }
     });
+    
     this.pieChartExecution = [];
     if (!agentResult) { // if not found it aggregate
       this.result = this.selectedExecution.agentsResults;
       this.selectedExecution.agentsResults.forEach(agent => {
-        this.pieChartExecution.push(...agent.processes);
+        this.pieChartExecution.push(...agent.processes)
       })
-
+      
     } else {
-      this.pieChartExecution.push(...agentResult.processes);
-      this.result = [agentResult];
+      this.pieChartExecution.push(...agentResult.processes)
+        this.result = [agentResult];
     }
     this.generateProcessesList();
     this.agProcessStatusesByProcessIndex = this.aggregateProcessStatusesByProcessIndex(this.result);
-  }
+  } 
 
   /**
    * Aggregates the results to generate processes list.
@@ -255,6 +262,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       total[current.uuid] = (total[current.uuid] || 0) + 1;
       return total;
     }, {});
+
     this.processesList = processesList
       .sort(sortByDate)
       .map(o => {
@@ -262,7 +270,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
           name: (o.name) || 'Process #' + (Object.keys(overall).indexOf(o.uuid) + 1),
           index: o.index,
           uuid: o.uuid,
-          overall: overall[o.uuid]
+          overall: overall[o.uuid],
         };
       });
 

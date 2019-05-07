@@ -21,13 +21,11 @@ export class ProcessResultComponent implements OnChanges {
   generalInfo: ProcessResult;
   agProcessActionsStatus: any;
   agActionsStatus: any;
-  colorScheme = {
-    domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
-  };
+
 
   constructor(private modalService: BsModalService) { }
 
-  ngOnChanges(changes) {
+  ngOnChanges() {
     this.aggregate =  this.result.length > 1 ? true : false;
     this.agProcessActionsStatus = null;
     this.agActionsStatus = null;
@@ -37,6 +35,7 @@ export class ProcessResultComponent implements OnChanges {
       this.generalInfo = this.result[0].processes.find(o => o.uuid === this.process[0].uuid && o.index === this.process[0].index);
     }
   }
+
 
   isObject(item){
     return typeof item == 'object' ? true : false;
