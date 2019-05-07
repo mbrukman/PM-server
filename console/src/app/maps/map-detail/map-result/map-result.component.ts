@@ -222,41 +222,16 @@ export class MapResultComponent implements OnInit, OnDestroy {
     if (!agentResult) { // if not found it aggregate
       this.result = this.selectedExecution.agentsResults;
       this.selectedExecution.agentsResults.forEach(agent => {
-        this.updatePieChart(agent,true)
+        this.pieChartExecution.push(...agent.processes)
       })
-      if(this.pieChartExecution.length == 0){
-        let processes = [];
-        this.selectedExecution.agentsResults.forEach((agent) => {
-          processes.push(...agent.processes);
-        })
-        this.pieChartExecution.push(...processes)
-      }
+      
     } else {
-        this.updatePieChart(agentResult);
+      this.pieChartExecution.push(...agentResult.processes)
         this.result = [agentResult];
     }
     this.generateProcessesList();
     this.agProcessStatusesByProcessIndex = this.aggregateProcessStatusesByProcessIndex(this.result);
-  }
-
-  updatePieChart(agent,isAggregate = false){
-    let clonedAgent = _.cloneDeep(agent);
-    let index = clonedAgent.processes.findIndex((process) => typeof process.result == 'string' && process.status == 'error')
-    if(index > -1){
-      clonedAgent.processes.splice(index,1)
-    }
-    if(clonedAgent.processes.length > 0){
-      this.pieChartExecution.push(...clonedAgent.processes)
-    }
-    if(isAggregate) return;
-    if(this.pieChartExecution.length == 0){ 
-      let processes = [];
-      this.selectedExecution.agentsResults.forEach((agent) => {
-        processes.push(...agent.processes);
-      })
-      this.pieChartExecution.push(...processes)
-    }
-  }
+  } 
 
   /**
    * Aggregates the results to generate processes list.
