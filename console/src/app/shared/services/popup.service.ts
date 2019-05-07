@@ -8,16 +8,25 @@ import { BsModalService } from 'ngx-bootstrap';
 export class PopupService {
 
     
-  constructor(private modalService: BsModalService,) {
+  constructor(private modalService: BsModalService) {
+  }
+
+  openComponent(component,content){
+    const modal = this.modalService.show(component);
+    Object.keys(content).forEach(key => {
+      modal.content[key] = content[key];
+    })
+    return modal.content.result;
   }
 
   openConfirm(title,message,confirmText,cancelText,thirdButtonText){
-      const modal = this.modalService.show(ConfirmComponent);
-      modal.content.message = message;
-      modal.content.confirm = confirmText;
-      modal.content.cancel = cancelText || 'Cancel';
-      modal.content.third = thirdButtonText;
-      modal.content.title = title;
-      return modal.content.result
+      let content = {
+        message:message,
+        confirm:confirmText,
+        title:title,
+        third:thirdButtonText,
+        cancel:cancelText || 'Cancel'
+      }
+      return this.openComponent(ConfirmComponent,content);
   }
 }

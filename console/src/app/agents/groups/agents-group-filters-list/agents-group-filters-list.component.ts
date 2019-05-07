@@ -2,13 +2,12 @@ import { Component, OnInit, Input } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import { BsModalService } from 'ngx-bootstrap';
+import {PopupService} from '@shared/services/popup.service'
 import * as _ from 'lodash';
 import { AgentsService } from '../../agents.service';
 import { Agent, Group } from '@agents/models';
 import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
 import {FILTER_FIELDS,FILTER_TYPES} from '@agents/models/group.model'
-import {AgentsGroupFilter} from '@agents/models/group.model'
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -25,7 +24,7 @@ export class AgentsGroupFiltersListComponent implements OnInit {
     // filtersGroups: AgentsGroupFilter[];
     @Input('group') group: Group;
 
-  constructor(private agentsService: AgentsService, private modalService: BsModalService) {
+  constructor(private agentsService: AgentsService, private popupService:PopupService) {
   }
   ngOnInit(){
     this.agentsService.getUpdateGroupAsObservable().subscribe((group) => {
@@ -43,10 +42,12 @@ export class AgentsGroupFiltersListComponent implements OnInit {
   }
 
   editFilter(filter,index){
-    const modal = this.modalService.show(AgentsGroupUpsertFilterComponent);
-    modal.content.edit = true;
-    modal.content.filter = filter;
-    modal.content.result.pipe(
+    let content = {
+      edit:true,
+      filter:filter
+    }
+    this.popupService.openComponent(AgentsGroupUpsertFilterComponent,content)
+    .pipe(
       take(1),
     ).subscribe(filters => {
         this.group.filters.splice(index,1,filters)

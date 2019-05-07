@@ -1,16 +1,12 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
-
 import * as _ from 'lodash';
-
 import { distinctUntilChanged, filter, debounceTime} from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-
 import { Process, Action, ProcessViewWrapper } from '@maps/models';
 import { PluginMethod } from '@plugins/models/plugin-method.model';
 import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
 import { SocketService } from '@shared/socket.service';
-import { PluginsService } from '@plugins/plugins.service';
 import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { PopupService } from '@shared/services/popup.service';

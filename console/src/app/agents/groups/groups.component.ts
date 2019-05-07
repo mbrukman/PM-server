@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 
 import { AgentsService } from '@agents/agents.service';
 import { Group } from '@agents/models/group.model';
-import { BsModalService } from 'ngx-bootstrap';
+import {PopupService} from '@shared/services/popup.service'
 import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
 import { Agent } from '@agents/models/agent.model';
 import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-group-upsertcomponent'
@@ -24,7 +24,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
   selectedDropGroupIndex : string;
   currentGroupIndex : number;
 
-  constructor(private agentsService: AgentsService, private modalService: BsModalService) {
+  constructor(private agentsService: AgentsService, private popupService:PopupService) {
   }
 
   ngOnInit() {
@@ -107,8 +107,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
    * Creating a new group and adding it to groups array.
    */
   createGroup() {
-    const modal = this.modalService.show(InputPopupComponent);
-    modal.content.result.pipe(
+    this.popupService.openComponent(InputPopupComponent,{})
+    .pipe(
       take(1),
       filter(name => !!name),
       mergeMap(name => this.agentsService.groupCreate(<Group>{ name: name }))
@@ -117,9 +117,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
 
   editGroup(index){
     let group = this.groups[index];
-    const modal = this.modalService.show(AgentsGroupUpsertComponent);
-    modal.content.name = group.name;
-    modal.content.result.pipe(
+    this.popupService.openComponent(AgentsGroupUpsertComponent,{name:group.name})
+    .pipe(
       take(1),
       filter(r => !!r)
     ).subscribe(r => {

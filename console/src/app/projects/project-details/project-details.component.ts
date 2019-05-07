@@ -1,7 +1,5 @@
 import { Component, OnDestroy, OnInit,ViewChild,ElementRef } from '@angular/core';
 import { ActivatedRoute, Router,Data } from '@angular/router';
-
-import { BsModalService } from 'ngx-bootstrap/modal';
 import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
 import { PopupService } from '../../shared/services/popup.service';
@@ -35,8 +33,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     private projectsService: ProjectsService,
     private popupService: PopupService,
     private mapsService:MapsService,
-    private seoService:SeoService,
-    private modalService:BsModalService) { }
+    private seoService:SeoService) { }
 
   ngOnInit() {
     this.id = this.route.snapshot.params.id;
@@ -99,8 +96,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   openImportModal() {
-    const modal = this.modalService.show(ImportModalComponent);
-    modal.content.projectId = this.id;
+    this.popupService.openComponent(ImportModalComponent,{projectId:this.id});
   }
 
 }

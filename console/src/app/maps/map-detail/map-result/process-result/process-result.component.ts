@@ -2,7 +2,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
-import { BsModalService } from 'ngx-bootstrap';
+import {PopupService} from '@shared/services/popup.service'
 import { AgentResult, ProcessResult, ActionResultView } from '@maps/models';
 import { Agent } from '@agents/models/agent.model';
 
@@ -25,7 +25,7 @@ export class ProcessResultComponent implements OnChanges {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
 
-  constructor(private modalService: BsModalService) { }
+  constructor(private popupService:PopupService) { }
 
   ngOnChanges(changes) {
     this.aggregate =  this.result.length > 1 ? true : false;
@@ -59,9 +59,7 @@ export class ProcessResultComponent implements OnChanges {
     });
     
     messages.push(msgs.join('\n'));
-
-    const modal = this.modalService.show(RawOutputComponent);
-    modal.content.messages = messages;
+    this.popupService.openComponent(RawOutputComponent,{messages:messages})
   }
 
 

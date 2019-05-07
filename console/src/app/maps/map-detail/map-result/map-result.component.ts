@@ -7,7 +7,7 @@ import { MapResult, AgentResult, ProcessResult } from '@maps/models/execution-re
 import { SocketService } from '@shared/socket.service';
 import { Agent } from '@agents/models/agent.model';
 import { ProcessResultByProcessIndex } from '@maps/models';
-import { BsModalService } from 'ngx-bootstrap';
+import {PopupService} from '@shared/services/popup.service'
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 import { filter, take, tap, mergeMap } from 'rxjs/operators';
 
@@ -49,7 +49,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
 
-  constructor(private mapsService: MapsService, private socketService: SocketService, private modalService: BsModalService) {
+  constructor(private mapsService: MapsService, private socketService: SocketService, private popupService:PopupService) {
   }
 
   ngOnInit() {
@@ -140,8 +140,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   expandOutput(){
     let messages = []
     this.selectedExecutionLogs.forEach(item=>{messages.push(item.message)});
-    const modal = this.modalService.show(RawOutputComponent);
-    modal.content.messages = messages;
+    this.popupService.openComponent(RawOutputComponent,{messages:messages})
   }
 
 

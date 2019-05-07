@@ -1,6 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap';
-
 import {MapsService} from '@maps/maps.service';
 import {Map, MapStructure, MapTrigger} from '@maps/models';
 import {TriggerFormComponent} from './trigger-form/trigger-form.component';
@@ -19,8 +17,7 @@ export class MapTriggersComponent implements OnInit {
 
   constructor(
     private popupService: PopupService, 
-    private mapsService: MapsService,
-    private modalService:BsModalService) { }
+    private mapsService: MapsService) { }
 
   ngOnInit() {
     this.mapsService.getCurrentMap().subscribe(map => {
@@ -38,11 +35,8 @@ export class MapTriggersComponent implements OnInit {
 
   openTriggerFormModal(index?) {
     const edit = index || index === 0;
-    let modal: BsModalRef;
-    modal = this.modalService.show(TriggerFormComponent);
-    modal.content.trigger = this.triggers[index];
-    modal.content.configurations = this.mapStructure.configurations.map(o => o.name);
-    modal.content.result.subscribe(result => {
+    this.popupService.openComponent(TriggerFormComponent,{trigger:this.triggers[index],configurations:this.mapStructure.configurations.map(o => o.name)})
+    .subscribe(result => {
       if (!edit) {
         this.mapsService.createTrigger(this.map.id, result).subscribe(trigger => {
           this.triggers.push(trigger);

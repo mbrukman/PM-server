@@ -9,7 +9,6 @@ import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DistinctMapResult } from '@shared/model/distinct-map-result.model';
 import { Data, ActivatedRoute } from '@angular/router';
-
 import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({

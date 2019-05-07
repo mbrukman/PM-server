@@ -2,15 +2,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import * as _ from 'lodash';
-import { BsModalService } from 'ngx-bootstrap/modal';
-
 import { MapsService } from '../maps.service';
 import { MapStructureConfiguration, Map, MapStructure } from '@maps/models';
 import {PopupService} from '@shared/services/popup.service';
 import { SocketService } from '@shared/socket.service';
 import { filter, take } from 'rxjs/operators';
 import { Subject, Subscription } from 'rxjs';
-
 import {SeoService,PageTitleTypes} from '@app/seo.service';
 import { SelectItem } from 'primeng/primeng';
 
@@ -51,9 +48,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private mapsService: MapsService,
     private socketService: SocketService,
-    private modalService: BsModalService,
-    private seoService:SeoService,
-    private popupService: PopupService) {
+    private popupService:PopupService,
+    private seoService:SeoService,) {
 
     this.navItems = [
       { name: 'Properties', routerLink: ['properties'] },
@@ -348,10 +344,6 @@ export class MapDetailComponent implements OnInit, OnDestroy {
 
     let subject = new Subject<boolean>();
 
-    this.modalService.setDismissReason('Yes');
-    this.modalService.onHide.subscribe(() => {
-      return subject.next(false)
-    })
 
     popup.subscribe(result => {
       if (result === confirm) {

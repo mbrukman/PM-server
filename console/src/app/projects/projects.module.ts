@@ -6,7 +6,6 @@ import { ProjectsRoutingModule } from './projects-routing.module';
 import { ProjectDetailsComponent } from './project-details/project-details.component';
 import { ProjectsListComponent } from './projects-list/projects-list.component';
 import { ProjectCreateComponent } from './project-create/project-create.component';
-import { ImportModalComponent } from './project-details/import-modal/import-modal.component';
 import { ProjectsResolver } from './resolvers/projects-resolver.resolver';
 import {ProjectDetailsResolver} from './resolvers/project-details.resolver';
 
@@ -19,11 +18,10 @@ import {ProjectDetailsResolver} from './resolvers/project-details.resolver';
   declarations: [
     ProjectsListComponent,
     ProjectDetailsComponent,
-    ProjectCreateComponent,
-    ImportModalComponent
+    ProjectCreateComponent
   ],
   providers:[ProjectsResolver,ProjectDetailsResolver],
-  entryComponents: [ImportModalComponent]
+  entryComponents: []
 })
 export class ProjectsModule {
 }

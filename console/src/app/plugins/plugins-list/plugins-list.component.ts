@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { PluginsService } from '../plugins.service';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap';
-
 import { Plugin } from '../models/plugin.model';
 import { PluginUploadComponent } from '../plugin-upload/plugin-upload.component';
-
+import {PopupService} from '@shared/services/popup.service';
 import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
@@ -17,7 +15,7 @@ export class PluginsListComponent implements OnInit {
   filterTerm: string;
 
   constructor(private pluginsService: PluginsService, 
-    private modalService: BsModalService,
+    private popupService:PopupService,
     private seoService:SeoService) {
   }
 
@@ -39,9 +37,8 @@ export class PluginsListComponent implements OnInit {
   }
 
   onOpenModal() {
-    let modal: BsModalRef;
-    modal = this.modalService.show(PluginUploadComponent);
-    modal.content.closing.subscribe(() => {
+    this.popupService.openComponent(PluginUploadComponent,{})
+    .subscribe(() => {
       this.requestPlugins();
     });
   }
