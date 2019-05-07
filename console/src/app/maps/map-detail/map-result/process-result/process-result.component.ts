@@ -21,17 +21,11 @@ export class ProcessResultComponent implements OnChanges {
   generalInfo: ProcessResult;
   agProcessActionsStatus: any;
   agActionsStatus: any;
-  isRan : boolean = true;
-  yellowChart = [
-    { name: 'stopped', value: 1 },
-  ]
-  colorScheme = {
-    domain: ['#ebb936']
-  };
+
 
   constructor(private modalService: BsModalService) { }
 
-  ngOnChanges(changes) {
+  ngOnChanges() {
     this.aggregate =  this.result.length > 1 ? true : false;
     this.agProcessActionsStatus = null;
     this.agActionsStatus = null;
@@ -40,12 +34,8 @@ export class ProcessResultComponent implements OnChanges {
     if (this.process.length === 1) {
       this.generalInfo = this.result[0].processes.find(o => o.uuid === this.process[0].uuid && o.index === this.process[0].index);
     }
-    this.process.forEach((process) => {
-      if(typeof process.result == 'string'){
-        this.isRan = false;
-      }
-    })
   }
+
 
   isObject(item){
     return typeof item == 'object' ? true : false;

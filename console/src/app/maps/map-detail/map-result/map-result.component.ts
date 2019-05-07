@@ -10,6 +10,7 @@ import { ProcessResultByProcessIndex } from '@maps/models';
 import { BsModalService } from 'ngx-bootstrap';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 import { filter, take, tap, mergeMap } from 'rxjs/operators';
+import * as _ from 'lodash';
 
 const defaultAgentValue = 'default'
 
@@ -45,7 +46,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
   processesList: IProcessList[];
   agProcessStatusesByProcessIndex: ProcessResultByProcessIndex;
   pieChartExecution:ProcessResult[];
-  isProcessRan : boolean = true;
   colorScheme = {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
@@ -222,26 +222,42 @@ export class MapResultComponent implements OnInit, OnDestroy {
     if (!agentResult) { // if not found it aggregate
       this.result = this.selectedExecution.agentsResults;
       this.selectedExecution.agentsResults.forEach(agent => {
-        this.checkIfProcessDidntRun(agent)
-        this.pieChartExecution.push(...agent.processes);
+        this.updatePieChart(agent,true)
       })
-
+      if(this.pieChartExecution.length == 0){
+        let processes = [];
+        this.selectedExecution.agentsResults.forEach((agent) => {
+          processes.push(...agent.processes);
+        })
+        this.pieChartExecution.push(...processes)
+      }
     } else {
-      this.pieChartExecution.push(...agentResult.processes);
-      this.result = [agentResult];
-      this.checkIfProcessDidntRun(agentResult)
+        this.updatePieChart(agentResult);
+        this.result = [agentResult];
     }
     this.generateProcessesList();
     this.agProcessStatusesByProcessIndex = this.aggregateProcessStatusesByProcessIndex(this.result);
   }
 
-  checkIfProcessDidntRun(agent:AgentResult){
-    agent.processes.forEach((process) => {
-      if(typeof process.result == 'string'){
-        this.isProcessRan = false
-      }
-    })
+  updatePieChart(agent,isAggregate = false){
+    let clonedAgent = _.cloneDeep(agent);
+    let index = clonedAgent.processes.findIndex((process) => typeof process.result == 'string' && process.status == 'error')
+    if(index > -1){
+      clonedAgent.processes.splice(index,1)
+    }
+    if(clonedAgent.processes.length > 0){
+      this.pieChartExecution.push(...clonedAgent.processes)
+    }
+    if(isAggregate) return;
+    if(this.pieChartExecution.length == 0){ 
+      let processes = [];
+      this.selectedExecution.agentsResults.forEach((agent) => {
+        processes.push(...agent.processes);
+      })
+      this.pieChartExecution.push(...processes)
+    }
   }
+
   /**
    * Aggregates the results to generate processes list.
    */
