@@ -27,7 +27,7 @@ module.exports = {
                             });
                             return;
                         }
-                       mapsExecutionService.execute(job.map, null, socket, job.configuration, 'Started by schedules task').catch(err=>{console.error(err);})
+                       mapsExecutionService.execute(job.map, null, socket, job.configuration, 'Started by schedules task').catch(err=>{ winston.log('error', err);})
                     })
             });
     },

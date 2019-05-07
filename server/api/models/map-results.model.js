@@ -7,7 +7,8 @@ const statusEnum = {
     PENDING: 'pending',
     ERROR: 'error',
     STOPPED: 'stopped',
-    CANCELED: 'canceled'
+    CANCELED: 'canceled',
+    SUCCESS: 'success'
 }
 
 let actionResultSchema = new Schema({

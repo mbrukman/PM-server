@@ -35,7 +35,8 @@ module.exports = {
     },
 
 /**
-* Checks if agents have correct plugins versions, if not install them
+* Checks if agents have correct plugins versions, if not install them.
+* returns null promise 
 * @param map
 * @param structure
 * @param runId
@@ -105,7 +106,7 @@ module.exports = {
             }
         } 
 
-        let selectedConfiguration = {}
+        let selectedConfiguration
         if (mapStructure.configurations && mapStructure.configurations.length) {
             selectedConfiguration = configuration ? mapStructure.configurations.find(o => o.name === configuration) : mapStructure.configurations.find(o => o.selected);
             if (!selectedConfiguration) {
@@ -113,7 +114,7 @@ module.exports = {
             }
         }
 
-        return selectedConfiguration.value;
+        return selectedConfiguration.value || {};
     },
 
     /**
@@ -149,14 +150,12 @@ module.exports = {
     },
 
     areAllAgentsAlive(executionAgents) {
-        let agentKeys = Object.keys(executionAgents)
-        let res = true
-        agentKeys.forEach(async(key) => {
-            if(!this.isAgentShuldContinue(key, executionAgents)){
-                return res = false;
+        for(let key in executionAgents){
+            if(!this.isAgentShuldContinue(executionAgents[key])){
+                return false;
             }
-        })
-        return res;
+        }
+        return true;
     },
 
     /**
@@ -164,17 +163,14 @@ module.exports = {
      * @param {*} agentKey 
      * @param {*} executionAgents 
      */
-    isAgentShuldContinue(agentKey, executionAgents){
+    isAgentShuldContinue(agent){
         let agentsStatus = Object.assign({}, agentsService.agentsStatus());
-        let res = true
-        _.find(agentsStatus, (agent) => {
-            if (agent.id === executionAgents[agentKey].id) {
-                if (!agent.alive || executionAgents[agentKey].status) {
-                    return res = false
-                }
+        for(let key  in agentsStatus){
+            if (agentsStatus[key].id === agent.id) {
+                return (agentsStatus[key].alive && !agent.status) 
             }
-        })
-        return res;
+        }
+        return false;
     },
 
     IS_TIMEOUT:IS_TIMEOUT,
@@ -183,15 +179,17 @@ module.exports = {
      * Return timeout function  
      * @param {*} action 
      */
-    getTimeOutFunc(action){
+    generateTimeoutFun(action){
+        let timeout
+        let timeoutPromise = new Promise(() => { });
         if (action.timeout || (!action.timeout && action.timeout !== 0)) { // if there is a timeout or no timeout
-            return new Promise((resolve, reject) => {
+            timeoutPromise =  new Promise((resolve, reject) => {
                 timeout = setTimeout(() => {
                     resolve(IS_TIMEOUT);
                 }, (action.timeout || 600000));
-            });
+            })
         }
-        return new Promise(() => { });
+        return {timeoutPromise, timeout}
     },
 
     /**

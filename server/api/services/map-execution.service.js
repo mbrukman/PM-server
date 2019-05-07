@@ -26,7 +26,7 @@ let executions = {};
 let pending = {};
 
 let libpm = ''; // all sdk code.
-
+let libpmObjects = {}
 
 fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 'utf8', function (err, data) {
     // opens the lib_production file. this file is used for user to use overwrite custom function at map code
@@ -35,8 +35,20 @@ fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 
     }
     libpm = data;
     eval(libpm)
+    libpmObjects.currentAgent = currentAgent
 });
 
+/**
+ * Returns the agent object like in the sdk format 
+ * @param {*} agent 
+ */
+function getCurrentAgent(agent) {
+    let obj = {};
+    Object.keys(libpmObjects.currentAgent).forEach(field => {
+        obj[field] = agent[field]
+    })
+    return obj;
+}
 
 async function evaluateParam(param, typeParam, context) {
     if (!param.code) {
@@ -96,18 +108,19 @@ function updateClientPending(socket, pendingToRemove = null) {
  * @returns {number}
  */
 function createProcessContext(runId, agent, processUUID, process) {
-    let processes = executions[runId].executionAgents[agent.key].context.processes
+    let executionAgent = executions[runId].executionAgents[agent.key]
+    let processes = executionAgent.context.processes
 
-    if (!processes.numProcesses && processes.numProcesses != 0) {
-        processes.numProcesses = 0
+    if (!executionAgent.numProcesses && executionAgent.numProcesses != 0) {
+        executionAgent.numProcesses = 0
     } else {
-        processes.numProcesses++
+        executionAgent.numProcesses++
     }
     if (!processes[processUUID]) {
         processes[processUUID] = [];
     }
 
-    process.name = process.name || 'Process #' + (processes.numProcesses + 1)
+    process.name = process.name || 'Process #' + (executionAgent.numProcesses + 1)
 
     const processData = {
         processId: process.id || process._id.toString(),
@@ -116,7 +129,7 @@ function createProcessContext(runId, agent, processUUID, process) {
         uuid: processUUID,
         actions: {},
         startTime: new Date(),
-        processIndex: processes.numProcesses  // numProcesses => represents the process in the DB.  
+        processIndex: executionAgent.numProcesses  // numProcesses => represents the process in the DB.  
     };
     processes[processUUID].push(processData);
 
@@ -126,9 +139,8 @@ function createProcessContext(runId, agent, processUUID, process) {
         processData: processData
     }
     dbUpdates.addProcess(options)
-
-
-    return processData.iterationIndex;
+    
+    process.iterationIndex = processData.iterationIndex;
 }
 
 /**
@@ -139,7 +151,7 @@ function createProcessContext(runId, agent, processUUID, process) {
  * @param processIndex
  * @param processData
  */
-function updateProcessContext(runId, agent, processUUID, iterationIndex, processData, updateDB = true) { // sharbst updateDB? delete it?
+function updateProcessContext(runId, agent, processUUID, iterationIndex, processData) {
 
     if (!executions[runId]) {
         return;
@@ -156,9 +168,32 @@ function updateProcessContext(runId, agent, processUUID, iterationIndex, process
         data: processData
     }
 
-    updateDB ? dbUpdates.updateProcess(options) : null
+    dbUpdates.updateProcess(options)
 
 }
+
+function createActionContect(runId, agentKey, processKey, processIndex, action, actionData){
+    if (!executions[runId]) {return;}
+    let process = executions[runId].executionAgents[agentKey].context.processes[processKey][processIndex]
+
+    process.actions[action._id] = Object.assign(action, actionData);
+
+    // set previousAction & currentAction
+    executions[runId].executionAgents[agentKey].context.previousAction = executions[runId].executionAgents[agentKey].context.currentAction
+    executions[runId].executionAgents[agentKey].context.currentAction = process.actions[action._id]
+
+    let options = {
+        data: actionData,
+        mapResultId: executions[runId].mapResultId,
+        agentId: executions[runId].executionAgents[agentKey].id,
+        processIndex: process.processIndex,
+        actionIndex: process.actions[action._id].actionIndex
+    }
+
+    return dbUpdates.addAction(options)
+
+}
+
 
 /**
  * assigning data to action execution.
@@ -170,14 +205,11 @@ function updateProcessContext(runId, agent, processUUID, iterationIndex, process
  * @param actionData
  */
 function updateActionContext(runId, agentKey, processKey, processIndex, action, actionData) {
-    if (!executions[runId]) {
-        return;
-    }
-    executions[runId].executionAgents[agentKey].context.processes[processKey][processIndex].actions[action._id] = Object.assign(
-        (executions[runId].executionAgents[agentKey].context.processes[processKey][processIndex].actions[action._id] || {}),
-        actionData
-    );
+    if (!executions[runId]) { return;}
+
     let curActionData = executions[runId].executionAgents[agentKey].context.processes[processKey][processIndex].actions[action._id]
+    
+    Object.assign(curActionData , actionData);
 
     // If action have a result (i.e. done) set to previous action;
     if (actionData.result)
@@ -185,12 +217,12 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
 
     let result = ""
     if (actionData.status == statusEnum.ERROR && action.mandatory && !actionData.hasOwnProperty('retriesLeft')) {
-        result = ' - Mandatory Action Faild'
-        actionData.result.result += result
+        result = 'Mandatory Action Faild'
+        actionData.result.result += (" - " + result)
 
 
         let msg = `result: ${JSON.stringify(result)}`
-        _updateRawOutput(map._id, runId, msg, 'success')
+        _updateRawOutput(map._id, runId, msg, statusEnum.ERROR)
     }
 
     let options = {
@@ -199,12 +231,6 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
         agentId: executions[runId].executionAgents[agentKey].id,
         processIndex: executions[runId].executionAgents[agentKey].context.processes[processKey][processIndex].processIndex,
         actionIndex: curActionData.actionIndex
-    }
-    if (actionData.startTime) {
-        executions[runId].executionAgents[agentKey].context.previousAction = executions[runId].executionAgents[agentKey].context.currentAction
-        executions[runId].executionAgents[agentKey].context.currentAction = curActionData
-
-        return dbUpdates.addAction(options)
     }
 
     dbUpdates.updateAction(options)
@@ -247,7 +273,7 @@ function updateMapResult(mapResultId, updateData, socket) {
         data: updateData,
         socket: socket
     }
-    dbUpdates.updateMapReasult(options)
+    dbUpdates.updateMapResult(options)
 }
 
 /**
@@ -266,21 +292,12 @@ function createAgentContext(agent, runId, executionContext, startNode, mapCode) 
         startNode: true,
     }]
 
-    let agentContext = {
-        currentAgent: {
-            name: agent.name,
-            url: agent.url,
-            attributes: agent.attributes
-        },
-        processes: processes
-
-    }
-
     executions[runId].executionAgents[agent.key] = {
-        context: Object.assign(agentContext, executionContext, _addFuncsToCodeEnv()),
+        context: Object.assign({processes}, executionContext, _addFuncsToCodeEnv()),
         id: agent.id
     }
     createCodeEnv(mapCode, runId, agent.key)
+    executions[runId].executionAgents[agent.key].context.currentAgent = getCurrentAgent(agent)
 
     dbUpdates.addAgentResult(executions[runId].executionAgents[agent.key], executions[runId].mapResultId)
 }
@@ -292,7 +309,11 @@ function createAgentContext(agent, runId, executionContext, startNode, mapCode) 
  * @param {*} agentKey 
  */
 function createCodeEnv(mapCode, runId, agentKey) {
-    vm.runInNewContext(libpm + '\n' + mapCode, executions[runId].executionAgents[agentKey].context);
+    try{
+        vm.runInNewContext(libpm + '\n' + mapCode, executions[runId].executionAgents[agentKey].context);
+    }catch(err){
+        stopExecution(runId, executions[runId], "Error in code environment. " + err)
+    }
 }
 
 /**
@@ -375,7 +396,7 @@ async function createMapResult(runId, socket, map, configurationName, structure,
 }
 
 /**
- * returns false if there is a plugin that isn`t installed on server. else returns the relevant plugins
+ * returns empty array if there is a plugin that isn`t installed on server. else returns the relevant plugins
  * @param {*} mapStructure 
  * @param {*} runId 
  */
@@ -385,7 +406,7 @@ async function getPluginsToExec(mapStructure, runId) {
     const names = Object.keys(pluginNames)
     let plugins = await pluginsService.filterPlugins({ name: { $in: names } })
     if(plugins.length != names.length){
-        return false
+        return []
     }
     return plugins
 }
@@ -403,20 +424,23 @@ async function executeMap(runId, map, mapStructure, agents, context) {
     updateClientExecutions(executions[runId].clientSocket);
 
     executions[runId].plugins = await getPluginsToExec(mapStructure, runId)
-    if(!executions[runId].plugins){
-        return stopExecution(runId, clientSocket, ' - not all plugins installed', executions[runId].mapResultId)
+    if(!executions[runId].plugins.length){
+        return stopExecution(runId, clientSocket, 'not all plugins installed', executions[runId].mapResultId)
     }
     
 
     const startNode = helper.findStartNode(mapStructure);
     let promises = []
     for (let i = 0, length = agents.length; i < length; i++) {
-        createAgentContext(agents[i], runId, context, startNode, mapStructure.code)
+        try{
+            createAgentContext(agents[i], runId, context, startNode, mapStructure.code)
+        }catch(err){
+            return 
+        }
         promises.push(runMapOnAgent(map, mapStructure, runId, startNode, agents[i]))
     }
     Promise.all(promises).catch(err => {
         winston.log('error', "structureId: " + mapStructure.id + err);
-        console.error(err) // TODO: delete 
     });
 }
 
@@ -460,7 +484,7 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
 }
 
 /**
- * runs the map on a specific agent.  
+ * runs the map on a specific agent. 
  * @param {*} map 
  * @param {*} structure 
  * @param {*} runId 
@@ -498,7 +522,7 @@ function isThereProcessExecutingOnAgent(runId, agentKey) {
     } catch (e) {
         return false;
     }
-    for (let i = processes.length - 1; i >= 2; i--) {
+    for (let i = processes.length - 1; i >= 0; i--) {
         if (executions[runId].executionAgents[agentKey].context.processes[processes[i]].findIndex(p => p.status === statusEnum.RUNNING) > -1) {
             return true;
         }
@@ -646,8 +670,7 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
     if (successors.length === 0) {
         return endRunPathResults(runId, agent, map);
     }
-
-    let nodesToRun = [];
+    let promises = []
     successors.forEach((successor, successorIdx) => { // go over all successors and checks if successor pass execution conditions
         let  process = findProcessByUuid(successor, structure);
         process = Object.assign({},process.toObject())
@@ -678,15 +701,11 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
                 runAgentsFlowControlPendingProcesses(runId, map, structure, process)
             }
 
-            process.iterationIndex = createProcessContext(runId, agent, successor, process)
-            nodesToRun.push(process);
+            createProcessContext(runId, agent, successor, process)
+            promises.push(runProcess(map, structure, runId, agent, process))
         }
     })
 
-    promises = []
-    for (let i = 0, length = nodesToRun.length; i < length; i++) {
-        promises.push(runProcess(map, structure, runId, agent, nodesToRun[i]))
-    }
     return Promise.all(promises)
 }
 
@@ -724,7 +743,7 @@ function endRunPathResults(runId, agent, map) {
         data: data,
         socket: executions[runId].clientSocket
     }
-    dbUpdates.updateMapReasult(options)
+    dbUpdates.updateMapResult(options)
 
     let socket = executions[runId].clientSocket
 
@@ -769,33 +788,19 @@ function passProcessCondition(runId, agent, process) {
 }
 
 /**
- * Runs process preRun function. Saves the result in DB and context 
+ * Runs process pre/post function. Saves the result in DB and context 
  */
-function runProcessPreRunFunc(runId, agent, process) {
+function runProcessFunc(runId, agent, process, fieldName, funcToRun) {
     if (!process.preRun) { return }
-    let res;
+    let processData = {}
     try {
-        res = vm.runInNewContext(process.preRun, executions[runId].executionAgents[agent.key].context);
+        processData[fieldName] = vm.runInNewContext(funcToRun, executions[runId].executionAgents[agent.key].context);
     } catch (e) {
-        res = 'Error running preProcess function' + res
+        processData[fieldName] = 'Error running preProcess function' + res
     }
-    updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { preRunResult: res });
+    updateProcessContext(runId, agent, process.uuid, process.iterationIndex, processData);
 }
 
-/**
- * Runs process postRun function. Saves the result in DB and context 
- */
-function runProcessPostRunFunc(runId, agent, process) {
-    if (!process.postRun) { return null }
-    let res;
-    try {
-        res = vm.runInNewContext(process.postRun, executions[runId].executionAgents[agent.key].context);
-    } catch (e) {
-        res = 'Error running postProcess function' + res
-    }
-    updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { postRunResult: res });
-
-}
 
 /**
  * Returns a function for async.each call. this function is adding the process to the context, running all condition, filter, pre and post and calling the action execution function
@@ -809,7 +814,7 @@ function runProcessPostRunFunc(runId, agent, process) {
  */
 function runProcess(map, structure, runId, agent, process) {
     return new Promise((resolve, reject) => {
-        if (!helper.isAgentShuldContinue(agent.key, executions[runId].executionAgents)) {
+        if (!helper.isAgentShuldContinue(executions[runId].executionAgents[agent.key])) {
             return resolve()
         }
 
@@ -817,7 +822,7 @@ function runProcess(map, structure, runId, agent, process) {
             return stopExecution(runId);
         }
 
-        runProcessPreRunFunc(runId, agent, process)
+        runProcessFunc(runId, agent, process, 'preRunResult', process.preRun)
 
         let plugin = executions[runId].plugins.find(o => o.name.toString() == process.used_plugin.name)
 
@@ -839,9 +844,9 @@ function runProcess(map, structure, runId, agent, process) {
         });
 
         let reduceFunc = (promiseChain, currentAction, index) => {
-            let actionId = (currentAction[6]._id).toString()
+            // let actionId = (currentAction[6]._id).toString()
             currentAction[6].actionIndex = index;
-            executions[runId].executionAgents[agent.key].context.processes[process.uuid][process.iterationIndex].actions[actionId] = currentAction[6];
+            // executions[runId].executionAgents[agent.key].context.processes[process.uuid][process.iterationIndex].actions[actionId] = currentAction[6];
 
             return promiseChain.then(chainResults => {
                 return executeAction.apply(null, currentAction).then(currentResult => {
@@ -873,7 +878,7 @@ function actionsExecutionCallback(map, structure, runId, agent, process) {
     if (!executions[runId] || executions[runId].executionAgents[agent.key].status) { // status is just error or done
         return;
     }
-    runProcessPostRunFunc(runId, agent, process)
+    runProcessFunc(runId, agent, process, 'postRunResult', process.postRun)
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.DONE, finishTime: new Date() });
     runNodeSuccessors(map, structure, runId, agent, process.uuid);
 }
@@ -985,7 +990,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
         retriesLeft: action.retries
     }
 
-    updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData)
+    createActionContect(runId, agent.key, process.uuid, processIndex, action, actionData)
     let actionString
 
     let params = action.params || [];
@@ -1034,8 +1039,6 @@ async function executeAction(map, structure, runId, agent, process, processIndex
         agentPromise = sendActionViaRequest(agent, actionExecutionForm);
     }
 
-    let timeout;
-    let timeoutPromise;
     return runAction();
 
     /**
@@ -1045,15 +1048,15 @@ async function executeAction(map, structure, runId, agent, process, processIndex
      */
     function runAction() {
         
-        timeoutPromise = helper.getTimeOutFunc(action)
+        let timeoutFunc = helper.generateTimeoutFun(action)
 
-        return Promise.race([agentPromise, timeoutPromise]).then((result) => { // race condition between agent action and action timeout
-            clearTimeout(timeout);
+        return Promise.race([agentPromise, timeoutFunc.timeoutPromise]).then((result) => { // race condition between agent action and action timeout
+            clearTimeout(timeoutFunc.timeout);
             if (result === helper.IS_TIMEOUT) {
-                return { result: 'Timeout Error', status: 'error', stdout: actionString };
+                return { result: 'Timeout Error', status: statusEnum.ERROR, stdout: actionString };
             }
             else {
-                if (result.status === 'success') {
+                if (result.status === statusEnum.SUCCESS) {
                     if (result.stdout) {
                         result.stdout = actionString + '\n' + result.stdout;
                     } else {
@@ -1067,14 +1070,14 @@ async function executeAction(map, structure, runId, agent, process, processIndex
                 status: result.status,
                 result: result
             }
-            if (result.status == 'error' && action.retriesLeft > 0) { // retry handling
+            if (result.status == statusEnum.ERROR && action.retriesLeft > 0) { // retry handling
                 actionData.retriesLeft = --action.retriesLeft
                 updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData)
                 return runAction();
             }
             actionData.finishTime = new Date();
             let msg = `'${process.name} ' - '${action.name}' result: ${JSON.stringify(result)} (${agent.name})`
-            _updateRawOutput(map._id, runId, msg, 'success')
+            _updateRawOutput(map._id, runId, msg, result.status)
             updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData);
             return result;
         });
@@ -1127,9 +1130,8 @@ async function stopExecution(runId, socket = null, result = "", mapResultId = nu
         let agent = executionAgents[agentKey];
         if (!agent) return;
         optionAction = []
-        let processkeys = Object.keys(agent.context.processes)
-        for (let indexKey = 2; indexKey < processkeys.length; indexKey++) {
-            let processArray = agent.context.processes[processkeys[indexKey]];
+        for (let uuid in agent.context.processes) {
+            let processArray = agent.context.processes[uuid];
             processArray.forEach(process => {
                 if (!process.actions) {
                     return
@@ -1151,7 +1153,7 @@ async function stopExecution(runId, socket = null, result = "", mapResultId = nu
                     }
                 });
             });
-        }
+        }2
         options = {
             data: optionAction,
             agentId: agent.id,
@@ -1161,7 +1163,7 @@ async function stopExecution(runId, socket = null, result = "", mapResultId = nu
         optionAction ? dbUpdates.updateActionsInAgent(options) : null
     });
 
-    updateMapResult(executions[runId].mapResultId, { finishTime: d, status: statusEnum.STOPPED + result }, executions[runId].clientSocket)
+    updateMapResult(executions[runId].mapResultId, { finishTime: d, status: statusEnum.STOPPED + " - " + result }, executions[runId].clientSocket)
 
     startPendingExecution(executions[runId].mapId, executions[runId].clientSocket)
     updateClientExecutions(executions[runId].clientSocket, runId);
@@ -1199,9 +1201,9 @@ function cancelPending(mapId, runId, socket) {
         const runIndex = pending[mapId].findIndex((o) => o === runId);
         if (runIndex === -1) {
             throw new Error('No such job');
-
         }
-        await MapResult.findOneAndUpdate({ map: ObjectId(mapId), status: statusEnum.PENDING }, { status: statusEnum.CANCELED })
+
+        await MapResult.findOneAndUpdate({runId: ObjectId(runId)}, { status: statusEnum.CANCELED })
         pending[mapId].splice(runIndex, 1);
         updateClientPending(socket);
         resolve();

@@ -10,7 +10,7 @@ const statusEnum = models.statusEnum
 
 
 var funcs = {
-    updateMapReasult: _updateMapReasult,
+    updateMapResult: _updateMapResult,
     addProcess: _addProcess,
     updateProcess: _updateProcess,
     addAction: _addAction,
@@ -49,7 +49,6 @@ function _insertToDB(options) {
     if (dbQueue.length == 1) {
         _runDbFunc()
     }
-    console.log('new insert', options.func);
 }
 
 function _getPathFiledsToUpdate(pathToSet, data) {
@@ -61,7 +60,7 @@ function _getPathFiledsToUpdate(pathToSet, data) {
     return toUpdate
 }
 
-function _updateMapReasult(options) {
+function _updateMapResult(options) {
     return MapResult.findByIdAndUpdate(options.mapResultId, { $set: options.data }, { new: true })
     .then((mapResult) => {
         options.socket.emit('map-execution-result', mapResult);
@@ -171,9 +170,9 @@ module.exports = function (methods) {
     return {
         statusEnum: statusEnum,
 
-        updateMapReasult(optionsData) {
+        updateMapResult(optionsData) {
             let options = {
-                func: "updateMapReasult",
+                func: "updateMapResult",
                 data: optionsData
             }
             _insertToDB(options)
@@ -255,11 +254,7 @@ module.exports = function (methods) {
         },
 
         getAndUpdatePendingExecution(mapId) {
-            return MapResult.findOneAndUpdate({ map: ObjectId(mapId), status: statusEnum.PENDING }, { status: statusEnum.RUNNING, startTime: new Date() }, { new: true }).then(res => {
-                return res
-            }).catch(err => {
-                console.error(err);
-            })
+            return MapResult.findOneAndUpdate({ map: ObjectId(mapId), status: statusEnum.PENDING }, { status: statusEnum.RUNNING, startTime: new Date() }, { new: true })
 
         }
 

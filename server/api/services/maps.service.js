@@ -204,9 +204,7 @@ module.exports = {
             return MapStructure.findById(structureId)
         }
 
-        return MapStructure.find({ map: mapId }).sort('-createdAt').limit(1).then((structures) => {
-            return structures[0];
-        })
+        return MapStructure.findOne({ map: mapId }).sort('-createdAt')
     },
     
     structureList: (mapId, page) => {

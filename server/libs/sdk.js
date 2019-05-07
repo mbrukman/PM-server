@@ -3,6 +3,16 @@
  * Represents the execution Id	
  */
 /** @type {KaholoAgent} */
+var currentAgent={
+    name: '',
+    url: '',
+    attributes: [{ name: ''}]
+}
+
+/**	
+ * Represents the execution Id	
+ */
+/** @type {KaholoAgent} */
 var currentAgent;
 var executionId;
 
