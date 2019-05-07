@@ -8,7 +8,8 @@ let agentSchema = new Schema({
     publicUrl: {type: String, required: true},
     key: { type: String, required: true },
     sshKey: String,
-    attributes: []
+    attributes: [],
+    isDeleted: Boolean
 });
 
 

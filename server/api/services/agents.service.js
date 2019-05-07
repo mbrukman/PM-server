@@ -39,6 +39,7 @@ const FILTER_FIELDS = Object.freeze({
 let followAgentStatus = (agent) => {
     let listenInterval = setInterval(() => {
         let start = new Date();
+        if(!agents[agent.key]) return;
         request.post(
             agents[agent.key].defaultUrl + '/api/status', {
                 form: {
@@ -264,7 +265,7 @@ module.exports = {
             if (!agentObj) {
                 return Agent.create(agent)
             }
-            return Agent.findByIdAndUpdate(agentObj._id, { $set: { url: agent.url, publicUrl: agent.publicUrl } });
+            return Agent.findByIdAndUpdate(agentObj._id, { $set: { url: agent.url, publicUrl: agent.publicUrl,isDeleted:false } });
         }).then(agent => {
             followAgentStatus(agent)
             return setDefaultUrl(agent).then(()=>{
@@ -290,16 +291,17 @@ module.exports = {
         });
     },
     delete: (agentId) => {
-        return Agent.findOneAndRemove({ _id: agentId }).then((agent) => {
+        return Agent.findByIdAndUpdate(agentId,{ $set: { "isDeleted": "true" } }).then((agent) => {
             if(agents[agent.key]){
                 clearInterval(agents[agent.key].intervalId)
             }
-            delete agents[agent.key]
+            delete agents[agent.key];
         })
     },
     /* filter the agents. if no query is passed, will return all agents */
     filter: (query = {}) => {
-        return Agent.find(query)
+        query.isDeleted = {$ne:true};
+        return Agent.find(query);
     },
     /* send plugin file to an agent */
     installPluginOnAgent: (pluginPath, agent) => {
