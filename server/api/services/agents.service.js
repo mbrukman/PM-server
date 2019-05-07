@@ -291,12 +291,11 @@ module.exports = {
         });
     },
     delete: (agentId) => {
-        return Agent.findById(agentId).then((agent) => {
+        return Agent.findByIdAndUpdate(agentId,{ $set: { "isDeleted": "true" } }).then((agent) => {
             if(agents[agent.key]){
                 clearInterval(agents[agent.key].intervalId)
             }
             delete agents[agent.key];
-            return Agent.update({_id:agent._id}, { $set: { "isDeleted": "true" } })
         })
     },
     /* filter the agents. if no query is passed, will return all agents */
