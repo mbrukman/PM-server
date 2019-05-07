@@ -1,9 +1,7 @@
 import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 
 import { Subscription } from 'rxjs';
-
-import { BsModalService } from 'ngx-bootstrap';
-
+import {PopupService} from '@shared/services/popup.service'
 import { AgentsService } from '../../agents.service';
 import { Agent, Group } from '@agents/models';
 import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
@@ -21,7 +19,7 @@ export class ConstantAgentsListComponent implements OnInit,OnDestroy {
     @Input('agents') agents: [Agent];
     @Input('group') group: Group;
 
-  constructor(private agentsService: AgentsService, private modalService: BsModalService) {
+  constructor(private agentsService: AgentsService,private popupService:PopupService ) {
   }
 
   ngOnInit() {
@@ -40,10 +38,12 @@ export class ConstantAgentsListComponent implements OnInit,OnDestroy {
 
   editAgent(agentIndex) {
     let agent = this.agents[agentIndex];
-    const modal = this.modalService.show(EditAgentComponent);
-    modal.content.name = agent.name;
-    modal.content.attributes = agent.attributes;
-    modal.content.result.pipe(
+    let content = {
+      name:agent.name,
+      attributes:agent.attributes
+    }
+    this.popupService.openComponent(EditAgentComponent,content)
+    .pipe(
       take(1),
       filter(r => !!r)
     ).subscribe(r => {

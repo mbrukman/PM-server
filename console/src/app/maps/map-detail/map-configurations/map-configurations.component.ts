@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { BsModalService } from 'ngx-bootstrap';
-
+import {PopupService} from '@shared/services/popup.service'
 import { MapStructureConfiguration, MapStructure } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { AddConfigurationComponent } from '@maps/map-detail/map-configurations/add-configuration/add-configuration.component';
-import { filter, take } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-main-map-configurations',
@@ -19,7 +18,7 @@ export class MapConfigurationsComponent implements OnInit {
     language: 'json'
   };
   value: string = '';
-  constructor(private mapsService: MapsService, private modalService: BsModalService) { }
+  constructor(private mapsService: MapsService, private popupService:PopupService) { }
 
   ngOnInit() {
     this.mapsService.getCurrentMapStructure().pipe(
@@ -33,9 +32,7 @@ export class MapConfigurationsComponent implements OnInit {
   }
 
   addNewConfiguration() {
-    const modal = this.modalService.show(AddConfigurationComponent);
-    modal.content.configurations = this.mapStructure.configurations;
-    modal.content.result
+    this.popupService.openComponent(AddConfigurationComponent,{configurations:this.mapStructure.configurations})
       .filter(name => !!name)
       .subscribe(name => {
         this.mapStructure.configurations.push(new MapStructureConfiguration(name, '{\n\n}'));

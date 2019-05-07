@@ -1,22 +1,15 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
-
 import * as _ from 'lodash';
-
-import { distinctUntilChanged, filter, debounceTime, mergeMap, map } from 'rxjs/operators';
-import { Observable, from, of, forkJoin } from 'rxjs';
+import { distinctUntilChanged, filter, debounceTime} from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-
-import { Process, Action, ActionParam, ProcessViewWrapper } from '@maps/models';
-import { Plugin } from '@plugins/models/plugin.model';
+import { Process, Action, ProcessViewWrapper } from '@maps/models';
 import { PluginMethod } from '@plugins/models/plugin-method.model';
 import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
 import { SocketService } from '@shared/socket.service';
-import { PluginsService } from '@plugins/plugins.service';
 import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
-import { BsModalService } from 'ngx-bootstrap';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
-import { ConfirmComponent } from '@shared/confirm/confirm.component';
+import { PopupService } from '@shared/services/popup.service';
 import {FLOW_CONTROL_TYPES, COORDINATION_TYPES}  from '@maps/constants'
 import { SelectItem } from 'primeng/primeng';
 
@@ -47,9 +40,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
 
   constructor(
     private socketService: SocketService,
-    private pluginsService: PluginsService,
     private mapDesignService: MapDesignService,
-    private modalService: BsModalService
+    private popupService: PopupService
   ) {}
 
   ngOnInit() {
@@ -137,11 +129,9 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       return action();
     }
     else{
-      this.bsModalRef = this.modalService.show(ConfirmComponent);
-      this.bsModalRef.content.title = 'Plugin missing'
-      this.bsModalRef.content.message = `This process uses the plugin ${this.processViewWrapper.process.used_plugin.name} which have been removed.\nPlease reinstall the plugin to enable editing.`;
-      this.bsModalRef.content.cancel = null;
-      this.bsModalRef.content.confirm = 'Confirm'
+      let message = `This process uses the plugin ${this.processViewWrapper.process.used_plugin.name} which have been removed.\nPlease reinstall the plugin to enable editing.`
+      this.popupService.openConfirm('Plugin missing',message,'Confirm',null,null)
+      
     }
   }
 

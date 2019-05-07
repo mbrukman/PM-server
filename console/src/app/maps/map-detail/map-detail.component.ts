@@ -2,15 +2,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import * as _ from 'lodash';
-import { BsModalService } from 'ngx-bootstrap/modal';
-
 import { MapsService } from '../maps.service';
 import { MapStructureConfiguration, Map, MapStructure } from '@maps/models';
-import { ConfirmComponent } from '@shared/confirm/confirm.component';
+import {PopupService} from '@shared/services/popup.service';
 import { SocketService } from '@shared/socket.service';
 import { filter, take } from 'rxjs/operators';
 import { Subject, Subscription } from 'rxjs';
-
 import {SeoService,PageTitleTypes} from '@app/seo.service';
 import { SelectItem } from 'primeng/primeng';
 
@@ -51,8 +48,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private mapsService: MapsService,
     private socketService: SocketService,
-    private modalService: BsModalService,
-    private seoService:SeoService) {
+    private popupService:PopupService,
+    private seoService:SeoService,) {
 
     this.navItems = [
       { name: 'Properties', routerLink: ['properties'] },
@@ -340,30 +337,20 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     if (!this.edited && !this.structureEdited) {
       return true;
     }
-    let modal = this.modalService.show(ConfirmComponent);
-    let answers = {
-      confirm: 'Discard',
-      third: 'Save and continue',
-      cancel: 'Cancel'
-    };
-    modal.content.message = 'You have unsaved changes that will be lost by this action. Discard changes?';
-    modal.content.confirm = answers.confirm;
-    modal.content.third = answers.third;
-    modal.content.cancel = answers.cancel;
+    let confirm = 'Save and continue';
+    let third = 'Discard'
+    let popup =this.popupService.openConfirm(null,'You have unsaved changes that will be lost by this action. Discard changes?',confirm,'Cancel',third)
+   
 
     let subject = new Subject<boolean>();
 
-    this.modalService.setDismissReason('Yes');
-    this.modalService.onHide.subscribe(() => {
-      return subject.next(false)
-    })
 
-    modal.content.result.subscribe(result => {
-      if (result === answers.third) {
+    popup.subscribe(result => {
+      if (result === confirm) {
         this.saveMap();
         return subject.next(true);
       }
-      return subject.next(result === answers.confirm);
+      return subject.next(result === third);
     })
 
     return subject.asObservable()

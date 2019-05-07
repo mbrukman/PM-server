@@ -1,8 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-
-import { BsModalService } from 'ngx-bootstrap';
 import { Subscription } from 'rxjs';
-
 import { MapsService } from '../../maps.service';
 import { Map } from '../../models/map.model';
 import { MapStructure } from '../../models/map-structure.model';
@@ -29,7 +26,7 @@ export class MapEditComponent implements OnInit, OnDestroy {
   @ViewChild('wrapper') wrapper: ElementRef;
 
 
-  constructor(private mapsService: MapsService, public designService: MapDesignService, private modalService: BsModalService) {
+  constructor(private mapsService: MapsService, public designService: MapDesignService) {
   }
 
   ngOnInit() {

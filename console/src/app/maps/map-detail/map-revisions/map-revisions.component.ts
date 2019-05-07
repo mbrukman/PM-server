@@ -1,11 +1,9 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
 import { DiffEditorModel } from 'ngx-monaco-editor';
-import { BsModalService } from 'ngx-bootstrap';
-
+import {PopupService} from '@shared/services/popup.service'
 import { MapsService } from '../../maps.service';
 import { MapStructure, Process } from '@maps/models';
 import { JOINT_OPTIONS } from '@maps/constants'
@@ -54,7 +52,7 @@ export class MapRevisionsComponent implements OnInit {
   };
   
 
-  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private modalService: BsModalService) {}
+  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private popupService:PopupService) {}
 
   ngOnInit() {
     this.route.parent.params.subscribe(params => {
@@ -242,8 +240,8 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   duplicateMap(structureId: string) {
-    const modal = this.modalService.show(MapDuplicateComponent);
-    modal.content.result.pipe(
+    this.popupService.openComponent(MapDuplicateComponent,{})
+    .pipe(
       take(1),
       filter(obj => !!(<MapDuplicateOptions>obj).name), // filtering only results with a name
     mergeMap(obj =>  this.mapsService.duplicateMap(this.mapId, structureId, this.project.id,<MapDuplicateOptions>obj))

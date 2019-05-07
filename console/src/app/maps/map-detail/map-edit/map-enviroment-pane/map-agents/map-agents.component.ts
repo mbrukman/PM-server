@@ -4,9 +4,8 @@ import { timer, Subscription } from 'rxjs';
 import { AgentsService } from '@agents/agents.service';
 import { MapsService } from '@maps/maps.service';
 import { Map } from '@maps/models/map.model';
-import { BsModalService } from 'ngx-bootstrap/modal';
-import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
+import {PopupService} from '@shared/services/popup.service';
 
 import { SelectAgentComponent } from './select-agent/select-agent.component';
 import { switchMap } from 'rxjs/operators';
@@ -22,7 +21,7 @@ export class MapAgentsComponent implements OnInit, OnDestroy{
   statuses: any;
   agentsStatusReq : Subscription
   
-  constructor(private modalService: BsModalService, private mapsService: MapsService, private agentsService: AgentsService) {
+  constructor(private popupService:PopupService, private mapsService: MapsService, private agentsService: AgentsService) {
   }
 
   ngOnInit() {
@@ -42,11 +41,8 @@ export class MapAgentsComponent implements OnInit, OnDestroy{
   }
 
   openSelectAgentsModal() {
-    let modal: BsModalRef;
-    modal = this.modalService.show(SelectAgentComponent);
-    modal.content.selectedAgents = this.map.agents;
-    modal.content.selectedGroups = this.map.groups;
-    modal.content.result.subscribe(result => {
+    this.popupService.openComponent(SelectAgentComponent,{selectedAgents:this.map.agents,selectedGroups:this.map.groups})
+    .subscribe(result => {
       this.map.agents = result.agents;
       this.map.groups = result.groups;
       this.mapsService.setCurrentMap(this.map);
