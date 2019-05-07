@@ -73,7 +73,7 @@ module.exports = {
     /* Get all agents list */
     list: (req, res) => {
         hooks.hookPre('agent-list').then(() => {
-            return agentsService.filter({})
+            return agentsService.filter()
         }).then(agents => {
             res.json(agents);
         }).catch(error => {
