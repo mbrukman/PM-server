@@ -50,7 +50,8 @@ let mapResultSchema = new Schema({
     status: { type: String, enum: [statusEnum.DONE, statusEnum.ERROR, statusEnum.RUNNING, statusEnum.PENDING] },
     reason: String, // e.g. no agents
     triggerPayload: Schema.Types.Mixed,
-    archivedMap: { type: Boolean, default: false, index: true }
+    archivedMap: { type: Boolean, default: false, index: true }, 
+    createdAt:  {type: Date, default: new Date()}
 });
 
 

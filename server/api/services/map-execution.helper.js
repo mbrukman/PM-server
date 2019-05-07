@@ -8,6 +8,7 @@ const IS_TIMEOUT = "Agent Timeout";
 module.exports = {
     /**
      * generate runId
+     * @returns {string} - new runId
      */
     guidGenerator() {
         let S4 = function () {
@@ -17,9 +18,8 @@ module.exports = {
     },
 
     /**
-     * returns the start node of a structure
      * @param structure
-     * @returns {*}
+     * @returns {Object} - start node of a structure
      */
     findStartNode(structure) {
         const links = structure.links;
@@ -41,6 +41,7 @@ module.exports = {
 * @param structure
 * @param runId
 * @param agentKey
+* @returns {Promise<null>}
 */
     validate_plugin_installation(plugins, agentKey) {
         const agents = agentsService.agentsStatus();
@@ -85,7 +86,7 @@ module.exports = {
     /**
      * create configuration
      * @param {*} mapStructure 
-     * @param {string/Object} configuration 
+     * @param {string|Object} configuration 
      */
     createConfiguration(mapStructure, configuration) {
 
@@ -124,7 +125,7 @@ module.exports = {
      * @param groups
      * @param mapAgents
      * @param executionAgents
-     * @returns {*}
+     * @returns {KaholoAgent[]}
      */
     getRelevantAgent(groups, mapAgents) {
         function filterLiveAgents(agents) {
@@ -149,6 +150,10 @@ module.exports = {
         return filterLiveAgents(totalAgents);
     },
 
+    /**
+     * @param {*} executionAgents 
+     * @returns {boolean}
+     */
     areAllAgentsAlive(executionAgents) {
         for(let key in executionAgents){
             if(!this.isAgentShuldContinue(executionAgents[key])){
@@ -159,9 +164,9 @@ module.exports = {
     },
 
     /**
-     * Return false if agent dead or has an error
      * @param {*} agentKey 
-     * @param {*} executionAgents 
+     * @param {*} executionAgents
+     * @returns {boolean} - false if agent dead or has an error
      */
     isAgentShuldContinue(agent){
         let agentsStatus = Object.assign({}, agentsService.agentsStatus());
@@ -178,6 +183,7 @@ module.exports = {
     /**
      * Return timeout function  
      * @param {*} action 
+     * @returns {{timeoutPromise : Promise, timeout : function}}
      */
     generateTimeoutFun(action){
         let timeout
@@ -196,7 +202,7 @@ module.exports = {
      * returns successors uuids for certain node
      * @param nodeUuid
      * @param structure
-     * @returns {Array}
+     * @returns {string[]} - array of uuids
      */
     findSuccessors(nodeUuid, structure) {
         let links = structure.links.filter((o) => o.sourceId === nodeUuid);
@@ -206,7 +212,13 @@ module.exports = {
         }, []);
     },
 
-
+/**
+ * 
+ * @param {*} executionAgents 
+ * @param {string} processUUID 
+ * @param {*} agentKey 
+ * @returns {boolean} - false in case another agent got to process first 
+ */
     isThisTheFirstAgentToGetToTheProcess(executionAgents, processUUID, agentKey) {
         for (let i in executionAgents) {
             if (i != agentKey && executionAgents[i].context.processes.hasOwnProperty(processUUID)) {
@@ -218,7 +230,7 @@ module.exports = {
     },
 
 
-    /**
+/**
  * return ancestors for a certain node
  * @param nodeUuid
  * @param structure

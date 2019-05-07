@@ -253,8 +253,9 @@ module.exports = function (methods) {
             _insertToDB(options)
         },
 
-        getAndUpdatePendingExecution(mapId) {
-            return MapResult.findOneAndUpdate({ map: ObjectId(mapId), status: statusEnum.PENDING }, { status: statusEnum.RUNNING, startTime: new Date() }, { new: true })
+        getAndUpdatePendingExecution(mapId) { //returnNewDocument: true,
+            return MapResult.findOneAndUpdate({ map: ObjectId(mapId), status: statusEnum.PENDING }, { status: statusEnum.RUNNING, startTime: new Date() }, 
+            {new:true, sort:{'createdAt':1}})
 
         }
 
