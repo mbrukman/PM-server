@@ -115,7 +115,7 @@ module.exports = {
             }
         }
 
-        return selectedConfiguration.value || {};
+        return selectedConfiguration ? selectedConfiguration.value : {};
     },
 
     /**

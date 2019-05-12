@@ -705,6 +705,9 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
         // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
         if (passProcessCoordination && !passAgentFlowCondition) {
             if (process.flowControl === 'race') {
+                if(process.coordination == 'race'){
+                    executions[runId].executionAgents[agent.key].context.processes[process.uuid] = [] // indication that process uuid run (in case of race coordination) 
+                }
                 runNodeSuccessors(map, structure, runId, agent, process.uuid);
             }
 
