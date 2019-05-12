@@ -777,7 +777,7 @@ function endRunPathResults(runId, agent, map) {
 
 /**
  * Checks if process pass condition and save the result
- * Return false if  mandatory process failed   
+ * Return false if process failed   
  * @param {*} runId 
  * @param {*} agent 
  * @param {*} process 
@@ -801,12 +801,7 @@ function passProcessCondition(runId, agent, process) {
         status: statusEnum.ERROR,
         finishTime: new Date()
     });
-    if (process.mandatory) { // mandatory process failed, stop executions
-        winston.log('info', "Mandatory process failed");
-        executions[runId].executionAgents[agent.key].status = statusEnum.ERROR;
-        return false;
-    }
-    return true;
+    return false;
 }
 
 /**
@@ -841,7 +836,12 @@ function runProcess(map, structure, runId, agent, process) {
         }
 
         if (!passProcessCondition(runId, agent, process)) {
-            return stopExecution(runId);
+            if (process.mandatory) { // mandatory process failed, stop executions
+                executions[runId].executionAgents[agent.key].status = statusEnum.ERROR;
+                return stopExecution(runId, null, "Mandatory process failed" );
+            }
+           endRunPathResults(runId, agent, map)
+            return resolve()
         }
 
         runProcessFunc(runId, agent, process, 'preRunResult', process.preRun)
