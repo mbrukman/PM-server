@@ -37,7 +37,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   executing: boolean;
   downloadJson: SafeUrl;
   configurationDropDown:SelectItem[] = [];
-  selected: MapStructureConfiguration;
+  selected: string;
   navItems: {
     name: string,
     routerLink: string[]
@@ -147,23 +147,15 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
           return o.id === structure.id;
         });
-        this.initiated = true;
-        this.generateDownloadJsonUri();
-
-        if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0) {
-          const selected = this.mapStructure.configurations.findIndex(o => o.selected);
-          this.selected = selected !== -1 ? this.mapStructure.configurations[selected] : this.mapStructure.configurations[0];
-          this.changeSelected(false)
+        if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0 && !this.initiated) {
+          this.selected = this.mapStructure.configurations[0].name;
         }
-        else{
+        else if(!this.initiated){
           this.selected = undefined;
         }
-
-
-
+        this.initiated = true;
+        this.generateDownloadJsonUri();
       });
-
-
 
     // get the current executing maps
     this.mapsService.currentExecutionList().pipe(
@@ -180,10 +172,12 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  changeSelected(e){
+    this.selected = e.value.name;
+  }
 
   ngOnDestroy() {
-    this.routeReq.unsubscribe();
-    
+    this.routeReq.unsubscribe();  
     this.mapsService.clearCurrentMap();
     this.mapsService.clearCurrentMapStructure();
     this.mapExecutionSubscription.unsubscribe();
@@ -265,8 +259,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   }
 
   executeMap() {
-    let index = this.mapStructure.configurations.findIndex(conf => conf.name == this.selected.name)
-    this.mapsService.execute(this.id, (!this.selected) ? undefined : this.mapStructure.configurations[index].name).subscribe();
+    this.mapsService.execute(this.id, this.selected).subscribe();
   }
 
   saveMap() {
@@ -297,7 +290,6 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       this.mapsService.createMapStructure(this.map.id, this.mapStructure).subscribe((structure) => {
 
         this.originalMapStructure = _.cloneDeep(this.mapStructure);
-
         this.structureEdited = false;
         this.structuresList.unshift(structure);
         this.mapStructure.id = structure.id;
@@ -360,14 +352,6 @@ export class MapDetailComponent implements OnInit, OnDestroy {
    * Updating selected configuration
    * @param {number} index
    */
-  changeSelected(updateMap : boolean) {
-    this.mapStructure.configurations.forEach((configuration) => {
-      configuration.selected = (this.selected.name == configuration.name)
-    });
-    if(updateMap){
-      this.mapsService.setCurrentMapStructure(this.mapStructure);
-    }
-  }
 
   onKeyDown($event: KeyboardEvent) {
     let charCode = String.fromCharCode($event.which).toLowerCase();

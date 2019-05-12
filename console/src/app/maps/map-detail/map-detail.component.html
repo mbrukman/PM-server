@@ -32,7 +32,7 @@
     <div class="dropdown">
         <p-dropdown [(ngModel)]="selected" 
         [options]="configurationDropDown" 
-        (onChange)="changeSelected(true)" 
+        (onChange)="changeSelected($event)" 
         [autoWidth]="false">
         </p-dropdown>
     </div>
