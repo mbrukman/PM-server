@@ -75,6 +75,13 @@
             <span>{{ ((map.updatedAt | date: 'dd/MM/yyyy') || '') + ' ' + ((map.updatedAt | date: 'HH:mm') || '' )}}</span>
           </ng-template>
         </p-column>
+        <p-column field="" header="Actions" [sortable]="true" [style]="{width:'120px'}">
+          <ng-template let-map="rowData" pTemplate="body">
+            <div class="actions-wrapper">
+              <i class="material-icons garbage" (click)="onConfirmDelete(map.id)">delete_outline</i>
+            </div>
+          </ng-template>
+        </p-column>
       </p-dataTable>
 
     </div>
