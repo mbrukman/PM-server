@@ -444,6 +444,9 @@ async function executeMap(runId, map, mapStructure, agents, context) {
 
 
     const startNode = helper.findStartNode(mapStructure);
+    if(!startNode){
+        stopExecution(runId, clientSocket, "link is missing to start execution")
+    }
     let promises = []
     for (let i = 0, length = agents.length; i < length; i++) {
         try {
