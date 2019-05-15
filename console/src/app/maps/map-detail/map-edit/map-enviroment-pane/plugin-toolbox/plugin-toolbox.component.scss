@@ -2,6 +2,11 @@
   display: flex;
   flex-grow: 1;
   flex-direction: column;
+
+  .plugins-wrapper{
+    overflow: overlay;
+    height: -webkit-fill-available;
+  }
 }
 
 .graph {
@@ -34,7 +39,7 @@
 
 
 .filter{
-  margin: 12px 0px 0px;
+  margin: 12px 0px 3px;
   padding: 2px 3px;
   border-bottom: 0 none;
   height: 39px;
