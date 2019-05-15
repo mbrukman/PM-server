@@ -20,6 +20,9 @@ import { VaultService } from '@shared/vault.service';
 import {SeoService} from './seo.service';
 import { AutoCompleteService } from '@shared/components/params/autocomplete.service';
 import {PopupService} from '@shared/services/popup.service';
+import {httpInterceptorProviders} from './http-interceptors';
+
+
 
 
 @NgModule({
@@ -30,7 +33,7 @@ import {PopupService} from '@shared/services/popup.service';
     SharedModule,
     AppRoutingModule
   ],
-  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService,AutoCompleteService,PopupService],
+  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService,AutoCompleteService,PopupService, httpInterceptorProviders],
   bootstrap: [AppComponent]
 })
 export class AppModule {

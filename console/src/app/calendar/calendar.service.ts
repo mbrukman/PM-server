@@ -2,10 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Subject } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { Job } from './models/job.model';
 
-const serverUrl = environment.serverUrl;
 
 
 @Injectable()
@@ -16,15 +14,15 @@ export class CalendarService {
   }
 
   create(mapId: string, job) {
-    return this.http.post<Job>(`${serverUrl}api/scheduled-jobs`, job);
+    return this.http.post<Job>(`api/scheduled-jobs`, job);
   }
 
   deleteJob(jobId: string) {
-    return this.http.delete<string>(`${serverUrl}api/scheduled-jobs/${jobId}`, { responseType: 'text' as 'json' });
+    return this.http.delete<string>(`api/scheduled-jobs/${jobId}`, { responseType: 'text' as 'json' });
   }
 
   getFutureJobs() {
-    return this.http.get<Job[]>(`${serverUrl}api/scheduled-jobs/getFutureJobs`);
+    return this.http.get<Job[]>(`api/scheduled-jobs/getFutureJobs`);
   }
 
   newJobAsObservable() {
@@ -32,7 +30,7 @@ export class CalendarService {
   }
 
   list() {
-    return this.http.get<Job[]>(`${serverUrl}api/scheduled-jobs`);
+    return this.http.get<Job[]>(`api/scheduled-jobs`);
   }
 
   setNewJob(job: Job) {
@@ -40,7 +38,7 @@ export class CalendarService {
   }
 
   updateJob(job) {
-    return this.http.put<Job>(`${serverUrl}api/scheduled-jobs`, job);
+    return this.http.put<Job>(`api/scheduled-jobs`, job);
   }
 
 }
