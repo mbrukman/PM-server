@@ -422,6 +422,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           this.addNewLink(cellView);
         }
       } else {
+        if(cellView.model.attributes.type == "devs.PMStartPoint"){
+          return
+        }
         this.cellView = cellView;
         const id = cellView.model.id;
         const process = _.find(this.mapStructure.processes, (o) => {
@@ -435,9 +438,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
 
     this.graph.on('change:source change:target', function (link) {
-      let sourcePort = link.get('source').port;
       let sourceId = link.get('source').id;
-      let targetPort = link.get('target').port;
       let targetId = link.get('target').id;
       let id = link.get('id')
 
@@ -541,7 +542,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     let cell = this.graph.getCell(uuid);
     cell.attr('.label/text',label);
     cell.attr('text/text', label);
-    this.cellView.model.attributes.attrs['.label'].text = cell.attributes.attrs['.label'].text
+    if(this.cellView.model.cid != cell.cid){
+      console.error("cellView is not the cell to update!");
+      return;
+    }
     this.onMapContentUpdate()
   }
 
