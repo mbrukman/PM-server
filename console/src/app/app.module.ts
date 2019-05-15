@@ -20,7 +20,8 @@ import { VaultService } from '@shared/vault.service';
 import {SeoService} from './seo.service';
 import { AutoCompleteService } from '@shared/components/params/autocomplete.service';
 import {PopupService} from '@shared/services/popup.service';
-import {httpInterceptorProviders} from './http-interceptors';
+import { KaholoHttpInterceptor } from './http-interceptor';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 
 
@@ -33,7 +34,7 @@ import {httpInterceptorProviders} from './http-interceptors';
     SharedModule,
     AppRoutingModule
   ],
-  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService,AutoCompleteService,PopupService, httpInterceptorProviders],
+  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService,AutoCompleteService,PopupService, { provide: HTTP_INTERCEPTORS, useClass: KaholoHttpInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule {
