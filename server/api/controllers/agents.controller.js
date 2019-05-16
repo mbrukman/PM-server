@@ -83,26 +83,11 @@ module.exports = {
         });
     },
     /* Get agents status */
-    status:
+    status: 
         (req, res) => {
             hooks.hookPre('agent-status-list', req).then(() => {
-                const agents = _.cloneDeep(agentsService.agentsStatus());
-                const status = Object.keys(agents)
-                    .reduce((total, current) => {
+         let status = agentsService.getAgentStatuses()
 
-                        current = _.cloneDeep(agents[current]);
-                        if (!current.hasOwnProperty('id')) {
-                            return total;
-                        }
-                        delete current.key;
-                        delete current.intervalId;
-                        delete current.socket;
-                        total[current.id] = current;
-                        return total;
-                    }, {});
-
-
-                // console.log(status);
                 if (status) {
                     return res.json(status);
                 }

@@ -1,14 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { timer, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
-import { AgentsService } from '@agents/agents.service';
 import { MapsService } from '@maps/maps.service';
 import { Map } from '@maps/models/map.model';
 
 import {PopupService} from '@shared/services/popup.service';
 
 import { SelectAgentComponent } from './select-agent/select-agent.component';
-import { switchMap } from 'rxjs/operators';
+import { SocketService } from '@app/shared/socket.service';
 
 
 @Component({
@@ -22,7 +21,7 @@ export class MapAgentsComponent implements OnInit, OnDestroy{
   agentsStatusReq : Subscription
   currentMapSubscription : Subscription
   
-  constructor(private popupService:PopupService, private mapsService: MapsService, private agentsService: AgentsService) {
+  constructor(private popupService:PopupService, private mapsService: MapsService, private socketService: SocketService) {
   }
 
   ngOnInit() {
@@ -34,11 +33,9 @@ export class MapAgentsComponent implements OnInit, OnDestroy{
   }
 
   getAgentsStatus() {
-    this.agentsStatusReq = timer(0, 5000).pipe(
-      switchMap(() => this.agentsService.status())
-    ).subscribe(statuses => {
-        this.statuses = statuses;
-      });
+    this.agentsStatusReq = this.socketService.geteAgentsStatusAsObservable().subscribe(statuses => {
+      this.statuses = statuses;
+    });
   }
 
   openSelectAgentsModal() {

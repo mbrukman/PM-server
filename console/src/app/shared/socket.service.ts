@@ -15,6 +15,8 @@ export class SocketService {
   mapExecution: Subject<MapResult> = new Subject<MapResult>();
   pending: Subject<Pending> = new Subject<Pending>();
   test: Pending;
+  agentsStatus: Subject<any> = new Subject<any>();
+  
 
   constructor() {
     this.socket = io(environment.serverUrl);
@@ -45,6 +47,18 @@ export class SocketService {
     this.socket.on('pending', (data) => {
       this.updateCurrentPending(data);
     });
+
+    this.socket.on('agentsStatus', (data) => {
+      this.updateAgentsStatus(data);
+    });
+  }
+
+  updateAgentsStatus(data){
+    this.agentsStatus.next(data)
+  }
+
+  geteAgentsStatusAsObservable() {
+    return this.agentsStatus.asObservable();
   }
 
   getMessagesAsObservable() {

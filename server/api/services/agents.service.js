@@ -9,6 +9,7 @@ const env = require("../../env/enviroment");
 
 const Agent = require("../models").Agent;
 const Group = require("../models").Group;
+const socketService = require('./socket.service');
 
 
 const LIVE_COUNTER = env.retries; // attempts before agent will be considered dead
@@ -25,15 +26,28 @@ const FILTER_TYPES = Object.freeze({
     lt: 'lt'
 });
 
-const FILTER_FIELDS = Object.freeze({
-    hostname: 'hostname',
-    arch: 'arch',
-    alive: 'alive',
-    freeSpace: 'freeSpace',
-    respTime: 'respTime',
-    url: 'url',
-    createdAt: 'createdAt'
-});
+
+setInterval(()=>{ 
+    const agentsStatuses =  _getAgentsStatuses()
+    socketService.emit('agentsStatus', agentsStatuses)
+},5000)
+
+function _getAgentsStatuses(){
+        const agentsCopy = _.cloneDeep(agents);
+        const statuses = Object.keys(agentsCopy)
+            .reduce((total, current) => {
+                current = _.cloneDeep(agentsCopy[current]);
+                if (!current.hasOwnProperty('id')) {
+                    return total;
+                }
+                delete current.key;
+                delete current.intervalId;
+                delete current.socket;
+                total[current.id] = current;
+                return total;
+            }, {});
+            return statuses
+}
 
 /* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
 let followAgentStatus = (agent) => {
@@ -260,6 +274,9 @@ function sendRequestToAgent(options, agent) {
 }
 
 module.exports = {
+
+  getAgentStatuses: _getAgentsStatuses,
+
     add: (agent) => {
         return Agent.findOne({ key: agent.key }).then(agentObj => {
             if (!agentObj) {

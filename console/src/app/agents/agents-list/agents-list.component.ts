@@ -2,10 +2,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AgentsService } from '../agents.service';
 import { Agent, Group } from '@agents/models';
-import { timer } from 'rxjs';
 import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
-import { switchMap, take } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import {PopupService} from '@shared/services/popup.service';
+import { SocketService } from '@shared/socket.service';
 
 @Component({
   selector: 'app-agents-list',
@@ -23,7 +23,7 @@ export class AgentsListComponent implements OnInit, OnDestroy {
   constants : boolean = true;
 
 
-  constructor(private agentsService: AgentsService,private popupService:PopupService) {
+  constructor(private agentsService: AgentsService,private popupService:PopupService, private socketService: SocketService) {
   }
 
   ngOnInit() {
@@ -50,7 +50,8 @@ export class AgentsListComponent implements OnInit, OnDestroy {
 
     // get agents status to pass
 
-    this.agentsStatusReq = timer(0, 5000).pipe(switchMap(() => this.agentsService.status())).subscribe(statuses => {
+
+    this.agentsStatusReq = this.socketService.geteAgentsStatusAsObservable().subscribe(statuses => {
         this.agentsStatus = statuses;
       });
 
