@@ -12,6 +12,7 @@ import { PluginsService } from '@plugins/plugins.service';
 import { Plugin } from '@plugins/models/plugin.model';
 import { COORDINATION_TYPES, JOINT_OPTIONS } from '@maps/constants'
 import { filter, tap } from 'rxjs/operators';
+import { environment } from '@env/environment';
 
 
 

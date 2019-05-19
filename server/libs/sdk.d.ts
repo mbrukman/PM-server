@@ -7,7 +7,7 @@ declare class KaholoTrigger {
 declare class KaholoAgent {
     name: string;
     url: string;
-    attributes: [{ name: string ,value: string}]
+    attributes: [{ name: string }]
 }
 declare class KaholoAction {
     server: {type: string,name: string,id: string};
