@@ -304,7 +304,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
         for (let j = 0, procLength = this.mapStructure.processes.length; j < procLength; j++) {
           if (cells[i].id == this.mapStructure.processes[j].uuid) {
-            this.fixUrlImg(cells[i].attrs)
             this.processViewWrapper = new ProcessViewWrapper(this.mapStructure.processes[j], this.mapStructure, this.plugins)
             this.setProcessWarning(cells[i].attrs);
             break;
@@ -362,12 +361,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       }
     }
     this.center();
-  }
-
-  fixUrlImg(attrs:any){
-    if(!attrs.image){return}
-      let index = attrs.image['xlink:href'].indexOf('plugins');
-      attrs.image['xlink:href'] = environment.serverUrl + attrs.image['xlink:href'].substring(index)
   }
 
   center() {
