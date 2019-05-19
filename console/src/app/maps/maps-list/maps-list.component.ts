@@ -85,7 +85,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
 
     this.mapsService.delete(id).subscribe(() => {
       for (let i = 0, lenght = this.recentMaps.length; i < lenght; i++) {
-        if (this.recentMaps[i].id == id) {
+        if (this.recentMaps[i]._id == id) {
           this.recentMaps.splice(i, 1);
           break;
         }

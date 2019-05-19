@@ -98,5 +98,31 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   openImportModal() {
     this.popupService.openComponent(ImportModalComponent,{projectId:this.id});
   }
+  
+
+
+  onConfirmDelete(id) {
+    let confirm ='Delete';
+    this.popupService.openConfirm(null,'Are you sure you want to delete? all data related to the map will get permanently lost',confirm,'Cancel',null)
+    .subscribe(ans => {
+      if (ans === confirm) {
+        this.deleteMap(id);
+      }
+    })
+
+  }
+
+  deleteMap(id) {
+    this.mapsService.delete(id).subscribe(() => {
+      for (let i = 0, lenght = this.featuredMaps.length; i < lenght; i++) {
+        if (this.featuredMaps[i]._id == id) {
+          this.featuredMaps.splice(i, 1);
+          break;
+        }
+      }
+      this.loadMapsLazy();
+    });
+  }
+
 
 }
