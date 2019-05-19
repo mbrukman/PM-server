@@ -23,15 +23,19 @@ function _mapperResult(execResult, processNames=null) {
             let statuses = [];
             process.actions.forEach(action => {
                 statuses.push(action.status)
+                if(!action.result){
+                    action.result = {stdout:action.status}
+                }
                 processResult.push(action.result)
             })
             let processStatus = 'error'
             let mapS = {}
-            statuses.map(s => { mapS[s] = 1 })
-            if (mapS['error'] && mapS['success']) { processStatus = 'partial' }
-            else if (!mapS['error']) { processStatus = 'success' }
-
-            process.status = processStatus
+            if(process.status == 'done' && statuses){
+                statuses.map(s => { mapS[s] = 1 })
+                if (mapS['error'] && mapS['success']) { processStatus = 'partial' }
+                else if (!mapS['error']) { processStatus = 'success' }
+                process.status = processStatus
+            }
             process.index = process.iterationIndex;
             process.result = processResult
             process.process ? process.uuid = process.process.toString(): null

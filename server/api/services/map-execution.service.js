@@ -1156,11 +1156,14 @@ async function stopExecution(runId, socket = null, result = "", mapResultId = nu
     let executionAgents = executions[runId].executionAgents
     Object.keys(executionAgents).forEach(agentKey => {
         let agent = executionAgents[agentKey];
+        agent.key = agentKey
         if (!agent) return;
         optionAction = []
         for (let uuid in agent.context.processes) {
             let processArray = agent.context.processes[uuid];
             processArray.forEach(process => {
+                if(process.startNode|| process.finishTime){return}
+                updateProcessContext(runId,agent,process.uuid,process.iterationIndex, {status:statusEnum.STOPPED,finishTime:d})
                 if (!process.actions) {
                     return
                 }
