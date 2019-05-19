@@ -18,6 +18,8 @@ module.exports = {
         return _socket;
     },
     emit : (type, payload)=>{
+        console.log("emit!!", new Date());
+        
         if (_socket)
             _socket.emit(type,payload)
     }

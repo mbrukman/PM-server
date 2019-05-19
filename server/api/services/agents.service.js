@@ -50,7 +50,26 @@ function _getAgentsStatuses(){
 }
 
 /* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
-let followAgentStatus = (agent) => {
+let followAgentStatus =  (agent) => {
+    if(!agents[agent.key]){
+        agents[agent.key] = agent.toJSON();
+        agents[agent.key].alive = false;
+        agents[agent.key].following = true;
+        setDefaultUrl(agent);
+        return
+    }
+    if(agents[agent.key].socket){
+        let agentSocket = agents[agent.key].socket
+        agentSocket.emit('status', actionForm);
+        
+        agentSocket.on('status', (data) => {
+            resolve(data);
+        });
+    }
+
+
+
+return
     let listenInterval = setInterval(() => {
         let start = new Date();
         if(!agents[agent.key]) return;
@@ -248,6 +267,8 @@ function addSocketIdToAgent(agentKey, socket) {
         return;
     }
     agents[agentKey].socket = socket;
+    agents[agentKey].alive = true
+
 }
 
 function sendRequestToAgent(options, agent) {
@@ -499,9 +520,16 @@ module.exports = {
             winston.log("info", "Agent log");
             // agent send key on connection string
             addSocketIdToAgent(socket.client.request._query.key, socket);
+
+            nsp.on('disconnect',(reason) => {
+                console.error("discomect!!!");
+                
+                agents[agentKey].alive = false;
+            });
+    
         });
 
-
+       
     }
 
 };

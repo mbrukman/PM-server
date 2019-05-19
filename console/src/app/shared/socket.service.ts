@@ -54,6 +54,8 @@ export class SocketService {
   }
 
   updateAgentsStatus(data){
+    console.log(new Date(), data['5c448c2cb248189b006e4b74'].alive);
+    
     this.agentsStatus.next(data)
   }
 
