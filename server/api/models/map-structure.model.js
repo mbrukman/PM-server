@@ -57,7 +57,7 @@ const configurationSchema = new Schema({
 }, { _id: false });
 
 const mapStructureSchema = new Schema({
-    createdAt: { type: Date, default: Date.now },
+    createdAt: { type: Date, default: Date.now, index:true },
     map: { type: Schema.Types.ObjectId, ref: 'Map', required: true },
     content: Schema.Types.Mixed,
     links: [linkSchema],

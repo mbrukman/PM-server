@@ -1,17 +1,19 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {MapsService} from '@maps/maps.service';
 import {Map, MapStructure, MapTrigger} from '@maps/models';
 import {TriggerFormComponent} from './trigger-form/trigger-form.component';
 import {PopupService} from '@shared/services/popup.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-map-triggers',
   templateUrl: './map-triggers.component.html',
   styleUrls: ['./map-triggers.component.scss']
 })
-export class MapTriggersComponent implements OnInit {
+export class MapTriggersComponent implements OnInit, OnDestroy {
   mapStructure: MapStructure;
   triggers: MapTrigger[];
+  currentMapSubscription : Subscription;
   id: string;
   map: Map;
 
@@ -20,7 +22,7 @@ export class MapTriggersComponent implements OnInit {
     private mapsService: MapsService) { }
 
   ngOnInit() {
-    this.mapsService.getCurrentMap().subscribe(map => {
+    this.currentMapSubscription = this.mapsService.getCurrentMap().subscribe(map => {
       this.map = map;
       this.mapsService.triggersList(map.id).subscribe(triggers => {
         this.triggers = triggers;
@@ -31,6 +33,10 @@ export class MapTriggersComponent implements OnInit {
       .subscribe(structure => {
         this.mapStructure = structure;
       });
+  }
+
+  ngOnDestroy() {
+    this.currentMapSubscription.unsubscribe();
   }
 
   openTriggerFormModal(index?) {

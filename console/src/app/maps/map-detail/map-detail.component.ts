@@ -4,11 +4,11 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import * as _ from 'lodash';
 import { MapsService } from '../maps.service';
 import { MapStructureConfiguration, Map, MapStructure } from '@maps/models';
-import {PopupService} from '@shared/services/popup.service';
+import { PopupService } from '@shared/services/popup.service';
 import { SocketService } from '@shared/socket.service';
 import { filter, take } from 'rxjs/operators';
 import { Subject, Subscription } from 'rxjs';
-import {SeoService,PageTitleTypes} from '@app/seo.service';
+import { SeoService, PageTitleTypes } from '@app/seo.service';
 import { SelectItem } from 'primeng/primeng';
 
 @Component({
@@ -26,14 +26,14 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   map: Map;
   routeReq: any;
   mapStructure: MapStructure;
-  structuresList: MapStructure[] = [];
-  structureIndex: number;
   originalMapStructure: MapStructure;
   mapStructureSubscription: Subscription;
+  mapSubscription: Subscription;
+
   edited: boolean = false;
   structureEdited: boolean = false;
   initiated: boolean = false;
-  mapExecutionSubscription: Subscription; 
+  mapExecutionSubscription: Subscription;
   executing: boolean;
   downloadJson: SafeUrl;
   configurationDropDown:SelectItem[] = [];
@@ -48,8 +48,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private mapsService: MapsService,
     private socketService: SocketService,
-    private popupService:PopupService,
-    private seoService:SeoService,) {
+    private popupService: PopupService,
+    private seoService: SeoService, ) {
 
     this.navItems = [
       { name: 'Properties', routerLink: ['properties'] },
@@ -69,14 +69,10 @@ export class MapDetailComponent implements OnInit, OnDestroy {
           this.router.navigate(['NotFound']);
         }
         this.map = map;
-        this.seoService.setTitle(map.name+PageTitleTypes.Map)
+        this.seoService.setTitle(map.name + PageTitleTypes.Map)
         this.originalMap = _.cloneDeep(map);
         this.mapsService.setCurrentMap(map);
-        this.mapsService.structuresList(this.id).subscribe(structureList => {
-          this.structuresList = structureList;
-        });
         this.mapsService.getMapStructure(this.id).subscribe(structure => {
-
           if (structure === null) {
             structure = new MapStructure();
             structure.map = params['id'];
@@ -95,17 +91,17 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       });
     });
 
-    this.mapsService.getCurrentMap().pipe(
+    this.mapSubscription = this.mapsService.getCurrentMap().pipe(
       filter(map => map)
     ).subscribe(map => {
-        this.map = map;
-        this.originalMap.archived = map.archived;
-        if (!_.isEqual(map, this.originalMap)) {
-          this.edited = true;
-        } else {
-          this.edited = false;
-        }
-      });
+      this.map = map;
+      this.originalMap.archived = map.archived;
+      if (!_.isEqual(map, this.originalMap)) {
+        this.edited = true;
+      } else {
+        this.edited = false;
+      }
+    });
 
     this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(
       filter(structure => !!structure)
@@ -144,9 +140,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         if(this.configurationDropDown.length == 0){
           this.configurationDropDown.push({label:"No config",value:''})
         }
-        this.structureIndex = this.structuresList.length - this.structuresList.findIndex((o) => {
-          return o.id === structure.id;
-        });
+        
         if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0 && !this.initiated) {
           this.selected = this.mapStructure.configurations[0].name;
         }
@@ -161,9 +155,9 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.mapsService.currentExecutionList().pipe(
       take(1)
     ).subscribe(executions => {
-        const maps = Object.keys(executions).map(key => executions[key]);
-        this.executing = maps.indexOf(this.id) > -1;
-      });
+      const maps = Object.keys(executions).map(key => executions[key]);
+      this.executing = maps.indexOf(this.id) > -1;
+    });
 
     // subscribing to executions updates
     this.mapExecutionSubscription = this.socketService.getCurrentExecutionsAsObservable().subscribe(executions => {
@@ -181,6 +175,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.mapsService.clearCurrentMap();
     this.mapsService.clearCurrentMapStructure();
     this.mapExecutionSubscription.unsubscribe();
+    this.mapSubscription.unsubscribe();
   }
 
   cleanStructure(structure) {
@@ -288,10 +283,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       delete this.mapStructure.id;
       delete this.mapStructure.createdAt;
       this.mapsService.createMapStructure(this.map.id, this.mapStructure).subscribe((structure) => {
-
         this.originalMapStructure = _.cloneDeep(this.mapStructure);
         this.structureEdited = false;
-        this.structuresList.unshift(structure);
         this.mapStructure.id = structure.id;
       }, error => {
         console.log('Error saving map', error);
@@ -331,8 +324,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     }
     let confirm = 'Save and continue';
     let third = 'Discard'
-    let popup =this.popupService.openConfirm(null,'You have unsaved changes that will be lost by this action. Discard changes?',confirm,'Cancel',third)
-   
+    let popup = this.popupService.openConfirm(null, 'You have unsaved changes that will be lost by this action. Discard changes?', confirm, 'Cancel', third)
+
 
     let subject = new Subject<boolean>();
 
@@ -364,6 +357,3 @@ export class MapDetailComponent implements OnInit, OnDestroy {
 
 
 }
-
-  
-

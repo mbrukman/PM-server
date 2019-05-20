@@ -150,27 +150,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
    * @param results
    * @returns {ProcessResultByProcessIndex}
    */
-  aggregateProcessStatusesByProcessIndex(results): ProcessResultByProcessIndex {
-    let processes = [];
-    results.forEach(res => {
-      processes = [...processes, ...res.processes];
-    });
-    return processes.reduce((total, current) => {
-      if (!total.hasOwnProperty(current.uuid)) {
-        total[current.uuid] = {};
-      }
-      if (!total[current.uuid].hasOwnProperty(current.index)) {
-        total[current.uuid][current.index] = [];
-      }
-      if(typeof current.result == 'string'){
-        total[current.uuid][current.index].push('skipped')
-      }
-      else{
-        total[current.uuid][current.index].push(current.status);
-      }
-      return total;
-    }, {});
-  }
 
   /**
    * Selecting execution and getting result from the server
@@ -229,8 +208,21 @@ export class MapResultComponent implements OnInit, OnDestroy {
         this.result = [agentResult];
     }
     this.generateProcessesList();
-    this.agProcessStatusesByProcessIndex = this.aggregateProcessStatusesByProcessIndex(this.result);
   } 
+
+  resultsByProcessUuid(uuid){
+    let processes = [];
+    this.result.forEach(res => {
+      processes = [...processes, ...res.processes];
+    });
+    let processUuid = [];
+    processes.forEach((process) => {
+      if(process.uuid == uuid){
+        processUuid.push(process)
+      }
+    })
+    return processUuid;
+  }
 
   /**
    * Aggregates the results to generate processes list.

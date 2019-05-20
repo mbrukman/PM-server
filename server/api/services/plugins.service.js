@@ -252,6 +252,7 @@ module.exports = {
 
   pluginDelete: id => {
     return Plugin.findById(id).then((obj) => {
+      if(!obj){ return} 
       deleteContent(obj.file);
       if (obj.type === "executer")
         return deletePluginOnAgent(obj.name)

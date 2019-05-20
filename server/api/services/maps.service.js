@@ -2,7 +2,6 @@ const Map = require("../models/map.model");
 const MapStructure = require("../models").Structure;
 const Plugin = require("../models").Plugin;
 const env = require("../../env/enviroment");
-const MapExecutionLog = require("../models/map-execution-log.model")
 const MapTrigger = require("../models/map-trigger.model")
 const MapResult = require("../models/map-results.model")
 const Project = require("../models/project.model")
@@ -59,7 +58,6 @@ module.exports = {
 
                 return project.save();
             }),
-            MapExecutionLog.remove({ map: id }),
             MapResult.remove({ map: id }),
             MapStructure.remove({ map: id }),
             MapTrigger.remove({ map: id }),
@@ -205,9 +203,8 @@ module.exports = {
         if (structureId) {
             return MapStructure.findById(structureId)
         }
-        return MapStructure.find({ map: mapId }).then((structures) => {
-            return structures.pop();
-        })
+
+        return MapStructure.findOne({ map: mapId }).sort('-createdAt')
     },
     
     structureList: (mapId, page) => {

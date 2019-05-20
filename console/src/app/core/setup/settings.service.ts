@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '@env/environment';
 import { Observable } from 'rxjs';
 
-
-const serverUrl = environment.serverUrl;
 
 class Settings {
   isSetup : boolean;
@@ -18,14 +15,14 @@ export class SettingsService {
   constructor(private http: HttpClient) {}
 
   getSettings() : Observable<Settings> {
-    return this.http.get<Settings>(`${serverUrl}api/settings`).map(settings=>{
+    return this.http.get<Settings>(`api/settings`).map(settings=>{
       this.settings = settings;
       return settings;
     });
   }
 
   setupDbConnectionString(data) {
-    return this.http.post(`${serverUrl}api/settings/db`, data);
+    return this.http.post(`api/settings/db`, data);
   }
 
 

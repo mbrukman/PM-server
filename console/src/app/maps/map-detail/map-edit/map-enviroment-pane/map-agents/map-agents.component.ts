@@ -20,12 +20,13 @@ export class MapAgentsComponent implements OnInit, OnDestroy{
   map: Map;
   statuses: any;
   agentsStatusReq : Subscription
+  currentMapSubscription : Subscription
   
   constructor(private popupService:PopupService, private mapsService: MapsService, private agentsService: AgentsService) {
   }
 
   ngOnInit() {
-    this.mapsService.getCurrentMap()
+    this.currentMapSubscription = this.mapsService.getCurrentMap()
       .subscribe(map => {
         this.map = map;
         this.getAgentsStatus();
@@ -50,6 +51,7 @@ export class MapAgentsComponent implements OnInit, OnDestroy{
   }
 
   ngOnDestroy() {
+    this.currentMapSubscription.unsubscribe();
     if (this.agentsStatusReq) {
       this.agentsStatusReq.unsubscribe();
     }
