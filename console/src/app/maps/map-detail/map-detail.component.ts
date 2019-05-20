@@ -37,7 +37,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   executing: boolean;
   downloadJson: SafeUrl;
   configurationDropDown:SelectItem[] = [];
-  selected: string;
+  selected: string ;
   navItems: {
     name: string,
     routerLink: string[]
@@ -141,7 +141,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
           this.configurationDropDown.push({label:"No config",value:''})
         }
         
-        if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0 && !this.initiated) {
+        if ((this.mapStructure.configurations && this.mapStructure.configurations.length > 0 && !this.initiated) || (!this.selected && this.mapStructure.configurations.length > 0)) {
           this.selected = this.mapStructure.configurations[0].name;
         }
         else if(!this.initiated){
@@ -164,10 +164,6 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       const maps = Object.keys(executions).map(key => executions[key]);
       this.executing = maps.indexOf(this.id) > -1;
     });
-  }
-
-  changeSelected(e){
-    this.selected = e.value.name;
   }
 
   ngOnDestroy() {
@@ -254,7 +250,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   }
 
   executeMap() {
-    this.mapsService.execute(this.id, this.selected).subscribe();
+    this.mapsService.execute(this.id, this.selected ? this.selected['name'] || this.selected : undefined ).subscribe();
   }
 
   saveMap() {

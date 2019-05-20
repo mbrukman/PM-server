@@ -42,7 +42,7 @@ export class MapConfigurationsComponent implements OnInit {
 
   removeConfiguration(index: number) {
     this.mapStructure.configurations.splice(index, 1);
-    this.updateMapStructure();
+    this.updateMapStructure(true);
     this.selectedConfiguration = null;
   }
 
@@ -57,10 +57,12 @@ export class MapConfigurationsComponent implements OnInit {
     this.updateMapStructure();
   }
 
-  updateMapStructure() {
+  updateMapStructure(remove = false) {
     try {
-      this.selectedConfiguration.value = JSON.parse(this.value);
+      if(!remove)this.selectedConfiguration.value = JSON.parse(this.value);
       this.mapsService.setCurrentMapStructure(this.mapStructure);
-    } catch (err) {}
+    } catch (err) {
+      console.log(err)
+    }
   }
 }
