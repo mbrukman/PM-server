@@ -4,6 +4,7 @@ import { MapStructureConfiguration, MapStructure } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { AddConfigurationComponent } from '@maps/map-detail/map-configurations/add-configuration/add-configuration.component';
 import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-main-map-configurations',
@@ -18,10 +19,12 @@ export class MapConfigurationsComponent implements OnInit {
     language: 'json'
   };
   value: string = '';
+  mapStructureSubscription: Subscription;
+
   constructor(private mapsService: MapsService, private popupService:PopupService) { }
 
   ngOnInit() {
-    this.mapsService.getCurrentMapStructure().pipe(
+    this.mapStructureSubscription =  this.mapsService.getCurrentMapStructure().pipe(
       filter(structure => !!structure)
     ).subscribe(structure => {
         this.mapStructure = structure;
@@ -29,6 +32,10 @@ export class MapConfigurationsComponent implements OnInit {
           this.editConfiguration(0);
         }
       });
+  }
+
+  ngOnDestroy(){
+    this.mapStructureSubscription.unsubscribe()
   }
 
   addNewConfiguration() {

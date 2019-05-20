@@ -180,6 +180,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.mapsService.clearCurrentMapStructure();
     this.mapExecutionSubscription.unsubscribe();
     this.mapSubscription.unsubscribe();
+    this.mapStructureSubscription.unsubscribe()
   }
 
   cleanStructure(structure) {

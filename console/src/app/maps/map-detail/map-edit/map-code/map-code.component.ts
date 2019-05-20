@@ -30,6 +30,9 @@ export class MapCodeComponent implements OnInit {
     });
   }
  
+  ngOnDestroy() {
+    this.mapSubscription .unsubscribe()
+  }
   onKeyDown($event) {
 
     let charCode = String.fromCharCode($event.which).toLowerCase();
