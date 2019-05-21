@@ -6,10 +6,10 @@ const winston = require("winston");
 const _ = require("lodash");
 const humanize = require("../../helpers/humanize");
 const env = require("../../env/enviroment");
-
+const Map = require("../models/map.model");
 const Agent = require("../models").Agent;
 const Group = require("../models").Group;
-
+const ObjectId = require('mongoose').Types.ObjectId;
 
 const LIVE_COUNTER = env.retries; // attempts before agent will be considered dead
 const INTERVAL_TIME = env.interval_time;
@@ -258,6 +258,19 @@ function sendRequestToAgent(options, agent) {
     })
 }
 
+function deleteAgentFromMap(agentId){
+    return Map.find({}).then((maps) => {
+        for(let i=0,length=maps.length;i<length;i++){
+            let index = maps[i].agents.findIndex(id => id.equals(ObjectId(agentId)));
+            if(index!=-1){
+                maps[i].agents.splice(index,1);
+                maps[i].save()
+            }
+        }
+        
+    })
+}
+
 module.exports = {
     add: (agent) => {
         return Agent.findOne({ key: agent.key }).then(agentObj => {
@@ -290,7 +303,8 @@ module.exports = {
         });
     },
     delete: (agentId) => {
-        return Agent.findByIdAndUpdate(agentId,{ $set: { "isDeleted": "true" } }).then((agent) => {
+        return Agent.findByIdAndUpdate(agentId,{ $set: { "isDeleted": "true" } }).then(async(agent) => {
+            let deleteAgent = await deleteAgentFromMap(agentId)
             if(agents[agent.key]){
                 clearInterval(agents[agent.key].intervalId)
             }
