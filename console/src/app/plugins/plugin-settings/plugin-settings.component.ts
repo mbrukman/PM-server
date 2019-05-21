@@ -3,8 +3,7 @@ import { FormControl, FormGroup, FormArray,Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {PluginsService} from '@plugins/plugins.service'
 import {Plugin} from '@plugins/models/plugin.model'
-import { from, forkJoin, of } from 'rxjs';
-import { filter, mergeMap } from 'rxjs/operators';
+import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
     selector: 'app-plugin-settings',
@@ -16,7 +15,7 @@ export class PluginSettingsComponent implements OnInit{
     settingsForm: FormGroup = new FormGroup({});
     plugin = new Plugin();
     methods: object = {};
-    constructor(private route: ActivatedRoute,private pluginsService: PluginsService,private router:Router){}
+    constructor(private route: ActivatedRoute,private pluginsService: PluginsService,private router:Router,private seoService:SeoService){}
 
     ngOnInit(){
         
@@ -24,6 +23,7 @@ export class PluginSettingsComponent implements OnInit{
         this.pluginsService.getById(pluginId).subscribe(plugin =>{
             this.plugin = plugin;
             this.initSettingsForm();
+            this.seoService.setTitle(plugin.name+PageTitleTypes.Settings)
         }) 
         
     }
