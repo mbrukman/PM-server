@@ -1,11 +1,9 @@
 const Map = require("../models/map.model");
 const MapStructure = require("../models").Structure;
-const Plugin = require("../models").Plugin;
 const env = require("../../env/enviroment");
 const MapTrigger = require("../models/map-trigger.model")
-const MapResult = require("../models/map-results.model")
+const MapResult = require("../models").MapResult;
 const Project = require("../models/project.model")
-const proejctServise = require("./projects.service")
 const PAGE_SIZE = env.page_size;
 const shared = require("../shared/recents-maps")
 const mongoose = require('mongoose');
@@ -58,10 +56,10 @@ module.exports = {
 
                 return project.save();
             }),
-            MapResult.remove({ map: id }),
-            MapStructure.remove({ map: id }),
-            MapTrigger.remove({ map: id }),
-            Map.remove({ _id: id })
+            MapResult.deleteMany({ map: id }),
+            MapStructure.deleteMany({ map: id }),
+            MapTrigger.deleteMany({ map: id }),
+            Map.deleteMany({ _id: id })
         ]);
     },
 
