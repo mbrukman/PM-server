@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { Subscription } from "rxjs";
 
@@ -10,7 +10,7 @@ import { MapStructure } from "../../../models/map-structure.model";
   templateUrl: './map-code.component.html',
   styleUrls: ['./map-code.component.scss']
 })
-export class MapCodeComponent implements OnInit {
+export class MapCodeComponent implements OnInit, OnDestroy {
   structure: MapStructure = new MapStructure();
   mapSubscription: Subscription;
   editorOptions = {
@@ -30,6 +30,9 @@ export class MapCodeComponent implements OnInit {
     });
   }
  
+  ngOnDestroy() {
+    this.mapSubscription .unsubscribe()
+  }
   onKeyDown($event) {
 
     let charCode = String.fromCharCode($event.which).toLowerCase();

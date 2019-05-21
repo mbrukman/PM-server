@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
@@ -14,13 +14,14 @@ import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplica
 import { FilterOptions } from '@shared/model/filter-options.model';
 import { take, filter, mergeMap } from 'rxjs/operators';
 import { MapDuplicateOptions } from '@maps/models/map-duplicate-options.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-map-revisions',
   templateUrl: './map-revisions.component.html',
   styleUrls: ['./map-revisions.component.scss']
 })
-export class MapRevisionsComponent implements OnInit {
+export class MapRevisionsComponent implements OnInit, OnDestroy {
   load_structures = 25;
   previewProcess: Process;
   structures: MapStructure[] = [];
@@ -50,6 +51,7 @@ export class MapRevisionsComponent implements OnInit {
   monacoOptions = {
     theme: 'vs-dark'
   };
+  mapStructureSubscription: Subscription;
   
 
   constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private popupService:PopupService) {}
@@ -139,6 +141,10 @@ export class MapRevisionsComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(){
+    this.mapStructureSubscription.unsubscribe()
+  }
+
   loadStructureOnScroll(mapId = this.mapId,OnInit = false){
     this.mapsService.structuresList(mapId,this.page)
     .subscribe(structures => {
@@ -175,7 +181,7 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   changeStructure(structureId) {
-    this.mapsService.getMapStructure(this.mapId, structureId).subscribe(structure => {
+    this.mapStructureSubscription = this.mapsService.getMapStructure(this.mapId, structureId).subscribe(structure => {
       this.mapsService.setCurrentMapStructure(structure);
       this.socketService.setNotification({
         title: 'Changed version',
