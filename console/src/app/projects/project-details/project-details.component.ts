@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit,ViewChild,ElementRef } from '@angular/core';
-import { ActivatedRoute, Router,Data } from '@angular/router';
+import { ActivatedRoute,Data } from '@angular/router';
 import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
 import { PopupService } from '../../shared/services/popup.service';
@@ -29,7 +29,6 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
 
   @ViewChild('globalFilter') globalFilterElement : ElementRef;
   constructor(private route: ActivatedRoute,
-    private router: Router,
     private projectsService: ProjectsService,
     private popupService: PopupService,
     private mapsService:MapsService,
@@ -55,7 +54,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
 
   getMaps(fields=null,page= 1){
     this.mapsService.filterMaps(fields,page,this.filterOptions).subscribe(maps => {
-      this.maps = maps.items
+      this.maps = maps ? maps.items :null
     })
   }
 
