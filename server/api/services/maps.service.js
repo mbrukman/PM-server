@@ -94,7 +94,7 @@ module.exports = {
             projectLookup = {$in: ["$$mapId", "$maps"]};
         }
 
-        let m = Map.aggregate([
+        let aggregateSteps = [
             {
                 $match: $match
             },
@@ -153,7 +153,10 @@ module.exports = {
                     ],
                     as: "latestExectionResult",
                 },
-            },
+            }
+        ]
+
+        let resultsQuery = [...aggregateSteps,
             { $sort: getSort(sort) },
             { $skip: page ? ((page - 1) * PAGE_SIZE) : 0 },
             { $limit: filterOptions.options.limit || PAGE_SIZE },
@@ -163,18 +166,21 @@ module.exports = {
                     "path": "$latestExectionResult",
                     "preserveNullAndEmptyArrays": true
                 }
-            }
-        ])
+            }];
+        
+        let countQuery = [...aggregateSteps,{
+            $count: "count"
+          }]
 
-        return m.then(maps => {
+        return Map.aggregate(resultsQuery).then(maps => {
             for (let i = 0, mapsLength = maps.length; i < mapsLength; i++) {
                 maps[i].id = maps[i]._id;
                 maps[i].project.id = maps[i].project._id;
                 delete maps[i]._id;
                 delete maps[i].project._id;
             }
-            return module.exports.count(q).then(r => {
-                return { items: maps, totalCount: r }
+            return Map.aggregate(countQuery).then(r => {
+                return { items: maps, totalCount: r[0].count }
             });
         });
     },
