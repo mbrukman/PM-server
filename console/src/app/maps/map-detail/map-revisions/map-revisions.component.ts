@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
@@ -21,7 +21,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './map-revisions.component.html',
   styleUrls: ['./map-revisions.component.scss']
 })
-export class MapRevisionsComponent implements OnInit {
+export class MapRevisionsComponent implements OnInit, OnDestroy {
   load_structures = 25;
   previewProcess: Process;
   structures: MapStructure[] = [];

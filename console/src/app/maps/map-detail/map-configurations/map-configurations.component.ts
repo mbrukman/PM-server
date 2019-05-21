@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import {PopupService} from '@shared/services/popup.service'
 import { MapStructureConfiguration, MapStructure } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
@@ -11,7 +11,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './map-configurations.component.html',
   styleUrls: ['./map-configurations.component.scss']
 })
-export class MapConfigurationsComponent implements OnInit {
+export class MapConfigurationsComponent implements OnInit ,OnDestroy{
   selectedConfiguration: MapStructureConfiguration;
   mapStructure: MapStructure;
   editorOptions = {
