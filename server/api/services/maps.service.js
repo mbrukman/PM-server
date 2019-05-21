@@ -65,14 +65,12 @@ module.exports = {
 
     filter: (filterOptions = {}) => {
         mapsId = [];
-        let q = {};
         let fields = filterOptions.fields
         let sort = filterOptions.options.sort || 'name'
         let page = filterOptions.page
         if (fields) {
             // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
             Object.keys(fields).map(key => { fields[key] = { '$regex': `.*${fields[key]}.*` } });
-            q = fields;
         }
 
         var $match = {};
@@ -178,7 +176,7 @@ module.exports = {
                 delete maps[i].project._id;
             }
             return Map.aggregate(countQuery).then(r => {
-                return { items: maps, totalCount: r[0].count }
+                return { items: maps, totalCount: r.length ? r[0].count : 0  }
             });
         });
     },

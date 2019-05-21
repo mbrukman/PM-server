@@ -173,7 +173,7 @@ module.exports = {
         hooks.hookPre('map-filter', req).then(() => {
             return mapsService.filter(body);
         }).then(data => {
-            if (!data || data.totalCount === 0) {
+            if (!data) {
                 return res.status(204).send();
             }
             return res.json(data);
