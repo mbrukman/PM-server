@@ -259,15 +259,11 @@ function sendRequestToAgent(options, agent) {
 }
 
 function deleteAgentFromMap(agentId){
-    return Map.find({}).then((maps) => {
+    return Map.find({agents:{$elemMatch:{$eq:agentId}}}).then(maps => {
         for(let i=0,length=maps.length;i<length;i++){
-            let index = maps[i].agents.findIndex(id => id.equals(ObjectId(agentId)));
-            if(index!=-1){
-                maps[i].agents.splice(index,1);
-                maps[i].save()
-            }
+            maps[i].agents.splice(maps[i].agents.findIndex(id => id.equals(ObjectId(agentId))));
+            maps[i].save();
         }
-        
     })
 }
 
