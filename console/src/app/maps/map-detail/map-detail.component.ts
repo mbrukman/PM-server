@@ -36,8 +36,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   mapExecutionSubscription: Subscription;
   executing: boolean;
   downloadJson: SafeUrl;
-  configurationDropDown: SelectItem[] = [];
-  selected: MapStructureConfiguration;
+  configurationDropDown:SelectItem[] = [];
+  selected: string ;
   navItems: {
     name: string,
     routerLink: string[]
@@ -106,56 +106,50 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(
       filter(structure => !!structure)
     ).subscribe(structure => {
-      let newContent;
-      let oldContent;
-      if (!this.initiated) {
-        this.originalMapStructure = _.cloneDeep(structure);
-      }
-      try {
-        newContent = JSON.parse(structure.content).cells
-          .filter(c => c.type = 'devs.MyImageModel')
-          .map(c => {
-            return {
-              position: c.position
-            };
-          });
-        oldContent = JSON.parse(this.originalMapStructure.content).cells
-          .filter(c => c.type = 'devs.MyImageModel')
-          .map(c => {
-            return {
-              position: c.position
-            };
-          });
-      } catch (e) { }
+        let newContent;
+        let oldContent;
+        if (!this.initiated) {
+          this.originalMapStructure = _.cloneDeep(structure);
+        }
+        try {
+          newContent = JSON.parse(structure.content).cells
+            .filter(c => c.type = 'devs.MyImageModel')
+            .map(c => {
+              return {
+                position: c.position
+              };
+            });
+          oldContent = JSON.parse(this.originalMapStructure.content).cells
+            .filter(c => c.type = 'devs.MyImageModel')
+            .map(c => {
+              return {
+                position: c.position
+              };
+            });
+        } catch (e) { }
 
-      const compareStructure = this.cleanStructure(JSON.parse(JSON.stringify(structure)));
-      const compareOriginalStructure = this.cleanStructure(JSON.parse(JSON.stringify(this.originalMapStructure)));
-      delete compareStructure.content;
-      delete compareOriginalStructure.content;
-      this.structureEdited = (JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent);
-      this.mapStructure = structure;
-      this.configurationDropDown = this.mapStructure.configurations.map(config => {
-        return { label: config.name, value: config }
-      })
-      if (this.configurationDropDown.length == 0) {
-        this.configurationDropDown.push({ label: "No config", value: '' })
-      }
-      this.initiated = true;
-      this.generateDownloadJsonUri();
-
-      if (this.mapStructure.configurations && this.mapStructure.configurations.length > 0) {
-        const selected = this.mapStructure.configurations.findIndex(o => o.selected);
-        this.selected = selected !== -1 ? this.mapStructure.configurations[selected] : this.mapStructure.configurations[0];
-        this.changeSelected(false)
-      }
-      else {
-        this.selected = undefined;
-      }
-
-
-
-    });
-
+        const compareStructure = this.cleanStructure(JSON.parse(JSON.stringify(structure)));
+        const compareOriginalStructure = this.cleanStructure(JSON.parse(JSON.stringify(this.originalMapStructure)));
+        delete compareStructure.content;
+        delete compareOriginalStructure.content;
+        this.structureEdited = (JSON.stringify(compareStructure) !== JSON.stringify(compareOriginalStructure)) || !_.isEqual(newContent, oldContent);
+        this.mapStructure = structure;
+        this.configurationDropDown = this.mapStructure.configurations.map(config => {
+          return {label:config.name, value:config}
+        })
+        if(this.configurationDropDown.length == 0){
+          this.configurationDropDown.push({label:"No config",value:''})
+        }
+        
+        if ((this.mapStructure.configurations && this.mapStructure.configurations.length > 0 && !this.initiated) || (!this.selected && this.mapStructure.configurations.length > 0)) {
+          this.selected = this.mapStructure.configurations[0].name;
+        }
+        else if(!this.initiated){
+          this.selected = undefined;
+        }
+        this.initiated = true;
+        this.generateDownloadJsonUri();
+      });
 
     // get the current executing maps
     this.mapsService.currentExecutionList().pipe(
@@ -172,10 +166,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-
   ngOnDestroy() {
-    this.routeReq.unsubscribe();
-
+    this.routeReq.unsubscribe();  
     this.mapsService.clearCurrentMap();
     this.mapsService.clearCurrentMapStructure();
     this.mapExecutionSubscription.unsubscribe();
@@ -258,8 +250,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   }
 
   executeMap() {
-    let index = this.mapStructure.configurations.findIndex(conf => conf.name == this.selected.name)
-    this.mapsService.execute(this.id, (!this.selected) ? "" : this.mapStructure.configurations[index].name).subscribe();
+    this.mapsService.execute(this.id, this.selected ? this.selected['name'] || this.selected : undefined ).subscribe();
   }
 
   saveMap() {
@@ -350,14 +341,6 @@ export class MapDetailComponent implements OnInit, OnDestroy {
    * Updating selected configuration
    * @param {number} index
    */
-  changeSelected(updateMap: boolean) {
-    this.mapStructure.configurations.forEach((configuration) => {
-      configuration.selected = (this.selected.name == configuration.name)
-    });
-    if (updateMap) {
-      this.mapsService.setCurrentMapStructure(this.mapStructure);
-    }
-  }
 
   onKeyDown($event: KeyboardEvent) {
     let charCode = String.fromCharCode($event.which).toLowerCase();

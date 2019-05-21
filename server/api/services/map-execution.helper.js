@@ -89,7 +89,6 @@ module.exports = {
      * @param {string|Object} configuration 
      */
     createConfiguration(mapStructure, configuration) {
-
         if(configuration){
             if (typeof configuration != 'string'){
                 return {
@@ -108,8 +107,8 @@ module.exports = {
         } 
 
         let selectedConfiguration
-        if (mapStructure.configurations && mapStructure.configurations.length) {
-            selectedConfiguration = configuration ? mapStructure.configurations.find(o => o.name === configuration) : mapStructure.configurations.find(o => o.selected);
+        if (mapStructure.configurations && mapStructure.configurations.length && configuration) {
+            selectedConfiguration = mapStructure.configurations.find(o => o.name === configuration);
             if (!selectedConfiguration) {
                 selectedConfiguration = mapStructure.configurations[0];
             }
