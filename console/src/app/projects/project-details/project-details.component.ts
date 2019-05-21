@@ -54,7 +54,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
 
   getMaps(fields=null,page= 1){
     this.mapsService.filterMaps(fields,page,this.filterOptions).subscribe(maps => {
-      this.maps = maps ? maps.items :null
+      this.maps = maps.items
     })
   }
 

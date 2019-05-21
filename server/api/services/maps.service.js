@@ -178,7 +178,7 @@ module.exports = {
                 delete maps[i].project._id;
             }
             return Map.aggregate(countQuery).then(r => {
-                return { items: maps, totalCount: r[0]? r[0].count : 0  }
+                return { items: maps, totalCount: r.length ? r[0].count : 0  }
             });
         });
     },
