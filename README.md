@@ -26,4 +26,4 @@ All information about Kaholo can be found on our [website].
 [LogoImage]: /logo.png
 [GitHub]: https://github.com/Kaholo/PM-server
 [website]: https://kaholo.io/
-[UserGuide]: http://wiki.kaholo.io/
+[UserGuide]: https://www.kaholo.io/documents/kaholo-user-guide/
