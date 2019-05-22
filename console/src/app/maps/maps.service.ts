@@ -7,12 +7,37 @@ import { FilterOptions } from '@shared/model/filter-options.model'
 import { MapDuplicateOptions } from './models/map-duplicate-options.model'
 import { SettingsService } from '@core/setup/settings.service';
 import { IEntityList } from '@shared/interfaces/entity-list.interface';
+import {PopupService} from '@shared/services/popup.service';
 
 @Injectable()
 export class MapsService {
   currentMap: BehaviorSubject<Map> = new BehaviorSubject<Map>(null);
+  currentMapId: string
   public currentMapStructure: BehaviorSubject<MapStructure> = new BehaviorSubject<MapStructure>(null);
-  constructor(private http: HttpClient, private settingsService: SettingsService) {
+  socketID: string;
+  mapChaned: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+
+  constructor(private http: HttpClient, private settingsService: SettingsService, private popupService:PopupService) {
+  }
+
+setSocketID(v:string){
+  this.socketID = v
+}
+  checkSyncMap(mapId) {
+    let OK = 'Confirm'
+    if(this.currentMapId == mapId){
+      this.popupService.openConfirm(null, 'The same map was saved in different window. Do you want to refresh window and get the latest map?',OK,null,null).subscribe(result=>{
+        if(OK == result){
+          location.reload();
+        }else{
+          this.mapChaned.next(true)
+        }
+        })
+    }
+  }
+
+  isMapChanged(){
+    return this.mapChaned.asObservable()
   }
 
   recentMaps() {
@@ -28,6 +53,7 @@ export class MapsService {
   }
 
   clearCurrentMap() {
+    this.currentMapId = null
     this.currentMap.next(null);
   }
 
@@ -56,6 +82,7 @@ export class MapsService {
   }
 
   setCurrentMap(map: Map) {
+    this.currentMapId = map.id || map._id
     this.currentMap.next(map);
   }
 
@@ -111,7 +138,8 @@ export class MapsService {
   /* map structure */
 
   createMapStructure(mapId: string, structure: MapStructure) {
-    return this.http.post<MapStructure>(`api/maps/${mapId}/structure/create`, structure);
+    let data = {structure, socketId: this.socketID }
+    return this.http.post<MapStructure>(`api/maps/${mapId}/structure/create`, data);
   }
 
   clearCurrentMapStructure() {
