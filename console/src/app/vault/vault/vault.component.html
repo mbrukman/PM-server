@@ -18,11 +18,10 @@
       </p-column>
       <p-column field="" header="Actions" [style]="{'width':'150px', 'text-align':'center'}">
         <ng-template let-col let-i="rowIndex" let-item="rowData" pTemplate="body">
-          <div class="actions-wrapper">
-            <button class="btn btn-link" (click)="deleteVaultItem(item.id)" tooltip="Delete" placement="bottom"><i
-                class="material-icons">delete_outline</i></button>
-            <button class="btn btn-link" (click)="upsertItem(item)" tooltip="Edit" placement="bottom"><i class="material-icons">edit</i></button>
-          </div>
+            <div class="actions-wrapper">
+                <i class="material-icons garbage" (click)="upsertItem(item)">delete_outline</i>
+                <i (click)="upsertItem(item)" class="material-icons garbage">edit</i>
+            </div>
         </ng-template>
       </p-column>
     </p-dataTable>
