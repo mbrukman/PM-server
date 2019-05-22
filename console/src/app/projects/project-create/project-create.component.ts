@@ -15,7 +15,8 @@ import { Project } from '../models/project.model';
 export class ProjectCreateComponent implements OnInit, OnDestroy {
   projectForm: FormGroup;
   project: Project;
-  queryParamsReq : Subscription
+  queryParamsReq : Subscription;
+  title:string = 'Create a new project'
 
   constructor(private projectsService: ProjectsService, private router: Router, private route: ActivatedRoute) {
   }
@@ -26,6 +27,7 @@ export class ProjectCreateComponent implements OnInit, OnDestroy {
       if (params && params.project) {
         this.projectsService.detail(params.project).subscribe(project => {
           this.project = project;
+          this.title = `Edit ${this.project.name} project`;
           this.setFormData({ name: project.name, description: project.description });
         });
       }
