@@ -258,13 +258,9 @@ function sendRequestToAgent(options, agent) {
     })
 }
 
+
 function deleteAgentFromMap(agentId){
-    return Map.find({agents:{$elemMatch:{$eq:agentId}}}).then(maps => {
-        for(let i=0,length=maps.length;i<length;i++){
-            maps[i].agents.splice(maps[i].agents.findIndex(id => id.equals(ObjectId(agentId))));
-            maps[i].save();
-        }
-    })
+    return Map.updateMany({agents:{$elemMatch:{$eq:agentId}}},{$pull:{agents:{$in:[agentId]}}})
 }
 
 module.exports = {
