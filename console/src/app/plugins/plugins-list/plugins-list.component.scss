@@ -7,13 +7,14 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 10px;
+    padding-left: 60px;
     .btn-upload-plugin{
       margin-right: 37px;
     }
   }
 
   .plugins-list{
-    padding: 18px 40px;
+    padding: 18px 100px;
     .table-wrapper{
       @include table();
 

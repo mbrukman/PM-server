@@ -9,6 +9,12 @@
   .side-nav {
     background: $kh-background;
     flex : 0 0 60px;
+    height: 100%;
+    width: 60px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    overflow-x: hidden;
     .nav{
       padding-top: 19px;
     }
