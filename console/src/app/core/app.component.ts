@@ -21,18 +21,8 @@ export class AppComponent implements OnInit {
   notificationSubscription: Subscription;
   currentMap: Map;
 
-  options = {
-    min: 8,
-    max: 100,
-    ease: 'linear',
-    speed: 200,
-    trickleSpeed: 300,
-    meteor: true,
-    spinner: false,
-    spinnerPosition: 'right',
-    direction: 'ltr+',
+  progressBarOptions = {
     color: '#f79f2b',
-    thick: true
   };
   constructor(private mapsService: MapsService,
     private router: Router,

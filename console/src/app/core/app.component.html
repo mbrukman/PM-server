@@ -1,7 +1,5 @@
 <div class="row root">
-    <ng-progress #progressBar [meteor]="options.meteor" [color]="options.color" [min]="options.min" [speed]="options.speed" [spinner]="options.spinner" [max]="options.max"
-    [spinnerPosition]="options.spinnerPosition" [direction]="options.direction" [thick]="options.thick" [trickleSpeed]="options.trickleSpeed"
-    [ease]="options.ease">
+    <ng-progress #progressBar [color]="progressBarOptions.color">
   </ng-progress>
   <div class="pm-sidebar" *ngIf="settingsService.settings?.isSetup">
     <div class="logo-wrapper">
