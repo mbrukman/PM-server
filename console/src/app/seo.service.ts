@@ -11,7 +11,7 @@ export enum PageTitleTypes {
     Agents = "Agents - Manage",
     Vault = "Vault - Manage",
     Calendar= "Calendar - Manage",
-    Settings = " - Settings - Manage"
+    Settings = " - PluginSettings - Manage"
 }
 
 @Injectable()
