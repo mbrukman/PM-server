@@ -23,7 +23,7 @@ export class PluginSettingsComponent implements OnInit{
         this.pluginsService.getById(pluginId).subscribe(plugin =>{
             this.plugin = plugin;
             this.initSettingsForm();
-            this.seoService.setTitle(plugin.name+PageTitleTypes.Settings)
+            this.seoService.setTitle(plugin.name+PageTitleTypes.PluginSettings)
         }) 
         
     }
