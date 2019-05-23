@@ -54,11 +54,10 @@ const linkSchema = new Schema({
 const configurationSchema = new Schema({
     name: { type: String, require: true },
     value: { type: Schema.Types.Mixed, require: true },
-    selected: Boolean
 }, { _id: false });
 
 const mapStructureSchema = new Schema({
-    createdAt: { type: Date, default: Date.now },
+    createdAt: { type: Date, default: Date.now, index:true },
     map: { type: Schema.Types.ObjectId, ref: 'Map', required: true },
     content: Schema.Types.Mixed,
     links: [linkSchema],

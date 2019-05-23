@@ -1,15 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
-import {PluginSettings} from '@plugins/models/plugin-settings.model.ts'
 
 import { Plugin } from './models/plugin.model';
-import { PluginSettingsComponent } from './plugin-settings/plugin-settings.component';
 import { map } from 'rxjs/operators';
 
-const serverUrl = environment.serverUrl;
 
 @Injectable()
 export class PluginsService {
@@ -18,11 +13,11 @@ export class PluginsService {
   }
 
   delete(id) {
-    return this.http.delete(`${serverUrl}api/plugins/${id}/delete`);
+    return this.http.delete(`api/plugins/${id}/delete`);
   }
 
   list() {
-    return this.http.get<Plugin[]>(`${serverUrl}api/plugins`).pipe(
+    return this.http.get<Plugin[]>(`api/plugins`).pipe(
       map(plugins=>{
       return plugins.map(plugin=> new Plugin(plugin));
     }))
@@ -30,15 +25,15 @@ export class PluginsService {
 
 
   upload(file): Observable<any> {
-    return this.http.post(`${serverUrl}api/plugins/upload`, file);
+    return this.http.post(`api/plugins/upload`, file);
   }
 
   updateSettings(pluginId,settings):Observable<any>{
-    return this.http.post(`${serverUrl}api/plugins/${pluginId}/settings`, settings);
+    return this.http.post(`api/plugins/${pluginId}/settings`, settings);
   }
 
   getById(pluginId){
-    return this.http.get<Plugin>(`${serverUrl}api/plugins/${pluginId}`)
+    return this.http.get<Plugin>(`api/plugins/${pluginId}`)
   }
   
 }

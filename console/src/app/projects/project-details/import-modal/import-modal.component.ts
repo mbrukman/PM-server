@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { BsModalRef } from 'ngx-bootstrap';
 import { ProjectsService } from '@projects/projects.service';
 import { mergeMap } from 'rxjs/operators';
+import { environment } from '@env/environment';
 
 @Component({
   templateUrl: './import-modal.component.html',
@@ -22,11 +23,24 @@ export class ImportModalComponent {
     this.bsModalRef.hide();
   }
 
+  fixImgUrl(){
+    let startString = 'xlink:href\":\"' ;
+    let endString = 'plugins/';
+    let start = this.structure.content.indexOf(startString)
+    let end = this.structure.content.indexOf(endString)
+    let imgUrl = this.structure.content.slice(start,end)
+    if(imgUrl ==  (startString + environment.serverUrl)){
+      return
+    }
+    this.structure.content = this.structure.content.replace(new RegExp(imgUrl, 'g'), (startString + environment.serverUrl))
+  }
+
   onConfirm() {
     if (!this.name || !this.structure) {
       this.error = 'All fields are required';
       return ;
     }
+    this.fixImgUrl()
     this.projectsService.createMap({ name: this.name, project: this.projectId }).pipe(
       mergeMap(map => this.projectsService.createMapStructure(map.id, this.structure))
     ).subscribe(structure => {

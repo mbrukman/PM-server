@@ -33,6 +33,9 @@
                 margin-right: 10px
             }
         }
+        .garbage{
+            cursor: pointer; 
+        }
     }
 
     @include page-list-items();

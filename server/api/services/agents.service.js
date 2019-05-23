@@ -6,11 +6,12 @@ const winston = require("winston");
 const _ = require("lodash");
 const humanize = require("../../helpers/humanize");
 const env = require("../../env/enviroment");
-
+const Map = require("../models/map.model");
 const Agent = require("../models").Agent;
 const Group = require("../models").Group;
 const socketService = require('./socket.service');
 
+const ObjectId = require('mongoose').Types.ObjectId;
 
 const LIVE_COUNTER = env.retries; // attempts before agent will be considered dead
 const INTERVAL_TIME = env.interval_time;
@@ -273,9 +274,8 @@ function addSocketIdToAgent(agentKey, socket) {
 
 function sendRequestToAgent(options, agent) {
     return new Promise((resolve, reject) => {
-
-        options.uri = agent.defaultUrl + options.uri;
-
+        options = Object.assign({},options);
+        options.uri = agents[agent.key].defaultUrl + options.uri;
         options.method = options.method || 'POST';
 
         if (options.body) {
@@ -292,6 +292,11 @@ function sendRequestToAgent(options, agent) {
             resolve(response)
         })
     })
+}
+
+
+function deleteAgentFromMap(agentId){
+    return Map.updateMany({agents:{$elemMatch:{$eq:agentId}}},{$pull:{agents:{$in:[agentId]}}})
 }
 
 module.exports = {
@@ -329,7 +334,8 @@ module.exports = {
         });
     },
     delete: (agentId) => {
-        return Agent.findByIdAndUpdate(agentId,{ $set: { "isDeleted": "true" } }).then((agent) => {
+        return Agent.findByIdAndUpdate(agentId,{ $set: { "isDeleted": "true" } }).then(async(agent) => {
+            let deleteAgent = await deleteAgentFromMap(agentId)
             if(agents[agent.key]){
                 clearInterval(agents[agent.key].intervalId)
             }
