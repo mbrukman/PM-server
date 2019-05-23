@@ -8,9 +8,9 @@
 
   .side-nav {
     background: $kh-background;
-    flex : 0 0 60px;
+    flex : 0 0 $manage-sidenav-width;
     height: 100%;
-    width: 60px;
+    width: $manage-sidenav-width;
     position: fixed;
     z-index: 1;
     top: 0;
