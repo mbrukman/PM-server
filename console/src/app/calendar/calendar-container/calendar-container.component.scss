@@ -1,8 +1,10 @@
+@import "~src/assets/sass/variables";
+
 .main {
   flex-grow: 1;
 
   .row {
-    padding: 18px 100px;
+    padding: 18px$admin-padding;
     .add-job {
       padding-left: 0;
       margin-top: 34px;

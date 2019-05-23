@@ -1,3 +1,5 @@
+@import "~src/assets/sass/variables";
+
 .main {
     width: 100%;
     .header{
@@ -9,7 +11,7 @@
     }
 
     .content-wrapper{
-        padding: 18px 100px;
+        padding: 18px $admin-padding;
 
         .actions-wrapper{
             text-align: center;
