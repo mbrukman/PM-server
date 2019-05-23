@@ -27,7 +27,7 @@ export class ProjectCreateComponent implements OnInit, OnDestroy {
       if (params && params.project) {
         this.projectsService.detail(params.project).subscribe(project => {
           this.project = project;
-          this.title = `Edit ${this.project.name} project`;
+          this.title = `Edit ${this.project.name}`;
           this.setFormData({ name: project.name, description: project.description });
         });
       }
