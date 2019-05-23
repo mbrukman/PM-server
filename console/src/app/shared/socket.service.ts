@@ -20,14 +20,12 @@ export class SocketService {
 
   constructor(private mapsService: MapsService) {
 
-    var socket = io(environment.serverUrl);
+    this.socket = io(environment.serverUrl);
 
-    socket.on('connect', function () {
-      this._socketID = socket.id;
-      mapsService.setSocketID(socket.id) 
+    this.socket.on('connect', function () {
+      this._socketID = this.id;
+      mapsService.setSocketID(this.id) 
     });
-
-    this.socket = socket // TODO: why just var works?! 
 
     this.socketListener();
   }
