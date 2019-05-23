@@ -5,26 +5,25 @@ import * as io from 'socket.io-client';
 import { Subject, Observable } from 'rxjs';
 
 import { MapResult, Pending } from '@maps/models';
-import { MapsService } from '@maps/maps.service'
 
 @Injectable()
 export class SocketService {
   socket: any;
-  message: Subject<any> = new Subject<any>();
+  logExecution: Subject<any> = new Subject<any>();
   notification: Subject<any> = new Subject<any>();
+  message: Subject<any> = new Subject<any>();
   executions: Subject<object> = new Subject<object>();
   mapExecution: Subject<MapResult> = new Subject<MapResult>();
   pending: Subject<Pending> = new Subject<Pending>();
   test: Pending;
-  private _socketID: string;
+  socketID: string;
 
-  constructor(private mapsService: MapsService) {
+  constructor() {
 
     this.socket = io(environment.serverUrl);
-
+    let self = this
     this.socket.on('connect', function () {
-      this._socketID = this.id;
-      mapsService.setSocketID(this.id) 
+      self.socketID = this.id;
     });
 
     this.socketListener();
@@ -34,26 +33,21 @@ export class SocketService {
     return this.socket;
   }
 
-  public get socketID(): string {
-    return this._socketID;
-  }
 
 
   socketListener() {
     this.socket.on('update', (data) => {
-      this.setMessage(data);
+      this.setLegExecution(data);
     });
 
     this.socket.on('notification', (data) => {
       this.setNotification(data);
     });
 
-    this.socket.on('saved-map', (data) => {
-      if (data.savedMapSocket != this.mapsService.socketID) { // if another user or in another tab saved map 
-        this.mapsService.checkSyncMap(data.mapId)
-      }else{
-        this.setNotification(data);
-      }
+    this.socket.on('message', (data) => {
+      this.message.next(data)
+
+
     });
 
     this.socket.on('executions', (data: object) => {
@@ -69,12 +63,15 @@ export class SocketService {
     });
   }
 
-  getMessagesAsObservable() {
-    return this.message.asObservable();
+  getLogExecutionAsObservable() {
+    return this.logExecution.asObservable();
   }
 
-  setMessage(message) {
-    this.message.next(message);
+  setLegExecution(message) {
+    this.logExecution.next(message);
+  }
+  getMessageAsObservable() {
+    return this.message.asObservable();
   }
 
   getNotificationAsObservable() {

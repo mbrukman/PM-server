@@ -1,43 +1,53 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { DistinctMapResult } from '@shared/model/distinct-map-result.model';
 import { Map, MapExecutionLogs, MapResult, MapStructure, MapTrigger } from './models';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { MapDuplicateOptions } from './models/map-duplicate-options.model'
 import { SettingsService } from '@core/setup/settings.service';
 import { IEntityList } from '@shared/interfaces/entity-list.interface';
-import {PopupService} from '@shared/services/popup.service';
+import { PopupService } from '@shared/services/popup.service';
+import { SocketService } from '@app/shared/socket.service';
 
 @Injectable()
 export class MapsService {
   currentMap: BehaviorSubject<Map> = new BehaviorSubject<Map>(null);
   currentMapId: string
   public currentMapStructure: BehaviorSubject<MapStructure> = new BehaviorSubject<MapStructure>(null);
-  socketID: string;
-  mapChaned: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+  mapChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
 
-  constructor(private http: HttpClient, private settingsService: SettingsService, private popupService:PopupService) {
+  constructor(private http: HttpClient, private settingsService: SettingsService, private popupService: PopupService, private socketService: SocketService) {
+    this.init()
   }
 
-setSocketID(v:string){
-  this.socketID = v
-}
+  init() {
+    this.socketService.getMessageAsObservable().subscribe(data => {
+      if (data.type != 'saved-map') { return }
+      if (data.msg.savedMapSocket != this.socketService.socketID) { // if another user or in another tab map was saved 
+        this.checkSyncMap(data.msg.mapId)
+      } else {
+        this.socketService.setNotification(data.msg);
+      }
+    })
+  }
+
+
   checkSyncMap(mapId) {
     let OK = 'Confirm'
-    if(this.currentMapId == mapId){
-      this.popupService.openConfirm(null, 'The same map was saved in different window. Do you want to refresh window and get the latest map?',OK,null,null).subscribe(result=>{
-        if(OK == result){
+    if (this.currentMapId == mapId) {
+      this.popupService.openConfirm(null, 'The same map was saved in different window. Do you want to refresh window and get the latest map?', OK, null, null).subscribe(result => {
+        if (OK == result) {
           location.reload();
-        }else{
-          this.mapChaned.next(true)
+        } else {
+          this.mapChanged.next(true)
         }
-        })
+      })
     }
   }
 
-  isMapChanged(){
-    return this.mapChaned.asObservable()
+  isMapChanged() {
+    return this.mapChanged.asObservable()
   }
 
   recentMaps() {
@@ -138,7 +148,7 @@ setSocketID(v:string){
   /* map structure */
 
   createMapStructure(mapId: string, structure: MapStructure) {
-    let data = {structure, socketId: this.socketID }
+    let data = { structure, socketId: this.socketService.socketID }
     return this.http.post<MapStructure>(`api/maps/${mapId}/structure/create`, data);
   }
 

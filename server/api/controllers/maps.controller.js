@@ -254,7 +254,11 @@ module.exports = {
         hooks.hookPre('map-create-structure', req).then(() => {
             return mapsService.createStructure(req.body.structure)
         }).then(structure => {
-            req.io.emit('saved-map', { title: 'Saved', message: `Map saved successfully`, type: 'success', mapId: mapId, savedMapSocket : req.body.socketId });
+            let data = {
+                type: 'saved-map', 
+                msg: { title: 'Saved', message: `Map saved successfully`, type: 'success', mapId: mapId, savedMapSocket : req.body.socketId }
+            }
+            req.io.emit('message', data);
             return res.json(structure)
         }).catch((error) => {
             winston.log('error', "Error creating map structure", error);
