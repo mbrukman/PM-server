@@ -1,16 +1,5 @@
 <div class="wrapper row design-wrapper" #wrapper>
-  <div class="main">
-    <h3 class="pane-header">Design
-        <i class="material-icons" (click)="onClose()" [hidden]="!editing">keyboard_arrow_right</i>
-    </h3>
-    <div class="map-controllers">
-      <div class="zoom">
-        <button class="btn" (click)="onScale(-0.1)"><i class="material-icons">zoom_out</i></button>
-        <button class="btn" (click)="onScale(0.1)"><i class="material-icons">zoom_in</i></button>
-      </div>
-    </div>
-    <div id="graph" class="graph"></div>
-  </div>
+  <app-map-graph (addProcess)="addNewProcess($event)"  (editProcess)="editProcess($event)" (close)="onClose()" [wrapper]="wrapperChild"></app-map-graph>
   <div class="map-management col-4" *ngIf="editing">
     <app-process-form [processViewWrapper]="processViewWrapper" (saved)="onSave($event)" (close)="onClose($event)"
                       (delete)="onDelete($event)" (clone)="onClone($event)"></app-process-form>
