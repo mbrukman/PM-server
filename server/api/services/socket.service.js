@@ -6,8 +6,6 @@ function init(server){
     // socket.io
     _socket = socket(server);
     _socket.on('connection', function (socket) {
-        console.log(socket.id);
-        
         winston.log('info', 'a user connected');
     });
     return _socket;
