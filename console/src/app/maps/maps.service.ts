@@ -24,26 +24,23 @@ export class MapsService {
   init() {
     this.socketService.getMessageAsObservable().subscribe(data => {
       if (data.type != 'saved-map') { return }
-      if (data.msg.savedMapSocket != this.socketService.socketID) { // if another user or in another tab map was saved 
-        this.checkSyncMap(data.msg.mapId)
+      if (data.msg.initiator != this.socketService.socketID && this.currentMapId == data.msg.mapId) { // if another user or in another tab map was saved 
+        this.checkSyncMap()
       } else {
         this.socketService.setNotification(data.msg);
       }
     })
   }
 
-
-  checkSyncMap(mapId) {
-    let OK = 'Confirm'
-    if (this.currentMapId == mapId) {
-      this.popupService.openConfirm(null, 'The same map was saved in different window. Do you want to refresh window and get the latest map?', OK, null, null).subscribe(result => {
-        if (OK == result) {
-          location.reload();
-        } else {
-          this.mapChanged.next(true)
-        }
-      })
-    }
+  checkSyncMap() {
+    let OK = 'Refresh'
+    this.popupService.openConfirm("Map Changed", 'This map was saved in different window. Would you like to refresh window and get the latest map?', OK, "Close", null).subscribe(result => {
+      if (OK == result) {
+        window['location'].reload();
+      } else {
+        this.mapChanged.next(true)
+      }
+    })
   }
 
   isMapChanged() {

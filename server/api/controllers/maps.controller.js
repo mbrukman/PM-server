@@ -250,13 +250,12 @@ module.exports = {
     createStructure: (req, res) => {
         let mapId = req.params.id;
         req.body.structure.map = mapId;
-        console.log("createStructure", req.body.structure);
         hooks.hookPre('map-create-structure', req).then(() => {
             return mapsService.createStructure(req.body.structure)
         }).then(structure => {
             let data = {
                 type: 'saved-map', 
-                msg: { title: 'Saved', message: `Map saved successfully`, type: 'success', mapId: mapId, savedMapSocket : req.body.socketId }
+                msg: { title: 'Saved', message: `Map saved successfully`, type: 'success', mapId: mapId, initiator : req.body.socketId }
             }
             req.io.emit('message', data);
             return res.json(structure)
