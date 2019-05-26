@@ -29,6 +29,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   originalMapStructure: MapStructure;
   mapStructureSubscription: Subscription;
   mapSubscription: Subscription;
+  isMapChangedSubscription : Subscription;
 
   edited: boolean = false;
   structureEdited: boolean = false;
@@ -159,6 +160,10 @@ export class MapDetailComponent implements OnInit, OnDestroy {
       this.executing = maps.indexOf(this.id) > -1;
     });
 
+    this.isMapChangedSubscription =  this.mapsService.isMapChanged().subscribe(res=>{
+      this.structureEdited = res
+    })
+
     // subscribing to executions updates
     this.mapExecutionSubscription = this.socketService.getCurrentExecutionsAsObservable().subscribe(executions => {
       const maps = Object.keys(executions).map(key => executions[key]);
@@ -173,6 +178,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.mapExecutionSubscription.unsubscribe();
     this.mapSubscription.unsubscribe();
     this.mapStructureSubscription.unsubscribe()
+    this.isMapChangedSubscription.unsubscribe()
   }
 
   cleanStructure(structure) {
