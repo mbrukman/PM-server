@@ -29,7 +29,7 @@
     <div class="graph-container">
       <div class="content-graph current" #wrapper (window:resize)="onResize($event)" [hidden]="viewMode !== 'design'">
         <span class="title-graph">Current</span>
-        <div id="currentGraph"></div>
+       <app-map-graph [content]="currentStructure?.content" [wrapper]="wrapperChild"></app-map-graph>
       </div>
       <div class="content-graph" #wrapper (window:resize)="onResize($event)" [hidden]="viewMode !== 'design'">
         <span class="title-graph">Latest</span>
