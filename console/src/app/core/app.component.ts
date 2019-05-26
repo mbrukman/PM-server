@@ -20,6 +20,7 @@ export class AppComponent implements OnInit {
   search: boolean = false;
   notificationSubscription: Subscription;
   currentMap: Map;
+
   constructor(private mapsService: MapsService,
     private router: Router,
     private socketService: SocketService,

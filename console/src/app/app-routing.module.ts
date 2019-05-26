@@ -5,6 +5,8 @@ import { NotFoundComponent } from './core/not-found/not-found.component';
 import { DashboardComponent } from './core/dashboard/dashboard.component';
 import { SetupComponent } from './core/setup/setup.component';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
+import { NgProgressModule } from '@ngx-progressbar/core';
+import { NgProgressRouterModule } from '@ngx-progressbar/router';
 
 const appRoutes: Routes = [
   {
@@ -42,7 +44,9 @@ const appRoutes: Routes = [
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(appRoutes, { preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(appRoutes, { preloadingStrategy: PreloadAllModules }),
+    NgProgressModule,
+    NgProgressRouterModule
   ],
   exports: [
     RouterModule

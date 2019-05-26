@@ -14,6 +14,8 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SetupComponent } from './setup/setup.component';
+import { NgProgressModule } from '@ngx-progressbar/core';
+import { NgProgressRouterModule } from '@ngx-progressbar/router';
 
 @NgModule({
   imports: [
@@ -26,7 +28,9 @@ import { SetupComponent } from './setup/setup.component';
     ToastyModule.forRoot(),
     BsDropdownModule,
     TooltipModule,
-    SharedModule
+    SharedModule,
+    NgProgressModule,
+    NgProgressRouterModule
   ],
   declarations: [
     AppComponent,
