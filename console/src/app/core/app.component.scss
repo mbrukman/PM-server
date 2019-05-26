@@ -88,3 +88,27 @@
     border-right: 1px solid $selected-nav;
     padding: 0 30px;
 }
+
+::ng-deep{
+    ng-progress {
+        .ng-progress-bar{
+            .ng-bar-placeholder{
+                height: 3px;
+
+                .ng-bar{
+                    background-color: $kaholo-orange !important;
+
+                    .ng-meteor{
+                        background-color: $kaholo-orange  !important;
+                        box-shadow: $kaholo-orange 0px 0px 10px, $kaholo-orange 0px 0px 5px !important;
+                    }
+                }
+            }
+
+            .ng-spinner-icon{
+                border-top-color: $kaholo-orange !important;
+                border-left-color: $kaholo-orange !important;
+            }
+        }
+    }
+}

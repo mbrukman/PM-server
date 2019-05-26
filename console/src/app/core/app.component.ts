@@ -21,9 +21,6 @@ export class AppComponent implements OnInit {
   notificationSubscription: Subscription;
   currentMap: Map;
 
-  progressBarOptions = {
-    color: '#f79f2b',
-  };
   constructor(private mapsService: MapsService,
     private router: Router,
     private socketService: SocketService,
