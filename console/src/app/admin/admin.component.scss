@@ -27,6 +27,10 @@
       > *:not(router-outlet){
         display: flex;
         flex-grow: 1;
+
+        .head-title{
+          padding-left: $manage-sidenav-width;
+        }
       }
     }
   }
