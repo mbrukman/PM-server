@@ -1,11 +1,11 @@
-import { AfterContentInit, Component, EventEmitter,OnDestroy, OnInit, Input, Output } from '@angular/core';
+import { AfterContentInit, Component, EventEmitter,OnDestroy, OnInit, Input, Output, OnChanges } from '@angular/core';
 
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 
-import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
+
 import { Link, MapStructure, Process, ProcessViewWrapper } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { PluginsService } from '@plugins/plugins.service';
@@ -34,9 +34,10 @@ export const linkAttrs = {
   styleUrls: ['./map-graph.component.scss']
 })
 
-export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
+export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy,OnChanges {
 
   @Input('wrapper') wrapper;
+  @Input('content') content;
   @Output('editProcess') editProcess:  EventEmitter<any> = new EventEmitter<any>();
   @Output('close') close: EventEmitter<any> = new EventEmitter<any>();
   @Output('addProcess') addProcess: EventEmitter<any> = new EventEmitter<any>();
@@ -60,29 +61,25 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
   constructor(
     private mapsService: MapsService,
     private pluginsService: PluginsService,
-    private mapDesignService: MapDesignService) { }
+) { }
 
   ngOnInit() {
     this.defineShape();
     this.pluginsService.list().subscribe(plugins => {
       this.plugins = plugins;
-      this.initMapDraw();
+      if(!this.content){
+        this.initMapDraw();
+      }
       this.getCurrentMapStructure();
-    });
+    }); 
+  }
 
-    this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
-    this.dropSubscription = this.mapDesignService
-      .getDrop().pipe(
-        filter(obj => this.isDroppedOnMap(obj.x, obj.y))
-      ).subscribe(obj => {
-        this.cellView = obj.cell;
-        this.addNewCell(obj,new Process());
-      });
-
+  ngOnChanges(){
+    this.initMapDraw()
   }
 
   ngOnDestroy() {
-    this.dropSubscription.unsubscribe();	
+    //this.dropSubscription.unsubscribe();	
     this.mapStructureSubscription.unsubscribe();
     this.deselectAllCellsAndUpdateStructure();
   }
@@ -121,8 +118,43 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
         return true;
       }
     });
+
+    if(this.content){
+      this.paper.scale(0.75, 0.75);
+      this.addPaperDrag();
+    }
     this.listeners();
   }
+
+  addPaperDrag() {
+    let initialPosition = { x: 0, y: 0 };
+    let move = false;
+
+    let paperOnPointerDown = (event, x, y) => {
+      initialPosition = { x: x * 0.75, y: y * 0.75 };
+      move = true;
+    };
+
+    let paperOnPointerUp = (event, x, y) => {
+      move = false;
+    };
+
+    let graphMouseMove = (paper) => (event)=>{
+      if (move) {
+        paper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
+      }
+    };
+
+    this.paper.on('blank:pointerdown', paperOnPointerDown);
+    this.paper.on('blank:pointerup', paperOnPointerUp);;
+
+    $('#graph').mousemove(graphMouseMove(this.paper));
+
+  }
+
+onResize(event) {
+  this.paper.setDimensions(this.wrapper.nativeElement.offsetWidth, this.wrapper.nativeElement.offsetHeight);
+}
 
  getCurrentMapStructure(){
   this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(
@@ -144,20 +176,20 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
   });
  }
 
-  initMapDraw() {
-    if (!this.init && this.plugins && this.mapStructure) {
-      this.drawGraph();
-      this.init = true;
-      this.graph.getElements().forEach(cell => {
-        this.setCellSelectState(cell,false);
-      });
+initMapDraw() {
+  if (!this.init && this.plugins && this.mapStructure) {
+    this.drawGraph();
+    this.init = true;
+    this.graph.getElements().forEach(cell => {
+      this.setCellSelectState(cell,false);
+    });
 
-      if ((<any>(this.mapStructure)).imported) {
-        delete (<any>(this.mapStructure)).imported;
-        this.deselectAllCellsAndUpdateStructure();
-      }
+    if ((<any>(this.mapStructure)).imported) {
+      delete (<any>(this.mapStructure)).imported;
+      this.deselectAllCellsAndUpdateStructure();
     }
   }
+}
 
   /**
    * Check if the x, y are over the map
@@ -204,7 +236,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
       else if (!this.mapStructure.processes[processIndex].coordination) {
         this.mapStructure.processes[processIndex].coordination = COORDINATION_TYPES.wait.id;
       }
-      this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
+     
     }
     this.deselectAllCellsAndUpdateStructure();
   }
@@ -304,7 +336,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
         }
       }
 
-      var content = JSON.parse(this.mapStructure.content);
+      var content = this.content ? JSON.parse(this.content) : JSON.parse(this.mapStructure.content);
       content.cells = cells;
       this.graph.fromJSON(content);
 
@@ -458,7 +490,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
           }
           delete p.coordination;
 
-          self.mapDesignService.updateProcess(p);
+
         }
         self.deselectAllCellsAndUpdateStructure();
       }

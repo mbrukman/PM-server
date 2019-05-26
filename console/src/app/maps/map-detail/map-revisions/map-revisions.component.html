@@ -28,12 +28,10 @@
     </div>
     <div class="graph-container">
       <div class="content-graph current" #wrapper (window:resize)="onResize($event)" [hidden]="viewMode !== 'design'">
-        <span class="title-graph">Current</span>
-        <div id="currentGraph"></div>
+        <app-map-graph [wrapper]="wrapperChild" [content]="currentStructure?.content"></app-map-graph>
       </div>
       <div class="content-graph" #wrapper (window:resize)="onResize($event)" [hidden]="viewMode !== 'design'">
-        <span class="title-graph">Latest</span>
-        <div id="latestGraph"></div>
+          <app-map-graph [wrapper]="wrapperChild" [content]="latestStructure?.content"></app-map-graph>
       </div>
       <div class="row code-container" id="container" *ngIf="viewMode === 'code'">
         <div class="title">

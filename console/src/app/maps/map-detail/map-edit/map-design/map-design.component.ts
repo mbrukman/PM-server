@@ -54,11 +54,11 @@ export class MapDesignComponent implements OnInit {
   }
   
 
-  addNewProcess(e) {
+  addNewProcess(process) {
     if (!this.mapStructure.processes) {
-      this.mapStructure.processes = [e.value.process];
+      this.mapStructure.processes = [process];
     } else {
-      this.mapStructure.processes.push(e.value.process);
+      this.mapStructure.processes.push(process);
     }
   }
 

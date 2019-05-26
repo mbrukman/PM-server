@@ -40,6 +40,7 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
   viewMode: 'code' | 'design' = 'design';
   latestStructure: MapStructure;
   @ViewChild('wrapper') wrapper: ElementRef;
+  wrapperChild:any;
   editorOptions = {
     theme: 'vs-dark',
     language: 'javascript',
@@ -62,6 +63,7 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
       this.getMapProject();
       this.loadStructureOnScroll(this.mapId,true);
     });
+    this.wrapperChild = this.wrapper;
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
     this.currentGraph = new joint.dia.Graph;
     this.latestGraph = new joint.dia.Graph;
@@ -142,7 +144,7 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(){
-    this.mapStructureSubscription.unsubscribe()
+    //this.mapStructureSubscription.unsubscribe()
   }
 
   loadStructureOnScroll(mapId = this.mapId,OnInit = false){

@@ -32,6 +32,9 @@
         flex-grow: 1;
         max-width: initial;
         flex-direction: column;
+        app-map-graph{
+          flex-grow: 1;
+        }
         .title-graph{
           padding: 10px 0;
         }
