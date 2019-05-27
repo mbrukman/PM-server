@@ -123,16 +123,20 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
         // Disable linking interaction for magnets marked as passive (see below `.inPorts circle`).
         return magnet.getAttribute('magnet') !== 'passive';
       },
-      interactive: (cellView: any): any => {
-        if (cellView.model instanceof joint.dia.Link) {
-          // Disable the default vertex add functionality on pointerdown.
-          return { vertexAdd: false };
-        }
-        return true;
-      }
+      interactive: this.isInteractive()
     });
     this.defineShape();
     this.isReadOnly ? this.readOnlyListener() : this.listeners() 
+  }
+
+  isInteractive(){
+    return this.isReadOnly ? false : (cellView: any): any => {
+      if (cellView.model instanceof joint.dia.Link) {
+        // Disable the default vertex add functionality on pointerdown.
+        return { vertexAdd: false };
+      }
+      return true;
+    }
   }
 
   ngOnChanges(){
