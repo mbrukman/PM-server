@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '@env/environment';
 
 import { Observable } from 'rxjs';
 
@@ -8,7 +7,6 @@ import { AgentsGroupFilter, Group } from '@agents/models/group.model';
 import { Agent } from './models/agent.model';
 import { Subject } from 'rxjs';
 
-const serverUrl = environment.serverUrl;
 
 @Injectable()
 export class AgentsService {
@@ -22,19 +20,19 @@ export class AgentsService {
   }
 
   delete(agentId) {
-    return this.http.delete(`${serverUrl}api/agents/${agentId}`, { responseType: 'text' as 'json' });
+    return this.http.delete(`api/agents/${agentId}`, { responseType: 'text' as 'json' });
   }
 
   list() {
-    return this.http.get<[Agent]>(`${serverUrl}api/agents`);
+    return this.http.get<[Agent]>(`api/agents`);
   }
 
   status() {
-    return this.http.get<any>(`${serverUrl}api/agents/status`);
+    return this.http.get<any>(`api/agents/status`);
   }
 
   update(agent) {
-    return this.http.put<Agent>(`${serverUrl}api/agents/${agent._id}`, agent);
+    return this.http.put<Agent>(`api/agents/${agent._id}`, agent);
   }
 
   /* groups */
@@ -45,7 +43,7 @@ export class AgentsService {
    * @returns {Observable<Object>}
    */
   groupCreate(group: Group) {
-    return this.http.post<Group>(`${serverUrl}api/agents/groups/create`, group);
+    return this.http.post<Group>(`api/agents/groups/create`, group);
   }
 
   /**
@@ -54,11 +52,11 @@ export class AgentsService {
    * @returns {Observable<Object>}
    */
   groupDelete(groupId: string) {
-    return this.http.delete<string>(`${serverUrl}api/agents/groups/${groupId}`, { responseType: 'text' as 'json' });
+    return this.http.delete<string>(`api/agents/groups/${groupId}`, { responseType: 'text' as 'json' });
   }
 
   deleteFilterFromGroup(groupId,index){
-    return this.http.delete<Group>(`${serverUrl}api/agents/groups/${groupId}/filters/${index}`);
+    return this.http.delete<Group>(`api/agents/groups/${groupId}/filters/${index}`);
   }
 
   /**
@@ -67,7 +65,7 @@ export class AgentsService {
    * @returns {Observable<Object>}
    */
   groupDetail(groupId: string) {
-    return this.http.get<Group>(`${serverUrl}api/agents/groups/${groupId}`);
+    return this.http.get<Group>(`api/agents/groups/${groupId}`);
   }
 
   /**
@@ -75,7 +73,7 @@ export class AgentsService {
    * @returns {Observable<Object>}
    */
   groupsList() {
-    return this.http.get<Group[]>(`${serverUrl}api/agents/groups`);
+    return this.http.get<Group[]>(`api/agents/groups`);
   }
 
   /**
@@ -84,7 +82,7 @@ export class AgentsService {
    * @param {string[]} agentsIds
    */
   addAgentToGroup(groupId: string, agentsIds: string[]) {
-    return this.http.put<Group>(`${serverUrl}api/agents/groups/${groupId}/add-agent`, agentsIds);
+    return this.http.put<Group>(`api/agents/groups/${groupId}/add-agent`, agentsIds);
   }
 
   /**
@@ -94,7 +92,7 @@ export class AgentsService {
    * @returns {Observable<Object>}
    */
   addGroupFilters(groupId: string, filters: AgentsGroupFilter[]) {
-    return this.http.post<Group>(`${serverUrl}api/agents/groups/${groupId}/add-filters`, filters);
+    return this.http.post<Group>(`api/agents/groups/${groupId}/add-filters`, filters);
   }
 
   /**
@@ -141,7 +139,7 @@ export class AgentsService {
   }
 
   updateGroupToServer(group: Group){
-    return this.http.put<Group>(`${serverUrl}api/agents/groups/${group._id}`, group);
+    return this.http.put<Group>(`api/agents/groups/${group._id}`, group);
   }
 
   /**
@@ -174,7 +172,7 @@ export class AgentsService {
    * @param {string} groupId
    */
   removeAgentFromGroup(agentId: string, groupId: string) {
-    return this.http.post<Group>(`${serverUrl}api/agents/groups/${groupId}/remove-agent`, { agentId });
+    return this.http.post<Group>(`api/agents/groups/${groupId}/remove-agent`, { agentId });
   }
 
 }

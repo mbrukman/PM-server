@@ -7,9 +7,10 @@ import { MapResult, AgentResult, ProcessResult } from '@maps/models/execution-re
 import { SocketService } from '@shared/socket.service';
 import { Agent } from '@agents/models/agent.model';
 import { ProcessResultByProcessIndex } from '@maps/models';
-import { BsModalService } from 'ngx-bootstrap';
+import {PopupService} from '@shared/services/popup.service'
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 import { filter, take, tap, mergeMap } from 'rxjs/operators';
+import * as _ from 'lodash';
 
 const defaultAgentValue = 'default'
 
@@ -49,7 +50,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
 
-  constructor(private mapsService: MapsService, private socketService: SocketService, private modalService: BsModalService) {
+  constructor(private mapsService: MapsService, private socketService: SocketService, private popupService:PopupService) {
   }
 
   ngOnInit() {
@@ -86,7 +87,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       });
 
     // updating logs messages updates
-    this.mapExecutionMessagesSubscription = this.socketService.getMessagesAsObservable().pipe(
+    this.mapExecutionMessagesSubscription = this.socketService.getLogExecutionAsObservable().pipe(
       filter(message => this.selectedExecution && (message.runId === this.selectedExecution.runId))
     ).subscribe(message => {
         this.selectedExecutionLogs.push(message);
@@ -140,8 +141,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   expandOutput(){
     let messages = []
     this.selectedExecutionLogs.forEach(item=>{messages.push(item.message)});
-    const modal = this.modalService.show(RawOutputComponent);
-    modal.content.messages = messages;
+    this.popupService.openComponent(RawOutputComponent,{messages:messages})
   }
 
 
@@ -150,22 +150,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
    * @param results
    * @returns {ProcessResultByProcessIndex}
    */
-  aggregateProcessStatusesByProcessIndex(results): ProcessResultByProcessIndex {
-    let processes = [];
-    results.forEach(res => {
-      processes = [...processes, ...res.processes];
-    });
-    return processes.reduce((total, current) => {
-      if (!total.hasOwnProperty(current.uuid)) {
-        total[current.uuid] = {};
-      }
-      if (!total[current.uuid].hasOwnProperty(current.index)) {
-        total[current.uuid][current.index] = [];
-      }
-      total[current.uuid][current.index].push(current.status);
-      return total;
-    }, {});
-  }
 
   /**
    * Selecting execution and getting result from the server
@@ -211,19 +195,33 @@ export class MapResultComponent implements OnInit, OnDestroy {
         return false;
       }
     });
+    
     this.pieChartExecution = [];
     if (!agentResult) { // if not found it aggregate
       this.result = this.selectedExecution.agentsResults;
       this.selectedExecution.agentsResults.forEach(agent => {
-        this.pieChartExecution.push(...agent.processes);
+        this.pieChartExecution.push(...agent.processes)
       })
-
+      
     } else {
-      this.pieChartExecution.push(...agentResult.processes);
-      this.result = [agentResult];
+      this.pieChartExecution.push(...agentResult.processes)
+        this.result = [agentResult];
     }
     this.generateProcessesList();
-    this.agProcessStatusesByProcessIndex = this.aggregateProcessStatusesByProcessIndex(this.result);
+  } 
+
+  resultsByProcessUuid(uuid){
+    let processes = [];
+    this.result.forEach(res => {
+      processes = [...processes, ...res.processes];
+    });
+    let processUuid = [];
+    processes.forEach((process) => {
+      if(process.uuid == uuid){
+        processUuid.push(process)
+      }
+    })
+    return processUuid;
   }
 
   /**
@@ -255,6 +253,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       total[current.uuid] = (total[current.uuid] || 0) + 1;
       return total;
     }, {});
+
     this.processesList = processesList
       .sort(sortByDate)
       .map(o => {
@@ -262,7 +261,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
           name: (o.name) || 'Process #' + (Object.keys(overall).indexOf(o.uuid) + 1),
           index: o.index,
           uuid: o.uuid,
-          overall: overall[o.uuid]
+          overall: overall[o.uuid],
         };
       });
 

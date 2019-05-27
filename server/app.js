@@ -42,9 +42,7 @@ let expressWinstonTranports = [
     })];
 
 if (env.dbURI) {
-    mongoose.connect(env.dbURI, {
-        useMongoClient: true
-    }).then(() => {
+    mongoose.connect(env.dbURI).then(() => {
         winston.add(new winston.transports.MongoDB({
             db: env.dbURI,
         }));

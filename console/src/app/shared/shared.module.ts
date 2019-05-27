@@ -24,6 +24,17 @@ import { MapsCardsComponents } from './map-cards/map-cards.component';
 import { ParamsComponent } from './components/params/params.component';
 import { OptionsParamComponent } from './components/params/options-param/options-param.component';
 import { AutocompleteComponent } from './components/params/autocomplete/autocomplete.component';
+import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
+import { EditAgentComponent } from '@agents/edit-agent/edit-agent.component';
+import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
+import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-group-upsertcomponent';
+import { AddConfigurationComponent } from '@maps/map-detail/map-configurations/add-configuration/add-configuration.component';
+import { SelectAgentComponent } from '@maps/map-detail/map-edit/map-enviroment-pane/map-agents/select-agent/select-agent.component';
+import { TriggerFormComponent } from '@maps/map-detail/map-edit/map-enviroment-pane/map-triggers/trigger-form/trigger-form.component';
+import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
+import { PluginUploadComponent } from '@plugins/plugin-upload/plugin-upload.component';
+import { ImportModalComponent } from '@projects/project-details/import-modal/import-modal.component';
+import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-vault-items.component'
 
 
 @NgModule({
@@ -53,12 +64,23 @@ import { AutocompleteComponent } from './components/params/autocomplete/autocomp
     InlineEditDirective,
     LinebreakPipe,
     InPipe,
+    EditAgentComponent,
     RawOutputComponent,
     MapsCardsComponents,
     ExecutionChartComponent,
     ParamsComponent,
     OptionsParamComponent,
-    AutocompleteComponent
+    AgentsGroupUpsertFilterComponent,
+    AutocompleteComponent,
+    InputPopupComponent,
+    AgentsGroupUpsertComponent,
+    AddConfigurationComponent,
+    SelectAgentComponent,
+    TriggerFormComponent,
+    MapDuplicateComponent,
+    PluginUploadComponent,
+    ImportModalComponent,
+    UpsertVaultItemsComponent
 
   ],
   exports: [
@@ -82,7 +104,7 @@ import { AutocompleteComponent } from './components/params/autocomplete/autocomp
     ExecutionChartComponent,
     ParamsComponent
   ],
-  entryComponents: [ConfirmComponent, RawOutputComponent]
+  entryComponents: [ConfirmComponent, RawOutputComponent,AgentsGroupUpsertFilterComponent,EditAgentComponent,InputPopupComponent,AgentsGroupUpsertComponent,AddConfigurationComponent,SelectAgentComponent,TriggerFormComponent,MapDuplicateComponent,PluginUploadComponent,ImportModalComponent,UpsertVaultItemsComponent]
 })
 export class SharedModule {
 }

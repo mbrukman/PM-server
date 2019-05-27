@@ -1,11 +1,9 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
 import { DiffEditorModel } from 'ngx-monaco-editor';
-import { BsModalService } from 'ngx-bootstrap';
-
+import {PopupService} from '@shared/services/popup.service'
 import { MapsService } from '../../maps.service';
 import { MapStructure, Process } from '@maps/models';
 import { JOINT_OPTIONS } from '@maps/constants'
@@ -16,13 +14,14 @@ import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplica
 import { FilterOptions } from '@shared/model/filter-options.model';
 import { take, filter, mergeMap } from 'rxjs/operators';
 import { MapDuplicateOptions } from '@maps/models/map-duplicate-options.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-map-revisions',
   templateUrl: './map-revisions.component.html',
   styleUrls: ['./map-revisions.component.scss']
 })
-export class MapRevisionsComponent implements OnInit {
+export class MapRevisionsComponent implements OnInit, OnDestroy {
   load_structures = 25;
   previewProcess: Process;
   structures: MapStructure[] = [];
@@ -52,9 +51,10 @@ export class MapRevisionsComponent implements OnInit {
   monacoOptions = {
     theme: 'vs-dark'
   };
+  mapStructureSubscription: Subscription;
   
 
-  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private modalService: BsModalService) {}
+  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private popupService:PopupService) {}
 
   ngOnInit() {
     this.route.parent.params.subscribe(params => {
@@ -141,6 +141,10 @@ export class MapRevisionsComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(){
+    this.mapStructureSubscription.unsubscribe()
+  }
+
   loadStructureOnScroll(mapId = this.mapId,OnInit = false){
     this.mapsService.structuresList(mapId,this.page)
     .subscribe(structures => {
@@ -177,7 +181,7 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   changeStructure(structureId) {
-    this.mapsService.getMapStructure(this.mapId, structureId).subscribe(structure => {
+    this.mapStructureSubscription = this.mapsService.getMapStructure(this.mapId, structureId).subscribe(structure => {
       this.mapsService.setCurrentMapStructure(structure);
       this.socketService.setNotification({
         title: 'Changed version',
@@ -242,8 +246,8 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   duplicateMap(structureId: string) {
-    const modal = this.modalService.show(MapDuplicateComponent);
-    modal.content.result.pipe(
+    this.popupService.openComponent(MapDuplicateComponent,{})
+    .pipe(
       take(1),
       filter(obj => !!(<MapDuplicateOptions>obj).name), // filtering only results with a name
     mergeMap(obj =>  this.mapsService.duplicateMap(this.mapId, structureId, this.project.id,<MapDuplicateOptions>obj))

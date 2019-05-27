@@ -11,7 +11,7 @@ export class ExecutionChartComponent implements OnChanges {
   @Input('size') size:number[] = [200,200];
   status : [{ name: string, value: number }];
   colorScheme = {
-    domain: ['#42bc76', '#f85555', '#ebb936']
+    domain: ['#42bc76', '#f85555', '#ebb936','#3FC9EB','#ebb936']
   };
 
   ngOnChanges(){
@@ -19,10 +19,15 @@ export class ExecutionChartComponent implements OnChanges {
   }
 
   aggregateProcessesStatus(processes) {
+    let skipped = 0;
     let ag = processes.reduce((total, current) => {
       if (!total[current.status]) {
         return total;
-      } 
+      }
+      if(typeof current.result == 'string' && current.status == 'error'){
+        skipped++;
+        return total;
+      }
       if(current.status == 'partial'){
         current.actions.forEach((action) => {
             action.status == 'success' ?  total['success'].value++ : total['error'].value++;
@@ -38,10 +43,14 @@ export class ExecutionChartComponent implements OnChanges {
         error: { name: 'error', value: 0 },
         stopped: { name: 'stopped', value: 0 },
         partial: { name: 'partial', value: 0 },
+        skipped: { name: 'skipped', value: 0 },
       });
     let result = Object.keys(ag).map((key) => {
       return ag[key];
     });
+    if(result.every(item => item.value == 0)){
+      result[result.findIndex(item => item.name == 'skipped')].value = skipped;
+    }
     return <[{ name: string, value: number }]>result;
   }
 }

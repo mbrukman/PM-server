@@ -6,8 +6,14 @@
 var currentAgent={
     name: '',
     url: '',
-    attributes: [{ name: '', value: ''}]
+    attributes: [{ name: ''}]
 }
+
+/**	
+ * Represents the execution Id	
+ */
+/** @type {KaholoAgent} */
+var currentAgent;
 var executionId;
 
 /** @type {KaholoTrigger} */
@@ -96,14 +102,15 @@ var currentAction;
 /** @type {KaholoAction} */
 var previousAction;
 
-/* represents the current running process */
+/* represents the previous running process */
 /** @type {KaholoProcess} */
-var previouseProcess;
+var previousProcess;
 
+/* represents the current running process */
 /** @type {KaholoProcess} */
 var currentProcess;
 
-/* represents the previous link result (not the prcess) */
+/* represents the previous link result (not the process) */
 /** @type {KaholoLink} */
 var previousLink;
 

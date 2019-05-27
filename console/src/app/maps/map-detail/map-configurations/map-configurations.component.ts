@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { BsModalService } from 'ngx-bootstrap';
-
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import {PopupService} from '@shared/services/popup.service'
 import { MapStructureConfiguration, MapStructure } from '@maps/models';
 import { MapsService } from '@maps/maps.service';
 import { AddConfigurationComponent } from '@maps/map-detail/map-configurations/add-configuration/add-configuration.component';
-import { filter, take } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-main-map-configurations',
   templateUrl: './map-configurations.component.html',
   styleUrls: ['./map-configurations.component.scss']
 })
-export class MapConfigurationsComponent implements OnInit {
+export class MapConfigurationsComponent implements OnInit ,OnDestroy{
   selectedConfiguration: MapStructureConfiguration;
   mapStructure: MapStructure;
   editorOptions = {
@@ -19,10 +19,12 @@ export class MapConfigurationsComponent implements OnInit {
     language: 'json'
   };
   value: string = '';
-  constructor(private mapsService: MapsService, private modalService: BsModalService) { }
+  mapStructureSubscription: Subscription;
+
+  constructor(private mapsService: MapsService, private popupService:PopupService) { }
 
   ngOnInit() {
-    this.mapsService.getCurrentMapStructure().pipe(
+    this.mapStructureSubscription =  this.mapsService.getCurrentMapStructure().pipe(
       filter(structure => !!structure)
     ).subscribe(structure => {
         this.mapStructure = structure;
@@ -32,10 +34,12 @@ export class MapConfigurationsComponent implements OnInit {
       });
   }
 
+  ngOnDestroy(){
+    this.mapStructureSubscription.unsubscribe()
+  }
+
   addNewConfiguration() {
-    const modal = this.modalService.show(AddConfigurationComponent);
-    modal.content.configurations = this.mapStructure.configurations;
-    modal.content.result
+    this.popupService.openComponent(AddConfigurationComponent,{configurations:this.mapStructure.configurations})
       .filter(name => !!name)
       .subscribe(name => {
         this.mapStructure.configurations.push(new MapStructureConfiguration(name, '{\n\n}'));
@@ -45,7 +49,7 @@ export class MapConfigurationsComponent implements OnInit {
 
   removeConfiguration(index: number) {
     this.mapStructure.configurations.splice(index, 1);
-    this.updateMapStructure();
+    this.updateMapStructure(true);
     this.selectedConfiguration = null;
   }
 
@@ -60,10 +64,12 @@ export class MapConfigurationsComponent implements OnInit {
     this.updateMapStructure();
   }
 
-  updateMapStructure() {
+  updateMapStructure(remove = false) {
     try {
-      this.selectedConfiguration.value = JSON.parse(this.value);
+      if(!remove)this.selectedConfiguration.value = JSON.parse(this.value);
       this.mapsService.setCurrentMapStructure(this.mapStructure);
-    } catch (err) {}
+    } catch (err) {
+      console.log(err)
+    }
   }
 }

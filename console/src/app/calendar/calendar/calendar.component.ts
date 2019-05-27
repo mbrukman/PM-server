@@ -19,10 +19,8 @@ import * as moment from 'moment';
 import { CalendarService } from '../calendar.service';
 import { Job } from '../models/job.model';
 import { Map } from '@maps/models';
-import { BsModalService } from 'ngx-bootstrap';
-import { ConfirmComponent } from '@shared/confirm/confirm.component';
 import { takeUntil, take } from 'rxjs/operators';
-
+import {PopupService} from '@shared/services/popup.service';
 import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 const colors: any = {
@@ -60,8 +58,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
 
   constructor(private calendarService: CalendarService, 
-    private modalService: BsModalService,
-    private seoService:SeoService) {
+    private seoService:SeoService,
+    private popupService:PopupService) {
   }
 
   ngOnInit() { 
@@ -169,12 +167,8 @@ closeDayBar(){
           this.closeDayBar();
         });
     }
-    const modal = this.modalService.show(ConfirmComponent);
-    modal.content.message = 'How would you like to proceed?';
-    modal.content.confirm = DeleteOptions.delete;
-    modal.content.cancel = DeleteOptions.cancel;
-    modal.content.third = DeleteOptions.skip;
-    modal.content.result.pipe(
+    this.popupService.openConfirm('Delete Job','How would you like to proceed?',DeleteOptions.delete,DeleteOptions.cancel,DeleteOptions.skip)
+    .pipe(
       take(1),
     ).subscribe(result => {
         switch (result) {

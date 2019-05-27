@@ -608,3 +608,8 @@ span[contenteditable=true]{
 .ellipsis{
   @include ellipsis();
 }
+
+.material-icons{
+  // to fix issues with Edge browsers
+  font-feature-settings: 'liga';
+}

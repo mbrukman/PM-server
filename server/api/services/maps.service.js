@@ -1,12 +1,9 @@
 const Map = require("../models/map.model");
 const MapStructure = require("../models").Structure;
-const Plugin = require("../models").Plugin;
 const env = require("../../env/enviroment");
-const MapExecutionLog = require("../models/map-execution-log.model")
 const MapTrigger = require("../models/map-trigger.model")
-const MapResult = require("../models/map-results.model")
+const MapResult = require("../models").MapResult;
 const Project = require("../models/project.model")
-const proejctServise = require("./projects.service")
 const PAGE_SIZE = env.page_size;
 const shared = require("../shared/recents-maps")
 const mongoose = require('mongoose');
@@ -59,24 +56,21 @@ module.exports = {
 
                 return project.save();
             }),
-            MapExecutionLog.remove({ map: id }),
-            MapResult.remove({ map: id }),
-            MapStructure.remove({ map: id }),
-            MapTrigger.remove({ map: id }),
-            Map.remove({ _id: id })
+            MapResult.deleteMany({ map: id }),
+            MapStructure.deleteMany({ map: id }),
+            MapTrigger.deleteMany({ map: id }),
+            Map.deleteMany({ _id: id })
         ]);
     },
 
     filter: (filterOptions = {}) => {
         mapsId = [];
-        let q = {};
         let fields = filterOptions.fields
         let sort = filterOptions.options.sort || 'name'
         let page = filterOptions.page
         if (fields) {
             // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
             Object.keys(fields).map(key => { fields[key] = { '$regex': `.*${fields[key]}.*` } });
-            q = fields;
         }
 
         var $match = {};
@@ -96,7 +90,7 @@ module.exports = {
             projectLookup = {$in: ["$$mapId", "$maps"]};
         }
 
-        let m = Map.aggregate([
+        let aggregateSteps = [
             {
                 $match: $match
             },
@@ -155,7 +149,10 @@ module.exports = {
                     ],
                     as: "latestExectionResult",
                 },
-            },
+            }
+        ]
+
+        let resultsQuery = [...aggregateSteps,
             { $sort: getSort(sort) },
             { $skip: page ? ((page - 1) * PAGE_SIZE) : 0 },
             { $limit: filterOptions.options.limit || PAGE_SIZE },
@@ -165,18 +162,21 @@ module.exports = {
                     "path": "$latestExectionResult",
                     "preserveNullAndEmptyArrays": true
                 }
-            }
-        ])
+            }];
+        
+        let countQuery = [...aggregateSteps,{
+            $count: "count"
+          }]
 
-        return m.then(maps => {
+        return Map.aggregate(resultsQuery).then(maps => {
             for (let i = 0, mapsLength = maps.length; i < mapsLength; i++) {
                 maps[i].id = maps[i]._id;
                 maps[i].project.id = maps[i].project._id;
                 delete maps[i]._id;
                 delete maps[i].project._id;
             }
-            return module.exports.count(q).then(r => {
-                return { items: maps, totalCount: r }
+            return Map.aggregate(countQuery).then(r => {
+                return { items: maps, totalCount: r.length ? r[0].count : 0  }
             });
         });
     },
@@ -205,9 +205,8 @@ module.exports = {
         if (structureId) {
             return MapStructure.findById(structureId)
         }
-        return MapStructure.find({ map: mapId }).then((structures) => {
-            return structures.pop();
-        })
+
+        return MapStructure.findOne({ map: mapId }).sort('-createdAt')
     },
     
     structureList: (mapId, page) => {

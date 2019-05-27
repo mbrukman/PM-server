@@ -13,7 +13,7 @@ import { PluginsService } from '../plugins.service';
 })
 export class PluginUploadComponent implements OnInit {
   uploading: boolean = false;
-  public closing: Subject<any> = new Subject<any>();
+  public result: Subject<any> = new Subject<any>();
 
   constructor(private pluginsService: PluginsService, public bsModalRef: BsModalRef) {
   }
@@ -46,7 +46,7 @@ export class PluginUploadComponent implements OnInit {
   }
 
   onClose() {
-    this.closing.next();
+    this.result.next();
     this.bsModalRef.hide();
   }
 

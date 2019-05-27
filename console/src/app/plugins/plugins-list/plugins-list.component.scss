@@ -1,5 +1,5 @@
 @import "~src/assets/sass/mixins";
-
+@import "~src/assets/sass/variables";
 .main {
   width : 100%;
   .section-title-wrapper{
@@ -13,7 +13,7 @@
   }
 
   .plugins-list{
-    padding: 18px 40px;
+    padding: 18px $admin-padding;
     .table-wrapper{
       @include table();
 

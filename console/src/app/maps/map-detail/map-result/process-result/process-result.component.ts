@@ -2,7 +2,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
-import { BsModalService } from 'ngx-bootstrap';
+import {PopupService} from '@shared/services/popup.service'
 import { AgentResult, ProcessResult, ActionResultView } from '@maps/models';
 import { Agent } from '@agents/models/agent.model';
 
@@ -21,13 +21,11 @@ export class ProcessResultComponent implements OnChanges {
   generalInfo: ProcessResult;
   agProcessActionsStatus: any;
   agActionsStatus: any;
-  colorScheme = {
-    domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
-  };
 
-  constructor(private modalService: BsModalService) { }
 
-  ngOnChanges(changes) {
+  constructor(private popupService:PopupService) { }
+
+  ngOnChanges() {
     this.aggregate =  this.result.length > 1 ? true : false;
     this.agProcessActionsStatus = null;
     this.agActionsStatus = null;
@@ -37,6 +35,7 @@ export class ProcessResultComponent implements OnChanges {
       this.generalInfo = this.result[0].processes.find(o => o.uuid === this.process[0].uuid && o.index === this.process[0].index);
     }
   }
+
 
   isObject(item){
     return typeof item == 'object' ? true : false;
@@ -59,9 +58,7 @@ export class ProcessResultComponent implements OnChanges {
     });
     
     messages.push(msgs.join('\n'));
-
-    const modal = this.modalService.show(RawOutputComponent);
-    modal.content.messages = messages;
+    this.popupService.openComponent(RawOutputComponent,{messages:messages})
   }
 
 

@@ -128,6 +128,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.initMapDraw();
     for(let i=0,length=structure.processes.length;i<length;i++){
       let imageProcess = this.graph.getCell(structure.processes[i].uuid)
+      if (!imageProcess) continue;
       for(let j =0,pluginsLength = this.plugins.length;j<pluginsLength;j++){
         if((imageProcess.attributes.attrs['.p_id'].text == '' || imageProcess.attributes.attrs['.p_id'].text != this.plugins[j].id) && this.plugins[j].name == structure.processes[i].used_plugin.name){
           this.updateNodePid(structure.processes[i].uuid,this.plugins[j].id);
@@ -422,6 +423,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           this.addNewLink(cellView);
         }
       } else {
+        if(cellView.model.attributes.type == "devs.PMStartPoint"){
+          return
+        }
         this.cellView = cellView;
         const id = cellView.model.id;
         const process = _.find(this.mapStructure.processes, (o) => {
@@ -435,9 +439,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
 
     this.graph.on('change:source change:target', function (link) {
-      let sourcePort = link.get('source').port;
       let sourceId = link.get('source').id;
-      let targetPort = link.get('target').port;
       let targetId = link.get('target').id;
       let id = link.get('id')
 
@@ -541,7 +543,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     let cell = this.graph.getCell(uuid);
     cell.attr('.label/text',label);
     cell.attr('text/text', label);
-    this.cellView.model.attributes.attrs['.label'].text = cell.attributes.attrs['.label'].text
+    if(this.cellView.model.cid != cell.cid){
+      console.error("cellView is not the cell to update!");
+      return;
+    }
     this.onMapContentUpdate()
   }
 

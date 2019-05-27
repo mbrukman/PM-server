@@ -1,44 +1,75 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '@env/environment';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { DistinctMapResult } from '@shared/model/distinct-map-result.model';
 import { Map, MapExecutionLogs, MapResult, MapStructure, MapTrigger } from './models';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { MapDuplicateOptions } from './models/map-duplicate-options.model'
 import { SettingsService } from '@core/setup/settings.service';
 import { IEntityList } from '@shared/interfaces/entity-list.interface';
-const serverUrl = environment.serverUrl;
+import { PopupService } from '@shared/services/popup.service';
+import { SocketService } from '@app/shared/socket.service';
 
 @Injectable()
 export class MapsService {
   currentMap: BehaviorSubject<Map> = new BehaviorSubject<Map>(null);
+  currentMapId: string
   public currentMapStructure: BehaviorSubject<MapStructure> = new BehaviorSubject<MapStructure>(null);
-  constructor(private http: HttpClient, private settingsService: SettingsService) {
+  mapChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+
+  constructor(private http: HttpClient, private settingsService: SettingsService, private popupService: PopupService, private socketService: SocketService) {
+    this.init()
+  }
+
+  init() {
+    this.socketService.getMessageAsObservable().subscribe(data => {
+      if (data.type != 'saved-map') { return }
+      if (data.msg.initiator != this.socketService.socketID && this.currentMapId == data.msg.mapId) { // if another user or in another tab map was saved 
+        this.checkSyncMap()
+      } else {
+        this.socketService.setNotification(data.msg);
+      }
+    })
+  }
+
+  checkSyncMap() {
+    let OK = 'Refresh'
+    this.popupService.openConfirm("Map Changed", 'This map was saved in different window. Would you like to refresh window and get the latest map?', OK, "Close", null).subscribe(result => {
+      if (OK == result) {
+        window['location'].reload();
+      } else {
+        this.mapChanged.next(true)
+      }
+    })
+  }
+
+  isMapChanged() {
+    return this.mapChanged.asObservable()
   }
 
   recentMaps() {
-    return this.http.get<DistinctMapResult[]>(`${serverUrl}api/maps/recent`);
+    return this.http.get<DistinctMapResult[]>(`api/maps/recent`);
   }
   allMaps(): Observable<[Map]> {
-    return this.http.get<[Map]>(`${serverUrl}api/maps`);
+    return this.http.get<[Map]>(`api/maps`);
   }
 
   archive(mapId: string, isArchive: boolean) {
     let body = { isArchive: isArchive }
-    return this.http.put(`${serverUrl}api/maps/${mapId}/archive`, body);
+    return this.http.put(`api/maps/${mapId}/archive`, body);
   }
 
   clearCurrentMap() {
+    this.currentMapId = null
     this.currentMap.next(null);
   }
 
   createMap(map): Observable<Map> {
-    return this.http.post<Map>(`${serverUrl}api/maps/create`, map);
+    return this.http.post<Map>(`api/maps/create`, map);
   }
 
   duplicateMap(mapId, structureId, projectId, options: MapDuplicateOptions) {
-    return this.http.post<Map>(`${serverUrl}api/maps/${mapId}/structure/${structureId}/duplicate`, { projectId: projectId, options });
+    return this.http.post<Map>(`api/maps/${mapId}/structure/${structureId}/duplicate`, { projectId: projectId, options });
   }
 
   getCurrentMap(): Observable<any> {
@@ -46,29 +77,30 @@ export class MapsService {
   }
 
   getMap(id: string): Observable<Map> {
-    return this.http.get<Map>(`${serverUrl}api/maps/${id}`);
+    return this.http.get<Map>(`api/maps/${id}`);
   }
 
   filterMaps(fields?: any, page?: number, options?: FilterOptions) {
-    return this.http.post<IEntityList<Map>>(`${serverUrl}api/maps`, { page, fields, options });
+    return this.http.post<IEntityList<Map>>(`api/maps`, { page, fields, options });
   }
 
   delete(id) {
-    return this.http.delete(`${serverUrl}api/maps/${id}`);
+    return this.http.delete(`api/maps/${id}`);
   }
 
   setCurrentMap(map: Map) {
+    this.currentMapId = map.id || map._id
     this.currentMap.next(map);
   }
 
   updateMap(mapId: string, map: Map) {
-    return this.http.put<string>(`${serverUrl}api/maps/${mapId}/update`, map, { responseType: 'text' as 'json' });
+    return this.http.put<string>(`api/maps/${mapId}/update`, map, { responseType: 'text' as 'json' });
   }
 
   /* map execution */
 
   cancelPending(mapId: string, runId: string) {
-    return this.http.post(`${serverUrl}api/maps/${mapId}/cancel-pending`, { runId });
+    return this.http.post(`api/maps/${mapId}/cancel-pending`, { runId });
   }
 
   execute(mapId: string, config?: string) {
@@ -79,27 +111,27 @@ export class MapsService {
     if (this.settingsService.configToken) {
       data.configToken = this.settingsService.configToken
     }
-    return this.http.post(`${serverUrl}api/maps/${mapId}/execute`, data);
+    return this.http.post(`api/maps/${mapId}/execute`, data);
   }
 
   stopExecutions(mapId: string, runId = '') {
-    return this.http.get(`${serverUrl}api/maps/${mapId}/stop-execution/${runId}`);
+    return this.http.get(`api/maps/${mapId}/stop-execution/${runId}`);
   }
 
   getDistinctMapExecutionsResult() {
-    return this.http.get<DistinctMapResult[]>(`${serverUrl}api/maps/results`);
+    return this.http.get<DistinctMapResult[]>(`api/maps/results`);
   }
 
   logsList(mapId: string, runId?: string) {
-    return this.http.get<MapExecutionLogs[]>(`${serverUrl}api/maps/${mapId}/results/${runId ? runId + '/' : ''}logs`);
+    return this.http.get<MapExecutionLogs[]>(`api/maps/${mapId}/results/${runId ? runId + '/' : ''}logs`);
   }
 
   currentExecutionList() {
-    return this.http.get(`${serverUrl}api/maps/currentruns`);
+    return this.http.get(`api/maps/currentruns`);
   }
 
   executionResultDetail(mapId, resultId) {
-    return this.http.get<MapResult>(`${serverUrl}api/maps/${mapId}/results/${resultId}`);
+    return this.http.get<MapResult>(`api/maps/${mapId}/results/${resultId}`);
   }
 
   executionResults(mapId, page) {
@@ -107,13 +139,14 @@ export class MapsService {
     if (page) {
       params = params.set('page', page.toString());
     }
-    return this.http.get<MapResult[]>(`${serverUrl}api/maps/${mapId}/results`, { params: params });
+    return this.http.get<MapResult[]>(`api/maps/${mapId}/results`, { params: params });
   }
 
   /* map structure */
 
   createMapStructure(mapId: string, structure: MapStructure) {
-    return this.http.post<MapStructure>(`${serverUrl}api/maps/${mapId}/structure/create`, structure);
+    let data = { structure, socketId: this.socketService.socketID }
+    return this.http.post<MapStructure>(`api/maps/${mapId}/structure/create`, data);
   }
 
   clearCurrentMapStructure() {
@@ -121,7 +154,7 @@ export class MapsService {
   }
 
   getMapStructure(mapId, structureId = '') {
-    return this.http.get<MapStructure>(`${serverUrl}api/maps/${mapId}/structure/${structureId}`);
+    return this.http.get<MapStructure>(`api/maps/${mapId}/structure/${structureId}`);
   }
 
   getCurrentMapStructure(): Observable<MapStructure> {
@@ -137,25 +170,25 @@ export class MapsService {
     if (page) {
       params = params.set('page', page.toString());
     }
-    return this.http.get<MapStructure[]>(`${serverUrl}api/maps/${mapId}/structures`, { params: params });
+    return this.http.get<MapStructure[]>(`api/maps/${mapId}/structures`, { params: params });
   }
 
   /* map triggers */
   createTrigger(mapId, trigger) {
-    return this.http.post<MapTrigger>(`${serverUrl}api/triggers/${mapId}`, trigger);
+    return this.http.post<MapTrigger>(`api/triggers/${mapId}`, trigger);
   }
 
   deleteTrigger(mapId, triggerId) {
     const options = { responseType: 'text' as 'json' };
-    return this.http.delete<any>(`${serverUrl}api/triggers/${mapId}/${triggerId}`, options);
+    return this.http.delete<any>(`api/triggers/${mapId}/${triggerId}`, options);
   }
 
   triggersList(mapId) {
-    return this.http.get<MapTrigger[]>(`${serverUrl}api/triggers/${mapId}`);
+    return this.http.get<MapTrigger[]>(`api/triggers/${mapId}`);
   }
 
   updateTrigger(mapId, trigger) {
-    return this.http.put<MapTrigger>(`${serverUrl}api/triggers/${mapId}/${trigger._id}`, trigger);
+    return this.http.put<MapTrigger>(`api/triggers/${mapId}/${trigger._id}`, trigger);
   }
 
 }

@@ -19,6 +19,11 @@ import { IsSetUpGuard } from './core/setup/issetup.guard';
 import { VaultService } from '@shared/vault.service';
 import {SeoService} from './seo.service';
 import { AutoCompleteService } from '@shared/components/params/autocomplete.service';
+import {PopupService} from '@shared/services/popup.service';
+import { KaholoHttpInterceptor } from './http-interceptor';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+
+
 
 
 @NgModule({
@@ -29,7 +34,7 @@ import { AutoCompleteService } from '@shared/components/params/autocomplete.serv
     SharedModule,
     AppRoutingModule
   ],
-  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService,AutoCompleteService],
+  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService,AutoCompleteService,PopupService, { provide: HTTP_INTERCEPTORS, useClass: KaholoHttpInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule {

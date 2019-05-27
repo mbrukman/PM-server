@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap';
 import { UpsertVaultItemsComponent } from '../upsert-vault-items/upsert-vault-items.component';
 import { VaultService } from '../../shared/vault.service';
 import { AutoCompleteItem } from '@shared/model/autocomplete.model';
 import {VaultItem} from '../vault.model';
 import {SeoService,PageTitleTypes} from '@app/seo.service';
+import {PopupService} from '@shared/services/popup.service';
 
 @Component({
   selector: 'app-vault',
@@ -15,7 +15,7 @@ export class VaultComponent implements OnInit {
 
   vaultItems: VaultItem[]
 
-  constructor(private vaultService: VaultService, private modalService: BsModalService,
+  constructor(private vaultService: VaultService, private popupService:PopupService,
     private seoService:SeoService) { }
 
   ngOnInit() {
@@ -37,12 +37,12 @@ export class VaultComponent implements OnInit {
   }
 
   upsertItem(item: AutoCompleteItem = null) {
-    let modal: BsModalRef;
-    modal = this.modalService.show(UpsertVaultItemsComponent);
+    let content;
     if (item) {
-      modal.content.vault = Object.assign({},item);
+      content = {vault : Object.assign({},item)};
     }
-    modal.content.result.subscribe(() => {
+    this.popupService.openComponent(UpsertVaultItemsComponent, content || {})
+    .subscribe(() => {
       this.requestVaults();
     });
   }

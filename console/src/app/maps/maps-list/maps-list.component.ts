@@ -1,16 +1,14 @@
 import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Subscription, Observable } from 'rxjs';
+import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import { MapsService } from '../maps.service';
 import { Map } from '../models/map.model';
-import { ConfirmComponent } from '@shared/confirm/confirm.component';
-import { BsModalService } from 'ngx-bootstrap/modal';
+import { PopupService } from '@shared/services/popup.service';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DistinctMapResult } from '@shared/model/distinct-map-result.model';
 import { Data, ActivatedRoute } from '@angular/router';
-
 import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
@@ -30,7 +28,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
   @ViewChild('globalFilter') globalFilterElement: ElementRef;
 
   constructor(private mapsService: MapsService,
-    private modalService: BsModalService,
+    private popupService: PopupService,
     private route: ActivatedRoute,
     private seoService:SeoService) {
     this.onDataLoad = this.onDataLoad.bind(this)
@@ -87,7 +85,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
 
     this.mapsService.delete(id).subscribe(() => {
       for (let i = 0, lenght = this.recentMaps.length; i < lenght; i++) {
-        if (this.recentMaps[i].id == id) {
+        if (this.recentMaps[i]._id == id) {
           this.recentMaps.splice(i, 1);
           break;
         }
@@ -110,17 +108,10 @@ export class MapsListComponent implements OnInit, OnDestroy {
 
   onConfirmDelete(id) {
     // will be triggered by deactivate guard
-    let modal = this.modalService.show(ConfirmComponent);
-    let answers = {
-      third: 'Delete',
-      cancel: 'Cancel'
-    };
-    modal.content.message = 'Are you sure you want to delete? all data related to the map will get permanently lost';
-    modal.content.third = answers.third;
-    modal.content.confirm = null;
-    modal.content.cancel = answers.cancel;
-    modal.content.result.asObservable().subscribe(ans => {
-      if (ans === answers.third) {
+    let confirm ='Delete';
+    this.popupService.openConfirm(null,'Are you sure you want to delete? all data related to the map will get permanently lost',confirm,'Cancel',null)
+    .subscribe(ans => {
+      if (ans === confirm) {
         this.deleteMap(id);
       }
     })

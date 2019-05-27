@@ -1,14 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-
-
-
-import { BsModalService } from 'ngx-bootstrap';
 import { Subscription } from 'rxjs';
 import { AgentsService } from '../agents.service';
 import { Agent, Group } from '@agents/models';
 import { timer } from 'rxjs';
 import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
 import { switchMap, take } from 'rxjs/operators';
+import {PopupService} from '@shared/services/popup.service';
 
 @Component({
   selector: 'app-agents-list',
@@ -26,7 +23,7 @@ export class AgentsListComponent implements OnInit, OnDestroy {
   constants : boolean = true;
 
 
-  constructor(private agentsService: AgentsService,private modalService: BsModalService) {
+  constructor(private agentsService: AgentsService,private popupService:PopupService) {
   }
 
   ngOnInit() {
@@ -71,16 +68,15 @@ export class AgentsListComponent implements OnInit, OnDestroy {
 
   
   addNewFilterParam(group:Group){
-    const modal = this.modalService.show(AgentsGroupUpsertFilterComponent);
-    modal.content.edit = false;
-    modal.content.result.pipe(take(1))
+    this.popupService.openComponent(AgentsGroupUpsertFilterComponent,{edit:false})
+    .pipe(take(1))
       .subscribe(filters => {
         group.filters.push(filters)
         this.agentsService.updateGroupToServer(group).subscribe((group) => {
           this.agentsService.updateGroup(group)
         })
       });
-  }
+  } 
 
 
   onSelectAgent(agent) {

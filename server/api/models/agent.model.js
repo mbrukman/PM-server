@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// TODO add plugins installed?
 let agentSchema = new Schema({
     name: String,
     url: { type: String, required: true },
     publicUrl: {type: String, required: true},
     key: { type: String, required: true },
     sshKey: String,
-    attributes: []
+    attributes: [],
+    isDeleted: Boolean
 });
 
 

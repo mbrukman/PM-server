@@ -15,7 +15,6 @@ import { MapTriggersComponent } from './map-detail/map-edit/map-enviroment-pane/
 import { MapDesignComponent } from './map-detail/map-edit/map-design/map-design.component';
 import { MapDetailComponent } from './map-detail/map-detail.component';
 import { MapsListComponent } from './maps-list/maps-list.component';
-import { SelectAgentComponent } from './map-detail/map-edit/map-enviroment-pane/map-agents/select-agent/select-agent.component';
 import { TriggerFormComponent } from './map-detail/map-edit/map-enviroment-pane/map-triggers/trigger-form/trigger-form.component';
 import { MapEditComponent } from './map-detail/map-edit/map-edit.component';
 import { MapAgentsComponent } from './map-detail/map-edit/map-enviroment-pane/map-agents/map-agents.component';
@@ -30,7 +29,6 @@ import { MapResultComponent } from './map-detail/map-result/map-result.component
 import { ProcessResultComponent } from './map-detail/map-result/process-result/process-result.component';
 import { ProcessListItemComponent } from './map-detail/map-result/process-list-item/process-list-item.component';
 import { MapConfigurationsComponent } from './map-detail/map-configurations/map-configurations.component';
-import { AddConfigurationComponent } from './map-detail/map-configurations/add-configuration/add-configuration.component';
 import { ProcessViewComponent } from './map-detail/map-revisions/process-view/process-view.component';
 import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
 import { monacoConfig } from './monaco-config' 
@@ -68,20 +66,17 @@ import { MapsResolver } from './resolvers/maps.resolver';
     MapEnvironmentPaneComponent,
     MapAgentsComponent,
     MapRevisionsComponent,
-    SelectAgentComponent,
     MapConfigurationsComponent,
     MapTriggersComponent,
-    TriggerFormComponent,
     ProcessFormComponent,
     PluginToolboxComponent,
     MapResultComponent,
     ProcessResultComponent,
     ProcessListItemComponent,
-    AddConfigurationComponent,
     ProcessViewComponent,
-    MapDuplicateComponent,
+    
   ],
-  entryComponents: [SelectAgentComponent, TriggerFormComponent, AddConfigurationComponent,MapDuplicateComponent],
+  entryComponents: [ ],
   providers:[MapsResolver]
 })
 export class MapsModule {}

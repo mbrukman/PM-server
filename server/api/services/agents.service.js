@@ -6,10 +6,10 @@ const winston = require("winston");
 const _ = require("lodash");
 const humanize = require("../../helpers/humanize");
 const env = require("../../env/enviroment");
-
+const Map = require("../models/map.model");
 const Agent = require("../models").Agent;
 const Group = require("../models").Group;
-
+const ObjectId = require('mongoose').Types.ObjectId;
 
 const LIVE_COUNTER = env.retries; // attempts before agent will be considered dead
 const INTERVAL_TIME = env.interval_time;
@@ -39,6 +39,7 @@ const FILTER_FIELDS = Object.freeze({
 let followAgentStatus = (agent) => {
     let listenInterval = setInterval(() => {
         let start = new Date();
+        if(!agents[agent.key]) return;
         request.post(
             agents[agent.key].defaultUrl + '/api/status', {
                 form: {
@@ -237,9 +238,8 @@ function addSocketIdToAgent(agentKey, socket) {
 
 function sendRequestToAgent(options, agent) {
     return new Promise((resolve, reject) => {
-
-        options.uri = agent.defaultUrl + options.uri;
-
+        options = Object.assign({},options);
+        options.uri = agents[agent.key].defaultUrl + options.uri;
         options.method = options.method || 'POST';
 
         if (options.body) {
@@ -258,13 +258,18 @@ function sendRequestToAgent(options, agent) {
     })
 }
 
+
+function deleteAgentFromMap(agentId){
+    return Map.updateMany({agents:{$elemMatch:{$eq:agentId}}},{$pull:{agents:{$in:[agentId]}}})
+}
+
 module.exports = {
     add: (agent) => {
         return Agent.findOne({ key: agent.key }).then(agentObj => {
             if (!agentObj) {
                 return Agent.create(agent)
             }
-            return Agent.findByIdAndUpdate(agentObj._id, { $set: { url: agent.url, publicUrl: agent.publicUrl } });
+            return Agent.findByIdAndUpdate(agentObj._id, { $set: { url: agent.url, publicUrl: agent.publicUrl,isDeleted:false } });
         }).then(agent => {
             followAgentStatus(agent)
             return setDefaultUrl(agent).then(()=>{
@@ -290,16 +295,18 @@ module.exports = {
         });
     },
     delete: (agentId) => {
-        return Agent.findOneAndRemove({ _id: agentId }).then((agent) => {
+        return Agent.findByIdAndUpdate(agentId,{ $set: { "isDeleted": "true" } }).then(async(agent) => {
+            let deleteAgent = await deleteAgentFromMap(agentId)
             if(agents[agent.key]){
                 clearInterval(agents[agent.key].intervalId)
             }
-            delete agents[agent.key]
+            delete agents[agent.key];
         })
     },
     /* filter the agents. if no query is passed, will return all agents */
     filter: (query = {}) => {
-        return Agent.find(query)
+        query.isDeleted = {$ne:true};
+        return Agent.find(query);
     },
     /* send plugin file to an agent */
     installPluginOnAgent: (pluginPath, agent) => {

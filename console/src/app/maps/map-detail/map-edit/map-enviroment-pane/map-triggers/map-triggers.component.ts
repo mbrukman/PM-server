@@ -1,26 +1,28 @@
-import {Component, OnInit} from '@angular/core';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap';
-
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {MapsService} from '@maps/maps.service';
 import {Map, MapStructure, MapTrigger} from '@maps/models';
 import {TriggerFormComponent} from './trigger-form/trigger-form.component';
-import {ConfirmComponent} from '@shared/confirm/confirm.component';
+import {PopupService} from '@shared/services/popup.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-map-triggers',
   templateUrl: './map-triggers.component.html',
   styleUrls: ['./map-triggers.component.scss']
 })
-export class MapTriggersComponent implements OnInit {
+export class MapTriggersComponent implements OnInit, OnDestroy {
   mapStructure: MapStructure;
   triggers: MapTrigger[];
+  currentMapSubscription : Subscription;
   id: string;
   map: Map;
 
-  constructor(private modalService: BsModalService, private mapsService: MapsService) { }
+  constructor(
+    private popupService: PopupService, 
+    private mapsService: MapsService) { }
 
   ngOnInit() {
-    this.mapsService.getCurrentMap().subscribe(map => {
+    this.currentMapSubscription = this.mapsService.getCurrentMap().subscribe(map => {
       this.map = map;
       this.mapsService.triggersList(map.id).subscribe(triggers => {
         this.triggers = triggers;
@@ -33,13 +35,14 @@ export class MapTriggersComponent implements OnInit {
       });
   }
 
+  ngOnDestroy() {
+    this.currentMapSubscription.unsubscribe();
+  }
+
   openTriggerFormModal(index?) {
     const edit = index || index === 0;
-    let modal: BsModalRef;
-    modal = this.modalService.show(TriggerFormComponent);
-    modal.content.trigger = this.triggers[index];
-    modal.content.configurations = this.mapStructure.configurations.map(o => o.name);
-    modal.content.result.subscribe(result => {
+    this.popupService.openComponent(TriggerFormComponent,{trigger:this.triggers[index],configurations:this.mapStructure.configurations.map(o => o.name)})
+    .subscribe(result => {
       if (!edit) {
         this.mapsService.createTrigger(this.map.id, result).subscribe(trigger => {
           this.triggers.push(trigger);
@@ -55,17 +58,10 @@ export class MapTriggersComponent implements OnInit {
   }
 
   removeTrigger(index: number) {
-    let modal: BsModalRef;
     let trigger = this.triggers[index];
-    modal = this.modalService.show(ConfirmComponent);
-    let answers = {
-      confirm:'Yes'
-    }
-    modal.content.title = 'Delete Trigger'
-    modal.content.message = `Are you sure you want to delete ${trigger.name}?`;
-    modal.content.confirm = answers.confirm;
-    modal.content.result.asObservable().subscribe(ans => {
-      if (ans === answers.confirm) {
+    let confirm = 'Yes';
+    this.popupService.openConfirm('Delete Trigger',`Are you sure you want to delete ${trigger.name}?`,confirm,'No',null).subscribe(ans => {
+      if (ans === confirm) {
         this.mapsService.deleteTrigger(this.map.id, trigger.id).subscribe(() => {
           this.triggers.splice(index, 1);
         });

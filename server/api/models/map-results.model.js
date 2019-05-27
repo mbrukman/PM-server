@@ -1,37 +1,40 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const statusEnum = {
+    RUNNING: 'running',
+    DONE: 'done',
+    PENDING: 'pending',
+    ERROR: 'error',
+    STOPPED: 'stopped',
+    CANCELED: 'canceled',
+    SUCCESS: 'success'
+}
+
 let actionResultSchema = new Schema({
-    name: String,
     action: { type: Schema.Types.ObjectId, ref: 'MapStructure.processes.actions' },
-    method: { name: String, _id: {type: Schema.Types.ObjectId, ref: 'Plugin.method' }},
     status: String,
     startTime: Date,
     finishTime: Date,
-    result: Schema.Types.Mixed
+    result: Schema.Types.Mixed,
+    retriesLeft: Number
 }, { _id: false });
 
 let processResultSchema = new Schema({
-    index: Number,
-    name: String,
+    iterationIndex: Number,
     process: { type: Schema.Types.ObjectId, ref: 'MapStructure.processes' },
-    uuid: String,
-    plugin: String,
     actions: [actionResultSchema],
     status: String,
-    startTime: Date,
+    message: Schema.Types.Mixed,
+    preRunResult: Schema.Types.Mixed,
+    postRunResult: Schema.Types.Mixed,
+    startTime: Date, 
     finishTime: Date,
-    result: Schema.Types.Mixed
 }, { _id: false });
 
-let agentResultSchema = new Schema({
-    name: String,
+let AgentResultSchema = new Schema({
     processes: [processResultSchema],
     agent: { type: Schema.Types.ObjectId, ref: 'Agent' },
-    status: String,
-    startTime: Date,
-    finish: Date,
-    result: Schema.Types.Mixed
 }, { _id: false });
 
 
@@ -40,14 +43,15 @@ let mapResultSchema = new Schema({
     runId: { type: String, required: true },
     structure: { type: Schema.Types.ObjectId, ref: 'MapStructure' },
     configuration: Schema.Types.Mixed,
-    agentsResults: [agentResultSchema],
-    startAgentsNumber: Number,
-    cleanFinish: Boolean,
-    startTime: {type:Date, index:true },
-    finishTime: Date,
+    agentsResults: [AgentResultSchema],
+    startTime: { type: Date, index: true },
+    finishTime: { type: Date, index: true },
     trigger: String,
-    triggerPayload:Schema.Types.Mixed,
-    archivedMap:{type:Boolean, default:false, index: true}
+    status: { type: String, enum: [statusEnum.DONE, statusEnum.ERROR, statusEnum.RUNNING, statusEnum.PENDING] },
+    reason: String, // e.g. no agents
+    triggerPayload: Schema.Types.Mixed,
+    archivedMap: { type: Boolean, default: false, index: true }, 
+    createdAt:  {type: Date, default: new Date()}
 });
 
 
@@ -57,6 +61,13 @@ mapResultSchema.set('toJSON', {
     }
 });
 let MapResult = mongoose.model('MapResult', mapResultSchema, 'mapResults');
+mongoose.model('AgentResult', AgentResultSchema, 'agentResults');
+mongoose.model('ActionResult', AgentResultSchema, 'actionResults');
 
 
-module.exports = MapResult;
+module.exports = {
+    MapResult,
+    AgentResult: AgentResultSchema,
+    ActionResult: actionResultSchema,
+    statusEnum
+};

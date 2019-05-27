@@ -2,9 +2,6 @@
   <h1>
     <span placeholder="Enter map name" [(inlineEdit)]="map.name" (valueChanged)="edited=true" *ngIf="map">{{map.name}}</span>
     <span *ngIf="map?.archived">(archived)</span>
-    <span *ngIf="structuresList[0] && mapStructure?.id !== structuresList[0].id && structureIndex < structuresList.length">
-      (<i class="material-icons">history</i> {{ structureIndex }}/{{ structuresList.length }})
-    </span>
   </h1>
 </div>
 
@@ -31,15 +28,12 @@
 
     <div class="dropdown">
         <p-dropdown [(ngModel)]="selected" 
-        [options]="configurationDropDown" 
-        (onChange)="changeSelected(true)" 
+        [options]="configurationDropDown"  
         [autoWidth]="false">
         </p-dropdown>
     </div>
   </div>
 </div>
-
-
 
 <div class="router-wrapper">
   <router-outlet></router-outlet>
