@@ -15,7 +15,6 @@ let agentSchema = new Schema({
 agentSchema.set('toJSON', {
     transform: function (doc, ret, options) {
         ret.id = ret._id;
-        delete ret.key;
     }
 });
 

@@ -68,7 +68,6 @@ module.exports = {
             winston.log('error', "Error deleting agent", error);
             return res.status(500).send(error);
         });
-        agentsService.unfollowAgent(req.params.id);
     },
     /* Get all agents list */
     list: (req, res) => {

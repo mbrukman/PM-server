@@ -1,26 +1,23 @@
-const socket = require('socket.io');
+const io = require('socket.io');
 const winston = require('winston');
-var _socket;
+var socket;
 
-function init(server){
-    // socket.io
-    let _sock = socket(server);
-    _sock.on('connection', function (socket) {
-        _socket = socket;
+function init(server) {
+    socket = io(server);
+    socket.on('connection', function (socket) {
         winston.log('info', 'a user connected');
     });
-    return _sock;
+    return socket;
 }
 
 module.exports = {
-    init : init,
-    get socket(){
-        return _socket;
+    init: init,
+    get socket() {
+        return socket;
     },
-    emit : (type, payload)=>{
-        console.log("emit!!", new Date());
-        
-        if (_socket)
-            _socket.emit(type,payload)
+    emit: (type, payload) => {
+
+        if (socket)
+            socket.emit(type, payload)
     }
 }

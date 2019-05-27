@@ -11,10 +11,6 @@ const Agent = require("../models").Agent;
 const Group = require("../models").Group;
 const socketService = require('./socket.service');
 
-const ObjectId = require('mongoose').Types.ObjectId;
-
-const LIVE_COUNTER = env.retries; // attempts before agent will be considered dead
-const INTERVAL_TIME = env.interval_time;
 let agents = {}; // store the agents status.
 
 
@@ -44,7 +40,7 @@ function _getAgentsStatuses(){
                 delete current.key;
                 delete current.intervalId;
                 delete current.socket;
-                total[current.id] = current;
+                total[current._id] = current;
                 return total;
             }, {});
             return statuses
@@ -52,93 +48,12 @@ function _getAgentsStatuses(){
 
 /* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
 let followAgentStatus =  (agent) => {
-    if(!agents[agent.key]){
-        agents[agent.key] = agent.toJSON();
-        agents[agent.key].alive = false;
-        agents[agent.key].following = true;
-        setDefaultUrl(agent);
-        return
-    }
-    if(agents[agent.key].socket){
-        let agentSocket = agents[agent.key].socket
-        agentSocket.emit('status', actionForm);
-        
-        agentSocket.on('status', (data) => {
-            resolve(data);
-        });
-    }
-
-
-
-return
-    let listenInterval = setInterval(() => {
-        let start = new Date();
-        if(!agents[agent.key]) return;
-        request.post(
-            agents[agent.key].defaultUrl + '/api/status', {
-                form: {
-                    key: agent.key
-                }
-            }, (error, response, body) => {
-                try {
-                    body = JSON.parse(body);
-                } catch (e) {
-                    body = { res: e };
-                }
-                if (!error && response.statusCode === 200 && agents[agent.key]) {
-                    agents[agent.key].name = agent.name;
-                    agents[agent.key].attributes = agent.attributes;
-                    agents[agent.key].alive = true;
-                    agents[agent.key].hostname = body.hostname;
-                    agents[agent.key].arch = body.arch;
-                    agents[agent.key].freeSpace = humanize.bytes(body.freeSpace);
-                    agents[agent.key].respTime = new Date() - start;
-                    agents[agent.key].url = agent.url;
-                    agents[agent.key].publicUrl = agent.publicUrl;
-                    agents[agent.key].defaultUrl = agents[agent.key].defaultUrl || '';
-                    agents[agent.key].id = agent.id;
-                    agents[agent.key].key = agent.key;
-                    agents[agent.key].installed_plugins = body.installed_plugins;
-                    agents[agent.key].liveCounter = LIVE_COUNTER;
-                } else if ( agents[agent.key] && (--agents[agent.key].liveCounter) === 0) {
-                    agents[agent.key].alive = false;
-                    if (!agents[agent.key].hostname) {
-                        agents[agent.key].hostname = 'unknown';
-                    }
-                    if (!agents[agent.key].arch) {
-                        agents[agent.key].arch = 'unknown';
-                    }
-                    if (!agents[agent.key].freeSpace) {
-                        agents[agent.key].freeSpace = 0;
-                    }
-                    agents[agent.key].respTime = 0;
-                }
-            })
-    }, INTERVAL_TIME);
-    if (!agents[agent.key]) {
-        agents[agent.key] = agent.toJSON();
-        agents[agent.key].alive = false;
-        agents[agent.key].following = true;
-        agents[agent.key].intervalId = listenInterval;
-        setDefaultUrl(agent);
-        // agents[agent.key] = { intervalId: listenInterval, alive: false, following: true };
-    }
-};
-
-/* stop following an agent */
-let unfollowAgentStatus = (agentId) => {
-    let agent = _.find(agents, (o) => {
-        return o.id === agentId
-    });
-    // stop the check interval
-    if (!agent) {
-        return;
-    }
-    clearInterval(agents[agent.key].intervalId);
+    if(agents[agent.key]){return}
+    agents[agent.key] = agent.toJSON();
     agents[agent.key].alive = false;
-    agents[agent.key].following = false;
-
+    setDefaultUrl(agent);
 };
+
 
 function getAgentStatus() {
     return agents;
@@ -263,9 +178,13 @@ function evaluateFilter(filter, agents) {
  * @param agentKey
  * @param socket
  */
-function addSocketIdToAgent(agentKey, socket) {
-    if (!agents.hasOwnProperty(agentKey)) {
-        return;
+async function addSocketIdToAgent(agentKey, socket) {
+    if (!agents.hasOwnProperty(agentKey)) { 
+
+        let agent = await Agent.findOne({ key: agentKey })
+        if(!agent){return} 
+        agents[agentKey] = agent.toJSON();
+        
     }
     agents[agentKey].socket = socket;
     agents[agentKey].alive = true
@@ -311,9 +230,7 @@ module.exports = {
             return Agent.findByIdAndUpdate(agentObj._id, { $set: { url: agent.url, publicUrl: agent.publicUrl,isDeleted:false } });
         }).then(agent => {
             followAgentStatus(agent)
-            return setDefaultUrl(agent).then(()=>{
-                return agent;
-            });
+            return agent
         })
     },
     getByKey: (agentKey) => {
@@ -416,7 +333,6 @@ module.exports = {
     },
     setDefaultUrl: setDefaultUrl,
     followAgent: followAgentStatus,
-    unfollowAgent: unfollowAgentStatus,
     /* update an agent */
     update: (agentId, agent) => {
         return Agent.findByIdAndUpdate(agentId, agent, { new: true });
@@ -523,13 +439,23 @@ module.exports = {
     establishSocket: (socket) => {
         const nsp = socket.of('/agents');
         nsp.on('connection', function (socket) {
+            let agentKey = socket.client.request._query.key
+
             winston.log("info", "Agent log");
             // agent send key on connection string
-            addSocketIdToAgent(socket.client.request._query.key, socket);
+            addSocketIdToAgent(agentKey, socket);
 
-            nsp.on('disconnect',(reason) => {
-                console.error("discomect!!!");
-                
+            socket.on('status', res=>{
+                if(!agents[agentKey]){return} 
+                agents[agentKey].hostname = res.hostname;
+                agents[agentKey].arch = res.arch;
+                agents[agentKey].freeSpace = humanize.bytes(res.freeSpace);
+                agents[agentKey].installed_plugins = res.installed_plugins;
+                agents[agentKey].alive = true
+
+            })
+
+            socket.on('disconnect',() => {
                 agents[agentKey].alive = false;
             });
     

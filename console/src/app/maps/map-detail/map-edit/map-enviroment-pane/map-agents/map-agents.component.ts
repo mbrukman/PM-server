@@ -34,7 +34,6 @@ export class MapAgentsComponent implements OnInit, OnDestroy{
 
   getAgentsStatus() {
     this.agentsStatusReq = this.socketService.geteAgentsStatusAsObservable().subscribe(statuses => {
-      console.log('map-agent', statuses['5c448c2cb248189b006e4b74'].alive);
       this.statuses = statuses;
     });
   }

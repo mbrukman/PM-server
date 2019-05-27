@@ -133,7 +133,7 @@ module.exports = {
             agents.forEach((agentObj) => {
 
                 const agentAlive = _.find(agentsStatus, (agent) => {
-                    return (agent.id === agentObj.id && agent.alive)      // check if this is the condition:
+                    return (agent.id.toString() === agentObj.id && agent.alive)      // check if this is the condition:
                 });
                 agentAlive ? allAgents.push(agentAlive) : null;
             })

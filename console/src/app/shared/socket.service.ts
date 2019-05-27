@@ -23,9 +23,6 @@ export class SocketService {
     this.socketListener();
   }
 
-  get getSocket() {
-    return this.socket;
-  }
 
   socketListener() {
     this.socket.on('update', (data) => {
@@ -54,8 +51,6 @@ export class SocketService {
   }
 
   updateAgentsStatus(data){
-    console.log(new Date(), data['5c448c2cb248189b006e4b74'].alive);
-    
     this.agentsStatus.next(data)
   }
 

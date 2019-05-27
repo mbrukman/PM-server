@@ -7,6 +7,5 @@ export interface IAgentStatus {
   url: string,
   id: string,
   key: string,
-  liveCounter: number,
-  following: boolean
+  liveCounter: number
 }

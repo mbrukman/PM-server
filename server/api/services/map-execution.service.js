@@ -458,6 +458,7 @@ async function executeMap(runId, map, mapStructure, agents, context) {
     }
     Promise.all(promises).catch(err => {
         winston.log('error', "structureId: " + mapStructure.id + err);
+        stopExecution(runId, err)
     });
 }
 

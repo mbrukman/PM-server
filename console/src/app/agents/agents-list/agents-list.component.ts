@@ -52,8 +52,6 @@ export class AgentsListComponent implements OnInit, OnDestroy {
 
 
     this.agentsStatusReq = this.socketService.geteAgentsStatusAsObservable().subscribe(statuses => {
-      console.log("in agent-list", statuses['5c448c2cb248189b006e4b74'].alive);
-      
         this.agentsStatus = statuses;
       });
 
