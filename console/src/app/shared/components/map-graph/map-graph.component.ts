@@ -132,7 +132,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
       }
     });
     this.defineShape();
- 
+    this.isReadOnly ? this.readOnlyListener() : this.listeners() 
   }
 
   ngOnChanges(){
