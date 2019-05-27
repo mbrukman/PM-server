@@ -7,8 +7,25 @@
   overflow-y: auto;
   margin-left: 0;
   margin-right: 0;
-  app-map-graph{
+  .graph-wrapper{
     flex-grow: 1;
+    .pane-header {
+      @extend .pane-header;
+      margin-bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .material-icons{
+        cursor: pointer;
+        &:hover{
+          color: white;
+        }
+      }
+    }
+  
+    app-map-graph{
+      flex-grow: 1;
+    }
   }
 
   .map-management {

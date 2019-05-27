@@ -8,8 +8,7 @@ import { MapDesignService } from './map-design.service';
 @Component({
   selector: 'app-map-edit',
   templateUrl: './map-edit.component.html',
-  styleUrls: ['./map-edit.component.scss'],
-  providers: [MapDesignService]
+  styleUrls: ['./map-edit.component.scss']
 })
 export class MapEditComponent implements OnInit, OnDestroy {
   mapStructure: MapStructure;

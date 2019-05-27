@@ -9,19 +9,6 @@
     border-left: 1px solid $cool-grey;
     flex-direction: column;
     height: 100%;
-    .pane-header {
-      @extend .pane-header;
-      margin-bottom: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      .material-icons{
-        cursor: pointer;
-        &:hover{
-          color: white;
-        }
-      }
-    }
 
     .graph {
       background: $dark-background;

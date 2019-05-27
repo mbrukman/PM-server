@@ -1,13 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { MonacoEditorModule, NGX_MONACO_EDITOR_CONFIG} from 'ngx-monaco-editor';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { NgxDnDModule } from '@swimlane/ngx-dnd';
-
 import { SharedModule } from '@shared/shared.module';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { MapsRoutingModule } from './maps-routing.module';
@@ -15,7 +13,6 @@ import { MapTriggersComponent } from './map-detail/map-edit/map-enviroment-pane/
 import { MapDesignComponent } from './map-detail/map-edit/map-design/map-design.component';
 import { MapDetailComponent } from './map-detail/map-detail.component';
 import { MapsListComponent } from './maps-list/maps-list.component';
-import { TriggerFormComponent } from './map-detail/map-edit/map-enviroment-pane/map-triggers/trigger-form/trigger-form.component';
 import { MapEditComponent } from './map-detail/map-edit/map-edit.component';
 import { MapAgentsComponent } from './map-detail/map-edit/map-enviroment-pane/map-agents/map-agents.component';
 import { MapCodeComponent } from './map-detail/map-edit/map-code/map-code.component';
@@ -30,10 +27,10 @@ import { ProcessResultComponent } from './map-detail/map-result/process-result/p
 import { ProcessListItemComponent } from './map-detail/map-result/process-list-item/process-list-item.component';
 import { MapConfigurationsComponent } from './map-detail/map-configurations/map-configurations.component';
 import { ProcessViewComponent } from './map-detail/map-revisions/process-view/process-view.component';
-import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
 import { monacoConfig } from './monaco-config' 
 import {AutoCompleteModule} from 'primeng/primeng';
 import { MapsResolver } from './resolvers/maps.resolver';
+import { MapDesignService } from './map-detail/map-edit/map-design.service';
 
 @NgModule({
   imports: [
@@ -77,6 +74,6 @@ import { MapsResolver } from './resolvers/maps.resolver';
     
   ],
   entryComponents: [ ],
-  providers:[MapsResolver]
+  providers:[MapsResolver, MapDesignService]
 })
 export class MapsModule {}

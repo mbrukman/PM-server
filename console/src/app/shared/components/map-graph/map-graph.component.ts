@@ -1,4 +1,4 @@
-import { AfterContentInit, Component, EventEmitter,OnDestroy, OnInit, Input, Output } from '@angular/core';
+import { AfterContentInit, Component, EventEmitter,OnDestroy, OnInit, Input, Output, ViewChild, ElementRef } from '@angular/core';
 
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
@@ -36,10 +36,15 @@ export const linkAttrs = {
 
 export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
 
-  @Input('wrapper') wrapper;
-  @Output('editProcess') editProcess:  EventEmitter<any> = new EventEmitter<any>();
-  @Output('close') close: EventEmitter<any> = new EventEmitter<any>();
-  @Output('addProcess') addProcess: EventEmitter<any> = new EventEmitter<any>();
+  @Input('content') content;
+  @Input('wrapper') wrapper; 
+  @Input('isReadOnly') isReadOnly;
+  @Output('cellClick') cellClick:  EventEmitter<any> = new EventEmitter<any>();
+  @Output('paperClick') paperClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output('cellAdded') cellAdded: EventEmitter<any> = new EventEmitter<any>();
+
+  @ViewChild('mapGraph') mapGraph: ElementRef;
+
   graph: joint.dia.Graph;
   paper: joint.dia.Paper;
   mapStructure: MapStructure;
@@ -60,19 +65,24 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
   constructor(
     private mapsService: MapsService,
     private pluginsService: PluginsService,
-    private mapDesignService: MapDesignService) { }
-
+    private mapDesignService: MapDesignService
+    ) { }
+ 
   ngOnInit() {
-    this.defineShape();
     this.pluginsService.list().subscribe(plugins => {
       this.plugins = plugins;
-      this.initMapDraw();
-      this.getCurrentMapStructure();
+      if(!this.content && !this.isReadOnly){
+        this.initMapDraw();
+        this.getCurrentMapStructure();
+      }
     });
 
+    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().subscribe(structure => {
+      this.mapStructure = structure
+    })
+
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
-    this.dropSubscription = this.mapDesignService
-      .getDrop().pipe(
+    this.dropSubscription = this.mapDesignService.getDrop().pipe(
         filter(obj => this.isDroppedOnMap(obj.x, obj.y))
       ).subscribe(obj => {
         this.cellView = obj.cell;
@@ -83,14 +93,14 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
 
   ngOnDestroy() {
     this.dropSubscription.unsubscribe();	
-    this.mapStructureSubscription.unsubscribe();
+    //this.mapStructureSubscription.unsubscribe();
     this.deselectAllCellsAndUpdateStructure();
   }
 
   ngAfterContentInit() {
     this.graph = new joint.dia.Graph;
     this.paper = new joint.dia.Paper({
-      el: $('#graph'),
+      el: $(this.mapGraph.nativeElement),
       width: this.wrapper.nativeElement.offsetWidth,
       height: this.wrapper.nativeElement.offsetHeight - 80,
       gridSize: this.scale,
@@ -121,7 +131,51 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
         return true;
       }
     });
-    this.listeners();
+    this.defineShape();
+ 
+  }
+
+  ngOnChanges(){
+    if(this.content && this.isReadOnly && this.graph){
+      this.paper.scale(0.75, 0.75);
+      this.addPaperDrag();
+      this.graph.fromJSON(JSON.parse(this.content))
+    }
+  }
+
+  readOnlyListener() {
+    this.paper.on('cell:pointerup', (cellView, evt, x, y) => {
+      if (cellView.model.isLink()) {
+        return;
+      }
+    });
+
+  }
+
+  addPaperDrag() {
+    let initialPosition = { x: 0, y: 0 };
+    let move = false;
+
+    let paperOnPointerDown = (event, x, y) => {
+      initialPosition = { x: x * 0.75, y: y * 0.75 };
+      move = true;
+    };
+
+    let paperOnPointerUp = (event, x, y) => {
+      move = false;
+    };
+
+    let graphMouseMove = (paper) => (event)=>{
+      if (move) {
+        paper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
+      }
+    };
+
+    this.paper.on('blank:pointerdown', paperOnPointerDown);
+    this.paper.on('blank:pointerup', paperOnPointerUp);
+
+    $(this.mapGraph.nativeElement).mousemove(graphMouseMove(this.paper));
+
   }
 
  getCurrentMapStructure(){
@@ -284,7 +338,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
     this.graph.addCell(imageModel);
     process.used_plugin = { name: plugin.name, version: plugin.version };
     process.uuid = <string>imageModel.id;
-    this.addProcess.emit(process);
+    this.cellAdded.emit(process);
     this.deselectAllCellsAndUpdateStructure();
     this.editCell(this.mapStructure.processes[this.mapStructure.processes.length - 1]);
   }
@@ -368,7 +422,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
     this.setCellSelectState(cell);
     this.paper.setDimensions(this.wrapper.nativeElement.offsetWidth - 250, this.wrapper.nativeElement.offsetHeight);
     this.process = process;
-    this.editProcess.emit(process)
+    this.cellClick.emit(process)
   }
 
   listeners() {
@@ -380,7 +434,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
       move = true;
     });
 
-    $('#graph').mousemove((event) => {
+    $(this.mapGraph.nativeElement).mousemove((event) => {
       if (move) {
         self.paper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
       }
@@ -469,7 +523,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
     if(this.process){
       this.setCellSelectState(this.graph.getCell(this.process.uuid),false);
       this.process = null;
-      this.close.emit()
+      this.paperClick.emit()
     }
   }
 
