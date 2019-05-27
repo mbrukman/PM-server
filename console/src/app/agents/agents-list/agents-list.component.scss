@@ -8,7 +8,7 @@
 .main{
   flex-grow: 1;
   .row{
-    padding: 18px 40px;
+    padding: 18px $admin-padding;
     .groups{
       padding-left: 4px;
       padding-right: 45px;

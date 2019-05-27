@@ -87,7 +87,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       });
 
     // updating logs messages updates
-    this.mapExecutionMessagesSubscription = this.socketService.getMessagesAsObservable().pipe(
+    this.mapExecutionMessagesSubscription = this.socketService.getLogExecutionAsObservable().pipe(
       filter(message => this.selectedExecution && (message.runId === this.selectedExecution.runId))
     ).subscribe(message => {
         this.selectedExecutionLogs.push(message);

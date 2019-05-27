@@ -1,18 +1,50 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { DistinctMapResult } from '@shared/model/distinct-map-result.model';
 import { Map, MapExecutionLogs, MapResult, MapStructure, MapTrigger } from './models';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { MapDuplicateOptions } from './models/map-duplicate-options.model'
 import { SettingsService } from '@core/setup/settings.service';
 import { IEntityList } from '@shared/interfaces/entity-list.interface';
+import { PopupService } from '@shared/services/popup.service';
+import { SocketService } from '@app/shared/socket.service';
 
 @Injectable()
 export class MapsService {
   currentMap: BehaviorSubject<Map> = new BehaviorSubject<Map>(null);
+  currentMapId: string
   public currentMapStructure: BehaviorSubject<MapStructure> = new BehaviorSubject<MapStructure>(null);
-  constructor(private http: HttpClient, private settingsService: SettingsService) {
+  mapChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+
+  constructor(private http: HttpClient, private settingsService: SettingsService, private popupService: PopupService, private socketService: SocketService) {
+    this.init()
+  }
+
+  init() {
+    this.socketService.getMessageAsObservable().subscribe(data => {
+      if (data.type != 'saved-map') { return }
+      if (data.msg.initiator != this.socketService.socketID && this.currentMapId == data.msg.mapId) { // if another user or in another tab map was saved 
+        this.checkSyncMap()
+      } else {
+        this.socketService.setNotification(data.msg);
+      }
+    })
+  }
+
+  checkSyncMap() {
+    let OK = 'Refresh'
+    this.popupService.openConfirm("Map Changed", 'This map was saved in different window. Would you like to refresh window and get the latest map?', OK, "Close", null).subscribe(result => {
+      if (OK == result) {
+        window['location'].reload();
+      } else {
+        this.mapChanged.next(true)
+      }
+    })
+  }
+
+  isMapChanged() {
+    return this.mapChanged.asObservable()
   }
 
   recentMaps() {
@@ -28,6 +60,7 @@ export class MapsService {
   }
 
   clearCurrentMap() {
+    this.currentMapId = null
     this.currentMap.next(null);
   }
 
@@ -56,6 +89,7 @@ export class MapsService {
   }
 
   setCurrentMap(map: Map) {
+    this.currentMapId = map.id || map._id
     this.currentMap.next(map);
   }
 
@@ -111,7 +145,8 @@ export class MapsService {
   /* map structure */
 
   createMapStructure(mapId: string, structure: MapStructure) {
-    return this.http.post<MapStructure>(`api/maps/${mapId}/structure/create`, structure);
+    let data = { structure, socketId: this.socketService.socketID }
+    return this.http.post<MapStructure>(`api/maps/${mapId}/structure/create`, data);
   }
 
   clearCurrentMapStructure() {
