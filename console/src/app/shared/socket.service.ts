@@ -14,6 +14,7 @@ export class SocketService {
   message: Subject<any> = new Subject<any>();
   executions: Subject<object> = new Subject<object>();
   mapExecution: Subject<MapResult> = new Subject<MapResult>();
+  mapResult: Subject<any> = new Subject<MapResult>();
   pending: Subject<Pending> = new Subject<Pending>();
   test: Pending;
   socketID: string;
@@ -44,10 +45,12 @@ export class SocketService {
       this.setNotification(data);
     });
 
+    this.socket.on('execution-update', (data) => {
+      this.setNotification(data);
+    });
+
     this.socket.on('message', (data) => {
-      this.message.next(data)
-
-
+      this.message.next(data);
     });
 
     this.socket.on('executions', (data: object) => {
@@ -61,6 +64,7 @@ export class SocketService {
     this.socket.on('pending', (data) => {
       this.updateCurrentPending(data);
     });
+
   }
 
   getLogExecutionAsObservable() {
@@ -76,6 +80,14 @@ export class SocketService {
 
   getNotificationAsObservable() {
     return this.notification.asObservable();
+  }
+
+  setMapExecutionResult(data){
+    this.mapResult.next(data)
+  }
+
+  getMapExecutionResult(){
+    return this.mapResult.asObservable()
   }
 
   setNotification(message) {

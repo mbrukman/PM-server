@@ -1,6 +1,6 @@
 const models = require("../models");
 const MapResult = models.MapResult;
-
+const socketService = require("./socket.service");
 let dbQueue = []
 
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -28,6 +28,10 @@ function _runDbFunc() {
     }
     const lastElement = dbQueue[dbQueue.length - 1]
     funcs[lastElement.func](lastElement.data).then(res => {
+
+        if(lastElement.func == "updateAction"){
+            socketService.socket.emit('execution-update', res)
+        }
         dbRetries = 3;
         // console.log(`func ${lastElement.func} res:`, res)
         dbQueue.pop();

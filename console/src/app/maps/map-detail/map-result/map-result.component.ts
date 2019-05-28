@@ -73,7 +73,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       });
 
     // subscribing to map executions results updates.
-    this.mapExecutionResultSubscription = this.socketService.getMapExecutionResultAsObservable().pipe(
+    this.mapExecutionResultSubscription = this.socketService.getMapExecutionResult().pipe(
       filter(result => (<string>result.map) === this.map.id)
     ).subscribe(result => {
         let execution = this.executionsList.find((o) => o.runId === result.runId);
