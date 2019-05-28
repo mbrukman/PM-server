@@ -4,7 +4,7 @@ import { Project } from '../models/project.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { Subscription, fromEvent } from 'rxjs'
 import { take, debounceTime } from 'rxjs/operators';
-import { ActivatedRoute, Data } from '@angular/router';
+import { ActivatedRoute, Data, Router } from '@angular/router';
 
 import {SeoService,PageTitleTypes} from '@app/seo.service';
 
@@ -26,7 +26,8 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
 
   constructor(private projectsService: ProjectsService,
     private route:ActivatedRoute,
-    private seoService:SeoService) {
+    private seoService:SeoService,
+    private readonly router: Router) {
     this.onDataLoad = this.onDataLoad.bind(this);
   }
 
@@ -49,19 +50,34 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
     ).subscribe(()=>{
         this.loadProjectLazy();
       })
+
+
+      let params = this.route.snapshot.queryParams
+      this.page = params.page;
+      this.filterOptions.isArchived = params.archive? params.archive!='false' : null
+      this.filterOptions.sort = params.sort
+      this.filterOptions.globalFilter = params.filter
+      this.reloadProjects()
   }
 
   ngOnDestroy(){
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
+
+  updateUrl(page=this.page): void {
+    this.router.navigate(['projects'], { queryParams:  { archive: this.filterOptions.isArchived, page: page, sort: this.filterOptions.sort, filter: this.filterOptions.globalFilter} });
+  }
+
   clearSearchFilter(){
     this.filterOptions.globalFilter = undefined;
     this.loadProjectLazy()
+    this.updateUrl()
   }
 
 
   reloadProjects(fields=null,page=this.page,filter=this.filterOptions){
+    this.updateUrl(page)
     this.projectsService.filter(fields,page,filter).subscribe(this.onDataLoad);
   }
 

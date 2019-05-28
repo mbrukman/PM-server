@@ -8,7 +8,7 @@ import { FilterOptions } from '@shared/model/filter-options.model'
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DistinctMapResult } from '@shared/model/distinct-map-result.model';
-import { Data, ActivatedRoute } from '@angular/router';
+import { Data, ActivatedRoute, Router } from '@angular/router';
 import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
@@ -30,7 +30,8 @@ export class MapsListComponent implements OnInit, OnDestroy {
   constructor(private mapsService: MapsService,
     private popupService: PopupService,
     private route: ActivatedRoute,
-    private seoService:SeoService) {
+    private seoService:SeoService,
+    private readonly router: Router) {
     this.onDataLoad = this.onDataLoad.bind(this)
   }
 
@@ -49,9 +50,17 @@ export class MapsListComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.loadMapsLazy();
       })
+
+      let params = this.route.snapshot.queryParams
+      this.page = params.page;
+      this.filterOptions.isArchived = params.archive? params.archive!='false' : null
+      this.filterOptions.sort = params.sort
+      this.filterOptions.globalFilter = params.filter
+      this.reloadMaps()
   }
 
   reloadMaps(fields = null, page = this.page, filter = this.filterOptions) {
+    this.updateUrl()
     this.mapsService.filterMaps(fields, page, filter).subscribe(this.onDataLoad);
   }
 
@@ -59,9 +68,15 @@ export class MapsListComponent implements OnInit, OnDestroy {
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
+  
+  updateUrl(page=this.page): void {
+    this.router.navigate(['maps'], { queryParams:  { archive: this.filterOptions.isArchived, page: page, sort: this.filterOptions.sort, filter: this.filterOptions.globalFilter} });
+  }
+  
   clearSearchFilter(){
     this.filterOptions.globalFilter = undefined;
     this.loadMapsLazy()
+    this.updateUrl()
   }
 
 

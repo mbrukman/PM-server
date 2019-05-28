@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit,ViewChild,ElementRef } from '@angular/core';
-import { ActivatedRoute,Data } from '@angular/router';
+import { ActivatedRoute,Data, Router } from '@angular/router';
 import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
 import { PopupService } from '../../shared/services/popup.service';
@@ -32,7 +32,8 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     private projectsService: ProjectsService,
     private popupService: PopupService,
     private mapsService:MapsService,
-    private seoService:SeoService) { }
+    private seoService:SeoService,
+    private readonly router: Router) { }
 
   ngOnInit() {
     this.id = this.route.snapshot.params.id;
@@ -50,9 +51,21 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     ).subscribe(()=>{
         this.loadMapsLazy();
       })
+      let params = this.route.snapshot.queryParams
+      this.page = params.page;
+      this.filterOptions.isArchived = params.archive? params.archive!='false' : null
+      this.filterOptions.sort = params.sort
+      this.filterOptions.globalFilter = params.filter
+      this.getMaps()
+
+  }
+  
+  updateUrl(page=this.page): void {
+    this.router.navigate(['projects', this.id], { queryParams:  { archive: this.filterOptions.isArchived, page: page, sort: this.filterOptions.sort, filter: this.filterOptions.globalFilter} });
   }
 
   getMaps(fields=null,page= 1){
+    this.updateUrl()
     this.mapsService.filterMaps(fields,page,this.filterOptions).subscribe(maps => {
       this.maps = maps.items
     })
