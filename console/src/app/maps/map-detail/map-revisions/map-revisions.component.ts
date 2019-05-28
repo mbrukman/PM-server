@@ -34,8 +34,6 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
   currentStructure: MapStructure;
   viewMode: 'code' | 'design' = 'design';
   latestStructure: MapStructure;
-  @ViewChild('wrapper') wrapper: ElementRef;
-  wrapperChild:any;
   editorOptions = {
     theme: 'vs-dark',
     language: 'javascript',
@@ -58,8 +56,6 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
       this.getMapProject();
       this.loadStructureOnScroll(this.mapId,true);
     });
-    this.wrapperChild = this.wrapper;
-    this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
   }
 
   originalModel: DiffEditorModel = {

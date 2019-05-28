@@ -28,9 +28,7 @@ export class MapDesignComponent implements OnInit {
   scale: number = 1;
   cellView:any;
   processViewWrapper: ProcessViewWrapper;
-  wrapperChild:any
 
-  @ViewChild('wrapper') wrapper: ElementRef;
   @ViewChild(MapGraphComponent) mapGraph: MapGraphComponent;
 
   constructor(
@@ -42,8 +40,7 @@ export class MapDesignComponent implements OnInit {
       this.plugins = plugins;
       this.getCurrentMapStructure();
     });
-    this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
-    this.wrapperChild = this.wrapper;
+
   }
 
   getCurrentMapStructure(){

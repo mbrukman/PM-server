@@ -13,6 +13,7 @@ import { Plugin } from '@plugins/models/plugin.model';
 import { COORDINATION_TYPES, JOINT_OPTIONS } from '@maps/constants'
 import { filter, tap } from 'rxjs/operators';
 
+
 export const linkAttrs = {
   router: { name: 'manhattan' },
   connector: { name: 'rounded' },
@@ -36,8 +37,7 @@ export const linkAttrs = {
 
 export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
 
-  @Input('structure') structure;
-  @Input('wrapper') wrapper; 
+  @Input('mapStructure') mapStructure;
   @Input('isReadOnly') isReadOnly;
   @Output('cellClick') cellClick:  EventEmitter<any> = new EventEmitter<any>();
   @Output('paperClick') paperClick: EventEmitter<any> = new EventEmitter<any>();
@@ -47,7 +47,6 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
 
   graph: joint.dia.Graph;
   paper: joint.dia.Paper;
-  mapStructure: MapStructure;
   dropSubscription: Subscription;
   editing: boolean = false; 
   plugins: Plugin[];
@@ -60,7 +59,8 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
   processViewWrapper: ProcessViewWrapper;
   scaleX = 430;
   scaleY = 240;
-
+  parentNode:any;
+  @ViewChild('wrapper') wrapper:ElementRef
 
   constructor(
     private mapsService: MapsService,
@@ -77,11 +77,9 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
       }
     });
 
-    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().subscribe(structure => {
-      this.mapStructure = structure
-    })
+    this.parentNode = this.isReadOnly ? this.wrapper.nativeElement.parentNode : this.wrapper.nativeElement.parentNode.parentNode
 
-    this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
+    this.parentNode.maxHeight = this.parentNode.offsetHeight;
     this.dropSubscription = this.mapDesignService.getDrop().pipe(
         filter(obj => this.isDroppedOnMap(obj.x, obj.y))
       ).subscribe(obj => {
@@ -101,8 +99,8 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
     this.graph = new joint.dia.Graph;
     this.paper = new joint.dia.Paper({
       el: $(this.mapGraph.nativeElement),
-      width: this.wrapper.nativeElement.offsetWidth,
-      height: this.wrapper.nativeElement.offsetHeight - 80,
+      width: this.parentNode.offsetWidth,
+      height: this.parentNode.offsetHeight - 80,
       gridSize: this.scale,
       model: this.graph,
       snapLinks: { radius: 75 },
@@ -140,10 +138,10 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   ngOnChanges(){
-    if(this.structure && this.structure.content && this.isReadOnly && this.graph){
+    if(this.mapStructure && this.mapStructure.content && this.isReadOnly && this.graph){
       this.paper.scale(0.75, 0.75);
       this.addPaperDrag();
-      this.graph.fromJSON(JSON.parse(this.structure.content))
+      this.graph.fromJSON(JSON.parse(this.mapStructure.content))
     }
   }
 
@@ -216,9 +214,9 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
    * @returns {boolean}
    */
   isDroppedOnMap(x: number, y: number): boolean {
-    let offsetLeft = this.wrapper.nativeElement.offsetLeft;
-    let offsetTop = this.wrapper.nativeElement.offsetTop;
-    let height = this.wrapper.nativeElement.offsetHeight;
+    let offsetLeft = this.parentNode.offsetLeft;
+    let offsetTop = this.parentNode.offsetTop;
+    let height = this.parentNode.offsetHeight;
     return (x > offsetLeft) && (y > offsetTop) && (y < offsetTop + height);
   }
 
@@ -416,7 +414,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
     this.graph.getElements().forEach(c => this.setCellSelectState(c,false));
     const cell = this.graph.getCell(process.uuid);
     this.setCellSelectState(cell);
-    this.paper.setDimensions(this.wrapper.nativeElement.offsetWidth - 250, this.wrapper.nativeElement.offsetHeight);
+    this.paper.setDimensions(this.parentNode.offsetWidth - 250, this.parentNode.offsetHeight);
     this.process = process;
     this.cellClick.emit(process)
   }
