@@ -36,7 +36,7 @@ export const linkAttrs = {
 
 export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
 
-  @Input('content') content;
+  @Input('structure') structure;
   @Input('wrapper') wrapper; 
   @Input('isReadOnly') isReadOnly;
   @Output('cellClick') cellClick:  EventEmitter<any> = new EventEmitter<any>();
@@ -71,7 +71,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
   ngOnInit() {
     this.pluginsService.list().subscribe(plugins => {
       this.plugins = plugins;
-      if(!this.content && !this.isReadOnly){
+      if(!this.isReadOnly){
         this.initMapDraw();
         this.getCurrentMapStructure();
       }
@@ -126,7 +126,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
       interactive: this.isInteractive()
     });
     this.defineShape();
-    this.isReadOnly ? this.readOnlyListener() : this.listeners() 
+    if(!this.isReadOnly) this.listeners() 
   }
 
   isInteractive(){
@@ -140,21 +140,13 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   ngOnChanges(){
-    if(this.content && this.isReadOnly && this.graph){
+    if(this.structure && this.structure.content && this.isReadOnly && this.graph){
       this.paper.scale(0.75, 0.75);
       this.addPaperDrag();
-      this.graph.fromJSON(JSON.parse(this.content))
+      this.graph.fromJSON(JSON.parse(this.structure.content))
     }
   }
 
-  readOnlyListener() {
-    this.paper.on('cell:pointerup', (cellView, evt, x, y) => {
-      if (cellView.model.isLink()) {
-        return;
-      }
-    });
-
-  }
 
   addPaperDrag() {
     let initialPosition = { x: 0, y: 0 };
