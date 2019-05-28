@@ -1280,12 +1280,8 @@ module.exports = {
                     keys.forEach(k => {
                         action.result[k] ? logs.push({ message: k + ':' + action.result[k] }) : null
                     })
-                    logs.push({ message: " ---  " })
                 })
-                logs.push({ message: " ---  " })
             });
-            logs.push({ message: "   " })
-
         })
         return Promise.resolve(logs)
     },
