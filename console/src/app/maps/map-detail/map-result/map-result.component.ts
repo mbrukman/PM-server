@@ -11,6 +11,7 @@ import {PopupService} from '@shared/services/popup.service'
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 import { filter, take, tap, mergeMap } from 'rxjs/operators';
 import * as _ from 'lodash';
+import { ActivatedRoute, Router } from '@angular/router';
 
 const defaultAgentValue = 'default'
 
@@ -50,11 +51,11 @@ export class MapResultComponent implements OnInit, OnDestroy {
     domain: ['#42bc76', '#f85555', '#ebb936', '#3FC9EB']
   };
 
-  constructor(private mapsService: MapsService, private socketService: SocketService, private popupService:PopupService) {
+  constructor(private route:ActivatedRoute, private router:Router, private mapsService: MapsService, private socketService: SocketService, private popupService:PopupService) {
   }
 
   ngOnInit() {
-    
+
     // getting current map and requesting the executions list
     this.mapSubscription = this.mapsService.getCurrentMap().pipe(filter(map=>map)).subscribe(map => {
         this.map= map;
@@ -111,7 +112,13 @@ export class MapResultComponent implements OnInit, OnDestroy {
         this.maxLengthReached = true
       }
       this.executionsList.push(...executions);
-      if (this.page == 1 && this.executionsList[0])
+  
+
+      if(this.route.snapshot.data.execution){
+        this.selectedExecution = this.route.snapshot.data.execution
+        this.route.snapshot.data.execution = null
+        this.selectExecution(this.selectedExecution.id);
+      }else if (this.page == 1 && this.executionsList[0])
         this.selectExecution(this.executionsList[0]._id);
     })
   }
@@ -177,6 +184,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       mergeMap(result => this.mapsService.logsList((<string>result.map), result.runId)) // get the logs list for this execution
     ).subscribe(logs => {
         this.selectedExecutionLogs = logs;
+        this.router.navigate(['results', executionId], { relativeTo: this.route.parent });
       });
   }
 
