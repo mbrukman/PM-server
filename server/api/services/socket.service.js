@@ -7,6 +7,9 @@ function init(server){
     _socket = socket(server);
     _socket.on('connection', function (socket) {
         winston.log('info', 'a user connected');
+        _socket.on('execution-update',(data) =>{
+            console.log(data);
+        })
     });
     return _socket;
 }

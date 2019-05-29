@@ -45,9 +45,7 @@ export class SocketService {
       this.setNotification(data);
     });
 
-    this.socket.on('execution-update', (data) => {
-      this.setNotification(data);
-    });
+    this.socket.on()
 
     this.socket.on('message', (data) => {
       this.message.next(data);
@@ -65,6 +63,10 @@ export class SocketService {
       this.updateCurrentPending(data);
     });
 
+  }
+
+  joinRoom(id){
+    this.socket.emit('execution-update',id)
   }
 
   getLogExecutionAsObservable() {
