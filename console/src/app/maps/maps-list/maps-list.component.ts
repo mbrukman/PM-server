@@ -25,6 +25,8 @@ export class MapsListComponent implements OnInit, OnDestroy {
   filterKeyUpSubscribe: Subscription;
   isInit:boolean=true;
 
+  readonly tablePageSize = 15;
+
   @ViewChild('globalFilter') globalFilterElement: ElementRef;
 
   constructor(private mapsService: MapsService,
@@ -69,7 +71,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
     let fields, page;
     if (event) {
       fields = event.filters || null;
-      page = event.first / 15 + 1;
+      page = (event.first / this.tablePageSize) + 1;
       if (event.sortField) {
         this.filterOptions.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }

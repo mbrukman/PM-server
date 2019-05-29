@@ -29,8 +29,9 @@ export class  MapsCardsComponents implements OnInit {
     }
   }
 
-  goToProject($event, id){
+  goToProject($event : Event, id){
     $event.stopPropagation();
+    $event.preventDefault();
     this.router.navigate(['projects',id]);
   }
 
