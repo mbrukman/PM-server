@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { MapsService } from '../maps.service';
@@ -20,6 +20,8 @@ export class MapCreateComponent implements OnInit, OnDestroy {
   paramsReq: any;
   map: Map;
   projectsDropDown:SelectItem[];
+  newProject:boolean = false;
+  NEW_PROJECT :String = 'createNewProject'
   constructor(private mapsService: MapsService, private projectsService: ProjectsService, private router: Router, private route: ActivatedRoute) {
   }
 
@@ -42,9 +44,12 @@ export class MapCreateComponent implements OnInit, OnDestroy {
       var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt'};
       this.projectsService.filter(null,null,filterOptions).subscribe(data => {
         this.projects = data.items;
-        this.projectsDropDown = this.projects.map(project => {
+        let projectOptions = this.projects.map(project => {
           return {label:project.name,value:project._id}
         })
+        this.projectsDropDown = [{label:'New Project', value: this.NEW_PROJECT}]
+        this.projectsDropDown.push(...projectOptions);
+
         if (params.map) {
           data.items.forEach(project => {
             const index = (<string[]>project.maps).indexOf(params.map);
@@ -64,6 +69,8 @@ export class MapCreateComponent implements OnInit, OnDestroy {
 
   initMapForm(project?) {
     this.mapForm = new FormGroup({
+      projectName: new FormControl(''),
+      projectDescription: new FormControl(""),
       project: new FormControl(project || '', Validators.required),
       name: new FormControl(null, Validators.required),
       description: new FormControl('')
@@ -76,16 +83,31 @@ export class MapCreateComponent implements OnInit, OnDestroy {
   }
 
 
+  onChange(val){
+    this.newProject = val.value == this.NEW_PROJECT
+  }
   onSubmitForm(value) {
     if (this.map) {
       this.mapsService.updateMap(this.map.id, value).subscribe(map => {
         this.router.navigate(['/maps', this.map.id]);
       });
     } else {
-      this.mapsService.createMap(value).subscribe(map => {
-        this.router.navigate(['/maps', map.id]);
-      });
+      if(this.mapForm.controls.project.value==this.NEW_PROJECT){
+        this.projectsService.create({name:value.projectName, description: value.projectDescription}).subscribe(res=>{
+          value.project = res.id 
+          this.createMap(value)
+        })
+      }
+      else{
+        this.createMap(value)
+      }
     }
+  }
+
+  createMap(value){
+    this.mapsService.createMap(value).subscribe(map => {
+      this.router.navigate(['/maps', map.id]);
+    });
   }
 
 }
