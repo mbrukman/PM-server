@@ -90,7 +90,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     this.mapExecutionMessagesSubscription = this.socketService.getLogExecutionAsObservable().pipe(
       filter(message => this.selectedExecution && (message.runId === this.selectedExecution.runId))
     ).subscribe(message => {
-        this.selectedExecutionLogs.push(message);
+      this.selectedExecutionLogs? this.selectedExecutionLogs.push(message): this.selectedExecutionLogs = [message];
         this.scrollOutputToBottom();
       });
 
@@ -156,6 +156,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
    * @param executionId
    */
   selectExecution(executionId) {
+    this.selectedExecutionLogs = null
     this.selectedProcess = null;
     this.mapsService.executionResultDetail(this.map.id, executionId).pipe(
       tap(result => {
@@ -174,9 +175,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
         }
         this.changeAgent();
       }),
-      mergeMap(result => this.mapsService.logsList((<string>result.map), result.runId)) // get the logs list for this execution
-    ).subscribe(logs => {
-        this.selectedExecutionLogs = logs;
+      mergeMap(result => 
+        this.mapsService.logsList((<string>result.map), result.runId)) // get the logs list for this execution
+        ).subscribe(logs => {
+          if(!this.executing.length || this.executing.findIndex(runId=> runId == this.selectedExecution.runId) == -1){
+            this.selectedExecutionLogs = logs;
+          }
       });
   }
 
