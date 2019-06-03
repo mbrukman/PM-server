@@ -47,6 +47,6 @@ export class ProjectsService {
   }
   
   createMapStructure(mapId: string, structure: MapStructure) {
-    return this.http.post<MapStructure>('api/maps/' + mapId + '/structure/create', structure);
+    return this.http.post<MapStructure>('api/maps/' + mapId + '/structure/create', {structure});
   }
 }
