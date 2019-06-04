@@ -1,38 +1,18 @@
 @import "~src/assets/sass/variables";
 
-.row {
-  flex-grow: 1;
-  margin-left: 0;
-  flex-wrap: initial;
-  margin : 0;
-
+.main-admin {
+  display: flex;
+  height: 100%;
   .side-nav {
     background: $kh-background;
-    flex : 0 0 $manage-sidenav-width;
-    height: 100%;
-    width: $manage-sidenav-width;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    overflow-x: hidden;
     .nav{
       padding-top: 19px;
     }
   }
   .main-content {
-    flex-grow: 1;
-    display: flex;
+    width: 100%;
 
-    ::ng-deep{
-      > *:not(router-outlet){
-        display: flex;
-        flex-grow: 1;
 
-        .head-title{
-          padding-left: $manage-sidenav-width;
-        }
-      }
-    }
   }
 }
 
