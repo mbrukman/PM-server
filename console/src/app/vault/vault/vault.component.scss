@@ -11,8 +11,7 @@
         }
     }
 
-    .content-wrapper{
-        padding: 18px $admin-padding;
+    .vault-list{
         @include table();
         .actions-wrapper{
             width: 100%;

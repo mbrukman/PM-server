@@ -127,6 +127,9 @@ textarea {
   background: transparent; /* make scrollbar invisible */
 }
 
+.content-wrapper{
+    padding: 18px $admin-padding;     
+}
 
 .main {
   overflow-y: auto;
