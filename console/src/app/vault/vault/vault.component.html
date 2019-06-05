@@ -4,7 +4,7 @@
     <button class="kh-btn kh-btn-blue add-item" (click)="upsertItem()">Add item</button>
   </div>
 
-  <div class="content-wrapper vault-list">
+  <div class="content-wrapper">
     <p-dataTable [value]="vaultItems" [rows]="15" [paginator]="true" [pageLinks]="4" [hidden]="!vaultItems || !vaultItems.length">
       <p-column field="name" header="Name" [sortable]="true" [style]="{'width':'300px'}">
         <ng-template let-col let-item="rowData" pTemplate="body">
