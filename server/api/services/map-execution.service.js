@@ -482,7 +482,7 @@ async function executeMap(runId, map, mapStructure, agents, context) {
  * @returns {string} - the new runId
  */
 async function execute(mapId, structureId, socket, configurationName, triggerReason, triggerPayload = null) {
-    trigger = triggerReason;
+
     clientSocket = socket; // save socket in global 
     map = await mapsService.get(mapId)
     if (!map) { throw new Error(`Couldn't find map`); }
