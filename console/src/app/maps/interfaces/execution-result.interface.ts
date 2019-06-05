@@ -41,7 +41,6 @@ export interface IAgentResult {
 
 export interface IMapResult {
   map: string | IMap;
-  runId: string;
   structure: string | IMapStructure;
   agentsResults?: [IAgentResult];
   configuration: MapStructureConfiguration;
