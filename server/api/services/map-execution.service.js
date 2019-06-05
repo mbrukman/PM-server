@@ -585,6 +585,21 @@ function areAllAgentsWaitingToStartThis(runId, agent, process) {
 }
 
 /**
+ * 
+ * @param {String} runId 
+ * @param {String} agentKey 
+ * @param {String} text - the parallel param of action or process 
+ */
+function _getParallelExecutionsNum(runId, agentKey, text){
+    if(!text){return 1}
+    let numProcessParallel = 1;
+    try {
+        numProcessParallel = vm.runInNewContext(text, executions[runId].executionAgents[agentKey].context);
+    } catch (e) {} // I dont care :) 
+    return numProcessParallel || 1  
+}
+
+/**
  * In case of wait condition, go over all agents and runs pending process   
  * @param {*} runId 
  * @param {*} map 
@@ -601,6 +616,8 @@ function runAgentsFlowControlPendingProcesses(runId, map, structure, process) {
             updateProcessContext(runId, agentsStatus[i], process.uuid, processToRun.iterationIndex, { status: statusEnum.RUNNING, startTime: new Date() })
             process.iterationIndex = processToRun.iterationIndex
             runProcess(map, structure, runId, agentsStatus[i], process);
+            
+            executeProcessParallel(runId, agentsStatus[i], process, process.uuid, map, structure, 1)
         }
     }
 }
@@ -672,6 +689,32 @@ function checkProcessCoordination(process, runId, agent, structure) {
 
 }
 
+/**
+ * Creates processes contex and run them  
+ * @param {*} runId 
+ * @param {*} agent 
+ * @param {*} process 
+ * @param {*} processUUID 
+ * @param {*} map 
+ * @param {*} structure 
+ * @param {*} startIndex - in case of pending/wait condition, startIndex=1. (because one process was created )
+ */
+function executeProcessParallel(runId, agent, process, processUUID, map, structure, startIndex = 0){
+    let promises = []
+    let numToExecProcess = _getParallelExecutionsNum(runId, agent.key, process.numProcessParallel)
+    for (let index = startIndex; index < numToExecProcess; index++) {
+        let copyProcess = Object.assign({}, process)
+        createProcessContext(runId, agent, processUUID, copyProcess)
+        promises.push(runProcess(map, structure, runId, agent, copyProcess))
+    }
+
+    Promise.all(promises)
+    .catch(err=>{
+        winston.log('error', `structureId: ${structure.id}, process:${process._id.toString()}` + err);
+        stopExecution(runId, null, 'error occurred : ' + err); 
+    })
+}
+
 
 
 /**
@@ -724,13 +767,10 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
             if (process.flowControl === 'wait') {
                 runAgentsFlowControlPendingProcesses(runId, map, structure, process)
             }
-
-            createProcessContext(runId, agent, successor, process)
-            promises.push(runProcess(map, structure, runId, agent, process))
+            executeProcessParallel(runId, agent, process, successor, map, structure)
         }
     })
 
-    return Promise.all(promises)
 }
 
 function updateAgentContext(runId, agent, agentData) {
@@ -821,6 +861,39 @@ function runProcessFunc(runId, agent, process, fieldName, funcToRun) {
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, processData);
 }
 
+/**
+ * returns array of actions to execute
+ */
+function _getProcessActionsToExec(runId, process, agent, map, structure ){
+    let plugin = executions[runId].plugins.find(o => o.name.toString() == process.used_plugin.name)
+
+    let actionsArray = [];
+
+    process.actions.forEach((action, i) => {
+        action.name = (action.name || `Action #${i + 1} `);
+
+        let numToExecProcess = _getParallelExecutionsNum(runId, agent.key, action.numParallel)
+        for (let index = 0; index < numToExecProcess; index++) {
+            let copyAction = _.cloneDeep(action)
+            
+            actionsArray.push([
+                map,
+                structure,
+                runId,
+                agent,
+                process,
+                process.iterationIndex,
+                copyAction,
+                plugin.toJSON(),
+                executions[runId].clientSocket
+            ])
+        }
+
+
+    });
+    return actionsArray
+}
+
 
 /**
  * Returns a function for async.each call. this function is adding the process to the context, running all condition, filter, pre and post and calling the action execution function
@@ -849,29 +922,10 @@ function runProcess(map, structure, runId, agent, process) {
 
         runProcessFunc(runId, agent, process, 'preRunResult', process.preRun)
 
-        let plugin = executions[runId].plugins.find(o => o.name.toString() == process.used_plugin.name)
+        let actionsArray = _getProcessActionsToExec(runId, process, agent, map, structure);
 
-        let actionsArray = [];
-
-        process.actions.forEach((action, i) => {
-            action.name = (action.name || `Action #${i + 1} `);
-            actionsArray.push([
-                map,
-                structure,
-                runId,
-                agent,
-                process,
-                process.iterationIndex,
-                _.cloneDeep(action),
-                plugin.toJSON(),
-                executions[runId].clientSocket
-            ])
-        });
-
-        let reduceFunc = (promiseChain, currentAction, index) => {
-            // let actionId = (currentAction[6]._id).toString()
+        let reduceFunc = (promiseChain, currentAction, index) => { /// todo maybe to add iteration index to action
             currentAction[6].actionIndex = index;
-            // executions[runId].executionAgents[agent.key].context.processes[process.uuid][process.iterationIndex].actions[actionId] = currentAction[6];
 
             return promiseChain.then(chainResults => {
                 return executeAction.apply(null, currentAction).then(currentResult => {
