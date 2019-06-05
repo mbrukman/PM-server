@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { MapsService } from '../../maps/maps.service';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { ProcessResult } from '@app/maps/models';
-
+import { Data, ActivatedRoute } from '@angular/router';
 import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
@@ -14,13 +13,15 @@ export class DashboardComponent implements OnInit {
   executions: DistinctMapResult[];
   results : ProcessResult[][] = [];
   mode: string = 'grid';
-  constructor(private mapsService: MapsService,
+  constructor(
+    private route : ActivatedRoute,
     private seoService:SeoService) {
   }
 
   ngOnInit() {
     this.seoService.setTitle(PageTitleTypes.Dashboard)
-    this.mapsService.getDistinctMapExecutionsResult().subscribe(executions => {
+    this.route.data.subscribe((data: Data) => {
+      let executions = data['mapsResult'];
       this.executions = executions;
       if(this.executions){
         for(let i=0,length=this.executions.length;i<length;i++){
