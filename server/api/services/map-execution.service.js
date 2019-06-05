@@ -1243,7 +1243,7 @@ function cancelPending(mapId, runId, socket) {
 
 }
 
-function sortData(data) {
+function sortDatabyFinishTime(data) {
     return data.sort((a, b) => {
       return -(new Date(b.finishTime) - new Date(a.finishTime));
     });
@@ -1271,17 +1271,18 @@ module.exports = {
         let q = { runId: resultId };
         let mapResult = await MapResult.findOne(q).populate({path:'agentsResults.agent', select:'name'}).exec() 
         let logs = []
-        let structure = await mapsService.getMapStructure(mapResult.map, mapResult.structure)
-        let processNames = {}
-        let actionNames = {}
+        let structure = await mapsService.getMapStructure(mapResult.map, mapResult.structure) // for process/actions names (populate on names didnt work)
+        let processNames = {} // a map <process.id, process name>  
+        let actionNames = {} // same as above 
         structure.processes.forEach((process,iProcess) => {
-            processNames[process.id] = process.name || (processNames[process.id]? processNames[process.id] :`Process #${iProcess+1}`)
+            processNames[process.id] = process.name || (processNames[process.id]? processNames[process.id] :`Process #${iProcess+1}`) // extract process name
             if(!process.actions){return}
             process.actions.forEach((action, iAction)=>{
-                actionNames[action.id] = action.name || `Action #${iAction+1}`
+                actionNames[action.id] = action.name || `Action #${iAction+1}` // extract action name 
             })
         });
         
+        // sort all actions results by finishTime 
         mapResult.agentsResults.forEach((agentResult) => {
             agentResult.processes.forEach((process) => {
                 process.actions.forEach((action) => {
@@ -1289,8 +1290,8 @@ module.exports = {
                 })
             });
         })
-        logs = sortData(logs)
-        logs.map(log=>delete log.finishTime)
+        logs = sortDatabyFinishTime(logs)
+        logs.forEach(log=>delete log.finishTime)
         return Promise.resolve(logs)
     },
 
