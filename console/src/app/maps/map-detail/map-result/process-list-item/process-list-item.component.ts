@@ -42,7 +42,7 @@ export class ProcessListItemComponent implements OnInit{
   }
 
   isWarning(status){
-    return status == 'stopped' || status == 'skipped'
+    return status == 'stopped' || status == 'skipped';
   }
 
 }

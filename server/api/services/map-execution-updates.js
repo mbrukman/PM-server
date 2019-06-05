@@ -29,9 +29,6 @@ function _runDbFunc() {
     const lastElement = dbQueue[dbQueue.length - 1]
     funcs[lastElement.func](lastElement.data).then(res => {
 
-        if(lastElement.func == "updateAction"){
-            socketService.socket.emit('execution-update', res)
-        }
         dbRetries = 3;
         // console.log(`func ${lastElement.func} res:`, res)
         dbQueue.pop();

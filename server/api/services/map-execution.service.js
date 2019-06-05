@@ -18,15 +18,18 @@ const vaultService = require('./vault.service')
 const helper = require('./map-execution.helper')
 const dbUpdates = require('./map-execution-updates')({ stopExecution })
 const shared = require('../shared/recents-maps')
-
+const socketService = require("./socket.service");
 
 const statusEnum = models.statusEnum
-let clientSocket
+let clientSocket;
 let executions = {};
 let pending = {};
-
 let libpm = ''; // all sdk code.
 let libpmObjects = {}
+
+
+
+
 
 fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 'utf8', function (err, data) {
     // opens the lib_production file. this file is used for user to use overwrite custom function at map code
@@ -240,6 +243,8 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
         _updateRawOutput(map._id, runId, msg, statusEnum.ERROR)
     }
 
+    // console.log(executions)
+
     let options = {
         data: actionData,
         mapResultId: executions[runId].mapResultId,
@@ -447,6 +452,11 @@ async function executeMap(runId, map, mapStructure, agents, context) {
     if(!startNode){
         stopExecution(runId, clientSocket, "link is missing to start execution")
     }
+
+    let nsp = socketService.getNamespaceSocket('execution-update-'+ executions[runId].mapResultId);
+    nsp['actions'] = [];
+
+
     let promises = []
     for (let i = 0, length = agents.length; i < length; i++) {
         try {
@@ -472,6 +482,7 @@ async function executeMap(runId, map, mapStructure, agents, context) {
  * @returns {string} - the new runId
  */
 async function execute(mapId, structureId, socket, configurationName, triggerReason, triggerPayload = null) {
+    trigger = triggerReason;
     clientSocket = socket; // save socket in global 
     map = await mapsService.get(mapId)
     if (!map) { throw new Error(`Couldn't find map`); }
@@ -839,6 +850,22 @@ function runProcess(map, structure, runId, agent, process) {
         }
 
         if (!passProcessCondition(runId, agent, process)) {
+            let res = {
+                process:{
+                    process:process._id,
+                    index:process.iterationIndex,
+                    uuid:process.uuid,
+                    startTime:new Date(),
+                    finishTime:new Date()
+                },
+                agent:{
+                    _id:agent.id,
+                    name:agent.name
+                },               
+            
+            } 
+            let nsp = socketService.getNamespaceSocket('execution-update-'+executions[runId].mapResultId);
+            nsp.emit('updateAction',res)
             if (process.mandatory) { // mandatory process failed, stop executions
                 executions[runId].executionAgents[agent.key].status = statusEnum.ERROR;
                 return stopExecution(runId, null, "Mandatory process failed" );
@@ -864,7 +891,8 @@ function runProcess(map, structure, runId, agent, process) {
                 process.iterationIndex,
                 _.cloneDeep(action),
                 plugin.toJSON(),
-                executions[runId].clientSocket
+                executions[runId].clientSocket,
+            
             ])
         });
 
@@ -1066,7 +1094,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
         agentPromise = sendActionViaRequest(agent, actionExecutionForm);
     }
 
-    return runAction();
+    return runAction(actionData);
 
     /**
      * Declare a timeout function. 
@@ -1074,7 +1102,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
      * In case of retries- try again
      * @returns {object} - action result
      */
-    function runAction() {
+    function runAction(actionData) {
 
         let timeoutFunc = helper.generateTimeoutFun(action)
 
@@ -1093,20 +1121,46 @@ async function executeAction(map, structure, runId, agent, process, processIndex
                 }
                 return result
             }
-        }).then((result) => {
-            let actionData = {
-                status: result.status,
-                result: result
-            }
+        }).then(async(result) => {
+            actionData.status = result.status;
+            actionData.result = result;
+
             if (result.status == statusEnum.ERROR && action.retriesLeft > 0) { // retry handling
                 actionData.retriesLeft = --action.retriesLeft
                 updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData)
-                return runAction();
+                return runAction(actionData);
             }
             actionData.finishTime = new Date();
             let msg = `'${process.name} ' - '${action.name}' result: ${JSON.stringify(result)} (${agent.name})`
             _updateRawOutput(map._id, runId, msg, result.status)
             updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData);
+            
+            let res = {
+                data:actionData,
+                process:{
+                    process:process._id,
+                    index:process.iterationIndex,
+                    uuid:process.uuid
+                },
+                agent:{
+                    _id:agent.id,
+                    name:agent.name
+                }
+            } 
+
+            let nsp = socketService.getNamespaceSocket('execution-update-'+executions[runId].mapResultId);
+            nsp.actions.push(res)
+            Object.keys(nsp.sockets).forEach(socket => {
+                let clientSocket = nsp.sockets[socket];
+                if(clientSocket.isFirstMessageToSocket){
+                    clientSocket.emit('updateActions',nsp.actions)
+                    clientSocket.isFirstMessageToSocket = false
+                }
+                else{
+                    clientSocket.emit('updateAction',res)
+                }
+            })
+
             return result;
         });
     }
