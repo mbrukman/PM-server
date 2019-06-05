@@ -112,4 +112,10 @@ export class MapDesignComponent implements OnInit {
     this.paper.scale(this.scale, this.scale);
   }
 
+  onMapContentUpdate(graphContent) {
+    if ((graphContent != this.mapStructure.content) && (this.mapStructure)) {
+      this.mapStructure.content = graphContent;
+      this.mapsService.setCurrentMapStructure(this.mapStructure);
+    }
+  }
 }

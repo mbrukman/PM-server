@@ -3,7 +3,7 @@
       <h3 class="pane-header" >Design
           <i class="material-icons" (click)="onClose()" [hidden]="!editing">keyboard_arrow_right</i>
       </h3>
-      <app-map-graph (cellAdded)="addNewProcess($event)"  (cellClick)="editProcess($event)" (paperClick)="onClose()" ></app-map-graph>
+      <app-map-graph (cellAdded)="addNewProcess($event)"  (cellClick)="editProcess($event)" (paperClick)="onClose()" (save)="onMapContentUpdate($event)"></app-map-graph>
   </div>
   <div class="map-management col-4" *ngIf="editing">
     <app-process-form [processViewWrapper]="processViewWrapper" (saved)="onSave($event)" (close)="onClose($event)"

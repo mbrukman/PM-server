@@ -42,6 +42,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
   @Output('cellClick') cellClick:  EventEmitter<any> = new EventEmitter<any>();
   @Output('paperClick') paperClick: EventEmitter<any> = new EventEmitter<any>();
   @Output('cellAdded') cellAdded: EventEmitter<any> = new EventEmitter<any>();
+  @Output('save') save:  EventEmitter<any> = new EventEmitter<string>();
 
   @ViewChild('mapGraph') mapGraph: ElementRef;
 
@@ -91,7 +92,6 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
 
   ngOnDestroy() {
     this.dropSubscription.unsubscribe();	
-    //this.mapStructureSubscription.unsubscribe();
     this.deselectAllCellsAndUpdateStructure();
   }
 
@@ -178,17 +178,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
     filter(structure => !!structure)
   ).subscribe(structure => {
     this.initMapDraw();
-    for(let i=0,length=structure.processes.length;i<length;i++){
-      let imageProcess = this.graph.getCell(structure.processes[i].uuid)
-      if (!imageProcess) continue;
-      for(let j =0,pluginsLength = this.plugins.length;j<pluginsLength;j++){
-        if((imageProcess.attributes.attrs['.p_id'].text == '' || imageProcess.attributes.attrs['.p_id'].text != this.plugins[j].id) && this.plugins[j].name == structure.processes[i].used_plugin.name){
-          this.updateNodePid(structure.processes[i].uuid,this.plugins[j].id);
-          break;
-        }
-      }
-    }
-    this.onMapContentUpdate()
+    this.save.emit(JSON.stringify(this.graph.toJSON()));
   });
  }
 
@@ -221,7 +211,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   deselectAllCellsAndUpdateStructure() {
-    this.onMapContentUpdate();
+    this.save.emit(JSON.stringify(this.graph.toJSON()));
   }
 
   addNewLink(cell) {
@@ -323,14 +313,15 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
     const plugin = this.plugins.find((o) => {
       return o._id === pluginId;
     });
+    let image = plugin ? plugin.fullImageUrl : obj.cell.model.attributes.attrs.image['xlink:href'];
 
     let imageModel = this.getPluginCube({
       x: obj.x - (this.scaleX * this.scale) - this.paper.translate().tx,
       y: obj.y - (this.scaleY * this.scale) - this.paper.translate().ty
-    }, pluginDisplayName, plugin.fullImageUrl,pluginId);
+    }, pluginDisplayName, image ,pluginId);
 
     this.graph.addCell(imageModel);
-    process.used_plugin = { name: plugin.name, version: plugin.version };
+    process.used_plugin = process.used_plugin || { name: plugin.name, version: plugin.version };
     process.uuid = <string>imageModel.id;
     this.cellAdded.emit(process);
     this.deselectAllCellsAndUpdateStructure();
@@ -397,7 +388,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
           });
         }
 
-        this.onMapContentUpdate();
+        this.save.emit(JSON.stringify(this.graph.toJSON()));
       }
     }
     this.center();
@@ -521,6 +512,14 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
     }
   }
 
+  changeCurrentContent(){
+    this.graph.fromJSON(JSON.parse(this.mapStructure.content))
+  }
+
+  onClear(){
+    this.graph.clear();
+  }
+
   onDelete() {
     this.graph.removeCells([this.graph.getCell(this.process.uuid)]);
     this.process = null;
@@ -560,7 +559,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
       console.error("cellView is not the cell to update!");
       return;
     }
-    this.onMapContentUpdate()
+    this.save.emit(JSON.stringify(this.graph.toJSON()));
   }
 
   updateNodePid(uuid:string,id:string){
@@ -648,18 +647,10 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
     return new joint.shapes.devs['MyImageModel'](options);
   }
 
-  private onMapContentUpdate() {
-    let graphContent = JSON.stringify(this.graph.toJSON());
-    if ((graphContent != this.mapStructure.content) && (this.mapStructure)) {
-      this.mapStructure.content = graphContent;
-      this.mapsService.setCurrentMapStructure(this.mapStructure);
-    }
-  }
-
   findPluginForProcess(process,plugins){
     if(process.used_plugin){
         for(let i=0, pluginsLength = plugins.length; i<pluginsLength; i++){
-            if(process.used_plugin.name == plugins[i].name){
+            if(process.used_plugin.name == plugins[i].name){             
                 return plugins[i]
             }
         }

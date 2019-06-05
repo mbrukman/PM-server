@@ -14,6 +14,8 @@ import { FilterOptions } from '@shared/model/filter-options.model';
 import { take, filter, mergeMap } from 'rxjs/operators';
 import { MapDuplicateOptions } from '@maps/models/map-duplicate-options.model';
 import { Subscription } from 'rxjs';
+import { MapGraphComponent } from '@app/shared/components/map-graph/map-graph.component';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-map-revisions',
@@ -46,6 +48,7 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
     theme: 'vs-dark'
   };
   mapStructureSubscription: Subscription;
+  @ViewChild(MapGraphComponent) mapGraph: MapGraphComponent;
   
 
   constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private popupService:PopupService) {}
@@ -135,7 +138,6 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
     this.mapsService.getMapStructure(this.mapId, structureId)
       .subscribe(structure => {
         this.currentStructure = structure;
-        //this.currentGraph.fromJSON(JSON.parse(structure.content));
         this.originalModel = {
           code : structure.code,
           language : 'javascript'
@@ -149,14 +151,8 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
         }
       });
 
-   
   }
 
-  // onResize(event) {
-  //   // when resizing window currentPaper size should be updated
-  //   this.currentPaper.setDimensions(this.wrapper.nativeElement.offsetWidth, this.wrapper.nativeElement.offsetHeight);
-  //   this.latestPaper.setDimensions(this.wrapper.nativeElement.offsetWidth, this.wrapper.nativeElement.offsetHeight);
-  // }
 
   onVersionScroll(event) {
   }
@@ -169,13 +165,13 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
 
   changeMode(mode: 'code' | 'design') {
     this.viewMode = mode;
-    //this.currentGraph.clear();
+    this.mapGraph.onClear();
     if (mode === 'code') {
       this.loadCodeDiff();
     } else {
       setTimeout(() => {
 
-        //this.currentGraph.fromJSON(JSON.parse(this.currentStructure.content));
+        this.mapGraph.changeCurrentContent()
       }, 0);
     }
   }
