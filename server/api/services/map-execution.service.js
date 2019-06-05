@@ -243,8 +243,6 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
         _updateRawOutput(map._id, runId, msg, statusEnum.ERROR)
     }
 
-    // console.log(executions)
-
     let options = {
         data: actionData,
         mapResultId: executions[runId].mapResultId,

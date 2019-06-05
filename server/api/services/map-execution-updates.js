@@ -1,6 +1,5 @@
 const models = require("../models");
 const MapResult = models.MapResult;
-const socketService = require("./socket.service");
 let dbQueue = []
 
 const ObjectId = require('mongoose').Types.ObjectId;
