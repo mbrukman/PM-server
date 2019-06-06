@@ -19,7 +19,6 @@ import {SeoService,PageTitleTypes} from '@app/seo.service';
 export class MapsListComponent implements OnInit, OnDestroy {
   maps: Map[];
   resultCount: number = 0;
-  page: number = 1;
   filterOptions: FilterOptions = new FilterOptions();
   recentMaps: DistinctMapResult[];
   filterKeyUpSubscribe: Subscription;
@@ -37,6 +36,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
+    this.filterOptions = this._getObjectFrom(this.route.snapshot.queryParams)
     this.seoService.setTitle(PageTitleTypes.MapsList)
     this.route.data.subscribe((data: Data) => {
       this.onDataLoad(data['maps']);
@@ -51,26 +51,30 @@ export class MapsListComponent implements OnInit, OnDestroy {
         this.loadMapsLazy();
       })
 
-      let params = this.route.snapshot.queryParams
-      this.page = params.page;
-      this.filterOptions.isArchived = params.archive? params.archive!='false' : null
-      this.filterOptions.sort = params.sort
-      this.filterOptions.globalFilter = params.filter
-      this.reloadMaps()
   }
 
-  reloadMaps(fields = null, page = this.page, filter = this.filterOptions) {
+  reloadMaps(fields = null, filter = this.filterOptions) {
     this.updateUrl()
-    this.mapsService.filterMaps(fields, page, filter).subscribe(this.onDataLoad);
+    this.mapsService.filterMaps(fields, filter).subscribe(this.onDataLoad);
   }
 
   ngOnDestroy() {
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
+  _getObjectFrom(obj) : FilterOptions{
+    let data = this.filterOptions
+    let filterKeys = Object.keys(obj)
+    filterKeys.forEach(field=>{
+      data[field] = obj[field] || this.filterOptions[field]
+    })
+    return data;
+  }
   
-  updateUrl(page=this.page): void {
-    this.router.navigate(['maps'], { queryParams:  { archive: this.filterOptions.isArchived, page: page, sort: this.filterOptions.sort, filter: this.filterOptions.globalFilter} });
+  updateUrl(): void {
+    let data = this._getObjectFrom(this.filterOptions)
+        
+    this.router.navigate(['maps'], { queryParams: data});
   }
   
   clearSearchFilter(){
@@ -93,7 +97,8 @@ export class MapsListComponent implements OnInit, OnDestroy {
       this.isInit=false;
       return;
     }
-    this.reloadMaps(fields, page, this.filterOptions)
+    this.filterOptions.page = page
+    this.reloadMaps(fields, this.filterOptions)
   }
 
   deleteMap(id) {

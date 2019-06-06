@@ -32,6 +32,7 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.filterOptions = this._getObjectFrom(this.route.snapshot.queryParams)
     this.seoService.setTitle(PageTitleTypes.ProjectsList)
     this.route.data.subscribe((data:Data) => {
       this.onDataLoad(data['projects']);
@@ -39,7 +40,7 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
 
     let featuredFilterOptions = new FilterOptions();	
     featuredFilterOptions.limit = 4;	
-    this.projectsService.filter(null, this.page,featuredFilterOptions).pipe(	
+    this.projectsService.filter(null, featuredFilterOptions).pipe(	
       take(1)).subscribe(data => {	
       if (data)	
         this.featuredProjects = data.items;	
@@ -50,23 +51,25 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
     ).subscribe(()=>{
         this.loadProjectLazy();
       })
-
-
-      let params = this.route.snapshot.queryParams
-      this.page = params.page;
-      this.filterOptions.isArchived = params.archive? params.archive!='false' : null
-      this.filterOptions.sort = params.sort
-      this.filterOptions.globalFilter = params.filter
-      this.reloadProjects()
   }
 
   ngOnDestroy(){
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
+  _getObjectFrom(obj) : FilterOptions{
+    let data = this.filterOptions
+    let filterKeys = Object.keys(obj)
+    filterKeys.forEach(field=>{
+      data[field] = obj[field] || this.filterOptions[field]
+    })
+    return data;
+  }
 
-  updateUrl(page=this.page): void {
-    this.router.navigate(['projects'], { queryParams:  { archive: this.filterOptions.isArchived, page: page, sort: this.filterOptions.sort, filter: this.filterOptions.globalFilter} });
+  updateUrl(): void {
+    let data =  Object.assign({}, this._getObjectFrom(this.filterOptions))
+    delete data.filter
+    this.router.navigate(['projects'], { queryParams:  data });
   }
 
   clearSearchFilter(){
@@ -76,9 +79,9 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
   }
 
 
-  reloadProjects(fields=null,page=this.page,filter=this.filterOptions){
-    this.updateUrl(page)
-    this.projectsService.filter(fields,page,filter).subscribe(this.onDataLoad);
+  reloadProjects(fields=null,filter=this.filterOptions){
+    this.updateUrl()
+    this.projectsService.filter(fields,filter).subscribe(this.onDataLoad);
   }
 
   loadProjectLazy(event?) {
@@ -94,7 +97,8 @@ export class ProjectsListComponent implements OnInit, OnDestroy {
       this.isInit=false;
       return;
     }
-    this.reloadProjects(fields,page,this.filterOptions)
+    this.filterOptions.page = page
+    this.reloadProjects(fields,this.filterOptions)
   }
 
   onDataLoad(data){
