@@ -13,7 +13,7 @@ const appRoutes: Routes = [
   {
     path: '',
     component: DashboardComponent,
-    resolve:{mapsResult:DashboardResolver},
+    resolve:{dashboardItems:DashboardResolver},
     canActivate: [IsSetUpGuard]
   },
   {

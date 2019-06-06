@@ -21,7 +21,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.seoService.setTitle(PageTitleTypes.Dashboard)
     this.route.data.subscribe((data: Data) => {
-      let executions = data['mapsResult'];
+      let executions = data['dashboardItems'];
       this.executions = executions;
       if(this.executions){
         for(let i=0,length=this.executions.length;i<length;i++){
