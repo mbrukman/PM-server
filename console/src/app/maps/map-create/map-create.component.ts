@@ -85,6 +85,12 @@ export class MapCreateComponent implements OnInit, OnDestroy {
 
   onChange(val){
     this.newProject = val.value == this.NEW_PROJECT
+    if(this.newProject){
+      this.mapForm.controls.projectName.setValidators( Validators.required)
+    }else{
+     this.mapForm.controls.projectName.setValidators(null)
+    }
+    this.mapForm.controls.projectName.updateValueAndValidity();
   }
   onSubmitForm(value) {
     if (this.map) {

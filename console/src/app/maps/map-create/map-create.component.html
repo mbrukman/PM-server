@@ -16,7 +16,7 @@
         <div class="form-group" *ngIf="newProject" >
             <label>Project Name:</label>
             <input type="text" id="projectName" class="form-control" formControlName="projectName" />
-            <div *ngIf="!mapForm.get('projectName').value && (mapForm.get('projectName').touched)">
+            <div *ngIf="mapForm.get('projectName').invalid && (mapForm.get('projectName').touched)">
               Name is mandatory
             </div>
         </div>
@@ -39,7 +39,7 @@
           <textarea type="text" id="description" class="form-control" placeholder="eg. This map will..."
                     formControlName="description"></textarea>
         </div>
-        <button type="submit" class="kh-btn kh-btn-blue" [disabled]="mapForm.invalid || (mapForm.controls.project.value == NEW_PROJECT && !mapForm.controls.projectName.value)">Create</button> 
+        <button type="submit" class="kh-btn kh-btn-blue" [disabled]="mapForm.invalid">Create</button> 
       </form>
     </div>
   </div>
