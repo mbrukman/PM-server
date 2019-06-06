@@ -12,9 +12,6 @@ export class MapResultResolver implements Resolve<any> {
     constructor(private mapsService: MapsService, private router: Router) { }
 
     resolve(route: ActivatedRouteSnapshot) {
-        if(!route.paramMap.get('resultId')){
-            return of(null)
-        }
         return this.mapsService.executionResultDetail(route.parent.paramMap.get('id'), route.paramMap.get('resultId')).pipe(
             catchError(err => {
                 this.router.navigate(['/not-found']);

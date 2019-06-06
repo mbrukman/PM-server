@@ -359,8 +359,11 @@ module.exports = {
 
     resultDetail: (req, res) => {
         hooks.hookPre('map-results-detail').then(() => {
-            return mapsExecutionService.detail(req.params.resultId);
+            return mapsExecutionService.detail(req.params);
         }).then(async execResult => {
+            if(Array.isArray(execResult)){
+                execResult = execResult[0]
+            }
             if (!execResult)
                 throw "No result found";
 

@@ -12,7 +12,7 @@
           </span>
 
         </li>
-        <li *ngFor="let execution of executionsList; let i = index" (click)="gotoExecution(execution._id)" class="d-flex justify-content-between"
+        <a *ngFor="let execution of executionsList; let i = index" [routerLink]="['../',execution._id]" class="d-flex justify-content-between"
           [ngClass]="{'selected': selectedExecution?.id === execution.id}">
           <span>
             {{ execution.startTime | date: 'short' }}
@@ -21,8 +21,7 @@
             <i class="fa fa-spinner fa-pulse fa-fw"></i>
             <i class="fa fa-stop text-danger" (click)="stopRun(execution.runId)"></i>
           </span>
-
-        </li>
+        </a>
       </ul>
     </div>
   </div>

@@ -82,9 +82,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
         delete result.agentsResults;
         this.executionsList.unshift(result);
       }
-      if (this.selectedExecution.runId === result.runId) {
-        this.gotoExecution(result._id);
-      }
     });
 
     // updating logs messages updates
@@ -103,6 +100,11 @@ export class MapResultComponent implements OnInit, OnDestroy {
           this.pendingExecutions = message[this.map.id];
         }
       });
+
+      this.route.data.subscribe(data => {
+        this.selectedExecution = data.execution
+        this.selectExecution(this.selectedExecution);
+      })
   }
 
   loadResultOnScroll(map = this.map) {
@@ -112,16 +114,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
           this.maxLengthReached = true
         }
         this.executionsList.push(...executions);
-
-
-        this.route.data.subscribe(data => {
-          if (!data || !data.execution) {
-            this.gotoExecution(this.executionsList[0]._id);
-          } else {
-            this.selectedExecution = data.execution
-            this.selectExecution(this.selectedExecution);
-          }
-        })
       })
   }
 
@@ -169,7 +161,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
    */
   selectExecution(execution) {
     this.selectedProcess = null;
-
+    this.gotoExecution(execution.id);
     this.agents = execution.agentsResults.map(agentResult => {
       return { label: agentResult.agent ? (<Agent>agentResult.agent).name : '', value: agentResult };
     });
