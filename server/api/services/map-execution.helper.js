@@ -29,7 +29,7 @@ module.exports = {
                 return o.uuid === source;
             });
             if (index === -1) {
-                return { type: 'start_node', uuid: source };
+                return { type: 'start_node', uuid: source }; 
             }
         }
     },

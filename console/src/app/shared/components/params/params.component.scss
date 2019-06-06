@@ -5,7 +5,14 @@
 .param-wrapper{
      margin-bottom: 12px;
     .col-4{
-        padding-left: 0
+        display: flex;
+        padding-left: 0;
+        .material-icons{
+            margin-right: 7px;
+            font-size:19px;
+            cursor: pointer;
+        
+        }
     }
     .col-2{
         margin-right: 8px;
@@ -29,4 +36,29 @@
         padding-right: 0;
         padding-left: 0;
     }
+}
+
+.tooltiptext{
+    ::ng-deep {
+        bs-tooltip-container{
+            top:-32px !important;
+
+            .tooltip-inner{
+                background-color:$background-tooltip;
+                border: 1px solid $border-tooltip; 
+           
+                
+
+            }
+            .tooltip-arrow::before{
+                border-left-color:$border-tooltip
+            }
+            
+        }
+      }
+}
+.hey{
+    background-color: red;
+    position :absolute;
+    left:-10px
 }

@@ -3,7 +3,10 @@
     <div *ngFor="let param of paramsForm.controls; let k = index">
       <div [formGroupName]="k">
         <div class="row param-wrapper">
-          <div class="col-4">{{param.value.viewName}}</div>
+          <div class="col-4 tooltiptext">
+            <i class="material-icons"  [tooltip]="tolTemplate"  placement="left"  aria-hidden="true">help_outline</i>
+            <span>{{param.value.viewName}}</span>
+          </div>
           <hr>
           <div *ngIf="code">
               <div class="col-2">
@@ -33,3 +36,11 @@
     </div>
   </div>
 </div>
+
+<ng-template #tolTemplate >
+  <div >
+    <p>fgewgrfyegdfgfdsugsdauygfasgdfyuyudkfhgtygo;iusdyuytyeruijifusigsrdigsdhfgudshufghsufgfygygdfyasftguyghusghfdugdsfyu</p>
+  </div>
+</ng-template> 
+
+<div class="hey">hey</div>
