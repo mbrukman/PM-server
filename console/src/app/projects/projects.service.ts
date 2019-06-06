@@ -41,12 +41,4 @@ export class ProjectsService {
   update(projectId, project) {
     return this.http.put<Project>('api/projects/' + projectId + '/update', project);
   }
-  
-  createMap(map) {
-    return this.http.post<Map>('api/maps/create', map);
-  }
-  
-  createMapStructure(mapId: string, structure: MapStructure) {
-    return this.http.post<MapStructure>('api/maps/' + mapId + '/structure/create', {structure});
-  }
 }

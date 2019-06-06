@@ -5,6 +5,7 @@ import { BsModalRef } from 'ngx-bootstrap';
 import { ProjectsService } from '@projects/projects.service';
 import { mergeMap } from 'rxjs/operators';
 import { environment } from '@env/environment';
+import { MapsService } from '@app/maps/maps.service';
 
 @Component({
   templateUrl: './import-modal.component.html',
@@ -16,7 +17,7 @@ export class ImportModalComponent {
   error: string;
   projectId: string;
 
-  constructor(private router: Router, public bsModalRef: BsModalRef, private projectsService: ProjectsService) {
+  constructor(private router: Router, public bsModalRef: BsModalRef, private projectsService: ProjectsService, private mapsService:MapsService) {
   }
 
   onClose() {
@@ -41,8 +42,8 @@ export class ImportModalComponent {
       return ;
     }
     this.fixImgUrl()
-    this.projectsService.createMap({ name: this.name, project: this.projectId }).pipe(
-      mergeMap(map => this.projectsService.createMapStructure(map.id, this.structure))
+    this.mapsService.createMap({ name: this.name, project: this.projectId }).pipe(
+      mergeMap(map => this.mapsService.createMapStructure(map.id, this.structure))
     ).subscribe(structure => {
         this.router.navigate(['/maps', structure.map]);
         this.onClose();
