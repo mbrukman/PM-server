@@ -76,20 +76,24 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
       }
     });
 
-    this.parentNode = this.isReadOnly ? this.wrapper.nativeElement.parentNode : this.wrapper.nativeElement.parentNode.parentNode
+    this.parentNode = this.wrapper.nativeElement.parentNode.parentNode;
 
     this.parentNode.maxHeight = this.parentNode.offsetHeight;
-    this.dropSubscription = this.mapDesignService.getDrop().pipe(
+    if(!this.isReadOnly){
+      this.dropSubscription = this.mapDesignService.getDrop().pipe(
         filter(obj => this.isDroppedOnMap(obj.x, obj.y))
       ).subscribe(obj => {
         this.cellView = obj.cell;
         this.addNewCell(obj,new Process());
       });
+    }
 
   }
 
   ngOnDestroy() {
-    this.dropSubscription.unsubscribe();	
+    if(!this.isReadOnly){
+      this.dropSubscription.unsubscribe();	
+    }
     this.deselectAllCellsAndUpdateStructure();
   }
 
