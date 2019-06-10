@@ -42,7 +42,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
   @Output('cellClick') cellClick:  EventEmitter<any> = new EventEmitter<any>();
   @Output('paperClick') paperClick: EventEmitter<any> = new EventEmitter<any>();
   @Output('cellAdded') cellAdded: EventEmitter<any> = new EventEmitter<any>();
-  @Output('save') save:  EventEmitter<any> = new EventEmitter<string>();
+  @Output('contentChanged') contentChanged:  EventEmitter<any> = new EventEmitter<string>();
 
   @ViewChild('mapGraph') mapGraph: ElementRef;
 
@@ -52,7 +52,6 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
   editing: boolean = false; 
   plugins: Plugin[];
   process: Process;
-  mapStructureSubscription: Subscription;
   link: Link;
   init: boolean = false;
   scale: number = 1;
@@ -74,7 +73,6 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
       this.plugins = plugins;
       if(!this.isReadOnly){
         this.initMapDraw();
-        this.getCurrentMapStructure();
       }
     });
 
@@ -124,7 +122,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
       interactive: this.isInteractive()
     });
     this.defineShape();
-    if(!this.isReadOnly) this.listeners() 
+    this.listeners() 
   }
 
   isInteractive(){
@@ -142,6 +140,9 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
       this.paper.scale(0.75, 0.75);
       this.addPaperDrag();
       this.graph.fromJSON(JSON.parse(this.mapStructure.content))
+    }
+    if(!this.isReadOnly && this.mapStructure){
+      this.initMapDraw();
     }
   }
 
@@ -172,15 +173,6 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
 
   }
 
- getCurrentMapStructure(){
-  this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(
-    tap(structure => this.mapStructure = structure),
-    filter(structure => !!structure)
-  ).subscribe(structure => {
-    this.initMapDraw();
-    this.save.emit(JSON.stringify(this.graph.toJSON()));
-  });
- }
 
   initMapDraw() {
     if (!this.init && this.plugins && this.mapStructure) {
@@ -211,7 +203,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   deselectAllCellsAndUpdateStructure() {
-    this.save.emit(JSON.stringify(this.graph.toJSON()));
+    this.contentChanged.emit(JSON.stringify(this.graph.toJSON()));
   }
 
   addNewLink(cell) {
@@ -355,41 +347,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
         }
       });
       this.graph.addCell(startNode);
-
-      if (this.mapStructure.processes.length) {
-        this.mapStructure.processes.forEach((process, i) => {
-          let plugin = this.plugins.find((p) => p.name === process.used_plugin.name);
-          let imageModel = this.getPluginCube({
-            x: ((i + 1) * 160),
-            y: 200
-          }, process.name || process.used_plugin.name, plugin.fullImageUrl,plugin.id, process.uuid);
-
-          this.setProcessWarning(imageModel,process);
-          this.graph.addCell(imageModel);
-        });
-
-        if (this.mapStructure.links.length) {
-          this.mapStructure.links.forEach((link, i) => {
-            if (!this.mapStructure.processes.find(p => p.uuid === link.sourceId)) {
-              link.sourceId = startNode.id;
-            }
-            let newLink = new joint.shapes.devs.Link({
-              ...linkAttrs,
-              source: {
-                id: link.sourceId,
-                port: '  '
-              },
-              target: {
-                id: link.targetId,
-                port: ' '
-              }
-            });
-            this.graph.addCell(newLink);
-          });
-        }
-
-        this.save.emit(JSON.stringify(this.graph.toJSON()));
-      }
+      
     }
     this.center();
   }
@@ -512,7 +470,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
     }
   }
 
-  changeCurrentContent(){
+  reloadContent(){
     this.graph.fromJSON(JSON.parse(this.mapStructure.content))
   }
 
@@ -559,7 +517,7 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
       console.error("cellView is not the cell to update!");
       return;
     }
-    this.save.emit(JSON.stringify(this.graph.toJSON()));
+    this.contentChanged.emit(JSON.stringify(this.graph.toJSON()));
   }
 
   updateNodePid(uuid:string,id:string){

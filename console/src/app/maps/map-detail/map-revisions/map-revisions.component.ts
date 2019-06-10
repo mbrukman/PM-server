@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as joint from 'jointjs';
 import { DiffEditorModel } from 'ngx-monaco-editor';
@@ -22,7 +22,7 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
   templateUrl: './map-revisions.component.html',
   styleUrls: ['./map-revisions.component.scss']
 })
-export class MapRevisionsComponent implements OnInit, OnDestroy {
+export class MapRevisionsComponent implements OnInit {
   load_structures = 25;
   previewProcess: Process;
   structures: MapStructure[] = [];
@@ -47,7 +47,6 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
   monacoOptions = {
     theme: 'vs-dark'
   };
-  mapStructureSubscription: Subscription;
   @ViewChild(MapGraphComponent) mapGraph: MapGraphComponent;
   
 
@@ -71,11 +70,7 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
     language: 'text/javascript'
   };
 
-  
 
-  ngOnDestroy(){
-    //this.mapStructureSubscription.unsubscribe()
-  }
 
   loadStructureOnScroll(mapId = this.mapId,OnInit = false){
     this.mapsService.structuresList(mapId,this.page)
@@ -113,7 +108,7 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
   }
 
   changeStructure(structureId) {
-    this.mapStructureSubscription = this.mapsService.getMapStructure(this.mapId, structureId).subscribe(structure => {
+    this.mapsService.getMapStructure(this.mapId, structureId).subscribe(structure => {
       this.mapsService.setCurrentMapStructure(structure);
       this.socketService.setNotification({
         title: 'Changed version',
@@ -171,7 +166,7 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
     } else {
       setTimeout(() => {
 
-        this.mapGraph.changeCurrentContent()
+        this.mapGraph.reloadContent()
       }, 0);
     }
   }
