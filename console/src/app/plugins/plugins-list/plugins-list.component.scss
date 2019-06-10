@@ -2,7 +2,7 @@
 @import "~src/assets/sass/variables";
 .main {
   width : 100%;
-  .section-title-wrapper{
+  .head-title{
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -12,7 +12,8 @@
     }
   }
 
-  .plugins-list{
+  .content-wrapper{
+    flex-direction: column;
     .table-wrapper{
       @include table();
 
