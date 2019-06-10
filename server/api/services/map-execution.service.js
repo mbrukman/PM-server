@@ -309,7 +309,8 @@ function createAgentContext(agent, runId, executionContext, startNode, mapCode) 
 
     executions[runId].executionAgents[agent.key] = {
         context: Object.assign({ processes }, executionContext, _addFuncsToCodeEnv()),
-        id: agent.id
+        id: agent.id, 
+        runNodeSuccessorsCounter:0
     }
     createCodeEnv(mapCode, runId, agent.key)
     executions[runId].executionAgents[agent.key].context.currentAgent = getCurrentAgent(agent)
@@ -685,10 +686,12 @@ function checkProcessCoordination(process, runId, agent, structure) {
  * @returns {Promise[]}
  */
 function runNodeSuccessors(map, structure, runId, agent, node) {
+    executions[runId].executionAgents[agent.key].runNodeSuccessorsCounter++
     if (!executions[runId] || executions[runId].status == statusEnum.ERROR || executions[runId].status == statusEnum.DONE) { return Promise.resolve() } // status : 'Error' , 'Done'
 
     const successors = node ? helper.findSuccessors(node, structure) : [];
     if (successors.length === 0) {
+        executions[runId].executionAgents[agent.key].runNodeSuccessorsCounter--
         return endRunPathResults(runId, agent, map);
     }
     let promises = []
@@ -699,11 +702,6 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
         let passProcessCoordination = checkProcessCoordination(process, runId, agent, structure)
         let passAgentFlowCondition = checkAgentFlowCondition(runId, process, map, structure, agent)
 
-        // if it is the last ancestoer of a process
-        if (!passProcessCoordination && process.coordination === 'race' &&
-            (successors.length - 1 == successorIdx)) {
-            endRunPathResults(runId, agent, executions[runId].clientSocket, map);
-        }
 
         // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
         if (passProcessCoordination && !passAgentFlowCondition) {
@@ -729,7 +727,8 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
             promises.push(runProcess(map, structure, runId, agent, process))
         }
     })
-
+    executions[runId].executionAgents[agent.key].runNodeSuccessorsCounter--
+    promises.length ? null :  endRunPathResults(runId, agent, map)
     return Promise.all(promises)
 }
 
@@ -751,7 +750,7 @@ function updateAgentContext(runId, agent, agentData) {
  * @param {*} map 
  */
 function endRunPathResults(runId, agent, map) {
-    if (isThereProcessExecutingOnAgent(runId, agent.key)) { return }
+    if (executions[runId].executionAgents[agent.key].runNodeSuccessorsCounter!=0 || isThereProcessExecutingOnAgent(runId, agent.key)) { return }
 
     updateAgentContext(runId, agent, { status: statusEnum.DONE })
 
