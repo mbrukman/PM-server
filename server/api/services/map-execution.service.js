@@ -87,12 +87,14 @@ async function getSettingsAction(plugin) {
  * @param socket
  */
 function updateClientExecutions(socket, execToDelete = null) {
+
     execToDelete ? delete executions[execToDelete] : null
     let emitv = Object.keys(executions).reduce((total, current) => {
         total[current] = executions[current].mapId;
         return total;
     }, {});
     socket ? socket.emit('executions', emitv) : clientSocket.emit('executions', emitv);
+   
 }
 
 /**
@@ -162,14 +164,15 @@ function createProcessContext(runId, agent, processUUID, process) {
  */
 function updateProcessContext(runId, agent, processUUID, iterationIndex, processData) {
 
+    if (!executions[runId]) {
+        return;
+    }
+
     if(processData.finishTime){
         let processId = executions[runId].executionAgents[agent.key].context.processes[processUUID][0].processId;
         sendFinishTimeToClient(runId,{process:{finishTime:processData.finishTime,id:processId}})
     }
 
-    if (!executions[runId]) {
-        return;
-    }
     executions[runId].executionAgents[agent.key].context.processes[processUUID][iterationIndex] = Object.assign(
         (executions[runId].executionAgents[agent.key].context.processes[processUUID][iterationIndex] || {}),
         processData
