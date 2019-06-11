@@ -13,6 +13,8 @@ function init(server){
         winston.log('info', 'a user connected');
     });
 
+
+
     return _socket;
 }
 
@@ -21,11 +23,7 @@ function getNamespaceSocket(nsp){
     if (namespaces[nsp])
         return namespaces[nsp];
     namespaces[nsp] = _socket.of('/' + nsp);
-    namespaces[nsp].on('connection',function (socket) {
-        Object.keys(namespaces[nsp].sockets).forEach(socket => {
-            namespaces[nsp].sockets[socket]['isFirstMessageToSocket'] = true;
-        })
-    })
+    
     return namespaces[nsp];
 }
 

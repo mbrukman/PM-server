@@ -63,7 +63,6 @@ function _getPathFiledsToUpdate(pathToSet, data) {
 function _updateMapResult(options) {
     return MapResult.findByIdAndUpdate(options.mapResultId, { $set: options.data }, { new: true })
     .then((mapResult) => {
-        options.socket.emit('map-execution-result', mapResult);
         return mapResult
     });
 }

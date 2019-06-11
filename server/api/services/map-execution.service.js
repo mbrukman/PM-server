@@ -162,6 +162,11 @@ function createProcessContext(runId, agent, processUUID, process) {
  */
 function updateProcessContext(runId, agent, processUUID, iterationIndex, processData) {
 
+    if(processData.finishTime){
+        let processId = executions[runId].executionAgents[agent.key].context.processes[processUUID][0].processId;
+        sendFinishTimeToClient(runId,{process:{finishTime:processData.finishTime,id:processId}})
+    }
+
     if (!executions[runId]) {
         return;
     }
@@ -286,6 +291,8 @@ async function startPendingExecution(mapId, socket) {
 }
 
 function updateMapResult(mapResultId, updateData, socket) {
+
+
     let options = {
         mapResultId: mapResultId,
         data: updateData,
@@ -452,6 +459,11 @@ async function executeMap(runId, map, mapStructure, agents, context) {
     }
 
     let nsp = socketService.getNamespaceSocket('execution-update-'+ executions[runId].mapResultId);
+    nsp.on('connection',function (socket) {
+        Object.keys(nsp.sockets).forEach(socket => {
+            nsp.sockets[socket]['isFirstMessageToSocket'] = true;
+        })
+    })
     nsp['actions'] = [];
 
 
@@ -507,7 +519,7 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
     }
     let context = createExecutionContext(runId, socket, mapResult)
     executeMap(runId, map, mapStructure, agents, context)
-    return runId
+    return runId;
 }
 
 /**
@@ -753,6 +765,14 @@ function updateAgentContext(runId, agent, agentData) {
     dbUpdates.updateAgent(options)
 }
 
+function sendFinishTimeToClient(runId,data){
+    let nsp = socketService.getNamespaceSocket('execution-update-'+executions[runId].mapResultId);
+    Object.keys(nsp.sockets).forEach(socket => {
+        let clientSocket = nsp.sockets[socket];
+        clientSocket.emit('updateFinishTime',data);     
+    })
+}
+
 /**
  * Checks if there is no more running processes and finishes execution. 
  * @param {*} runId 
@@ -766,8 +786,12 @@ function endRunPathResults(runId, agent, map) {
 
     if (!areAllAgentsDone(runId)) { return }
 
+    let finishTime = new Date();
+
+    sendFinishTimeToClient(runId,{execution:finishTime});
+
     let data = {
-        finishTime: new Date(),
+        finishTime: finishTime,
         status: statusEnum.DONE
     }
 
@@ -852,7 +876,7 @@ function runProcess(map, structure, runId, agent, process) {
                 process:{
                     process:process._id,
                     index:process.iterationIndex,
-                    uuid:process.uuid,
+                    name:process.name,
                     startTime:new Date(),
                     finishTime:new Date()
                 },
@@ -1092,7 +1116,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
         agentPromise = sendActionViaRequest(agent, actionExecutionForm);
     }
 
-    return runAction(actionData);
+    return runAction();
 
     /**
      * Declare a timeout function. 
@@ -1100,8 +1124,8 @@ async function executeAction(map, structure, runId, agent, process, processIndex
      * In case of retries- try again
      * @returns {object} - action result
      */
-    function runAction(actionData) {
-
+    function runAction() {
+        let actionResult = actionData;
         let timeoutFunc = helper.generateTimeoutFun(action)
 
         return Promise.race([agentPromise, timeoutFunc.timeoutPromise]).then((result) => { // race condition between agent action and action timeout
@@ -1120,25 +1144,26 @@ async function executeAction(map, structure, runId, agent, process, processIndex
                 return result
             }
         }).then(async(result) => {
-            actionData.status = result.status;
-            actionData.result = result;
+            actionResult.status = result.status;
+            actionResult.result = result;
 
             if (result.status == statusEnum.ERROR && action.retriesLeft > 0) { // retry handling
-                actionData.retriesLeft = --action.retriesLeft
-                updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData)
-                return runAction(actionData);
+                actionResult.retriesLeft = --action.retriesLeft
+                updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionResult)
+                return runAction();
             }
-            actionData.finishTime = new Date();
+            actionResult.finishTime = new Date();
             let msg = `'${process.name} ' - '${action.name}' result: ${JSON.stringify(result)} (${agent.name})`
             _updateRawOutput(map._id, runId, msg, result.status)
-            updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionData);
-            
+            updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionResult);
             let res = {
-                data:actionData,
+                action:actionResult,
                 process:{
                     process:process._id,
                     index:process.iterationIndex,
-                    uuid:process.uuid
+                    finishTime:null,
+                    name:process.name,
+                    startTime:process.startTime || actionResult.startTime
                 },
                 agent:{
                     _id:agent.id,

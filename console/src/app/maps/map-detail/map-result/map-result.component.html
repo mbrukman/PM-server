@@ -47,7 +47,7 @@
               <div class="card-body">
                 <ul class="process-list">
                   <li *ngFor="let item of processesList; let i = index" (click)="selectProcess(item,i)" >
-                    <app-process-list-item [ngClass]="{'selected': processIndex == i }" [item]="item" [processes]="resultsByProcessUuid(item.uuid)"></app-process-list-item>
+                    <app-process-list-item [ngClass]="{'selected': processIndex == i }" [item]="item" [processes]="resultsByProcessId(item.process)"></app-process-list-item>
                   </li>
                 </ul>
               </div>

@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, Host } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { MapsService } from '@maps/maps.service';
 import { Map } from '@maps/models/map.model';
@@ -11,6 +11,7 @@ import {PopupService} from '@shared/services/popup.service'
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 import { filter, take, tap, mergeMap } from 'rxjs/operators';
 import * as _ from 'lodash';
+
 
 const defaultAgentValue = 'default'
 
@@ -74,7 +75,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
       .subscribe(executions => {
         this.executing = Object.keys(executions);
       });
-
     // subscribing to map executions results updates.
     this.mapExecutionResultSubscription = this.socketService.getMapExecutionResultAsObservable().pipe(
       filter(result => (<string>result.map) === this.map.id)
@@ -84,9 +84,10 @@ export class MapResultComponent implements OnInit, OnDestroy {
           delete result.agentsResults;
           this.executionsList.unshift(result);
         }
-
+        if (this.selectedExecution.runId === result.runId) {
+          this.selectExecution(result._id);
+        }
       });
-
 
     // updating logs messages updates
     this.mapExecutionMessagesSubscription = this.socketService.getLogExecutionAsObservable().pipe(
@@ -148,11 +149,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
     this.popupService.openComponent(RawOutputComponent,{messages:messages})
   }
 
-  buildExecutionFromSocket(selectedExecution,result){   
+  buildExecutionFromSocket(selectedExecution,result){ 
+
     let agentIndex = selectedExecution.agentsResults.findIndex(agent => agent.agent['_id'] == result.agent._id);
     if(agentIndex == -1){
       let process = result.process;
-      process['actions'] = [result.data];
+      process['actions'] = [result.action];
       let agentResult = {
         agent:result.agent,
         processes:[process]
@@ -168,32 +170,15 @@ export class MapResultComponent implements OnInit, OnDestroy {
       })
       if(processIndex == -1 || result.process.index != selectedExecution.agentsResults[agentIndex].processes[processIndex].index){
         let process = result.process;
-        process['actions'] = result.data ? [result.data] : [];
+        process['actions'] = result.action ? [result.action] : [];
         selectedExecution.agentsResults[agentIndex].processes.push(<ProcessResult>process)
       }
       else{
-          selectedExecution.agentsResults[agentIndex].processes[processIndex].actions.push(result.data)    
+          selectedExecution.agentsResults[agentIndex].processes[processIndex].actions.push(result.action)    
       }
     }
-    let startExecTime;
-    selectedExecution.agentsResults.forEach(agent => {
-      if(!startExecTime || startExecTime < agent.processes[0].startTime){
-        startExecTime = agent.processes[0].startTime;
-      }
-    })
-    selectedExecution.startTime = startExecTime;
-    selectedExecution.agentsResults.forEach(agent => {
-      agent.processes.forEach(process => {
-        if(process.actions.length > 0 && process.actions[0]){
-          process.startTime = process.actions[0].startTime;
-          process.finishTime = process.actions[process.actions.length -1].finishTime;
-        }
-        else{
-          process.startTime = process.startTime || result.process.startTime;
-          process.finishTime = process.finishTime || result.process.finishTime
-        }
-      })
-    })
+
+    selectedExecution.startTime = this.selectedExecution ? (this.selectedExecution.startTime || result.action.startTime) : result.action.startTime
     return selectedExecution;
   }
 
@@ -243,7 +228,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
           this.ongoingExecutionSocket.on('updateAction',(action) => {
             this.setActionToSelectedExecution(this.selectedExecution,action);
           });
-          this.ongoingExecutionSocket.on('updateActions',(actions) => {
+          this.ongoingExecutionSocket.on('updateActions',(actions) => {    
               let exec = {
                 agentsResults:[],
                 id:result.id,
@@ -257,6 +242,18 @@ export class MapResultComponent implements OnInit, OnDestroy {
               })  
             
           });
+
+          this.ongoingExecutionSocket.on('updateFinishTime',(data) => {
+            this.selectedExecution.finishTime = data.execution;
+            if(data.process){
+              let processes = [];
+              this.selectedExecution.agentsResults.forEach(agent => {
+                processes = [...processes,...agent.processes]
+              })
+              processes[processes.findIndex((process) => process.process == data.process.id)].finishTime = data.process.finishTime;
+            }
+          });
+          
         }
         else{
           this.selectedExecution = result;
@@ -301,18 +298,18 @@ export class MapResultComponent implements OnInit, OnDestroy {
     this.generateProcessesList();
   } 
 
-  resultsByProcessUuid(uuid){
+  resultsByProcessId(id){
     let processes = [];
     this.result.forEach(res => {
       processes = [...processes, ...res.processes];
     });
-    let processUuid = [];
+    let resultProcess = [];
     processes.forEach((process) => {
-      if(process.uuid == uuid){
-        processUuid.push(process)
+      if(process.process == id){
+        resultProcess.push(process)
       }
     })
-    return processUuid;
+    return resultProcess;
   }
 
   /**
@@ -334,14 +331,14 @@ export class MapResultComponent implements OnInit, OnDestroy {
     let processesList = [];
     this.result.forEach(res => {
       res.processes.map(o => {
-        if (processesList.findIndex(k => o.uuid === k.uuid && o.index === k.index) === -1) {
+        if (processesList.findIndex(k => o.process === k.process && o.index === k.index) === -1) {
           processesList.push(o);
         }
       });
 
     });
     let overall = processesList.reduce((total, current) => {
-      total[current.uuid] = (total[current.uuid] || 0) + 1;
+      total[current.process] = (total[current.process] || 0) + 1;
       return total;
     }, {});
 
@@ -349,10 +346,10 @@ export class MapResultComponent implements OnInit, OnDestroy {
       .sort(sortByDate)
       .map(o => {
         return {
-          name: (o.name) || 'Process #' + (Object.keys(overall).indexOf(o.uuid) + 1),
+          name: (o.name) || 'Process #' + (Object.keys(overall).indexOf(o.process) + 1),
           index: o.index,
-          uuid: o.uuid,
-          overall: overall[o.uuid],
+          process: o.process,
+          overall: overall[o.process],
         };
       });
 
@@ -366,7 +363,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     let processes = [];
     this.result.forEach(res => {
       res.processes.forEach(o=>{
-        if(o.uuid === process.uuid && o.index === process.index){
+        if(o.process === process.process && o.index === process.index){
           res.agent? processes.push({...o, agentKey: (<Agent>res.agent).id})  : null  
         }
       })
@@ -415,8 +412,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
             }
             
             process.result = processResult
-            process.process ? process.uuid = process.process.toString(): null
-            processNames ? process.name = processNames[process.uuid] : null
+            process.process =process.process.toString();
+            processNames ? process.name = processNames[process.process] : null
             newResult.agentsResults[agentIndex].processes[processIndex] = process
         })
     })

@@ -30,7 +30,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   mapStructureSubscription: Subscription;
   mapSubscription: Subscription;
   isMapChangedSubscription : Subscription;
-
+  mapResultId:Subject<string> = new Subject<string>();
   edited: boolean = false;
   structureEdited: boolean = false;
   initiated: boolean = false;
@@ -252,12 +252,19 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.downloadJson = this.sanitizer.bypassSecurityTrustUrl('data:text/json;charset=UTF-8,' + encodeURIComponent(JSON.stringify(structure)));
   }
 
+  getMapResultIdAsObservable(){
+
+    return this.mapResultId.asObservable()
+  }
+
   discardChanges() {
     this.mapsService.setCurrentMapStructure(this.originalMapStructure);
   }
 
   executeMap() {
-    this.mapsService.execute(this.id, this.selected ? this.selected['name'] || this.selected : undefined ).subscribe();
+    this.mapsService.execute(this.id, this.selected ? this.selected['name'] || this.selected : undefined ).subscribe((result) => {
+      this.mapResultId.next(result['id']);
+    });
   }
 
   saveMap() {
