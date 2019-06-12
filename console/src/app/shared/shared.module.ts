@@ -34,7 +34,8 @@ import { TriggerFormComponent } from '@maps/map-detail/map-edit/map-enviroment-p
 import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
 import { PluginUploadComponent } from '@plugins/plugin-upload/plugin-upload.component';
 import { ImportModalComponent } from '@projects/project-details/import-modal/import-modal.component';
-import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-vault-items.component'
+import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-vault-items.component';
+import {TooltipComponent} from '@shared/components/params/tooltip/tooltip.component';
 
 
 @NgModule({
@@ -80,7 +81,8 @@ import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-va
     MapDuplicateComponent,
     PluginUploadComponent,
     ImportModalComponent,
-    UpsertVaultItemsComponent
+    UpsertVaultItemsComponent,
+    TooltipComponent
 
   ],
   exports: [
@@ -102,7 +104,8 @@ import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-va
     InPipe,
     MapsCardsComponents,
     ExecutionChartComponent,
-    ParamsComponent
+    ParamsComponent,
+    TooltipComponent
   ],
   entryComponents: [ConfirmComponent, RawOutputComponent,AgentsGroupUpsertFilterComponent,EditAgentComponent,InputPopupComponent,AgentsGroupUpsertComponent,AddConfigurationComponent,SelectAgentComponent,TriggerFormComponent,MapDuplicateComponent,PluginUploadComponent,ImportModalComponent,UpsertVaultItemsComponent]
 })

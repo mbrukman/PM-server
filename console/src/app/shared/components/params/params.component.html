@@ -4,7 +4,7 @@
       <div [formGroupName]="k">
         <div class="row param-wrapper">
           <div class="col-4 tooltiptext">
-            <i class="material-icons"  [tooltip]="tolTemplate"  placement="left"  aria-hidden="true">help_outline</i>
+            <app-tooltip [description]="param.value.description"></app-tooltip>
             <span>{{param.value.viewName}}</span>
           </div>
           <hr>
@@ -37,10 +37,3 @@
   </div>
 </div>
 
-<ng-template #tolTemplate >
-  <div >
-    <p>fgewgrfyegdfgfdsugsdauygfasgdfyuyudkfhgtygo;iusdyuytyeruijifusigsrdigsdhfgudshufghsufgfygygdfyasftguyghusghfdugdsfyu</p>
-  </div>
-</ng-template> 
-
-<div class="hey">hey</div>
