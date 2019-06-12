@@ -45,7 +45,7 @@ let mapResultSchema = new Schema({
     configuration: Schema.Types.Mixed,
     agentsResults: [AgentResultSchema],
     startTime: { type: Date, index: true },
-    finishTime: Date,
+    finishTime: { type: Date, index: true },
     trigger: String,
     status: { type: String, enum: [statusEnum.DONE, statusEnum.ERROR, statusEnum.RUNNING, statusEnum.PENDING] },
     reason: String, // e.g. no agents

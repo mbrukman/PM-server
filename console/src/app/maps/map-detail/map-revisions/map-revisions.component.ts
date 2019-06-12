@@ -43,7 +43,7 @@ export class MapRevisionsComponent implements OnInit {
   };
   latestCode: string;
   currentCode: string;
-  
+
   monacoOptions = {
     theme: 'vs-dark'
   };
@@ -64,12 +64,11 @@ export class MapRevisionsComponent implements OnInit {
     code: this.latestCode,
     language: 'text/javascript'
   };
- 
+
   modifiedModel: DiffEditorModel = {
     code: this.currentCode,
     language: 'text/javascript'
   };
-
 
 
   loadStructureOnScroll(mapId = this.mapId,OnInit = false){
@@ -127,7 +126,7 @@ export class MapRevisionsComponent implements OnInit {
       ).subscribe(map => { this.router.navigate(['/maps', map.id]);
     });
   }
-  
+
   previewStructure(structureId: string) {
     this.previewProcess = null;
     this.mapsService.getMapStructure(this.mapId, structureId)
@@ -140,7 +139,7 @@ export class MapRevisionsComponent implements OnInit {
         if (!this.latestStructure) {
           this.setLatestStructure(this.mapId, this.structures[0].id);
         }
-    
+
         if (this.viewMode === 'code') {
           this.loadCodeDiff();
         }
@@ -153,7 +152,7 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   loadRevisions() {
-    
+
     this.page++;
     this.loadStructureOnScroll();
   }

@@ -1,3 +1,5 @@
+@import "~src/assets/sass/variables";
+
 @import "~src/assets/sass/mixins";
 .main {
     width: 100%;
@@ -10,7 +12,7 @@
     }
 
     .content-wrapper{
-        padding: 18px 40px;
+        padding: 18px $admin-padding;
         @include table();
         .actions-wrapper{
             width: 100%;

@@ -9,15 +9,23 @@ import { MapResult, Pending } from '@maps/models';
 @Injectable()
 export class SocketService {
   socket: any;
-  message: Subject<any> = new Subject<any>();
+  logExecution: Subject<any> = new Subject<any>();
   notification: Subject<any> = new Subject<any>();
+  message: Subject<any> = new Subject<any>();
   executions: Subject<object> = new Subject<object>();
   mapExecution: Subject<MapResult> = new Subject<MapResult>();
   pending: Subject<Pending> = new Subject<Pending>();
   test: Pending;
+  socketID: string;
 
   constructor() {
+
     this.socket = io(environment.serverUrl);
+    let self = this
+    this.socket.on('connect', function () {
+      self.socketID = this.id;
+    });
+
     this.socketListener();
   }
 
@@ -25,13 +33,21 @@ export class SocketService {
     return this.socket;
   }
 
+
+
   socketListener() {
     this.socket.on('update', (data) => {
-      this.setMessage(data);
+      this.setLegExecution(data);
     });
 
     this.socket.on('notification', (data) => {
       this.setNotification(data);
+    });
+
+    this.socket.on('message', (data) => {
+      this.message.next(data)
+
+
     });
 
     this.socket.on('executions', (data: object) => {
@@ -47,12 +63,15 @@ export class SocketService {
     });
   }
 
-  getMessagesAsObservable() {
-    return this.message.asObservable();
+  getLogExecutionAsObservable() {
+    return this.logExecution.asObservable();
   }
 
-  setMessage(message) {
-    this.message.next(message);
+  setLegExecution(message) {
+    this.logExecution.next(message);
+  }
+  getMessageAsObservable() {
+    return this.message.asObservable();
   }
 
   getNotificationAsObservable() {

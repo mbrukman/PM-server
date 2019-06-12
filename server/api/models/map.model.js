@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 let mapSchema = new Schema({
     name: { type: String, required: true },
     description: {type: String, default: ''},
-    archived: { type: Boolean, default: false },
+    archived: { type: Boolean, default: false, index:true },
     agents: [{ type: Schema.Types.ObjectId, ref: 'Agent' }],
     groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
     queue: Number,

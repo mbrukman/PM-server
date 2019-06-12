@@ -1,28 +1,18 @@
 @import "~src/assets/sass/variables";
 
-.row {
-  flex-grow: 1;
-  margin-left: 0;
-  flex-wrap: initial;
-  margin : 0;
-
+.main-admin {
+  display: flex;
+  height: 100%;
   .side-nav {
     background: $kh-background;
-    flex : 0 0 60px;
     .nav{
       padding-top: 19px;
     }
   }
   .main-content {
-    flex-grow: 1;
-    display: flex;
+    width: 100%;
 
-    ::ng-deep{
-      > *:not(router-outlet){
-        display: flex;
-        flex-grow: 1;
-      }
-    }
+
   }
 }
 
