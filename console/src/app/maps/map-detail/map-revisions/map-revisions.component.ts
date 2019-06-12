@@ -21,7 +21,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './map-revisions.component.html',
   styleUrls: ['./map-revisions.component.scss']
 })
-export class MapRevisionsComponent implements OnInit, OnDestroy {
+export class MapRevisionsComponent implements OnInit {
   load_structures = 25;
   previewProcess: Process;
   structures: MapStructure[] = [];
@@ -47,12 +47,11 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
   };
   latestCode: string;
   currentCode: string;
-  
+
   monacoOptions = {
     theme: 'vs-dark'
   };
-  mapStructureSubscription: Subscription;
-  
+
 
   constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private popupService:PopupService) {}
 
@@ -70,7 +69,7 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
       width: this.wrapper.nativeElement.offsetWidth,
       height: this.wrapper.nativeElement.offsetHeight,
       gridSize: 1,
-      model: this.currentGraph, 
+      model: this.currentGraph,
       interactive: false
     });
     this.latestPaper = new joint.dia.Paper({
@@ -78,7 +77,7 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
       width: this.wrapper.nativeElement.offsetWidth,
       height: this.wrapper.nativeElement.offsetHeight,
       gridSize: 1,
-      model: this.latestGraph, 
+      model: this.latestGraph,
       interactive: false
     });
     this.defineShape();
@@ -92,7 +91,7 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
     code: this.latestCode,
     language: 'text/javascript'
   };
- 
+
   modifiedModel: DiffEditorModel = {
     code: this.currentCode,
     language: 'text/javascript'
@@ -141,10 +140,6 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(){
-    this.mapStructureSubscription.unsubscribe()
-  }
-
   loadStructureOnScroll(mapId = this.mapId,OnInit = false){
     this.mapsService.structuresList(mapId,this.page)
     .subscribe(structures => {
@@ -181,7 +176,7 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
   }
 
   changeStructure(structureId) {
-    this.mapStructureSubscription = this.mapsService.getMapStructure(this.mapId, structureId).subscribe(structure => {
+    this.mapsService.getMapStructure(this.mapId, structureId).subscribe(structure => {
       this.mapsService.setCurrentMapStructure(structure);
       this.socketService.setNotification({
         title: 'Changed version',
@@ -254,7 +249,7 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
       ).subscribe(map => { this.router.navigate(['/maps', map.id]);
     });
   }
-  
+
   previewStructure(structureId: string) {
     this.previewProcess = null;
     this.mapsService.getMapStructure(this.mapId, structureId)
@@ -268,13 +263,13 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
         if (!this.latestStructure) {
           this.setLatestStructure(this.mapId, this.structures[0].id);
         }
-    
+
         if (this.viewMode === 'code') {
           this.loadCodeDiff();
         }
       });
 
-   
+
   }
 
   onResize(event) {
@@ -287,7 +282,7 @@ export class MapRevisionsComponent implements OnInit, OnDestroy {
   }
 
   loadRevisions() {
-    
+
     this.page++;
     this.loadStructureOnScroll();
   }
