@@ -1,7 +1,6 @@
 import { FormGroup, FormControl, FormArray } from '@angular/forms';
 
 import { Serializable } from '@core/models/serializable.model';
-import { Plugin } from '@plugins/models/plugin.model';
 
 import { IProcess } from '../interfaces/map-structure.interface';
 import { UsedPlugin } from './used-plugin.model';
@@ -25,6 +24,7 @@ export class Process extends Serializable implements IProcess {
   updatedAt: Date;
   correlateAgents: boolean;
   uuid: string;
+  numProcessParallel?: string;
 
 
   constructor(json?: any) {
@@ -44,7 +44,8 @@ export class Process extends Serializable implements IProcess {
       postRun : new FormControl(process.postRun),
       correlateAgents : new FormControl(process.correlateAgents),
       filterAgents : new FormControl(process.filterAgents),
-      actions: new FormArray([])
+      actions: new FormArray([]),
+      numProcessParallel:new FormControl(process.numProcessParallel)
     });
   }
 }

@@ -445,7 +445,7 @@ async function executeMap(runId, map, mapStructure, agents, context) {
 
 
     const startNode = helper.findStartNode(mapStructure);
-    if(!startNode){
+    if (!startNode) {
         stopExecution(runId, clientSocket, "link is missing to start execution")
     }
     let promises = []
@@ -586,6 +586,21 @@ function areAllAgentsWaitingToStartThis(runId, agent, process) {
 }
 
 /**
+ * 
+ * @param {String} runId 
+ * @param {String} agentKey 
+ * @param {String} text - the parallel param of action or process 
+ */
+function _getParallelExecutionsNum(runId, agentKey, text) {
+    if (!text) { return 1 }
+    let numProcessParallel = 1;
+    try {
+        numProcessParallel = vm.runInNewContext(text, executions[runId].executionAgents[agentKey].context);
+    } catch (e) { } // I dont care :) 
+    return numProcessParallel || 1
+}
+
+/**
  * In case of wait condition, go over all agents and runs pending process   
  * @param {*} runId 
  * @param {*} map 
@@ -658,7 +673,7 @@ function checkProcessCoordination(process, runId, agent, structure) {
         if (ancestors.length > 1) {
             for (let i = 0; i < ancestors.length; i++) {
                 const ancestor = ancestors[i];
-                if (!processes[ancestor] || processes[ancestor][0].status == statusEnum.RUNNING) { // if ancestor status is running retun false 
+                if (!processes[ancestor] || !(processes[ancestor][0].status == statusEnum.DONE)) { // if ancestor status is running retun false 
                     return false;
                 }
             }
@@ -671,6 +686,27 @@ function checkProcessCoordination(process, runId, agent, structure) {
     }
     return true;
 
+}
+
+/**
+ * Creates processes contex and run them  
+ * @param {*} runId 
+ * @param {*} agent 
+ * @param {*} process 
+ * @param {*} processUUID 
+ * @param {*} map 
+ * @param {*} structure 
+ * @param {*} startIndex - in case of pending/wait condition, startIndex=1. (because one process was created )
+ */
+function executeProcessParallel(runId, agent, process, processUUID, map, structure, startIndex = 0) {
+    let promises = []
+    let numToExecProcess = _getParallelExecutionsNum(runId, agent.key, process.numProcessParallel)
+    for (let index = startIndex; index < numToExecProcess; index++) {
+        let copyProcess = Object.assign({}, process)
+        createProcessContext(runId, agent, processUUID, copyProcess)
+        promises.push(runProcess(map, structure, runId, agent, copyProcess))
+    }
+    return promises
 }
 
 
@@ -686,12 +722,10 @@ function checkProcessCoordination(process, runId, agent, structure) {
  * @returns {Promise[]}
  */
 function runNodeSuccessors(map, structure, runId, agent, node) {
-    executions[runId].executionAgents[agent.key].runNodeSuccessorsCounter++
     if (!executions[runId] || executions[runId].status == statusEnum.ERROR || executions[runId].status == statusEnum.DONE) { return Promise.resolve() } // status : 'Error' , 'Done'
 
     const successors = node ? helper.findSuccessors(node, structure) : [];
     if (successors.length === 0) {
-        executions[runId].executionAgents[agent.key].runNodeSuccessorsCounter--
         return endRunPathResults(runId, agent, map);
     }
     let promises = []
@@ -702,11 +736,16 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
         let passProcessCoordination = checkProcessCoordination(process, runId, agent, structure)
         let passAgentFlowCondition = checkAgentFlowCondition(runId, process, map, structure, agent)
 
+        // if it is the last ancestoer of a process
+        if (!passProcessCoordination && process.coordination === 'race' &&
+            (successors.length - 1 == successorIdx)) {
+            endRunPathResults(runId, agent, executions[runId].clientSocket, map);
+        }
 
         // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
         if (passProcessCoordination && !passAgentFlowCondition) {
             if (process.flowControl === 'race') {
-                if(process.coordination == 'race'){
+                if (process.coordination == 'race') {
                     executions[runId].executionAgents[agent.key].context.processes[process.uuid] = [] // indication that process uuid run (in case of race coordination) 
                 }
                 runNodeSuccessors(map, structure, runId, agent, process.uuid);
@@ -720,16 +759,25 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
 
         if (passProcessCoordination && passAgentFlowCondition) {
             if (process.flowControl === 'wait') {
+
                 runAgentsFlowControlPendingProcesses(runId, map, structure, process)
             }
-
-            createProcessContext(runId, agent, successor, process)
-            promises.push(runProcess(map, structure, runId, agent, process))
+            promises.push(executeProcessParallel(runId, agent, process, successor, map, structure))
         }
     })
-    executions[runId].executionAgents[agent.key].runNodeSuccessorsCounter--
-    promises.length ? null :  endRunPathResults(runId, agent, map)
-    return Promise.all(promises)
+    Promise.all(promises).then(processesRusult => {
+        processesRusult.forEach(processPromiseArr=>{
+            processPromiseArr.forEach(p=>{
+                p.then(res=>{
+                    res.endPath? endRunPathResults(runId, agent, map) : null;
+                })
+            })
+        })
+       
+    }).catch(err => {
+        stopExecution(runId, null, err)
+        console.log(err);
+    })
 }
 
 function updateAgentContext(runId, agent, agentData) {
@@ -750,7 +798,8 @@ function updateAgentContext(runId, agent, agentData) {
  * @param {*} map 
  */
 function endRunPathResults(runId, agent, map) {
-    if (executions[runId].executionAgents[agent.key].runNodeSuccessorsCounter!=0 || isThereProcessExecutingOnAgent(runId, agent.key)) { return }
+    if(!executions[runId]){return}
+    if (isThereProcessExecutingOnAgent(runId, agent.key)) { return }
 
     updateAgentContext(runId, agent, { status: statusEnum.DONE })
 
@@ -820,6 +869,39 @@ function runProcessFunc(runId, agent, process, fieldName, funcToRun) {
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, processData);
 }
 
+/**
+ * returns array of actions to execute
+ */
+function _getProcessActionsToExec(runId, process, agent, map, structure) {
+    let plugin = executions[runId].plugins.find(o => o.name.toString() == process.used_plugin.name)
+
+    let actionsArray = [];
+
+    process.actions.forEach((action, i) => {
+        action.name = (action.name || `Action #${i + 1} `);
+
+        let numToExecProcess = _getParallelExecutionsNum(runId, agent.key, action.numParallel)
+        for (let index = 0; index < numToExecProcess; index++) {
+            let copyAction = _.cloneDeep(action)
+
+            actionsArray.push([
+                map,
+                structure,
+                runId,
+                agent,
+                process,
+                process.iterationIndex,
+                copyAction,
+                plugin.toJSON(),
+                executions[runId].clientSocket
+            ])
+        }
+
+
+    });
+    return actionsArray
+}
+
 
 /**
  * Returns a function for async.each call. this function is adding the process to the context, running all condition, filter, pre and post and calling the action execution function
@@ -840,37 +922,17 @@ function runProcess(map, structure, runId, agent, process) {
         if (!passProcessCondition(runId, agent, process)) {
             if (process.mandatory) { // mandatory process failed, stop executions
                 executions[runId].executionAgents[agent.key].status = statusEnum.ERROR;
-                return stopExecution(runId, null, "Mandatory process failed" );
+                return stopExecution(runId, null, "Mandatory process failed");
             }
-           endRunPathResults(runId, agent, map)
-            return resolve()
+            return resolve({endPath:true})
         }
 
         runProcessFunc(runId, agent, process, 'preRunResult', process.preRun)
 
-        let plugin = executions[runId].plugins.find(o => o.name.toString() == process.used_plugin.name)
+        let actionsArray = _getProcessActionsToExec(runId, process, agent, map, structure);
 
-        let actionsArray = [];
-
-        process.actions.forEach((action, i) => {
-            action.name = (action.name || `Action #${i + 1} `);
-            actionsArray.push([
-                map,
-                structure,
-                runId,
-                agent,
-                process,
-                process.iterationIndex,
-                _.cloneDeep(action),
-                plugin.toJSON(),
-                executions[runId].clientSocket
-            ])
-        });
-
-        let reduceFunc = (promiseChain, currentAction, index) => {
-            // let actionId = (currentAction[6]._id).toString()
+        let reduceFunc = (promiseChain, currentAction, index) => { /// todo maybe to add iteration index to action
             currentAction[6].actionIndex = index;
-            // executions[runId].executionAgents[agent.key].context.processes[process.uuid][process.iterationIndex].actions[actionId] = currentAction[6];
 
             return promiseChain.then(chainResults => {
                 return executeAction.apply(null, currentAction).then(currentResult => {
@@ -1161,8 +1223,8 @@ async function stopExecution(runId, socket = null, result = "", mapResultId = nu
         for (let uuid in agent.context.processes) {
             let processArray = agent.context.processes[uuid];
             processArray.forEach(process => {
-                if(process.startNode|| process.finishTime){return}
-                updateProcessContext(runId,agent,process.uuid,process.iterationIndex, {status:statusEnum.STOPPED,finishTime:d})
+                if (process.startNode || process.finishTime) { return }
+                updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.STOPPED, finishTime: d })
                 if (!process.actions) {
                     return
                 }

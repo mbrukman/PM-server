@@ -527,7 +527,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       return o.uuid === this.process.uuid;
     });
     this.updateNodeLabel(process.uuid, process.name || this.process.used_plugin.name);
-    let updateFields = ['name', 'description', 'mandatory', 'condition', 'coordination', 'actions', 'correlateAgents', 'flowControl', 'filterAgents', 'postRun', 'preRun']
+    let updateFields = ['numProcessParallel','name', 'description', 'mandatory', 'condition', 'coordination', 'actions', 'correlateAgents', 'flowControl', 'filterAgents', 'postRun', 'preRun']
     for (let i=0, length=updateFields.length;i<length;i++){
       this.mapStructure.processes[index][updateFields[i]] =  process[updateFields[i]];
     }

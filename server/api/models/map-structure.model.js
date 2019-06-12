@@ -15,7 +15,9 @@ const actionSchema = new Schema({
     retries: { type: Number, default: 0 },
     method: String,
     params: [actionParamsSchema],
-    mandatory: { type: Boolean, default: false }
+    mandatory: { type: Boolean, default: false },
+    numParallel: String
+
 });
 
 
@@ -40,7 +42,8 @@ const processSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
     used_plugin: usedPluginsSchema,
     actions: [actionSchema],
-    uuid: String
+    uuid: String,
+    numProcessParallel:String
 });
 
 const linkSchema = new Schema({
