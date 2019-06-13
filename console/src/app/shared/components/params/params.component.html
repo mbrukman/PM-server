@@ -15,18 +15,17 @@
           </div>
           <hr>
           
-          <div class="input dropdown" [ngSwitch]="param.value.type" [hidden]="param.value.code">
-            <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
-            <app-autocomplete  *ngSwitchCase="'vault'" formControlName="value" [model]="'Vault'" ></app-autocomplete>
-            <app-autocomplete  *ngSwitchCase="'autocomplete'" formControlName="value" [model]="params[k].model"></app-autocomplete>
-            <app-options-param *ngSwitchCase="'options'" [options]="params[k].options" formControlName="value"></app-options-param>    
-            <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
-            <input formControlName="value" type="checkbox" class="form-control" *ngSwitchCase="'boolean'">
-            <input formControlName="value" type="number" class="form-control" *ngSwitchCase="'int'">
+          <div class="input dropdown" [ngSwitch]="param.value.type">
+            <div [hidden]="param.value.code">
+              <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
+              <app-autocomplete  *ngSwitchCase="'vault'" formControlName="value" [model]="'Vault'" ></app-autocomplete>
+              <app-autocomplete  *ngSwitchCase="'autocomplete'" formControlName="value" [model]="params[k].model"></app-autocomplete>
+              <app-options-param *ngSwitchCase="'options'" [options]="params[k].options" formControlName="value"></app-options-param>    
+              <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
+              <input formControlName="value" type="checkbox" class="form-control" *ngSwitchCase="'boolean'">
+              <input formControlName="value" type="number" class="form-control" *ngSwitchCase="'int'">
+            </div>
             <input formControlName="value" type="text" class="form-control" *ngSwitchDefault>
-          </div>
-          <div class="input" [hidden]="!param.value.code">
-            <input formControlName="value" type="text" class="form-control">
           </div>
         </div>
       </div>
