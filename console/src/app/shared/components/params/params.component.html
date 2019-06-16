@@ -3,7 +3,7 @@
     <div *ngFor="let param of paramsForm.controls; let k = index">
       <div [formGroupName]="k">
         <div class="row param-wrapper">
-          <div class="col-4">{{param.value.viewName}}</div>
+          <div class="col-4">{{param.value.viewName}} {{ params[k].required? '*' :'' }} </div>
           <hr>
           <div *ngIf="code">
               <div class="col-2">

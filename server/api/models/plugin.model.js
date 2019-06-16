@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 
 let pluginMethodParamsSchema = new Schema({
+    required:Boolean , 
     name: { type: String, required: true },
     viewName: String,
     type: { type: String, enum: ['string', 'int', 'float', 'options', 'autocomplete', 'file', 'text', 'boolean', 'vault'], required: true },
@@ -29,6 +30,7 @@ let pluginMethodSchema = new Schema({
 });
 
 let pluginSettingsSchema = {
+    required:Boolean , 
     name:{ type: String, required: true },
     valueType:String,
     viewName: String,

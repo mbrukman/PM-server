@@ -8,7 +8,7 @@
                 <div *ngIf="settingsForm.controls.params">
                     <app-params [form]="settingsForm" [code]="false" [params]="plugin.settings"></app-params>
                 </div> 
-                <button type="submit" class="kh-btn-blue kh-btn"><span>Save</span></button>
+                <button type="submit" class="kh-btn-blue kh-btn" [disabled]="settingsForm.invalid"><span>Save</span></button>
             </form>
         </div> 
     </div>
