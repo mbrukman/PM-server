@@ -380,13 +380,13 @@ function createExecutionContext(runId, socket, mapResult) {
  * @param {*} payload 
  * @return {MapResult}   
  */
-async function createMapResult(runId, socket, map, configurationName, structure, triggerReason, payload) {
+async function createMapResult(runId, socket, map, configuration, structure, triggerReason, payload) {
     // get number of running executions
     const ongoingExecutions = helper.countMapExecutions(executions, map.id.toString());
 
     // if more running executions than map.queue them save map as pending
     const status = (map.queue && (ongoingExecutions >= map.queue)) ? statusEnum.PENDING : statusEnum.RUNNING;
-    const configuration = helper.createConfiguration(structure, configurationName);
+    configuration = helper.getConfiguration(structure, configuration);
     const startTime = status == statusEnum.PENDING ? null : new Date()
 
     let mapResult = new MapResult({
@@ -466,12 +466,12 @@ async function executeMap(runId, map, mapStructure, agents, context) {
  * @param {*} mapId 
  * @param {*} structureId 
  * @param {*} socket 
- * @param {*} configurationName 
+ * @param {object} configuration - {config - the main configuration, mergeConfig - in case of mapExecution plugin}  
  * @param {*} triggerReason 
  * @param {*} triggerPayload 
  * @returns {string} - the new runId
  */
-async function execute(mapId, structureId, socket, configurationName, triggerReason, triggerPayload = null) {
+async function execute(mapId, structureId, socket, configuration, triggerReason, triggerPayload = null) {
     clientSocket = socket; // save socket in global 
     map = await mapsService.get(mapId)
     if (!map) { throw new Error(`Couldn't find map`); }
@@ -484,7 +484,7 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
 
     if (agents.length == 0 && triggerReason == "Started manually by user") { throw new Error('No agents alive'); }
     let runId = helper.guidGenerator();
-    let mapResult = await createMapResult(runId, socket, map, configurationName, mapStructure, triggerReason, triggerPayload)
+    let mapResult = await createMapResult(runId, socket, map, configuration, mapStructure, triggerReason, triggerPayload)
 
     if (agents.length == 0) { // in case of trigger or schedules task we create mapResult and save the error. 
         await MapResult.findOneAndUpdate({ _id: ObjectId(mapResult.id) }, { $set: { 'reason': "No agents alive" } })

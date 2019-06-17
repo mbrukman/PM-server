@@ -312,8 +312,12 @@ module.exports = {
         }
         let config = payload && payload.config ? Object.assign(configRequest, payload.config) : configRequest;
         let trigger = payload && payload.triggerMsg ? triggerRequest + " " + "-" + " " + payload.triggerMsg : triggerRequest;
+        let configuration = {
+            config, 
+            mergeConfig: req.body.mergeConfig
+        }
         hooks.hookPre('map-execute', req).then(() => {
-            return mapsExecutionService.execute(req.params.id, req.params.structure, req.io, config, trigger)
+            return mapsExecutionService.execute(req.params.id, req.params.structure, req.io, configuration, trigger)
         }).then(result => {
             return res.json(result);
         }).catch(error => {

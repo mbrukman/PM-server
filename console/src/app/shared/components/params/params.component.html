@@ -19,7 +19,7 @@
             <div [hidden]="param.value.code">
               <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
               <app-autocomplete  *ngSwitchCase="'vault'" formControlName="value" [model]="'Vault'" ></app-autocomplete>
-              <app-autocomplete  *ngSwitchCase="'autocomplete'" formControlName="value" [model]="params[k].model"></app-autocomplete>
+              <app-autocomplete  *ngSwitchCase="'autocomplete'" formControlName="value" [model]="params[k].model" [modelId]="paramsForm.controls[0].value"></app-autocomplete>
               <app-options-param *ngSwitchCase="'options'" [options]="params[k].options" formControlName="value"></app-options-param>    
               <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
               <input formControlName="value" type="checkbox" class="form-control" *ngSwitchCase="'boolean'">

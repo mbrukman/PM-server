@@ -10,9 +10,9 @@ export class AutoCompleteService {
   }
 
   generateAutoCompleteParams(modelName,options) {
-    return this.http.get<AutoCompleteItem[]>(`api/autocomplete/${modelName}?query=${options.query}`);
+    return this.http.get<AutoCompleteItem[]>(`api/autocomplete/${modelName}?query=${options.query}&id=${options.modelId}`);
   }
-
+  
   getValueById(id,modelName){
     return this.http.get<AutoCompleteItem>(`api/autocomplete/${modelName}/${id}`);
   }
