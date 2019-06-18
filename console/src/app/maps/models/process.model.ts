@@ -19,7 +19,7 @@ export class Process extends Serializable implements IProcess {
   filterAgents?: string;
   coordination?: string;
   flowControl: string;
-  actionExecution: string;
+  actionsExecution: string;
   actions: Action[];
   used_plugin: UsedPlugin;
   createdAt: Date;
@@ -41,7 +41,7 @@ export class Process extends Serializable implements IProcess {
       condition : new FormControl(process.condition),
       coordination : new FormControl(process.coordination),
       flowControl : new FormControl(process.flowControl || 'each'),
-      actionExecution : new FormControl(process.actionExecution || 'series'),
+      actionsExecution : new FormControl(process.actionsExecution || 'series'),
       preRun : new FormControl(process.preRun),
       postRun : new FormControl(process.postRun),
       correlateAgents : new FormControl(process.correlateAgents),

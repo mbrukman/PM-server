@@ -897,7 +897,7 @@ function runProcess(map, structure, runId, agent, process) {
             });
         }
 
-        actionsArray.reduce(reduceFunc, Promise.resolve([])).then((actionsResults) => { // runs all actions of a process
+        return actionsArray.reduce(reduceFunc, Promise.resolve([])).then((actionsResults) => { // runs all actions of a process
             return actionsExecutionCallback(map, structure, runId, agent, process)
         }).catch((error) => {
             winston.log('error', error);

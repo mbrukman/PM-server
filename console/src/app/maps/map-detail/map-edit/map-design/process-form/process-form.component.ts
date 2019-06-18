@@ -34,7 +34,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   selectedMethod: PluginMethod;
   FLOW_CONTROL_TYPES  = FLOW_CONTROL_TYPES;
   COORDINATION_TYPES = COORDINATION_TYPES;
-  ACTIONS_EXECUTIONS_TYPES = ACTIONS_EXECUTIONS_TYPES;
   flowControlDropDown :SelectItem[] = [];
   actionsExecutionsDropDown: SelectItem[] = [];
   coordinationDropDown :SelectItem[] = []
@@ -63,9 +62,9 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       return {value:this.FLOW_CONTROL_TYPES[key].id,label:this.FLOW_CONTROL_TYPES[key].label}
     })
 
-    let actionsExecutionsType =  Object.keys(this.ACTIONS_EXECUTIONS_TYPES);
+    let actionsExecutionsType =  Object.keys(ACTIONS_EXECUTIONS_TYPES);
     this.actionsExecutionsDropDown = actionsExecutionsType.map(key => {
-      return {value:this.ACTIONS_EXECUTIONS_TYPES[key].id,label:this.ACTIONS_EXECUTIONS_TYPES[key].label}
+      return {value:ACTIONS_EXECUTIONS_TYPES[key].id,label:ACTIONS_EXECUTIONS_TYPES[key].label}
     })
 
     let coordinationType = Object.keys(this.COORDINATION_TYPES)
