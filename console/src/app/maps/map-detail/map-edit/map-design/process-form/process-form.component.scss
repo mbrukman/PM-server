@@ -34,6 +34,40 @@
                 cursor: grabbing !important;
             }
 
+
+            .action-config{
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                ::ng-deep{
+                    p-inputswitch{
+                        .ui-inputswitch{
+                            width: 30px;
+                            height: 15px;
+                            position: relative;
+                            display: inline-block;
+                            .ui-inputswitch-slider:before {
+                                left: 0;
+                                bottom: 0;
+                                height: 15px;
+                                width: 15px;
+                                border-radius: 50%;
+                                transition: .1s;
+                                position: absolute;
+                                content: "";
+                            }
+                        }
+                    }
+                }
+                .disabled{
+                    opacity: 0.7;
+                }
+                span {
+                    display: block;
+                    margin-left: 18px;
+                }
+            }
+
             .action-btns {
                 i:not(:last-of-type){
                     margin-right: 13px;

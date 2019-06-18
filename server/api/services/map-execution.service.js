@@ -853,17 +853,19 @@ function runProcess(map, structure, runId, agent, process) {
 
         process.actions.forEach((action, i) => {
             action.name = (action.name || `Action #${i + 1} `);
-            actionsArray.push([
-                map,
-                structure,
-                runId,
-                agent,
-                process,
-                process.iterationIndex,
-                _.cloneDeep(action),
-                plugin.toJSON(),
-                executions[runId].clientSocket
-            ])
+            if(action.isEnabled){
+                actionsArray.push([
+                    map,
+                    structure,
+                    runId,
+                    agent,
+                    process,
+                    process.iterationIndex,
+                    _.cloneDeep(action),
+                    plugin.toJSON(),
+                    executions[runId].clientSocket
+                ])
+            }
         });
 
         let reduceFunc = (promiseChain, currentAction, index) => {
