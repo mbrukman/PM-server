@@ -14,7 +14,7 @@
     <div class="form-row">
       
         <p class="title">Description</p>
-        <textarea class="form-control map-description" placeholder="eg. This map will..." [(ngModel)]="map.description" (change)="onMapUpdate()" *ngIf="map"></textarea>
+        <textarea class="form-control map-description" placeholder="eg. This map will..." [(ngModel)]="map.description" (keyup)="onMapUpdate()" *ngIf="map"></textarea>
 
       
     </div>
@@ -28,6 +28,26 @@
                       (change)="onMapUpdate()"
                       *ngIf="map"/>
       
+    </div>
+    <div class="form-row dropdown">  
+        <p class="title">Get response after:</p>
+        <p-dropdown 
+        [options]="processesDropDown" 
+        (onChange)="onChangeProcessResponse()" 
+        [(ngModel)]="selectedProcess" 
+        placeholder="Select a process"
+        [autoWidth]="false">
+        </p-dropdown>
+    </div>
+    <div class="form-row">
+      
+        <p class="title">Code Reference</p>
+        <input 
+        class="form-control"
+        [(ngModel)]="selectedapiResponseCodeReference"
+        (keyup)="onapiResponseCodeReference()"
+        *ngIf="map"/>
+                      
     </div>
   </div>
  <div class="created-at">

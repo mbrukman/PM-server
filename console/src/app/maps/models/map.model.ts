@@ -12,7 +12,9 @@ export class Map extends Serializable implements IMap {
   archived: boolean;
   agents?: Agent[];
   groups?: Group[];
-  project:{name: String, id:String};
+  project:{name: string, id:string};
   latestExectionResult?: MapResult;
   queue?: number;
+  processResponse:string;
+  apiResponseCodeReference:string
 }

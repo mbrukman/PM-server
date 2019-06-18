@@ -11,5 +11,7 @@ export interface IMap {
   archived: boolean,
   agents?: IAgent[],
   groups?: Group[],
-  queue?: number
+  queue?: number,
+  processResponse:string,
+  apiResponseCodeReference:string
 }
