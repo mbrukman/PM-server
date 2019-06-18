@@ -140,7 +140,7 @@ function createProcessContext(runId, agent, processUUID, process) {
     processes[processUUID].push(processData);
 
     let options = {
-        mapResultId: executions[runId].mapResultId,
+        mapResultId: runId,
         agentId: agent.id,
         processData: processData
     }
@@ -168,7 +168,7 @@ function updateProcessContext(runId, agent, processUUID, iterationIndex, process
     );
 
     let options = {
-        mapResultId: executions[runId].mapResultId,
+        mapResultId: runId,
         agentId: agent.id,
         processIndex: executions[runId].executionAgents[agent.key].context.processes[processUUID][iterationIndex].processIndex,
         data: processData
@@ -199,7 +199,7 @@ function createActionContect(runId, agentKey, processKey, processIndex, action, 
 
     let options = {
         data: actionData,
-        mapResultId: executions[runId].mapResultId,
+        mapResultId: runId,
         agentId: executions[runId].executionAgents[agentKey].id,
         processIndex: process.processIndex,
         actionIndex: process.actions[action._id].actionIndex
@@ -242,7 +242,7 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
 
     let options = {
         data: actionData,
-        mapResultId: executions[runId].mapResultId,
+        mapResultId: runId,
         agentId: executions[runId].executionAgents[agentKey].id,
         processIndex: executions[runId].executionAgents[agentKey].context.processes[processKey][processIndex].processIndex,
         actionIndex: curActionData.actionIndex
@@ -267,7 +267,7 @@ async function startPendingExecution(mapId, socket) {
     let pendingExec = await dbUpdates.getAndUpdatePendingExecution(mapId)
     if (!pendingExec) { return }
 
-    updateClientPending(socket, { mapId, runId: pendingExec.runId })
+    updateClientPending(socket, { mapId, runId: pendingExec._id })
     socket.emit('map-execution-result', pendingExec)
 
     map = await mapsService.get(pendingExec.map)
@@ -278,8 +278,8 @@ async function startPendingExecution(mapId, socket) {
         return updateMapResult(pendingExec.id, { reason: 'no agents alive', status: statusEnum.ERROR }, socket)
     }
 
-    let context = createExecutionContext(pendingExec.runId, socket, pendingExec, mapStructure)
-    executeMap(pendingExec.runId, map, mapStructure, agents, context);
+    let context = createExecutionContext(pendingExec._id, socket, pendingExec, mapStructure)
+    executeMap(pendingExec._id, map, mapStructure, agents, context);
 }
 
 function updateMapResult(mapResultId, updateData, socket) {
@@ -314,7 +314,7 @@ function createAgentContext(agent, runId, executionContext, startNode, mapCode) 
     createCodeEnv(mapCode, runId, agent.key)
     executions[runId].executionAgents[agent.key].context.currentAgent = getCurrentAgent(agent)
 
-    dbUpdates.addAgentResult(executions[runId].executionAgents[agent.key], executions[runId].mapResultId)
+    dbUpdates.addAgentResult(executions[runId].executionAgents[agent.key], runId)
 }
 
 /**
@@ -351,7 +351,6 @@ function createExecutionContext(runId, socket, mapResult, structure) {
         status: mapResult.status,
         executionAgents: {},
         clientSocket: socket,
-        mapResultId: mapResult.id
     }
 
     return executionContext = {
@@ -386,7 +385,7 @@ function createExecutionContext(runId, socket, mapResult, structure) {
  * @param {*} payload 
  * @return {MapResult}   
  */
-async function createMapResult(runId, socket, map, configuration, structure, triggerReason, payload) {
+async function createMapResult(socket, map, configuration, structure, triggerReason, payload) {
     // get number of running executions
     const ongoingExecutions = helper.countMapExecutions(executions, map.id.toString());
 
@@ -397,7 +396,6 @@ async function createMapResult(runId, socket, map, configuration, structure, tri
 
     let mapResult = new MapResult({
         map: map._id,
-        runId: runId,  // TODO: use map result id instead of runId (delete runId usage from everywhere)
         structure: structure.id,
         startTime: startTime,
         configuration: configuration,
@@ -420,7 +418,7 @@ async function createMapResult(runId, socket, map, configuration, structure, tri
  * @param {*} runId 
  * @returns {String[]} 
  */
-async function getPluginsToExec(mapStructure, runId) {
+async function getPluginsToExec(mapStructure) {
     let pluginNames = {}
     mapStructure.used_plugins.forEach(plugin => pluginNames[plugin.name] = plugin.name);
     const names = Object.keys(pluginNames)
@@ -445,7 +443,7 @@ async function executeMap(runId, map, mapStructure, agents, context) {
 
     executions[runId].plugins = await getPluginsToExec(mapStructure, runId)
     if (!executions[runId].plugins.length) {
-        return stopExecution(runId, clientSocket, 'not all plugins installed', executions[runId].mapResultId)
+        return stopExecution(runId, clientSocket, 'not all plugins installed')
     }
 
 
@@ -490,7 +488,7 @@ async function execute(mapId, structureId, socket, configuration, triggerReason,
 
     if (agents.length == 0 && triggerReason == "Started manually by user") { throw new Error('No agents alive'); }
     let runId = helper.guidGenerator();
-    let mapResult = await createMapResult(runId, socket, map, configuration, mapStructure, triggerReason, triggerPayload)
+    let mapResult = await createMapResult(socket, map, configuration, mapStructure, triggerReason, triggerPayload)
 
     if (agents.length == 0) { // in case of trigger or schedules task we create mapResult and save the error. 
         await MapResult.findOneAndUpdate({ _id: ObjectId(mapResult.id) }, { $set: { 'reason': "No agents alive" } })
@@ -743,7 +741,7 @@ function updateAgentContext(runId, agent, agentData) {
     executions[runId].executionAgents[agent.key] = Object.assign(executions[runId].executionAgents[agent.key], agentData)
 
     let options = {
-        mapResultId: executions[runId].mapResultId,
+        mapResultId: runId,
         agentId: agent.id,
         data: agentData
     }
@@ -769,7 +767,7 @@ function endRunPathResults(runId, agent, map) {
     }
 
     let options = {
-        mapResultId: executions[runId].mapResultId,
+        mapResultId: runId,
         data: data,
         socket: executions[runId].clientSocket
     }
@@ -1150,10 +1148,8 @@ function sendKillRequest(mapId, actionId, agentKey) {
  * @param {*} socket 
  * @param {string} result - the cuase of stopping the execution  
  */
-async function stopExecution(runId, socket = null, result = "", mapResultId = null) {
-    if (!runId && mapResultId) {
-        runId = (await MapResult.findOne({ _id: ObjectId(mapResultId) })).runId
-    }
+async function stopExecution(runId, socket = null, result = "") {
+
     const d = new Date();
     let options, optionAction
 
@@ -1186,7 +1182,7 @@ async function stopExecution(runId, socket = null, result = "", mapResultId = nu
                             actionIndex: action.actionIndex
                         }
                         optionAction.push(option)
-                        sendKillRequest(executions[runId].mapResultId, actionKey, agentKey);
+                        sendKillRequest(runId, actionKey, agentKey);
                     }
                 });
             });
@@ -1194,13 +1190,13 @@ async function stopExecution(runId, socket = null, result = "", mapResultId = nu
         options = {
             data: optionAction,
             agentId: agent.id,
-            mapResultId: executions[runId].mapResultId
+            mapResultId: runId
 
         }
         optionAction ? dbUpdates.updateActionsInAgent(options) : null
     });
 
-    updateMapResult(executions[runId].mapResultId, { finishTime: d, status: statusEnum.STOPPED + " - " + result }, executions[runId].clientSocket)
+    updateMapResult(runId, { finishTime: d, status: statusEnum.STOPPED + " - " + result }, executions[runId].clientSocket)
 
     startPendingExecution(executions[runId].mapId, executions[runId].clientSocket)
     updateClientExecutions(executions[runId].clientSocket, runId);
@@ -1214,7 +1210,7 @@ async function rebuildPending() {
     let allPending = await MapResult.find({ status: statusEnum.PENDING })
     pending = {}
     allPending.map(pendingMap => {
-        pending[pendingMap.map.toString()] ? pending[pendingMap.map.toString()].push(pendingMap.runId) : pending[pendingMap.map.toString()] = [pendingMap.runId]
+        pending[pendingMap.map.toString()] ? pending[pendingMap.map.toString()].push(pendingMap._id) : pending[pendingMap.map.toString()] = [pendingMap._id]
     })
     updateClientPending(clientSocket)
 
@@ -1241,7 +1237,7 @@ function cancelPending(mapId, runId, socket) {
             throw new Error('No such job');
         }
 
-        await MapResult.findOneAndUpdate({ runId: runId }, { status: statusEnum.CANCELED })
+        await MapResult.findOneAndUpdate({ _id: runId }, { status: statusEnum.CANCELED })
         pending[mapId].splice(runIndex, 1);
         updateClientPending(socket);
         resolve();
@@ -1269,7 +1265,7 @@ module.exports = {
      * @returns {Promise<object[]>}
      */
     logs: async (resultId) => {
-        let q = { runId: resultId };
+        let q = { _id: resultId };
         let mapResult = await MapResult.findOne(q)
         let logs = []
         logs.push({ message: 'status: ' + mapResult.status })

@@ -40,16 +40,6 @@ _createConfiguration(mapStructure, configuration) {
 
 
 module.exports = {
-    /**
-     * generate runId
-     * @returns {string} - new runId
-     */
-    guidGenerator() {
-        let S4 = function () {
-            return (((1 + Math.random()) * 65536) | 0).toString(16).substring(1);
-        };
-        return (S4() + '-' + S4());
-    },
 
     /**
      * @param structure

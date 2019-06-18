@@ -16,6 +16,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { SetupComponent } from './setup/setup.component';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressRouterModule } from '@ngx-progressbar/router';
+import {DashboardResolver} from '@core/resolver/dashboard.resolver';
 
 @NgModule({
   imports: [
@@ -42,6 +43,7 @@ import { NgProgressRouterModule } from '@ngx-progressbar/router';
   exports: [
     DashboardComponent,
     SetupComponent
-  ]
+  ],
+  providers:[DashboardResolver]
 })
 export class CoreModule { }
