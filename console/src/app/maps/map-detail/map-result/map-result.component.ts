@@ -156,6 +156,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
    * @param executionId
    */
   selectExecution(executionId) {
+    if(this.selectedExecution && executionId == this.selectedExecution.id ){
+      return
+    }
     this.selectedProcess = null;
     this.mapsService.executionResultDetail(this.map.id, executionId).pipe(
       tap(result => {
