@@ -227,6 +227,33 @@ module.exports = {
 
     recentMaps:()=>{
         return shared.recentsMaps(4,['startTime','trigger']);
+    },
+
+
+    /**
+    * returns an array of the maps configurations
+    */
+    getMapConfigurations: async(structureId)=>{
+        let item = await MapStructure.find({_id:structureId},{configurations:1})
+        return Promise.resolve(item[0].configurations.toBSON())
+    }, 
+
+  
+    /**
+     * returns an array of the executions results
+     * @param {Number} amount - the aount of results to return
+     */
+    getMapExecutions: (amount, mapId)=>{
+        return MapResult.find({map:mapId}).sort('-createdAt').limit(amount)
+    },
+
+    /**
+     *  returns the latest map and map structure
+     */
+    getMap: async(mapId)=>{
+            let structure = await MapStructure.findOne({ map: mapId }).sort('-createdAt')
+            let map = await Map.findById(mapId)
+            return Promise.resolve({map:map.toJSON(), structure:structure.toJSON()})
     }
 
 };

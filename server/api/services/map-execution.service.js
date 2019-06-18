@@ -278,7 +278,7 @@ async function startPendingExecution(mapId, socket) {
         return updateMapResult(pendingExec.id, { reason: 'no agents alive', status: statusEnum.ERROR }, socket)
     }
 
-    let context = createExecutionContext(pendingExec.runId, socket, pendingExec)
+    let context = createExecutionContext(pendingExec.runId, socket, pendingExec, mapStructure)
     executeMap(pendingExec.runId, map, mapStructure, agents, context);
 }
 
@@ -345,7 +345,7 @@ function _addFuncsToCodeEnv() {
  * @param {mapResult} mapResult
  * @return {object} - all the global context of an execution  
  */
-function createExecutionContext(runId, socket, mapResult) {
+function createExecutionContext(runId, socket, mapResult, structure) {
     executions[runId] = {
         mapId: mapResult.map,
         status: mapResult.status,
@@ -365,6 +365,12 @@ function createExecutionContext(runId, socket, mapResult) {
         },
         vault: {
             getValueByKey: vaultService.getValueByKey
+        },
+
+        MapsService:{
+            getMapConfigurations: ()=>{ return structure.configurations.toBSON()},
+            getMapExecutions: async(amount)=>{ return mapsService.getMapExecutions(amount, structure.map.toString())},
+            getMap: (mapId = mapResult.map)=>{ return mapsService.getMap(mapId)}
         }
     };
 }
@@ -496,7 +502,7 @@ async function execute(mapId, structureId, socket, configuration, triggerReason,
         updateClientPending(socket)
         return runId // exit if the map is pending
     }
-    let context = createExecutionContext(runId, socket, mapResult)
+    let context = createExecutionContext(runId, socket, mapResult, mapStructure)
     executeMap(runId, map, mapStructure, agents, context)
     return runId
 }
