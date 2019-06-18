@@ -422,14 +422,13 @@ async function getPluginsToExec(mapStructure) {
     }
     return plugins
 }
-function isProcessIsOnTheFlow(processId,structure){
+function isProcessIsOnTheFlow(processUuid,structure){
     let uuids = [];
     let links = structure.links;
     links.forEach(link => {
         uuids.push(link.targetId);
         uuids.push(link.sourceId)
     })
-    let processUuid = structure.processes[structure.processes.findIndex(process => process.id.toString() == processId.toString())].uuid;
     return uuids.includes(processUuid);
 }
 
@@ -468,7 +467,13 @@ async function executeMap(runId, map, mapStructure, agents, context) {
     }
     Promise.all(promises)
     .then(async() => {
-        let responseData = await vm.runInNewContext(map.apiResponseCodeReference,executions[runId].executionAgents[agent.key].context)
+        let responseData;
+        try{
+            responseData = await vm.runInNewContext(map.apiResponseCodeReference,executions[runId].executionAgents[agent.key].context)
+        }
+        catch{
+            responseData = null
+        }
         executions[runId].subscription.complete(responseData);
         executions[runId].subscription.unsubscribe();
     })
@@ -882,7 +887,13 @@ function runProcess(map, structure, runId, agent, process) {
         }
 
         if (!passProcessCondition(runId, agent, process)) {
-            let responseData = await vm.runInNewContext(map.apiResponseCodeReference,executions[runId].executionAgents[agent.key].context)
+            let responseData;
+            try{
+                responseData = await vm.runInNewContext(map.apiResponseCodeReference,executions[runId].executionAgents[agent.key].context)
+            }
+            catch{
+                responseData = null
+            }
             executions[runId].subscription.next(responseData)
             if (process.mandatory) { // mandatory process failed, stop executions
                 executions[runId].executionAgents[agent.key].status = statusEnum.ERROR;
@@ -948,8 +959,14 @@ async function actionsExecutionCallback(map, structure, runId, agent, process) {
     if (!executions[runId] || executions[runId].executionAgents[agent.key].status) { // status is just error or done
         return;
     }
-    if(map.processResponse && map.processResponse.toString() == process._id.toString()){
-        let responseData = await vm.runInNewContext(map.apiResponseCodeReference,executions[runId].executionAgents[agent.key].context)
+    if(map.processResponse && map.processResponse == process.uuid){
+        let responseData;
+        try{
+            responseData = await vm.runInNewContext(map.apiResponseCodeReference,executions[runId].executionAgents[agent.key].context)
+        }
+        catch{
+            responseData = null
+        }
         executions[runId].subscription.next(responseData)
     }
     runProcessFunc(runId, agent, process, 'postRunResult', process.postRun)

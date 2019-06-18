@@ -61,7 +61,7 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
         this.onChangeProcessResponse();
         this.processesDropDown.push({label:'Select a Process',value:null});
         let processes = structure.processes.map(process => {
-          return {label:process.name || process.used_plugin.name, value:process._id}
+          return {label:process.name || process.used_plugin.name, value:process.uuid}
         })
         this.processesDropDown.push(...processes);
 

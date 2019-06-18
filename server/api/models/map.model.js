@@ -8,7 +8,7 @@ let mapSchema = new Schema({
     agents: [{ type: Schema.Types.ObjectId, ref: 'Agent' }],
     groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
     queue: Number,
-    processResponse: { type: Schema.Types.ObjectId, ref: 'MapStructure.processes' },
+    processResponse: { type:String, default:null },
     apiResponseCodeReference:{ type: String},
 }, { timestamps: true });
 
