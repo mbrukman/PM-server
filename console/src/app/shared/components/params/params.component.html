@@ -3,8 +3,10 @@
     <div *ngFor="let param of paramsForm.controls; let k = index">
       <div [formGroupName]="k">
         <div class="row param-wrapper">
-          <div class="col-4 tooltiptext">
-            <app-tooltip [description]="param.value.description"></app-tooltip>
+          <div class="col-4">
+            <div *ngIf="param.value.description" class="tooltiptext">
+              <i class="material-icons" [tooltip]="param.value.description"  placement="left"  aria-hidden="true">help_outline</i>
+            </div>
             <span>{{param.value.viewName}}</span>
           </div>
           <hr>

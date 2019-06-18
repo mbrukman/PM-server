@@ -35,7 +35,6 @@ import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplica
 import { PluginUploadComponent } from '@plugins/plugin-upload/plugin-upload.component';
 import { ImportModalComponent } from '@projects/project-details/import-modal/import-modal.component';
 import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-vault-items.component';
-import {TooltipComponent} from '@shared/components/params/tooltip/tooltip.component';
 
 
 @NgModule({
@@ -81,8 +80,7 @@ import {TooltipComponent} from '@shared/components/params/tooltip/tooltip.compon
     MapDuplicateComponent,
     PluginUploadComponent,
     ImportModalComponent,
-    UpsertVaultItemsComponent,
-    TooltipComponent
+    UpsertVaultItemsComponent
 
   ],
   exports: [
@@ -104,8 +102,7 @@ import {TooltipComponent} from '@shared/components/params/tooltip/tooltip.compon
     InPipe,
     MapsCardsComponents,
     ExecutionChartComponent,
-    ParamsComponent,
-    TooltipComponent
+    ParamsComponent
   ],
   entryComponents: [ConfirmComponent, RawOutputComponent,AgentsGroupUpsertFilterComponent,EditAgentComponent,InputPopupComponent,AgentsGroupUpsertComponent,AddConfigurationComponent,SelectAgentComponent,TriggerFormComponent,MapDuplicateComponent,PluginUploadComponent,ImportModalComponent,UpsertVaultItemsComponent]
 })
