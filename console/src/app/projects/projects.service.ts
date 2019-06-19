@@ -26,8 +26,8 @@ export class ProjectsService {
     return this.http.get<Project>(`api/projects/${projectId}/detail`);
   }
 
-  filter(fields?: any, page?: number, options?:FilterOptions) {
-    return this.http.post<IEntityList<Project>>(`api/projects`, { page, fields ,options});
+  filter(fields?: any,  options?:FilterOptions) {
+    return this.http.post<IEntityList<Project>>(`api/projects`, { fields ,options});
   }
 
   filterRecentMaps(projectId:string){

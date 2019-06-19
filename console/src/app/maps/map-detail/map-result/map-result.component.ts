@@ -76,21 +76,21 @@ export class MapResultComponent implements OnInit, OnDestroy {
     this.mapExecutionResultSubscription = this.socketService.getMapExecutionResultAsObservable().pipe(
       filter(result => (<string>result.map) === this.map.id)
     ).subscribe(result => {
-        let execution = this.executionsList.find((o) => o.runId === result.runId);
+        let execution = this.executionsList.find((o) => o._id === result._id);
         if (!execution) {
           delete result.agentsResults;
           this.executionsList.unshift(result);
         }
-        if (this.selectedExecution.runId === result.runId) {
+        if (this.selectedExecution._id === result._id) {
           this.selectExecution(result._id);
         }
       });
 
     // updating logs messages updates
     this.mapExecutionMessagesSubscription = this.socketService.getLogExecutionAsObservable().pipe(
-      filter(message => this.selectedExecution && (message.runId === this.selectedExecution.runId))
+      filter(message => this.selectedExecution && (message.runId === this.selectedExecution._id))
     ).subscribe(message => {
-        this.selectedExecutionLogs.push(message);
+      this.selectedExecutionLogs.push(message)
         this.scrollOutputToBottom();
       });
 
@@ -156,6 +156,10 @@ export class MapResultComponent implements OnInit, OnDestroy {
    * @param executionId
    */
   selectExecution(executionId) {
+    if(this.selectedExecution && executionId == this.selectedExecution.id ){
+      return
+    }    
+    this.selectedExecutionLogs = [];
     this.selectedProcess = null;
     this.mapsService.executionResultDetail(this.map.id, executionId).pipe(
       tap(result => {
@@ -174,9 +178,12 @@ export class MapResultComponent implements OnInit, OnDestroy {
         }
         this.changeAgent();
       }),
-      mergeMap(result => this.mapsService.logsList((<string>result.map), result.runId)) // get the logs list for this execution
-    ).subscribe(logs => {
-        this.selectedExecutionLogs = logs;
+      mergeMap(result => 
+        this.mapsService.logsList((<string>result.map), result._id)) // get the logs list for this execution
+        ).subscribe(logs => {
+          if(!this.executing.length || this.executing.findIndex(runId=> runId == this.selectedExecution._id) == -1){
+            this.selectedExecutionLogs = logs; // just if the execution finished to run
+          }
       });
   }
 

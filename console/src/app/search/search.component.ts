@@ -36,11 +36,11 @@ export class SearchComponent implements OnInit {
       }
       
       this.loading = true;
-      this.mapsService.filterMaps(null, null, filterOptions).subscribe(data => {
+      this.mapsService.filterMaps(null, filterOptions).subscribe(data => {
         this.maps = data.items;
         this.loading = false;
       });
-      this.projectsService.filter(null, null, filterOptions).subscribe(data => {
+      this.projectsService.filter(null, filterOptions).subscribe(data => {
         this.projects = data.items;
         this.loading = false;
       });

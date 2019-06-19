@@ -67,14 +67,14 @@ module.exports = {
         mapsId = [];
         let fields = filterOptions.fields
         let sort = filterOptions.options.sort || 'name'
-        let page = filterOptions.page
+        let page = Number(filterOptions.options.page)
         if (fields) {
             // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
             Object.keys(fields).map(key => { fields[key] = { '$regex': `.*${fields[key]}.*` } });
         }
 
         var $match = {};
-        if (filterOptions.options.isArchived !== true)
+        if (!(filterOptions.options.isArchived == true || filterOptions.options.isArchived == 'true'))
             $match.archived = false;
         if (filterOptions.options.globalFilter) {
             $match.$or = [

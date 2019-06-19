@@ -1,4 +1,4 @@
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import {IPluginMethodParam} from '../interfaces/plugin-method-param.interface';
 import { IParam } from '@shared/interfaces/param.interface';
@@ -17,15 +17,19 @@ export class PluginMethodParam extends Serializable implements IPluginMethodPara
   code?: boolean = null;
   query?: object;
   model?: string;
+  required?:boolean;
+  description:string
 
   static getFormGroup(param: PluginMethodParam, paramInUse = new ActionParam()): FormGroup {
+    let isRequired = param.required? Validators.required: null
     return new FormGroup({
       code: new FormControl(paramInUse.code),
-      value: new FormControl(paramInUse.value),
+      value: new FormControl(paramInUse.value, isRequired),
       param: new FormControl(paramInUse._id),
       viewName: new FormControl(param.viewName),
       name: new FormControl(param.name),
-      type: new FormControl(param.type)
+      type: new FormControl(param.type),
+      description: new FormControl(param.description)
     });
   }
 

@@ -4,6 +4,7 @@ module.exports = {
         properties: {
             name: { type: 'string' },
             viewName: { type: 'string' },
+            description: { type: 'string' },
             type: {
                 type: 'string',
                 enum:['string', 'int', 'float', 'options', 'autocomplete', 'file', 'text', 'boolean', 'vault']
