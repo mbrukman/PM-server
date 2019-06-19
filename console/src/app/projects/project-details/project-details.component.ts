@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit,ViewChild,ElementRef } from '@angular/core';
-import { ActivatedRoute,Data } from '@angular/router';
+import { ActivatedRoute,Data, Router } from '@angular/router';
 import { ProjectsService } from '../projects.service';
 import { Project } from '../models/project.model';
 import { PopupService } from '../../shared/services/popup.service';
@@ -32,9 +32,11 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     private projectsService: ProjectsService,
     private popupService: PopupService,
     private mapsService:MapsService,
-    private seoService:SeoService) { }
+    private seoService:SeoService,
+    private readonly router: Router) { }
 
   ngOnInit() {
+    this.filterOptions = this._getObjectFrom(this.route.snapshot.queryParams)
     this.id = this.route.snapshot.params.id;
     this.filterOptions.filter = {};
     this.filterOptions.filter.projectId = this.id;
@@ -52,10 +54,26 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       })
   }
 
-  getMaps(fields=null,page= 1){
-    this.mapsService.filterMaps(fields,page,this.filterOptions).subscribe(maps => {
+  _getObjectFrom(obj) : FilterOptions{
+    let data = this.filterOptions
+    let filterKeys = Object.keys(obj)
+    filterKeys.forEach(field=>{
+      data[field] = obj[field] || this.filterOptions[field]
+    })
+    return data;
+  }
+  
+  updateUrl(): void {
+    let data =  Object.assign({}, this._getObjectFrom(this.filterOptions))
+    delete data.filter
+    this.router.navigate(['projects', this.id], { queryParams: data});
+  }
+
+  getMaps(fields=null){
+    this.mapsService.filterMaps(fields,this.filterOptions).subscribe(maps => {
       this.maps = maps.items
     })
+    this.updateUrl()
   }
 
   ngOnDestroy() {
@@ -85,13 +103,12 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     let fields, page;
     if (event) {
       fields = event.filters || null;
-      page = event.first / 5 + 1;
+      this.filterOptions.page = event.first / 5 + 1;
       if (event.sortField) {
         this.filterOptions.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-
-    this.getMaps(fields,page)
+    this.getMaps(fields)
   }
 
   openImportModal() {

@@ -8,7 +8,7 @@ import { FilterOptions } from '@shared/model/filter-options.model'
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DistinctMapResult } from '@shared/model/distinct-map-result.model';
-import { Data, ActivatedRoute } from '@angular/router';
+import { Data, ActivatedRoute, Router } from '@angular/router';
 import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
@@ -19,23 +19,26 @@ import {SeoService,PageTitleTypes} from '@app/seo.service';
 export class MapsListComponent implements OnInit, OnDestroy {
   maps: Map[];
   resultCount: number = 0;
-  page: number = 1;
   filterOptions: FilterOptions = new FilterOptions();
   recentMaps: DistinctMapResult[];
   filterKeyUpSubscribe: Subscription;
   isInit:boolean=true;
+
+  readonly tablePageSize = 15;
 
   @ViewChild('globalFilter') globalFilterElement: ElementRef;
 
   constructor(private mapsService: MapsService,
     private popupService: PopupService,
     private route: ActivatedRoute,
-    private seoService:SeoService) {
+    private seoService:SeoService,
+    private readonly router: Router) {
     this.onDataLoad = this.onDataLoad.bind(this)
   }
 
 
   ngOnInit() {
+    this.filterOptions = this._getObjectFrom(this.route.snapshot.queryParams)
     this.seoService.setTitle(PageTitleTypes.MapsList)
     this.route.data.subscribe((data: Data) => {
       this.onDataLoad(data['maps']);
@@ -49,19 +52,37 @@ export class MapsListComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.loadMapsLazy();
       })
+
   }
 
-  reloadMaps(fields = null, page = this.page, filter = this.filterOptions) {
-    this.mapsService.filterMaps(fields, page, filter).subscribe(this.onDataLoad);
+  reloadMaps(fields = null, filter = this.filterOptions) {
+    this.updateUrl()
+    this.mapsService.filterMaps(fields, filter).subscribe(this.onDataLoad);
   }
 
   ngOnDestroy() {
     this.filterKeyUpSubscribe.unsubscribe();
   }
 
+  _getObjectFrom(obj) : FilterOptions{
+    let data = this.filterOptions
+    let filterKeys = Object.keys(obj)
+    filterKeys.forEach(field=>{
+      data[field] = obj[field] || this.filterOptions[field]
+    })
+    return data;
+  }
+  
+  updateUrl(): void {
+    let data = this._getObjectFrom(this.filterOptions)
+        
+    this.router.navigate(['maps'], { queryParams: data});
+  }
+  
   clearSearchFilter(){
     this.filterOptions.globalFilter = undefined;
     this.loadMapsLazy()
+    this.updateUrl()
   }
 
 
@@ -69,7 +90,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
     let fields, page;
     if (event) {
       fields = event.filters || null;
-      page = event.first / 15 + 1;
+      page = (event.first / this.tablePageSize) + 1;
       if (event.sortField) {
         this.filterOptions.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
@@ -78,7 +99,8 @@ export class MapsListComponent implements OnInit, OnDestroy {
       this.isInit=false;
       return;
     }
-    this.reloadMaps(fields, page, this.filterOptions)
+    this.filterOptions.page = page
+    this.reloadMaps(fields, this.filterOptions)
   }
 
   deleteMap(id) {

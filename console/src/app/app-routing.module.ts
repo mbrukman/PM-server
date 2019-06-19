@@ -7,11 +7,13 @@ import { SetupComponent } from './core/setup/setup.component';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressRouterModule } from '@ngx-progressbar/router';
+import {DashboardResolver} from '@core/resolver/dashboard.resolver';
 
 const appRoutes: Routes = [
   {
     path: '',
     component: DashboardComponent,
+    resolve:{dashboardItems:DashboardResolver},
     canActivate: [IsSetUpGuard]
   },
   {

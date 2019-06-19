@@ -77,7 +77,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     this.mapExecutionResultSubscription = this.socketService.getMapExecutionResultAsObservable().pipe(
       filter(result => (<string>result.map) === this.map.id)
     ).subscribe(result => {
-      let execution = this.executionsList.find((o) => o.runId === result.runId);
+      let execution = this.executionsList.find((o) => o._id === result._id);
       if (!execution) {
         delete result.agentsResults;
         this.executionsList.unshift(result);
@@ -86,7 +86,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
 
     // updating logs messages updates
     this.mapExecutionMessagesSubscription = this.socketService.getLogExecutionAsObservable().pipe(
-      filter(message => this.selectedExecution && (message.runId === this.selectedExecution.runId))
+      filter(message => this.selectedExecution && (message.runId === this.selectedExecution._id))
     ).subscribe(message => {
       this.selectedExecutionLogs.push(message);
       this.scrollOutputToBottom();
@@ -159,7 +159,11 @@ export class MapResultComponent implements OnInit, OnDestroy {
    * Selecting execution and getting result from the server
    * @param executionId
    */
-  selectExecution(execution) {
+  selectExecution(execution : MapResult) {
+    if(this.selectedExecution && execution.id == this.selectedExecution.id ){
+      return
+    }    
+    this.selectedExecutionLogs = [];
     this.selectedProcess = null;
     this.gotoExecution(execution.id);
     this.agents = execution.agentsResults.map(agentResult => {
@@ -174,7 +178,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       this.selectedAgent = this.agents[0].value
     }
     this.changeAgent();
-    this.mapsService.logsList((<string>execution.map), execution.runId // get the logs list for this execution
+    this.mapsService.logsList((<string>execution.map), execution._id // get the logs list for this execution
     ).subscribe(logs => {
       this.selectedExecutionLogs = logs;
     });

@@ -15,7 +15,11 @@
     .card {
       height: 150px;
       overflow-y: hidden;
-    
+      &:hover{
+        text-decoration:none;
+        color:inherit;
+      }
+     
       .card-body {
         padding: 16px 18px 18px 16px;
         

@@ -153,9 +153,12 @@
             
                   .details{
                     flex-grow: 1;
+                    width: 68%;
                     
                     .execution-detail {
                       margin-bottom: 10px;
+                      @include ellipsis();
+
                     }
                   }
             
