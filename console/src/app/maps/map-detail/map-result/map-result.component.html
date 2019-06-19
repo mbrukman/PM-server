@@ -17,9 +17,9 @@
           <span>
             {{ execution.startTime | date: 'short' }}
           </span>
-          <span *ngIf="executing?.indexOf(execution.runId) > -1">
+          <span *ngIf="executing?.indexOf(execution._id) > -1">
             <i class="fa fa-spinner fa-pulse fa-fw"></i>
-            <i class="fa fa-stop text-danger" (click)="stopRun(execution.runId)"></i>
+            <i class="fa fa-stop text-danger" (click)="stopRun(execution._id)"></i>
           </span>
 
         </li>
@@ -61,7 +61,7 @@
                 <div class="card-body">
                   <div class="result-overview">
                     <div class="details">
-                      <h5 class="card-title">Execution {{ selectedExecution?.runId }}</h5>
+                      <h5 class="card-title">Execution {{ selectedExecution?._id }}</h5>
                       <p class="execution-detail">Start time: {{ selectedExecution?.startTime | date: 'short' }}</p>
                       <p class="execution-detail">Finish time: {{ selectedExecution?.finishTime | date: 'short' }}</p>
                       <p class="execution-detail">Structure: {{ selectedExecution?.structure?._id }}</p>
@@ -94,7 +94,7 @@
               </div>
             </div>
           </div>
-          <div class="row card-row" *ngIf="selectedExecution && executing?.indexOf(selectedExecution.runId) === -1">
+          <div class="row card-row" *ngIf="selectedExecution && executing?.indexOf(selectedExecution._id) === -1">
             <div class="col-12" *ngIf="selectedProcess">
               <app-process-result  [process]="selectedProcess" [result]="result"></app-process-result>
             </div>

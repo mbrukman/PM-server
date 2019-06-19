@@ -18,6 +18,7 @@ export class PluginMethodParam extends Serializable implements IPluginMethodPara
   query?: object;
   model?: string;
   required?:boolean;
+  description:string
 
   static getFormGroup(param: PluginMethodParam, paramInUse = new ActionParam()): FormGroup {
     let isRequired = param.required? Validators.required: null
@@ -27,7 +28,8 @@ export class PluginMethodParam extends Serializable implements IPluginMethodPara
       param: new FormControl(paramInUse._id),
       viewName: new FormControl(param.viewName),
       name: new FormControl(param.name),
-      type: new FormControl(param.type)
+      type: new FormControl(param.type),
+      description: new FormControl(param.description)
     });
   }
 

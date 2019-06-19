@@ -3,7 +3,12 @@
     <div *ngFor="let param of paramsForm.controls; let k = index">
       <div [formGroupName]="k">
         <div class="row param-wrapper">
-          <div class="col-4">{{param.value.viewName}} {{ params[k].required? '*' :'' }} </div>
+          <div class="col-4">
+            <div *ngIf="param.value.description" class="tooltiptext">
+              <i class="material-icons" [tooltip]="param.value.description"  placement="left"  aria-hidden="true">help_outline</i>
+            </div>
+            <span>{{param.value.viewName}} {{ params[k].required? '*' :'' }} </span>
+          </div>
           <hr>
           <div *ngIf="code">
               <div class="col-2">
@@ -15,21 +20,21 @@
           </div>
           <hr>
           
-          <div class="input dropdown" [ngSwitch]="param.value.type" [hidden]="param.value.code">
-            <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
-            <app-autocomplete  *ngSwitchCase="'vault'" formControlName="value" [model]="'Vault'" ></app-autocomplete>
-            <app-autocomplete  *ngSwitchCase="'autocomplete'" formControlName="value" [model]="params[k].model"></app-autocomplete>
-            <app-options-param *ngSwitchCase="'options'" [options]="params[k].options" formControlName="value"></app-options-param>    
-            <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
-            <input formControlName="value" type="checkbox" class="form-control" *ngSwitchCase="'boolean'">
-            <input formControlName="value" type="number" class="form-control" *ngSwitchCase="'int'">
+          <div class="input dropdown" [ngSwitch]="param.value.type">
+            <div [hidden]="param.value.code">
+              <textarea formControlName="value" class="form-control" *ngSwitchCase="'text'"></textarea>
+              <app-autocomplete  *ngSwitchCase="'vault'" formControlName="value" [model]="'Vault'" ></app-autocomplete>
+              <app-autocomplete  *ngSwitchCase="'autocomplete'" formControlName="value" [model]="params[k].model"></app-autocomplete>
+              <app-options-param *ngSwitchCase="'options'" [options]="params[k].options" formControlName="value"></app-options-param>    
+              <input formControlName="value" type="number" step="any" class="form-control" *ngSwitchCase="'float'">
+              <input formControlName="value" type="checkbox" class="form-control" *ngSwitchCase="'boolean'">
+              <input formControlName="value" type="number" class="form-control" *ngSwitchCase="'int'">
+            </div>
             <input formControlName="value" type="text" class="form-control" *ngSwitchDefault>
-          </div>
-          <div class="input" [hidden]="!param.value.code">
-            <input formControlName="value" type="text" class="form-control">
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
