@@ -1304,8 +1304,14 @@ module.exports = {
      * @param resultId {string}
      * @returns {Query} a result with structure and agent result populated
      */
-    detail: (resultId) => {
-        return MapResult.findById(resultId).populate('structure agentsResults.agent');
+    detail: (params) => {
+        let query;
+        if(params.resultId && params.resultId != 'null'){
+            query = MapResult.findById(params.resultId);
+        } else {
+            query = MapResult.findOne({map:params.id}).sort({ createdAt: -1 }).limit(1);
+        }
+        return query.populate('structure agentsResults.agent');
     },
 
     /**
