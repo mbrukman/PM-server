@@ -11,9 +11,15 @@
   }
   .main-content {
     width: 100%;
-
+    ::ng-deep{
+      .content-wrapper{
+        display: flex;
+        padding: 18px $admin-padding;
+      }
+    }
   }
 }
+
 
 ul.nav {
   align-items: center;
