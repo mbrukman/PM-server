@@ -974,7 +974,6 @@ function _updateRawOutput(mapId, runId, msg, status) {
         status: status
     }
 
-    clientSocket.emit('notification', logMsg);
     clientSocket.emit('update', logMsg);
 }
 
@@ -1199,6 +1198,7 @@ async function stopExecution(runId, socket = null, result = "") {
 
 /**
  * get all pending execution from db and saves it globaly.
+ * TODO: use to rebuild on system start
  */
 async function rebuildPending() {
     let allPending = await MapResult.find({ status: statusEnum.PENDING })
@@ -1260,31 +1260,36 @@ module.exports = {
      */
     logs: async (resultId) => {
         let q = { _id: resultId };
-        let mapResult = await MapResult.findOne(q)
+        let mapResult = await MapResult.findOne(q).populate({path:'agentsResults.agent', select:'name'}).exec();
         let logs = []
-        logs.push({ message: 'status: ' + mapResult.status })
-        mapResult.agentsResults.forEach((agentResult, iAgent) => {
-            logs.push({ message: "Agent #" + (iAgent + 1) + ": " })
-            agentResult.processes.forEach((process, iProcess) => {
-                logs.push({ message: "Process #" + (iProcess + 1) + ": " + process.status })
-                process.message ? logs.push({ message: "message: " + process.message }) : null
-                process.preRunResult ? logs.push({ message: "preRun result: " + process.preRunResult }) : null
-                process.postRunResult ? logs.push({ message: "postRun result: " + process.postRunResult }) : null
-                process.actions.forEach((action, iAction) => {
-                    logs.push({ message: "Action #" + (iAction + 1) + ": " + action.status })
-                    let keys = Object.keys((action.result || {}))
-                    keys.forEach(k => {
-                        action.result[k] ? logs.push({ message: k + ':' + action.result[k] }) : null
-                    })
-                    logs.push({ message: " ---  " })
+        let structure = await mapsService.getMapStructure(mapResult.map, mapResult.structure) // for process/actions names (populate on names didnt work)
+        let processNames = {} // a map <process.id, process name>  
+        let actionNames = {} // same as above 
+        structure.processes.forEach((process,iProcess) => {
+            processNames[process.id] = process.name || (processNames[process.id]? processNames[process.id] :`Process #${iProcess+1}`) // extract process name
+            if(!process.actions){return}
+            process.actions.forEach((action, iAction)=>{
+                actionNames[action.id] = action.name || `Action #${iAction+1}` // extract action name 
+            })
+        });
+        
+        // sort all actions results by finishTime 
+        mapResult.agentsResults.forEach((agentResult) => {
+            agentResult.processes.forEach((process) => {
+                process.actions.forEach((action) => {
+                    logs.push({finishTime:action.finishTime,  message: `'${processNames[process.process.toString()]}' - '${actionNames[action.action.toString()]}' result: ${JSON.stringify(action.result)} (${agentResult.agent.name})`})
                 })
-                logs.push({ message: " ---  " })
             });
-            logs.push({ message: "   " })
-
         })
+
+        logs = logs.sort((a, b) => {
+            return -(new Date(b.finishTime) - new Date(a.finishTime));
+        })
+        logs.forEach(log=>delete log.finishTime)
         return Promise.resolve(logs)
     },
+
+
     /**
      * getting all results for a certain map (not populated)
      * @param mapId {string}
