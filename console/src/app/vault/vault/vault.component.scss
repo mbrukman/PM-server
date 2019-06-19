@@ -11,16 +11,16 @@
         }
     }
 
-    .content-wrapper{
-        padding: 18px $admin-padding;
-        @include table();
-        .actions-wrapper{
-            width: 100%;
-            display: flex;
-            justify-content: space-evenly;
-            .garbage{
-                cursor: pointer;
-            }
+
+    
+    @include table();
+    .actions-wrapper{
+        width: 100%;
+        display: flex;
+        justify-content: space-evenly;
+        .garbage{
+            cursor: pointer;
         }
     }
+    
 }

@@ -12,6 +12,11 @@ export class MapsResolver implements Resolve<IEntityList<Map>>{
     constructor(private mapsService: MapsService) { };
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<IEntityList<Map>> {
-        return this.mapsService.filterMaps(null, 1, this.filterOptions);
+
+        let filterKeys = Object.keys(route.queryParams)
+        filterKeys.forEach(field=>{
+        this.filterOptions[field] = route.queryParams[field] || this.filterOptions[field]
+        })  
+        return this.mapsService.filterMaps(null, this.filterOptions);
     }
 } 

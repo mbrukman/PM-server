@@ -3,5 +3,6 @@ export class FilterOptions{
     isArchived?:boolean;
     sort:string = '-createdAt';
     limit? : number;
-    filter?:any
+    filter?:any;
+    page?:number = 1 
 }

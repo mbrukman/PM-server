@@ -28,11 +28,12 @@ export class PluginSettingsComponent implements OnInit{
         
     }
 
-    initParamsForm(value, type, viewName) {
+    initParamsForm(param) {
+        let isRequired = param.required? Validators.required: null
         return new FormGroup({
-          value: new FormControl(value),
-          type: new FormControl(type, Validators.required),
-          viewName: new FormControl(viewName, Validators.required),
+          value: new FormControl(param.value, isRequired),
+          type: new FormControl(param.valueType, Validators.required),
+          viewName: new FormControl(param.viewName, Validators.required),
         });
       }
 
@@ -42,7 +43,7 @@ export class PluginSettingsComponent implements OnInit{
         })
         let paramsControl = <FormArray>this.settingsForm.controls['params'];
         this.plugin.settings.forEach(param => {
-            paramsControl.push(this.initParamsForm(param.value,param.valueType,param.viewName))
+            paramsControl.push(this.initParamsForm(param))
         })
     }
 
