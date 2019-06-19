@@ -1,6 +1,6 @@
 @import "~src/assets/sass/variables";
 
-.row {
+.main-admin {
   margin-left: 0;
   flex-wrap: initial;	
   margin : 0;
@@ -24,6 +24,12 @@
     display: flex;	
 
      ::ng-deep{	
+
+      .content-wrapper{
+        display: flex;
+        padding: 18px $admin-padding;
+      }
+
       > *:not(router-outlet){	
         display: flex;	
         flex-grow: 1;	
@@ -35,6 +41,7 @@
       }	
     }
 }
+
 
 ul.nav {
   align-items: center;
@@ -60,4 +67,8 @@ ul.nav {
     }
   }
 }
+<<<<<<< HEAD
 }
+=======
+
+>>>>>>> origin/develop

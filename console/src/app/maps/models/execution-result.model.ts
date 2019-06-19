@@ -45,7 +45,6 @@ export class MapResult implements IMapResult {
   id?: string;
   _id?: string;
   map: string | Map;
-  runId: string;
   structure: string | MapStructure;
   agentsResults?: [AgentResult];
   configuration: MapStructureConfiguration;

@@ -7,6 +7,7 @@ let pluginMethodParamsSchema = new Schema({
     viewName: String,
     type: { type: String, enum: ['string', 'int', 'float', 'options', 'autocomplete', 'file', 'text', 'boolean', 'vault'], required: true },
     options: [{ id: String, name: String }],
+    description:{type:String},
     model: {
         type: String, required: function () {
             return this.type === 'autocomplete'

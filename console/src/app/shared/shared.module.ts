@@ -34,7 +34,7 @@ import { TriggerFormComponent } from '@maps/map-detail/map-edit/map-enviroment-p
 import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
 import { PluginUploadComponent } from '@plugins/plugin-upload/plugin-upload.component';
 import { ImportModalComponent } from '@projects/project-details/import-modal/import-modal.component';
-import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-vault-items.component'
+import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-vault-items.component';
 
 
 @NgModule({
