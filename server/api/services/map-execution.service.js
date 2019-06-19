@@ -1198,6 +1198,7 @@ async function stopExecution(runId, socket = null, result = "") {
 
 /**
  * get all pending execution from db and saves it globaly.
+ * TODO: use to rebuild on system start
  */
 async function rebuildPending() {
     let allPending = await MapResult.find({ status: statusEnum.PENDING })
@@ -1238,12 +1239,6 @@ function cancelPending(mapId, runId, socket) {
 
 
 }
-
-function sortDatabyFinishTime(data) {
-    return data.sort((a, b) => {
-      return -(new Date(b.finishTime) - new Date(a.finishTime));
-    });
-  }
 
 module.exports = {
 
@@ -1286,7 +1281,10 @@ module.exports = {
                 })
             });
         })
-        logs = sortDatabyFinishTime(logs)
+
+        logs = logs.sort((a, b) => {
+            return -(new Date(b.finishTime) - new Date(a.finishTime));
+        })
         logs.forEach(log=>delete log.finishTime)
         return Promise.resolve(logs)
     },
