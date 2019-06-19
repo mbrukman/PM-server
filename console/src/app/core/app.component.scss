@@ -68,6 +68,7 @@
         }
     }
     .main {
+        overflow: visible;
         flex-grow: 1;
         display: flex;
         ::ng-deep>*:not(router-outlet) {
