@@ -34,7 +34,7 @@
         <p-dropdown 
         [options]="processesDropDown" 
         (onChange)="onChangeProcessResponse()" 
-        [(ngModel)]="selectedProcess" 
+        [(ngModel)]="apiResponseAfterProcess" 
         placeholder="Select a process"
         [autoWidth]="false">
         </p-dropdown>
@@ -44,7 +44,7 @@
         <p class="title">Code Reference</p>
         <input 
         class="form-control"
-        [(ngModel)]="selectedapiResponseCodeReference"
+        [(ngModel)]="apiResponseCodeRefrence"
         (keyup)="onapiResponseCodeReference()"
         *ngIf="map"/>
                       

@@ -22,8 +22,8 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
   queue: number;
   onInit:boolean;
   processesDropDown:SelectItem[] = [];
-  selectedProcess:string;
-  selectedapiResponseCodeReference:string;
+  apiResponseAfterProcess:string;
+  apiResponseCodeRefrence:string;
   constructor(private mapsService: MapsService, private projectsService: ProjectsService) {
   }
 
@@ -37,7 +37,7 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
 
         if(this.onInit){
           this.getProcessByMapId();
-          this.selectedapiResponseCodeReference = this.map.apiResponseCodeReference;
+          this.apiResponseCodeRefrence = this.map.apiResponseCodeReference;
         }
 
         this.projects = data.items;
@@ -57,7 +57,7 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
     this.mapsService.getCurrentMapStructure().pipe(filter((structure) => !!structure))
     .subscribe(structure => {
       if(structure.processes.length){
-        this.selectedProcess = this.map.processResponse;
+        this.apiResponseAfterProcess = this.map.processResponse;
         this.onChangeProcessResponse();
         this.processesDropDown.push({label:'Select a Process',value:null});
         let processes = structure.processes.map(process => {
@@ -70,12 +70,12 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
   }
 
   onChangeProcessResponse(){
-    let mapObj = Object.assign({}, this.map, { processResponse: this.selectedProcess });
+    let mapObj = Object.assign({}, this.map, { processResponse: this.apiResponseAfterProcess });
     this.mapsService.setCurrentMap(mapObj);
   }
 
   onapiResponseCodeReference(){
-    let mapObj = Object.assign({}, this.map, { apiResponseCodeReference: this.selectedapiResponseCodeReference });
+    let mapObj = Object.assign({}, this.map, { apiResponseCodeReference: this.apiResponseCodeRefrence });
     this.mapsService.setCurrentMap(mapObj);
   }
 
