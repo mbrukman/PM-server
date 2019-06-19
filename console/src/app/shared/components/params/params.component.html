@@ -7,7 +7,7 @@
             <div *ngIf="param.value.description" class="tooltiptext">
               <i class="material-icons" [tooltip]="param.value.description"  placement="left"  aria-hidden="true">help_outline</i>
             </div>
-            <span>{{param.value.viewName}}</span>
+            <span>{{param.value.viewName}} {{ params[k].required? '*' :'' }} </span>
           </div>
           <hr>
           <div *ngIf="code">
