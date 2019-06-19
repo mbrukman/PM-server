@@ -40,7 +40,7 @@ export class MapCreateComponent implements OnInit, OnDestroy {
         this.initMapForm();
       }
       var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt'};
-      this.projectsService.filter(null,null,filterOptions).subscribe(data => {
+      this.projectsService.filter(null,filterOptions).subscribe(data => {
         this.projects = data.items;
         this.projectsDropDown = this.projects.map(project => {
           return {label:project.name,value:project._id}
