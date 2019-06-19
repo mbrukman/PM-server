@@ -1,23 +1,45 @@
 @import "~src/assets/sass/variables";
 
 .main-admin {
-  display: flex;
-  height: 100%;
+  margin-left: 0;
+  flex-wrap: initial;	
+  margin : 0;
+  flex-grow: 1;
   .side-nav {
+    overflow: visible;
+    position: fixed;
     background: $kh-background;
+    flex : 0 0 $manage-sidenav-width;	
+    height: 100%;	
+    width: $manage-sidenav-width;	
+    z-index: 1;	
+    top: 0;	
     .nav{
       padding-top: 19px;
-    }
+      
+    } 
   }
-  .main-content {
-    width: 100%;
-    ::ng-deep{
+  .main-content {	  
+    flex-grow: 1;	    
+    display: flex;	
+
+     ::ng-deep{	
+
       .content-wrapper{
         display: flex;
         padding: 18px $admin-padding;
       }
+
+      > *:not(router-outlet){	
+        display: flex;	
+        flex-grow: 1;	
+
+
+         .head-title{	
+          padding-left: $manage-sidenav-width;	
+        }	
+      }	
     }
-  }
 }
 
 
@@ -45,4 +67,8 @@ ul.nav {
     }
   }
 }
+<<<<<<< HEAD
+}
+=======
 
+>>>>>>> origin/develop
