@@ -83,7 +83,7 @@ export class MapCreateComponent implements OnInit, OnDestroy {
   }
 
 
-  onChange(val){
+  onProjectChange(val){
     this.newProject = val.value == this.NEW_PROJECT
     if(this.newProject){
       this.mapForm.controls.projectName.setValidators( Validators.required)
@@ -95,7 +95,7 @@ export class MapCreateComponent implements OnInit, OnDestroy {
   onSubmitForm(value) {
     if (this.map) {
       this.mapsService.updateMap(this.map.id, value).subscribe(map => {
-        this.router.navigate(['/maps', this.map.id]);
+        this.navigateToMap(this.map.id);
       });
     } else {
       if(this.mapForm.controls.project.value==this.NEW_PROJECT){
@@ -112,8 +112,12 @@ export class MapCreateComponent implements OnInit, OnDestroy {
 
   createMap(value){
     this.mapsService.createMap(value).subscribe(map => {
-      this.router.navigate(['/maps', map.id]);
+      this.navigateToMap(map.id);
     });
+  }
+
+  navigateToMap(mapId : string){
+    this.router.navigate(['/maps', mapId]);
   }
 
 }
