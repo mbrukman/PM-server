@@ -80,8 +80,8 @@ export class MapsService {
     return this.http.get<Map>(`api/maps/${id}`);
   }
 
-  filterMaps(fields?: any, page?: number, options?: FilterOptions) {
-    return this.http.post<IEntityList<Map>>(`api/maps`, { page, fields, options });
+  filterMaps(fields?: any,  options?: FilterOptions) {
+    return this.http.post<IEntityList<Map>>(`api/maps`, { fields, options });
   }
 
   delete(id) {
