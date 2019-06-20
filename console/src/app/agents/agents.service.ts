@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { AgentsGroupFilter, Group } from '@agents/models/group.model';
 import { Agent } from './models/agent.model';
 import { Subject } from 'rxjs';
+import { SocketService } from '@app/shared/socket.service';
 
 
 @Injectable()
@@ -16,7 +17,11 @@ export class AgentsService {
   private selectedGroupSubject: Subject<Group> = new Subject<Group>();
   private reEvaluateFilterSubject: Subject<Group> = new Subject<Group>();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private socketService: SocketService) {
+    
+    this.status().subscribe(res=>{ //TODO: remove after socket will update the status too.
+      this.socketService.updateAgentsStatus(res)
+    })
   }
 
   delete(agentId) {

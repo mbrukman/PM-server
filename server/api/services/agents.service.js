@@ -461,8 +461,6 @@ module.exports = {
             socket.on('status', res=>{
                 if(!agents[agentKey]){return} 
                 _updateAgentStatus(agentKey, res)
-                updateClientAgentStatus()
-
             })
 
             socket.on('disconnect',() => {
