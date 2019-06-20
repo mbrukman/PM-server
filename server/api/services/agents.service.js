@@ -24,10 +24,11 @@ const FILTER_TYPES = Object.freeze({
 });
 
 
-setInterval(()=>{ 
+
+function  updateClientAgentStatus(){
     const agentsStatuses =  _getAgentsStatuses()
     socketService.emit('agentsStatus', agentsStatuses)
-},5000)
+}
 
 function _getAgentsStatuses(){
         const agentsCopy = _.cloneDeep(agents);
@@ -46,8 +47,17 @@ function _getAgentsStatuses(){
             return statuses
 }
 
+function _updateAgentStatus(agentKey, res){
+    agents[agentKey].hostname = res.hostname;
+    agents[agentKey].arch = res.arch;
+    agents[agentKey].freeSpace = humanize.bytes(res.freeSpace);
+    agents[agentKey].installed_plugins = res.installed_plugins;
+    agents[agentKey].alive = true
+
+}
+
 /* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
-let followAgentStatus =  (agent) => {
+let initAgent =  (agent) => {
     if(agents[agent.key]){return}
     agents[agent.key] = agent.toJSON();
     agents[agent.key].alive = false;
@@ -188,6 +198,7 @@ async function addSocketIdToAgent(agentKey, socket) {
     }
     agents[agentKey].socket = socket;
     agents[agentKey].alive = true
+    updateClientAgentStatus()
 
 }
 
@@ -218,6 +229,8 @@ function deleteAgentFromMap(agentId){
     return Map.updateMany({agents:{$elemMatch:{$eq:agentId}}},{$pull:{agents:{$in:[agentId]}}})
 }
 
+
+
 module.exports = {
 
   getAgentStatuses: _getAgentsStatuses,
@@ -229,7 +242,7 @@ module.exports = {
             }
             return Agent.findByIdAndUpdate(agentObj._id, { $set: { url: agent.url, publicUrl: agent.publicUrl,isDeleted:false } });
         }).then(agent => {
-            followAgentStatus(agent)
+            initAgent(agent)
             return agent
         })
     },
@@ -327,12 +340,12 @@ module.exports = {
         agents = {};
         Agent.find({}).then(agents => {
             agents.forEach(agent => {
-                followAgentStatus(agent);
+                initAgent(agent);
             })
         })
     },
     setDefaultUrl: setDefaultUrl,
-    followAgent: followAgentStatus,
+    followAgent: initAgent,
     /* update an agent */
     update: (agentId, agent) => {
         return Agent.findByIdAndUpdate(agentId, agent, { new: true });
@@ -447,16 +460,14 @@ module.exports = {
 
             socket.on('status', res=>{
                 if(!agents[agentKey]){return} 
-                agents[agentKey].hostname = res.hostname;
-                agents[agentKey].arch = res.arch;
-                agents[agentKey].freeSpace = humanize.bytes(res.freeSpace);
-                agents[agentKey].installed_plugins = res.installed_plugins;
-                agents[agentKey].alive = true
+                _updateAgentStatus(agentKey, res)
+                updateClientAgentStatus()
 
             })
 
             socket.on('disconnect',() => {
                 agents[agentKey].alive = false;
+                updateClientAgentStatus()
             });
     
         });
