@@ -31,6 +31,7 @@ import { monacoConfig } from './monaco-config'
 import {AutoCompleteModule} from 'primeng/primeng';
 import { MapsResolver } from './resolvers/maps.resolver';
 import { MapDesignService } from './map-detail/map-edit/map-design.service';
+import {InputSwitchModule} from 'primeng/inputswitch';
 
 @NgModule({
   imports: [
@@ -49,7 +50,8 @@ import { MapDesignService } from './map-detail/map-edit/map-design.service';
     TooltipModule,
     NgxDnDModule,
     InfiniteScrollModule,
-    AutoCompleteModule
+    AutoCompleteModule,
+    InputSwitchModule
     
   ],
   declarations: [

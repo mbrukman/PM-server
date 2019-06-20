@@ -1,6 +1,11 @@
 @import "~src/assets/sass/mixins";
 .main {
     .head-title {
+        justify-content: space-between;
+        .btn-title{
+            display: flex;
+            margin: 35px;
+        }
         a {
             margin-right: 10px;
         }

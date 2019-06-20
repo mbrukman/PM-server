@@ -12,6 +12,10 @@ export class ProjectsResolver implements Resolve<IEntityList<Project>>{
     constructor(private projectsService: ProjectsService) { };
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<IEntityList<Project>> {
-        return this.projectsService.filter(null, 1, this.filterOptions);
+        let filterKeys = Object.keys(route.queryParams)
+        filterKeys.forEach(field=>{
+        this.filterOptions[field] = route.queryParams[field] || this.filterOptions[field]
+        })  
+        return this.projectsService.filter(null, this.filterOptions);
     }
 } 

@@ -56,10 +56,10 @@ module.exports = {
             // apply sorting by field name. for reverse, should pass with '-'.
             p.sort(filterOptions.options.sort)
         }
-        if (filterOptions.page) {
+        if (filterOptions.options.page) {
             var pageSize = filterOptions.options.limit || PAGE_SIZE;
             // apply paging. if no paging, return all
-            p.limit(pageSize).skip((filterOptions.page - 1) * pageSize)
+            p.limit(pageSize).skip((filterOptions.options.page - 1) * pageSize)
         }
 
         return p.then(projects => {

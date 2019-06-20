@@ -116,14 +116,17 @@
                  (mouseup)="onMouseUp($event)" ngxDroppable>
               <div *ngFor="let action of processForm.controls.actions['controls']; let i=index" ngxDraggable
                    [model]="action">
-                <div class="d-flex justify-content-between action-tile">
-                  <span *ngIf="processForm.get('actions').at(i).get('name').value">{{processForm.get('actions').at(i).get('name').value}} (#{{i + 1}})</span>
-                  <span *ngIf="!processForm.get('actions').at(i).get('name').value">Action #{{i + 1}}</span>
+                <div [formGroupName]="i" class="d-flex justify-content-between action-tile">
+                 <div class="action-config">
+                    <p-inputSwitch formControlName="isEnabled"></p-inputSwitch>
+                    <span [ngClass]="{'disabled':!action.value.isEnabled}" *ngIf="processForm.get('actions').at(i).get('name').value">{{processForm.get('actions').at(i).get('name').value}} (#{{i + 1}})</span>
+                    <span [ngClass]="{'disabled':!action.value.isEnabled}" *ngIf="!processForm.get('actions').at(i).get('name').value">Action #{{i + 1}}</span>
+                 </div>
                   <span class="action-btns">
                     <i class="material-icons pointer" (click)="editAction(i)">mode_edit</i>
                     <i class="material-icons pointer" (click)="removeAction(i)"> delete_outline</i>
                   </span>
-                </div>
+                </div> 
               </div>
             </div>
             <button type="button" class="kh-btn-blue kh-btn add-action" (click)="addNewAction()">Add action</button>
@@ -185,7 +188,7 @@
             </div>
           </div>
           <div class="text-center">
-            <button type="button" (click)="backToProcessView()" class="kh-btn kh-btn-blue ">Submit</button>
+            <button type="button" (click)="backToProcessView()" class="kh-btn kh-btn-blue " [disabled]="processForm.invalid" >Submit</button>
           </div>
         </div>
     

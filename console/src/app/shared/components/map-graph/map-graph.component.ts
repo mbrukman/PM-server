@@ -63,7 +63,6 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
   @ViewChild('wrapper') wrapper:ElementRef
 
   constructor(
-    private mapsService: MapsService,
     private pluginsService: PluginsService,
     private mapDesignService: MapDesignService
     ) { }
@@ -186,10 +185,6 @@ export class MapGraphComponent implements OnInit, AfterContentInit, OnDestroy {
         this.setCellSelectState(cell,false);
       });
 
-      if ((<any>(this.mapStructure)).imported) {
-        delete (<any>(this.mapStructure)).imported;
-        this.deselectAllCellsAndUpdateStructure();
-      }
     }
   }
 

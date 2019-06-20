@@ -30,7 +30,7 @@ export class MapDesignComponent implements OnInit {
   processViewWrapper: ProcessViewWrapper;
 
   @ViewChild(MapGraphComponent) mapGraph: MapGraphComponent;
-
+ 
   constructor(
     private mapsService: MapsService,
     private pluginsService: PluginsService) { }
