@@ -49,6 +49,7 @@ export interface IProcess {
   updatedAt: Date;
   correlateAgents: boolean;
   uuid: string;
+  actionsExecution: string
 }
 
 export interface ILink {
