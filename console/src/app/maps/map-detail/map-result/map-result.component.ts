@@ -88,7 +88,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
 
     // updating logs messages updates
     this.mapExecutionMessagesSubscription = this.socketService.getLogExecutionAsObservable().pipe(
-      filter(message => this.selectedExecution && (message.runId === this.selectedExecution._id))
+      filter(message => this.selectedExecution && (message.runId === this.selectedExecution.id))
     ).subscribe(message => {
       this.selectedExecutionLogs.push(message);
       this.scrollOutputToBottom();
@@ -256,10 +256,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       });
       
     }
-    else{
-      if(this.selectedExecution && execution.id == this.selectedExecution.id ){
-        return
-      }    
+    else{    
       this.selectedExecutionLogs = [];
       this.selectedProcess = null;
       this.gotoExecution(execution.id);

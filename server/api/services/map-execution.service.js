@@ -459,7 +459,7 @@ async function executeMap(runId, map, mapStructure, agents, context) {
         stopExecution(runId, clientSocket, "link is missing to start execution")
     }
 
-    let nsp = socketService.getNamespaceSocket('execution-update-'+ executions[runId].mapResultId);
+    let nsp = socketService.getNamespaceSocket('execution-update-'+ runId.toString());
     nsp.on('connection',function (socket) {
         Object.keys(nsp.sockets).forEach(socket => {
             nsp.sockets[socket]['isFirstMessageToSocket'] = true;
@@ -767,7 +767,7 @@ function updateAgentContext(runId, agent, agentData) {
 }
 
 function sendFinishTimeToClient(runId,data){
-    let nsp = socketService.getNamespaceSocket('execution-update-'+executions[runId].mapResultId);
+    let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
     Object.keys(nsp.sockets).forEach(socket => {
         let clientSocket = nsp.sockets[socket];
         clientSocket.emit('updateFinishTime',data);     
@@ -887,13 +887,13 @@ function runProcess(map, structure, runId, agent, process) {
                 },               
             
             } 
-            let nsp = socketService.getNamespaceSocket('execution-update-'+executions[runId].mapResultId);
+            let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
             nsp.emit('updateAction',res)
             if (process.mandatory) { // mandatory process failed, stop executions
                 executions[runId].executionAgents[agent.key].status = statusEnum.ERROR;
                 return stopExecution(runId, null, "Mandatory process failed" );
             }
-           endRunPathResults(runId, agent, map)
+            endRunPathResults(runId, agent, map)
             return resolve()
         }
 
@@ -1171,7 +1171,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
                 }
             } 
 
-            let nsp = socketService.getNamespaceSocket('execution-update-'+executions[runId].mapResultId);
+            let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
             nsp.actions.push(res)
             Object.keys(nsp.sockets).forEach(socket => {
                 let clientSocket = nsp.sockets[socket];
@@ -1389,7 +1389,7 @@ module.exports = {
         if(params.resultId && params.resultId != 'null'){
             query = MapResult.findById(params.resultId);
         } else {
-            query = MapResult.findOne({map:params.id}).sort({ createdAt: -1 }).limit(1);
+            query = MapResult.findOne({map:params.id}).sort( '-finishTime' ).limit(1);
         }
         return query.populate('structure agentsResults.agent');
     },
