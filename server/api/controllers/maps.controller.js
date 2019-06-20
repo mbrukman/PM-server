@@ -21,13 +21,15 @@ function _mapperResult(execResult, processNames=null) {
             process = Object.assign({},process)
             let processResult = []
             let statuses = [];
-            process.actions.forEach(action => {
-                statuses.push(action.status)
-                if(!action.result){
-                    action.result = {stdout:action.status}
-                }
-                processResult.push(action.result)
-            })
+           if(process.actions){
+                process.actions.forEach(action => {
+                    statuses.push(action.status)
+                    if(!action.result){
+                        action.result = {stdout:action.status}
+                    }
+                    processResult.push(action.result)
+                })
+           }
             let processStatus = 'error'
             let mapS = {}
             if(process.status == 'done' && statuses){
@@ -359,7 +361,7 @@ module.exports = {
 
     resultDetail: (req, res) => {
         hooks.hookPre('map-results-detail').then(() => {
-            return mapsExecutionService.detail(req.params.resultId);
+            return mapsExecutionService.detail(req.params);
         }).then(async execResult => {
             if (!execResult)
                 throw "No result found";

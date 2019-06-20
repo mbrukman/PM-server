@@ -6,4 +6,5 @@ export class PluginSettings  {
     viewName?: string;
     options?: { id: string, name: string }[];
     value?: string | { id: string, value: string } = null;
+    required?:boolean;
 }

@@ -1,8 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-
 import { Subscription } from 'rxjs';
 import { filter, tap, mergeMap } from "rxjs/operators";;
-
 import { MapsService } from '../../maps.service';
 import { Map } from '@maps/models/map.model';
 import { ProjectsService } from '@projects/projects.service';
@@ -54,7 +52,7 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
   }
 
   onChangeProject() {
-    let mapObj = Object.assign({}, this.map, { project: this.selectedProject });
+    let mapObj = Object.assign({}, this.map, { project: this.selectedProject  });
     this.mapsService.setCurrentMap(mapObj);
   }
 

@@ -36,7 +36,7 @@ export class AddJobComponent implements OnInit {
 
   ngOnInit() {
     var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt'};
-    this.projectsService.filter(null,null,filterOptions).subscribe(data => {
+    this.projectsService.filter(null,filterOptions).subscribe(data => {
       this.projects = data.items;
       this.projectsDropDown = this.projects.map(project => {
         return {label:project.name,value:project._id}
@@ -65,7 +65,7 @@ export class AddJobComponent implements OnInit {
     let filterOptions = new FilterOptions();
     filterOptions.filter = {};
     filterOptions.filter.projectId = projectId;
-    this.mapsService.filterMaps(null,null,filterOptions).subscribe(maps => {
+    this.mapsService.filterMaps(null,filterOptions).subscribe(maps => {
       for(let i =0,length=maps.items.length;i<length;i++){
         this.mapDropDown.push({label:maps.items[i].name,value:maps.items[i].id})
       }

@@ -25,15 +25,17 @@
         list-style: none;
         font-size: 14px;
 
-        li {
+        a {
           padding-left: 15px;
           padding-right: 15px;
           height: 41px;
           line-height: 41px;
+          color:#ddd;
 
           &:hover { 
             cursor: pointer;
             background: $dark-background;
+            text-decoration: none; 
           }
 
           &.selected {
@@ -151,9 +153,12 @@
             
                   .details{
                     flex-grow: 1;
+                    width: 68%;
                     
                     .execution-detail {
                       margin-bottom: 10px;
+                      @include ellipsis();
+
                     }
                   }
             

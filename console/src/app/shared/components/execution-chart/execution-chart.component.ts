@@ -20,6 +20,7 @@ export class ExecutionChartComponent implements OnChanges {
 
   aggregateProcessesStatus(processes) {
     let skipped = 0;
+    if(!processes){return}
     let ag = processes.reduce((total, current) => {
       if (!total[current.status]) {
         return total;
