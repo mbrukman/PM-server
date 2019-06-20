@@ -33,6 +33,7 @@ import { ProcessViewComponent } from './map-detail/map-revisions/process-view/pr
 import { monacoConfig } from './monaco-config' 
 import {AutoCompleteModule} from 'primeng/primeng';
 import { MapsResolver } from './resolvers/maps.resolver';
+import {InputSwitchModule} from 'primeng/inputswitch';
 
 @NgModule({
   imports: [
@@ -51,7 +52,8 @@ import { MapsResolver } from './resolvers/maps.resolver';
     TooltipModule,
     NgxDnDModule,
     InfiniteScrollModule,
-    AutoCompleteModule
+    AutoCompleteModule,
+    InputSwitchModule
     
   ],
   declarations: [
