@@ -37,6 +37,7 @@
     }
     .input{
         &.dropdown{
+            @include checkbox();
             width: 100%;
             @include dropdown();
         }
