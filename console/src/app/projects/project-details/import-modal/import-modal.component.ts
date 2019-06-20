@@ -42,10 +42,8 @@ export class ImportModalComponent {
       return ;
     }
     this.fixImgUrl()
-    this.mapsService.createMap({ name: this.name, project: this.projectId }).pipe(
-      mergeMap(map => this.mapsService.createMapStructure(map.id, this.structure))
-    ).subscribe(structure => {
-        this.router.navigate(['/maps', structure.map]);
+    this.mapsService.createMap({ name: this.name, project: this.projectId, structure:this.structure}).subscribe(map => {
+        this.router.navigate(['/maps', map.id]);
         this.onClose();
       })
   }
