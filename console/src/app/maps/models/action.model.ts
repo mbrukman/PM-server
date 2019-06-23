@@ -17,6 +17,7 @@ export class Action extends Serializable implements IAction {
   method: PluginMethod | string;
   params?: ActionParam[];
   isEnabled: boolean
+  numParallel?: string; 
 
   static getFormGroup(action?: Action): FormGroup {
     if (!action) {
@@ -31,6 +32,7 @@ export class Action extends Serializable implements IAction {
       mandatory: new FormControl(action.mandatory),
       params: new FormArray([]),
       isEnabled: new FormControl(action.isEnabled == null ? true : action.isEnabled),
+      numParallel: new FormControl(action.numParallel)
     });
   }
 }

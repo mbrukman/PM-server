@@ -1,12 +1,17 @@
+/**
+ * @type {MapsService}
+ */
+var MapService 
+
 
 /**	
  * Represents the execution Id	
  */
 /** @type {KaholoAgent} */
-var currentAgent={
+var currentAgent = {
     name: '',
     url: '',
-    attributes: [{ name: ''}]
+    attributes: [{ name: '' }]
 }
 
 /**	

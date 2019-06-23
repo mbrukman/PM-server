@@ -73,7 +73,7 @@
     
               <small class="form-text text-muted">Controlling syncing between agents.</small>
             </div>
-    
+
             <div class="form-group dropdown" *ngIf="processViewWrapper.process?.coordination">
               <label>Process coordination</label>
               <p-dropdown  [options]="coordinationDropDown" placeholder="Select a Coordination" formControlName="coordination"  
@@ -83,6 +83,21 @@
     
               <small class="form-text text-muted">Controlling process sync.</small>
             </div>
+
+            <div class="form-group dropdown">
+              <label>Actions execution</label>
+              <p-dropdown  [options]="actionsExecutionsDropDown" formControlName="actionsExecution"  
+                          [autoWidth]="false">
+              </p-dropdown>
+    
+              <small class="form-text text-muted">Controlling syncing between actions.</small>
+            </div>
+            <div class=" form-group parallel">
+                <label for="parallel">Parallel executions</label>
+                <input type="text" class="form-control" id="numProcessParallel" formControlName="numProcessParallel">
+              <small class="form-text text-muted">Number - Leave empty to run once, insert a number or refer to to map code</small>
+            </div>
+
           </accordion-group>
           <accordion-group>
             <div accordion-heading class="clearfix">
@@ -167,6 +182,13 @@
             </label>
             <small class="form-text text-muted">If the action fails the process will stop (with failure).</small>
           </div>
+
+          <div class="parallel">
+              <label class="parallel">Parallel executions</label>
+              <input type="text" class="form-control" id="numParallel" formControlName="numParallel">
+            <small class="form-text text-muted">Number - Leave empty to run once, insert a number or refer to to map code</small>
+          </div>
+
           <p class="lead">Method</p>
     
           <div class="dropdown">
@@ -194,6 +216,4 @@
     
       </form>
     </div>
-    </div>
-    
-    
+</div>

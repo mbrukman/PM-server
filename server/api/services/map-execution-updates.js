@@ -1,6 +1,5 @@
 const models = require("../models");
 const MapResult = models.MapResult;
-
 let dbQueue = []
 
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -28,6 +27,7 @@ function _runDbFunc() {
     }
     const lastElement = dbQueue[dbQueue.length - 1]
     funcs[lastElement.func](lastElement.data).then(res => {
+
         dbRetries = 3;
         // console.log(`func ${lastElement.func} res:`, res)
         dbQueue.pop();
@@ -63,7 +63,6 @@ function _getPathFiledsToUpdate(pathToSet, data) {
 function _updateMapResult(options) {
     return MapResult.findByIdAndUpdate(options.mapResultId, { $set: options.data }, { new: true })
     .then((mapResult) => {
-        options.socket.emit('map-execution-result', mapResult);
         return mapResult
     });
 }

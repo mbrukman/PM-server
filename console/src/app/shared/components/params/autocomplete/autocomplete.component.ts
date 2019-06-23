@@ -43,11 +43,11 @@ export class AutocompleteComponent implements OnInit, ControlValueAccessor {
   search(event) {
     this.options.query = event.query;
     if(event.query !=""){
-      this.autoCompleteService.generateAutoCompleteParams(this.model,this.options).subscribe(autoCompleteItem => {
+    this.autoCompleteService.generateAutoCompleteParams(this.model,this.options).subscribe(autoCompleteItem => {
         this.mapResult(autoCompleteItem)
       });
-    }
   }
+}
 
   // interface implementation//
   writeValue(obj: any): void {
