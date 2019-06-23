@@ -252,10 +252,6 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.downloadJson = this.sanitizer.bypassSecurityTrustUrl('data:text/json;charset=UTF-8,' + encodeURIComponent(JSON.stringify(structure)));
   }
 
-  getMapResultIdAsObservable(){
-
-    return this.mapResultId.asObservable()
-  }
 
   discardChanges() {
     this.mapsService.setCurrentMapStructure(this.originalMapStructure);

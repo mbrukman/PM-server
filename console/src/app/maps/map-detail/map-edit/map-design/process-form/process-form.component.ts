@@ -110,7 +110,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       });
     }
 
-
     // subscribe to changes in form
     this.formValueChangeSubscription = this.processForm.valueChanges.pipe(
       debounceTime(300),

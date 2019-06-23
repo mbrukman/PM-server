@@ -164,7 +164,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     else{
       let processIndex = -1;
       selectedExecution.agentsResults[agentIndex].processes.forEach((process,index) => {
-        if(process.process == result.process.process){
+        if(process.uuid == result.process.uuid){
           processIndex = index;
         }
       })
@@ -247,11 +247,16 @@ export class MapResultComponent implements OnInit, OnDestroy {
       this.ongoingExecutionSocket.on('updateFinishTime',(data) => {
         this.selectedExecution.finishTime = data.execution;
         if(data.process){
-          let processes = [];
-          this.selectedExecution.agentsResults.forEach(agent => {
-            processes = [...processes,...agent.processes]
-          })
-          processes[processes.findIndex((process) => process.process == data.process.id)].finishTime = data.process.finishTime;
+          for(let i=0,length = this.selectedExecution.agentsResults.length;i<length;i++){
+            let agent = this.selectedExecution.agentsResults[i];
+            for(let j=0,length = agent.processes.length;j<length;j++){
+              let process = agent.processes[j];
+              if(process.uuid == data.process.uuid){
+                process.finishTime = data.process.finishTime;
+                break;
+              }
+            }
+          }
         }
       });
       
@@ -302,14 +307,14 @@ export class MapResultComponent implements OnInit, OnDestroy {
     this.generateProcessesList();
   }
 
-  resultsByProcessId(id){
+  resultsByProcessUuid(uuid){
     let processes = [];
     this.result.forEach(res => {
       processes = [...processes, ...res.processes];
     });
     let resultProcess = [];
     processes.forEach((process) => {
-      if(process.process == id){
+      if(process.uuid == uuid){
         resultProcess.push(process)
       }
     })
@@ -335,14 +340,14 @@ export class MapResultComponent implements OnInit, OnDestroy {
     let processesList = [];
     this.result.forEach(res => {
       res.processes.map(o => {
-        if (processesList.findIndex(k => o.process === k.process && o.index === k.index) === -1) {
+        if (processesList.findIndex(k => o.uuid === k.uuid && o.index === k.index) === -1) {
           processesList.push(o);
         }
       });
 
     });
     let overall = processesList.reduce((total, current) => {
-      total[current.process] = (total[current.process] || 0) + 1;
+      total[current.uuid] = (total[current.uuid] || 0) + 1;
       return total;
     }, {});
 
@@ -350,10 +355,10 @@ export class MapResultComponent implements OnInit, OnDestroy {
       .sort(sortByDate)
       .map(o => {
         return {
-          name: (o.name) || 'Process #' + (Object.keys(overall).indexOf(o.process) + 1),
+          name: (o.name) || 'Process #' + (Object.keys(overall).indexOf(o.uuid) + 1),
           index: o.index,
-          process: o.process,
-          overall: overall[o.process],
+          uuid: o.uuid,
+          overall: overall[o.uuid],
         };
       });
 
@@ -367,7 +372,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     let processes = [];
     this.result.forEach(res => {
       res.processes.forEach(o=>{
-        if(o.process === process.process && o.index === process.index){
+        if(o.uuid === process.uuid && o.index === process.index){
           res.agent? processes.push({...o, agentKey: (<Agent>res.agent).id})  : null  
         }
       })
@@ -416,8 +421,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
             }
             
             process.result = processResult
-            process.process =process.process.toString();
-            processNames ? process.name = processNames[process.process] : null
+            processNames ? process.name = processNames[process.uuid] : null
             newResult.agentsResults[agentIndex].processes[processIndex] = process
         })
     })

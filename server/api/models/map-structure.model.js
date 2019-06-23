@@ -16,7 +16,7 @@ const actionSchema = new Schema({
     method: String,
     params: [actionParamsSchema],
     mandatory: { type: Boolean, default: false },
-    isEnabled:{type:Boolean, required:true}
+    isEnabled:{type:Boolean, default:true}
 });
 
 
