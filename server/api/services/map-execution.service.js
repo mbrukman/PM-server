@@ -1,7 +1,7 @@
 const vm = require('vm');
 const fs = require('fs');
 const path = require('path');
-
+const { Subject } = require('rxjs');
 const winston = require('winston');
 const request = require('request');
 const _ = require("lodash");
@@ -437,6 +437,36 @@ async function getPluginsToExec(mapStructure) {
 }
 
 
+function isProcessIsOnTheFlow(nodeUuid,structure,processUuid ,processesDidntPassConditionUuid = null){
+    let successor = helper.findSuccessors(nodeUuid,structure);
+    if(successor.includes(processUuid)){
+        return true;
+    }
+    if(successor.length == 0){
+        return false;
+    }
+    for(let i=0,length=successor.length;i<length;i++){
+        if(!processesDidntPassConditionUuid || !processesDidntPassConditionUuid.includes(successor[i])){
+            if(isProcessIsOnTheFlow(successor[i],structure,processUuid,processesDidntPassConditionUuid)){
+                return true;
+            }
+        }
+    }
+    return false
+}
+
+
+async function runCode(map,runId,agent){
+    let responseData;
+    try{
+        responseData = await vm.runInNewContext(map.apiResponseCodeReference,executions[runId].executionAgents[agent.key].context)
+    }
+    catch{
+        responseData = null
+    }
+    return responseData
+}
+
 /**
  * 
  * @param {*} runId 
@@ -453,8 +483,12 @@ async function executeMap(runId, map, mapStructure, agents, context) {
         return stopExecution(runId, clientSocket, 'not all plugins installed')
     }
 
-
     const startNode = helper.findStartNode(mapStructure);
+
+    if(map.processResponse && !isProcessIsOnTheFlow(startNode.uuid,mapStructure,map.processResponse)){
+        executions[runId].subscription.next()
+    }
+
     if(!startNode){
         stopExecution(runId, clientSocket, "link is missing to start execution")
     }
@@ -477,7 +511,13 @@ async function executeMap(runId, map, mapStructure, agents, context) {
         }
         promises.push(runMapOnAgent(map, mapStructure, runId, startNode, agents[i]))
     }
-    Promise.all(promises).catch(err => {
+    Promise.all(promises)
+    .then(async () => {
+        let responseData = await  runCode(map,runId,agent);
+        executions[runId].subscription.complete(responseData);
+        executions[runId].subscription.unsubscribe();
+    })
+    .catch(err => {
         winston.log('error', "structureId: " + mapStructure.id + err);
     });
 }
@@ -508,19 +548,46 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
     let mapResult = await createMapResult(socket, map, configurationName, mapStructure, triggerReason, triggerPayload);
     let runId = mapResult._id;
 
+    let response = {
+        runId:runId,
+        mapId:mapId
+    }
+
     if (agents.length == 0) { // in case of trigger or schedules task we create mapResult and save the error. 
         await MapResult.findOneAndUpdate({ _id: ObjectId(mapResult.id) }, { $set: { 'reason': "No agents alive" } })
-        return
+        return response;
     }
 
     if (mapResult.status == statusEnum.PENDING) {
         pending[mapResult.map] ? pending[mapResult.map].push(runId) : pending[mapResult.map] = [runId]
         updateClientPending(socket)
-        return runId // exit if the map is pending
+        return response // exit if the map is pending
     }
     let context = createExecutionContext(runId, socket, mapResult)
-    executeMap(runId, map, mapStructure, agents, context)
-    return runId;
+    
+    
+    executeMap(runId, map, mapStructure, agents, context);
+
+    if (!map.processResponse){
+        return Promise.resolve(response)
+    }
+
+    executions[runId].subscription = new Subject();
+    return new Promise((resolve,reject)=>{
+        executions[runId].subscription
+        .subscribe(
+            (responseData) => {
+            response.responseData = responseData;
+            resolve (response);
+            },
+            (error) => console.log(error),
+            (responseData) => {
+                response.responseData = responseData;
+                resolve (response);
+            }
+        )
+    })
+
 }
 
 /**
@@ -866,8 +933,8 @@ function runProcessFunc(runId, agent, process, fieldName, funcToRun) {
  * @param socket
  * @returns {Promise} - null resolve
  */
-function runProcess(map, structure, runId, agent, process) {
-    return new Promise((resolve, reject) => {
+ function runProcess(map, structure, runId, agent, process) {
+    return new Promise(async(resolve, reject) => {
         if (!helper.isAgentShuldContinue(executions[runId].executionAgents[agent.key])) {
             return resolve()
         }
@@ -889,6 +956,17 @@ function runProcess(map, structure, runId, agent, process) {
             } 
             let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
             nsp.emit('updateAction',res)
+            executions[runId].processesDidntPassConditionUuid = executions[runId].processesDidntPassConditionUuid || [];
+            executions[runId].processesDidntPassConditionUuid.push(process.uuid);
+            if(map.processResponse == process.uuid){
+                let responseData = await runCode(map,runId,agent);
+                executions[runId].subscription.next(responseData)
+            }
+            let startNodeUuid = helper.findStartNode(structure).uuid;
+            if(isProcessIsOnTheFlow(process.uuid,structure,map.processResponse) && !isProcessIsOnTheFlow(startNodeUuid,structure,map.processResponse,executions[runId].processesDidntPassConditionUuid)){
+                let responseData = await runCode(map,runId,agent);
+                executions[runId].subscription.next(responseData);
+            }
             if (process.mandatory) { // mandatory process failed, stop executions
                 executions[runId].executionAgents[agent.key].status = statusEnum.ERROR;
                 return stopExecution(runId, null, "Mandatory process failed" );
@@ -967,9 +1045,14 @@ function runActionsInParallel(actionsArray,runId){
  * @param {*} agent 
  * @param {*} process 
  */
-function actionsExecutionCallback(map, structure, runId, agent, process) {
+async function actionsExecutionCallback(map, structure, runId, agent, process) {
     if (!executions[runId] || executions[runId].executionAgents[agent.key].status) { // status is just error or done
         return;
+    }
+    if(map.processResponse && map.processResponse == process.uuid){
+        let responseData = await runCode(map,runId,agent);
+        executions[runId].subscription.next(responseData);
+        executions[runId].subscription.unsubscribe();
     }
     runProcessFunc(runId, agent, process, 'postRunResult', process.postRun)
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.DONE, finishTime: new Date() });
