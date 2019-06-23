@@ -468,7 +468,7 @@ async function runCode(map,runId,agent){
     try{
         responseData = await vm.runInNewContext(map.apiResponseCodeReference,executions[runId].executionAgents[agent.key].context)
     }
-    catch{
+    catch(err){
         responseData = null
     }
     return responseData
