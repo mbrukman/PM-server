@@ -67,14 +67,14 @@ module.exports = {
         mapsId = [];
         let fields = filterOptions.fields
         let sort = filterOptions.options.sort || 'name'
-        let page = filterOptions.page
+        let page = Number(filterOptions.options.page)
         if (fields) {
             // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
             Object.keys(fields).map(key => { fields[key] = { '$regex': `.*${fields[key]}.*` } });
         }
 
         var $match = {};
-        if (filterOptions.options.isArchived !== true)
+        if (!(filterOptions.options.isArchived == true || filterOptions.options.isArchived == 'true'))
             $match.archived = false;
         if (filterOptions.options.globalFilter) {
             $match.$or = [
@@ -206,7 +206,10 @@ module.exports = {
             return MapStructure.findById(structureId)
         }
 
-        return MapStructure.findOne({ map: mapId }).sort('-createdAt')
+        return MapStructure.findOne({ map: mapId }).sort('-createdAt').then(res=>{
+            console.log(res);
+            return res;
+        })
     },
     
     structureList: (mapId, page) => {
@@ -227,6 +230,33 @@ module.exports = {
 
     recentMaps:()=>{
         return shared.recentsMaps(4,['startTime','trigger']);
+    },
+
+
+    /**
+    * returns an array of the maps configurations
+    */
+    getMapConfigurations: async(structureId)=>{
+        let item = await MapStructure.find({_id:structureId},{configurations:1})
+        return Promise.resolve(item[0].configurations.toBSON())
+    }, 
+
+  
+    /**
+     * returns an array of the executions results
+     * @param {Number} amount - the aount of results to return
+     */
+    getMapExecutions: (amount, mapId)=>{
+        return MapResult.find({map:mapId}).sort('-createdAt').limit(amount)
+    },
+
+    /**
+     *  returns the latest map and map structure
+     */
+    getMap: async(mapId)=>{
+            let structure = await MapStructure.findOne({ map: mapId }).sort('-createdAt')
+            let map = await Map.findById(mapId)
+            return Promise.resolve({map:map.toJSON(), structure:structure.toJSON()})
     }
 
 };

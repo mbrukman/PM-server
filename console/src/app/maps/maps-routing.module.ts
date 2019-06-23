@@ -12,6 +12,7 @@ import { MapCreateComponent } from './map-create/map-create.component';
 import { MapResultComponent } from './map-detail/map-result/map-result.component';
 import { MapConfigurationsComponent } from "@maps/map-detail/map-configurations/map-configurations.component";
 import { MapsResolver } from './resolvers/maps.resolver';
+import { MapResultResolver } from './resolvers/map-result.resolver';
 
 const routes: Routes = [
   {
@@ -66,7 +67,13 @@ const routes: Routes = [
       },
       {
         path: 'results',
-        component: MapResultComponent
+        component: MapResultComponent,
+        resolve: {execution: MapResultResolver}
+      },
+      {
+        path: 'results/:resultId',
+        component: MapResultComponent,
+        resolve: {execution: MapResultResolver}
       }
     ]
   }
@@ -74,6 +81,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
+  providers: [MapResultResolver]
 })
 export class MapsRoutingModule { }

@@ -29,7 +29,7 @@
     </div>
 
     <div class="table-wrapper">
-      <p-dataTable [value]="maps" [lazy]="true" [rows]="15" [paginator]="true" [totalRecords]="resultCount"
+      <p-dataTable [value]="maps" [lazy]="true" [rows]="tablePageSize" [paginator]="true" [totalRecords]="resultCount"
         (onLazyLoad)="loadMapsLazy($event)">
         <p-column field="name" header="Name" [sortable]="true">
           <ng-template let-col let-map="rowData" pTemplate="body">

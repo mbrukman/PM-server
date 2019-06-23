@@ -23,6 +23,8 @@ export interface IAction {
   mandatory: boolean;
   method: IPluginMethod | string;
   params?: IActionParam[];
+  isEnabled: boolean
+  numParallel? : string;
 }
 
 export interface IUsedPlugin {
@@ -49,6 +51,8 @@ export interface IProcess {
   updatedAt: Date;
   correlateAgents: boolean;
   uuid: string;
+  actionsExecution: string
+  numProcessParallel? :string
 }
 
 export interface ILink {

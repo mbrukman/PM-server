@@ -4,18 +4,42 @@ const _ = require("lodash");
 const winston = require('winston');
 const IS_TIMEOUT = "Agent Timeout";
 
+function  /**
+* create configuration
+* @param {*} mapStructure 
+* @param {string|Object} configuration 
+*/
+_createConfiguration(mapStructure, configuration) {
+   if(configuration){
+       if (typeof configuration != 'string'){
+           return {
+               name: 'custom',
+               value: configuration
+           }
+       } else {
+           try{
+               let parsedConfiguration = JSON.parse(configuration);
+               return {
+                   name: 'custom',
+                   value: parsedConfiguration
+               }
+           }catch(err){}
+       }
+   } 
+
+   let selectedConfiguration
+   if (mapStructure.configurations && mapStructure.configurations.length && configuration) {
+       selectedConfiguration = mapStructure.configurations.find(o => o.name === configuration);
+       if (!selectedConfiguration) {
+           selectedConfiguration = mapStructure.configurations[0];
+       }
+   }
+
+   return selectedConfiguration ? selectedConfiguration.toObject() : { name: 'custom',value : ""};
+}
+
 
 module.exports = {
-    /**
-     * generate runId
-     * @returns {string} - new runId
-     */
-    guidGenerator() {
-        let S4 = function () {
-            return (((1 + Math.random()) * 65536) | 0).toString(16).substring(1);
-        };
-        return (S4() + '-' + S4());
-    },
 
     /**
      * @param structure
@@ -29,7 +53,7 @@ module.exports = {
                 return o.uuid === source;
             });
             if (index === -1) {
-                return { type: 'start_node', uuid: source };
+                return { type: 'start_node', uuid: source }; 
             }
         }
     },
@@ -83,39 +107,17 @@ module.exports = {
         })).length;
     },
 
-    /**
-     * create configuration
-     * @param {*} mapStructure 
-     * @param {string|Object} configuration 
-     */
-    createConfiguration(mapStructure, configuration) {
-        if(configuration){
-            if (typeof configuration != 'string'){
-                return {
-                    name: 'custom',
-                    value: configuration
-                }
-            } else {
-                try{
-                    let parsedConfiguration = JSON.parse(configuration);
-                    return {
-                        name: 'custom',
-                        value: parsedConfiguration
-                    }
-                }catch(err){}
-            }
-        } 
-
-        let selectedConfiguration
-        if (mapStructure.configurations && mapStructure.configurations.length && configuration) {
-            selectedConfiguration = mapStructure.configurations.find(o => o.name === configuration);
-            if (!selectedConfiguration) {
-                selectedConfiguration = mapStructure.configurations[0];
-            }
+    getConfiguration(structure, configuration){
+        const mainConfig = _createConfiguration(structure, configuration.config);
+        if(!configuration.mergeConfig){
+            return mainConfig
         }
-
-        return selectedConfiguration ? selectedConfiguration.value : {};
+        const mergeConfig =  _createConfiguration(structure, configuration.mergeConfig);
+        return {name: 'custom', value: Object.assign(mainConfig.value, mergeConfig.value)}
     },
+
+
+   
 
     /**
      * filter agents for execution

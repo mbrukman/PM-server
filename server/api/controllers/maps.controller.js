@@ -21,13 +21,15 @@ function _mapperResult(execResult, processNames=null) {
             process = Object.assign({},process)
             let processResult = []
             let statuses = [];
-            process.actions.forEach(action => {
-                statuses.push(action.status)
-                if(!action.result){
-                    action.result = {stdout:action.status}
-                }
-                processResult.push(action.result)
-            })
+           if(process.actions){
+                process.actions.forEach(action => {
+                    statuses.push(action.status)
+                    if(!action.result){
+                        action.result = {stdout:action.status}
+                    }
+                    processResult.push(action.result)
+                })
+           }
             let processStatus = 'error'
             let mapS = {}
             if(process.status == 'done' && statuses){
@@ -312,8 +314,12 @@ module.exports = {
         }
         let config = payload && payload.config ? Object.assign(configRequest, payload.config) : configRequest;
         let trigger = payload && payload.triggerMsg ? triggerRequest + " " + "-" + " " + payload.triggerMsg : triggerRequest;
+        let configuration = {
+            config, 
+            mergeConfig: req.body.mergeConfig
+        }
         hooks.hookPre('map-execute', req).then(() => {
-            return mapsExecutionService.execute(req.params.id, req.params.structure, req.io, config, trigger)
+            return mapsExecutionService.execute(req.params.id, req.params.structure, req.io, configuration, trigger)
         }).then(result => {
             return res.json(result);
         }).catch(error => {
@@ -359,10 +365,15 @@ module.exports = {
 
     resultDetail: (req, res) => {
         hooks.hookPre('map-results-detail').then(() => {
-            return mapsExecutionService.detail(req.params.resultId);
+            return mapsExecutionService.detail(req.params);
         }).then(async execResult => {
-            if (!execResult)
+            if (!execResult && req.params.resultId && req.params.resultId != 'null') // wrong Id 
                 throw "No result found";
+
+            //TODO : handle in client
+            if(!execResult){
+                return null;
+            }
 
             if (!execResult.status) { // the old maps do not need to be mapped
                 return execResult

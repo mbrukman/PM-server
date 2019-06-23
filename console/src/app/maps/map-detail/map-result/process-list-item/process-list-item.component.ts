@@ -31,7 +31,7 @@ export class ProcessListItemComponent implements OnInit{
         total[current.index] = [];
       }
 
-      if(typeof current.result == 'string'){
+      if(typeof current.result == 'string' || current.message == "Process didn't pass condition"){
         total[current.index].push('skipped')
       }
       else{
@@ -42,7 +42,7 @@ export class ProcessListItemComponent implements OnInit{
   }
 
   isWarning(status){
-    return status == 'stopped' || status == 'skipped'
+    return status == 'stopped' || status == 'skipped';
   }
 
 }

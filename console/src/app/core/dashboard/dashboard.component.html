@@ -25,11 +25,11 @@
           </ng-template>
         </p-column>
         <ng-template let-item let-i="rowIndex"pTemplate="rowexpansion">
-          <div class="row" [routerLink]="['/maps',item.map._id, 'results']">
+          <a class="row" [routerLink]="['/maps',item.map._id, 'results']">
             <div class="col-4">
               <app-execution-chart [size]=[130,130] [result]="results[i]"></app-execution-chart>
             </div>
-          </div>
+          </a>
         </ng-template>
       </p-dataTable>
     </div>  

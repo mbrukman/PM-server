@@ -7,7 +7,7 @@
               <!-- <p>{{ generalInfo.description }}</p> -->
               <p *ngIf="generalInfo">Start time: {{ generalInfo?.startTime | date: 'short' }}</p>
               <p *ngIf="generalInfo">Finish time: {{ generalInfo?.finishTime | date: 'short' }}</p>
-              <p *ngIf="showProcessResult(generalInfo?.result)">{{ generalInfo?.result }}</p>
+              <p >{{ generalInfo?.message }}</p>
             </ng-container>
             <ng-container *ngIf="aggregate">
                 <p>Start time: Not supported in aggregate mode</p>

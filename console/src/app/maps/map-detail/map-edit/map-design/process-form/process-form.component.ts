@@ -10,7 +10,7 @@ import { SocketService } from '@shared/socket.service';
 import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { PopupService } from '@shared/services/popup.service';
-import {FLOW_CONTROL_TYPES, COORDINATION_TYPES}  from '@maps/constants'
+import {FLOW_CONTROL_TYPES, COORDINATION_TYPES, ACTIONS_EXECUTIONS_TYPES}  from '@maps/constants'
 import { SelectItem } from 'primeng/primeng';
 
 @Component({
@@ -35,6 +35,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   FLOW_CONTROL_TYPES  = FLOW_CONTROL_TYPES;
   COORDINATION_TYPES = COORDINATION_TYPES;
   flowControlDropDown :SelectItem[] = [];
+  actionsExecutionsDropDown: SelectItem[] = [];
   coordinationDropDown :SelectItem[] = []
   methodsDropDown:SelectItem[];
 
@@ -59,6 +60,11 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     let flowControlType =  Object.keys(this.FLOW_CONTROL_TYPES)
     this.flowControlDropDown = flowControlType.map(key => {
       return {value:this.FLOW_CONTROL_TYPES[key].id,label:this.FLOW_CONTROL_TYPES[key].label}
+    })
+
+    let actionsExecutionsType =  Object.keys(ACTIONS_EXECUTIONS_TYPES);
+    this.actionsExecutionsDropDown = actionsExecutionsType.map(key => {
+      return {value:ACTIONS_EXECUTIONS_TYPES[key].id,label:ACTIONS_EXECUTIONS_TYPES[key].label}
     })
 
     let coordinationType = Object.keys(this.COORDINATION_TYPES)
@@ -104,7 +110,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       });
     }
 
-
     // subscribe to changes in form
     this.formValueChangeSubscription = this.processForm.valueChanges.pipe(
       debounceTime(300),
@@ -115,6 +120,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       });
   }
 
+  
   ngOnDestroy(): void {
     if (this.processUpdateSubscription) {
       this.processUpdateSubscription.unsubscribe();

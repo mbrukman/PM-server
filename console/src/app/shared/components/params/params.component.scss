@@ -5,7 +5,31 @@
 .param-wrapper{
      margin-bottom: 12px;
     .col-4{
-        padding-left: 0
+        display: flex;
+        padding-left: 0;
+        .tooltiptext{
+            position: relative;
+            ::ng-deep {
+                bs-tooltip-container{
+                    top:calc(50% -2px) !important;
+                    left:calc(50% -2px) !important;
+                    .tooltip-inner{
+                        background-color:$background-tooltip;
+                        border: 1px solid $border-tooltip; 
+                    }
+                    .tooltip-arrow::before{
+                        border-left-color:$border-tooltip
+                    }
+                    
+                }
+              }
+        }
+        .material-icons{
+            margin-right: 7px;
+            font-size:19px;
+            cursor: pointer;
+        
+        }
     }
     .col-2{
         margin-right: 8px;
@@ -13,6 +37,7 @@
     }
     .input{
         &.dropdown{
+            @include checkbox();
             width: 100%;
             @include dropdown();
         }
@@ -30,3 +55,4 @@
         padding-left: 0;
     }
 }
+

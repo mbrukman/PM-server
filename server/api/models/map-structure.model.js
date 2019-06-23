@@ -15,7 +15,10 @@ const actionSchema = new Schema({
     retries: { type: Number, default: 0 },
     method: String,
     params: [actionParamsSchema],
-    mandatory: { type: Boolean, default: false }
+    mandatory: { type: Boolean, default: false },
+    isEnabled:{type:Boolean, default:true},
+    numParallel: String
+
 });
 
 
@@ -34,13 +37,15 @@ const processSchema = new Schema({
     filterAgents: String,
     coordination: String,
     flowControl: { type: String, enum: ['race', 'each', 'wait'], default: 'each' },
+    actionsExecution: { type: String, enum: ['series', 'parallel'], default: 'series' },
     correlateAgents: { type: Boolean, default: false },
     mandatory: { type: Boolean, default: false },
     condition: String,
     createdAt: { type: Date, default: Date.now },
     used_plugin: usedPluginsSchema,
     actions: [actionSchema],
-    uuid: String
+    uuid: String,
+    numProcessParallel:String
 });
 
 const linkSchema = new Schema({

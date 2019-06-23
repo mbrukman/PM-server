@@ -9,6 +9,7 @@ import { MapResult, Pending } from '@maps/models';
 @Injectable()
 export class SocketService {
   socket: any;
+  socketNamespaces: object = {};
   logExecution: Subject<any> = new Subject<any>();
   notification: Subject<any> = new Subject<any>();
   message: Subject<any> = new Subject<any>();
@@ -19,48 +20,59 @@ export class SocketService {
   socketID: string;
 
   constructor() {
-
     this.socket = io(environment.serverUrl);
+    this.socketNamespaces['/'] = this.socket;
     let self = this
     this.socket.on('connect', function () {
       self.socketID = this.id;
-    });
-
-    this.socketListener();
+    }); 
+    this.socketListener(this.socket);
   }
 
   get getSocket() {
     return this.socket;
   }
 
+  addNewSocket(namespace : string){
+    if (this.socketNamespaces[namespace])
+      return this.socketNamespaces[namespace]
+    let socket = io(environment.serverUrl+namespace);
+    this.socketNamespaces['/'+namespace] = socket;
+    return socket;
+  }
 
+  closeSocket(namespace:string){
+    if(this.socketNamespaces[namespace]){
+      this.socketNamespaces[namespace].close();
+      delete this.socketNamespaces[namespace];
+    }
+  }
 
-  socketListener() {
-    this.socket.on('update', (data) => {
+  socketListener(socket) {
+    socket.on('update', (data) => {
       this.setLegExecution(data);
     });
 
-    this.socket.on('notification', (data) => {
+    socket.on('notification', (data) => {
       this.setNotification(data);
     });
 
-    this.socket.on('message', (data) => {
-      this.message.next(data)
-
-
+    socket.on('message', (data) => {
+      this.message.next(data);
     });
 
-    this.socket.on('executions', (data: object) => {
+    socket.on('executions', (data: object) => {
       this.setCurrentExecutions(data);
     });
 
-    this.socket.on('map-execution-result', (data) => {
+    socket.on('map-execution-result', (data) => {
       this.updateExecutionResult(data);
     });
 
-    this.socket.on('pending', (data) => {
+    socket.on('pending', (data) => {
       this.updateCurrentPending(data);
     });
+
   }
 
   getLogExecutionAsObservable() {
