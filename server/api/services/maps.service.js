@@ -206,7 +206,10 @@ module.exports = {
             return MapStructure.findById(structureId)
         }
 
-        return MapStructure.findOne({ map: mapId }).sort('-createdAt')
+        return MapStructure.findOne({ map: mapId }).sort('-createdAt').then(res=>{
+            console.log(res);
+            return res;
+        })
     },
     
     structureList: (mapId, page) => {

@@ -16,7 +16,9 @@ const actionSchema = new Schema({
     method: String,
     params: [actionParamsSchema],
     mandatory: { type: Boolean, default: false },
-    isEnabled:{type:Boolean, default:true}
+    isEnabled:{type:Boolean, default:true},
+    numParallel: String
+
 });
 
 
@@ -43,6 +45,7 @@ const processSchema = new Schema({
     used_plugin: usedPluginsSchema,
     actions: [actionSchema],
     uuid: String,
+    numProcessParallel:String
 });
 
 const linkSchema = new Schema({

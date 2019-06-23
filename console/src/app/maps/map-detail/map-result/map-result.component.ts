@@ -219,6 +219,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
    * @param executionId
    */
   selectExecution(execution : MapResult) {
+    if(!execution){return }
     
     let selectedExecution = null;
     if(this.ongoingExecutionSocket){

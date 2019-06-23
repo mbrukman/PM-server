@@ -367,8 +367,12 @@ module.exports = {
         hooks.hookPre('map-results-detail').then(() => {
             return mapsExecutionService.detail(req.params);
         }).then(async execResult => {
-            if (!execResult)
+            if (!execResult && req.params.resultId && req.params.resultId != 'null') // wrong Id 
                 throw "No result found";
+
+            if(!execResult){
+                return null;
+            }
 
             if (!execResult.status) { // the old maps do not need to be mapped
                 return execResult
