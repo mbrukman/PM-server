@@ -113,7 +113,7 @@ module.exports = {
             return mainConfig
         }
         const mergeConfig =  _createConfiguration(structure, configuration.mergeConfig);
-        return {name: 'custom', value: Object.assign(mergeConfig.value, mainConfig.value)}
+        return {name: 'custom', value: Object.assign(mainConfig.value, mergeConfig.value)}
     },
 
 

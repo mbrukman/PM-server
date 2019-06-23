@@ -370,6 +370,7 @@ module.exports = {
             if (!execResult && req.params.resultId && req.params.resultId != 'null') // wrong Id 
                 throw "No result found";
 
+            //TODO : handle in client
             if(!execResult){
                 return null;
             }
