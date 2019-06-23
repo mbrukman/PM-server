@@ -919,19 +919,9 @@ function runProcess(map, structure, runId, agent, process) {
             ])
         });
 
-        let reduceFunc = (promiseChain, currentAction, index) => {
-            // let actionId = (currentAction[6]._id).toString()
-            currentAction[6].actionIndex = index;
-            // executions[runId].executionAgents[agent.key].context.processes[process.uuid][process.iterationIndex].actions[actionId] = currentAction[6];
+        let actionExecutionPromises = process.actionsExecution == 'series' ? runActionsInSeries(actionsArray) : runActionsInParallel(actionsArray,runId);
 
-            return promiseChain.then(chainResults => {
-                return executeAction.apply(null, currentAction).then(currentResult => {
-                    return [...chainResults, currentResult]
-                })
-            });
-        }
-
-        actionsArray.reduce(reduceFunc, Promise.resolve([])).then((actionsResults) => { // runs all actions of a process
+        return actionExecutionPromises.then((actionsResults) => { // runs all actions of a process
             return actionsExecutionCallback(map, structure, runId, agent, process)
         }).catch((error) => {
             winston.log('error', error);
@@ -939,6 +929,33 @@ function runProcess(map, structure, runId, agent, process) {
             updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.ERROR, message: error.message, finishTime: new Date() });
         })
     })
+}
+
+
+function runActionsInSeries(actionsArray){
+    let reduceFunc = (promiseChain, currentAction, index) => {
+        // let actionId = (currentAction[6]._id).toString()
+        currentAction[6].actionIndex = index;
+        // executions[runId].executionAgents[agent.key].context.processes[process.uuid][process.iterationIndex].actions[actionId] = currentAction[6];
+
+        return promiseChain.then(chainResults => {
+            return executeAction.apply(null, currentAction).then(currentResult => {
+                return [...chainResults, currentResult]
+            })
+        });
+    }
+
+    return actionsArray.reduce(reduceFunc, Promise.resolve([]))
+}
+
+function runActionsInParallel(actionsArray,runId){
+    let promises = [];
+    executions[runId].index = 0;
+    actionsArray.forEach((action,index)=> {
+        action[6].actionIndex = index;
+        promises.push(executeAction.apply(null, action))
+    })
+    return Promise.all(promises)
 }
 
 /**
@@ -1047,6 +1064,8 @@ function getMethodAction(plugin, action) {
     }
     return method
 }
+
+
 
 /**
  * execute an action

@@ -73,7 +73,7 @@
     
               <small class="form-text text-muted">Controlling syncing between agents.</small>
             </div>
-    
+
             <div class="form-group dropdown" *ngIf="processViewWrapper.process?.coordination">
               <label>Process coordination</label>
               <p-dropdown  [options]="coordinationDropDown" placeholder="Select a Coordination" formControlName="coordination"  
@@ -83,6 +83,16 @@
     
               <small class="form-text text-muted">Controlling process sync.</small>
             </div>
+
+            <div class="form-group dropdown">
+              <label>Actions execution</label>
+              <p-dropdown  [options]="actionsExecutionsDropDown" formControlName="actionsExecution"  
+                          [autoWidth]="false">
+              </p-dropdown>
+    
+              <small class="form-text text-muted">Controlling syncing between actions.</small>
+            </div>
+
           </accordion-group>
           <accordion-group>
             <div accordion-heading class="clearfix">
