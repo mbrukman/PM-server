@@ -4,6 +4,40 @@ const _ = require("lodash");
 const winston = require('winston');
 const IS_TIMEOUT = "Agent Timeout";
 
+function  /**
+* create configuration
+* @param {*} mapStructure 
+* @param {string|Object} configuration 
+*/
+_createConfiguration(mapStructure, configuration) {
+   if(configuration){
+       if (typeof configuration != 'string'){
+           return {
+               name: 'custom',
+               value: configuration
+           }
+       } else {
+           try{
+               let parsedConfiguration = JSON.parse(configuration);
+               return {
+                   name: 'custom',
+                   value: parsedConfiguration
+               }
+           }catch(err){}
+       }
+   } 
+
+   let selectedConfiguration
+   if (mapStructure.configurations && mapStructure.configurations.length && configuration) {
+       selectedConfiguration = mapStructure.configurations.find(o => o.name === configuration);
+       if (!selectedConfiguration) {
+           selectedConfiguration = mapStructure.configurations[0];
+       }
+   }
+
+   return selectedConfiguration ? selectedConfiguration.value : {};
+}
+
 
 module.exports = {
 
@@ -73,39 +107,14 @@ module.exports = {
         })).length;
     },
 
-    /**
-     * create configuration
-     * @param {*} mapStructure 
-     * @param {string|Object} configuration 
-     */
-    createConfiguration(mapStructure, configuration) {
-        if(configuration){
-            if (typeof configuration != 'string'){
-                return {
-                    name: 'custom',
-                    value: configuration
-                }
-            } else {
-                try{
-                    let parsedConfiguration = JSON.parse(configuration);
-                    return {
-                        name: 'custom',
-                        value: parsedConfiguration
-                    }
-                }catch(err){}
-            }
-        } 
-
-        let selectedConfiguration
-        if (mapStructure.configurations && mapStructure.configurations.length && configuration) {
-            selectedConfiguration = mapStructure.configurations.find(o => o.name === configuration);
-            if (!selectedConfiguration) {
-                selectedConfiguration = mapStructure.configurations[0];
-            }
-        }
-
-        return selectedConfiguration ? selectedConfiguration.value : {};
+    getConfiguration(structure, configuration){
+        const mainConfig = _createConfiguration(structure, configuration.config);
+        const mergeConfig =  _createConfiguration(structure, configuration.mergeConfig);
+        return mainConfig.value = Object.assign(mergeConfig, mainConfig.value || mainConfig)
     },
+
+
+   
 
     /**
      * filter agents for execution

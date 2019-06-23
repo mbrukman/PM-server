@@ -289,7 +289,7 @@ async function startPendingExecution(mapId, socket) {
         return updateMapResult(pendingExec.id, { reason: 'no agents alive', status: statusEnum.ERROR }, socket)
     }
 
-    let context = createExecutionContext(pendingExec._id, socket, pendingExec)
+    let context = createExecutionContext(pendingExec._id, socket, pendingExec, mapStructure)
     executeMap(pendingExec._id, map, mapStructure, agents, context);
 }
 
@@ -358,7 +358,7 @@ function _addFuncsToCodeEnv() {
  * @param {mapResult} mapResult
  * @return {object} - all the global context of an execution  
  */
-function createExecutionContext(runId, socket, mapResult) {
+function createExecutionContext(runId, socket, mapResult, structure) {
     executions[runId] = {
         mapId: mapResult.map,
         status: mapResult.status,
@@ -377,6 +377,12 @@ function createExecutionContext(runId, socket, mapResult) {
         },
         vault: {
             getValueByKey: vaultService.getValueByKey
+        },
+
+        MapsService:{
+            getMapConfigurations: ()=>{ return structure.configurations.toBSON()},
+            getMapExecutions: async(amount)=>{ return mapsService.getMapExecutions(amount, structure.map.toString())},
+            getMap: (mapId = mapResult.map)=>{ return mapsService.getMap(mapId)}
         }
     };
 }
@@ -392,13 +398,13 @@ function createExecutionContext(runId, socket, mapResult) {
  * @param {*} payload 
  * @return {MapResult}   
  */
-async function createMapResult(socket, map, configurationName, structure, triggerReason, payload) {
+async function createMapResult(socket, map, configuration, structure, triggerReason, payload) {
     // get number of running executions
     const ongoingExecutions = helper.countMapExecutions(executions, map.id.toString());
 
     // if more running executions than map.queue them save map as pending
     const status = (map.queue && (ongoingExecutions >= map.queue)) ? statusEnum.PENDING : statusEnum.RUNNING;
-    const configuration = helper.createConfiguration(structure, configurationName);
+    configuration = helper.getConfiguration(structure, configuration);
     const startTime = status == statusEnum.PENDING ? null : new Date()
 
     let mapResult = new MapResult({
@@ -527,13 +533,12 @@ async function executeMap(runId, map, mapStructure, agents, context) {
  * @param {*} mapId 
  * @param {*} structureId 
  * @param {*} socket 
- * @param {*} configurationName 
+ * @param {object} configuration - {config - the main configuration, mergeConfig - in case of mapExecution plugin}  
  * @param {*} triggerReason 
  * @param {*} triggerPayload 
  * @returns {string} - the new runId
  */
-async function execute(mapId, structureId, socket, configurationName, triggerReason, triggerPayload = null) {
-
+async function execute(mapId, structureId, socket, configuration, triggerReason, triggerPayload = null) {
     clientSocket = socket; // save socket in global 
     map = await mapsService.get(mapId)
     if (!map) { throw new Error(`Couldn't find map`); }
@@ -545,8 +550,8 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
     let agents = helper.getRelevantAgent(map.groups, map.agents)
 
     if (agents.length == 0 && triggerReason == "Started manually by user") { throw new Error('No agents alive'); }
-    let mapResult = await createMapResult(socket, map, configurationName, mapStructure, triggerReason, triggerPayload);
-    let runId = mapResult._id;
+    let mapResult = await createMapResult(socket, map, configuration, mapStructure, triggerReason, triggerPayload)
+    let runId = mapResult.id
 
     let response = {
         runId:runId,
@@ -563,7 +568,8 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
         updateClientPending(socket)
         return response // exit if the map is pending
     }
-    let context = createExecutionContext(runId, socket, mapResult)
+
+    let context = createExecutionContext(runId, socket, mapResult, mapStructure)
     
     
     executeMap(runId, map, mapStructure, agents, context);
@@ -588,6 +594,7 @@ async function execute(mapId, structureId, socket, configurationName, triggerRea
         )
     })
 
+ 
 }
 
 /**
