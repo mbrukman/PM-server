@@ -35,7 +35,7 @@ _createConfiguration(mapStructure, configuration) {
        }
    }
 
-   return selectedConfiguration ? selectedConfiguration.value : {};
+   return selectedConfiguration ? selectedConfiguration.toObject() : { name: 'custom',value : ""};
 }
 
 
@@ -109,8 +109,11 @@ module.exports = {
 
     getConfiguration(structure, configuration){
         const mainConfig = _createConfiguration(structure, configuration.config);
+        if(!configuration.mergeConfig){
+            return mainConfig
+        }
         const mergeConfig =  _createConfiguration(structure, configuration.mergeConfig);
-        return mainConfig.value = Object.assign(mergeConfig, mainConfig.value || mainConfig)
+        return {name: 'custom', value: Object.assign(mergeConfig.value, mainConfig.value)}
     },
 
 
