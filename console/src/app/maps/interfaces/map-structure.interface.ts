@@ -23,6 +23,7 @@ export interface IAction {
   mandatory: boolean;
   method: IPluginMethod | string;
   params?: IActionParam[];
+  isEnabled: boolean
 }
 
 export interface IUsedPlugin {

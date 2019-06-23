@@ -15,7 +15,8 @@ const actionSchema = new Schema({
     retries: { type: Number, default: 0 },
     method: String,
     params: [actionParamsSchema],
-    mandatory: { type: Boolean, default: false }
+    mandatory: { type: Boolean, default: false },
+    isEnabled:{type:Boolean, required:true}
 });
 
 
