@@ -19,20 +19,6 @@ module.exports = {
         
       },
 
-      generateAutoCompleteById:async (modelName,id, queryString)=> {
-        let i = modelName.indexOf('.')
-        let innerModel = modelName.slice(i+1,)
-        modelName = modelName.slice(0, i)
-        let model = models[modelName];
-        let result = await model.find({map: id}).sort({createdAt:-1}).limit(1)
-
-        let optionsArr = []
-        result[0][innerModel].forEach(option => {
-          if(option.name.includes(queryString)){
-            optionsArr.push({value:option.name, id:option.name})
-          }})
-          return optionsArr
-      },
 
 
       getValueByKey: (key,modelName) => {

@@ -14,9 +14,6 @@ module.exports = {
         let query = req.query;
         let model = req.params.modelName;
         hooks.hookPre('plugin-generate-params').then(() => {
-        if(query.id){
-            return autoCompleteService.generateAutoCompleteById(model,query.id, query.query)
-        }
             return autoCompleteService.generateAutoComplete(model, query)
         }).then((generated) => {
             return res.json(generated);

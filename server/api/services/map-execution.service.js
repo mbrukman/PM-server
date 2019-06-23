@@ -550,8 +550,8 @@ async function execute(mapId, structureId, socket, configuration, triggerReason,
     let agents = helper.getRelevantAgent(map.groups, map.agents)
 
     if (agents.length == 0 && triggerReason == "Started manually by user") { throw new Error('No agents alive'); }
-    let runId = helper.guidGenerator();
     let mapResult = await createMapResult(socket, map, configuration, mapStructure, triggerReason, triggerPayload)
+    let runId = mapResult.id
 
     let response = {
         runId:runId,
