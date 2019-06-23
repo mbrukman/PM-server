@@ -169,8 +169,8 @@ function updateProcessContext(runId, agent, processUUID, iterationIndex, process
     }
 
     if(processData.finishTime){
-        let processId = executions[runId].executionAgents[agent.key].context.processes[processUUID][0].processId;
-        sendFinishTimeToClient(runId,{process:{finishTime:processData.finishTime,id:processId}})
+        let processUuid = executions[runId].executionAgents[agent.key].context.processes[processUUID][0].uuid;
+        sendFinishTimeToClient(runId,{process:{finishTime:processData.finishTime,uuid:processUuid}})
     }
 
     executions[runId].executionAgents[agent.key].context.processes[processUUID][iterationIndex] = Object.assign(
@@ -842,10 +842,8 @@ function updateAgentContext(runId, agent, agentData) {
 
 function sendFinishTimeToClient(runId,data){
     let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
-    Object.keys(nsp.sockets).forEach(socket => {
-        let clientSocket = nsp.sockets[socket];
-        clientSocket.emit('updateFinishTime',data);     
-    })
+    nsp.emit('updateFinishTime',data)
+
 }
 
 /**
@@ -949,7 +947,7 @@ function runProcessFunc(runId, agent, process, fieldName, funcToRun) {
         if (!passProcessCondition(runId, agent, process)) {
             let res = {
                 process:{
-                    process:process._id,
+                    process:process.uuid,
                     index:process.iterationIndex,
                     name:process.name,
                     startTime:new Date(),
@@ -989,8 +987,9 @@ function runProcessFunc(runId, agent, process, fieldName, funcToRun) {
         let actionsArray = [];
 
         process.actions.forEach((action, i) => {
-            action.name = (action.name || `Action #${i + 1} `);
-            actionsArray.push([
+            if(action.isEnabled){
+                action.name = (action.name || `Action #${i + 1} `);
+                actionsArray.push([
                 map,
                 structure,
                 runId,
@@ -1002,6 +1001,7 @@ function runProcessFunc(runId, agent, process, fieldName, funcToRun) {
                 executions[runId].clientSocket,
             
             ])
+            }
         });
 
         let actionExecutionPromises = process.actionsExecution == 'series' ? runActionsInSeries(actionsArray) : runActionsInParallel(actionsArray,runId);
@@ -1268,7 +1268,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
             let res = {
                 action:actionResult,
                 process:{
-                    process:process._id,
+                    uuid:process.uuid,
                     index:process.iterationIndex,
                     finishTime:null,
                     name:process.name,
