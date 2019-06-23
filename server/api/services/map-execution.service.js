@@ -380,7 +380,7 @@ function createExecutionContext(runId, socket, mapResult, structure) {
             getValueByKey: vaultService.getValueByKey
         },
 
-        MapsService:{
+        MapService:{
             getMapConfigurations: ()=>{ return structure.configurations.toBSON()},
             getMapExecutions: async(amount)=>{ return mapsService.getMapExecutions(amount, structure.map.toString())},
             getMap: (mapId = mapResult.map)=>{ return mapsService.getMap(mapId)}
