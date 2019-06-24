@@ -1561,7 +1561,7 @@ module.exports = {
         if(params.resultId && params.resultId != 'null'){
             query = MapResult.findById(params.resultId);
         } else {
-            query = MapResult.findOne({map:params.id}).sort( '-finishTime' ).limit(1);
+            query = MapResult.findOne({map:params.id}).sort( '-startTime' ).limit(1);
         }
         return query.populate('structure agentsResults.agent');
     },
