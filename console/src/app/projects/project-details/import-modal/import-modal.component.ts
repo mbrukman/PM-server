@@ -2,8 +2,6 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { BsModalRef } from 'ngx-bootstrap';
-import { ProjectsService } from '@projects/projects.service';
-import { mergeMap } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { MapsService } from '@app/maps/maps.service';
 
@@ -17,7 +15,7 @@ export class ImportModalComponent {
   error: string;
   projectId: string;
 
-  constructor(private router: Router, public bsModalRef: BsModalRef, private projectsService: ProjectsService, private mapsService:MapsService) {
+  constructor(private router: Router, public bsModalRef: BsModalRef, private mapsService:MapsService) {
   }
 
   onClose() {
