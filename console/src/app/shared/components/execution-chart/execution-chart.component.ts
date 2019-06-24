@@ -25,7 +25,7 @@ export class ExecutionChartComponent implements OnChanges {
       if (!total[current.status]) {
         return total;
       }
-      if(typeof current.result == 'string' && current.status == 'error'){
+      if((typeof current.result == 'string' && current.status == 'error') || current.message == "Process didn't pass condition"){
         skipped++;
         return total;
       }
