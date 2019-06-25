@@ -19,6 +19,7 @@ export class MapConfigurationsComponent implements OnInit ,OnDestroy{
     language: 'json'
   };
   value: string = '';
+  david
   mapStructureSubscription: Subscription;
 
   constructor(private mapsService: MapsService, private popupService:PopupService) { }
