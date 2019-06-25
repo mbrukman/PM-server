@@ -1,4 +1,5 @@
 @import "~src/assets/sass/variables";
+@import "~src/assets/sass/mixins";
 
 .main {
   display: flex;
@@ -16,6 +17,10 @@
       flex-direction: column;
       justify-content: space-between;
       padding-bottom: 15px;
+
+      .form-group{
+        @include radio();
+      }
 
       .add-config{
         width: 83%;
@@ -38,7 +43,7 @@
           }
 
           &.active {
-            background: $turquoise-blue;
+            background: $kh-selected-bck;
           }
 
         }

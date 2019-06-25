@@ -5,9 +5,13 @@
     <div class="configurations-list">
       <ul>
         <li *ngFor="let configuration of mapStructure?.configurations; let i = index" (click)="editConfiguration(i)"
-          
         class="d-flex justify-content-between" [class.active]="selectedConfiguration === configuration">
-        <input type="radio" name="gender" value="{{configuration.name}}" (click)="david=configuration.name" > Other<br>  
+        <div class="form-group">
+          <label class="control control-checkbox checkbox">
+            <input type="radio" name="gender" value="{{configuration.name}}" [checked]="configuration.default" (click)="selectDefault(configuration.name)"> 
+            <div class="control_indicator check-control"></div>
+          </label>
+        </div>
         <span class="configuration-name">{{configuration.name}}</span>
           <i class="material-icons" (click)="removeConfiguration(i)">delete</i>
         </li>

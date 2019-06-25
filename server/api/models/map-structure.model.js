@@ -57,8 +57,9 @@ const linkSchema = new Schema({
 });
 
 const configurationSchema = new Schema({
-    name: { type: String, require: true },
-    value: { type: Schema.Types.Mixed, require: true },
+    name: { type: String, required: true },
+    value: { type: Schema.Types.Mixed, required: true },
+    default: { type:Boolean, default: false },
 }, { _id: false });
 
 const mapStructureSchema = new Schema({

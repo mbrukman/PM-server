@@ -19,7 +19,6 @@ export class MapConfigurationsComponent implements OnInit ,OnDestroy{
     language: 'json'
   };
   value: string = '';
-  david
   mapStructureSubscription: Subscription;
 
   constructor(private mapsService: MapsService, private popupService:PopupService) { }
@@ -30,9 +29,22 @@ export class MapConfigurationsComponent implements OnInit ,OnDestroy{
     ).subscribe(structure => {
         this.mapStructure = structure;
         if (!this.selectedConfiguration && structure.hasOwnProperty('configurations') && structure.configurations.length) {
+          for(let i=0,length = this.mapStructure.configurations.length;i<length;i++){
+            if(!this.mapStructure.configurations[i].value){
+              this.mapStructure.configurations[i].value = {};
+            }
+          }
           this.editConfiguration(0);
         }
       });
+  }
+
+
+  selectDefault(configurationName){
+    this.mapStructure.configurations.forEach(configuration => {
+      configuration.default = configuration.name == configurationName
+    })
+    this.updateMapStructure()
   }
 
   ngOnDestroy(){
@@ -43,7 +55,8 @@ export class MapConfigurationsComponent implements OnInit ,OnDestroy{
     this.popupService.openComponent(AddConfigurationComponent,{configurations:this.mapStructure.configurations})
       .filter(name => !!name)
       .subscribe(name => {
-        this.mapStructure.configurations.push(new MapStructureConfiguration(name, '{\n\n}'));
+        let defaultConfiguration = !this.mapStructure.configurations.length;
+        this.mapStructure.configurations.push(new MapStructureConfiguration(name, '{\n\n}',defaultConfiguration));
         this.editConfiguration(this.mapStructure.configurations.length - 1);
       });
   }

@@ -202,6 +202,41 @@
   }
 }
 
+
+@mixin radio() {
+  .control {
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 5px;
+    padding-top: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 12px;
+    input {
+      position: absolute;
+      z-index: -1;
+      opacity: 0;
+  }
+  .control_indicator {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    height: $radio-size;
+    width: $radio-size;
+    background: #3f4247;
+    border-radius: 12px;
+
+  }
+  
+  input:checked {
+    ~ .control_indicator {
+      background: #2aa1c0;
+    }
+  }
+}
+}
+
   
 
 @mixin header{

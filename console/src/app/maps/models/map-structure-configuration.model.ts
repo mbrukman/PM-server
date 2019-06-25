@@ -1,9 +1,13 @@
+import { de } from 'ngx-bootstrap';
+
 export class MapStructureConfiguration {
   name: string;
   value: object | string;
-
-  constructor(name?, value?) {
+  default:boolean = false;
+ 
+  constructor(name?, value?,isDefault?) {
     this.name = name;
     this.value = value;
+    this.default = isDefault;
   }
 }

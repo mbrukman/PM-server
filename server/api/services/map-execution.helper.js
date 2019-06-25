@@ -31,9 +31,10 @@ _createConfiguration(mapStructure, configuration) {
    if (mapStructure.configurations && mapStructure.configurations.length && configuration) {
        selectedConfiguration = mapStructure.configurations.find(o => o.name === configuration);
        if (!selectedConfiguration) {
-           selectedConfiguration = mapStructure.configurations[0];
+           selectedConfiguration = mapStructure.configurations[mapStructure.configurations.findIndex(configuration => !!configuration.default)];
        }
    }
+
 
    return selectedConfiguration ? selectedConfiguration.toObject() : { name: 'custom',value : ""};
 }
