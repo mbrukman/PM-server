@@ -21,10 +21,14 @@
     <!--<button type="button" class="btn" (click)="discardChanges()" *ngIf="edited || structureEdited" disabled>Discard</button>-->
     <button type="button" class="kh-btn-blue kh-btn" *ngIf="!edited && !structureEdited" disabled>Saved</button>
     <button type="button" class="kh-btn-blue kh-btn" (click)="saveMap()" *ngIf="edited || structureEdited">Save</button>
-    <button class="kh-btn-blue kh-btn" (click)="executeMap()" [disabled]="!(map.agents.length || map.groups.length)">
+    <button  class="kh-btn-blue kh-btn" (click)="executeMap()" *ngIf="(map?.agents.length || map?.groups.length)">
       Execute
       <span *ngIf="executing"><i class="fa fa-spinner fa-pulse fa-fw"></i></span>
     </button>
+    <button  class="kh-btn-blue kh-btn disabled" *ngIf="!(map?.agents.length || map?.groups.length)"  [tooltip]="'No agents selected'">
+      Execute
+    </button>
+
 
     <div class="dropdown">
         <p-dropdown [(ngModel)]="selected" 
