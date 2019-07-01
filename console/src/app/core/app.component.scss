@@ -11,11 +11,14 @@
         max-width: $sidebar-Width;
         min-width: $sidebar-Width;
         flex-grow: 1;
+        position: fixed;
+        z-index: 3;
         background-color: $pale-blue;
         display: flex;
         flex-direction: column;
         padding: 0px 5px 0;
         align-items: center;
+        height: 100%;
         img {
             width: 40px;
             margin-bottom: 30px;
@@ -71,6 +74,7 @@
         overflow: visible;
         flex-grow: 1;
         display: flex;
+        margin-left: $sidebar-Width;
         ::ng-deep>*:not(router-outlet) {
             display: flex;
             flex-direction: column;
