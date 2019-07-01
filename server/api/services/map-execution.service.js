@@ -1512,13 +1512,14 @@ module.exports = {
      */
     logs: async (resultId) => {
         let q = { _id: resultId };
-        let mapResult = await MapResult.findOne(q).populate({path:'agentsResults.agent', select:'name'}).exec();
+        let mapResult = (await MapResult.findOne(q).populate({path:'agentsResults.agent', select:'name'}).exec()).toBSON()
         let logs = []
         let structure = await mapsService.getMapStructure(mapResult.map, mapResult.structure) // for process/actions names (populate on names didnt work)
         let processNames = {} // a map <process.id, process name>  
         let actionNames = {} // same as above 
+        let fieldToMap = mapResult.status? {name: 'id', val: 'process' } : {name: 'uuid', val: 'uuid' }  // just to handle with old maps. maps with status are new. 
         structure.processes.forEach((process,iProcess) => {
-            processNames[process.id] = process.name || (processNames[process.id]? processNames[process.id] :`Process #${iProcess+1}`) // extract process name
+            processNames[process[fieldToMap.name]] = process.name || (processNames[process[fieldToMap.val]]? processNames[process[fieldToMap.name]] :`Process #${iProcess+1}`) // extract process name
             if(!process.actions){return}
             process.actions.forEach((action, iAction)=>{
                 actionNames[action.id] = action.name || `Action #${iAction+1}` // extract action name 
@@ -1529,7 +1530,7 @@ module.exports = {
         mapResult.agentsResults.forEach((agentResult) => {
             agentResult.processes.forEach((process) => {
                 process.actions.forEach((action) => {
-                    logs.push({finishTime:action.finishTime,  message: `'${processNames[process.process.toString()]}' - '${actionNames[action.action.toString()]}' result: ${JSON.stringify(action.result)} (${agentResult.agent.name})`})
+                    logs.push({finishTime:action.finishTime,  message: `'${processNames[process[fieldToMap.val].toString()]}' - '${actionNames[action.action.toString()]}' result: ${JSON.stringify(action.result)} (${agentResult.agent.name})`})
                 })
             });
         })
