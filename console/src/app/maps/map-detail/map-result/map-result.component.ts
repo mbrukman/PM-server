@@ -244,6 +244,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
           selectedExecution = <MapResult> exec;   
           actions.forEach(action => {
             this.setActionToSelectedExecution(selectedExecution,action)
+            //TODO: ask David why
             this.selectedExecution.agentsResults.forEach(agent => {
                 this.selectedProcess.push(agent.processes[0])
             })

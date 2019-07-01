@@ -276,6 +276,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       return o._id === pluginId;
     });
 
+    //TODO: ask David why
     if(process._id){
       delete process._id;
     }
