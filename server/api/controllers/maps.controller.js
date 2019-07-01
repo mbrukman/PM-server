@@ -72,7 +72,11 @@ module.exports = {
         }
 
         hooks.hookPre('map-create', req).then(() => {
-            mapsService.create(req.body).then((map) => {
+            mapsService.create(req.body).then(async (map) => {
+                if(req.body.structure){
+                    req.body.structure.map = map._id;
+                    await mapsService.createStructure(req.body.structure)
+                }
                 projectsService.addMap(req.body.project, map._id).then(() => {
                     req.io.emit('notification', {
                         title: 'Map created',
