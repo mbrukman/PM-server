@@ -276,6 +276,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       return o._id === pluginId;
     });
 
+    //TODO: ask David why
+    if(process._id){
+      delete process._id;
+    }
     let imageModel = this.getPluginCube({
       x: obj.x - (this.scaleX * this.scale) - this.paper.translate().tx,
       y: obj.y - (this.scaleY * this.scale) - this.paper.translate().ty
