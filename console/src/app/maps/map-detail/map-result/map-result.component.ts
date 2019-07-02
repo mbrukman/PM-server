@@ -228,6 +228,9 @@ export class MapResultComponent implements OnInit, OnDestroy {
     
     if(this.executing.indexOf(execution.id) > -1){ //if ongoing
       this.ongoingExecutionSocket = this.socketService.addNewSocket("execution-update-"+execution.id);
+      this.processesList = [];
+      this.selectedProcess = null;
+      this.selectedExecutionLogs = [];
       this.ongoingExecutionSocket.on('updateAction',(action) => {
         this.setActionToSelectedExecution(this.selectedExecution,action);
       });
@@ -241,6 +244,10 @@ export class MapResultComponent implements OnInit, OnDestroy {
           selectedExecution = <MapResult> exec;   
           actions.forEach(action => {
             this.setActionToSelectedExecution(selectedExecution,action)
+            //TODO: ask David why
+            this.selectedExecution.agentsResults.forEach(agent => {
+                this.selectedProcess.push(agent.processes[0])
+            })
           })  
         
       });

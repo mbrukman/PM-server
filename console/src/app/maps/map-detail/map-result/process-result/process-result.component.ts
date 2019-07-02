@@ -72,7 +72,11 @@ export class ProcessResultComponent implements OnChanges {
           break;
         }
       }
-      actions.push(...process.actions.map(a=> new ActionResultView(a,agent) ))
+      for (let i =0, length = process.actions.length; i<length; i++){
+        if (!process.actions[i].finishTime)
+          continue;
+        actions.push(new ActionResultView(process.actions[i],agent));
+      }
     })
     this.actions = actions;
     
