@@ -965,7 +965,7 @@ function passProcessCondition(runId, agent, process) {
  * Runs process pre/post function. Saves the result in DB and context 
  */
 function runProcessFunc(runId, agent, process, fieldName, funcToRun) {
-    if (!process.preRun) { return }
+    if (!funcToRun) { return }
     let processData = {}
     try {
         processData[fieldName] = vm.runInNewContext(funcToRun, executions[runId].executionAgents[agent.key].context);
