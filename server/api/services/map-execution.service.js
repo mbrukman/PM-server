@@ -371,7 +371,10 @@ function createExecutionContext(runId, socket, mapResult, structure) {
         executionId: runId,
         startTime: mapResult.startTime,
         // structure: structure.id,
-        configuration: mapResult.configuration,
+        configuration: {
+            name:mapResult.configuration.name,
+            value:mapResult.configuration.value
+        },
         trigger: {
             msg: mapResult.trigger,
             payload: mapResult.triggerPayload
