@@ -503,7 +503,8 @@ async function executeMap(runId, map, mapStructure, agents, context) {
     let nsp = socketService.getNamespaceSocket('execution-update-'+ runId.toString());
     nsp.on('connection',function (socket) {
         Object.keys(nsp.sockets).forEach(socket => {
-            nsp.sockets[socket]['isFirstMessageToSocket'] = true;
+            nsp.sockets[socket].emit("updateActions",nsp.actions);
+           
         })
     })
     nsp['actions'] = [];
@@ -970,7 +971,7 @@ function runProcessFunc(runId, agent, process, fieldName, funcToRun) {
     try {
         processData[fieldName] = vm.runInNewContext(funcToRun, executions[runId].executionAgents[agent.key].context);
     } catch (e) {
-        processData[fieldName] = 'Error running preProcess function' + res
+        processData[fieldName] = 'Error running preProcess function' + e
     }
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, processData);
 }
@@ -1036,7 +1037,8 @@ function _getProcessActionsToExec(runId, process, agent, map, structure) {
                     index:process.iterationIndex,
                     name:process.name,
                     startTime:new Date(),
-                    finishTime:new Date()
+                    finishTime:new Date(),
+                    message : "Process didn't pass condition"
                 },
                 agent:{
                     _id:agent.id,
@@ -1045,6 +1047,7 @@ function _getProcessActionsToExec(runId, process, agent, map, structure) {
             
             } 
             let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
+            nsp.actions.push(res)
             nsp.emit('updateAction',res)
             executions[runId].processesDidntPassConditionUuid = executions[runId].processesDidntPassConditionUuid || [];
             executions[runId].processesDidntPassConditionUuid.push(process.uuid);
@@ -1122,7 +1125,6 @@ async function actionsExecutionCallback(map, structure, runId, agent, process) {
     if(map.processResponse && map.processResponse == process.uuid){
         let responseData = await runCode(map,runId,agent);
         executions[runId].subscription.next(responseData);
-        executions[runId].subscription.unsubscribe();
     }
     runProcessFunc(runId, agent, process, 'postRunResult', process.postRun)
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.DONE, finishTime: new Date() });
@@ -1346,14 +1348,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
             let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
             nsp.actions.push(res)
             Object.keys(nsp.sockets).forEach(socket => {
-                let clientSocket = nsp.sockets[socket];
-                if(clientSocket.isFirstMessageToSocket){
-                    clientSocket.emit('updateActions',nsp.actions)
-                    clientSocket.isFirstMessageToSocket = false
-                }
-                else{
-                    clientSocket.emit('updateAction',res)
-                }
+                nsp.sockets[socket].emit('updateAction',res) 
             })
 
             return result;
