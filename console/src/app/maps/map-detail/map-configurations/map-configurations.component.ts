@@ -47,6 +47,15 @@ export class MapConfigurationsComponent implements OnInit ,OnDestroy{
       });
   }
 
+  editConfigurationName(index) {
+    this.popupService.openComponent(AddConfigurationComponent,{configurations:this.mapStructure.configurations,name:this.mapStructure.configurations[index].name})
+      .filter(name => !!name)
+      .subscribe(name => {
+        this.mapStructure.configurations[index].name = name;
+        this.editConfiguration(this.mapStructure.configurations.length - 1);
+      });
+  }
+
   removeConfiguration(index: number) {
     this.mapStructure.configurations.splice(index, 1);
     this.updateMapStructure(true);
