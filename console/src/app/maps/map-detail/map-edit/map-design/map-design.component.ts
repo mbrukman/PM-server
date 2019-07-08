@@ -118,27 +118,31 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       }
     });
     this.listeners();
+    
   }
 
+
+
  getCurrentMapStructure(){
-  this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(
-    tap(structure => this.mapStructure = structure),
-    filter(structure => !!structure)
-  ).subscribe(structure => {
-    this.initMapDraw();
-    for(let i=0,length=structure.processes.length;i<length;i++){
-      let imageProcess = this.graph.getCell(structure.processes[i].uuid)
-      if (!imageProcess) continue;
-      for(let j =0,pluginsLength = this.plugins.length;j<pluginsLength;j++){
-        if((imageProcess.attributes.attrs['.p_id'].text == '' || imageProcess.attributes.attrs['.p_id'].text != this.plugins[j].id) && this.plugins[j].name == structure.processes[i].used_plugin.name){
-          this.updateNodePid(structure.processes[i].uuid,this.plugins[j].id);
-          break;
+    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(
+      tap(structure => this.mapStructure = structure),
+      filter(structure => !!structure)
+    ).subscribe(structure => {
+      this.initMapDraw();
+      for(let i=0,length=structure.processes.length;i<length;i++){
+        let imageProcess = this.graph.getCell(structure.processes[i].uuid)
+        if (!imageProcess) continue;
+        for(let j =0,pluginsLength = this.plugins.length;j<pluginsLength;j++){
+          if((imageProcess.attributes.attrs['.p_id'].text == '' || imageProcess.attributes.attrs['.p_id'].text != this.plugins[j].id) && this.plugins[j].name == structure.processes[i].used_plugin.name){
+            this.updateNodePid(structure.processes[i].uuid,this.plugins[j].id);
+            break;
+          }
         }
       }
-    }
-    this.onMapContentUpdate()
-  });
- }
+      this.configurePaperScale();
+      this.onMapContentUpdate()
+    });
+  }
 
   initMapDraw() {
     if (!this.init && this.plugins && this.mapStructure) {
@@ -516,11 +520,27 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.addNewProcess(this.getClonePosition(cell),p)
   } 
 
+  configurePaperScale(){
+    for(let i=0,length = this.mapStructure.processes.length;i<length;i++){
+      let cell = this.graph.getCell(this.mapStructure.processes[i].uuid)
+      this.isCellIsVisible(cell);
+    }
+    this.paper.scale(this.scale, this.scale);
+  }
+
+  isCellIsVisible(cell){
+    let x = cell.attributes.position.x;
+    let y = cell.attributes.position.y;
+    console.log(x)
+    console.log(y);
+    
+  }
+
   getClonePosition(cellView){
 
     let cell =  this.graph.getCell(this.process.uuid)
     return {
-      x:cell.attributes.position.x + (this.scaleX * this.scale) + this.paper.translate().tx + 90,// 90 and 63 represents the distance between the clone and the original process in x and y absciss respectively.
+      x:1500 +(this.scaleX * this.scale)+ this.paper.translate().tx,// 90 and 63 represents the distance between the clone and the original process in x and y absciss respectively.
       y:cell.attributes.position.y + (this.scaleY * this.scale) + this.paper.translate().ty + 63,
       cell:cellView
     }

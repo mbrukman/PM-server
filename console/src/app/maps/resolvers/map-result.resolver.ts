@@ -20,6 +20,6 @@ export class MapResultResolver implements Resolve<any> {
     }
 
 }
-
+ 
 
 
