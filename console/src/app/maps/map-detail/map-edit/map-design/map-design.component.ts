@@ -544,7 +544,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
     let cell =  this.graph.getCell(this.process.uuid)
     return {
-      x:1500 +(this.scaleX * this.scale)+ this.paper.translate().tx,// 90 and 63 represents the distance between the clone and the original process in x and y absciss respectively.
+      x:cell.attributes.position.x + (this.scaleX * this.scale) + this.paper.translate().tx + 90,// 90 and 63 represents the distance between the clone and the original process in x and y absciss respectively.
       y:cell.attributes.position.y + (this.scaleY * this.scale) + this.paper.translate().ty + 63,
       cell:cellView
     }
