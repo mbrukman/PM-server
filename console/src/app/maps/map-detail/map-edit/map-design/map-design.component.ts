@@ -368,7 +368,26 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
         this.onMapContentUpdate();
       }
     }
+    this.configurePaperScale()
     this.center();
+  }
+
+
+  configurePaperScale(){
+    while(this.isGraphNotVisible()){
+      this.onScale(-0.1)
+    }
+  }
+
+  isGraphNotVisible(){
+    let paperDimension = document.getElementById('graph').getBoundingClientRect();
+    let graphDimension = this.paper.el.querySelector(".joint-viewport").getBoundingClientRect();
+    
+    if(paperDimension.height < graphDimension.height || paperDimension.width < graphDimension.width){
+      return true
+    }
+    return false
+
   }
 
   center() {
@@ -520,21 +539,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.addNewProcess(this.getClonePosition(cell),p)
   } 
 
-  configurePaperScale(){
-    for(let i=0,length = this.mapStructure.processes.length;i<length;i++){
-      let cell = this.graph.getCell(this.mapStructure.processes[i].uuid)
-      this.isCellIsVisible(cell);
-    }
-    this.paper.scale(this.scale, this.scale);
-  }
-
-  isCellIsVisible(cell){
-    let x = cell.attributes.position.x;
-    let y = cell.attributes.position.y;
-    console.log(x)
-    console.log(y);
-    
-  }
 
   getClonePosition(cellView){
 
