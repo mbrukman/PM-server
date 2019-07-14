@@ -139,7 +139,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           }
         }
       }
-      this.configurePaperScale();
       this.onMapContentUpdate()
     });
   }
