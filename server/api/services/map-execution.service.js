@@ -571,11 +571,11 @@ async function execute(mapId, structureId, socket, configuration, triggerReason,
 
     mapStructure = await mapsService.getMapStructure(map._id, structureId)
 
-    let structure = checkDuplicateProcess(mapStructure.toObject());
-    if(structure.isDuplicate){
-        delete structure.structure.id;
-        delete structure.structure._id;
-        mapStructure = await models['Structure'].create(structure.structure);
+    let checkDuplicate = checkDuplicateProcess(mapStructure.toObject());
+    if(checkDuplicate.isDuplicate){
+        delete checkDuplicate.structure.id;
+        delete checkDuplicate.structure._id;
+        mapStructure = await models['Structure'].create(checkDuplicate.structure);
     }
     if (!mapStructure) { throw new Error('No structure found.'); }
 
