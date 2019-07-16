@@ -570,14 +570,14 @@ async function execute(mapId, structureId, socket, configuration, triggerReason,
     if (map.archived) { throw new Error('Can\'t execute archived map'); }
 
     mapStructure = await mapsService.getMapStructure(map._id, structureId)
-
+    if (!mapStructure) { throw new Error('No structure found.'); }
+    
     let checkDuplicate = checkDuplicateProcess(mapStructure.toObject());
     if(checkDuplicate.isDuplicate){
         delete checkDuplicate.structure.id;
         delete checkDuplicate.structure._id;
         mapStructure = await models['Structure'].create(checkDuplicate.structure);
     }
-    if (!mapStructure) { throw new Error('No structure found.'); }
 
     let agents = helper.getRelevantAgent(map.groups, map.agents)
 
