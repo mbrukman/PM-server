@@ -529,6 +529,25 @@ async function executeMap(runId, map, mapStructure, agents, context) {
     });
 }
 
+function checkDuplicateProcess(structure){
+
+        let processIds = [];
+        let isDuplicateProcess = false;
+        structure.processes.map(process => {
+            if(processIds.includes(process._id.toString())){
+                delete process.id;
+                delete process._id;
+                isDuplicateProcess = true;
+            }
+            else{
+                processIds.push(process._id.toString())
+            }
+        });
+ 
+        return {isDuplicate:isDuplicateProcess,structure:structure};
+}
+
+
 /**
  * create mapResult if all params are good and run it.  
  * @param {*} mapId 
@@ -540,12 +559,21 @@ async function executeMap(runId, map, mapStructure, agents, context) {
  * @returns {string} - the new runId
  */
 async function execute(mapId, structureId, socket, configuration, triggerReason, triggerPayload = null) {
+
+    
     clientSocket = socket; // save socket in global 
     map = await mapsService.get(mapId)
     if (!map) { throw new Error(`Couldn't find map`); }
     if (map.archived) { throw new Error('Can\'t execute archived map'); }
 
     mapStructure = await mapsService.getMapStructure(map._id, structureId)
+
+    let structure = checkDuplicateProcess(mapStructure.toObject());
+    if(structure.isDuplicate){
+        delete structure.structure.id;
+        delete structure.structure._id;
+        mapStructure = await models['Structure'].create(structure.structure);
+    }
     if (!mapStructure) { throw new Error('No structure found.'); }
 
     let agents = helper.getRelevantAgent(map.groups, map.agents)
