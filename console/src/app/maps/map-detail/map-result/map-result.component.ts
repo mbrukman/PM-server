@@ -65,10 +65,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
       this.loadResultOnScroll(map)
     });
 
-    // getting the current executions list when initiating
-    this.mapsService.currentExecutionList().pipe(
-      take(1)
-    ).subscribe(executions => this.executing = Object.keys(executions));
 
     // subscribing to executions updates.
     this.mapExecutionSubscription = this.socketService.getCurrentExecutionsAsObservable()
@@ -104,7 +100,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
       });
 
       this.route.data.subscribe(data => {
-        this.selectedExecution = data.execution
+        this.selectedExecution = data.execution['selectedExecution'];
+        this.executing = Object.keys(data.execution['onGoing']);
         this.selectExecution(this.selectedExecution);
       })
   }
@@ -162,23 +159,27 @@ export class MapResultComponent implements OnInit, OnDestroy {
       selectedExecution.agentsResults.push(<AgentResult>agentResult);
     }
     else{
-      let processIndex = -1;
+      let isProcessFound;
+      let sameProcessIndex = -1;
       selectedExecution.agentsResults[agentIndex].processes.forEach((process,index) => {
         if(process.uuid == result.process.uuid){
-          processIndex = index;
+          isProcessFound = true;
+          if(result.process.index == process.index){
+            sameProcessIndex = index;
+          }
         }
       })
-      if(processIndex == -1 || result.process.index != selectedExecution.agentsResults[agentIndex].processes[processIndex].index){
+      if(!isProcessFound || sameProcessIndex == -1){
         let process = result.process;
         process['actions'] = result.action ? [result.action] : [];
         selectedExecution.agentsResults[agentIndex].processes.push(<ProcessResult>process)
       }
-      else{
-          selectedExecution.agentsResults[agentIndex].processes[processIndex].actions.push(result.action)    
+      else{ 
+          selectedExecution.agentsResults[agentIndex].processes[sameProcessIndex].actions.push(result.action);
       }
     }
 
-    selectedExecution.startTime = this.selectedExecution ? (this.selectedExecution.startTime || result.action.startTime) : result.action.startTime
+    selectedExecution.startTime = this.selectedExecution ? (this.selectedExecution.startTime || result.action.startTime) : result.action.startTime;
     return selectedExecution;
   }
 
@@ -225,7 +226,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     if(this.ongoingExecutionSocket){
         this.socketService.closeSocket(this.ongoingExecutionSocket.nsp)
     }
-    
+    this.gotoExecution(execution.id);
     if(this.executing.indexOf(execution.id) > -1){ //if ongoing
       this.ongoingExecutionSocket = this.socketService.addNewSocket("execution-update-"+execution.id);
       this.processesList = [];
@@ -272,7 +273,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
     else{    
       this.selectedExecutionLogs = [];
       this.selectedProcess = null;
-      this.gotoExecution(execution.id);
       this.agentsConfiguration();
       this.mapsService.logsList((<string>execution.map), execution._id // get the logs list for this execution
       ).subscribe(logs => {
