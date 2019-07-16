@@ -27,6 +27,7 @@ var trigger;
 /**	
  * Represents the selected configuration	
  */
+/** @type {KaholoConfiguration} */
 var configuration;
 
 /**
