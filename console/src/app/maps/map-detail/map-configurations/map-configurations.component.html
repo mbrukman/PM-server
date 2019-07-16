@@ -7,7 +7,10 @@
         <li *ngFor="let configuration of mapStructure?.configurations; let i = index" (click)="editConfiguration(i)"
             class="d-flex justify-content-between" [class.active]="selectedConfiguration === configuration">
           <span class="configuration-name">{{configuration.name}}</span>
-          <i class="material-icons" (click)="removeConfiguration(i)">delete</i>
+          <div>
+            <i (click)="editConfigurationName(i)" class="material-icons">edit</i>
+            <i class="material-icons" (click)="removeConfiguration(i)">delete</i>
+          </div>
         </li>
       </ul>
       <button class="kh-btn kh-btn-blue add-config" (click)="addNewConfiguration()">Add Configuration</button>

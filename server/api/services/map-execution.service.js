@@ -371,7 +371,10 @@ function createExecutionContext(runId, socket, mapResult, structure) {
         executionId: runId,
         startTime: mapResult.startTime,
         // structure: structure.id,
-        configuration: mapResult.configuration,
+        configuration: {
+            name:mapResult.configuration.name,
+            value:mapResult.configuration.value
+        },
         trigger: {
             msg: mapResult.trigger,
             payload: mapResult.triggerPayload
@@ -503,7 +506,8 @@ async function executeMap(runId, map, mapStructure, agents, context) {
     let nsp = socketService.getNamespaceSocket('execution-update-'+ runId.toString());
     nsp.on('connection',function (socket) {
         Object.keys(nsp.sockets).forEach(socket => {
-            nsp.sockets[socket]['isFirstMessageToSocket'] = true;
+            nsp.sockets[socket].emit("updateActions",nsp.actions);
+           
         })
     })
     nsp['actions'] = [];
@@ -993,12 +997,12 @@ function passProcessCondition(runId, agent, process) {
  * Runs process pre/post function. Saves the result in DB and context 
  */
 function runProcessFunc(runId, agent, process, fieldName, funcToRun) {
-    if (!process.preRun) { return }
+    if (!funcToRun) { return }
     let processData = {}
     try {
         processData[fieldName] = vm.runInNewContext(funcToRun, executions[runId].executionAgents[agent.key].context);
     } catch (e) {
-        processData[fieldName] = 'Error running preProcess function' + res
+        processData[fieldName] = 'Error running preProcess function' + e
     }
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, processData);
 }
@@ -1064,7 +1068,8 @@ function _getProcessActionsToExec(runId, process, agent, map, structure) {
                     index:process.iterationIndex,
                     name:process.name,
                     startTime:new Date(),
-                    finishTime:new Date()
+                    finishTime:new Date(),
+                    message : "Process didn't pass condition"
                 },
                 agent:{
                     _id:agent.id,
@@ -1073,6 +1078,7 @@ function _getProcessActionsToExec(runId, process, agent, map, structure) {
             
             } 
             let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
+            nsp.actions.push(res)
             nsp.emit('updateAction',res)
             executions[runId].processesDidntPassConditionUuid = executions[runId].processesDidntPassConditionUuid || [];
             executions[runId].processesDidntPassConditionUuid.push(process.uuid);
@@ -1150,7 +1156,6 @@ async function actionsExecutionCallback(map, structure, runId, agent, process) {
     if(map.processResponse && map.processResponse == process.uuid){
         let responseData = await runCode(map,runId,agent);
         executions[runId].subscription.next(responseData);
-        executions[runId].subscription.unsubscribe();
     }
     runProcessFunc(runId, agent, process, 'postRunResult', process.postRun)
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.DONE, finishTime: new Date() });
@@ -1374,14 +1379,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
             let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
             nsp.actions.push(res)
             Object.keys(nsp.sockets).forEach(socket => {
-                let clientSocket = nsp.sockets[socket];
-                if(clientSocket.isFirstMessageToSocket){
-                    clientSocket.emit('updateActions',nsp.actions)
-                    clientSocket.isFirstMessageToSocket = false
-                }
-                else{
-                    clientSocket.emit('updateAction',res)
-                }
+                nsp.sockets[socket].emit('updateAction',res) 
             })
 
             return result;
@@ -1540,13 +1538,14 @@ module.exports = {
      */
     logs: async (resultId) => {
         let q = { _id: resultId };
-        let mapResult = await MapResult.findOne(q).populate({path:'agentsResults.agent', select:'name'}).exec();
+        let mapResult = (await MapResult.findOne(q).populate({path:'agentsResults.agent', select:'name'}).exec()).toBSON()
         let logs = []
         let structure = await mapsService.getMapStructure(mapResult.map, mapResult.structure) // for process/actions names (populate on names didnt work)
         let processNames = {} // a map <process.id, process name>  
         let actionNames = {} // same as above 
+        let fieldToMap = mapResult.status? {name: 'id', val: 'process' } : {name: 'uuid', val: 'uuid' }  // just to handle with old maps. maps with status are new. 
         structure.processes.forEach((process,iProcess) => {
-            processNames[process.id] = process.name || (processNames[process.id]? processNames[process.id] :`Process #${iProcess+1}`) // extract process name
+            processNames[process[fieldToMap.name]] = process.name || (processNames[process[fieldToMap.val]]? processNames[process[fieldToMap.name]] :`Process #${iProcess+1}`) // extract process name
             if(!process.actions){return}
             process.actions.forEach((action, iAction)=>{
                 actionNames[action.id] = action.name || `Action #${iAction+1}` // extract action name 
@@ -1557,7 +1556,7 @@ module.exports = {
         mapResult.agentsResults.forEach((agentResult) => {
             agentResult.processes.forEach((process) => {
                 process.actions.forEach((action) => {
-                    logs.push({finishTime:action.finishTime,  message: `'${processNames[process.process.toString()]}' - '${actionNames[action.action.toString()]}' result: ${JSON.stringify(action.result)} (${agentResult.agent.name})`})
+                    logs.push({finishTime:action.finishTime,  message: `'${processNames[process[fieldToMap.val].toString()]}' - '${actionNames[action.action.toString()]}' result: ${JSON.stringify(action.result)} (${agentResult.agent.name})`})
                 })
             });
         })
@@ -1589,7 +1588,7 @@ module.exports = {
         if(params.resultId && params.resultId != 'null'){
             query = MapResult.findById(params.resultId);
         } else {
-            query = MapResult.findOne({map:params.id}).sort( '-finishTime' ).limit(1);
+            query = MapResult.findOne({map:params.id}).sort( '-startTime' ).limit(1);
         }
         return query.populate('structure agentsResults.agent');
     },
