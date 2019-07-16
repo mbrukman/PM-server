@@ -506,8 +506,7 @@ async function executeMap(runId, map, mapStructure, agents, context) {
     let nsp = socketService.getNamespaceSocket('execution-update-'+ runId.toString());
     nsp.on('connection',function (socket) {
         Object.keys(nsp.sockets).forEach(socket => {
-            nsp.sockets[socket].emit("updateActions",nsp.actions);
-           
+            nsp.sockets[socket].emit("updateActions",nsp.actions);     
         })
     })
     nsp['actions'] = [];
