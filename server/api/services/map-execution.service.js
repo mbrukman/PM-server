@@ -506,8 +506,7 @@ async function executeMap(runId, map, mapStructure, agents, context) {
     let nsp = socketService.getNamespaceSocket('execution-update-'+ runId.toString());
     nsp.on('connection',function (socket) {
         Object.keys(nsp.sockets).forEach(socket => {
-            nsp.sockets[socket].emit("updateActions",nsp.actions);
-           
+            nsp.sockets[socket].emit("updateActions",nsp.actions);     
         })
     })
     nsp['actions'] = [];
@@ -533,6 +532,25 @@ async function executeMap(runId, map, mapStructure, agents, context) {
     });
 }
 
+function checkDuplicateProcess(structure){
+
+        let processIds = [];
+        let isDuplicateProcess = false;
+        structure.processes.map(process => {
+            if(processIds.includes(process._id.toString())){
+                delete process.id;
+                delete process._id;
+                isDuplicateProcess = true;
+            }
+            else{
+                processIds.push(process._id.toString())
+            }
+        });
+ 
+        return {isDuplicate:isDuplicateProcess,structure:structure};
+}
+
+
 /**
  * create mapResult if all params are good and run it.  
  * @param {*} mapId 
@@ -544,6 +562,8 @@ async function executeMap(runId, map, mapStructure, agents, context) {
  * @returns {string} - the new runId
  */
 async function execute(mapId, structureId, socket, configuration, triggerReason, triggerPayload = null) {
+
+    
     clientSocket = socket; // save socket in global 
     map = await mapsService.get(mapId)
     if (!map) { throw new Error(`Couldn't find map`); }
@@ -551,6 +571,13 @@ async function execute(mapId, structureId, socket, configuration, triggerReason,
 
     mapStructure = await mapsService.getMapStructure(map._id, structureId)
     if (!mapStructure) { throw new Error('No structure found.'); }
+    
+    let checkDuplicate = checkDuplicateProcess(mapStructure.toObject());
+    if(checkDuplicate.isDuplicate){
+        delete checkDuplicate.structure.id;
+        delete checkDuplicate.structure._id;
+        mapStructure = await models['Structure'].create(checkDuplicate.structure);
+    }
 
     let agents = helper.getRelevantAgent(map.groups, map.agents)
 

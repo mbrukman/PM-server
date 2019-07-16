@@ -235,7 +235,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
       this.ongoingExecutionSocket.on('updateAction',(action) => {
         this.setActionToSelectedExecution(this.selectedExecution,action);
       });
-      this.ongoingExecutionSocket.on('updateActions',(actions) => {    
+      this.ongoingExecutionSocket.on('updateActions',(actions) => {  
+            
           let exec = {
             agentsResults:[],
             id:execution.id,
@@ -243,6 +244,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
             trigger:execution.trigger
           }
           selectedExecution = <MapResult> exec;   
+          this.selectedExecution = selectedExecution;
           actions.forEach(action => {
             this.setActionToSelectedExecution(selectedExecution,action)
             //TODO: ask David why
