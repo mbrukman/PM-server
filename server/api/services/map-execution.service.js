@@ -371,7 +371,10 @@ function createExecutionContext(runId, socket, mapResult, structure) {
         executionId: runId,
         startTime: mapResult.startTime,
         // structure: structure.id,
-        configuration: mapResult.configuration,
+        configuration: {
+            name:mapResult.configuration.name,
+            value:mapResult.configuration.value
+        },
         trigger: {
             msg: mapResult.trigger,
             payload: mapResult.triggerPayload
@@ -503,7 +506,7 @@ async function executeMap(runId, map, mapStructure, agents, context) {
     let nsp = socketService.getNamespaceSocket('execution-update-'+ runId.toString());
     nsp.on('connection',function (socket) {
         Object.keys(nsp.sockets).forEach(socket => {
-            nsp.sockets[socket]['isFirstMessageToSocket'] = true;
+            nsp.sockets[socket].emit("updateActions",nsp.actions);     
         })
     })
     nsp['actions'] = [];
@@ -529,6 +532,25 @@ async function executeMap(runId, map, mapStructure, agents, context) {
     });
 }
 
+function checkDuplicateProcess(structure){
+
+        let processIds = [];
+        let isDuplicateProcess = false;
+        structure.processes.map(process => {
+            if(processIds.includes(process._id.toString())){
+                delete process.id;
+                delete process._id;
+                isDuplicateProcess = true;
+            }
+            else{
+                processIds.push(process._id.toString())
+            }
+        });
+ 
+        return {isDuplicate:isDuplicateProcess,structure:structure};
+}
+
+
 /**
  * create mapResult if all params are good and run it.  
  * @param {*} mapId 
@@ -540,6 +562,8 @@ async function executeMap(runId, map, mapStructure, agents, context) {
  * @returns {string} - the new runId
  */
 async function execute(mapId, structureId, socket, configuration, triggerReason, triggerPayload = null) {
+
+    
     clientSocket = socket; // save socket in global 
     map = await mapsService.get(mapId)
     if (!map) { throw new Error(`Couldn't find map`); }
@@ -547,6 +571,13 @@ async function execute(mapId, structureId, socket, configuration, triggerReason,
 
     mapStructure = await mapsService.getMapStructure(map._id, structureId)
     if (!mapStructure) { throw new Error('No structure found.'); }
+    
+    let checkDuplicate = checkDuplicateProcess(mapStructure.toObject());
+    if(checkDuplicate.isDuplicate){
+        delete checkDuplicate.structure.id;
+        delete checkDuplicate.structure._id;
+        mapStructure = await models['Structure'].create(checkDuplicate.structure);
+    }
 
     let agents = helper.getRelevantAgent(map.groups, map.agents)
 
@@ -965,12 +996,12 @@ function passProcessCondition(runId, agent, process) {
  * Runs process pre/post function. Saves the result in DB and context 
  */
 function runProcessFunc(runId, agent, process, fieldName, funcToRun) {
-    if (!process.preRun) { return }
+    if (!funcToRun) { return }
     let processData = {}
     try {
         processData[fieldName] = vm.runInNewContext(funcToRun, executions[runId].executionAgents[agent.key].context);
     } catch (e) {
-        processData[fieldName] = 'Error running preProcess function' + res
+        processData[fieldName] = 'Error running preProcess function' + e
     }
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, processData);
 }
@@ -1036,7 +1067,8 @@ function _getProcessActionsToExec(runId, process, agent, map, structure) {
                     index:process.iterationIndex,
                     name:process.name,
                     startTime:new Date(),
-                    finishTime:new Date()
+                    finishTime:new Date(),
+                    message : "Process didn't pass condition"
                 },
                 agent:{
                     _id:agent.id,
@@ -1045,6 +1077,7 @@ function _getProcessActionsToExec(runId, process, agent, map, structure) {
             
             } 
             let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
+            nsp.actions.push(res)
             nsp.emit('updateAction',res)
             executions[runId].processesDidntPassConditionUuid = executions[runId].processesDidntPassConditionUuid || [];
             executions[runId].processesDidntPassConditionUuid.push(process.uuid);
@@ -1122,7 +1155,6 @@ async function actionsExecutionCallback(map, structure, runId, agent, process) {
     if(map.processResponse && map.processResponse == process.uuid){
         let responseData = await runCode(map,runId,agent);
         executions[runId].subscription.next(responseData);
-        executions[runId].subscription.unsubscribe();
     }
     runProcessFunc(runId, agent, process, 'postRunResult', process.postRun)
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.DONE, finishTime: new Date() });
@@ -1346,14 +1378,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
             let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
             nsp.actions.push(res)
             Object.keys(nsp.sockets).forEach(socket => {
-                let clientSocket = nsp.sockets[socket];
-                if(clientSocket.isFirstMessageToSocket){
-                    clientSocket.emit('updateActions',nsp.actions)
-                    clientSocket.isFirstMessageToSocket = false
-                }
-                else{
-                    clientSocket.emit('updateAction',res)
-                }
+                nsp.sockets[socket].emit('updateAction',res) 
             })
 
             return result;

@@ -69,6 +69,7 @@
 .router-wrapper {
   display: flex;
   flex-grow: 1;
+  overflow: hidden;
 
   ::ng-deep > *:not(router-outlet) {
     display: flex;

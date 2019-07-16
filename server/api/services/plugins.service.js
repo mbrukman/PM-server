@@ -170,12 +170,19 @@ function deployPluginFile(pluginPath, req) {
                 let oldFile;
                 Plugin.findOne({ name: obj.name })
                   .then(plugin => {
-                    if (obj.settings)
+                    if (obj.settings){
                       obj.settings = obj.settings.map(s => {
                         s.valueType = s.type;
                         delete s.type;
+                        if(plugin && plugin.settings){
+                          for (let i=0, length=plugin.settings.length; i<length; i++){
+                            if (s.name == plugin.settings[i].name)
+                              s.value = plugin.settings[i].value;
+                          }
+                        }
                         return s;
                       })
+                    }
                     if (!plugin) {
                       return Plugin.create(obj);
                     }
