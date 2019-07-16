@@ -174,9 +174,14 @@ function deployPluginFile(pluginPath, req) {
                       obj.settings = obj.settings.map(s => {
                         s.valueType = s.type;
                         delete s.type;
+                        if(plugin && plugin.settings){
+                          for (let i=0, length=plugin.settings.length; i<length; i++){
+                            if (s.name == plugin.settings[i].name)
+                              s.value = plugin.settings[i].value;
+                          }
+                        }
                         return s;
                       })
-                      obj.settings = plugin.settings;
                     }
                     if (!plugin) {
                       return Plugin.create(obj);
