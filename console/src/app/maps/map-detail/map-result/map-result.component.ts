@@ -159,17 +159,17 @@ export class MapResultComponent implements OnInit, OnDestroy {
       selectedExecution.agentsResults.push(<AgentResult>agentResult);
     }
     else{
-      let flag;
+      let isProcessFound;
       let sameProcessIndex = -1;
       selectedExecution.agentsResults[agentIndex].processes.forEach((process,index) => {
         if(process.uuid == result.process.uuid){
-          flag = true;
+          isProcessFound = true;
           if(result.process.index == process.index){
             sameProcessIndex = index;
           }
         }
       })
-      if(!flag || sameProcessIndex == -1){
+      if(!isProcessFound || sameProcessIndex == -1){
         let process = result.process;
         process['actions'] = result.action ? [result.action] : [];
         selectedExecution.agentsResults[agentIndex].processes.push(<ProcessResult>process)
