@@ -2,7 +2,7 @@ const scheduler = require('node-schedule');
 const mapsService = require("../services/maps.service");
 const mapsExecutionService = require("../services/map-execution.service");
 const ScheduledJob = require("../models").ScheduledJob;
-
+const winston = require('winston');
 let jobs = {};
 let socket;
 
@@ -27,7 +27,16 @@ module.exports = {
                             });
                             return;
                         }
-                       mapsExecutionService.execute(job.map, null, socket, job.configuration, 'Started by schedules task').catch(err=>{ winston.log('error', err);})
+                        let configuration = {
+                            config:job.configuration
+                        }
+                        mapsExecutionService.execute(job.map, null, socket, configuration, 'Started by schedules task')
+                        .then(res => {
+                            console.log(res)
+                        })
+                        .catch(err=>{ 
+                            winston.log('error', err);
+                            })
                     })
             });
     },
