@@ -32,12 +32,15 @@
     "rimraf": "2.6.2",
     "rxjs": "6.5.2",
     "socket.io": "2.0.4",
+    "supertest": "^4.0.2",  
     "unzipper": "0.9.4",
     "winston": "3.1.0",
     "winston-mongodb": "4.0.3"
   },
   "devDependencies": {
-    "speculate": "1.7.4"
+    "speculate": "1.7.4",
+    "jest": "^24.9.0"
+
   },
   "spec": {
     "nodeVersion": "> 10.13.0",
