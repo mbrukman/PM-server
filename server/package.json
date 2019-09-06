@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "spec": "speculate --name=kaholo-server",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest api/tests/vaults.test.js",
     "start": "node app.js",
     "build": "cd ../console && ng build",
     "build:prod": "cd ../console && ng build --prod",
@@ -37,7 +37,11 @@
     "winston-mongodb": "4.0.3"
   },
   "devDependencies": {
-    "speculate": "1.7.4"
+    "chance": "^1.1.0",
+    "jest": "^24.9.0",
+    "json-schema-faker": "^0.5.0-rc17",
+    "speculate": "1.7.4",
+    "supertest": "^4.0.2"
   },
   "spec": {
     "nodeVersion": "> 10.13.0",
