@@ -7,24 +7,39 @@ class TestDataManager {
         this.currentMongooseModel = mongooseModel;
     }
 
-    push(item) {
-        if (item) {
-            return this.currentMongooseModel.create(item).then(item => {
-                this.collection.push(item);
-                return item;
-            });
-        } else {
-            throw new Error("No item to add to collection!");
+    async _createModel(item) {
+        try {
+            const savedItem = await this.currentMongooseModel
+                .create(item);
+            this.collection.push(savedItem);
+            return savedItem;
+        } catch (err) {
+            console.log(err.message, 'Something went wrong in _createModel of TestDataManager!');
+            throw new Error('There was an error with adding items to MongoDB!');
+        }
+    }
+
+    async push(item) {
+        try {
+            return this._createModel(item);
+        } catch (err) {
+            if (!item)
+                throw new Error("No item to add to collection!");
+            else
+                throw new Error(err.message);
         }
     }
 
     remove(document) {
-        if (document._id) {
+        if (document && document.id) {
             return this.currentMongooseModel
                 .deleteOne(document)
-                .then(() => this.collection = this.collection.filter(item => item._id !== document._id));
+                .then((response) => {
+                    this.collection = this.collection.filter(item => item.id !== document.id);
+                    return response;
+                });
         } else {
-            throw new Error('Document does not have _id!');
+            throw new Error('Passed document has no id property!');
         }
     }
 
@@ -35,7 +50,7 @@ class TestDataManager {
             return this.collection;
         } catch (err) {
             console.log(err.message, 'In function clear of TestDataManager');
-            throw err.message;
+            throw 'There was an error with clearing the collection and the database!';
         }
     }
 

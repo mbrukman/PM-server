@@ -3,7 +3,7 @@ const env = require('../../../env/enviroment');
 
 mongoose.set('useCreateIndex', true);
 
-async function removeAllCollections () {
+async function removeAllCollections() {
     const collections = Object.keys(mongoose.connection.collections);
     for (const collectionName of collections) {
         const collection = mongoose.connection.collections[collectionName];
@@ -11,7 +11,7 @@ async function removeAllCollections () {
     }
 }
 
-async function dropAllCollections () {
+async function dropAllCollections() {
     const collections = Object.keys(mongoose.connection.collections);
     for (const collectionName of collections) {
         const collection = mongoose.connection.collections[collectionName];
@@ -27,11 +27,11 @@ async function dropAllCollections () {
 }
 
 module.exports = {
-    setupDB (databaseName = 'test') {
+    setupDB(databaseName = 'test', server) {
         // Connect to Mongoose
         beforeAll(async () => {
             const url = `${env.dbURI}`;
-            await mongoose.connect(url, { useNewUrlParser: true })
+            await mongoose.connect(url, {useNewUrlParser: true});
         });
 
         // Cleans up database between each test
@@ -40,9 +40,16 @@ module.exports = {
         });
 
         // Disconnect Mongoose
-        afterAll(async () => {
+        afterAll(async (done) => {
             await dropAllCollections();
-            await mongoose.connection.close();
-        })
+            await mongoose.disconnect();
+
+            if (server) {
+                await server.close();
+                delete require.cache[require.resolve('../../../app')]
+            }
+
+            done();
+        });
     }
 };
