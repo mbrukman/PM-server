@@ -15,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.19.0",
     "bluebird": "3.5.1",
     "body-parser": "1.18.2",
     "del": "3.0.0",

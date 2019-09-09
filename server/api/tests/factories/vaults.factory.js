@@ -1,31 +1,41 @@
-const jsf = require('json-schema-faker');
-const chance = require('chance').Chance();
+const {jsf} = require('./jsf.helper');
 
-jsf.extend('chance', () => chance);
-
-const schema = {
-    type: 'array',
-    items: {
-        type: 'object',
-        properties: {
-            value: {
-                $ref: '#/definitions/positiveInt'
-            },
-            key: {
-                type: 'string',
-                uniqueItems: true,
-                chance: {
-                    word: "",
-                }
-            },
-            description: {
-                type: 'string',
-                faker: 'lorem.paragraph'
+const singleSchema = {
+    type: 'object',
+    properties: {
+        value: {
+            type: 'string',
+        },
+        _id: {
+            "type": "string",
+            "format": "mongoID"
+        },
+        key: {
+            type: 'string',
+            uniqueItems: true,
+            chance: {
+                word: "",
             }
         },
-        required: ['value', 'key', 'description'],
+        description: {
+            type: 'string',
+            faker: 'lorem.paragraph'
+        }
     },
-    maxItems: 2,
+    required: ['value', 'key', 'description', '_id'],
+    definitions: {
+        positiveInt: {
+            type: 'integer',
+            minimum: 0,
+            exclusiveMinimum: true
+        }
+    }
+};
+
+const arraySchema = {
+    type: 'array',
+    items: singleSchema,
+    maxItems: 10,
     uniqueItems: 'key',
     definitions: {
         positiveInt: {
@@ -41,5 +51,6 @@ const schema = {
 
 // sync-version)
 module.exports = {
-    generateVaults: () => jsf.generate(schema),
-}
+    generateVaults: (options) => jsf.generate(Object.assign(arraySchema, options)),
+    generteSingleVault: (options) => jsf.generate(Object.assign(singleSchema, options))
+};
