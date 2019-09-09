@@ -3,18 +3,10 @@ const {ObjectId} = require('mongodb');
 
 class TestDataManager {
 
-    constructor(mongooseModel) {
+    constructor(mongooseModel, singularModelFactory, multipleModelFactory) {
         this.collection = [];
         this.currentMongooseModel = mongooseModel;
     }
-
-    generateNewItem(schemaOptions = {}) {
-        return generteSingleVault(schemaOptions);
-    }
-    generateNewItems(schemaOptions = {}) {
-        return generateVaults(schemaOptions);
-    }
-
     prepareItem(itemData) {
         if (!itemData || typeof itemData !== 'object') {
             throw new Error('Passed item is not an object!');
@@ -88,7 +80,6 @@ class TestDataManager {
         await this.currentMongooseModel.create(data);
         this.collection = await this.currentMongooseModel.find({}, selectedFields, collectionOptions);
         return this.collection;
-
     }
 }
 
@@ -98,6 +89,5 @@ const initTestDataManager = (mongooseModel) => {
 
 
 module.exports = {
-    generateVaults,
     initTestDataManager,
 };

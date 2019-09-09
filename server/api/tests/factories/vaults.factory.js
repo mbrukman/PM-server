@@ -52,5 +52,5 @@ const arraySchema = {
 // sync-version)
 module.exports = {
     generateVaults: (options) => jsf.generate(Object.assign(arraySchema, options)),
-    generteSingleVault: (options) => jsf.generate(Object.assign(singleSchema, options))
+    generateSingleVault: (options) => jsf.generate(Object.assign(singleSchema, options))
 };
