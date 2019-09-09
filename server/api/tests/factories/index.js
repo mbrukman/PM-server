@@ -1,14 +1,42 @@
-const {generateVaults} = require('./vaults.factory');
-
+const {generateVaults, generteSingleVault} = require('./vaults.factory');
+const {ObjectId} = require('mongodb');
 
 class TestDataManager {
+
     constructor(mongooseModel) {
         this.collection = [];
         this.currentMongooseModel = mongooseModel;
     }
 
+    generateNewItem(schemaOptions = {}) {
+        return generteSingleVault(schemaOptions);
+    }
+    generateNewItems(schemaOptions = {}) {
+        return generateVaults(schemaOptions);
+    }
+
+    prepareItem(itemData) {
+        if (!itemData || typeof itemData !== 'object') {
+            throw new Error('Passed item is not an object!');
+        }
+
+        if (itemData._id) {
+            return itemData;
+        }
+
+        itemData._id = new ObjectId();
+        return itemData;
+    }
+
+    pushToCollection(item) {
+        item = this.prepareItem(item);
+        this.collection.push(item);
+        return item;
+    }
+
     async _createModel(item) {
         try {
+            item = this.prepareItem(item);
             const savedItem = await this.currentMongooseModel
                 .create(item);
             this.collection.push(savedItem);
@@ -19,7 +47,7 @@ class TestDataManager {
         }
     }
 
-    async push(item) {
+    async pushToCollectionAndSave(item) {
         try {
             return this._createModel(item);
         } catch (err) {
@@ -54,8 +82,9 @@ class TestDataManager {
         }
     }
 
-    async initialise(generateDateCb, collectionOptions = {}, selectedFields = '') {
-        const data = generateDateCb();
+    async initialise(modelFactory, schemaOptions = {}, collectionOptions = {}, selectedFields = '') {
+        if (!modelFactory) throw new Error("No model factory was passed!");
+        const data = modelFactory();
         await this.currentMongooseModel.create(data);
         this.collection = await this.currentMongooseModel.find({}, selectedFields, collectionOptions);
         return this.collection;

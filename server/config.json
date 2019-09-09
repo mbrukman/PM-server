@@ -1,1 +1,1 @@
-{"upload_path":"uploads","interval_time":5000,"retries":3,"page_size":15,"dbURI":"mongodb+srv://admin:7vXYF4nNu8B9SnH5@cluster0-qnjcz.mongodb.net/testing?retryWrites=true&w=majority","serverKey":"af4bfc551fe7dc1dae8c2255e5f859f8"}
+{"upload_path":"uploads","interval_time":5000,"retries":3,"page_size":15,"dbURI":"mongodb+srv://admin:7vXYF4nNu8B9SnH5@cluster0-qnjcz.mongodb.net/testing?retryWrites=true&w=majority","serverKey":"adab2d12494cda4d13aeb066dfd85550"}

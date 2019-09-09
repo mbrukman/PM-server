@@ -8,13 +8,12 @@ setupDB('testing');
 const testDataManager = initTestDataManager(VaultModel);
 
 describe('Initialise TestDataManager', () => {
-
-
     it('POSITIVE, Initialise collection in DataTestManager works.', async () => {
         try {
 
             const rawReceived = await testDataManager.initialise(
                 generateVaults,
+                {},
                 null,
                 'key description id'
             );
@@ -35,6 +34,25 @@ describe('Initialise TestDataManager', () => {
             throw err;
         }
     });
+
+    it('NEGATIVE, Initialise collection in DataTestManager without model.', async () => {
+        try {
+
+            const rawReceived = await testDataManager.initialise(
+                {},
+                null,
+                null,
+                'key description id'
+            );
+            const rawExpected = await VaultModel.find({}, 'key description id');
+
+
+        } catch (err) {
+            expect(err.message).toBe('No mongoose model was passed!');
+            console.log(err.message);
+        }
+    });
+
 });
 
 
@@ -44,6 +62,7 @@ describe("TestDataManager's functions are working correctly.", () => {
         await testDataManager.clear(VaultModel);
         await testDataManager.initialise(
             generateVaults,
+            {},
             null,
             'key description id'
         );
@@ -93,7 +112,7 @@ describe("TestDataManager's functions are working correctly.", () => {
                     value: 'random secret value',
                     description: 'this will be a secret of my secrets!'
                 };
-                const received = await testDataManager.push({
+                const received = await testDataManager.pushToCollectionAndSave({
                     key: 'random key',
                     value: 'random secret value',
                     description: 'this will be a secret of my secrets!'
@@ -112,7 +131,7 @@ describe("TestDataManager's functions are working correctly.", () => {
 
         it('NEGATIVE, Add new document without document.', async () => {
             try {
-                const item = await testDataManager.push();
+                const item = await testDataManager.pushToCollectionAndSave();
                 if (item)
                     throw new Error('There should be no object received in this test!');
 
@@ -122,9 +141,5 @@ describe("TestDataManager's functions are working correctly.", () => {
                 throw err;
             }
         });
-
-
-
     });
-
 });
