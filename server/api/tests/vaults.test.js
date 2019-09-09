@@ -1,13 +1,13 @@
-const {initTestDataManager, generateVaults} = require('./factories');
+const {initTestDataManager} = require('./factories');
+const {generateVaults, generateSingleVault} = require('./factories/vaults.factory');
 const VaultModel = require('../../api/models/vault.model');
 const {setupDB} = require('./helpers/test-setup');
 const {sortBy} = require('lodash');
 const axios = require('axios');
-// const {server} = require('../../app');
 
 setupDB('testing',);
 
-const testDataManager = initTestDataManager(VaultModel);
+const testDataManager = initTestDataManager(VaultModel, generateSingleVault, generateVaults);
 
 describe("Get all vaults, GET /vaults", () => {
 
@@ -22,7 +22,7 @@ describe("Get all vaults, GET /vaults", () => {
         done();
     });
 
-    it('Gets the list of all vaults in the system', async () => {
+    it('should return all vaults in system', async () => {
         try {
             const response = await axios.get(`http://127.0.0.1:3000/api/vault`);
 
@@ -43,9 +43,11 @@ describe("Get all vaults, GET /vaults", () => {
 });
 
 describe('POST /vault, save new vault', function () {
-    it('POSITIVE, Create new vault with proper data', async () => {
+    it('should create, save and return new vault', async () => {
         try {
-            const expected = testDataManager.generateNewItem();
+            const expected = generateSingleVault();
+            testDataManager.pushToCollection(expected);
+
             const receivedResponse = await axios.post(`http://127.0.0.1:3000/api/vault`, expected);
             const {data} = receivedResponse;
 
@@ -61,7 +63,7 @@ describe('POST /vault, save new vault', function () {
         }
     });
 
-    it('NEGATIVE, Create new vault without data in body', async () => {
+    it('should not create', async () => {
         try {
             await axios.post(`http://127.0.0.1:3000/api/vault`);
         } catch (err) {
@@ -71,7 +73,7 @@ describe('POST /vault, save new vault', function () {
         }
     });
 
-    it('NEGATIVE, Create new vault with wrong data in body', async () => {
+    it('should not create, save and return vault with wrong body passed to it', async () => {
         try {
             await axios.post(`http://127.0.0.1:3000/api/vault`, {message: 'xyz', vault: 6131});
         } catch (err) {
@@ -96,13 +98,11 @@ describe('PUT /vault, Update already creted vault', () => {
         done();
     });
 
-    it('should update ', async () => {
+    it('should update a vault and return old record', async () => {
         try {
             const vault = testDataManager.collection[0];
-            const expected = Object.assign(vault, {
-                description: '\'That is a random key with random value, why even bother?\''
-            });
-            const receivedResponse = await axios.put(`http://127.0.0.1:3000/api/vault/${expected._id}`, {
+            const expected = vault;
+            const receivedResponse = await axios.put(`http://127.0.0.1:3000/api/vault/${vault._id}`, {
                 description: 'That is a random key with random value, why even bother?'
             });
 
@@ -115,42 +115,32 @@ describe('PUT /vault, Update already creted vault', () => {
             throw err;
         }
     });
-
-    it('should not return updated value', async () => {
-        try {
-            const vault = testDataManager.collection[0];
-            const expected = Object.assign(vault, {
-                value: 'Ad victoriam'
-            });
-            const receivedResponse = await axios.put(`http://127.0.0.1:3000/api/vault/${expected._id}`, expected);
-
-            expect(receivedResponse.status).toBe(200);
-            expect(receivedResponse.statusText).toBe('OK');
-
-            expect(receivedResponse.data).toBe(null);
-        } catch (err) {
-            console.log(err);
-            throw err;
-        }
-    });
-
-    it('should respond with truthy value and 200 after not receiving body', async () => {
-        try {
-            const receivedResponse = await axios.put('http://127.0.0.1:3000/api/vault',);
-
-            expect(receivedResponse.status).toBe(200);
-            expect(receivedResponse.statusText).toBe('OK');
-            expect(receivedResponse.data).toBeTruthy();
-        } catch (err) {
-            console.log(err);
-            throw err;
-        }
-    });
 });
 
 
 describe('DELETE /vault, Delete previously created vault', () => {
-    it('should respond with OK and deleted count', function () {
+
+    beforeAll(async (done) => {
+        await testDataManager.clear(VaultModel);
+        await testDataManager.initialise(
+            generateVaults,
+            {},
+            null,
+            'key description id'
+        );
+        done();
+    });
+
+    it('should respond with OK and deleted count', async () => {
+        try {
+            const vault = testDataManager.collection[0];
+            const receivedResponse = await axios.delete(`http://127.0.0.1:3000/api/vault/${vault._id}`);
+            expect(receivedResponse.status).toBe(204);
+            expect(receivedResponse.statusText).toBe('No Content');
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
 
     });
 });

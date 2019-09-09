@@ -1,4 +1,5 @@
-const {initTestDataManager, generateVaults} = require('./factories');
+const {initTestDataManager} = require('./factories');
+const {generateVaults, generateSingleVault} = require('./factories/vaults.factory')
 const VaultModel = require('../../api/models/vault.model');
 const {setupDB} = require('./helpers/test-setup');
 const {sortBy} = require('lodash');
@@ -8,7 +9,7 @@ setupDB('testing');
 const testDataManager = initTestDataManager(VaultModel);
 
 describe('Initialise TestDataManager', () => {
-    it('POSITIVE, Initialise collection in DataTestManager works.', async () => {
+    it('should initialise the collection and return it', async () => {
         try {
 
             const rawReceived = await testDataManager.initialise(
@@ -35,7 +36,7 @@ describe('Initialise TestDataManager', () => {
         }
     });
 
-    it('NEGATIVE, Initialise collection in DataTestManager without model.', async () => {
+    it('should not initialise collection in DataTestManager without model.', async () => {
         try {
 
             const rawReceived = await testDataManager.initialise(
@@ -77,7 +78,7 @@ describe("TestDataManager's functions are working correctly.", () => {
             done();
         });
 
-        it('POSITIVE, Delete document works with single object passed to it.', async () => {
+        it('should delete document works with single object passed to it and return the count.', async () => {
             try {
                 const received = await testDataManager.remove(modelToBeDeleted);
 
@@ -90,7 +91,7 @@ describe("TestDataManager's functions are working correctly.", () => {
             }
         });
 
-        it('NEGATIVE, Delete data in DataTestManager does not work without passed id.', async () => {
+        it('should not delete a document without passing id', async () => {
             try {
                 const received = await testDataManager.remove({});
 
@@ -105,7 +106,7 @@ describe("TestDataManager's functions are working correctly.", () => {
 
     describe('A function to add document  to collection in DataTestManager works.', () => {
 
-        it('POSITIVE, Add new document', async () => {
+        it('should save and return new document', async () => {
             try {
                 const expected = {
                     key: 'random key',
@@ -129,7 +130,7 @@ describe("TestDataManager's functions are working correctly.", () => {
             }
         });
 
-        it('NEGATIVE, Add new document without document.', async () => {
+        it('should not add new document without passed data', async () => {
             try {
                 const item = await testDataManager.pushToCollectionAndSave();
                 if (item)
