@@ -11,7 +11,7 @@ describe('Map triggers tests', () => {
       request(app)
         .post(`/api/triggers/${mapId}`)
         .send({ name: 'beforeEach trigger' })
-        .end(function (err, res) {
+        .then((res) => {
           triggerId = res.body.id;
           done();
         });
@@ -20,7 +20,7 @@ describe('Map triggers tests', () => {
     afterEach((done) => {
       request(app)
         .delete(`/api/triggers/${mapId}/${triggerId}`)
-        .end(function (err, res) {
+        .then((res) => {
           done();
         });
     })
@@ -30,7 +30,7 @@ describe('Map triggers tests', () => {
         request(app)
           .get(`/api/triggers/${mapId}`)
           .expect(200)
-          .end(function (err, res) {
+          .then((res) => {
             expect(Array.isArray(res.body)).toBe(true);
             done();
           });
@@ -44,7 +44,7 @@ describe('Map triggers tests', () => {
           .post(`/api/triggers/${mapId}`)
           .send({ name: triggerName })
           .expect(200)
-          .end(function (err, res) {
+          .then((res) => {
             expect(res.body.name).toEqual(triggerName);
             done();
           });
@@ -56,7 +56,7 @@ describe('Map triggers tests', () => {
         request(app)
           .delete(`/api/triggers/${mapId}/${triggerId}`)
           .expect(200)
-          .end(function (err, res) {
+          .then((res) => {
             expect('OK');
             done();
           });
@@ -70,7 +70,7 @@ describe('Map triggers tests', () => {
           .put(`/api/triggers/${mapId}/${triggerId}`)
           .send({ name: newTriggerName })
           .expect(200)
-          .end(function (err, res) {
+          .then((res) => {
             expect(res.body.name).toEqual(newTriggerName);
             done();
           });
@@ -84,7 +84,7 @@ describe('Map triggers tests', () => {
         request(app)
           .get('/api/triggers/0')
           .expect(500)
-          .end(function (err, res) {
+          .then((res) => {
             expect(res.body.message).toEqual("Cast to ObjectId failed for value \"0\" at path \"map\" for model \"Trigger\"");
             done();
           });
@@ -96,7 +96,7 @@ describe('Map triggers tests', () => {
         request(app)
           .post('/api/triggers/0')
           .expect(500)
-          .end(function (err, res) {
+          .then((res) => {
             expect(res.body.message).toEqual("Trigger validation failed: map: Cast to ObjectID failed for value \"0\" at path \"map\", name: Path `name` is required.");
             done();
           });
@@ -108,7 +108,7 @@ describe('Map triggers tests', () => {
         request(app)
           .delete('/api/triggers/0/0')
           .expect(500)
-          .end(function (err, res) {
+          .then((res) => {
             expect(res.body.message).toEqual("Cast to ObjectId failed for value \"0\" at path \"_id\" for model \"Trigger\"");
             done();
           });
@@ -120,7 +120,7 @@ describe('Map triggers tests', () => {
         request(app)
           .put('/api/triggers/0/0')
           .expect(500)
-          .end(function (err, res) {
+          .then((res) => {
             expect(res.body.message).toEqual("Cast to ObjectId failed for value \"0\" at path \"_id\" for model \"Trigger\"");
             done();
           });
