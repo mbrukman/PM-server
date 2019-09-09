@@ -1,41 +1,57 @@
 const request = require('supertest');
-const {isConnected} = require('./helpers/mongoose-connect');
+const mongoose = require('mongoose');
 const env = require('../../env/enviroment')
-const baseUrl = 'localhost:3000'
+const app = require('../../app');
+const fs = require('fs');
+const path = require("path");
+let config = require('../../env/config');
 
 describe("Settings Api", () => {
 
-    it('GET /', async (done) => {
-        try{
-            let connect = await isConnected();      
-            request(baseUrl).get(`/api/settings`)
-                .withCredentials()
-                .expect(200)
-                .end(function (err, res) {
-                    expect(res.body.isSetup).toBe(connect)
-                    expect(res.body.version).toBe(env.version)
-                    done();
-                  })
-              
-        }catch (err) {
-            console.log(err.message);
-            throw err;
-        }
-
+    beforeAll(async () => {
+        delete config.dbURI;
+        config = Object.assign({}, config);
+        fs.writeFileSync(path.join(__dirname, '../../env/config.json'), JSON.stringify(config));
+        await mongoose.connect('mongodb://localhost/testing', {useNewUrlParser: true})
     })
 
-    describe('Positive',()=>{
-        it('POST /', async (done) => {
-            let url = 'mongodb://localhost/test';
+     afterAll(async () => {
+        await mongoose.disconnect();
+    })
+
+    describe('Negative',() => {
+        it('GET /', async (done) => {
+            delete config.dbURI;
+            config = Object.assign({}, config);
+            fs.writeFileSync(path.join(__dirname, '../../env/config.json'), JSON.stringify(config));
+            try{  
+                request(app).get(`/api/settings`)
+                    .withCredentials()
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body.isSetup).toBe(false)
+                        expect(res.body.version).toBe(env.version)
+                        done();
+                      })
+                  
+            }catch (err) {
+                console.log(err.message);
+                throw err;
+            }
+        })
+
+        it('POST /db', async (done) => {
+            let url = '';
             try{    
-                request(baseUrl)
+                request(app)
                 .post(`/api/settings/db`)
                 .send({uri:url})
                 .withCredentials()
-                .expect(204)
-                .end(function (err, res) {
+                .expect(500)
+                .then(res => {
                     done();
                   });
+
             }catch (err) {
                 console.log(err.message);
                 throw err;
@@ -44,24 +60,43 @@ describe("Settings Api", () => {
         })
     })
 
-    describe('Negative',()=>{
-        it('POST /', async (done) => {
-            let url = '';
+
+    describe('Positive',() => {
+
+        it('POST /db', async (done) => {
+            let url = 'mongodb://localhost/test';
             try{    
-                request(baseUrl)
+                request(app)
                 .post(`/api/settings/db`)
                 .send({uri:url})
                 .withCredentials()
-                .expect(500)
-                .end(function (err, res) {
+                .expect(204)
+                .then(res => {
                     done();
                   });
-
             }catch (err) {
                 console.log(err.message);
                 throw err;
             }
     
+        })
+
+        it('GET /', async (done) => {
+            
+            try{    
+                request(app).get(`/api/settings`)
+                    .withCredentials()
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body.isSetup).toBe(true)
+                        expect(res.body.version).toBe(env.version)
+                        done();
+                      })
+                  
+            }catch (err) {
+                console.log(err.message);
+                throw err;
+            }
         })
     })
 })

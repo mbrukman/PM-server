@@ -125,3 +125,4 @@ server.listen(port, () => {
     winston.log('info', `Running on localhost:${port}`);
     bootstrap(app);
 });
+module.exports = app; 
