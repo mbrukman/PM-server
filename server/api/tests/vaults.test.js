@@ -6,7 +6,7 @@ const {sortBy} = require('lodash');
 const axios = require('axios');
 
 
-const testDataManager = initTestDataManager(VaultModel, generateSingleVault, generateVaults);
+const testDataManager = initTestDataManager(VaultModel);
 
 const baseApiURL = 'http://127.0.0.1:3000/api';
 
