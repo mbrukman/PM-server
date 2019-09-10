@@ -1,22 +1,14 @@
-const {generateVaults, generteSingleVault} = require('./vaults.factory');
-const {ObjectId} = require('mongodb');
-
 class TestDataManager {
+    // you can also expand this class for each of your test suites and overwrite some of the methods
 
     constructor(mongooseModel, singularModelFactory, multipleModelFactory) {
         this.collection = [];
         this.currentMongooseModel = mongooseModel;
     }
-    prepareItem(itemData) {
+    prepareItem(itemData) { // if you need ANY additional functionality to be added to items
         if (!itemData || typeof itemData !== 'object') {
             throw new Error('Passed item is not an object!');
         }
-
-        if (itemData._id) {
-            return itemData;
-        }
-
-        itemData._id = new ObjectId();
         return itemData;
     }
 
@@ -75,7 +67,9 @@ class TestDataManager {
     }
 
     async initialise(modelFactory, schemaOptions = {}, collectionOptions = {}, selectedFields = '') {
-        if (!modelFactory) throw new Error("No model factory was passed!");
+        if (!modelFactory) {
+            throw new Error("No model factory was passed!");
+        }
         const data = modelFactory();
         await this.currentMongooseModel.create(data);
         this.collection = await this.currentMongooseModel.find({}, selectedFields, collectionOptions);
