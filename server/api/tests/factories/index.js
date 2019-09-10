@@ -1,7 +1,7 @@
 class TestDataManager {
     // you can also expand this class for each of your test suites and overwrite some of the methods
 
-    constructor(mongooseModel, singularModelFactory, multipleModelFactory) {
+    constructor(mongooseModel) {
         this.collection = [];
         this.currentMongooseModel = mongooseModel;
     }
@@ -80,7 +80,7 @@ class TestDataManager {
         if (!modelFactory || typeof modelFactory !== 'function') {
             throw new Error("No model factory was passed!");
         }
-        const data = modelFactory();
+        const data = modelFactory(schemaOptions);
         await this.currentMongooseModel.create(data);
         this.collection = await this.currentMongooseModel.find({}, selectedFields, collectionOptions);
         return this.collection;
