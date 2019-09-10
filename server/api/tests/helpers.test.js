@@ -1,5 +1,5 @@
 const {initTestDataManager} = require('./factories');
-const {generateVaults, generateSingleVault} = require('./factories/vaults.factory')
+const {generateVaults} = require('./factories/vaults.factory')
 const VaultModel = require('../../api/models/vault.model');
 const {setupDB} = require('./helpers/test-setup');
 const {sortBy} = require('lodash');
