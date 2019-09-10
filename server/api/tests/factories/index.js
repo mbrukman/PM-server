@@ -32,13 +32,13 @@ class TestDataManager {
     }
 
     async pushToCollectionAndSave(item) {
+        if (!item)
+            throw new Error("No item to add to collection!");
         try {
             return this._createModel(item);
         } catch (err) {
-            if (!item)
-                throw new Error("No item to add to collection!");
-            else
-                throw new Error(err.message);
+            // else
+                throw err;
         }
     }
 
@@ -67,7 +67,7 @@ class TestDataManager {
     }
 
     async initialise(modelFactory, schemaOptions = {}, collectionOptions = {}, selectedFields = '') {
-        if (!modelFactory) {
+        if (!modelFactory || typeof modelFactory !== 'function') {
             throw new Error("No model factory was passed!");
         }
         const data = modelFactory();
