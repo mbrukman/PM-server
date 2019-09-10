@@ -5,6 +5,7 @@ class TestDataManager {
         this.collection = [];
         this.currentMongooseModel = mongooseModel;
     }
+
     prepareItem(itemData) { // if you need ANY additional functionality to be added to items
         if (!itemData || typeof itemData !== 'object') {
             throw new Error('Passed item is not an object!');
@@ -38,7 +39,7 @@ class TestDataManager {
             return this._createModel(item);
         } catch (err) {
             // else
-                throw err;
+            throw err;
         }
     }
 
@@ -50,6 +51,15 @@ class TestDataManager {
                     this.collection = this.collection.filter(item => item.id !== document.id);
                     return response;
                 });
+        } else {
+            throw new Error('Passed document has no id property!');
+        }
+    }
+
+    removeFromCollection(document) {
+        if (document && document.id) {
+            this.collection = this.collection.filter(item => item.id !== document.id);
+            return this.collection;
         } else {
             throw new Error('Passed document has no id property!');
         }
