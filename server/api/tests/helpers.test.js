@@ -49,7 +49,7 @@ describe('Initialise TestDataManager', () => {
 
 
         } catch (err) {
-            expect(err.message).toBe('No mongoose model was passed!');
+            expect(err.message).toBe('No model factory was passed!');
             console.log(err.message);
         }
     });
@@ -138,8 +138,6 @@ describe("TestDataManager's functions are working correctly.", () => {
 
             } catch (err) {
                 expect(err.message).toBe('No item to add to collection!');
-                console.log(err.message);
-                throw err;
             }
         });
     });
