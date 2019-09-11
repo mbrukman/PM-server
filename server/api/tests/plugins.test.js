@@ -1,21 +1,11 @@
 const request = require('supertest');
 const app = require('../../app');
 
-const pluginFile = './files/kaholo-plugin.csv.zip';
+const pluginFile = './api/tests/files/kaholo-plugin-gsuite.zip';
 // TODO: use factory
 let pluginID = '5d77df087044612270179e25';
 
 describe('Plugins tests', () => {
-
-    beforeEach((done) => {
-        request(app)
-            .post(`/api/plugins/upload`)
-            .attach('file', pluginFile)
-            .then(res => {
-                pluginID = res.body.id;
-                done();
-            });
-    });
 
     afterEach((done) => {
         request(app)
@@ -27,6 +17,17 @@ describe('Plugins tests', () => {
 
     describe('Positive', () => {
 
+        beforeEach((done) => {
+            jest.setTimeout(9000);
+            request(app)
+                .post(`/api/plugins/upload`)
+                .attach('file', pluginFile)
+                .then(res => {
+                    pluginID = res.body.id;
+                    done();
+                });
+        });
+
         describe(`POST /upload`, () => {
             it(`should upload plugin`, (done) => {
                 request(app)
@@ -37,7 +38,6 @@ describe('Plugins tests', () => {
                         expect(res.body.active).toBe(true);
                         expect(Array.isArray(res.body.methods)).toBe(true);
                         expect(Array.isArray(res.body.methods[0].params)).toBe(true);
-                        pluginID = res.body.id;
                         done();
                     });
             });
@@ -67,7 +67,7 @@ describe('Plugins tests', () => {
                         expect(Array.isArray(res.body.methods[0].params)).toBe(true);
                         done();
                     });
-                    
+
             });
         });
 
@@ -86,7 +86,7 @@ describe('Plugins tests', () => {
                     .post(`/api/plugins/${pluginID}/settings`)
                     .send(newSettings)
                     .expect(200)
-                    .then( res=> {
+                    .then(res => {
                         expect(res.body.settings[0].value).toBe(newSettings[0].value);
                         expect(res.body.settings[1].value).toBe(newSettings[1].value);
                         done();
@@ -112,10 +112,10 @@ describe('Plugins tests', () => {
             it(`should respond with status 500 and proper error msg for invalid plugin file`, (done) => {
                 request(app)
                     .post(`/api/plugins/upload`)
-                    .attach('file', './plugins.test.js')
+                    .attach('file', './api/tests/plugins.test.js')
                     .expect(500)
                     .then(res => {
-                        expect(res.body).toBe('Bad foramt'); // sic!
+                        expect(res.text).toBe('Bad foramt'); // sic!
                         done();
                     });
             });
