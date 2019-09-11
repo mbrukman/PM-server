@@ -7,15 +7,16 @@ let fixedProjects;
 let mapId;
 
 
-setupDB('testing');
+
+setupDB('test');
 
 const testDataManager = initTestDataManager(ProjectModel);
 
-function createMap(projectId,index){
+function createMap(projectId,index,mapName){
     return new Promise((resolve,reject) => {
         request(app)
         .post(`/api/maps/create`)
-        .send({ name: 'beforeEach map',project:projectId })
+        .send({ name: mapName,project:projectId })
         .then(res=> {
             testDataManager.collection[index].maps.push(res.body.id)
             mapId = res.body.id;
@@ -182,6 +183,8 @@ describe('Projects e2e tests', () => {
             }
         });
     });
+
+
     //BUG (KAH -20)
     // describe(`PUT /:id/archive `, () => {
     //     it(`should respond with the archived project`, function (done) {
@@ -207,39 +210,144 @@ describe('Projects e2e tests', () => {
     //     });
     // });
 
-    describe(`GET /:projectId/add/mapId `, () => {
-        it.only(`should respond with the updated project`, async function (done) {
+   
+
+    describe(`GET /:projectId/ `, () => {
+        it(`should respond with the recents maps of the project`, async function (done) {
             let projectName = fixedProjects[1].name;
-            let projectId = testDataManager.getProjectIdByName(projectName);
-            await createMap(projectId,testDataManager.collection.findIndex(item => item._id == projectId))
-            console.log(testDataManager.collection)
+            let projectId = testDataManager.getProjectIdByName(projectName)
+            let mapName = 'map 1'
+            await createMap(projectId,testDataManager.collection.findIndex(item => item._id == projectId),mapName)
             try{
-                request(app) 
-                .get(`/api/projects/${projectId}/add/${mapId}`)
+                request(app)
+                .get(`/api/projects/${projectId}`)
                 .expect(200)
                 .then(({body}) => {
-                    
-                    expect(body.id).toEqual(projectId);
-                    expect(body.maps.includes(mapId)).toBe(true)
+                    let data = body[0];
+                    expect(data.map.name).toBe(mapName);
+                    expect(data.exec).toBe(null);
+                    expect(data.project.name).toBe(projectName)
                     done();
                 });
             }
-            catch(err){ 
+            catch(err){
                 console.log(err.message);
-                throw err; 
+                throw err;
             }
         });
     });
 
-  
+   
 
   });
 
   describe('Negative', () => {
 
+    describe(`POST /`, () => {
+        it(`should respond with a 500 proper msg`, function (done) {
+            try{
+                request(app)
+                .post(`/api/projects`)
+                .expect(500)
+                .then(res => {
+                    done();
+                });  
+            }
+            catch(err){
+                console.log(err.message);
+                throw err;
+            }
+        }) 
+    });
+
+    describe(`POST /create`, () => {
+        it(`should respond with a 500 proper msg`, function (done) { 
+          try{
+              request(app)
+              .post(`/api/projects/create`)
+              .send({})
+              .expect(500)
+              .then(res => {
+                  done();
+              });
+          }
+          catch(err){
+              console.log(err.message);
+              throw err;
+          }
+        });
+      });
+
+    describe(`GET /:id/detail`, () => {
+        it(`should respond with a 500 proper msg`, function (done) { 
+            try{
+                request(app)
+                .get(`/api/projects/0/detail`)
+                .expect(404)
+                .then(res => {              
+                    done();
+                }); 
+            }
+            catch(err){
+                console.log(err.message);
+                throw err;
+            }
+        });
+    });
+
+    describe(`PUT /:id/update`, () => {
+        it(`should respond with a 500 proper msg`, function (done) {
+            let newDescription = 'simple description';
+            try{
+                request(app)
+                .put(`/api/projects/0/update`)
+                .send({description:newDescription})
+                .expect(500)
+                .then(res => {   
+                    done();
+                }); 
+            }
+            catch(err){
+                console.log(err.message);
+                throw err;
+            }
+        });
+    });
+
+    describe(`DELETE /:jobId/ `, () => {
+        it(`should respond with a 500 proper msg`, function (done) {
+            try{
+                request(app)
+                .delete(`/api/projects/0/delete`)
+                .expect(500)
+                .then(res => {
+                    done();
+                });
+            }
+            catch(err){
+                console.log(err.message);
+                throw err;
+            }
+        });
+    });
+
+    describe(`GET /:projectId/ `, () => {
+        it(`should respond with a 500 proper msg`, function (done) {
+            try{
+                request(app)
+                .get(`/api/projects/0`)
+                .expect(500)
+                .then(() => {
+                    done();
+                });
+            }
+            catch(err){
+                console.log(err.message);
+                throw err;
+            }
+        });
+    });
 
 
-
-     });
-
-});
+   })
+})

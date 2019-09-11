@@ -24,7 +24,7 @@ class TestDataManager {
     }
 
     getProjectIdByName(projectName){
-        return this.collection[this.collection.findIndex(item => item.name == projectName)]._id;
+        return this.collection[this.collection.findIndex(item => item.name == projectName)].id;
     }
 
     async _createModel(item) {
