@@ -1,89 +1,84 @@
-const {initTestDataManager} = require('./factories');
+const TestDataManager = require('./factories');
 const {generateVaults} = require('./factories/vaults.factory')
 const VaultModel = require('../../api/models/vault.model');
 const {setupDB} = require('./helpers/test-setup');
 const {sortBy} = require('lodash');
 
-setupDB('testing');
+setupDB('helpersTesting');
 
-const testDataManager = initTestDataManager(VaultModel);
+describe('Make sure DataTestManager is working as expected', () => {
+    let testDataManager;
 
-describe('Initialise TestDataManager', () => {
-    it('should initialise the collection and return it', async () => {
-        try {
 
-            const rawReceived = await testDataManager.initialise(
-                generateVaults,
-                {},
-                null,
-                'key description id'
-            );
-            const rawExpected = await VaultModel.find({}, 'key description id');
-
-            expect(rawReceived.length).toEqual(rawExpected.length);
-
-            const expected = sortBy(rawExpected, 'key');
-            const received = sortBy(rawReceived, 'key');
-
-            received.forEach((item, idx) => {
-                expect(item.key).toBe(expected[idx].key);
-                expect(item.id).toBe(expected[idx].id);
-                expect(item.description).toBe(expected[idx].description);
-            });
-        } catch (err) {
-            console.log(err.message);
-            throw err;
-        }
+    beforeAll(async () => {
+        testDataManager = new TestDataManager(VaultModel);
     });
 
-    it('should not initialise collection in DataTestManager without model.', async () => {
-        try {
-
-            const rawReceived = await testDataManager.initialise(
-                {},
-                null,
-                null,
-                'key description id'
-            );
-            const rawExpected = await VaultModel.find({}, 'key description id');
-
-
-        } catch (err) {
-            expect(err.message).toBe('No model factory was passed!');
-            console.log(err.message);
-        }
+    afterEach(async () => {
+        await testDataManager.clear();
     });
 
-});
+    describe('Initialise TestDataManager', () => {
 
+        it('should initialise the collection and return it', async (done) => {
+            try {
 
-describe("TestDataManager's functions are working correctly.", () => {
+                const rawReceived = await testDataManager.generateInitialCollection(
+                    generateVaults()
+                );
+                const rawExpected = await VaultModel.find({});
 
-    beforeEach(async (done) => {
-        await testDataManager.clear(VaultModel);
-        await testDataManager.initialise(
-            generateVaults,
-            {},
-            null,
-            'key description id'
-        );
-        done();
-    });
+                expect(rawReceived.length).toEqual(rawExpected.length);
 
-    describe('Deleting single record via DataTestManager.', () => {
-        let modelToBeDeleted = null;
+                const expected = sortBy(rawExpected, 'key');
+                const received = sortBy(rawReceived, 'key');
 
-        beforeEach(async (done) => {
-            modelToBeDeleted = await VaultModel.findOne();
-            done();
+                received.forEach((item, idx) => {
+                    expect(item.key).toBe(expected[idx].key);
+                    expect(item.id).toBe(expected[idx].id);
+                    expect(item.description).toBe(expected[idx].description);
+                });
+
+                done();
+            } catch (err) {
+                console.log(err.message);
+                throw err;
+            }
         });
 
-        it('should delete document works with single object passed to it and return the count.', async () => {
+        it('should not initialise collection in DataTestManager without model.', async (done) => {
             try {
-                const received = await testDataManager.remove(modelToBeDeleted);
 
-                expect(received.deletedCount).toBe(1);
-                expect(received.ok).toBe(1);
+                const rawReceived = await testDataManager.generateInitialCollection();
+                const rawExpected = await VaultModel.find({}, 'key description id');
+
+
+            } catch (err) {
+                expect(err.message).toBe('No generated data was passed!');
+                done();
+            }
+        });
+
+    });
+
+
+    describe('Deleting single record via DataTestManager.', () => {
+        beforeEach(async () => {
+            await testDataManager.generateInitialCollection(
+                generateVaults()
+            );
+        });
+
+        it('should delete document works with single object passed to it and return the count.', async (done) => {
+            try {
+                const randomlyFoundModel = await VaultModel.findOne({});
+                const received = await testDataManager.remove(randomlyFoundModel);
+
+                expect(received._id).toMatchObject(randomlyFoundModel._id);
+                expect(received.key).toBe(randomlyFoundModel.key);
+                expect(received.value).toBe(randomlyFoundModel.value);
+
+                done();
 
             } catch (err) {
                 console.log(err.message);
@@ -91,14 +86,16 @@ describe("TestDataManager's functions are working correctly.", () => {
             }
         });
 
-        it('should not delete a document without passing id', async () => {
+        it('should not delete a document without passing id', async (done) => {
             try {
                 const received = await testDataManager.remove({});
 
-                throw new Error("This request should fail!")
+                throw new Error("This request should fail!");
 
             } catch (err) {
                 expect(err.message).toBe('Passed document has no id property!');
+
+                done();
             }
         });
     });
@@ -106,7 +103,7 @@ describe("TestDataManager's functions are working correctly.", () => {
 
     describe('A function to add document  to collection in DataTestManager works.', () => {
 
-        it('should save and return new document', async () => {
+        it('should save and return new document', async (done) => {
             try {
                 const expected = {
                     key: 'random key',
@@ -124,13 +121,15 @@ describe("TestDataManager's functions are working correctly.", () => {
                 expect(received.description).toBe(expected.description);
                 expect(received._id).toBeTruthy();
 
+                done();
+
             } catch (err) {
                 console.log(err.message);
                 throw err;
             }
         });
 
-        it('should not add new document without passed data', async () => {
+        it('should not add new document without passed data', async (done) => {
             try {
                 const item = await testDataManager.pushToCollectionAndSave();
                 if (item)
@@ -138,6 +137,8 @@ describe("TestDataManager's functions are working correctly.", () => {
 
             } catch (err) {
                 expect(err.message).toBe('No item to add to collection!');
+
+                done();
             }
         });
     });

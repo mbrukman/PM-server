@@ -5,6 +5,12 @@ const singleSchema = {
     properties: {
         value: {
             type: 'string',
+            uniqueItems: true,
+            chance: {
+                word: {
+                    length: 10
+                }
+            }
         },
         _id: {
             "type": "string",
@@ -14,7 +20,9 @@ const singleSchema = {
             type: 'string',
             uniqueItems: true,
             chance: {
-                word: "",
+                word: {
+                    length: 15
+                },
             }
         },
         description: {
@@ -35,7 +43,8 @@ const singleSchema = {
 const arraySchema = {
     type: 'array',
     items: singleSchema,
-    maxItems: 10,
+    maxItems: 15,
+    minItems: 5,
     uniqueItems: 'key',
     definitions: {
         positiveInt: {

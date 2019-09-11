@@ -1,5 +1,5 @@
-class TestDataManager {
-    // you can also expand this class for each of your test suites and overwrite some of the methods
+module.exports = class TestDataManager {
+    // you can also extend this class for each of your test suites and overwrite some of the methods
 
     constructor(mongooseModel) {
         this.collection = [];
@@ -35,18 +35,20 @@ class TestDataManager {
     async pushToCollectionAndSave(item) {
         if (!item)
             throw new Error("No item to add to collection!");
-        try {
-            return this._createModel(item);
-        } catch (err) {
-            // else
-            throw err;
-        }
+        else
+            try {
+                return this._createModel(item);
+            } catch (err) {
+                // else
+                console.log(err)
+                throw err;
+            }
     }
 
     remove(document) {
-        if (document && document.id) {
+        if (document && document._id) {
             return this.currentMongooseModel
-                .deleteOne(document)
+                .findByIdAndRemove(document._id)
                 .then((response) => {
                     this.collection = this.collection.filter(item => item.id !== document.id);
                     return response;
@@ -57,8 +59,8 @@ class TestDataManager {
     }
 
     removeFromCollection(document) {
-        if (document && document.id) {
-            this.collection = this.collection.filter(item => item.id !== document.id);
+        if (document && document._id) {
+            this.collection = this.collection.filter(item => item.id !== document._id);
             return this.collection;
         } else {
             throw new Error('Passed document has no id property!');
@@ -67,7 +69,8 @@ class TestDataManager {
 
     async clear() {
         try {
-            await this.currentMongooseModel.deleteMany({});
+            const response = await this.currentMongooseModel.deleteMany({});
+            const resp = await this.currentMongooseModel.find({});
             this.collection = [];
             return this.collection;
         } catch (err) {
@@ -76,22 +79,19 @@ class TestDataManager {
         }
     }
 
-    async initialise(modelFactory, schemaOptions = {}, collectionOptions = {}, selectedFields = '') {
-        if (!modelFactory || typeof modelFactory !== 'function') {
-            throw new Error("No model factory was passed!");
+    async generateInitialCollection(generatedData, schemaOptions = {}, collectionOptions = {}, selectedFields = '') {
+        if (!generatedData || typeof generatedData !== 'object') {
+            throw new Error("No generated data was passed!");
         }
-        const data = modelFactory(schemaOptions);
-        await this.currentMongooseModel.create(data);
-        this.collection = await this.currentMongooseModel.find({}, selectedFields, collectionOptions);
-        return this.collection;
+
+        try {
+            // console.log(data.length, 'collections', generatedData.length, 'generated')
+            this.collection = await this.currentMongooseModel.insertMany(generatedData, {ordered: false});
+            return this.collection;
+        } catch (err) {
+            console.log(err, 'generate')
+            throw err;
+        }
     }
 }
 
-const initTestDataManager = (mongooseModel) => {
-    return new TestDataManager(mongooseModel);
-};
-
-
-module.exports = {
-    initTestDataManager,
-};

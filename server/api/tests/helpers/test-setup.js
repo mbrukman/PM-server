@@ -26,30 +26,32 @@ async function dropAllCollections() {
     }
 }
 
+
+function changeDbName(dbName) {
+    console.log( env.dbURI.replace(/\/(?=[^\/]*$).*\?(?=[^\?]*$)/g, `/${dbName}?`));
+    return env.dbURI.replace(/\/(?=[^\/]*$).*\?(?=[^\?]*$)/g, `/${dbName}?`);
+
+}
+
 module.exports = {
-    setupDB(databaseName = 'test', server) {
+    removeAllCollections,
+dropAllCollections,
+    setupDB(dbName = 'test') {
         // Connect to Mongoose
         beforeAll(async () => {
-            const url = `${env.dbURI}`;
-            await mongoose.connect(url, {useNewUrlParser: true});
+            await mongoose.connect(changeDbName(dbName), {useNewUrlParser: true});
+            await dropAllCollections();
         });
-
-        // Cleans up database between each test
+        //
+        // // Cleans up database between each test
         afterEach(async () => {
-            await removeAllCollections()
+            await removeAllCollections();
         });
 
         // Disconnect Mongoose
-        afterAll(async (done) => {
+        afterAll(async () => {
             await dropAllCollections();
             await mongoose.disconnect();
-
-            if (server) {
-                await server.close();
-                delete require.cache[require.resolve('../../../app')]
-            }
-
-            done();
         });
     }
 };
