@@ -7,8 +7,22 @@ let pluginID = '5d77df087044612270179e25';
 
 describe('Plugins tests', () => {
 
-    beforeAll(() => {
+    beforeEach((done) => {
+        request(app)
+            .post(`/api/plugins/upload`)
+            .attach('file', pluginFile)
+            .then(res => {
+                pluginID = res.body.id;
+                done();
+            });
+    });
 
+    afterEach((done) => {
+        request(app)
+            .delete(`/api/plugins/${pluginID}/delete`)
+            .then(res => {
+                done();
+            });
     });
 
     describe('Positive', () => {
@@ -73,8 +87,8 @@ describe('Plugins tests', () => {
                     .send(newSettings)
                     .expect(200)
                     .then( res=> {
-                        expect(res.body.settings[0].value).toEqual(newSettings[0].value);
-                        expect(res.body.settings[1].value).toEqual(newSettings[1].value);
+                        expect(res.body.settings[0].value).toBe(newSettings[0].value);
+                        expect(res.body.settings[1].value).toBe(newSettings[1].value);
                         done();
                     });
             });
@@ -109,25 +123,50 @@ describe('Plugins tests', () => {
 
         describe(`GET /:id`, () => {
             it(`should respond with status 500 and proper error msg for invalid id`, (done) => {
-
+                request(app)
+                    .get('/api/plugins/0')
+                    .expect(500)
+                    .then((res) => {
+                        expect(res.body.message).toBe("Cast to ObjectId failed for value \"0\" at path \"_id\" for model \"Plugin\"");
+                        done();
+                    });
             });
         });
 
         describe(`POST /:id/settings`, () => {
             it(`should respond with status 500 and proper error msg for invalid id`, (done) => {
-
+                request(app)
+                    .post(`/api/plugins/0/settings`)
+                    .expect(500)
+                    .then((res) => {
+                        expect(res.body.message).toBe("Cast to ObjectId failed for value \"0\" at path \"_id\" for model \"Plugin\"");
+                        done();
+                    });
             });
         });
 
         describe(`POST /:id/settings`, () => {
-            it(`should respond with status 500 and proper error msg for invalid settings body`, (done) => {
-
+            // notice: bug - response body should be an error message, not an empty object
+            it(`should respond with status 500 and empty object for invalid settings body`, (done) => {
+                request(app)
+                    .post(`/api/plugins/${pluginID}/settings`)
+                    .expect(500)
+                    .then((res) => {
+                        expect(res.body).toEqual({});
+                        done();
+                    });
             });
         });
 
         describe(`DELETE /:id/delete`, () => {
             it(`should respond with status 500 and proper error msg`, (done) => {
-
+                request(app)
+                    .delete('/api/plugins/0/delete')
+                    .expect(500)
+                    .then((res) => {
+                        expect(res.body.message).toBe("Cast to ObjectId failed for value \"0\" at path \"_id\" for model \"Plugin\"");
+                        done();
+                    });
             });
         });
     });
