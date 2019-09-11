@@ -85,7 +85,7 @@ describe('Plugins tests', () => {
             it(`should respond with 200`, (done) => {
                 // notice: RETURNS 200 for ANY ID
                 request(app)
-                    .delete(`/api/plugins/${pluginID}`/delete)
+                    .delete(`/api/plugins/${pluginID}/delete`)
                     .expect(200, done);
             });
         });
@@ -95,29 +95,32 @@ describe('Plugins tests', () => {
     describe('Negative', () => {
 
         describe(`POST /upload`, () => {
-            it(`should respond with status 500 and proper error msg`, (done) => {
-
-            });
-        });
-
-        describe(`GET /`, () => {
-            it(`should respond with status 500 and proper error msg`, (done) => {
-                // TODO: how to get 500 here?
-            });
-
-            it(`should respond with 'null'`, (done) => {
-
+            it(`should respond with status 500 and proper error msg for invalid plugin file`, (done) => {
+                request(app)
+                    .post(`/api/plugins/upload`)
+                    .attach('file', './plugins.test.js')
+                    .expect(500)
+                    .then(res => {
+                        expect(res.body).toBe('Bad foramt'); // sic!
+                        done();
+                    });
             });
         });
 
         describe(`GET /:id`, () => {
-            it(`should respond with status 500 and proper error msg`, (done) => {
+            it(`should respond with status 500 and proper error msg for invalid id`, (done) => {
 
             });
         });
 
         describe(`POST /:id/settings`, () => {
-            it(`should respond with status 500 and proper error msg`, (done) => {
+            it(`should respond with status 500 and proper error msg for invalid id`, (done) => {
+
+            });
+        });
+
+        describe(`POST /:id/settings`, () => {
+            it(`should respond with status 500 and proper error msg for invalid settings body`, (done) => {
 
             });
         });
