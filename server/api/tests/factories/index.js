@@ -39,8 +39,6 @@ module.exports = class TestDataManager {
             try {
                 return this._createModel(item);
             } catch (err) {
-                // else
-                console.log(err)
                 throw err;
             }
     }
@@ -85,11 +83,9 @@ module.exports = class TestDataManager {
         }
 
         try {
-            // console.log(data.length, 'collections', generatedData.length, 'generated')
             this.collection = await this.currentMongooseModel.insertMany(generatedData, {ordered: false});
             return this.collection;
         } catch (err) {
-            console.log(err, 'generate')
             throw err;
         }
     }

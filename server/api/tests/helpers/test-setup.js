@@ -28,14 +28,13 @@ async function dropAllCollections() {
 
 
 function changeDbName(dbName) {
-    console.log( env.dbURI.replace(/\/(?=[^\/]*$).*\?(?=[^\?]*$)/g, `/${dbName}?`));
     return env.dbURI.replace(/\/(?=[^\/]*$).*\?(?=[^\?]*$)/g, `/${dbName}?`);
 
 }
 
 module.exports = {
     removeAllCollections,
-dropAllCollections,
+    dropAllCollections,
     setupDB(dbName = 'test') {
         // Connect to Mongoose
         beforeAll(async () => {
