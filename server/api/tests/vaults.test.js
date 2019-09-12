@@ -12,12 +12,9 @@ setupDB('vaultsTesting');
 describe("All vaults endpoints are working as expected.", () => {
     let testDataManager;
 
-    beforeAll(async () => {
-        testDataManager = new TestDataManager(VaultModel);
-    });
 
     beforeEach(async (done) => {
-        await testDataManager.clear();
+        testDataManager = new TestDataManager(VaultModel);
         await testDataManager.generateInitialCollection(
             generateVaults(),
             {},
@@ -25,10 +22,6 @@ describe("All vaults endpoints are working as expected.", () => {
             'key description id'
         );
         done();
-    });
-
-    afterEach(async () => {
-        testDataManager.clear();
     });
 
     describe("Get all vaults, GET /vaults", () => {
