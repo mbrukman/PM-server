@@ -38,7 +38,7 @@ module.exports = {
     setupDB(dbName = 'test') {
         // Connect to Mongoose
         beforeAll(async () => {
-            await mongoose.connect(changeDbName(dbName), {useNewUrlParser: true});
+            await mongoose.connect(env.dbURI, {useNewUrlParser: true});
             await dropAllCollections();
         });
         //
