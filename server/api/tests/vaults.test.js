@@ -1,7 +1,7 @@
 const {TestDataManager, vaultsFactory} = require('./factories');
 const VaultModel = require('../../api/models/vault.model');
 const {setupDB} = require('./helpers/test-setup');
-const axios = require('axios');
+const request = require('supertest');
 
 const baseApiURL = 'http://127.0.0.1:3000/api';
 
@@ -11,121 +11,92 @@ describe("All vaults endpoints are working as expected.", () => {
     let testDataManager;
 
 
-    beforeEach(async (done) => {
+    beforeEach(() => {
         testDataManager = new TestDataManager(VaultModel);
-        await testDataManager.generateInitialCollection(
+        return testDataManager.generateInitialCollection(
             vaultsFactory.generateVaults(),
             {},
             null,
             'key description id'
         );
-        done();
     });
 
     describe("Get all vaults, GET /vaults", () => {
 
-    it('should return all vaults in system', async (done) => {
-        try {
-            const response = await axios.get(`${baseApiURL}/vault`);
-            expect.assertions(2);
-            expect(response.status).toBe(200);
-            expect(response.data.length).toEqual(testDataManager.collection.length);
-            done();
-        } catch (err) {
-            console.log(err.message);
-            throw err;
-        }
-    });
+        it('should return all vaults in system', () => {
+            return request(baseApiURL)
+                .get(`/vault`)
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .then((res) => {
+                    expect.assertions(1);
+                    expect(res.body.length).toEqual(testDataManager.collection.length);
+                });
+        });
     });
 
     describe('POST /vault, save new vault', () => {
 
-    it('should create, save and return new vault', async (done) => {
-        try {
+        it('should create, save and return new vault', () => {
             const expected = vaultsFactory.generateSingleVault();
             testDataManager.pushToCollection(expected);
 
-            const receivedResponse = await axios.post(`${baseApiURL}/vault`, expected);
-            const {data} = receivedResponse;
+            return request(baseApiURL)
+                .post(`/vault`)
+                .send(expected)
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .then(({body}) => {
+                    expect.assertions(3);
+                    expect(body.key).toBe(expected.key);
+                    expect(body._id).toBe(expected._id);
+                    expect(body.description).toBe(expected.description);
+                });
+        });
 
-            expect(receivedResponse.status).toBe(200);
-            expect(receivedResponse.statusText).toBe('OK');
+        it('should not create', (done) => {
+            return request(baseApiURL).post(`/vault`)
+                .send()
+                .expect(500, done);
+        });
 
-            expect(data.key).toBe(expected.key);
-            expect(data._id).toBe(expected._id);
-            expect(data.description).toBe(expected.description);
-
-            done();
-        } catch (err) {
-            console.log(err);
-            throw err;
-        }
-    });
-
-    it('should not create', async (done) => {
-        try {
-            await axios.post(`${baseApiURL}/vault`);
-        } catch (err) {
-            const {response} = err;
-            expect(response.status).toBe(500);
-            expect(response.statusText).toBe('Internal Server Error');
-
-            done();
-        }
-    });
-
-    it('should not create, save and return vault with wrong body passed to it', async (done) => {
-        try {
-            await axios.post(`${baseApiURL}/vault`, {message: 'xyz', vault: 6131});
-        } catch (err) {
-            const {response} = err;
-            expect(response.status).toBe(500);
-            expect(response.statusText).toBe('Internal Server Error');
-
-            done();
-        }
-    });
+        it('should not create, save and return vault with wrong body passed to it', (done) => {
+            return request(baseApiURL).post(`/vault`)
+                .send({message: 'xyz', vault: 6131})
+                .expect(500, done)
+        });
     });
 
 
     describe('PUT /vault, Update already created vault', () => {
 
-    it('should update a vault and return old record', async (done) => {
-        try {
+        it('should update a vault and return old record', () => {
             const expected = testDataManager.collection[0];
-            const receivedResponse = await axios.put(`${baseApiURL}/vault/${expected._id}`, {
-                description: 'That is a random key with random value, why even bother?'
-            });
-
-            expect(receivedResponse.status).toBe(200);
-            expect(receivedResponse.statusText).toBe('OK');
-
-            expect(receivedResponse.data.description).toBe(expected.description);
-
-            done();
-        } catch (err) {
-            console.log(err);
-            throw err;
-        }
-    });
+            return request(baseApiURL)
+                .put(`/vault/${expected._id}`)
+                .send({
+                    description: 'That is a random key with random value, why even bother?'
+                })
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .then(({body}) => {
+                    expect.assertions(1);
+                    expect(body.description).toBe(expected.description);
+                });
+        });
     });
 
 
     describe('DELETE /vault, Delete previously created vault', () => {
 
-    it('should respond with OK and deleted count', async (done) => {
-        try {
+        it('should respond with OK and deleted count', () => {
             const vault = testDataManager.collection[0];
-            const receivedResponse = await axios.delete(`${baseApiURL}/vault/${vault._id}`);
-            testDataManager.removeFromCollection(vault);
-            expect(receivedResponse.status).toBe(204);
-            expect(receivedResponse.statusText).toBe('No Content');
-
-            done();
-        } catch (err) {
-            console.log(err);
-            throw err;
-        }
-    });
+            return request(baseApiURL)
+                .del(`/vault/${vault._id}`)
+                .expect(204)
+                .then(() => {
+                    testDataManager.removeFromCollection(vault);
+                });
+        });
     });
 });
