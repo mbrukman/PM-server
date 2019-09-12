@@ -4,4 +4,4 @@ const TestDataManager = require('./test-data-manager');
 module.exports =  {
     TestDataManager,
     vaultsFactory
-}
+};
