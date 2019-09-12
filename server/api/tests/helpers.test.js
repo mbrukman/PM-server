@@ -10,13 +10,13 @@ describe('Make sure DataTestManager is working as expected', () => {
     let testDataManager;
 
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         testDataManager = new TestDataManager(VaultModel);
     });
-
-    afterEach(async () => {
-        await testDataManager.clear();
-    });
+    //
+    // afterEach(async () => {
+    //     await testDataManager.clear();
+    // });
 
     describe('Initialise TestDataManager', () => {
 
