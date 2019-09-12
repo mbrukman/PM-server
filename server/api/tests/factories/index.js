@@ -77,7 +77,7 @@ module.exports = class TestDataManager {
         }
     }
 
-    async generateInitialCollection(generatedData, schemaOptions = {}, collectionOptions = {}, selectedFields = '') {
+    async generateInitialCollection(generatedData) {
         if (!generatedData || typeof generatedData !== 'object') {
             throw new Error("No generated data was passed!");
         }

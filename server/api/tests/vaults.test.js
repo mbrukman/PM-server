@@ -17,7 +17,8 @@ describe("All vaults endpoints are working as expected.", () => {
     });
 
     beforeEach(async (done) => {
-        const d = await testDataManager.generateInitialCollection(
+        await testDataManager.clear();
+        await testDataManager.generateInitialCollection(
             generateVaults(),
             {},
             null,
