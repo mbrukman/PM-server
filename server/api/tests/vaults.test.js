@@ -1,8 +1,6 @@
-const TestDataManager = require('./factories');
-const {generateVaults, generateSingleVault} = require('./factories/vaults.factory');
+const {TestDataManager, vaultsFactory} = require('./factories');
 const VaultModel = require('../../api/models/vault.model');
 const {setupDB} = require('./helpers/test-setup');
-const {sortBy} = require('lodash');
 const axios = require('axios');
 
 const baseApiURL = 'http://127.0.0.1:3000/api';
@@ -16,7 +14,7 @@ describe("All vaults endpoints are working as expected.", () => {
     beforeEach(async (done) => {
         testDataManager = new TestDataManager(VaultModel);
         await testDataManager.generateInitialCollection(
-            generateVaults(),
+            vaultsFactory.generateVaults(),
             {},
             null,
             'key description id'
@@ -44,7 +42,7 @@ describe("All vaults endpoints are working as expected.", () => {
 
     it('should create, save and return new vault', async (done) => {
         try {
-            const expected = generateSingleVault();
+            const expected = vaultsFactory.generateSingleVault();
             testDataManager.pushToCollection(expected);
 
             const receivedResponse = await axios.post(`${baseApiURL}/vault`, expected);

@@ -1,5 +1,4 @@
-const TestDataManager = require('./factories');
-const {generateVaults} = require('./factories/vaults.factory')
+const {TestDataManager, vaultsFactory} = require('./factories');
 const VaultModel = require('../../api/models/vault.model');
 const {setupDB} = require('./helpers/test-setup');
 const {sortBy} = require('lodash');
@@ -24,7 +23,7 @@ describe('Make sure DataTestManager is working as expected', () => {
             try {
 
                 const rawReceived = await testDataManager.generateInitialCollection(
-                    generateVaults()
+                    vaultsFactory.generateVaults()
                 );
                 const rawExpected = await VaultModel.find({});
 
@@ -49,9 +48,7 @@ describe('Make sure DataTestManager is working as expected', () => {
         it('should not initialise collection in DataTestManager without model.', async (done) => {
             try {
 
-                const rawReceived = await testDataManager.generateInitialCollection();
-                const rawExpected = await VaultModel.find({}, 'key description id');
-
+                await testDataManager.generateInitialCollection();
 
             } catch (err) {
                 expect(err.message).toBe('No generated data was passed!');
@@ -65,7 +62,7 @@ describe('Make sure DataTestManager is working as expected', () => {
     describe('Deleting single record via DataTestManager.', () => {
         beforeEach(async () => {
             await testDataManager.generateInitialCollection(
-                generateVaults()
+                vaultsFactory.generateVaults()
             );
         });
 

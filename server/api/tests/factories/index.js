@@ -1,4 +1,6 @@
-module.exports = class TestDataManager {
+const vaultsFactory = require('./vaults.factory');
+
+class TestDataManager {
     // you can also extend this class for each of your test suites and overwrite some of the methods
 
     constructor(mongooseModel) {
@@ -91,3 +93,7 @@ module.exports = class TestDataManager {
     }
 }
 
+module.exports =  {
+    TestDataManager,
+    vaultsFactory
+}
