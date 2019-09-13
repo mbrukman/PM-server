@@ -2,129 +2,132 @@ const request = require('supertest');
 const TriggerModel = require('../../api/models/map-trigger.model');
 const TestDataManager = require('./factories/test-data-manager');
 const triggersFactory = require('./factories/triggers.factory');
-
+const {setupDB} = require('./helpers/test-setup')
 const app = 'localhost:3000';
 const mapId = triggersFactory.mapId;
 
+
+
 describe('Map triggers tests', () => {
-  let testDataManager;
+    let testDataManager;
 
-  describe('Positive', () => {
+    setupDB();
 
-    beforeEach(() => {
-      /*
-      testDataManager = new TestDataManager(TriggerModel);
-      const triggerCollection = triggersFactory.generateTriggerCollection();
-      return testDataManager.generateInitialCollection(
-        triggerCollection
-      )
-      */
-    })
+    describe('Positive', () => {
 
-    afterEach(() => {
+        beforeEach(async () => {
 
-    })
+            testDataManager = new TestDataManager(TriggerModel);
+            const triggerCollection = triggersFactory.generateTriggerCollection();
+            await testDataManager.generateInitialCollection(
+                triggerCollection
+            );
+        });
 
-    describe(`GET /:mapId`, () => {
-      it(`should respond with a list of triggers`, function (done) {
-        request(app)
-          .get(`/api/triggers/${mapId}`)
-          .expect(200)
-          .then((res) => {
-            expect(Array.isArray(res.body)).toBe(true);
-            done();
-          });
-      });
+        afterEach(() => {
+
+        })
+
+        describe(`GET /:mapId`, () => {
+            it(`should respond with a list of triggers`, function (done) {
+                request(app)
+                    .get(`/api/triggers/${mapId}`)
+                    .expect(200)
+                    .then((res) => {
+                        expect(Array.isArray(res.body)).toBe(true);
+                        done();
+                    });
+            });
+        });
+
+        describe(`POST /:mapId`, () => {
+            it(`should respond with a created trigger`, function (done) {
+                const triggerName = 'test trigger name';
+                request(app)
+                    .post(`/api/triggers/${mapId}`)
+                    .send({name: triggerName})
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body.name).toEqual(triggerName);
+                        done();
+                    });
+            });
+        });
+
+        describe(`DELETE /:mapId/:triggerId`, () => {
+            it(`should respond with 'OK'`, function (done) {
+                request(app)
+                    .delete(`/api/triggers/${mapId}/${triggerId}`)
+                    .expect(200)
+                    .then((res) => {
+                        expect('OK');
+                        done();
+                    });
+            });
+        });
+
+        describe(`PUT /:mapId/:triggerId`, () => {
+            it(`should respond with an updated trigger`, function (done) {
+                const newTriggerName = 'test trigger name 2';
+                request(app)
+                    .put(`/api/triggers/${mapId}/${triggerId}`)
+                    .send({name: newTriggerName})
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body.name).toEqual(newTriggerName);
+                        done();
+                    });
+            });
+        });
     });
 
-    describe(`POST /:mapId`, () => {
-      it(`should respond with a created trigger`, function (done) {
-        const triggerName = 'test trigger name';
-        request(app)
-          .post(`/api/triggers/${mapId}`)
-          .send({ name: triggerName })
-          .expect(200)
-          .then((res) => {
-            expect(res.body.name).toEqual(triggerName);
-            done();
-          });
-      });
-    });
+    describe('Negative', () => {
+        describe(`GET /:mapId`, () => {
+            it(`should respond with status code 500 and proper error msg`, function (done) {
+                request(app)
+                    .get('/api/triggers/0')
+                    .expect(500)
+                    .then((res) => {
+                        expect(res.body.message).toEqual("Cast to ObjectId failed for value \"0\" at path \"map\" for model \"Trigger\"");
+                        done();
+                    });
+            });
+        });
 
-    describe(`DELETE /:mapId/:triggerId`, () => {
-      it(`should respond with 'OK'`, function (done) {
-        request(app)
-          .delete(`/api/triggers/${mapId}/${triggerId}`)
-          .expect(200)
-          .then((res) => {
-            expect('OK');
-            done();
-          });
-      });
-    });
+        describe(`POST /:mapId`, () => {
+            it(`should respond with status code 500 and proper error msg`, function (done) {
+                request(app)
+                    .post('/api/triggers/0')
+                    .expect(500)
+                    .then((res) => {
+                        expect(res.body.message).toEqual("Trigger validation failed: map: Cast to ObjectID failed for value \"0\" at path \"map\", name: Path `name` is required.");
+                        done();
+                    });
+            });
+        });
 
-    describe(`PUT /:mapId/:triggerId`, () => {
-      it(`should respond with an updated trigger`, function (done) {
-        const newTriggerName = 'test trigger name 2';
-        request(app)
-          .put(`/api/triggers/${mapId}/${triggerId}`)
-          .send({ name: newTriggerName })
-          .expect(200)
-          .then((res) => {
-            expect(res.body.name).toEqual(newTriggerName);
-            done();
-          });
-      });
-    });
-  });
+        describe(`DELETE /:mapId/:triggerId`, () => {
+            it(`should respond with status code 500 and proper error msg`, function (done) {
+                request(app)
+                    .delete('/api/triggers/0/0')
+                    .expect(500)
+                    .then((res) => {
+                        expect(res.body.message).toEqual("Cast to ObjectId failed for value \"0\" at path \"_id\" for model \"Trigger\"");
+                        done();
+                    });
+            });
+        });
 
-  describe('Negative', () => {
-    describe(`GET /:mapId`, () => {
-      it(`should respond with status code 500 and proper error msg`, function (done) {
-        request(app)
-          .get('/api/triggers/0')
-          .expect(500)
-          .then((res) => {
-            expect(res.body.message).toEqual("Cast to ObjectId failed for value \"0\" at path \"map\" for model \"Trigger\"");
-            done();
-          });
-      });
+        describe(`PUT /:mapId/:triggerId`, () => {
+            it(`should respond with status code 500 and proper error msg`, function (done) {
+                request(app)
+                    .put('/api/triggers/0/0')
+                    .expect(500)
+                    .then((res) => {
+                        expect(res.body.message).toEqual("Cast to ObjectId failed for value \"0\" at path \"_id\" for model \"Trigger\"");
+                        done();
+                    });
+            });
+        });
     });
-
-    describe(`POST /:mapId`, () => {
-      it(`should respond with status code 500 and proper error msg`, function (done) {
-        request(app)
-          .post('/api/triggers/0')
-          .expect(500)
-          .then((res) => {
-            expect(res.body.message).toEqual("Trigger validation failed: map: Cast to ObjectID failed for value \"0\" at path \"map\", name: Path `name` is required.");
-            done();
-          });
-      });
-    });
-
-    describe(`DELETE /:mapId/:triggerId`, () => {
-      it(`should respond with status code 500 and proper error msg`, function (done) {
-        request(app)
-          .delete('/api/triggers/0/0')
-          .expect(500)
-          .then((res) => {
-            expect(res.body.message).toEqual("Cast to ObjectId failed for value \"0\" at path \"_id\" for model \"Trigger\"");
-            done();
-          });
-      });
-    });
-
-    describe(`PUT /:mapId/:triggerId`, () => {
-      it(`should respond with status code 500 and proper error msg`, function (done) {
-        request(app)
-          .put('/api/triggers/0/0')
-          .expect(500)
-          .then((res) => {
-            expect(res.body.message).toEqual("Cast to ObjectId failed for value \"0\" at path \"_id\" for model \"Trigger\"");
-            done();
-          });
-      });
-    });
-  });
 });
