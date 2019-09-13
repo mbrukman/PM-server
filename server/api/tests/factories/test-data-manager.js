@@ -83,7 +83,8 @@ module.exports = class TestDataManager {
         }
 
         try {
-            this.collection = await this.currentMongooseModel.insertMany(generatedData);
+            this.collection = await this.currentMongooseModel.insertMany(generatedData, {ordered: true});
+            console.log(this.collection);
             return this.collection;
         } catch (err) {
             throw err;
