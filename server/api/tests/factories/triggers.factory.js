@@ -30,6 +30,7 @@ const actionParamsSchema = {
     }
 };
 
+
 const triggerSchema = {
     type: 'object',
     properties: {
@@ -38,10 +39,8 @@ const triggerSchema = {
             format: 'mongoID'
         },
         name: {
-            type: {
-                type: 'string',
-                faker: 'random.word'
-            }
+            type: 'string',
+            faker: 'random.word'
         },
         map: {
             type: "string",
@@ -66,7 +65,9 @@ const triggerSchema = {
             type: 'string',
             faker: 'random.word'
         },
-        params: [actionParamsSchema],
+        params: {
+            $ref: actionParamsSchema
+        }
     },
     required: ['_id', 'name', 'map']
 };
@@ -75,8 +76,7 @@ const triggerCollectionSchema = {
     type: 'array',
     items: triggerSchema,
     maxItems: 15,
-    minItems: 5,
-    uniqueItems: 'key'
+    minItems: 5
 };
 
 module.exports = {

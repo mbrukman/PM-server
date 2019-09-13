@@ -12,10 +12,13 @@ describe('Map triggers tests', () => {
   describe('Positive', () => {
 
     beforeEach(() => {
-        testDataManager = new TestDataManager(TriggerModel);
-        return testDataManager.generateInitialCollection(
-          triggersFactory.generateTriggerCollection()
-        );
+      /*
+      testDataManager = new TestDataManager(TriggerModel);
+      const triggerCollection = triggersFactory.generateTriggerCollection();
+      return testDataManager.generateInitialCollection(
+        triggerCollection
+      )
+      */
     })
 
     afterEach(() => {
