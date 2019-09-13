@@ -1,28 +1,25 @@
 const request = require('supertest');
+const TriggerModel = require('../../api/models/map-trigger.model');
+const TestDataManager = require('./factories/test-data-manager');
+const triggersFactory = require('./factories/triggers.factory');
 
-const app = require('../../app');
-const mapId = '5d70c6f15556a11f1860bc6e';
-let triggerId = '5d720cabd990b82430dcf60a';
+const app = 'localhost:3000';
+const mapId = triggersFactory.mapId;
 
 describe('Map triggers tests', () => {
+  let testDataManager;
+
   describe('Positive', () => {
 
-    beforeEach((done) => {
-      request(app)
-        .post(`/api/triggers/${mapId}`)
-        .send({ name: 'beforeEach trigger' })
-        .then((res) => {
-          triggerId = res.body.id;
-          done();
-        });
+    beforeEach(() => {
+        testDataManager = new TestDataManager(TriggerModel);
+        return testDataManager.generateInitialCollection(
+          triggersFactory.generateTriggerCollection()
+        );
     })
 
-    afterEach((done) => {
-      request(app)
-        .delete(`/api/triggers/${mapId}/${triggerId}`)
-        .then((res) => {
-          done();
-        });
+    afterEach(() => {
+
     })
 
     describe(`GET /:mapId`, () => {
@@ -114,7 +111,7 @@ describe('Map triggers tests', () => {
           });
       });
     });
-    
+
     describe(`PUT /:mapId/:triggerId`, () => {
       it(`should respond with status code 500 and proper error msg`, function (done) {
         request(app)
