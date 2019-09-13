@@ -1,0 +1,1 @@
+{"upload_path":"uploads","interval_time":5000,"retries":3,"page_size":15,"dbURI":"mongodb://testUser:xyz123@127.0.0.1:27017/test","serverKey":"70839e17ecc2b73113f1a09962514298"}

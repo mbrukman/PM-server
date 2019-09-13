@@ -1,3 +1,5 @@
+const bootstrap = require("./helpers/bootstrap").bootstrap;
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -5,7 +7,6 @@ const http = require('http');
 const winston = require('winston');
 const expressWinston = require('express-winston');
 const mongoose = require('mongoose');
-const bootstrap = require("./helpers/bootstrap").bootstrap;
 
 const socketService = require('./api/services/socket.service');
 
@@ -13,10 +14,7 @@ require('winston-mongodb');
 const parseArgs = require('minimist')(process.argv.slice(2));
 
 const env = require('./env/enviroment');
-const app = express(); 
-
-
-
+const app = express();
 
 
 /////////////////////
@@ -102,18 +100,11 @@ app.use('/api/maps', mapsApi);
 app.use('/api/plugins', pluginsApi);
 app.use('/api/agents', agentsApi);
 app.use('/api/projects', projectsApi);
-app.use('/api/triggers', triggersApi)
-app.use('/api/scheduled-jobs', scheduledJobsApi)
-app.use('/api/vault', vaultApi)
-app.use('/api/config-token', configTokenApi)
-app.use('/api/autocomplete',autoCompleteApi)
-
-
-
-// Send all other requests to the Angular app
-app.all('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
+app.use('/api/triggers', triggersApi);
+app.use('/api/scheduled-jobs', scheduledJobsApi);
+app.use('/api/vault', vaultApi);
+app.use('/api/config-token', configTokenApi);
+app.use('/api/autocomplete',autoCompleteApi);
 
 
 //Set Port
@@ -121,9 +112,15 @@ const port = parseArgs.PORT || '3000';
 app.set('port', port);
 app.io = io;
 
-server.listen(port, () => {
-    winston.log('info', `Running on localhost:${port}`);
-    bootstrap(app);
+
+// Send all other requests to the Angular app
+app.all('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-module.exports = app; 
+module.exports = {
+    server: server.listen(port, () => {
+        winston.log('info', `Running on localhost:${port}`);
+        bootstrap(app);
+    })
+};
