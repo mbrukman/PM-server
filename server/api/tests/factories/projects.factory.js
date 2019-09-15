@@ -1,6 +1,6 @@
 const {jsf} = require('./jsf.helper');
 
-const singleSchema = {
+const singleProjectSchema = {
     type: 'object',
     properties: {
         name: {type: 'string'},
@@ -12,30 +12,25 @@ const singleSchema = {
 
 };
 
-const arraySchema = {
+const arrayProjectSchema = {
     type: 'array',
-    items: singleSchema,
+    items: singleProjectSchema,
     maxItems: 2,
 };
 
-function getSimpleMapSchema(project) {
-    return {
-        type: 'array',
-        items: {
-            type: 'object',
-            required: ['name', 'project'],
-            properties: {
-                name: {type: 'string'},
-                project
-            }
-        },
-        maxItems: 2,
-    };
 
+function getSimpleMapSchema(name) {
+    return {
+        type: 'object',
+        properties: {
+            name
+        },
+        required: ['name'],
+    };
 }
 
 module.exports = {
-    generateSimpleMaps: (project) => jsf.generate(getSimpleMapSchema(project)),
-    generateProjects: () => jsf.generate(arraySchema),
-    generateSingleProject: () => jsf.generate(singleSchema),
+    generateSimpleMaps: (name) => jsf.generate(getSimpleMapSchema(name)),
+    generateProjects: () => jsf.generate(arrayProjectSchema),
+    generateSingleProject: () => jsf.generate(singleProjectSchema),
 };
