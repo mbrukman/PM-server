@@ -3,9 +3,9 @@ const scheduledJobsService = require("../services/scheduled-job.service");
 const hooks = require("../../libs/hooks/hooks");
 
 module.exports = {
-        /* scheduled jobs
-        * TODO: change to standalone plugin (that is old implantation)
-        * */
+    /* scheduled jobs
+    * TODO: change to standalone plugin (that is old implantation)
+    * */
     createJob: (req, res) => {
         hooks.hookPre('scheduledJob-create', req).then(() => {
             return scheduledJobsService.create(req.body)
@@ -48,7 +48,7 @@ module.exports = {
         hooks.hookPre('scheduledJob-update', req).then(() => {
             return scheduledJobsService.update(req.body);
         }).then((job) => {
-            return res.json(job[0]);
+            return res.json(job);
         }).catch((error) => {
             return res.status(500).send(error);
         });

@@ -26,7 +26,6 @@ async function dropAllCollections() {
     }
 }
 
-
 function changeDbName(dbName) {
     return env.dbURI.replace(/\/(?=[^\/]*$).*\?(?=[^\?]*$)/g, `/${dbName}?`);
 
