@@ -1,16 +1,15 @@
-const {TestDataManager, projectsFactory} = require('./factories');
+const {TestDataManager, projectsFactory, mapsFactory} = require('./factories');
 const ProjectModel = require('../../api/models/project.model');
 const {setupDB} = require('./helpers/test-setup');
 const Map = require("../models/map.model");
 const request = require('supertest');
-
 const testDataManager = new TestDataManager(ProjectModel);
 const baseApiURL = 'http://127.0.0.1:3000/api';
 
-setupDB('test');
+setupDB('project-test');
 
 async function createMap(projectId, index, mapName) {
-    const generatedMap = projectsFactory.generateSimpleMaps(mapName);
+    const generatedMap = mapsFactory.generateSimpleMaps(mapName);
     try {
         const map = await Map.create(generatedMap);
         await ProjectModel.findByIdAndUpdate({_id: projectId}, {$push: {maps: map.id}}, {new: true});
@@ -20,7 +19,8 @@ async function createMap(projectId, index, mapName) {
     }
 }
 
-describe('Projects e2e tests', () => {
+describe('Projects API tests', () => {
+
     beforeEach(async () => {
         await testDataManager.generateInitialCollection(
             projectsFactory.generateProjects()
@@ -181,7 +181,7 @@ describe('Projects e2e tests', () => {
             it(`should respond with a 500 status code`, (done) => {
                 return request(baseApiURL)
                     .post(`/projects/create`)
-                    .send({})
+                    .send()
                     .expect(500, done)
             });
         });

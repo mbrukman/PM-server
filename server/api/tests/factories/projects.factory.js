@@ -18,19 +18,7 @@ const arrayProjectSchema = {
     maxItems: 2,
 };
 
-
-function getSimpleMapSchema(name) {
-    return {
-        type: 'object',
-        properties: {
-            name
-        },
-        required: ['name'],
-    };
-}
-
 module.exports = {
-    generateSimpleMaps: (name) => jsf.generate(getSimpleMapSchema(name)),
     generateProjects: () => jsf.generate(arrayProjectSchema),
-    generateSingleProject: () => jsf.generate(singleProjectSchema),
+    generateSingleProject: () => jsf.generate(singleProjectSchema)
 };
