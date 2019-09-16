@@ -1,9 +1,9 @@
-const {randomIdx} = require("./helpers");
-
 const {TestDataManager, projectsFactory, mapsFactory} = require('./factories');
 const ProjectModel = require('../../api/models/project.model');
 const {setupDB} = require('./helpers/test-setup');
+const {randomIdx} = require("./helpers");
 const request = require('supertest');
+
 const testDataManager = new TestDataManager(ProjectModel);
 const baseApiURL = 'http://127.0.0.1:3000/api';
 
