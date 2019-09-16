@@ -170,7 +170,7 @@ describe('Projects e2e tests', () => {
     describe('Negative', () => {
 
         describe(`POST /`, () => {
-            it(`should respond with a 500 proper msg`, (done) => {
+            it(`should respond with a 500 status code`, (done) => {
                 return request(baseApiURL)
                     .post(`/projects`)
                     .expect(500, done)
@@ -178,7 +178,7 @@ describe('Projects e2e tests', () => {
         });
 
         describe(`POST /create`, () => {
-            it(`should respond with a 500 proper msg`, (done) => {
+            it(`should respond with a 500 status code`, (done) => {
                 return request(baseApiURL)
                     .post(`/projects/create`)
                     .send({})
@@ -187,7 +187,7 @@ describe('Projects e2e tests', () => {
         });
 
         describe(`GET /:id/detail`, () => {
-            it(`should respond with a 500 proper msg`, (done) => {
+            it(`should respond with a 500 status code`, (done) => {
                 return request(baseApiURL)
                     .get(`/projects/0/detail`)
                     .expect(404, done)
@@ -195,7 +195,7 @@ describe('Projects e2e tests', () => {
         });
 
         describe(`PUT /:id/update`, () => {
-            it(`should respond with a 500 proper msg`, (done) => {
+            it(`should respond with a 500 status code`, (done) => {
                 const newDescription = 'simple description';
                 return request(baseApiURL)
                     .put(`/projects/0/update`)
@@ -205,7 +205,7 @@ describe('Projects e2e tests', () => {
         });
 
         describe(`DELETE /:jobId/ `, () => {
-            it(`should respond with a 500 proper msg`, (done) => {
+            it(`should respond with a 500 status code`, (done) => {
                 return request(baseApiURL)
                     .delete(`/projects/0/delete`)
                     .expect(500, done)
@@ -213,7 +213,7 @@ describe('Projects e2e tests', () => {
         });
 
         describe(`GET /:projectId/ `, () => {
-            it(`should respond with a 500 proper msg`, (done) => {
+            it(`should respond with a 500 status code`, (done) => {
                 return request(baseApiURL)
                     .get(`/projects/0`)
                     .expect(500, done)
