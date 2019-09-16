@@ -6,22 +6,22 @@ const {setupDB} = require('./helpers/test-setup')
 const app = 'localhost:3000';
 const mapId = triggersFactory.mapId;
 
-
-
 describe('Map triggers tests', () => {
     let testDataManager;
-
+    let triggerId;
     setupDB();
 
     describe('Positive', () => {
 
         beforeEach(async () => {
-
             testDataManager = new TestDataManager(TriggerModel);
             const triggerCollection = triggersFactory.generateTriggerCollection();
             await testDataManager.generateInitialCollection(
                 triggerCollection
             );
+            const trigger = triggersFactory.generateTriggerDocument();
+            triggerId = trigger._id;
+            await testDataManager.pushToCollectionAndSave(trigger);
         });
 
         afterEach(() => {
