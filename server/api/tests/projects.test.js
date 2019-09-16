@@ -1,22 +1,21 @@
 const {TestDataManager, projectsFactory} = require('./factories');
 const ProjectModel = require('../../api/models/project.model');
-const Map = require("../models/map.model");
 const {setupDB} = require('./helpers/test-setup');
+const Map = require("../models/map.model");
 const request = require('supertest');
-
-setupDB('test');
 
 const testDataManager = new TestDataManager(ProjectModel);
 const baseApiURL = 'http://127.0.0.1:3000/api';
 
+setupDB('test');
+
 async function createMap(projectId, index, mapName) {
-    let generatedMap = projectsFactory.generateSimpleMaps(mapName);
-    try{
-        let map = await Map.create(generatedMap);
-        await ProjectModel.findByIdAndUpdate({ _id: projectId }, { $push: { maps: map.id } },{new:true});
+    const generatedMap = projectsFactory.generateSimpleMaps(mapName);
+    try {
+        const map = await Map.create(generatedMap);
+        await ProjectModel.findByIdAndUpdate({_id: projectId}, {$push: {maps: map.id}}, {new: true});
         testDataManager.collection[index].maps.push(map.id)
-    }
-    catch(err){
+    } catch (err) {
         throw err;
     }
 }
@@ -29,9 +28,7 @@ describe('Projects e2e tests', () => {
         );
     });
 
-
     describe('Positive', () => {
-
 
         describe(`POST /`, () => {
             it(`should respond with a list of projects`, () => {
@@ -65,15 +62,14 @@ describe('Projects e2e tests', () => {
             })
         });
 
-
         describe(`POST /create`, () => {
             it(`should respond with the new project`, () => {
-                let randomProject = projectsFactory.generateSingleProject();
+                const randomProject = projectsFactory.generateSingleProject();
                 return request(baseApiURL)
                     .post(`/projects/create`)
                     .send(randomProject)
                     .expect(200)
-                    .then(res => {                      
+                    .then(res => {
                         testDataManager.pushToCollection(res.body)
                         expect(res.body.name).toEqual(randomProject.name);
                     });
@@ -83,7 +79,7 @@ describe('Projects e2e tests', () => {
         describe(`GET /:id/detail`, () => {
             it(`should respond with the specific project`, () => {
                 const randomIndex = Math.floor(Math.random() * testDataManager.collection.length);
-                let {id,name} = testDataManager.collection[randomIndex];
+                const {id, name} = testDataManager.collection[randomIndex];
                 return request(baseApiURL)
                     .get(`/projects/${id}/detail`)
                     .expect(200)
@@ -95,9 +91,9 @@ describe('Projects e2e tests', () => {
 
         describe(`PUT /:id/update`, () => {
             it(`should respond with the updated project`, () => {
-                let newDescription = 'simple description';
+                const newDescription = 'simple description';
                 const randomIndex = Math.floor(Math.random() * testDataManager.collection.length);
-                let {id,name} = testDataManager.collection[randomIndex];
+                const {id, name} = testDataManager.collection[randomIndex];
                 return request(baseApiURL)
                     .put(`/projects/${id}/update`)
                     .send({description: newDescription})
@@ -112,7 +108,7 @@ describe('Projects e2e tests', () => {
         describe(`DELETE /:id/delete `, () => {
             it(`should respond with 'OK'`, () => {
                 const randomIndex = Math.floor(Math.random() * testDataManager.collection.length);
-                let randomProject = testDataManager.collection[randomIndex];
+                const randomProject = testDataManager.collection[randomIndex];
                 testDataManager.removeFromCollection(randomProject)
                 return request(baseApiURL)
                     .delete(`/projects/${randomProject.id}/delete`)
@@ -128,8 +124,8 @@ describe('Projects e2e tests', () => {
         // describe(`PUT /:id/archive `, () => {
         //     it(`should respond with the archived project`, () => {
 
-        //         let projectName = fixedProjects[1].name;
-        //         let projectId = testDataManager.getProjectIdByName(projectName)
+        //         const projectName = fixedProjects[1].name;
+        //         const projectId = testDataManager.getProjectIdByName(projectName)
         //         try{
         //             request(baseApiURL)
         //             .put(`/projects/${projectId}/archive`)
@@ -149,32 +145,28 @@ describe('Projects e2e tests', () => {
         //     });
         // });
 
-
         describe(`GET /:projectId/ `, () => {
 
             it(`should respond with the recents maps of the project`, async () => {
                 const randomIndex = Math.floor(Math.random() * testDataManager.collection.length);
-                let {id,name} = testDataManager.collection[randomIndex];
-                let mapName = 'map 1'
-                try{
+                const {id, name} = testDataManager.collection[randomIndex];
+                const mapName = 'map 1';
+                try {
                     await createMap(id, randomIndex, mapName)
                     return request(baseApiURL)
                         .get(`/projects/${id}`)
                         .expect(200)
                         .then(({body}) => {
-                            let data = body[0];
+                            const data = body[0];
                             expect(data.map.name).toBe(mapName);
                             expect(data.exec).toBe(null);
                             expect(data.project.name).toBe(name)
                         });
-                }
-                catch(err){
+                } catch (err) {
                     throw err;
                 }
             });
         });
-
-
     });
 
     describe('Negative', () => {
@@ -183,7 +175,7 @@ describe('Projects e2e tests', () => {
             it(`should respond with a 500 proper msg`, (done) => {
                 return request(baseApiURL)
                     .post(`/projects`)
-                    .expect(500,done)
+                    .expect(500, done)
             })
         });
 
@@ -192,7 +184,7 @@ describe('Projects e2e tests', () => {
                 return request(baseApiURL)
                     .post(`/projects/create`)
                     .send({})
-                    .expect(500,done)
+                    .expect(500, done)
             });
         });
 
@@ -200,17 +192,17 @@ describe('Projects e2e tests', () => {
             it(`should respond with a 500 proper msg`, (done) => {
                 return request(baseApiURL)
                     .get(`/projects/0/detail`)
-                    .expect(404,done)
+                    .expect(404, done)
             });
         });
 
         describe(`PUT /:id/update`, () => {
             it(`should respond with a 500 proper msg`, (done) => {
-                let newDescription = 'simple description';
+                const newDescription = 'simple description';
                 return request(baseApiURL)
                     .put(`/projects/0/update`)
                     .send({description: newDescription})
-                    .expect(500,done)
+                    .expect(500, done)
             });
         });
 
@@ -218,7 +210,7 @@ describe('Projects e2e tests', () => {
             it(`should respond with a 500 proper msg`, (done) => {
                 return request(baseApiURL)
                     .delete(`/projects/0/delete`)
-                    .expect(500,done)
+                    .expect(500, done)
             });
         });
 
@@ -226,8 +218,8 @@ describe('Projects e2e tests', () => {
             it(`should respond with a 500 proper msg`, (done) => {
                 return request(baseApiURL)
                     .get(`/projects/0`)
-                    .expect(500,done)
+                    .expect(500, done)
             });
         });
     })
-})
+});
