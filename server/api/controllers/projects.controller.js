@@ -8,13 +8,13 @@ module.exports = {
     archive: (req, res) => {
         hooks.hookPre('project-archive', req).then(() => {
             return archiveService.archiveProject(req.params.id, req.body.isArchive);
-        }).then(() => {
+        }).then((project) => {
             req.io.emit('notification', {
                 title: 'Archived',
                 message: ``,
                 type: 'success'
             });
-            return res.status(204).send();
+            return res.json(project);
         }).catch((error) => {
             req.io.emit('notification', {
                 title: 'Oh no..',

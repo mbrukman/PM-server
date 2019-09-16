@@ -10,7 +10,7 @@ function archiveMaps(mapsIds, isArchive){
 }
 
 function archiveProject(projectId, isArchive){   
-    return Project.findByIdAndUpdate(projectId, { archived: isArchive }).then(project => {
+    return Project.findByIdAndUpdate(projectId, { archived: isArchive },{new:true}).then(project => {
         return archiveMaps(project.maps, isArchive);
     });
 }

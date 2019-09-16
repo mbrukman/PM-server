@@ -1,9 +1,13 @@
-const vaultsFactory = require('./vaults.factory');
 const scheduledJobsFactory = require('./scheduled-jobs.factory');
 const TestDataManager = require('./test-data-manager');
+const projectsFactory = require('./projects.factory');
+const vaultsFactory = require('./vaults.factory');
+const mapsFactory = require('./maps.factory');
 
 module.exports =  {
-    TestDataManager,
     scheduledJobsFactory,
-    vaultsFactory
+    TestDataManager,
+    projectsFactory,
+    vaultsFactory,
+    mapsFactory
 };
