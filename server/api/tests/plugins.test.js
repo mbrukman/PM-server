@@ -15,24 +15,16 @@ describe('Plugins tests', () => {
     describe('Positive', () => {
 
         beforeEach(async () => {
-        
             testDataManager = new TestDataManager(PluginModel);
-            const pluginCollection = pluginsFactory.generatePluginCollection();
-            await testDataManager.generateInitialCollection(
-                pluginCollection
-            );
             const plugin = pluginsFactory.generatePluginDocument();
             pluginId = plugin._id;
-            plugin.methods = [
-                {
-                    name: 'testMethod',
-                    params: []
-                }
-            ];
-            plugin.settings = [];
             await testDataManager.pushToCollectionAndSave(plugin);
         });
 
+        afterAll(async ()=> {
+            await testDataManager.clear();
+        });
+        
         describe(`POST /upload`, () => {
             it(`should upload plugin`, (done) => {
                 request(app)

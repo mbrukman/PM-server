@@ -4,22 +4,6 @@ jsf.option({
     useDefaultValue: true,
 });
 
-/*
-let pluginSchema = new Schema({
-    name: { type: String, required: true },
-    type: { type: String, enum: ["server", "executer", "trigger", "module"], required: true },
-    description: String,
-    main: { type: String, required: true },
-    execProgram: { type: String, required: true },
-    active: { type: Boolean, default: true },
-    version: { type: String, required: true },
-    imgUrl: String,
-    methods: [pluginMethodSchema],
-    settings:[pluginSettingsSchema],
-    file: { type: String, required: true }
-});
-*/
-
 const pluginSchema = {
     type: 'object',
     properties: {
@@ -48,16 +32,49 @@ const pluginSchema = {
             default: 'main.js'
         },
         execProgram: {
-            type: 'string'
+            type: 'string',
+            chance: {
+                word: {
+                    length: 10
+                }
+            }
         },
         version: {
-            type: 'string'
+            type: 'string',
+            default: '1.0.0'
         },
         file: {
-            type: 'string'
+            type: 'string',
+            chance: {
+                word: {
+                    length: 10
+                }
+            }
+        },
+        methods: {
+            type: 'array',
+            default: [
+                {
+                    name: 'testMethod',
+                    params: []
+                }
+            ]
+        },
+        settings: {
+            type: 'array',
+            default: [
+                {
+                    name: 'testName1',
+                    value: 'testvalue1'
+                },
+                {
+                    name: 'testName2',
+                    value: 'testvalue2'
+                }
+            ]
         },
     },
-    required: ['_id', 'name', 'type', 'main', 'execProgram', 'version', 'file']
+    required: ['_id', 'name', 'type', 'main', 'execProgram', 'version', 'file', 'methods', 'settings']
 };
 
 const pluginListSchema = {
