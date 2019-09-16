@@ -1,15 +1,12 @@
 const request = require('supertest');
+const {setupDB} = require('./helpers/test-setup');
 const JobsModel = require("../models/scheduled-job.model");
-const baseApiURL = 'http://127.0.0.1:3000/api';
 const {TestDataManager, scheduledJobsFactory} = require('./factories');
 
-const {setupDB} = require('./helpers/test-setup');
-
-
-setupDB('jobs-testing');
-
+const baseApiURL = 'http://127.0.0.1:3000/api';
 const testDataManager = new TestDataManager(JobsModel);
 
+setupDB('jobs-testing');
 
 describe('Scheduled Jobs tests', () => {
 
@@ -18,7 +15,6 @@ describe('Scheduled Jobs tests', () => {
             scheduledJobsFactory.generateJobs()
         );
     });
-
 
     describe('Positive', () => {
 
@@ -36,7 +32,6 @@ describe('Scheduled Jobs tests', () => {
             })
         });
 
-
         describe(`PUT /`, () => {
             it(`should respond with an updated Scheduled Jobs`, () => {
                 const randomIndex = Math.floor(Math.random() * testDataManager.collection.length);
@@ -46,12 +41,9 @@ describe('Scheduled Jobs tests', () => {
                     .put(`/scheduled-jobs`)
                     .send(job)
                     .expect(200)
-                    .then(res => {
-                        expect(res.body.id).toEqual(job.id);
-                    });
+                    .then(res => expect(res.body.id).toEqual(job.id));
             });
         });
-
 
         describe(`DELETE /:jobId/ `, () => {
             it(`should respond with 'OK'`, () => {
@@ -60,9 +52,7 @@ describe('Scheduled Jobs tests', () => {
                 return request(baseApiURL)
                     .delete(`/scheduled-jobs/${job.id}`)
                     .expect(200)
-                    .then(res => {
-                        expect('OK');
-                    });
+                    .then(res => expect('OK'));
             });
         });
 
@@ -89,7 +79,6 @@ describe('Scheduled Jobs tests', () => {
 
     describe('Negative', () => {
 
-
         describe(`PUT /`, () => {
             it(`should respond with status code 500 and proper error msg`, (done) => {
                 return request(baseApiURL)
@@ -108,7 +97,6 @@ describe('Scheduled Jobs tests', () => {
             });
         });
 
-
         describe(`POST /`, () => {
             it(`should respond with status code 500 and proper error msg`, (done) => {
                 return request(baseApiURL)
@@ -117,7 +105,5 @@ describe('Scheduled Jobs tests', () => {
                     .expect(500, done)
             });
         });
-
     });
-
 });
