@@ -20,7 +20,6 @@ async function createMap(projectId, index, mapName) {
     }
 }
 
-
 describe('Projects e2e tests', () => {
     beforeEach(async () => {
         await testDataManager.generateInitialCollection(
@@ -119,7 +118,6 @@ describe('Projects e2e tests', () => {
             });
         });
 
-
         //BUG (KAH -20)
         // describe(`PUT /:id/archive `, () => {
         //     it(`should respond with the archived project`, () => {
@@ -147,7 +145,7 @@ describe('Projects e2e tests', () => {
 
         describe(`GET /:projectId/ `, () => {
 
-            it(`should respond with the recents maps of the project`, async () => {
+            it(`should respond with the recents map s of the project`, async () => {
                 const randomIndex = Math.floor(Math.random() * testDataManager.collection.length);
                 const {id, name} = testDataManager.collection[randomIndex];
                 const mapName = 'map 1';
