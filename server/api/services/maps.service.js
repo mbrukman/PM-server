@@ -207,7 +207,6 @@ module.exports = {
         }
 
         return MapStructure.findOne({ map: mapId }).sort('-createdAt').then(res=>{
-            console.log(res);
             return res;
         })
     },
