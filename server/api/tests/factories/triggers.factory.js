@@ -40,7 +40,11 @@ const triggerSchema = {
         },
         name: {
             type: 'string',
-            faker: 'random.word'
+            chance: {
+                word: {
+                    length: 10
+                }
+            }
         },
         map: {
             type: "string",
