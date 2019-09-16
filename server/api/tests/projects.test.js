@@ -1,23 +1,14 @@
+const {randomIdx} = require("./helpers");
+
 const {TestDataManager, projectsFactory, mapsFactory} = require('./factories');
 const ProjectModel = require('../../api/models/project.model');
 const {setupDB} = require('./helpers/test-setup');
-const Map = require("../models/map.model");
 const request = require('supertest');
 const testDataManager = new TestDataManager(ProjectModel);
 const baseApiURL = 'http://127.0.0.1:3000/api';
 
 setupDB('project-test');
 
-async function createMap(projectId, index, mapName) {
-    const generatedMap = mapsFactory.generateSimpleMaps(mapName);
-    try {
-        const map = await Map.create(generatedMap);
-        await ProjectModel.findByIdAndUpdate({_id: projectId}, {$push: {maps: map.id}}, {new: true});
-        testDataManager.collection[index].maps.push(map.id)
-    } catch (err) {
-        throw err;
-    }
-}
 
 describe('Projects API tests', () => {
 
@@ -146,11 +137,12 @@ describe('Projects API tests', () => {
         describe(`GET /:projectId/ `, () => {
 
             it(`should respond with the recents map s of the project`, async () => {
-                const randomIndex = Math.floor(Math.random() * testDataManager.collection.length);
+                const randomIndex = randomIdx(testDataManager.collection.length);
                 const {id, name} = testDataManager.collection[randomIndex];
                 const mapName = 'map 1';
                 try {
-                    await createMap(id, randomIndex, mapName)
+                    const map = await mapsFactory.createMap(id, randomIndex, mapName);
+                    testDataManager.collection[index].maps.push(map.id)
                     return request(baseApiURL)
                         .get(`/projects/${id}`)
                         .expect(200)

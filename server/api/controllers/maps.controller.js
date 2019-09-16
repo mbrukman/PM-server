@@ -239,7 +239,6 @@ module.exports = {
         hooks.hookPre('map-update', req).then(() => {
             return mapsService.update(mapId, req.body);
         }).then((map) => {
-            console.log(map);
             return req.body.project ? projectsService.updateMap(mapId, req.body.project) : null;
         }).then(() => {
             return res.send('OK');

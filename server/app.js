@@ -46,7 +46,7 @@ if (env.dbURI) {
         }));
         winston.log('info', `Succesfully Connected to the Mongodb at ${env.dbURI}`);
     });
-    expressWinstonTranports.push(new winston.transports.MongoDB({ db: env.dbURI }));
+    expressWinstonTranports.push(new winston.transports.MongoDB({db: env.dbURI}));
 }
 
 // add express winston to router stack
@@ -90,7 +90,7 @@ const pluginsApi = require("./api/routes/plugins.routes");
 const agentsApi = require("./api/routes/agents.routes");
 const projectsApi = require("./api/routes/projects.routes");
 const triggersApi = require("./api/routes/triggers.routes");
-const scheduledJobsApi =  require("./api/routes/scheduled-jobs.routes");
+const scheduledJobsApi = require("./api/routes/scheduled-jobs.routes");
 const vaultApi = require("./api/routes/vault.routes");
 const configTokenApi = require("./api/routes/config-token.routes");
 const autoCompleteApi = require("./api/routes/autocomplete.routes");
@@ -104,7 +104,7 @@ app.use('/api/triggers', triggersApi);
 app.use('/api/scheduled-jobs', scheduledJobsApi);
 app.use('/api/vault', vaultApi);
 app.use('/api/config-token', configTokenApi);
-app.use('/api/autocomplete',autoCompleteApi);
+app.use('/api/autocomplete', autoCompleteApi);
 
 
 //Set Port
