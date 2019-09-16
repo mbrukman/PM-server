@@ -4,13 +4,12 @@ const {setupDB} = require('./helpers/test-setup');
 const {randomIdx} = require("./helpers");
 const request = require('supertest');
 
-const testDataManager = new TestDataManager(ProjectModel);
 const baseApiURL = 'http://127.0.0.1:3000/api';
 
-setupDB('project-test');
-
+setupDB();
 
 describe('Projects API tests', () => {
+    let testDataManager = new TestDataManager(ProjectModel);
 
     beforeEach(async () => {
         await testDataManager.generateInitialCollection(
@@ -18,35 +17,37 @@ describe('Projects API tests', () => {
         );
     });
 
+    afterEach(async () => {
+        await testDataManager.clear();
+    });
+
     describe('Positive', () => {
 
         describe(`POST /`, () => {
             it(`should respond with a list of projects`, () => {
-                const randomIndex = Math.floor(Math.random() * testDataManager.collection.length);
-
                 return request(baseApiURL)
                     .post(`/projects`)
                     .send({options: {}})
                     .expect(200)
-                    .then(res => {
-                        expect(res.body.items.length).toEqual(testDataManager.collection.length);
-                        expect(res.body.totalCount).toEqual(testDataManager.collection.length);
-                        expect(res.body.items[randomIndex].id).toEqual(testDataManager.collection[randomIndex].id);
+                    .then(({body}) => {
+                        expect(body.items.length).toEqual(testDataManager.collection.length);
+                        expect(body.totalCount).toEqual(testDataManager.collection.length);
                     });
             });
 
             //adding some parameter to the api like page, sort and globalFilter
             it(`should respond with a list of projects`, () => {
                 const globalFilter = testDataManager.collection[0].name;
+                const filtered = testDataManager.collection.filter(project => project.name === globalFilter);
                 return request(baseApiURL)
                     .post(`/projects`)
                     .send({options: {sort: 'name', page: 1, globalFilter}})
                     .expect(200)
-                    .then(res => {
-                        expect(res.body.items.length).toEqual(1);
-                        expect(res.body.totalCount).toEqual(1);
-                        if (res.body.items.length) {
-                            expect(res.body.items[0].name).toEqual(globalFilter);
+                    .then(({body}) => {
+                        expect(body.items.length).toEqual(filtered.length);
+                        expect(body.totalCount).toEqual(filtered.length);
+                        if (body.items.length) {
+                            expect(body.items[0].name).toEqual(globalFilter);
                         }
                     });
             })
@@ -59,10 +60,7 @@ describe('Projects API tests', () => {
                     .post(`/projects/create`)
                     .send(randomProject)
                     .expect(200)
-                    .then(res => {
-                        testDataManager.pushToCollection(res.body);
-                        expect(res.body.name).toEqual(randomProject.name);
-                    });
+                    .then(res => expect(res.body.name).toEqual(randomProject.name));
             });
         });
 
@@ -73,9 +71,7 @@ describe('Projects API tests', () => {
                 return request(baseApiURL)
                     .get(`/projects/${id}/detail`)
                     .expect(200)
-                    .then(res => {
-                        expect(res.body.name).toEqual(name);
-                    });
+                    .then(res => expect(res.body.name).toEqual(name));
             });
         });
 
@@ -99,7 +95,7 @@ describe('Projects API tests', () => {
             it(`should respond with 'OK'`, () => {
                 const randomIndex = Math.floor(Math.random() * testDataManager.collection.length);
                 const randomProject = testDataManager.collection[randomIndex];
-                testDataManager.removeFromCollection(randomProject);
+                // testDataManager.removeFromCollection(randomProject);
                 return request(baseApiURL)
                     .delete(`/projects/${randomProject.id}/delete`)
                     .expect(200)
@@ -122,7 +118,7 @@ describe('Projects API tests', () => {
         //                 testDataManager.updateCollection(projectId,res.body)
         //                 expect(res.body.name).toEqual(projectName);
         //                 expect(res.body.archived).toEqual(true);
-        //                
+        //
         //             });
         //         }
         //         catch(err){
@@ -139,17 +135,17 @@ describe('Projects API tests', () => {
                 const {id, name} = testDataManager.collection[randomIndex];
                 const mapName = 'map 1';
                 try {
-                    const map = await mapsFactory.createMap(id, randomIndex, mapName);
-                    testDataManager.collection[randomIndex].maps.push(map.id);
-                    return request(baseApiURL)
+                    await mapsFactory.createMap(id, randomIndex, mapName);
+                    await request(baseApiURL)
                         .get(`/projects/${id}`)
                         .expect(200)
                         .then(({body}) => {
                             const data = body[0];
                             expect(data.map.name).toBe(mapName);
                             expect(data.exec).toBe(null);
-                            expect(data.project.name).toBe(name)
+                            expect(data.project.name).toBe(name);
                         });
+
                 } catch (err) {
                     throw err;
                 }

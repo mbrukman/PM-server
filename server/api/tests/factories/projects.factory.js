@@ -1,31 +1,37 @@
-const { jsf } = require('./jsf.helper');
+const { jsf } = require("./jsf.helper");
 
 const singleProjectSchema = {
-    type: 'object',
-    properties: {
-        name: {
-            type: 'string', 
-            chance: {
-                word: {
-                    length: 10
-                }
-            }
-        },
-        description: { type: 'string' },
-        archived: { type: 'boolean' },
-        maps: []
+  type: "object",
+  properties: {
+    name: {
+      type: "string",
+      chance: {
+        word: {
+          length: 7
+        }
+      }
     },
-    required: ['name', 'description', 'maps'],
-
+    description: {
+      type: "string",
+      chance: { paragraph: {} }
+    },
+    archived: {
+      type: "boolean",
+      chance: { bool: { likelihood: 0 } }
+    },
+    maps: []
+  },
+  required: ["name", "description", "maps", "archived"]
 };
 
 const arrayProjectSchema = {
-    type: 'array',
-    items: singleProjectSchema,
-    maxItems: 2,
+  type: "array",
+  items: singleProjectSchema,
+  maxItems: 15,
+  minItems: 1
 };
 
 module.exports = {
-    generateProjects: () => jsf.generate(arrayProjectSchema),
-    generateSingleProject: () => jsf.generate(singleProjectSchema)
+  generateProjects: () => jsf.generate(arrayProjectSchema),
+  generateSingleProject: () => jsf.generate(singleProjectSchema)
 };
