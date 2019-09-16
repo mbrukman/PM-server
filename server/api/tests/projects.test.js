@@ -60,7 +60,7 @@ describe('Projects API tests', () => {
                     .send(randomProject)
                     .expect(200)
                     .then(res => {
-                        testDataManager.pushToCollection(res.body)
+                        testDataManager.pushToCollection(res.body);
                         expect(res.body.name).toEqual(randomProject.name);
                     });
             });
@@ -99,13 +99,11 @@ describe('Projects API tests', () => {
             it(`should respond with 'OK'`, () => {
                 const randomIndex = Math.floor(Math.random() * testDataManager.collection.length);
                 const randomProject = testDataManager.collection[randomIndex];
-                testDataManager.removeFromCollection(randomProject)
+                testDataManager.removeFromCollection(randomProject);
                 return request(baseApiURL)
                     .delete(`/projects/${randomProject.id}/delete`)
                     .expect(200)
-                    .then(res => {
-                        expect('OK');
-                    });
+                    .expect('OK');
             });
         });
 
@@ -136,13 +134,13 @@ describe('Projects API tests', () => {
 
         describe(`GET /:projectId/ `, () => {
 
-            it(`should respond with the recents map s of the project`, async () => {
+            it(`should respond with the recent maps of the project`, async () => {
                 const randomIndex = randomIdx(testDataManager.collection.length);
                 const {id, name} = testDataManager.collection[randomIndex];
                 const mapName = 'map 1';
                 try {
                     const map = await mapsFactory.createMap(id, randomIndex, mapName);
-                    testDataManager.collection[index].maps.push(map.id)
+                    testDataManager.collection[randomIndex].maps.push(map.id);
                     return request(baseApiURL)
                         .get(`/projects/${id}`)
                         .expect(200)
