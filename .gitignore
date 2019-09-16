@@ -72,6 +72,8 @@ private.ts
 /server/libs/plugins/*
 /server/tmp
 /console/env.json
+/server/config.json
+/server/dbdir
 
 #centOs
 *.service
