@@ -16,7 +16,7 @@ module.exports = {
 
     /* add a map to project */
     addMap: (projectId, mapId) => {
-        return Project.update({ _id: projectId }, { $push: { maps: mapId } });
+        return Project.findByIdAndUpdate({ _id: projectId }, { $push: { maps: mapId } },{new:true});
     },
 
     /* get project details */
@@ -56,7 +56,7 @@ module.exports = {
             // apply sorting by field name. for reverse, should pass with '-'.
             p.sort(filterOptions.options.sort)
         }
-        if (filterOptions.options.page) {
+        if (filterOptions.options.page) { 
             var pageSize = filterOptions.options.limit || PAGE_SIZE;
             // apply paging. if no paging, return all
             p.limit(pageSize).skip((filterOptions.options.page - 1) * pageSize)
@@ -182,7 +182,7 @@ module.exports = {
 
     /* update a project */
     update: (project) => {
-        return Project.findByIdAndUpdate(project._id, project)
+        return Project.findByIdAndUpdate(project._id, project,{ new: true })
     },
     /* Updating the maps list of the project.
      */
