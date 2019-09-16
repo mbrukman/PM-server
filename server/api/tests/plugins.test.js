@@ -1,31 +1,36 @@
 const request = require('supertest');
-const app = require('../../app');
-
-const pluginFile = './api/tests/files/kaholo-plugin-gsuite.zip';
-// TODO: use factory
-let pluginID = '5d77df087044612270179e25';
+const PluginModel = require('../../api/models/plugin.model');
+const TestDataManager = require('./factories/test-data-manager');
+const pluginsFactory = require('./factories/plugins.factory');
+const { setupDB } = require('./helpers/test-setup')
+const app = 'localhost:3000';
 
 describe('Plugins tests', () => {
+    let testDataManager;
+    let pluginId;
+    const pluginFile = './api/tests/files/kaholo-plugin-gsuite.zip';
 
-    afterEach((done) => {
-        request(app)
-            .delete(`/api/plugins/${pluginID}/delete`)
-            .then(res => {
-                done();
-            });
-    });
+    setupDB();
 
     describe('Positive', () => {
 
-        beforeEach((done) => {
-            jest.setTimeout(9000);
-            request(app)
-                .post(`/api/plugins/upload`)
-                .attach('file', pluginFile)
-                .then(res => {
-                    pluginID = res.body.id;
-                    done();
-                });
+        beforeEach(async () => {
+        
+            testDataManager = new TestDataManager(PluginModel);
+            const pluginCollection = pluginsFactory.generatePluginCollection();
+            await testDataManager.generateInitialCollection(
+                pluginCollection
+            );
+            const plugin = pluginsFactory.generatePluginDocument();
+            pluginId = plugin._id;
+            plugin.methods = [
+                {
+                    name: 'testMethod',
+                    params: []
+                }
+            ];
+            plugin.settings = [];
+            await testDataManager.pushToCollectionAndSave(plugin);
         });
 
         describe(`POST /upload`, () => {
@@ -60,7 +65,7 @@ describe('Plugins tests', () => {
         describe(`GET /:id`, () => {
             it(`should respond with a plugin of a given id`, (done) => {
                 request(app)
-                    .get(`/api/plugins/${pluginID}`)
+                    .get(`/api/plugins/${pluginId}`)
                     .expect(200)
                     .then(res => {
                         expect(Array.isArray(res.body.methods)).toBe(true);
@@ -83,7 +88,7 @@ describe('Plugins tests', () => {
                     }
                 ];
                 request(app)
-                    .post(`/api/plugins/${pluginID}/settings`)
+                    .post(`/api/plugins/${pluginId}/settings`)
                     .send(newSettings)
                     .expect(200)
                     .then(res => {
@@ -99,7 +104,7 @@ describe('Plugins tests', () => {
             it(`should respond with 200`, (done) => {
                 // notice: RETURNS 200 for ANY ID
                 request(app)
-                    .delete(`/api/plugins/${pluginID}/delete`)
+                    .delete(`/api/plugins/${pluginId}/delete`)
                     .expect(200, done);
             });
         });
@@ -149,7 +154,7 @@ describe('Plugins tests', () => {
             // notice: bug - response body should be an error message, not an empty object
             it(`should respond with status 500 and empty object for invalid settings body`, (done) => {
                 request(app)
-                    .post(`/api/plugins/${pluginID}/settings`)
+                    .post(`/api/plugins/${pluginId}/settings`)
                     .expect(500)
                     .then((res) => {
                         expect(res.body).toEqual({});
