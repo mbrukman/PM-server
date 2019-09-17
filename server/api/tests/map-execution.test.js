@@ -20,25 +20,25 @@ const app = 'localhost:3000';
 
 describe('Map execution tests', () => {
     let testDataManager;
+    let mapId;
     setupDB();
 
     beforeEach(async () => {
         testDataManager = new TestDataManager(MapModel);
-        const mapCollection = mapsFactory.generateSimpleMaps();
-        await testDataManager.generateInitialCollection(
-            mapCollection
-        );
-        const trigger = mapsFactory.createMap();
-        triggerId = trigger._id;
-        await testDataManager.pushToCollectionAndSave(trigger);
+        const map = mapsFactory.generateSimpleMap();
+        await testDataManager.generateInitialCollection(map);
+        mapId = map._id;
     });
 
-    describe('Positive', () => {
-
-    });
-
-    describe('Negative', () => {
-
+    describe('POST /api/maps/:mapId/execute', () => {
+        it(`should handle lack of map structure`, ()=> {
+            return request(app)
+                .post(`/api/maps/${mapId}/execute`)
+                .expect(500)
+                .then(({text}) => {
+                    expect(text).toBe('No structure found.');
+                })
+        });
     });
 
 });
