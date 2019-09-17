@@ -2,15 +2,12 @@ const request = require('supertest');
 const PluginModel = require('../../api/models/plugin.model');
 const TestDataManager = require('./factories/test-data-manager');
 const pluginsFactory = require('./factories/plugins.factory');
-const { setupDB } = require('./helpers/test-setup')
 const app = 'localhost:3000';
 
 describe('Plugins tests', () => {
     let testDataManager;
     let pluginId;
     const pluginFile = './api/tests/files/kaholo-plugin-gsuite.zip';
-
-    setupDB();
 
     describe('Positive', () => {
 

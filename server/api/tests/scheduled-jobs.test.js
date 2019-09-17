@@ -1,12 +1,9 @@
 const request = require('supertest');
-const {setupDB} = require('./helpers/test-setup');
 const JobsModel = require("../models/scheduled-job.model");
 const {TestDataManager, scheduledJobsFactory} = require('./factories');
 
 const baseApiURL = 'http://127.0.0.1:3000/api';
 const testDataManager = new TestDataManager(JobsModel);
-
-setupDB('jobs-testing');
 
 describe('Scheduled Jobs tests', () => {
 

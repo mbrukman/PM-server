@@ -2,14 +2,12 @@ const request = require('supertest');
 const TriggerModel = require('../../api/models/map-trigger.model');
 const TestDataManager = require('./factories/test-data-manager');
 const triggersFactory = require('./factories/triggers.factory');
-const {setupDB} = require('./helpers/test-setup')
 const app = 'localhost:3000';
 const mapId = triggersFactory.mapId;
 
 describe('Map triggers tests', () => {
     let testDataManager;
     let triggerId;
-    setupDB();
 
     describe('Positive', () => {
 

@@ -1,12 +1,20 @@
 const {TestDataManager, projectsFactory, mapsFactory} = require('./factories');
 const ProjectModel = require('../../api/models/project.model');
-const {setupDB} = require('./helpers/test-setup');
-const {randomIdx} = require("./helpers");
+const Map = require("../models/map.model");
 const request = require('supertest');
 
 const baseApiURL = 'http://127.0.0.1:3000/api';
 
-setupDB();
+async function createMap(projectId, index, mapName) {
+    const generatedMap = mapsFactory.generateSimpleMaps(mapName);
+    try {
+        const map = await Map.create(generatedMap);
+        await ProjectModel.findByIdAndUpdate({_id: projectId}, {$push: {maps: map.id}}, {new: true});
+        testDataManager.collection[index].maps.push(map.id)
+    } catch (err) {
+        throw err;
+    }
+}
 
 describe('Projects API tests', () => {
     let testDataManager = new TestDataManager(ProjectModel);
@@ -145,7 +153,6 @@ describe('Projects API tests', () => {
                             expect(data.exec).toBe(null);
                             expect(data.project.name).toBe(name);
                         });
-
                 } catch (err) {
                     throw err;
                 }

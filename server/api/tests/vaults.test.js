@@ -1,11 +1,8 @@
 const {TestDataManager, vaultsFactory} = require('./factories');
 const VaultModel = require('../../api/models/vault.model');
-const {setupDB} = require('./helpers/test-setup');
 const request = require('supertest');
 
 const baseApiURL = 'http://127.0.0.1:3000/api';
-
-setupDB('vaultsTesting');
 
 describe("All vaults endpoints are working as expected.", () => {
     let testDataManager;
