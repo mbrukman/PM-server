@@ -67,8 +67,8 @@ module.exports = class TestDataManager {
 
     async clear() {
         try {
-            const response = await this.currentMongooseModel.deleteMany({});
-            const resp = await this.currentMongooseModel.find({});
+            await this.currentMongooseModel.deleteMany({});
+            await this.currentMongooseModel.find({});
             this.collection = [];
             return this.collection;
         } catch (err) {
@@ -86,7 +86,6 @@ module.exports = class TestDataManager {
             this.collection = await this.currentMongooseModel.insertMany(generatedData, {ordered: true});
             return this.collection;
         } catch (err) {
-            console.log(err)
             throw err;
         }
     }
