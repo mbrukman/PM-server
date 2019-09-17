@@ -1,14 +1,5 @@
 const {jsf} = require('./jsf.helper');
 
-// createdAt: { type: Date, default: Date.now, index:true },
-// map: { type: Schema.Types.ObjectId, ref: 'Map', required: true },
-// content: Schema.Types.Mixed,
-//     links: [linkSchema],
-//     processes: [processSchema],
-//     code: String,
-//     configurations: [configurationSchema],
-//     used_plugins: [usedPluginsSchema]
-
 function generateSingleSchema(mapId, maps) {
     return {
         type: 'object',

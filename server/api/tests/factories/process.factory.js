@@ -1,22 +1,3 @@
-// name: String,
-//     description: String,
-//     order: Number,
-//     default_execution: Boolean,
-//     preRun: String,
-//     postRun: String,
-//     filterAgents: String,
-//     coordination: String,
-//     flowControl: { type: String, enum: ['race', 'each', 'wait'], default: 'each' },
-// actionsExecution: { type: String, enum: ['series', 'parallel'], default: 'series' },
-// correlateAgents: { type: Boolean, default: false },
-// mandatory: { type: Boolean, default: false },
-// condition: String,
-//     createdAt: { type: Date, default: Date.now },
-// used_plugin: usedPluginsSchema,
-//     actions: [actionSchema],
-//     uuid: String,
-//     numProcessParallel:String
-
 const {jsf} = require('./jsf.helper');
 
 function generateSingleSchema(usedPlugins) {
