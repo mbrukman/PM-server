@@ -1,5 +1,4 @@
 module.exports = {
-    // testEnvironment: 'node',
     testEnvironment: './api/tests/helpers/custom-test-environment.js',
     globalSetup: './api/tests/helpers/global-setup.js',
     globalTeardown: './api/tests/helpers/global-teardown.js',
@@ -14,6 +13,5 @@ module.exports = {
     runner: 'jest-runner',
     testRunner: "jest-circus/runner",
     setupFilesAfterEnv: ['./api/tests/helpers/global-test-setup.js']
-    // testRunner: "jasmine2"
     // coverageThreshold: https://github.com/facebook/jest/blob/master/docs/Configuration.md
 };
