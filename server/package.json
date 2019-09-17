@@ -40,6 +40,7 @@
     "chance": "^1.1.0",
     "jest": "^24.9.0",
     "jest-circus": "^24.9.0",
+    "jest-environment-node": "^24.9.0",
     "json-schema-faker": "^0.5.0-rc17",
     "speculate": "1.7.4",
     "supertest": "^4.0.2"
