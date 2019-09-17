@@ -1,5 +1,7 @@
 module.exports = {
     testEnvironment: 'node',
+    globalSetup: './api/tests/helpers/global-setup.js',
+    globalTeardown: './api/tests/helpers/global-teardown.js',
     coveragePathIgnorePatterns: ["/node_modules/"], // default
     coverageReporters: ["json", "clover"],
     displayName: {
