@@ -1,11 +1,18 @@
-const {jsf} = require('./jsf.helper');
+const { jsf } = require('./jsf.helper');
 
 const singleProjectSchema = {
     type: 'object',
     properties: {
-        name: {type: 'string'},
-        description: {type: 'string'},
-        archived: {type: 'boolean'},
+        name: {
+            type: 'string', 
+            chance: {
+                word: {
+                    length: 10
+                }
+            }
+        },
+        description: { type: 'string' },
+        archived: { type: 'boolean' },
         maps: []
     },
     required: ['name', 'description', 'maps'],
