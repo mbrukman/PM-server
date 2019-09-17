@@ -36,10 +36,10 @@ module.exports = {
     dropAllCollections,
     setupDB(dbName = 'test') {
         // Connect to Mongoose
-        beforeAll(async () => {
+        beforeAll(async () => {;
             await mongoose.connect(env.dbURI, {useNewUrlParser: true});
             await dropAllCollections();
-        });
+        })
         //
         // // Cleans up database between each test
         afterEach(async () => {

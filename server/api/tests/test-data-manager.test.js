@@ -1,9 +1,6 @@
 const {TestDataManager, vaultsFactory} = require('./factories');
 const VaultModel = require('../../api/models/vault.model');
-const {setupDB} = require('./helpers/test-setup');
 const {sortBy} = require('lodash');
-
-setupDB('helpersTesting');
 
 describe('Make sure DataTestManager is working as expected', () => {
     let testDataManager;
