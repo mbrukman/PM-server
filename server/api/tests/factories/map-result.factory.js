@@ -14,7 +14,7 @@
 
 const {jsf} = require('./jsf.helper');
 
-function generateSingleSchema(mapId, maps) {
+function generateSingleSchema(mapId, agentResults) {
     return {
         type: 'object',
         properties: {
@@ -35,7 +35,7 @@ function generateSingleSchema(mapId, maps) {
                 }
             },
             map: mapId,
-            maps,
+            agentResults,
             _id: {
                 "type": "string",
                 "format": "mongoID"

@@ -1,6 +1,8 @@
 const {jsf} = require('./jsf.helper');
+const pluginFactory = require('./plugins.factory');
 
 function generateSingleSchema(usedPlugins) {
+    if(!usedPlugins) usedPlugins = pluginFactory.generateMany({});
     return {
         type: "object",
         properties: {

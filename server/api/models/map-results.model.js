@@ -60,12 +60,13 @@ mapResultSchema.set('toJSON', {
     }
 });
 let MapResult = mongoose.model('MapResult', mapResultSchema, 'mapResults');
-mongoose.model('AgentResult', AgentResultSchema, 'agentResults');
+let AgentResultModel = mongoose.model('AgentResult', AgentResultSchema, 'agentResults');
 mongoose.model('ActionResult', AgentResultSchema, 'actionResults');
 
 
 module.exports = {
     MapResult,
+    AgentResultModel,
     AgentResult: AgentResultSchema,
     ActionResult: actionResultSchema,
     statusEnum
