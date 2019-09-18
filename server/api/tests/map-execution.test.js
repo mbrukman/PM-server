@@ -1,16 +1,3 @@
-
-/*
-router.post("/:id/execute", mapController.execute);
-router.post("/:id/execute/:structure", mapController.execute);
-router.get("/:id/stop-execution", mapController.stopExecution);
-router.get("/:id/stop-execution/:runId", mapController.stopExecution);
-router.post("/:id/cancel-pending", mapController.cancelPending);
-router.get("/currentruns", mapController.currentRuns);
-
-/api/maps
-
-*/
-
 const request = require('supertest');
 const MapModel = require('../../api/models/map.model');
 const TestDataManager = require('./factories/test-data-manager');
@@ -30,17 +17,7 @@ describe('Map execution tests', () => {
         mapId = map._id;
     });
 
-    describe('POST /api/maps/:mapId/execute', () => {
-        it(`should handle lack of map structure`, ()=> {
-            return request(app)
-                .post(`/api/maps/${mapId}/execute`)
-                .expect(500)
-                .then(({text}) => {
-                    expect(text).toBe('No structure found.');
-                })
-        });
-    });
-
+    // router.post("/:id/execute", mapController.execute);
     describe('POST /api/maps/:mapId/execute', () => {
         it(`should handle lack of map`, ()=> {
             const mapId = mapsFactory.generateSimpleMap()._id;
@@ -51,8 +28,54 @@ describe('Map execution tests', () => {
                     expect(text).toBe('Couldn\'t find map');
                 })
         });
+
+        it(`should handle lack of map structure`, ()=> {
+            return request(app)
+                .post(`/api/maps/${mapId}/execute`)
+                .expect(500)
+                .then(({text}) => {
+                    expect(text).toBe('No structure found.');
+                })
+        });
     });
 
+    // router.post("/:id/execute/:structure", mapController.execute);
+    // NOTICE - THIS ROUTE IS NOT USED IN THE FRONTEND (-> KAH-37)
+    describe('POST /api/maps/:mapId/execute/:structureId', () => {
+        it(`should handle lack of map`, ()=> {
+            const mapId = mapsFactory.generateSimpleMap()._id;
+            return request(app)
+                .post(`/api/maps/${mapId}/execute/${mapId}`)
+                .expect(500)
+                .then(({text}) => {
+                    expect(text).toBe('Couldn\'t find map');
+                })
+        });
+
+        it(`should handle lack of map structure`, ()=> {
+            return request(app)
+                .post(`/api/maps/${mapId}/execute/${mapId}`)
+                .expect(500)
+                .then(({text}) => {
+                    expect(text).toBe('No structure found.');
+                })
+        });
+    });
+
+    // router.get("/:id/stop-execution", mapController.stopExecution);
+    describe('GET /api/maps/:mapId/stop-execution', () => {
+    
+    });
+
+    // router.get("/:id/stop-execution/:runId", mapController.stopExecution);
+    describe('GET /api/maps/:mapId/stop-execution/:runId', () => {
+    
+    });
+
+    // router.post("/:id/cancel-pending", mapController.cancelPending);
+    //  TODO: cancel pending will not reject / respond with 500 because of the bug (KAH-36)
+
+    // router.get("/currentruns", mapController.currentRuns);
     describe('POST /api/maps/currentRuns', () => {
         it(`should return {} for no current runs`, ()=> {
             return request(app)
@@ -63,8 +86,4 @@ describe('Map execution tests', () => {
                 })
         });
     });
-
-    // TODO: cancel pending will not reject / respond with 500 because of the bug
-    // router.post("/:id/cancel-pending", mapController.cancelPending);
-
 });
