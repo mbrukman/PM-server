@@ -24,6 +24,7 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
   processesDropDown:SelectItem[] = [];
   apiResponseAfterProcess:string;
   apiResponseCodeRefrence:string;
+  mapStructureSubscription:Subscription;
   constructor(private mapsService: MapsService, private projectsService: ProjectsService) {
   }
 
@@ -54,7 +55,7 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
   }
 
   getProcessByMapId(){
-    this.mapsService.getCurrentMapStructure().pipe(filter((structure) => !!structure))
+    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(filter((structure) => !!structure))
     .subscribe(structure => {
       if(structure.processes.length){
         this.apiResponseAfterProcess = this.map.processResponse;
@@ -81,6 +82,7 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.mapSubscription.unsubscribe();
+    this.mapStructureSubscription.unsubscribe();
   }
 
   onMapUpdate() {
