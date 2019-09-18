@@ -1,20 +1,9 @@
 const {TestDataManager, projectsFactory, mapsFactory} = require('./factories');
 const ProjectModel = require('../../api/models/project.model');
-const Map = require("../models/map.model");
+const {randomIdx} = require('./helpers');
 const request = require('supertest');
 
 const baseApiURL = 'http://127.0.0.1:3000/api';
-
-async function createMap(projectId, index, mapName) {
-    const generatedMap = mapsFactory.generateSimpleMaps(mapName);
-    try {
-        const map = await Map.create(generatedMap);
-        await ProjectModel.findByIdAndUpdate({_id: projectId}, {$push: {maps: map.id}}, {new: true});
-        testDataManager.collection[index].maps.push(map.id)
-    } catch (err) {
-        throw err;
-    }
-}
 
 describe('Projects API tests', () => {
     let testDataManager = new TestDataManager(ProjectModel);
