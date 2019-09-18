@@ -41,4 +41,15 @@ describe('Map execution tests', () => {
         });
     });
 
+    describe('POST /api/maps/currentRuns', () => {
+        it(`should return {} for no current runs`, ()=> {
+            return request(app)
+                .post(`/api/maps/currentRuns`)
+                .expect(200)
+                .then(({body}) => {
+                    expect(body).toEqual({});
+                })
+        });
+    });
+
 });
