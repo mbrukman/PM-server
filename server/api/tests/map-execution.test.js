@@ -41,6 +41,18 @@ describe('Map execution tests', () => {
         });
     });
 
+    describe('POST /api/maps/:mapId/execute', () => {
+        it(`should handle lack of map`, ()=> {
+            const mapId = mapsFactory.generateSimpleMap()._id;
+            return request(app)
+                .post(`/api/maps/${mapId}/execute`)
+                .expect(500)
+                .then(({text}) => {
+                    expect(text).toBe('Couldn\'t find map');
+                })
+        });
+    });
+
     describe('POST /api/maps/currentRuns', () => {
         it(`should return {} for no current runs`, ()=> {
             return request(app)
@@ -51,5 +63,8 @@ describe('Map execution tests', () => {
                 })
         });
     });
+
+    // TODO: cancel pending will not reject / respond with 500 because of the bug
+    // router.post("/:id/cancel-pending", mapController.cancelPending);
 
 });
