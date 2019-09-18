@@ -37,6 +37,16 @@ describe('Map execution tests', () => {
                     expect(text).toBe('No structure found.');
                 })
         });
+
+        it(`should not execute an archived map`, async () => {
+            await MapModel.findByIdAndUpdate(mapId, {archived: true});
+            return request(app)
+                .post(`/api/maps/${mapId}/execute`)
+                .expect(500)
+                .then(({ text }) => {
+                    expect(text).toBe('Can\'t execute archived map');
+                })
+        });
     });
 
     // router.post("/:id/execute/:structure", mapController.execute);
