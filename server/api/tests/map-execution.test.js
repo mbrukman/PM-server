@@ -2,7 +2,7 @@ const request = require('supertest');
 const MapModel = require('../../api/models/map.model');
 const TestDataManager = require('./factories/test-data-manager');
 const mapsFactory = require('./factories/maps.factory');
-const {setupDB} = require('./helpers/test-setup')
+const { setupDB } = require('./helpers/test-setup')
 const app = 'localhost:3000';
 
 describe('Map execution tests', () => {
@@ -19,57 +19,75 @@ describe('Map execution tests', () => {
 
     // router.post("/:id/execute", mapController.execute);
     describe('POST /api/maps/:mapId/execute', () => {
-        it(`should handle lack of map`, ()=> {
+        it(`should handle lack of map`, () => {
             const mapId = mapsFactory.generateSimpleMap()._id;
             return request(app)
                 .post(`/api/maps/${mapId}/execute`)
                 .expect(500)
-                .then(({text}) => {
+                .then(({ text }) => {
                     expect(text).toBe('Couldn\'t find map');
                 })
         });
 
-        it(`should handle lack of map structure`, ()=> {
+        it(`should handle lack of map structure`, () => {
             return request(app)
                 .post(`/api/maps/${mapId}/execute`)
                 .expect(500)
-                .then(({text}) => {
+                .then(({ text }) => {
                     expect(text).toBe('No structure found.');
                 })
         });
     });
 
     // router.post("/:id/execute/:structure", mapController.execute);
-    // NOTICE - THIS ROUTE IS NOT USED IN THE FRONTEND (-> KAH-37)
+    // NOTICE - THIS ROUTE IS NOT USED IN THE FRONTEND (KAH-37)
     describe('POST /api/maps/:mapId/execute/:structureId', () => {
-        it(`should handle lack of map`, ()=> {
+        it(`should handle lack of map`, () => {
             const mapId = mapsFactory.generateSimpleMap()._id;
+            const structureId = mapId;
             return request(app)
-                .post(`/api/maps/${mapId}/execute/${mapId}`)
+                .post(`/api/maps/${mapId}/execute/${structureId}`)
                 .expect(500)
-                .then(({text}) => {
+                .then(({ text }) => {
                     expect(text).toBe('Couldn\'t find map');
                 })
         });
 
-        it(`should handle lack of map structure`, ()=> {
+        it(`should handle lack of map structure`, () => {
+            const structureId = mapId;
             return request(app)
-                .post(`/api/maps/${mapId}/execute/${mapId}`)
+                .post(`/api/maps/${mapId}/execute/${structureId}`)
                 .expect(500)
-                .then(({text}) => {
+                .then(({ text }) => {
                     expect(text).toBe('No structure found.');
                 })
         });
     });
 
     // router.get("/:id/stop-execution", mapController.stopExecution);
+    // NOTICE - THIS ROUTE IS NOT USED IN THE FRONTEND (KAH-38)
     describe('GET /api/maps/:mapId/stop-execution', () => {
-    
+        it(`should return {} for no executions stopped`, () => {
+            return request(app)
+                .get(`/api/maps/${mapId}/stop-execution`)
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body).toEqual({});
+                });
+        });
     });
 
     // router.get("/:id/stop-execution/:runId", mapController.stopExecution);
     describe('GET /api/maps/:mapId/stop-execution/:runId', () => {
-    
+        it(`should return {} for no executions stopped`, () => {
+            const random = Math.floor(Math.random() * 10 + 1);
+            return request(app)
+                .get(`/api/maps/${mapId}/stop-execution/${random}`)
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body).toEqual({});
+                });
+        });
     });
 
     // router.post("/:id/cancel-pending", mapController.cancelPending);
@@ -77,11 +95,11 @@ describe('Map execution tests', () => {
 
     // router.get("/currentruns", mapController.currentRuns);
     describe('POST /api/maps/currentRuns', () => {
-        it(`should return {} for no current runs`, ()=> {
+        it(`should return {} for no current runs`, () => {
             return request(app)
                 .post(`/api/maps/currentRuns`)
                 .expect(200)
-                .then(({body}) => {
+                .then(({ body }) => {
                     expect(body).toEqual({});
                 })
         });
