@@ -73,7 +73,7 @@ const triggerSchema = {
             $ref: actionParamsSchema
         }
     },
-    required: ['_id', 'name', 'map']
+    required: ['_id', 'name', 'map','plugin','method']
 };
 
 const triggerCollectionSchema = {
