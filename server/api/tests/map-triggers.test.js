@@ -41,9 +41,11 @@ describe('Map triggers tests', () => {
         describe(`POST /:mapId`, () => {
             it(`should respond with a created trigger`, function (done) {
                 const triggerName = 'test trigger name';
+                const plugin = 'test trigger plugin';
+                const method = 'test trigger method';
                 request(app)
                     .post(`/api/triggers/${mapId}`)
-                    .send({name: triggerName})
+                    .send({name: triggerName,plugin:plugin,method:method})
                     .expect(200)
                     .then((res) => {
                         expect(res.body.name).toEqual(triggerName);
@@ -84,11 +86,7 @@ describe('Map triggers tests', () => {
             it(`should respond with status code 500 and proper error msg`, function (done) {
                 request(app)
                     .get('/api/triggers/0')
-                    .expect(500)
-                    .then((res) => {
-                        expect(res.body.message).toEqual("Cast to ObjectId failed for value \"0\" at path \"map\" for model \"Trigger\"");
-                        done();
-                    });
+                    .expect(500,done)
             });
         });
 
@@ -96,11 +94,7 @@ describe('Map triggers tests', () => {
             it(`should respond with status code 500 and proper error msg`, function (done) {
                 request(app)
                     .post('/api/triggers/0')
-                    .expect(500)
-                    .then((res) => {
-                        expect(res.body.message).toEqual("Trigger validation failed: map: Cast to ObjectID failed for value \"0\" at path \"map\", name: Path `name` is required.");
-                        done();
-                    });
+                    .expect(500,done)
             });
         });
 
