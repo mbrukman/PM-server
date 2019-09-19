@@ -18,4 +18,4 @@ module.exports = {
     update: (triggerId, trigger) => {
         return Trigger.findByIdAndUpdate(triggerId, trigger, { new: true })
     }
-};
+}; 
