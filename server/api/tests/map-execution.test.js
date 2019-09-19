@@ -1,20 +1,24 @@
 const request = require('supertest');
 const MapModel = require('../../api/models/map.model');
+const MapStructureModel = require('../../api/models/map-structure.model');
 const TestDataManager = require('./factories/test-data-manager');
 const mapsFactory = require('./factories/maps.factory');
+const mapStructureFactory = require('./factories/map-structure.factory');
 const { setupDB } = require('./helpers/test-setup')
 const app = 'localhost:3000';
 
 describe('Map execution tests', () => {
-    let testDataManager;
+    let mapDataManager = new TestDataManager(MapModel);
+    let mapStructureDataManager = new TestDataManager(MapStructureModel);
     let mapId;
     setupDB();
 
     beforeEach(async () => {
-        testDataManager = new TestDataManager(MapModel);
+        
         const map = mapsFactory.generateSimpleMap();
-        await testDataManager.generateInitialCollection(map);
+        await mapDataManager.generateInitialCollection(map);
         mapId = map._id;
+
     });
 
     // router.post("/:id/execute", mapController.execute);
@@ -47,6 +51,31 @@ describe('Map execution tests', () => {
                     expect(text).toBe('Can\'t execute archived map');
                 })
         });
+
+        it(`should handle no agents alive when trigger is 'started manually by user'`, async () => {
+            await mapStructureDataManager.pushToCollectionAndSave(mapStructureFactory.generateOne(mapId));
+            return request(app)
+                .post(`/api/maps/${mapId}/execute`)
+                .send({trigger: "Started manually by user"})
+                .expect(500)
+                .then((res) => {
+                    expect(res.text).toBe('No agents alive');
+                })
+        });
+
+        it(`should respond with new runId and current mapId`, async () => {
+            await mapStructureDataManager.pushToCollectionAndSave(mapStructureFactory.generateOne(mapId));
+            return request(app)
+                .post(`/api/maps/${mapId}/execute`)
+                .expect(200)
+                .then(({body}) => {
+                    expect(body.runId).toBeDefined();
+                    expect(typeof body.runId).toBe('string');
+                    expect(body.runId.length > 0).toBe(true);
+                    expect(body.mapId).toBe(mapId);
+                })
+        });
+
     });
 
     // router.post("/:id/execute/:structure", mapController.execute);
@@ -104,10 +133,10 @@ describe('Map execution tests', () => {
     //  TODO: cancel pending will not reject / respond with 500 because of the bug (KAH-36)
 
     // router.get("/currentruns", mapController.currentRuns);
-    describe('POST /api/maps/currentRuns', () => {
+    describe('GET /api/maps/currentruns', () => {
         it(`should return {} for no current runs`, () => {
             return request(app)
-                .post(`/api/maps/currentRuns`)
+                .get(`/api/maps/currentruns`)
                 .expect(200)
                 .then(({ body }) => {
                     expect(body).toEqual({});
