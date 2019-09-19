@@ -169,12 +169,12 @@ module.exports = {
             {$limit:4}
         ])
         return projects.then((projects) => {
-            return projects.map((project) => {
+            return projects.map((item) => {
                 return {
-                    _id:project._id,
-                    map:project.map,
-                    exec:project.exec,
-                    project:{name:project.project}
+                    _id:item._id,
+                    map:item.map,
+                    exec:item.exec,
+                    project:{name:item.project}
                 }
             })
         })
