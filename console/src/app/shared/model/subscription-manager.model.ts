@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 export class SubscriptionManager{
     subscriptions : Subscription[] = [];
 
-    add(subscription){
+    add(subscription:Subscription){
         this.subscriptions.push(subscription)
     }
 
