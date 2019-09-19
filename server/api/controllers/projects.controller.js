@@ -47,20 +47,6 @@ module.exports = {
         });
     },
 
-    /* add a map to project */
-    addMap: (req, res) => {
-        let projectId = req.params.projectId;
-        let mapId = req.params.mapId;
-        hooks.hookPre('project-add-map', req).then(() => {
-            return projectsService.addMap(projectId, mapId);
-        }).then(project => {
-            res.json(project);
-        }).catch((error) => {
-            winston.log('error', "Error adding map to project", error);
-            res.status(500).send(error);
-        });
-    },
-
     /* get project details */
     detail: (req, res) => {
         hooks.hookPre('project-detail', req).then(() => {
