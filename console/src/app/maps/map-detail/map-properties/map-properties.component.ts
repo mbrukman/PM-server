@@ -88,7 +88,7 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
   }
 
   onChangeProject() {
-    let mapObj = Object.assign({}, this.map, { project: {id:this.selectedProject} });
+    let mapObj = Object.assign({}, this.map, { project: this.selectedProject});
     this.mapsService.setCurrentMap(mapObj);
   }
 
