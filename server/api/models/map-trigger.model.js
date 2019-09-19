@@ -17,8 +17,8 @@ let TriggerSchema = new Schema({
     description: String,
     createdAt: { type: Date, default: Date.now },
     active: { type: Boolean, default: true },
-    plugin: String,
-    method: String,
+    plugin: {type:String,required: true},
+    method: {type:String,required: true},
     configuration: String,
     params: [actionParamsSchema]
 });
