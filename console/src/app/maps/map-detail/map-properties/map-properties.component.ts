@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { filter, tap, mergeMap } from "rxjs/operators";;
 import { MapsService } from '../../maps.service';
 import { Map } from '@maps/models/map.model';
 import { ProjectsService } from '@projects/projects.service';
 import { Project } from '@projects/models/project.model';
 import { SelectItem } from 'primeng/primeng';
+import { SubscriptionManager } from '@app/shared/model/subscription-manager.model';
 
 
 @Component({
@@ -17,20 +17,19 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
   map: Map;
   projects: Project[];
   projectsDropDown:SelectItem[] = [];
-  mapSubscription: Subscription;
   selectedProject: string;
   queue: number;
   onInit:boolean;
+  subscriptionManager: SubscriptionManager = new SubscriptionManager();
   processesDropDown:SelectItem[] = [];
   apiResponseAfterProcess:string;
   apiResponseCodeRefrence:string;
-  mapStructureSubscription:Subscription;
   constructor(private mapsService: MapsService, private projectsService: ProjectsService) {
   }
 
   ngOnInit() {
     this.onInit = true;
-    this.mapSubscription = this.mapsService.getCurrentMap().pipe(
+    let mapSubscription = this.mapsService.getCurrentMap().pipe(
       tap(map => this.map = map),
       filter(map => map),
       mergeMap(() => this.projectsService.list(null,null,{isArchived:false,globalFilter:null,sort:'-createdAt'}))// filtering empty map result
@@ -52,10 +51,11 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
           this.onInit = false;
         }
       });
+      this.subscriptionManager.add(mapSubscription)
   }
 
   getProcessByMapId(){
-    this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(filter((structure) => !!structure))
+    let mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(filter((structure) => !!structure))
     .subscribe(structure => {
       if(structure.processes.length){
         this.apiResponseAfterProcess = this.map.processResponse;
@@ -68,6 +68,8 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
 
       }
     })
+
+    this.subscriptionManager.add(mapStructureSubscription)
   }
 
   onChangeProcessResponse(){
@@ -81,8 +83,7 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.mapSubscription.unsubscribe();
-    this.mapStructureSubscription.unsubscribe();
+    this.subscriptionManager.unsubscribe();
   }
 
   onMapUpdate() {
