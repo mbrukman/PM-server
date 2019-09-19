@@ -8,7 +8,7 @@ module.exports = {
     },
     /* delete a trigger */
     delete: (triggerId) => {
-        return Trigger.remove({ _id: triggerId })
+        return Trigger.remove({ _id: triggerId }) 
     },
     /* list of triggers to given map */
     list: (mapId) => {
