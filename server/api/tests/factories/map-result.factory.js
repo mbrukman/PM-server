@@ -1,23 +1,22 @@
-
-// map: { type: Schema.Types.ObjectId, ref: 'Map' },
-// structure: { type: Schema.Types.ObjectId, ref: 'MapStructure' },
-// configuration: Schema.Types.Mixed,
-//     agentsResults: [AgentResultSchema],
-//     startTime: { type: Date, index: true },
-// finishTime: { type: Date, index: true },
-// trigger: String,
-//     status: { type: String, enum: [statusEnum.DONE, statusEnum.ERROR, statusEnum.RUNNING, statusEnum.PENDING] },
-// reason: String, // e.g. no agents
-//     triggerPayload: Schema.Types.Mixed,
-//     archivedMap: { type: Boolean, default: false, index: true },
-// createdAt:  {type: Date, default: new Date()}
-
 const {jsf} = require('./jsf.helper');
+const agentResultsFactory = require('./agent-result.factory');
 
-function generateSingleSchema(mapId, agentResults) {
+function generateSingleSchema({mapId, agentId, actionId, processId, mapStructureId}) {
+    const agentsResults = agentResultsFactory.generateMany({agentId, actionId, processId});
+
     return {
         type: 'object',
         properties: {
+            structure: mapStructureId,
+            status: {
+                type: 'string',
+                enum: [
+                    'running',
+                    'done',
+                    'pending',
+                    'error'
+                ]
+            },
             reason: {
                 type: 'string',
                 chance: {
@@ -35,28 +34,28 @@ function generateSingleSchema(mapId, agentResults) {
                 }
             },
             map: mapId,
-            agentResults,
+            agentsResults,
             _id: {
                 "type": "string",
                 "format": "mongoID"
             }
         },
-        required: ['trigger', 'reason', '_id', 'map'],
+        required: ['trigger', 'reason', '_id', 'map', 'agentsResults', 'status', 'structure'],
     };
 
 }
 
-function generateMany(mapId, maps) {
+function generateMany(idsCollection) {
     return jsf.generate({
         type: 'array',
-        items: generateSingleSchema(mapId, maps),
+        items: generateSingleSchema(idsCollection),
         maxItems: 15,
         minItems: 5,
     })
 }
 
-function generateOne(mapId, maps) {
-    return jsf.generate(generateSingleSchema(mapId, maps));
+function generateOne(idsCollection) {
+    return jsf.generate(generateSingleSchema(idsCollection));
 }
 
 module.exports = {

@@ -1,23 +1,24 @@
 const {jsf} = require('./jsf.helper');
-const processFactory = require('./process.factory');
+const processResultFactory = require('./process-result.factory');
 
 
-function generateSingleSchema(agentId, processes) {
-    if(!processes) processes = processFactory.generateMany();
+function generateSingleSchema({agentId, actionId, processId}) {
+    const processes = processResultFactory.generateMany({actionId, processId});
+
     return {
         type: "object",
         properties: {
             processes,
             agent: agentId
         },
-        required: ['processes', 'agentId']
+        required: ['processes', 'agent']
     }
 }
 
-function generateMany(agentId, processes) {
+function generateMany(idsCollection) {
     return jsf.generate({
         type: 'array',
-        items: generateSingleSchema(agentId, processes),
+        items: generateSingleSchema(idsCollection),
         maxItems: 15,
         minItems: 5,
     })

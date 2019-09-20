@@ -1,5 +1,5 @@
 const Map = require("../models/map.model");
-const MapStructure = require("../models").Structure;
+const {MapStructure} = require("../models").Structure;
 const env = require("../../env/enviroment");
 const MapTrigger = require("../models/map-trigger.model")
 const MapResult = require("../models").MapResult;
@@ -202,6 +202,7 @@ module.exports = {
     },
     /* get map structure. if structure id is not defined, get the latest */
     getMapStructure: (mapId, structureId) => {
+        console.log(structureId)
         if (structureId) {
             return MapStructure.findById(structureId)
         }

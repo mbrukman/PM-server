@@ -79,6 +79,8 @@ mapStructureSchema.set('toJSON', {
 });
 
 const MapStructure = mongoose.model('MapStructure', mapStructureSchema, 'mapstructure');
+const ActionModel = mongoose.model('Action', actionSchema, 'actions');
+const ProcessModel = mongoose.model('Process', processSchema, 'processes');
 
 
-module.exports = MapStructure;
+module.exports = {MapStructure, ActionModel, ProcessModel};
