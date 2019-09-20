@@ -14,7 +14,7 @@ describe('Map execution tests', () => {
     setupDB();
 
     beforeEach(async () => {
-        
+
         const map = mapsFactory.generateSimpleMap();
         await mapDataManager.generateInitialCollection(map);
         mapId = map._id;
@@ -43,7 +43,7 @@ describe('Map execution tests', () => {
         });
 
         it(`should not execute an archived map`, async () => {
-            await MapModel.findByIdAndUpdate(mapId, {archived: true});
+            await MapModel.findByIdAndUpdate(mapId, { archived: true });
             return request(app)
                 .post(`/api/maps/${mapId}/execute`)
                 .expect(500)
@@ -56,7 +56,7 @@ describe('Map execution tests', () => {
             await mapStructureDataManager.pushToCollectionAndSave(mapStructureFactory.generateOne(mapId));
             return request(app)
                 .post(`/api/maps/${mapId}/execute`)
-                .send({trigger: "Started manually by user"})
+                .send({ trigger: "Started manually by user" })
                 .expect(500)
                 .then((res) => {
                     expect(res.text).toBe('No agents alive');
@@ -68,7 +68,7 @@ describe('Map execution tests', () => {
             return request(app)
                 .post(`/api/maps/${mapId}/execute`)
                 .expect(200)
-                .then(({body}) => {
+                .then(({ body }) => {
                     expect(body.runId).toBeDefined();
                     expect(typeof body.runId).toBe('string');
                     expect(body.runId.length > 0).toBe(true);
@@ -81,11 +81,20 @@ describe('Map execution tests', () => {
     // router.post("/:id/execute/:structure", mapController.execute);
     // NOTICE - THIS ROUTE IS NOT USED IN THE FRONTEND (KAH-37)
     describe('POST /api/maps/:mapId/execute/:structureId', () => {
+
+        let structureId;
+
+        beforeEach(async () => {
+            const mapStructure = mapStructureFactory.generateOne(mapId);
+            structureId = mapStructure._id;
+            await mapStructureDataManager.pushToCollectionAndSave(mapStructure);
+        })
+
         it(`should handle lack of map`, () => {
             const mapId = mapsFactory.generateSimpleMap()._id;
-            const structureId = mapId;
+            const invalidStructureId = mapId;
             return request(app)
-                .post(`/api/maps/${mapId}/execute/${structureId}`)
+                .post(`/api/maps/${mapId}/execute/${invalidStructureId}`)
                 .expect(500)
                 .then(({ text }) => {
                     expect(text).toBe('Couldn\'t find map');
@@ -93,12 +102,44 @@ describe('Map execution tests', () => {
         });
 
         it(`should handle lack of map structure`, () => {
-            const structureId = mapId;
+            const invalidStructureId = mapId;
+            return request(app)
+                .post(`/api/maps/${mapId}/execute/${invalidStructureId}`)
+                .expect(500)
+                .then(({ text }) => {
+                    expect(text).toBe('No structure found.');
+                })
+        });
+
+        it(`should not execute an archived map`, async () => {
+            await MapModel.findByIdAndUpdate(mapId, { archived: true });
             return request(app)
                 .post(`/api/maps/${mapId}/execute/${structureId}`)
                 .expect(500)
                 .then(({ text }) => {
-                    expect(text).toBe('No structure found.');
+                    expect(text).toBe('Can\'t execute archived map');
+                })
+        });
+
+        it(`should handle no agents alive when trigger is 'started manually by user'`, async () => {
+            return request(app)
+                .post(`/api/maps/${mapId}/execute/${structureId}`)
+                .send({ trigger: "Started manually by user" })
+                .expect(500)
+                .then((res) => {
+                    expect(res.text).toBe('No agents alive');
+                })
+        });
+
+        it(`should respond with new runId and current mapId`, async () => {
+            return request(app)
+                .post(`/api/maps/${mapId}/execute/${structureId}`)
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.runId).toBeDefined();
+                    expect(typeof body.runId).toBe('string');
+                    expect(body.runId.length > 0).toBe(true);
+                    expect(body.mapId).toBe(mapId);
                 })
         });
     });
