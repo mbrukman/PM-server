@@ -20,17 +20,11 @@ function generateSingleSchema({processId, actionId}) {
             startTime: {
                 format: "date-time",
                 type: "string",
-                // chance: {
-                //     date: {}
-                // }
             },
             process: processId,
             finishTime: {
                 format: "date-time",
                 type: "string",
-                // chance: {
-                //     date: {}
-                // }
             },
             status: {
                 type: 'string',
