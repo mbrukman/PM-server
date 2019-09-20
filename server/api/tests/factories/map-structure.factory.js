@@ -22,7 +22,7 @@ function generateSingleSchema(mapId, maps, processes) {
                 "format": "mongoID"
             }
         },
-        required: ['code', '_id', 'map'],
+        required: ['code', '_id', 'map', 'processes'],
     };
 
 }

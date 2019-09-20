@@ -1,7 +1,7 @@
 const vm = require('vm');
 const fs = require('fs');
 const path = require('path');
-const { Subject } = require('rxjs');
+const {Subject} = require('rxjs');
 const winston = require('winston');
 const request = require('request');
 const _ = require("lodash");
@@ -16,7 +16,7 @@ const mapsService = require('./maps.service');
 const pluginsService = require('../services/plugins.service');
 const vaultService = require('./vault.service')
 const helper = require('./map-execution.helper')
-const dbUpdates = require('./map-execution-updates')({ stopExecution })
+const dbUpdates = require('./map-execution-updates')({stopExecution})
 const shared = require('../shared/recents-maps')
 const socketService = require("./socket.service");
 
@@ -26,9 +26,6 @@ let executions = {};
 let pending = {};
 let libpm = ''; // all sdk code.
 let libpmObjects = {}
-
-
-
 
 
 fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 'utf8', function (err, data) {
@@ -43,7 +40,7 @@ fs.readFile(path.join(path.dirname(path.dirname(__dirname)), 'libs', 'sdk.js'), 
 
 /**
  * @param {*} agent
- * @returns {object} an agent object like with the sdk format 
+ * @returns {object} an agent object like with the sdk format
  */
 function getCurrentAgent(agent) {
     let obj = {};
@@ -54,10 +51,10 @@ function getCurrentAgent(agent) {
 }
 
 /**
- * @param {*} param 
- * @param {*} typeParam 
- * @param {*} context 
- * @return {Promise} with the relevant param 
+ * @param {*} param
+ * @param {*} typeParam
+ * @param {*} context
+ * @return {Promise} with the relevant param
  */
 async function evaluateParam(param, typeParam, context) {
     if (!param.code) {
@@ -68,8 +65,9 @@ async function evaluateParam(param, typeParam, context) {
     }
     return vm.runInNewContext(param.value, context);
 }
+
 /**
- * @param {*} plugin 
+ * @param {*} plugin
  * @return {Promise} - with the settings of a plugin.
  */
 async function getSettingsAction(plugin) {
@@ -94,7 +92,7 @@ function updateClientExecutions(socket, execToDelete = null) {
         return total;
     }, {});
     socket ? socket.emit('executions', emitv) : clientSocket.emit('executions', emitv);
-   
+
 }
 
 /**
@@ -168,9 +166,9 @@ function updateProcessContext(runId, agent, processUUID, iterationIndex, process
         return;
     }
 
-    if(processData.finishTime){
+    if (processData.finishTime) {
         let processUuid = executions[runId].executionAgents[agent.key].context.processes[processUUID][0].uuid;
-        sendFinishTimeToClient(runId,{process:{finishTime:processData.finishTime,uuid:processUuid}})
+        sendFinishTimeToClient(runId, {process: {finishTime: processData.finishTime, uuid: processUuid}})
     }
 
     executions[runId].executionAgents[agent.key].context.processes[processUUID][iterationIndex] = Object.assign(
@@ -190,16 +188,18 @@ function updateProcessContext(runId, agent, processUUID, iterationIndex, process
 }
 
 /**
- * create new action 
- * @param {string} runId 
- * @param {string} agentKey 
- * @param {string} processKey 
- * @param {string} processIndex 
- * @param {models} action 
- * @param {object} actionData 
+ * create new action
+ * @param {string} runId
+ * @param {string} agentKey
+ * @param {string} processKey
+ * @param {string} processIndex
+ * @param {models} action
+ * @param {object} actionData
  */
 function createActionContect(runId, agentKey, processKey, processIndex, action, actionData) {
-    if (!executions[runId]) { return; }
+    if (!executions[runId]) {
+        return;
+    }
     let process = executions[runId].executionAgents[agentKey].context.processes[processKey][processIndex]
 
     process.actions[action._id] = Object.assign(action, actionData);
@@ -231,7 +231,9 @@ function createActionContect(runId, agentKey, processKey, processIndex, action, 
  * @param actionData
  */
 function updateActionContext(runId, agentKey, processKey, processIndex, action, actionData) {
-    if (!executions[runId]) { return; }
+    if (!executions[runId]) {
+        return;
+    }
 
     let curActionData = executions[runId].executionAgents[agentKey].context.processes[processKey][processIndex].actions[action._id]
 
@@ -268,7 +270,6 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
 }
 
 
-
 /**
  * Starting a pending execution
  * @param mapId
@@ -276,9 +277,11 @@ function updateActionContext(runId, agentKey, processKey, processIndex, action, 
 async function startPendingExecution(mapId, socket) {
 
     let pendingExec = await dbUpdates.getAndUpdatePendingExecution(mapId)
-    if (!pendingExec) { return }
+    if (!pendingExec) {
+        return
+    }
 
-    updateClientPending(socket, { mapId, runId: pendingExec._id })
+    updateClientPending(socket, {mapId, runId: pendingExec._id})
     socket.emit('map-execution-result', pendingExec)
 
     map = await mapsService.get(pendingExec.map)
@@ -286,7 +289,7 @@ async function startPendingExecution(mapId, socket) {
 
     agents = helper.getRelevantAgent(map.groups, map.agents)
     if (agents.length == 0) { // If no living agents, stop execution with status error
-        return updateMapResult(pendingExec.id, { reason: 'no agents alive', status: statusEnum.ERROR }, socket)
+        return updateMapResult(pendingExec.id, {reason: 'no agents alive', status: statusEnum.ERROR}, socket)
     }
 
     let context = createExecutionContext(pendingExec._id, socket, pendingExec, mapStructure)
@@ -305,11 +308,11 @@ function updateMapResult(mapResultId, updateData, socket) {
 }
 
 /**
- * 
- * @param {*} agent 
- * @param {*} runId 
+ *
+ * @param {*} agent
+ * @param {*} runId
  * @param {*} executionContext - general context to save on every agent
- * @param {*} startNode 
+ * @param {*} startNode
  * @param {*} mapCode - the code section of a map
  */
 function createAgentContext(agent, runId, executionContext, startNode, mapCode) {
@@ -321,9 +324,9 @@ function createAgentContext(agent, runId, executionContext, startNode, mapCode) 
     }]
 
     executions[runId].executionAgents[agent.key] = {
-        context: Object.assign({ processes }, executionContext, _addFuncsToCodeEnv()),
-        id: agent.id, 
-        runNodeSuccessorsCounter:0
+        context: Object.assign({processes}, executionContext, _addFuncsToCodeEnv()),
+        id: agent.id,
+        runNodeSuccessorsCounter: 0
     }
     createCodeEnv(mapCode, runId, agent.key)
     executions[runId].executionAgents[agent.key].context.currentAgent = getCurrentAgent(agent)
@@ -333,9 +336,9 @@ function createAgentContext(agent, runId, executionContext, startNode, mapCode) 
 
 /**
  * Create code enviroment in context
- * @param {*} mapCode 
- * @param {*} runId 
- * @param {*} agentKey 
+ * @param {*} mapCode
+ * @param {*} runId
+ * @param {*} agentKey
  */
 function createCodeEnv(mapCode, runId, agentKey) {
     try {
@@ -349,15 +352,15 @@ function createCodeEnv(mapCode, runId, agentKey) {
  * Add more functionalities in our code enviroment (monaco). e.g. using 'require'.
  */
 function _addFuncsToCodeEnv() {
-    return { require, console, Buffer }
+    return {require, console, Buffer}
 }
 
 /**
  * create general context and executions[runId]
- * @param {*} runId 
- * @param {*} socket 
+ * @param {*} runId
+ * @param {*} socket
  * @param {mapResult} mapResult
- * @return {object} - all the global context of an execution  
+ * @return {object} - all the global context of an execution
  */
 function createExecutionContext(runId, socket, mapResult, structure) {
     executions[runId] = {
@@ -372,8 +375,8 @@ function createExecutionContext(runId, socket, mapResult, structure) {
         startTime: mapResult.startTime,
         // structure: structure.id,
         configuration: {
-            name:mapResult.configuration.name,
-            value:mapResult.configuration.value
+            name: mapResult.configuration.name,
+            value: mapResult.configuration.value
         },
         trigger: {
             msg: mapResult.trigger,
@@ -383,24 +386,30 @@ function createExecutionContext(runId, socket, mapResult, structure) {
             getValueByKey: vaultService.getValueByKey
         },
 
-        MapService:{
-            getMapConfigurations: ()=>{ return structure.configurations.toBSON()},
-            getMapExecutions: async(amount)=>{ return mapsService.getMapExecutions(amount, structure.map.toString())},
-            getMap: (mapId = mapResult.map)=>{ return mapsService.getMap(mapId)}
+        MapService: {
+            getMapConfigurations: () => {
+                return structure.configurations.toBSON()
+            },
+            getMapExecutions: async (amount) => {
+                return mapsService.getMapExecutions(amount, structure.map.toString())
+            },
+            getMap: (mapId = mapResult.map) => {
+                return mapsService.getMap(mapId)
+            }
         }
     };
 }
 
 /**
- * Create mapResult, with the wright status and configuration 
- * @param {*} runId 
- * @param {*} socket 
- * @param {*} map 
- * @param {*} configurationName 
- * @param {*} structure 
- * @param {*} triggerReason 
- * @param {*} payload 
- * @return {MapResult}   
+ * Create mapResult, with the wright status and configuration
+ * @param {*} runId
+ * @param {*} socket
+ * @param {*} map
+ * @param {*} configurationName
+ * @param {*} structure
+ * @param {*} triggerReason
+ * @param {*} payload
+ * @return {MapResult}
  */
 async function createMapResult(socket, map, configuration, structure, triggerReason, payload) {
     // get number of running executions
@@ -431,15 +440,15 @@ async function createMapResult(socket, map, configuration, structure, triggerRea
 
 /**
  * returns empty array if there is a plugin that isn`t installed on server. else returns the relevant plugins
- * @param {*} mapStructure 
- * @param {*} runId 
- * @returns {String[]} 
+ * @param {*} mapStructure
+ * @param {*} runId
+ * @returns {String[]}
  */
 async function getPluginsToExec(mapStructure) {
     let pluginNames = {}
     mapStructure.used_plugins.forEach(plugin => pluginNames[plugin.name] = plugin.name);
     const names = Object.keys(pluginNames)
-    let plugins = await pluginsService.filterPlugins({ name: { $in: names } })
+    let plugins = await pluginsService.filterPlugins({name: {$in: names}})
     if (plugins.length != names.length) {
         return []
     }
@@ -447,17 +456,17 @@ async function getPluginsToExec(mapStructure) {
 }
 
 
-function isProcessIsOnTheFlow(nodeUuid,structure,processUuid ,processesDidntPassConditionUuid = null){
-    let successor = helper.findSuccessors(nodeUuid,structure);
-    if(successor.includes(processUuid)){
+function isProcessIsOnTheFlow(nodeUuid, structure, processUuid, processesDidntPassConditionUuid = null) {
+    let successor = helper.findSuccessors(nodeUuid, structure);
+    if (successor.includes(processUuid)) {
         return true;
     }
-    if(successor.length == 0){
+    if (successor.length == 0) {
         return false;
     }
-    for(let i=0,length=successor.length;i<length;i++){
-        if(!processesDidntPassConditionUuid || !processesDidntPassConditionUuid.includes(successor[i])){
-            if(isProcessIsOnTheFlow(successor[i],structure,processUuid,processesDidntPassConditionUuid)){
+    for (let i = 0, length = successor.length; i < length; i++) {
+        if (!processesDidntPassConditionUuid || !processesDidntPassConditionUuid.includes(successor[i])) {
+            if (isProcessIsOnTheFlow(successor[i], structure, processUuid, processesDidntPassConditionUuid)) {
                 return true;
             }
         }
@@ -466,24 +475,23 @@ function isProcessIsOnTheFlow(nodeUuid,structure,processUuid ,processesDidntPass
 }
 
 
-async function runCode(map,runId,agent){
+async function runCode(map, runId, agent) {
     let responseData;
-    try{
-        responseData = await vm.runInNewContext(map.apiResponseCodeReference,executions[runId].executionAgents[agent.key].context)
-    }
-    catch(err){
+    try {
+        responseData = await vm.runInNewContext(map.apiResponseCodeReference, executions[runId].executionAgents[agent.key].context)
+    } catch (err) {
         responseData = null
     }
     return responseData
 }
 
 /**
- * 
- * @param {*} runId 
- * @param {*} map 
- * @param {*} mapStructure 
- * @param {*} agents 
- * @param {*} context - general context about the execution (this conetxt is seperate to every agent) 
+ *
+ * @param {*} runId
+ * @param {*} map
+ * @param {*} mapStructure
+ * @param {*} agents
+ * @param {*} context - general context about the execution (this conetxt is seperate to every agent)
  */
 async function executeMap(runId, map, mapStructure, agents, context) {
     updateClientExecutions(executions[runId].clientSocket);
@@ -495,7 +503,7 @@ async function executeMap(runId, map, mapStructure, agents, context) {
 
     const startNode = helper.findStartNode(mapStructure);
 
-    if(map.processResponse && !isProcessIsOnTheFlow(startNode.uuid,mapStructure,map.processResponse)){
+    if (map.processResponse && !isProcessIsOnTheFlow(startNode.uuid, mapStructure, map.processResponse)) {
         executions[runId].subscription.next()
     }
 
@@ -503,10 +511,10 @@ async function executeMap(runId, map, mapStructure, agents, context) {
         stopExecution(runId, clientSocket, "link is missing to start execution")
     }
 
-    let nsp = socketService.getNamespaceSocket('execution-update-'+ runId.toString());
-    nsp.on('connection',function (socket) {
+    let nsp = socketService.getNamespaceSocket('execution-update-' + runId.toString());
+    nsp.on('connection', function (socket) {
         Object.keys(nsp.sockets).forEach(socket => {
-            nsp.sockets[socket].emit("updateActions",nsp.actions);     
+            nsp.sockets[socket].emit("updateActions", nsp.actions);
         })
     })
     nsp['actions'] = [];
@@ -522,58 +530,63 @@ async function executeMap(runId, map, mapStructure, agents, context) {
         promises.push(runMapOnAgent(map, mapStructure, runId, startNode, agents[i]))
     }
     Promise.all(promises)
-    .then(async () => {
-        let responseData = await  runCode(map,runId,agent);
-        executions[runId].subscription.complete(responseData);
-        executions[runId].subscription.unsubscribe();
-    })
-    .catch(err => {
-        winston.log('error', "structureId: " + mapStructure.id + err);
-    });
+        .then(async () => {
+            let responseData = await runCode(map, runId, agent);
+            executions[runId].subscription.complete(responseData);
+            executions[runId].subscription.unsubscribe();
+        })
+        .catch(err => {
+            winston.log('error', "structureId: " + mapStructure.id + err);
+        });
 }
 
-function checkDuplicateProcess(structure){
+function checkDuplicateProcess(structure) {
 
-        let processIds = [];
-        let isDuplicateProcess = false;
-        structure.processes.map(process => {
-            if(processIds.includes(process._id.toString())){
-                delete process.id;
-                delete process._id;
-                isDuplicateProcess = true;
-            }
-            else{
-                processIds.push(process._id.toString())
-            }
-        });
- 
-        return {isDuplicate:isDuplicateProcess,structure:structure};
+    let processIds = [];
+    let isDuplicateProcess = false;
+    structure.processes.map(process => {
+        if (processIds.includes(process._id.toString())) {
+            delete process.id;
+            delete process._id;
+            isDuplicateProcess = true;
+        } else {
+            processIds.push(process._id.toString())
+        }
+    });
+
+    return {isDuplicate: isDuplicateProcess, structure: structure};
 }
 
 
 /**
- * create mapResult if all params are good and run it.  
- * @param {*} mapId 
- * @param {*} structureId 
- * @param {*} socket 
- * @param {object} configuration - {config - the main configuration, mergeConfig - in case of mapExecution plugin}  
- * @param {*} triggerReason 
- * @param {*} triggerPayload 
+ * create mapResult if all params are good and run it.
+ * @param {*} mapId
+ * @param {*} structureId
+ * @param {*} socket
+ * @param {object} configuration - {config - the main configuration, mergeConfig - in case of mapExecution plugin}
+ * @param {*} triggerReason
+ * @param {*} triggerPayload
  * @returns {string} - the new runId
  */
 async function execute(mapId, structureId, socket, configuration, triggerReason, triggerPayload = null) {
 
-    
+
     clientSocket = socket; // save socket in global 
     map = await mapsService.get(mapId)
-    if (!map) { throw new Error(`Couldn't find map`); }
-    if (map.archived) { throw new Error('Can\'t execute archived map'); }
+    if (!map) {
+        throw new Error(`Couldn't find map`);
+    }
+    if (map.archived) {
+        throw new Error('Can\'t execute archived map');
+    }
 
     mapStructure = await mapsService.getMapStructure(map._id, structureId)
-    if (!mapStructure) { throw new Error('No structure found.'); }
-    
+    if (!mapStructure) {
+        throw new Error('No structure found.');
+    }
+
     let checkDuplicate = checkDuplicateProcess(mapStructure.toObject());
-    if(checkDuplicate.isDuplicate){
+    if (checkDuplicate.isDuplicate) {
         delete checkDuplicate.structure.id;
         delete checkDuplicate.structure._id;
         mapStructure = await models['Structure'].create(checkDuplicate.structure);
@@ -581,17 +594,19 @@ async function execute(mapId, structureId, socket, configuration, triggerReason,
 
     let agents = helper.getRelevantAgent(map.groups, map.agents)
 
-    if (agents.length == 0 && triggerReason == "Started manually by user") { throw new Error('No agents alive'); }
+    if (agents.length == 0 && triggerReason == "Started manually by user") {
+        throw new Error('No agents alive');
+    }
     let mapResult = await createMapResult(socket, map, configuration, mapStructure, triggerReason, triggerPayload)
     let runId = mapResult.id
 
     let response = {
-        runId:runId,
-        mapId:mapId
+        runId: runId,
+        mapId: mapId
     }
 
     if (agents.length == 0) { // in case of trigger or schedules task we create mapResult and save the error. 
-        await MapResult.findOneAndUpdate({ _id: ObjectId(mapResult.id) }, { $set: { 'reason': "No agents alive" } })
+        await MapResult.findOneAndUpdate({_id: ObjectId(mapResult.id)}, {$set: {'reason': "No agents alive"}})
         return response;
     }
 
@@ -602,40 +617,40 @@ async function execute(mapId, structureId, socket, configuration, triggerReason,
     }
 
     let context = createExecutionContext(runId, socket, mapResult, mapStructure)
-    
-    
+
+
     executeMap(runId, map, mapStructure, agents, context);
 
-    if (!map.processResponse){
+    if (!map.processResponse) {
         return Promise.resolve(response)
     }
 
     executions[runId].subscription = new Subject();
-    return new Promise((resolve,reject)=>{
+    return new Promise((resolve, reject) => {
         executions[runId].subscription
-        .subscribe(
-            (responseData) => {
-            response.responseData = responseData;
-            resolve (response);
-            },
-            (error) => console.log(error),
-            (responseData) => {
-                response.responseData = responseData;
-                resolve (response);
-            }
-        )
+            .subscribe(
+                (responseData) => {
+                    response.responseData = responseData;
+                    resolve(response);
+                },
+                (error) => console.log(error),
+                (responseData) => {
+                    response.responseData = responseData;
+                    resolve(response);
+                }
+            )
     })
 
- 
+
 }
 
 /**
- * runs the map on a specific agent. 
- * @param {*} map 
- * @param {*} structure 
- * @param {*} runId 
- * @param {*} startNode 
- * @param {*} agent 
+ * runs the map on a specific agent.
+ * @param {*} map
+ * @param {*} structure
+ * @param {*} runId
+ * @param {*} startNode
+ * @param {*} agent
  * @returns {Promise}
  */
 function runMapOnAgent(map, structure, runId, startNode, agent) {
@@ -643,7 +658,6 @@ function runMapOnAgent(map, structure, runId, startNode, agent) {
         return runNodeSuccessors(map, structure, runId, agent, startNode.uuid)
     })
 }
-
 
 
 /**
@@ -694,7 +708,6 @@ function areAllAgentsDone(runId) {
 }
 
 
-
 /**
  * Checks if all agents have this process pending
  * @param runId
@@ -713,26 +726,29 @@ function areAllAgentsWaitingToStartThis(runId, agent, process) {
 }
 
 /**
- * 
- * @param {String} runId 
- * @param {String} agentKey 
- * @param {String} text - the parallel param of action or process 
+ *
+ * @param {String} runId
+ * @param {String} agentKey
+ * @param {String} text - the parallel param of action or process
  */
 function _getParallelExecutionsNum(runId, agentKey, text) {
-    if (!text) { return 1 }
+    if (!text) {
+        return 1
+    }
     let numProcessParallel = 1;
     try {
         numProcessParallel = vm.runInNewContext(text, executions[runId].executionAgents[agentKey].context);
-    } catch (e) { } // I dont care :) 
+    } catch (e) {
+    } // I dont care :)
     return numProcessParallel || 1
 }
 
 /**
- * In case of wait condition, go over all agents and runs pending process   
- * @param {*} runId 
- * @param {*} map 
- * @param {*} structure 
- * @param {*} process 
+ * In case of wait condition, go over all agents and runs pending process
+ * @param {*} runId
+ * @param {*} map
+ * @param {*} structure
+ * @param {*} process
  */
 function runAgentsFlowControlPendingProcesses(runId, map, structure, process) {
     const executionAgents = executions[runId].executionAgents
@@ -740,8 +756,13 @@ function runAgentsFlowControlPendingProcesses(runId, map, structure, process) {
     for (let i in executionAgents) {
         for (let j in executionAgents[i].context.processes[process.uuid]) {
             let processToRun = executionAgents[i].context.processes[process.uuid][j]
-            if (processToRun.status != statusEnum.PENDING) { return } // e.g. 1 agent
-            updateProcessContext(runId, agentsStatus[i], process.uuid, processToRun.iterationIndex, { status: statusEnum.RUNNING, startTime: new Date() })
+            if (processToRun.status != statusEnum.PENDING) {
+                return
+            } // e.g. 1 agent
+            updateProcessContext(runId, agentsStatus[i], process.uuid, processToRun.iterationIndex, {
+                status: statusEnum.RUNNING,
+                startTime: new Date()
+            })
             process.iterationIndex = processToRun.iterationIndex
             runProcess(map, structure, runId, agentsStatus[i], process);
         }
@@ -752,11 +773,11 @@ function runAgentsFlowControlPendingProcesses(runId, map, structure, process) {
  * Returns true if agent pass all conditions.
  * Race - return true just for the first agent who got to process.
  * Wait - return true if all agent got to process.
- * @param {*} runId 
- * @param {*} process 
- * @param {*} map 
- * @param {*} structure 
- * @param {*} agent 
+ * @param {*} runId
+ * @param {*} process
+ * @param {*} map
+ * @param {*} structure
+ * @param {*} agent
  * @returns {boolean}
  */
 function checkAgentFlowCondition(runId, process, map, structure, agent) {
@@ -786,11 +807,11 @@ function checkAgentFlowCondition(runId, process, map, structure, agent) {
 /**
  * returns true if process pass conditions
  * wait - if all other proceses in the same agent are waiting to start this process.
- * race - just the first process path run the process 
- * @param {*} process 
- * @param {*} runId 
- * @param {*} agent 
- * @param {*} structure 
+ * race - just the first process path run the process
+ * @param {*} process
+ * @param {*} runId
+ * @param {*} agent
+ * @param {*} structure
  * @returns {boolean}
  */
 function checkProcessCoordination(process, runId, agent, structure) {
@@ -816,13 +837,13 @@ function checkProcessCoordination(process, runId, agent, structure) {
 }
 
 /**
- * Creates processes contex and run them  
- * @param {*} runId 
- * @param {*} agent 
- * @param {*} process 
- * @param {*} processUUID 
- * @param {*} map 
- * @param {*} structure 
+ * Creates processes contex and run them
+ * @param {*} runId
+ * @param {*} agent
+ * @param {*} process
+ * @param {*} processUUID
+ * @param {*} map
+ * @param {*} structure
  * @param {*} startIndex - in case of pending/wait condition, startIndex=1. (because one process was created )
  */
 function executeProcessParallel(runId, agent, process, processUUID, map, structure, startIndex = 0) {
@@ -837,7 +858,6 @@ function executeProcessParallel(runId, agent, process, processUUID, map, structu
 }
 
 
-
 /**
  * Finds all successors for node and runs them in parallel if meeting coordination criteria.
  * Also checks process coordination and agent flow control.
@@ -849,7 +869,9 @@ function executeProcessParallel(runId, agent, process, processUUID, map, structu
  * @returns {Promise[]}
  */
 function runNodeSuccessors(map, structure, runId, agent, node) {
-    if (!executions[runId] || executions[runId].status == statusEnum.ERROR || executions[runId].status == statusEnum.DONE) { return Promise.resolve() } // status : 'Error' , 'Done'
+    if (!executions[runId] || executions[runId].status == statusEnum.ERROR || executions[runId].status == statusEnum.DONE) {
+        return Promise.resolve()
+    } // status : 'Error' , 'Done'
 
     const successors = node ? helper.findSuccessors(node, structure) : [];
     if (successors.length === 0) {
@@ -893,14 +915,14 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
         }
     })
     Promise.all(promises).then(processesRusult => {
-        processesRusult.forEach(processPromiseArr=>{
-            processPromiseArr.forEach(p=>{
-                p.then(res=>{
-                    res.endPath? endRunPathResults(runId, agent, map) : null;
+        processesRusult.forEach(processPromiseArr => {
+            processPromiseArr.forEach(p => {
+                p.then(res => {
+                    res.endPath ? endRunPathResults(runId, agent, map) : null;
                 })
             })
         })
-       
+
     }).catch(err => {
         stopExecution(runId, null, err)
         console.log(err);
@@ -918,29 +940,35 @@ function updateAgentContext(runId, agent, agentData) {
     dbUpdates.updateAgent(options)
 }
 
-function sendFinishTimeToClient(runId,data){
-    let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
-    nsp.emit('updateFinishTime',data)
+function sendFinishTimeToClient(runId, data) {
+    let nsp = socketService.getNamespaceSocket('execution-update-' + runId.toString());
+    nsp.emit('updateFinishTime', data)
 
 }
 
 /**
- * Checks if there is no more running processes and finishes execution. 
- * @param {*} runId 
- * @param {*} agent 
- * @param {*} map 
+ * Checks if there is no more running processes and finishes execution.
+ * @param {*} runId
+ * @param {*} agent
+ * @param {*} map
  */
 function endRunPathResults(runId, agent, map) {
-    if(!executions[runId]){return}
-    if (isThereProcessExecutingOnAgent(runId, agent.key)) { return }
+    if (!executions[runId]) {
+        return
+    }
+    if (isThereProcessExecutingOnAgent(runId, agent.key)) {
+        return
+    }
 
-    updateAgentContext(runId, agent, { status: statusEnum.DONE })
+    updateAgentContext(runId, agent, {status: statusEnum.DONE})
 
-    if (!areAllAgentsDone(runId)) { return }
+    if (!areAllAgentsDone(runId)) {
+        return
+    }
 
     let finishTime = new Date();
 
-    sendFinishTimeToClient(runId,{execution:finishTime});
+    sendFinishTimeToClient(runId, {execution: finishTime});
 
     let data = {
         finishTime: finishTime,
@@ -965,11 +993,11 @@ function endRunPathResults(runId, agent, map) {
 
 /**
  * Checks if process pass condition and save the result
- * Return false if process failed   
- * @param {*} runId 
- * @param {*} agent 
- * @param {*} process 
- * @returns {boolean} 
+ * Return false if process failed
+ * @param {*} runId
+ * @param {*} agent
+ * @param {*} process
+ * @returns {boolean}
  */
 function passProcessCondition(runId, agent, process) {
     if (!process.condition) {
@@ -982,7 +1010,9 @@ function passProcessCondition(runId, agent, process) {
         errMsg = `Error running process condition: ${e.message}`;
     }
 
-    if (isProcessPassCondition) { return true }
+    if (isProcessPassCondition) {
+        return true
+    }
 
     updateProcessContext(runId, agent, process.uuid, process.iterationIndex, {
         message: errMsg || "Process didn't pass condition",
@@ -993,10 +1023,12 @@ function passProcessCondition(runId, agent, process) {
 }
 
 /**
- * Runs process pre/post function. Saves the result in DB and context 
+ * Runs process pre/post function. Saves the result in DB and context
  */
 function runProcessFunc(runId, agent, process, fieldName, funcToRun) {
-    if (!funcToRun) { return }
+    if (!funcToRun) {
+        return
+    }
     let processData = {}
     try {
         processData[fieldName] = vm.runInNewContext(funcToRun, executions[runId].executionAgents[agent.key].context);
@@ -1015,7 +1047,7 @@ function _getProcessActionsToExec(runId, process, agent, map, structure) {
     let actionsArray = [];
 
     process.actions.forEach((action, i) => {
-        if(!action.isEnabled){
+        if (!action.isEnabled) {
             return
         }
         action.name = (action.name || `Action #${i + 1} `);
@@ -1040,7 +1072,7 @@ function _getProcessActionsToExec(runId, process, agent, map, structure) {
 
     });
 
-    return process.actionsExecution == 'series' ? runActionsInSeries(actionsArray) : runActionsInParallel(actionsArray,runId);
+    return process.actionsExecution == 'series' ? runActionsInSeries(actionsArray) : runActionsInParallel(actionsArray, runId);
 }
 
 
@@ -1054,48 +1086,48 @@ function _getProcessActionsToExec(runId, process, agent, map, structure) {
  * @param socket
  * @returns {Promise} - null resolve
  */
- function runProcess(map, structure, runId, agent, process) {
-    return new Promise(async(resolve, reject) => {
+function runProcess(map, structure, runId, agent, process) {
+    return new Promise(async (resolve, reject) => {
         if (!helper.isAgentShuldContinue(executions[runId].executionAgents[agent.key])) {
             return resolve()
         }
 
         if (!passProcessCondition(runId, agent, process)) {
             let res = {
-                process:{
-                    process:process.uuid,
-                    index:process.iterationIndex,
-                    name:process.name,
-                    startTime:new Date(),
-                    finishTime:new Date(),
-                    message : "Process didn't pass condition"
+                process: {
+                    process: process.uuid,
+                    index: process.iterationIndex,
+                    name: process.name,
+                    startTime: new Date(),
+                    finishTime: new Date(),
+                    message: "Process didn't pass condition"
                 },
-                agent:{
-                    _id:agent.id,
-                    name:agent.name
-                },               
-            
-            } 
-            let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
+                agent: {
+                    _id: agent.id,
+                    name: agent.name
+                },
+
+            }
+            let nsp = socketService.getNamespaceSocket('execution-update-' + runId.toString());
             nsp.actions.push(res)
-            nsp.emit('updateAction',res)
+            nsp.emit('updateAction', res)
             executions[runId].processesDidntPassConditionUuid = executions[runId].processesDidntPassConditionUuid || [];
             executions[runId].processesDidntPassConditionUuid.push(process.uuid);
-            if(map.processResponse == process.uuid){
-                let responseData = await runCode(map,runId,agent);
+            if (map.processResponse == process.uuid) {
+                let responseData = await runCode(map, runId, agent);
                 executions[runId].subscription.next(responseData)
                 let startNodeUuid = helper.findStartNode(structure).uuid;
-                if(isProcessIsOnTheFlow(process.uuid,structure,map.processResponse) && !isProcessIsOnTheFlow(startNodeUuid,structure,map.processResponse,executions[runId].processesDidntPassConditionUuid)){
-                    let responseData = await runCode(map,runId,agent);
+                if (isProcessIsOnTheFlow(process.uuid, structure, map.processResponse) && !isProcessIsOnTheFlow(startNodeUuid, structure, map.processResponse, executions[runId].processesDidntPassConditionUuid)) {
+                    let responseData = await runCode(map, runId, agent);
                     executions[runId].subscription.next(responseData);
                 }
             }
-            
+
             if (process.mandatory) { // mandatory process failed, stop executions
                 executions[runId].executionAgents[agent.key].status = statusEnum.ERROR;
                 return stopExecution(runId, null, "Mandatory process failed");
             }
-            return resolve({endPath:true})
+            return resolve({endPath: true})
         }
 
         runProcessFunc(runId, agent, process, 'preRunResult', process.preRun)
@@ -1107,13 +1139,17 @@ function _getProcessActionsToExec(runId, process, agent, map, structure) {
         }).catch((error) => {
             winston.log('error', error);
             console.error(error); //TODO: go over all console log and delete unnessasery
-            updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.ERROR, message: error.message, finishTime: new Date() });
+            updateProcessContext(runId, agent, process.uuid, process.iterationIndex, {
+                status: statusEnum.ERROR,
+                message: error.message,
+                finishTime: new Date()
+            });
         })
     })
 }
 
 
-function runActionsInSeries(actionsArray){
+function runActionsInSeries(actionsArray) {
     let reduceFunc = (promiseChain, currentAction, index) => {
         // let actionId = (currentAction[6]._id).toString()
         currentAction[6].actionIndex = index;
@@ -1129,10 +1165,10 @@ function runActionsInSeries(actionsArray){
     return actionsArray.reduce(reduceFunc, Promise.resolve([]))
 }
 
-function runActionsInParallel(actionsArray,runId){
+function runActionsInParallel(actionsArray, runId) {
     let promises = [];
     executions[runId].index = 0;
-    actionsArray.forEach((action,index)=> {
+    actionsArray.forEach((action, index) => {
         action[6].actionIndex = index;
         promises.push(executeAction.apply(null, action))
     })
@@ -1140,26 +1176,30 @@ function runActionsInParallel(actionsArray,runId){
 }
 
 /**
- * Last function of a process. After all actions are done runs the postRun function, finish execution 
- * and continue to the next process 
- * @param {*} map 
- * @param {*} structure 
- * @param {*} runId 
- * @param {*} agent 
- * @param {*} process 
+ * Last function of a process. After all actions are done runs the postRun function, finish execution
+ * and continue to the next process
+ * @param {*} map
+ * @param {*} structure
+ * @param {*} runId
+ * @param {*} agent
+ * @param {*} process
  */
 async function actionsExecutionCallback(map, structure, runId, agent, process) {
     if (!executions[runId] || executions[runId].executionAgents[agent.key].status) { // status is just error or done
         return;
     }
-    if(map.processResponse && map.processResponse == process.uuid){
-        let responseData = await runCode(map,runId,agent);
+    if (map.processResponse && map.processResponse == process.uuid) {
+        let responseData = await runCode(map, runId, agent);
         executions[runId].subscription.next(responseData);
     }
     runProcessFunc(runId, agent, process, 'postRunResult', process.postRun)
-    updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.DONE, finishTime: new Date() });
+    updateProcessContext(runId, agent, process.uuid, process.iterationIndex, {
+        status: statusEnum.DONE,
+        finishTime: new Date()
+    });
     runNodeSuccessors(map, structure, runId, agent, process.uuid);
 }
+
 /**
  * Send action to agent via socket
  * @param socket
@@ -1196,7 +1236,7 @@ function sendActionViaRequest(agent, actionForm) {
             function (error, response, body) {
                 if (error) {
                     if (!body) {
-                        body = { result: error };
+                        body = {result: error};
                     }
                 } else {
                     try {
@@ -1215,10 +1255,10 @@ function sendActionViaRequest(agent, actionForm) {
 
 /**
  * Sends notifications to client.
- * @param {*} mapId 
- * @param {*} runId 
- * @param {*} msg 
- * @param {*} status 
+ * @param {*} mapId
+ * @param {*} runId
+ * @param {*} msg
+ * @param {*} status
  */
 function _updateRawOutput(mapId, runId, msg, status) {
 
@@ -1234,8 +1274,8 @@ function _updateRawOutput(mapId, runId, msg, status) {
 
 /**
  * return the method to use or throw error if not exist
- * @param {*} plugin 
- * @param {*} action 
+ * @param {*} plugin
+ * @param {*} action
  * @returns {object}
  */
 function getMethodAction(plugin, action) {
@@ -1251,17 +1291,16 @@ function getMethodAction(plugin, action) {
 }
 
 
-
 /**
  * execute an action
- * @param {*} map 
- * @param {*} structure 
- * @param {*} runId 
- * @param {*} agent 
- * @param {*} process 
- * @param {*} processIndex 
- * @param {*} action 
- * @param {*} plugin 
+ * @param {*} map
+ * @param {*} structure
+ * @param {*} runId
+ * @param {*} agent
+ * @param {*} process
+ * @param {*} processIndex
+ * @param {*} action
+ * @param {*} plugin
  * @returns {object} - action result
  */
 async function executeAction(map, structure, runId, agent, process, processIndex, action, plugin) {
@@ -1276,7 +1315,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
 
     let params = action.params || [];
     action.params = {}
-    action.plugin = { name: plugin.name };
+    action.plugin = {name: plugin.name};
 
     try {
         action.method = getMethodAction(plugin, action) // can throw error
@@ -1293,7 +1332,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
         updateActionContext(runId, agent.key, process.uuid, processIndex, action, {
             status: statusEnum.ERROR,
             finishTime: new Date(),
-            result: { stderr: err.message }
+            result: {stderr: err.message}
         });
         console.error(err);
         return err.message // continue to next action if not mandatory 
@@ -1323,7 +1362,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
     return runAction();
 
     /**
-     * Declare a timeout function. 
+     * Declare a timeout function.
      * If there is timeout the action failed.
      * In case of retries- try again
      * @returns {object} - action result
@@ -1335,9 +1374,8 @@ async function executeAction(map, structure, runId, agent, process, processIndex
         return Promise.race([agentPromise, timeoutFunc.timeoutPromise]).then((result) => { // race condition between agent action and action timeout
             clearTimeout(timeoutFunc.timeout);
             if (result === helper.IS_TIMEOUT) {
-                return { result: 'Timeout Error', status: statusEnum.ERROR, stdout: actionString };
-            }
-            else {
+                return {result: 'Timeout Error', status: statusEnum.ERROR, stdout: actionString};
+            } else {
                 if (result.status === statusEnum.SUCCESS) {
                     if (result.stdout) {
                         result.stdout = actionString + '\n' + result.stdout;
@@ -1347,7 +1385,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
                 }
                 return result
             }
-        }).then(async(result) => {
+        }).then(async (result) => {
             actionResult.status = result.status;
             actionResult.result = result;
 
@@ -1361,24 +1399,24 @@ async function executeAction(map, structure, runId, agent, process, processIndex
             _updateRawOutput(map._id, runId, msg, result.status)
             updateActionContext(runId, agent.key, process.uuid, processIndex, action, actionResult);
             let res = {
-                action:actionResult,
-                process:{
-                    uuid:process.uuid,
-                    index:process.iterationIndex,
-                    finishTime:null,
-                    name:process.name,
-                    startTime:process.startTime || actionResult.startTime
+                action: actionResult,
+                process: {
+                    uuid: process.uuid,
+                    index: process.iterationIndex,
+                    finishTime: null,
+                    name: process.name,
+                    startTime: process.startTime || actionResult.startTime
                 },
-                agent:{
-                    _id:agent.id,
-                    name:agent.name
+                agent: {
+                    _id: agent.id,
+                    name: agent.name
                 }
-            } 
+            }
 
-            let nsp = socketService.getNamespaceSocket('execution-update-'+runId.toString());
+            let nsp = socketService.getNamespaceSocket('execution-update-' + runId.toString());
             nsp.actions.push(res)
             Object.keys(nsp.sockets).forEach(socket => {
-                nsp.sockets[socket].emit('updateAction',res) 
+                nsp.sockets[socket].emit('updateAction', res)
             })
 
             return result;
@@ -1412,18 +1450,20 @@ function sendKillRequest(mapId, actionId, agentKey) {
 }
 
 /**
- *  Stop and Update MapResult and running actions. 
- * @param {*} runId 
- * @param {*} mapId 
- * @param {*} socket 
- * @param {string} result - the cuase of stopping the execution  
+ *  Stop and Update MapResult and running actions.
+ * @param {*} runId
+ * @param {*} mapId
+ * @param {*} socket
+ * @param {string} result - the cuase of stopping the execution
  */
 async function stopExecution(runId, socket = null, result = "") {
 
     const d = new Date();
     let options, optionAction
 
-    if (!executions[runId]) { return updateClientExecutions(socket); }
+    if (!executions[runId]) {
+        return updateClientExecutions(socket);
+    }
 
     let executionAgents = executions[runId].executionAgents
     Object.keys(executionAgents).forEach(agentKey => {
@@ -1434,8 +1474,13 @@ async function stopExecution(runId, socket = null, result = "") {
         for (let uuid in agent.context.processes) {
             let processArray = agent.context.processes[uuid];
             processArray.forEach(process => {
-                if (process.startNode || process.finishTime) { return }
-                updateProcessContext(runId, agent, process.uuid, process.iterationIndex, { status: statusEnum.STOPPED, finishTime: d })
+                if (process.startNode || process.finishTime) {
+                    return
+                }
+                updateProcessContext(runId, agent, process.uuid, process.iterationIndex, {
+                    status: statusEnum.STOPPED,
+                    finishTime: d
+                })
                 if (!process.actions) {
                     return
                 }
@@ -1456,7 +1501,8 @@ async function stopExecution(runId, socket = null, result = "") {
                     }
                 });
             });
-        } 2
+        }
+        2
         options = {
             data: optionAction,
             agentId: agent.id,
@@ -1466,7 +1512,7 @@ async function stopExecution(runId, socket = null, result = "") {
         optionAction ? dbUpdates.updateActionsInAgent(options) : null
     });
 
-    updateMapResult(runId, { finishTime: d, status: statusEnum.STOPPED + " - " + result }, executions[runId].clientSocket)
+    updateMapResult(runId, {finishTime: d, status: statusEnum.STOPPED + " - " + result}, executions[runId].clientSocket)
 
     startPendingExecution(executions[runId].mapId, executions[runId].clientSocket)
     updateClientExecutions(executions[runId].clientSocket, runId);
@@ -1478,7 +1524,7 @@ async function stopExecution(runId, socket = null, result = "") {
  * TODO: use to rebuild on system start
  */
 async function rebuildPending() {
-    let allPending = await MapResult.find({ status: statusEnum.PENDING })
+    let allPending = await MapResult.find({status: statusEnum.PENDING})
     pending = {}
     allPending.map(pendingMap => {
         pending[pendingMap.map.toString()] ? pending[pendingMap.map.toString()].push(pendingMap._id) : pending[pendingMap.map.toString()] = [pendingMap._id]
@@ -1508,7 +1554,7 @@ function cancelPending(mapId, runId, socket) {
             throw new Error('No such job');
         }
 
-        await MapResult.findOneAndUpdate({ _id: runId }, { status: statusEnum.CANCELED })
+        await MapResult.findOneAndUpdate({_id: runId}, {status: statusEnum.CANCELED})
         pending[mapId].splice(runIndex, 1);
         updateClientPending(socket);
         resolve();
@@ -1536,26 +1582,39 @@ module.exports = {
      * @returns {Promise<object[]>}
      */
     logs: async (resultId) => {
-        let q = { _id: resultId };
-        let mapResult = (await MapResult.findOne(q).populate({path:'agentsResults.agent', select:'name'}).exec()).toBSON()
-        let logs = []
+        let q;
+
+        if (resultId) q = {_id: resultId};
+
+        let mapResult = (await MapResult.findOne(q).populate({
+            path: 'agentsResults.agent',
+            select: 'name'
+        }).exec()).toBSON();
+
+        let logs = [];
         let structure = await mapsService.getMapStructure(mapResult.map, mapResult.structure) // for process/actions names (populate on names didnt work)
-        let processNames = {} // a map <process.id, process name>  
-        let actionNames = {} // same as above 
-        let fieldToMap = mapResult.status? {name: 'id', val: 'process' } : {name: 'uuid', val: 'uuid' }  // just to handle with old maps. maps with status are new. 
-        structure.processes.forEach((process,iProcess) => {
-            processNames[process[fieldToMap.name]] = process.name || (processNames[process[fieldToMap.val]]? processNames[process[fieldToMap.name]] :`Process #${iProcess+1}`) // extract process name
-            if(!process.actions){return}
-            process.actions.forEach((action, iAction)=>{
-                actionNames[action.id] = action.name || `Action #${iAction+1}` // extract action name 
+
+        let processNames = {} // a map <process.id, process name>
+        let actionNames = {} // same as above
+        let fieldToMap = mapResult.status ? {name: '_id', val: 'process'} : {name: 'uuid', val: 'uuid'}  // just to handle with old maps. maps with status are new.
+        structure.processes.forEach((process, iProcess) => {
+            processNames[process[fieldToMap.name]] = process.name || (processNames[process[fieldToMap.val]] ? processNames[process[fieldToMap.name]] : `Process #${iProcess + 1}`) // extract process name
+            if (!process.actions) {
+                return
+            }
+            process.actions.forEach((action, iAction) => {
+                actionNames[action._id.toString()] = action.name || `Action #${iAction + 1}` // extract action name
             })
         });
-        
-        // sort all actions results by finishTime 
+
+        // sort all actions results by finishTime
         mapResult.agentsResults.forEach((agentResult) => {
             agentResult.processes.forEach((process) => {
                 process.actions.forEach((action) => {
-                    logs.push({finishTime:action.finishTime,  message: `'${processNames[process[fieldToMap.val].toString()]}' - '${actionNames[action.action.toString()]}' result: ${JSON.stringify(action.result)} (${agentResult.agent.name})`})
+                    logs.push({
+                        finishTime: action.finishTime,
+                            message: `'${processNames[process[fieldToMap.val].toString()]}' - '${actionNames[action.action.toString()]}' result: ${JSON.stringify(action.result)} (${agentResult.agent.name})`
+                    })
                 })
             });
         })
@@ -1563,7 +1622,7 @@ module.exports = {
         logs = logs.sort((a, b) => {
             return -(new Date(b.finishTime) - new Date(a.finishTime));
         })
-        logs.forEach(log=>delete log.finishTime)
+        logs.forEach(log => delete log.finishTime)
         return Promise.resolve(logs)
     },
 
@@ -1575,7 +1634,7 @@ module.exports = {
     results: (mapId, page) => {
         const load_Results = 25;
         let index = (page * load_Results) - load_Results;
-        return MapResult.find({ map: mapId }, null, { sort: { startTime: -1 } }).select('-agentsResults').skip(index).limit(load_Results)
+        return MapResult.find({map: mapId}, null, {sort: {startTime: -1}}).select('-agentsResults').skip(index).limit(load_Results)
     },
     /**
      * get an id of specific result and return populated object
@@ -1584,10 +1643,10 @@ module.exports = {
      */
     detail: (params) => {
         let query;
-        if(params.resultId && params.resultId != 'null'){
+        if (params.resultId && params.resultId != 'null') {
             query = MapResult.findById(params.resultId);
         } else {
-            query = MapResult.findOne({map:params.id}).sort( '-startTime' ).limit(1);
+            query = MapResult.findOne({map: params.id}).sort('-startTime').limit(1);
         }
         return query.populate('structure agentsResults.agent');
     },
