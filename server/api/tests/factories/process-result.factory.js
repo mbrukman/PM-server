@@ -1,12 +1,3 @@
-// let processResultSchema = new Schema({
-//     iterationIndex: Number,
-//     process: { type: Schema.Types.ObjectId, ref: 'MapStructure.processes' },
-//     actions: [actionResultSchema],
-//     message: Schema.Types.Mixed,
-//     preRunResult: Schema.Types.Mixed,
-//     postRunResult: Schema.Types.Mixed,
-// }, { _id: false });
-
 const {jsf} = require('./jsf.helper');
 const actionResultFactory = require('./action-result.factory');
 

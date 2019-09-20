@@ -1,7 +1,3 @@
-// let actionResultSchema = new Schema({
-//     result: Schema.Types.Mixed,
-// }, { _id: false });
-
 const {jsf} = require('./jsf.helper');
 
 

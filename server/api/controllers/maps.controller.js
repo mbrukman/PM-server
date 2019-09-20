@@ -343,7 +343,6 @@ module.exports = {
         }).then((results) => {
             res.json(results);
         }).catch(error => {
-            console.log(error)
             winston.log('error', "Error getting execution results", error);
             return res.status(500).json(error);
         });
