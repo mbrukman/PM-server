@@ -28,6 +28,8 @@ describe('Map revisions endpoints should work correctly', () => {
     let project;
     let map;
 
+    jest.setTimeout(15000);
+
     beforeEach(async () => {
         await projectTestDataManager.generateInitialCollection(
             projectsFactory.generateProjects()

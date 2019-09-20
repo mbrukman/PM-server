@@ -28,7 +28,6 @@ function generateSingleSchema() {
                     }
                 }
             },
-            // result:,
             params: [],
             numParallel: {
                 type: "string",
