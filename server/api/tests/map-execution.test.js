@@ -106,7 +106,7 @@ describe('Map execution tests', () => {
     // router.get("/:id/stop-execution", mapController.stopExecution);
     // NOTICE - THIS ROUTE IS NOT USED IN THE FRONTEND (KAH-38)
     describe('GET /api/maps/:mapId/stop-execution', () => {
-        it(`should return {} for no executions stopped`, () => {
+        it(`should return {}`, () => {
             return request(app)
                 .get(`/api/maps/${mapId}/stop-execution`)
                 .expect(200)
@@ -117,8 +117,9 @@ describe('Map execution tests', () => {
     });
 
     // router.get("/:id/stop-execution/:runId", mapController.stopExecution);
+    // NOTICE: does this route always return 200?
     describe('GET /api/maps/:mapId/stop-execution/:runId', () => {
-        it(`should return {} for no executions stopped`, () => {
+        it(`should return {}`, () => {
             const random = Math.floor(Math.random() * 10 + 1);
             return request(app)
                 .get(`/api/maps/${mapId}/stop-execution/${random}`)
@@ -130,9 +131,17 @@ describe('Map execution tests', () => {
     });
 
     // router.post("/:id/cancel-pending", mapController.cancelPending);
-    //  TODO: cancel pending will not reject / respond with 500 because of the bug (KAH-36)
+    // NOTICE: cancel pending will not reject / respond with 500 because of the bug (KAH-36)
+    // NOTICE: not possible to test this route, because the state is kept in memory of the node process
+    /*
+    describe('POST /api/maps/:id/cancel-pending', () => {
+    });
+    */
 
     // router.get("/currentruns", mapController.currentRuns);
+    // NOTICE: not able to test a case with existing current runs
+    // because, the same as with pending executions, the ongoing executions are kept
+    // in memory instead of the database
     describe('GET /api/maps/currentruns', () => {
         it(`should return {} for no current runs`, () => {
             return request(app)
