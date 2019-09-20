@@ -1,8 +1,8 @@
 const {jsf} = require('./jsf.helper');
 const processFactory = require('./process.factory');
 
-function generateSingleSchema(mapId, maps, processes) {
-    if(!processes) processes = processFactory.generateMany();
+function generateSingleSchema(mapId, maps) {
+    const processes = processFactory.generateMany();
     return {
         type: 'object',
         properties: {
@@ -27,17 +27,17 @@ function generateSingleSchema(mapId, maps, processes) {
 
 }
 
-function generateMany(mapId, maps, processes) {
+function generateMany(mapId, maps) {
     return jsf.generate({
         type: 'array',
-        items: generateSingleSchema(mapId, maps, processes),
+        items: generateSingleSchema(mapId, maps),
         maxItems: 15,
         minItems: 5,
     })
 }
 
 function generateOne(mapId, maps) {
-    return jsf.generate(generateSingleSchema(mapId, maps, processes));
+    return jsf.generate(generateSingleSchema(mapId, maps));
 }
 
 module.exports = {

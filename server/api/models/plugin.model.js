@@ -3,12 +3,16 @@ const Schema = mongoose.Schema;
 
 
 let pluginMethodParamsSchema = new Schema({
-    required:Boolean , 
-    name: { type: String, required: true },
+    required: Boolean,
+    name: {type: String, required: true},
     viewName: String,
-    type: { type: String, enum: ['string', 'int', 'float', 'options', 'autocomplete', 'file', 'text', 'boolean', 'vault'], required: true },
-    options: [{ id: String, name: String }],
-    description:{type:String},
+    type: {
+        type: String,
+        enum: ['string', 'int', 'float', 'options', 'autocomplete', 'file', 'text', 'boolean', 'vault'],
+        required: true
+    },
+    options: [{id: String, name: String}],
+    description: {type: String},
     model: {
         type: String, required: function () {
             return this.type === 'autocomplete'
@@ -23,7 +27,7 @@ let pluginMethodParamsSchema = new Schema({
 });
 
 let pluginMethodSchema = new Schema({
-    name: { type: String, required: true },
+    name: {type: String, required: true},
     viewName: String,
     route: String,
     actionString: String,
@@ -31,12 +35,12 @@ let pluginMethodSchema = new Schema({
 });
 
 let pluginSettingsSchema = {
-    required:Boolean , 
-    name:{ type: String, required: true },
-    valueType:String,
+    required: Boolean,
+    name: {type: String, required: true},
+    valueType: String,
     viewName: String,
-    options: [{ id: String, name: String }],
-    value:{type:String,default: ''},
+    options: [{id: String, name: String}],
+    value: {type: String, default: ''},
     model: {
         type: String, required: function () {
             return this.type === 'autocomplete'
@@ -51,17 +55,17 @@ let pluginSettingsSchema = {
 }
 
 let pluginSchema = new Schema({
-    name: { type: String, required: true },
-    type: { type: String, enum: ["server", "executer", "trigger", "module"], required: true },
+    name: {type: String, required: true},
+    type: {type: String, enum: ["server", "executer", "trigger", "module"], required: true},
     description: String,
-    main: { type: String, required: true },
-    execProgram: { type: String, required: true },
-    active: { type: Boolean, default: true },
-    version: { type: String, required: true },
+    main: {type: String, required: true},
+    execProgram: {type: String, required: true},
+    active: {type: Boolean, default: true},
+    version: {type: String, required: true},
     imgUrl: String,
     methods: [pluginMethodSchema],
-    settings:[pluginSettingsSchema],
-    file: { type: String, required: true }
+    settings: [pluginSettingsSchema],
+    file: {type: String, required: true}
 });
 
 pluginSchema.set('toJSON', {

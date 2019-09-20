@@ -20,10 +20,10 @@ const pluginSchema = {
                 }
             }
         },
-        // type: {
-        //     type: 'string',
-        //     // examples: ["server", "executer", "trigger", "module"]
-        // },
+        type: {
+            type: 'string',
+            examples: ["server", "executer", "trigger", "module"]
+        },
         main: {
             type: 'string',
             default: 'main.js'
@@ -71,7 +71,7 @@ const pluginSchema = {
             ]
         },
     },
-    required: ['_id', 'name', 'main', 'execProgram', 'version', 'file', 'methods', 'settings']
+    required: ['_id', 'name', 'main', 'execProgram', 'version', 'file', 'methods', 'settings', 'type']
 };
 
 const pluginListSchema = {
