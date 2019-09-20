@@ -28,7 +28,7 @@ module.exports = class TestDataManager {
             return savedItem;
         } catch (err) {
             console.log(err.message, 'Something went wrong in _createModel of TestDataManager!');
-            throw new Error('There was an error with adding items to MongoDB!');
+            throw new Error(err.message + 'There was an error with adding items to MongoDB!');
         }
     }
 

@@ -3,7 +3,7 @@ const {randomIdx} = require("./helpers");
 const request = require('supertest');
 const {setupDB} = require('./helpers/test-setup');
 const ProjectModel = require('../../api/models/project.model');
-const MapStructureModel = require('../../api/models/map-structure.model');
+const {MapStructure} = require('../../api/models/map-structure.model');
 const {mapStructureFactory, mapsFactory, projectsFactory, processFactory} = require('./factories');
 const TestDataManager = require('./factories/test-data-manager');
 
@@ -12,7 +12,7 @@ const apiURL = 'localhost:3000/api';
 setupDB();
 
 describe('Map revision endpoints should work correctly', () => {
-    const mapStructureTestDataManager = new TestDataManager(MapStructureModel);
+    const mapStructureTestDataManager = new TestDataManager(MapStructure);
     const projectTestDataManager = new TestDataManager(ProjectModel);
     let map;
     let project;

@@ -40,7 +40,7 @@ function generateSingleSchema({mapId, agentId, actionId, processId, mapStructure
                 "format": "mongoID"
             }
         },
-        required: ['trigger', 'reason', '_id', 'map', 'agentsResults', 'status', 'structure'],
+        required: ['trigger', 'reason', 'map', 'agentsResults', 'status', 'structure'],
     };
 
 }

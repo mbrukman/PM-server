@@ -9,7 +9,7 @@ function generateSingleSchema(usedPlugins, actions) {
     return {
         type: "object",
         properties: {
-            used_plugins: usedPlugins,
+            // used_plugins: usedPlugins,
             actions,
             uuid: {
                 type: "string",
@@ -46,7 +46,7 @@ function generateSingleSchema(usedPlugins, actions) {
                 }
             },
         },
-        required: ['order', 'default_execution', 'description', 'name', 'uuid', 'used_plugins', 'actions']
+        required: ['order', 'default_execution', 'description', 'name', 'uuid', 'actions']
     }
 }
 
