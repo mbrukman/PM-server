@@ -1,15 +1,12 @@
 const {jsf} = require('./jsf.helper');
-const pluginFactory = require('./plugins.factory');
 const actionFactory = require('./action.factory');
 
 function generateSingleSchema(usedPlugins, actions) {
-    if (!usedPlugins || !usedPlugins.length) usedPlugins = pluginFactory.generateMany({});
     if (!actions || !actions.length) actions = actionFactory.generateMany();
 
     return {
         type: "object",
         properties: {
-            // used_plugins: usedPlugins,
             actions,
             uuid: {
                 type: "string",
