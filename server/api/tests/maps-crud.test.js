@@ -117,14 +117,16 @@ describe('Map crud tests', () => {
         describe(`GET /results`, () => {
             it(`should respond with recents maps`, () => {
                 const randomIndex = randomIdx(mapResultTestDataManager.collection.length);
+                let mapId = mapResultTestDataManager.collection[randomIndex].map.toString();
+                let executionId = mapResultTestDataManager.collection[randomIndex]._id.toString();
                 return request(apiURL)
                     .get(`/maps/results`)
                     .expect(200)
                     .then(({body}) => {
                         expect(body.length).toBeLessThanOrEqual(16);
-                        expect(body[randomIndex].map._id).toEqual(mapResultTestDataManager.collection[randomIndex].map.toString());
-                        expect(body[randomIndex]._id).toEqual(mapResultTestDataManager.collection[randomIndex].map.toString());
-                        expect(body[randomIndex].exec._id).toEqual(mapResultTestDataManager.collection[randomIndex]._id.toString());
+                        expect(body[randomIndex].map._id).toEqual(mapId);
+                        expect(body[randomIndex]._id).toEqual(mapId);
+                        expect(body[randomIndex].exec._id).toEqual(executionId);
                         expect(body[0].project._id).toEqual(projectTestDataManager.collection[0]._id.toString());
                         expect(body[0].project.name).toEqual(projectTestDataManager.collection[0].name);
                     })
