@@ -26,7 +26,7 @@ function generateSingleSchema() {
                 }
             },
             key: {
-                type: "boolean",
+                type: "string",
                 chance: {
                     guid: {
                     }

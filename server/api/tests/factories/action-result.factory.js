@@ -32,19 +32,11 @@ function generateSingleSchema(action) {
             },
             startTime: {
                 format: "date-time",
-                type: "string",
-                // type: "date",
-                // chance: {
-                //     date: {}
-                // }
+                type: "string"
             },
             endTime: {
-                // type: "date",
                 format: "date-time",
-                type: "string",
-                // chance: {
-                //     date: {}
-                // }
+                type: "string"
             },
         },
         required: ['status', 'retriesLeft', 'startTime', 'endTime', 'action', 'result']
