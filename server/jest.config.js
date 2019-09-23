@@ -11,7 +11,6 @@ module.exports = {
     projects: ["./tests"],
     collectCoverage: true,
     forceExit: true,
-    maxConcurrency: 1,
     runner: 'jest-runner',
     testRunner: "jest-circus/runner",
     setupFilesAfterEnv: ['./api/tests/helpers/global-test-setup.js']
