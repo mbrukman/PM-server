@@ -1,6 +1,6 @@
 const request = require('supertest');
 const MapModel = require('../../api/models/map.model');
-const MapStructureModel = require('../../api/models/map-structure.model');
+const {MapStructure} = require('../../api/models/map-structure.model');
 const TestDataManager = require('./factories/test-data-manager');
 const mapsFactory = require('./factories/maps.factory');
 const mapStructureFactory = require('./factories/map-structure.factory');
@@ -9,7 +9,7 @@ const app = 'localhost:3000';
 
 describe('Map execution tests', () => {
     let mapDataManager = new TestDataManager(MapModel);
-    let mapStructureDataManager = new TestDataManager(MapStructureModel);
+    let mapStructureDataManager = new TestDataManager(MapStructure);
     let mapId;
     setupDB();
 
