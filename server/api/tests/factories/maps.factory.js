@@ -2,7 +2,7 @@ const { jsf } = require('./jsf.helper');
 const MapModel = require("../../models/map.model");
 const ProjectModel = require('../../models/project.model');
 
-function getSimpleMapSchema(name) {
+function getSimpleMapSchema() {
     return {
         type: 'object',
         properties: {
@@ -23,12 +23,13 @@ function getSimpleMapSchema(name) {
     };
 }
 
-function generateSimpleMap(name) {
-    return jsf.generate(getSimpleMapSchema(name));
+function generateSimpleMap() {
+    return jsf.generate(getSimpleMapSchema());
 }
 
 async function createMap(projectId, index, mapName) {
-    const generatedMap = generateSimpleMap(mapName);
+    const generatedMap = generateSimpleMap();
+    generatedMap.name = mapName;
     try {
         const map = await MapModel.create(generatedMap);
         await ProjectModel.findByIdAndUpdate({ _id: projectId }, { $push: { maps: map.id } });
