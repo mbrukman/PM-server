@@ -88,13 +88,13 @@ describe('Projects API tests', () => {
             });
         });
 
-        describe(`DELETE /:id/delete `, () => {
+        describe(`DELETE /:id `, () => {
             it(`should respond with 'OK'`, () => {
                 const randomIndex = Math.floor(Math.random() * testDataManager.collection.length);
                 const randomProject = testDataManager.collection[randomIndex];
                 // testDataManager.removeFromCollection(randomProject);
                 return request(baseApiURL)
-                    .delete(`/projects/${randomProject.id}/delete`)
+                    .delete(`/projects/${randomProject.id}`)
                     .expect(200)
                     .expect('OK');
             });
@@ -189,7 +189,7 @@ describe('Projects API tests', () => {
         describe(`DELETE /:jobId/ `, () => {
             it(`should respond with a 500 status code`, (done) => {
                 return request(baseApiURL)
-                    .delete(`/projects/0/delete`)
+                    .delete(`/projects/0`)
                     .expect(500, done)
             });
         });
