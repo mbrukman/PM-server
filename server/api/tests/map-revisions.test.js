@@ -25,7 +25,7 @@ describe('Map revision endpoints should work correctly', () => {
         const randomIndex = randomIdx(projectTestDataManager.collection.length);
         project = projectTestDataManager.collection[randomIndex];
 
-        map = await mapsFactory.createMap(project.id);
+        map = await mapsFactory.createMap(project.id, 'random map name');
         await mapStructureTestDataManager.generateInitialCollection(
             mapStructureFactory.generateMany(map._id.toString(), [map])
         );
