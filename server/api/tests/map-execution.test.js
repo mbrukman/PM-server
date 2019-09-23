@@ -121,17 +121,17 @@ describe('Map execution tests', () => {
                 })
         });
 
-        it(`should handle no agents alive when trigger is 'started manually by user'`, async () => {
+        it(`should handle no agents alive when trigger is 'started manually by user'`, () => {
             return request(app)
                 .post(`/api/maps/${mapId}/execute/${structureId}`)
                 .send({ trigger: "Started manually by user" })
                 .expect(500)
                 .then((res) => {
                     expect(res.text).toBe('No agents alive');
-                })
+                });
         });
 
-        it(`should respond with new runId and current mapId`, async () => {
+        it(`should respond with new runId and current mapId`, () => {
             return request(app)
                 .post(`/api/maps/${mapId}/execute/${structureId}`)
                 .expect(200)
