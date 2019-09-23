@@ -88,7 +88,7 @@ describe('Plugins tests', () => {
             it(`should respond with 200`, () => {
                 // notice: RETURNS 200 for ANY ID
                 return request(app)
-                    .delete(`/api/plugins/${pluginId}/delete`)
+                    .delete(`/api/plugins/${pluginId}`)
                     .expect(200).then();
             });
         });
@@ -146,7 +146,7 @@ describe('Plugins tests', () => {
         describe(`DELETE /:id/delete`, () => {
             it(`should respond with status 500 and proper error msg`, () => {
                 return request(app)
-                    .delete('/api/plugins/0/delete')
+                    .delete('/api/plugins/0')
                     .expect(500)
                     .then((res) => {
                         expect(res.body.message).toBe("Cast to ObjectId failed for value \"0\" at path \"_id\" for model \"Plugin\"");
