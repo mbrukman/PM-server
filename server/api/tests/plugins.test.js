@@ -122,8 +122,17 @@ describe('Plugins tests', () => {
 
         describe(`POST /:id/settings`, () => {
             it(`should respond with status 500 and proper error msg for invalid id`, () => {
+                const newSettings = [
+                    {
+                        "value": "testvalue3"
+                    },
+                    {
+                        "value": "testvalue4"
+                    }
+                ];
                 return request(app)
                     .post(`/api/plugins/0/settings`)
+                    .send(newSettings)
                     .expect(500)
                     .then((res) => {
                         expect(res.body.message).toBe("Cast to ObjectId failed for value \"0\" at path \"_id\" for model \"Plugin\"");
@@ -132,13 +141,12 @@ describe('Plugins tests', () => {
         });
 
         describe(`POST /:id/settings`, () => {
-            // notice: bug - response body should be an error message, not an empty object
             it(`should respond with status 500 and empty object for invalid settings body`, () => {
                 return request(app)
                     .post(`/api/plugins/${pluginId}/settings`)
                     .expect(500)
-                    .then((res) => {
-                        expect(res.body).toEqual({});
+                    .then(({error}) => {
+                        expect(error.text).toEqual(`Settings not found`);
                     });
             });
         });
