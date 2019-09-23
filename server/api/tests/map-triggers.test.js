@@ -103,7 +103,11 @@ describe('Map triggers tests', () => {
             it(`should respond with status code 500 and proper error msg`, function (done) {
                 request(app)
                     .delete('/api/triggers/5d83970f611fb22814c56c07/5d83970f611fb22814c56c07')
-                    .expect(500,done)
+                    .expect(500)
+                    .then(({body}) => {
+                        expect(body.message).toBe('Trigger not found')
+                        done()
+                    })
             });
         });
 
