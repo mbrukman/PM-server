@@ -30,10 +30,10 @@ describe('Map revisions endpoints should work correctly', () => {
         await projectTestDataManager.generateInitialCollection(
             projectsFactory.generateProjects()
         );
-        console.log(agentFactory.generateOne())
-        const agent = await agentsTestDataManager.pushToCollectionAndSave((
+
+        const agent = await agentsTestDataManager.pushToCollectionAndSave(
             agentFactory.generateOne()
-        ));
+        );
 
         const randomIndex = randomIdx(projectTestDataManager.collection.length);
         project = projectTestDataManager.collection[randomIndex];
