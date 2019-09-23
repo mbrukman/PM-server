@@ -130,13 +130,15 @@ describe('Projects API tests', () => {
             it(`should respond with the recent maps of the project`, async () => {
                 const randomIndex = randomIdx(testDataManager.collection.length);
                 const {id, name} = testDataManager.collection[randomIndex];
+                const mapName = 'random map name';
                 try {
-                    await mapsFactory.createMap(id);
+                    await mapsFactory.createMap(id, mapName);
                     await request(baseApiURL)
                         .get(`/projects/${id}`)
                         .expect(200)
                         .then(({body}) => {
                             const data = body[0];
+                            expect(data.map.name).toBe(mapName);
                             expect(data.exec).toBe(null);
                             expect(data.project.name).toBe(name);
                         });

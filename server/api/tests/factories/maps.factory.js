@@ -27,22 +27,41 @@ function generateSimpleMap() {
   return jsf.generate(getSimpleMapSchema());
 }
 
-async function createMap(projectId, index, mapName) {
+async function createMap(projectId, mapName) {
   const generatedMap = generateSimpleMap();
-  generatedMap.name = mapName;
+  generatedMap.name = mapName || generatedMap.name;
   try {
     const map = await MapModel.create(generatedMap);
-    await ProjectModel.findByIdAndUpdate(
-      { _id: projectId },
-      { $push: { maps: map.id } }
-    );
+    await addMapToProject(projectId, map.id);
     return map;
   } catch (err) {
     throw err;
   }
 }
 
+async function addMapToProject(projectId, mapId) {
+  try {
+    await ProjectModel.findByIdAndUpdate(
+      { _id: projectId },
+      { $push: { maps: mapId } }
+    );
+  } catch (err) {
+    throw err;
+  }
+}
+
+function generateMany() {
+  return jsf.generate({
+    type: "array",
+    items: getSimpleMapSchema(),
+    maxItems: 15,
+    minItems: 5
+  });
+}
+
 module.exports = {
   createMap,
-  generateSimpleMap: generateSimpleMap
+  generateSimpleMap,
+  generateMany,
+  addMapToProject
 };
