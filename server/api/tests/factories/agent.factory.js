@@ -14,22 +14,19 @@ function generateSingleSchema() {
             url: {
                 type: "string",
                 chance: {
-                    url: {
-                    }
+                    url: {}
                 }
             },
             publicUrl: {
                 type: "string",
                 chance: {
-                    url: {
-                    }
+                    url: {}
                 }
             },
             key: {
                 type: "string",
                 chance: {
-                    guid: {
-                    }
+                    guid: {}
                 }
             }
         },
