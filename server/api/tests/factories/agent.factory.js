@@ -45,5 +45,5 @@ function generateMany() {
 
 module.exports = {
     generateMany,
-    generateOne: generateSingleSchema,
+    generateOne: () => jsf.generate(generateSingleSchema()),
 };

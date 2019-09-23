@@ -3,16 +3,14 @@ const {randomIdx} = require("./helpers");
 const request = require('supertest');
 const {MapResult} = require('../../api/models/map-results.model');
 const ProjectModel = require('../../api/models/project.model');
-const {MapStructure, ActionModel, ProcessModel} = require('../../api/models/map-structure.model');
+const {MapStructure} = require('../../api/models/map-structure.model');
 const AgentModel = require('../../api/models/agent.model');
 const {
     mapResultFactory,
     mapStructureFactory,
     mapsFactory,
     projectsFactory,
-    actionFactory,
     agentFactory,
-    processFactory
 } = require('./factories');
 const TestDataManager = require('./factories/test-data-manager');
 
@@ -23,8 +21,6 @@ describe('Map revisions endpoints should work correctly', () => {
     const projectTestDataManager = new TestDataManager(ProjectModel);
     const agentsTestDataManager = new TestDataManager(AgentModel);
     const mapStructureTestDataManager = new TestDataManager(MapStructure);
-    const actionDataTestManager = new TestDataManager(ActionModel);
-    const processTestDataManager = new TestDataManager(ProcessModel);
     let project;
     let map;
 
@@ -34,15 +30,9 @@ describe('Map revisions endpoints should work correctly', () => {
         await projectTestDataManager.generateInitialCollection(
             projectsFactory.generateProjects()
         );
-
-        await agentsTestDataManager.generateInitialCollection((
-            agentFactory.generateMany()
-        ));
-        await actionDataTestManager.generateInitialCollection((
-            actionFactory.generateMany()
-        ));
-        await processTestDataManager.generateInitialCollection((
-            processFactory.generateMany()
+        console.log(agentFactory.generateOne())
+        const agent = await agentsTestDataManager.pushToCollectionAndSave((
+            agentFactory.generateOne()
         ));
 
         const randomIndex = randomIdx(projectTestDataManager.collection.length);
@@ -59,11 +49,11 @@ describe('Map revisions endpoints should work correctly', () => {
 
         await mapResultTestDataManager.generateInitialCollection(
             mapResultFactory.generateMany({
-                    agentId: agentsTestDataManager.collection[0]._id.toString(),
+                    agentId: agent._id.toString(),
                     mapStructureId: mapStructure._id.toString(),
                     mapId: map._id.toString(),
                     processId,
-                    actionId
+                    actionId,
                 }
             )
         );
