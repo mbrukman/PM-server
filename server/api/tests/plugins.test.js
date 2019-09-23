@@ -145,8 +145,8 @@ describe('Plugins tests', () => {
                 return request(app)
                     .post(`/api/plugins/${pluginId}/settings`)
                     .expect(500)
-                    .then(({error}) => {
-                        expect(error.text).toEqual(`Settings not found`);
+                    .then(({body}) => {
+                        expect(body.message).toEqual(`Settings not found`);
                     });
             });
         });
