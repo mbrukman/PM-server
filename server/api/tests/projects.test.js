@@ -100,30 +100,16 @@ describe('Projects API tests', () => {
             });
         });
 
-        //BUG (KAH -20)
-        // describe(`PUT /:id/archive `, () => {
-        //     it(`should respond with the archived project`, () => {
-
-        //         const projectName = fixedProjects[1].name;
-        //         const projectId = testDataManager.getProjectIdByName(projectName)
-        //         try{
-        //             request(baseApiURL)
-        //             .put(`/projects/${projectId}/archive`)
-        //             .send({isArchive:true})
-        //             .expect(204)
-        //             .then(res => {
-        //                 testDataManager.updateCollection(projectId,res.body)
-        //                 expect(res.body.name).toEqual(projectName);
-        //                 expect(res.body.archived).toEqual(true);
-        //
-        //             });
-        //         }
-        //         catch(err){
-        //             console.log(err.message);
-        //             throw err;
-        //         }
-        //     });
-        // });
+        describe(`PUT /:id/archive `, () => {
+            it(`should respond with 200 status code`, () => {
+                const randomIndex = randomIdx(testDataManager.collection.length);
+                const projectId = testDataManager.collection[randomIndex].id;
+                return request(baseApiURL)
+                    .put(`/projects/${projectId}/archive`)
+                    .send({isArchive:true})
+                    .expect(200)
+                })
+        });
 
         describe(`GET /:projectId/ `, () => {
 
