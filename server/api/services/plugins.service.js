@@ -291,7 +291,7 @@ module.exports = {
   },
 
   updateSettings: (id, settings) => {
-    if(!settings.length) return Promise.reject('Settings not found')
+    if(!settings.length) return Promise.reject({message:'Settings not found'})
     return Plugin.findOne({ _id: id }).then((plugin) => {
       for (let i = 0, length = plugin.settings.length; i < length; i++) {
         plugin.settings[i].value = settings[i].value
