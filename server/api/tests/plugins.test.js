@@ -141,7 +141,7 @@ describe('Plugins tests', () => {
         });
 
         describe(`POST /:id/settings`, () => {
-            it(`should respond with status 500 and empty object for invalid settings body`, () => {
+            it(`should respond with status 500 and error message`, () => {
                 return request(app)
                     .post(`/api/plugins/${pluginId}/settings`)
                     .expect(500)
