@@ -13,7 +13,7 @@ const upload = multer(multerParams);
 const router = express.Router();
 router.get("/", pluginsController.pluginsList);
 router.get("/:id", pluginsController.getPlugin);
-router.delete("/:id/delete", pluginsController.pluginDelete);
+router.delete("/:id", pluginsController.pluginDelete);
 router.post("/upload", upload.single('file'), pluginsController.pluginUpload);
 router.post("/:id/settings", pluginsController.updateSettings);
 
