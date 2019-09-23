@@ -1502,7 +1502,7 @@ async function stopExecution(runId, socket = null, result = "") {
                 });
             });
         }
-        2
+
         options = {
             data: optionAction,
             agentId: agent.id,
