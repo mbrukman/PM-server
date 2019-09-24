@@ -1,39 +1,69 @@
 const {randomIdx} = require("./helpers");
 const request = require('supertest');
 const MapModel = require('../../api/models/map.model');
-const ProjectModel = require('../models/project.model');
 const { MapResult } = require('../models/map-results.model');
-const { mapsFactory, projectsFactory, mapResultFactory } = require('./factories');
 const TestDataManager = require('./factories/test-data-manager');
 const apiURL = 'localhost:3000/api';
 const {orderBy} = require('lodash');
-
+const ProjectModel = require('../../api/models/project.model');
+const {MapStructure} = require('../../api/models/map-structure.model');
+const AgentModel = require('../../api/models/agent.model');
+const {
+    mapResultFactory,
+    mapStructureFactory,
+    mapsFactory,
+    projectsFactory,
+    agentFactory,
+} = require('./factories');
+let project;
 
 describe('Map crud tests', () => {
     const mapTestDataManager = new TestDataManager(MapModel);
     const projectTestDataManager = new TestDataManager(ProjectModel);
     const mapResultTestDataManager = new TestDataManager(MapResult);
+    const agentsTestDataManager = new TestDataManager(AgentModel);
+    const mapStructureTestDataManager = new TestDataManager(MapStructure);
+    jest.setTimeout(15000);
 
     beforeEach(async () => {
         await projectTestDataManager.generateInitialCollection(
-            [projectsFactory.generateSingleProject()]
+            projectsFactory.generateProjects()
         );
-        const randomIndex = randomIdx(projectTestDataManager.collection.length);
-        project = projectTestDataManager.collection[randomIndex];
+
         await mapTestDataManager.generateInitialCollection(
             mapsFactory.generateMany()
         );
+
+        let randomIndex = randomIdx(projectTestDataManager.collection.length);
+        project = projectTestDataManager.collection[randomIndex];
+
         for(let map of mapTestDataManager.collection){
-            await mapsFactory.createMap(project.id,map)
+            await mapsFactory.addMapToProject(project.id,map._id)
         }
-        let mapResultCollection = mapTestDataManager.collection.map(map => {
-            return mapResultFactory.generateOne(map._id.toString())
-        })
+
+        const agent = await agentsTestDataManager.pushToCollectionAndSave(
+            agentFactory.generateOne()
+        );
+        randomIndex = randomIdx(mapTestDataManager.collection.length);
+        let map = mapTestDataManager.collection[randomIndex];
+        await mapStructureTestDataManager.generateInitialCollection((
+            mapStructureFactory.generateMany(map._id.toString(), [map])
+        ));
+        const mapStructure = mapStructureTestDataManager.collection[0];
+        const process = mapStructure.processes[0];
+        const actionId = process.actions[0]._id.toString();
+        const processId = process._id.toString();
         await mapResultTestDataManager.generateInitialCollection(
-            mapResultCollection
+            [mapResultFactory.generateOne({
+                    agentId: agent._id.toString(),
+                    mapStructureId: mapStructure._id.toString(),
+                    mapId: map._id.toString(),
+                    processId,
+                    actionId,
+                }
+            )]
         );
         mapResultTestDataManager.collection = orderBy(mapResultTestDataManager.collection, ['startTime'],['desc']);
-
     });
 
     afterEach(async () => {
@@ -41,7 +71,6 @@ describe('Map crud tests', () => {
         await projectTestDataManager.clear();
         await mapResultTestDataManager.clear();
     });
-
 
     describe('Positive', () => {
 
@@ -77,7 +106,7 @@ describe('Map crud tests', () => {
 
         describe(`POST /:create`, () => {
             it(`should respond with the created map`, () => {
-                const randomMap = mapsFactory.generateSimpleMaps();
+                const randomMap = mapsFactory.generateSimpleMap();
                 const randomIndex = randomIdx(projectTestDataManager.collection.length)
                 let projectId = projectTestDataManager.collection[randomIndex].id;
                 randomMap.project = projectId
@@ -127,24 +156,25 @@ describe('Map crud tests', () => {
                         expect(body[randomIndex].map._id).toEqual(mapId);
                         expect(body[randomIndex]._id).toEqual(mapId);
                         expect(body[randomIndex].exec._id).toEqual(executionId);
-                        expect(body[0].project._id).toEqual(projectTestDataManager.collection[0]._id.toString());
-                        expect(body[0].project.name).toEqual(projectTestDataManager.collection[0].name);
+                        expect(body[0].project._id).toEqual(project._id.toString());
+                        expect(body[0].project.name).toEqual(project.name);
                     })
             });
         });
 
         describe(`GET /recent`, () => {
+
             it(`should respond with recents maps`, () => {
-                const randomIndex = randomIdx(4);
                 return request(apiURL)
                     .get(`/maps/recent`)
                     .expect(200)
                     .then(({body}) => {
+                        const randomIndex = randomIdx(body.length);
                         expect(body.length).toBeLessThanOrEqual(4);
                         expect(body[randomIndex].map._id).toEqual(mapResultTestDataManager.collection[randomIndex].map.toString());
                         expect(body[randomIndex]._id).toEqual(mapResultTestDataManager.collection[randomIndex].map.toString());
-                        expect(body[0].project._id).toEqual(projectTestDataManager.collection[0]._id.toString());
-                        expect(body[0].project.name).toEqual(projectTestDataManager.collection[0].name);
+                        expect(body[0].project._id).toEqual(project._id.toString());
+                        expect(body[0].project.name).toEqual(project.name);
                     })
             });
         });
