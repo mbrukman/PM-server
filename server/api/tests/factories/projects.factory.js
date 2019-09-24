@@ -27,8 +27,8 @@ const singleProjectSchema = {
 const arrayProjectSchema = {
   type: "array",
   items: singleProjectSchema,
-  maxItems: 15,
-  minItems: 1
+  maxItems: 7,
+  minItems: 2
 };
 
 module.exports = {
