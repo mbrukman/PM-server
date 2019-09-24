@@ -5,6 +5,10 @@ function generateSingleSchema() {
     return {
         type: "object",
         properties: {
+            _id:{
+                type: "string",
+                format: "mongoID"
+            },
             name: {
                 type: "string",
                 chance: {
@@ -30,7 +34,7 @@ function generateSingleSchema() {
                 }
             }
         },
-        required: ['key', 'publicUrl', 'url', 'name']
+        required: ['key', 'publicUrl', 'url', 'name', '_id']
     }
 }
 
