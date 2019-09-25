@@ -7,7 +7,7 @@ class CustomEnvironment extends NodeEnvironment {
     }
 
     async setup() {
-        this.global.io = await connectToSocket();
+        this.global.io = await connectToSocket(global.websocketURL);
         await super.setup();
     }
 
