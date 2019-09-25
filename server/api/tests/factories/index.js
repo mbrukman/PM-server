@@ -25,5 +25,5 @@ module.exports = {
   actionFactory,
   agentFactory,
   groupFactory,
-  mapsFactory,
+  mapsFactory
 };

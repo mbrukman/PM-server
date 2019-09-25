@@ -1,15 +1,15 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-const projectsController = require("../controllers/projects.controller");
+const projectsController = require('../controllers/projects.controller');
 
-router.get("/:projectId" , projectsController.filterRecentMaps)
-router.post("/", projectsController.filter);
-router.post("/create", projectsController.create);
-router.get("/:id/detail", projectsController.detail);
-router.put("/:id/update", projectsController.update);
-router.delete("/:id", projectsController.delete);
-router.put("/:id/archive", projectsController.archive);
+router.get('/:projectId', projectsController.filterRecentMaps);
+router.post('/', projectsController.filter);
+router.post('/create', projectsController.create);
+router.get('/:id/detail', projectsController.detail);
+router.put('/:id/update', projectsController.update);
+router.delete('/:id', projectsController.delete);
+router.put('/:id/archive', projectsController.archive);
 
 
 module.exports = router;

@@ -10,7 +10,22 @@
     "build": "cd ../console && ng build",
     "build:prod": "cd ../console && ng build --prod",
     "watch": "nodemon app.js",
-    "install:all": "npm i && cd ../console && npm i"
+    "install:all": "npm i && cd ../console && npm i",
+    "eslint": "eslint ./api/tests --fix"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es6": true,
+      "jest": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 8
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:prettier/recommended"
+    ]
   },
   "author": "",
   "license": "ISC",
@@ -38,6 +53,10 @@
   },
   "devDependencies": {
     "chance": "^1.1.0",
+    "eslint": "^6.4.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "prettier": "^1.18.2",
     "jest": "^24.9.0",
     "jest-circus": "^24.9.0",
     "jest-environment-node": "^24.9.0",
