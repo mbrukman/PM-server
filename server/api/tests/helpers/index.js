@@ -1,15 +1,15 @@
 const socket = require('socket.io-client');
-const ProjectModel = require('../../../api/models/project.model');
-const TestDataManager = require('./../factories/test-data-manager');
-const {MapStructure} = require('../../../api/models/map-structure.model');
-const {mapStructureFactory, mapsFactory, projectsFactory} = require('./../factories');
-
-function randomIdx(length) {
-    return Math.floor(Math.random() * length);
-}
+const MapModel = require('../../models/map.model');
+const { MapStructure } = require('../../models/map-structure.model');
+const TestDataManager = require('../factories/test-data-manager');
+const mapsFactory = require('../factories/maps.factory');
+const mapStructureFactory = require('../factories/map-structure.factory');
 
 module.exports = {
-    randomIdx,
+    randomIdx(length) {
+        return Math.floor(Math.random() * length);
+    },
+
     connectToSocket(url = 'http://localhost:3000/') {
         const io = socket(url);
         return new Promise((resolve, reject) => {
@@ -18,24 +18,15 @@ module.exports = {
             });
         });
     },
-    async generateMapAndProject() {
-        const mapStructureTestDataManager = new TestDataManager(MapStructure);
-        const projectTestDataManager = new TestDataManager(ProjectModel);
-        const projects = await projectTestDataManager.generateInitialCollection(
-            projectsFactory.generateProjects()
-        );
 
-        const randomIndex = randomIdx(projectTestDataManager.collection.length);
-        const project = projectTestDataManager.collection[randomIndex];
-
-        const map = await mapsFactory.createMap(project.id, 'random map name');
-        const mapStructures = await mapStructureTestDataManager.generateInitialCollection(
-            mapStructureFactory.generateMany(map._id.toString(), [map])
-        );
-        return {
-            map,
-            projects,
-            mapStructures
-        }
+    generateMapStructure: async () => {
+        let mapDataManager = new TestDataManager(MapModel);
+        let mapStructureDataManager = new TestDataManager(MapStructure);
+        const map = mapsFactory.generateSimpleMap();
+        map.queue = 3;
+        await mapDataManager.generateInitialCollection(map);
+        mapId = map._id;
+        await mapStructureDataManager.generateInitialCollection(mapStructureFactory.generateOne(mapId));
+        return mapId;
     }
 };
