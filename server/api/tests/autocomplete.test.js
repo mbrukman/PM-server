@@ -9,19 +9,19 @@ const app = 'localhost:3000';
 
 describe('Autocomplete tests', () => {
 
-    const projectDataManager = new TestDataManager(Project);
-
-    beforeEach(async () => {
-        let projects = projectsFactory.generateProjects();
-        projects = projects.map(p => {
-            p.name = 'test project';
-            return p;
-        });
-        await projectDataManager.generateInitialCollection(projects);
-    });
-
     describe('Positive', () => {
         describe('Project model', () => {
+            const projectDataManager = new TestDataManager(Project);
+
+            beforeEach(async () => {
+                let projects = projectsFactory.generateProjects();
+                projects = projects.map(p => {
+                    p.name = 'test project';
+                    return p;
+                });
+                await projectDataManager.generateInitialCollection(projects);
+            });
+
             it(`should return autocomplete`, () => {
                 return request(app)
                     .get(`/api/autocomplete/Project?query=test`)
@@ -43,11 +43,43 @@ describe('Autocomplete tests', () => {
                         expect(res.body.value).toBe('test project');
                     })
             });
-
         });
-        /*
-        describe('Map model', () => { });
 
+        describe('Map model', () => {
+            const mapDataManager = new TestDataManager(Map);
+
+            beforeEach(async () => {
+                let maps = mapsFactory.generateMany().map(m => {
+                    m.name = 'test map';
+                    return m;
+                });
+                await mapDataManager.generateInitialCollection(maps);
+            });
+
+            it(`should return autocomplete`, () => {
+                return request(app)
+                    .get(`/api/autocomplete/Map?query=test`)
+                    .expect(200)
+                    .then(res => {
+                        expect(Array.isArray(res.body)).toBe(true);
+                        expect(res.body.length > 0).toBe(true);
+                        expect(res.body.length <= 5).toBe(true);
+                    })
+            });
+
+            it(`should return value for given key`, async () => {
+                const map = await Map.findOne({ name: 'test map' });
+                return request(app)
+                    .get(`/api/autocomplete/Map/${map.id}`)
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body.id).toBe(map.id);
+                        expect(res.body.value).toBe('test map');
+                    })
+            });
+        });
+
+        /*
         describe('Vault model', () => { });
         */
     });
