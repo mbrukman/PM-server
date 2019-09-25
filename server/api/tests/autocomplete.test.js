@@ -33,14 +33,20 @@ describe('Autocomplete tests', () => {
                     })
             });
 
-            /*
-            it(`should return value for given key`, () => {
-
+            it(`should return value for given key`, async () => {
+                const project = await Project.findOne({ name: 'test project' });
+                return request(app)
+                    .get(`/api/autocomplete/Project/${project.id}`)
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body.id).toBe(project.id);
+                        expect(res.body.value).toBe('test project');
+                    })
             });
-            */
+
         });
         /*
-        describe('Project model', () => { });
+        describe('Map model', () => { });
 
         describe('Vault model', () => { });
         */
@@ -51,6 +57,19 @@ describe('Autocomplete tests', () => {
             const invalidModelName = 'invalid-model-name';
             return request(app)
                 .get(`/api/autocomplete/${invalidModelName}`)
+                .expect(500);
+        });
+
+        it(`should respond with status 500 on invalid model name and invalid key`, () => {
+            const invalidModelName = 'invalid-model-name';
+            return request(app)
+                .get(`/api/autocomplete/${invalidModelName}/test-key`)
+                .expect(500);
+        });
+
+        it(`should respond with status 500 on invalid key`, () => {
+            return request(app)
+                .get(`/api/autocomplete/Map/test-key`)
                 .expect(500);
         });
     });
