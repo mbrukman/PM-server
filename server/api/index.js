@@ -15,60 +15,60 @@ const env = require('../env/enviroment');
 const app = express();
 
 
-/////////////////////
+// ///////////////////
 // configurations //
-///////////////////
+// /////////////////
 
 // enable cors
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    next();
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  next();
 });
 
 // winston logger
 const server = http.createServer(app);
 
-let expressWinstonTranports = [
-    new winston.transports.Console({
-        json: false,
-        colorize: true
-    })];
+const expressWinstonTranports = [
+  new winston.transports.Console({
+    json: false,
+    colorize: true,
+  })];
 
 if (env.dbURI) {
-    mongoose.connect(env.dbURI).then(() => {
-        winston.add(new winston.transports.MongoDB({
-            db: env.dbURI,
-        }));
-        winston.log('info', `Succesfully Connected to the Mongodb at ${env.dbURI}`);
-    });
-    expressWinstonTranports.push(new winston.transports.MongoDB({ db: env.dbURI }));
+  mongoose.connect(env.dbURI).then(() => {
+    winston.add(new winston.transports.MongoDB({
+      db: env.dbURI,
+    }));
+    winston.log('info', `Succesfully Connected to the Mongodb at ${env.dbURI}`);
+  });
+  expressWinstonTranports.push(new winston.transports.MongoDB({db: env.dbURI}));
 }
 
 // add express winston to router stack
 app.use(expressWinston.logger({
-    transports: expressWinstonTranports,
-    meta: true, // optional: control whether you want to log the meta data about the request (default to true)
-    msg: "HTTP {{req.method}} {{req.url}} {{req.statusCode}}",
-    expressFormat: false, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
-    colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
+  transports: expressWinstonTranports,
+  meta: true, // optional: control whether you want to log the meta data about the request (default to true)
+  msg: 'HTTP {{req.method}} {{req.url}} {{req.statusCode}}',
+  expressFormat: false, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
+  colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
 }));
 
 mongoose.Promise = require('bluebird');
 
-var io = socketService.init(server);
+const io = socketService.init(server);
 
 app.use(bodyParser.urlencoded({
-    extended: false
+  extended: false,
 }));
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
-    req.io = io;
-    req.app = app;
-    next();
+  req.io = io;
+  req.app = app;
+  next();
 });
 
 // Angular dist output folder
@@ -77,21 +77,21 @@ app.use('/plugins', express.static(path.join(__dirname, '../libs', 'plugins')));
 app.use('/media', express.static(path.join(__dirname, '..media_cdn')));
 
 
-//////////////////////
-/////// routes //////
-////////////////////
+// ////////////////////
+// ///// routes //////
+// //////////////////
 
 /* api references */
-const settingsApi = require("./routes/settings.routes");
-const mapsApi = require("./routes/maps.routes");
-const pluginsApi = require("./routes/plugins.routes");
-const agentsApi = require("./routes/agents.routes");
-const projectsApi = require("./routes/projects.routes");
-const triggersApi = require("./routes/triggers.routes");
-const scheduledJobsApi =  require("./routes/scheduled-jobs.routes");
-const vaultApi = require("./routes/vault.routes");
-const configTokenApi = require("./routes/config-token.routes");
-const autoCompleteApi = require("./routes/autocomplete.routes");
+const settingsApi = require('./routes/settings.routes');
+const mapsApi = require('./routes/maps.routes');
+const pluginsApi = require('./routes/plugins.routes');
+const agentsApi = require('./routes/agents.routes');
+const projectsApi = require('./routes/projects.routes');
+const triggersApi = require('./routes/triggers.routes');
+const scheduledJobsApi = require('./routes/scheduled-jobs.routes');
+const vaultApi = require('./routes/vault.routes');
+const configTokenApi = require('./routes/config-token.routes');
+const autoCompleteApi = require('./routes/autocomplete.routes');
 
 app.use('/api/settings', settingsApi);
 app.use('/api/maps', mapsApi);
@@ -102,10 +102,10 @@ app.use('/api/triggers', triggersApi);
 app.use('/api/scheduled-jobs', scheduledJobsApi);
 app.use('/api/vault', vaultApi);
 app.use('/api/config-token', configTokenApi);
-app.use('/api/autocomplete',autoCompleteApi);
+app.use('/api/autocomplete', autoCompleteApi);
 
 
-//Set Port
+// Set Port
 const port = parseArgs.PORT || '3000';
 app.set('port', port);
 app.io = io;
@@ -113,12 +113,12 @@ app.io = io;
 
 // Send all other requests to the Angular app
 app.all('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 module.exports = {
-    app,
-    port,
-    server,
-    winston
+  app,
+  port,
+  server,
+  winston,
 };
