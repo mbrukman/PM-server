@@ -16,7 +16,7 @@ describe('Agents tests', () => {
             agentFactory.generateMany()
         );
 
-        let agentsIds = agentsTestDataManager.collection.map(agent => {
+        const agentsIds = agentsTestDataManager.collection.map(agent => {
             return agent.id
         })
 
@@ -92,7 +92,7 @@ describe('Agents tests', () => {
             it(`should respond with the groups`, () => {
                 const groupRandomIndex = randomIdx(groupsTestDataManager.collection.length);
                 const groupId = groupsTestDataManager.collection[groupRandomIndex].id;
-                let groupName = 'random group name';
+                const groupName = 'random group name';
                 return request(apiURL)
                     .put(`/agents/groups/${groupId}`)
                     .send({name:groupName})
@@ -107,7 +107,7 @@ describe('Agents tests', () => {
             it(`should respond with the groups`, () => {
                 const groupRandomIndex = randomIdx(groupsTestDataManager.collection.length);
                 const groupId = groupsTestDataManager.collection[groupRandomIndex].id;
-                let newFilter = [
+                const newFilter = [
                     {
                         field: 'random field',
                         value: 'random value',
@@ -168,7 +168,7 @@ describe('Agents tests', () => {
             it(`should respond with the group`, () => {
                 const groupRandomIndex = randomIdx(groupsTestDataManager.collection.length);
                 const {id, agents} = groupsTestDataManager.collection[groupRandomIndex];
-                let agent = agents[0];
+                const agent = agents[0];
                 return request(apiURL)
                     .post(`/agents/groups/${id}/remove-agent`)
                     .send({agentId:agent})
@@ -212,7 +212,7 @@ describe('Agents tests', () => {
             it(`should respond with the updated agent`, () => {
                 const randomIndex = randomIdx(agentsTestDataManager.collection.length);
                 const agentId = agentsTestDataManager.collection[randomIndex].id;
-                let newAgentName = 'random agent name';
+                const newAgentName = 'random agent name';
                 return request(apiURL)
                     .put(`/agents/${agentId}`)
                     .send({name:newAgentName})
@@ -246,7 +246,7 @@ describe('Agents tests', () => {
 
         describe(`POST /groups/:id/add-filters`, () => {
             it(`should respond with 500 status code`, (done) => {
-                let newFilter = [
+                const newFilter = [
                     {
                         field: 'random field',
                         value: 'random value',
