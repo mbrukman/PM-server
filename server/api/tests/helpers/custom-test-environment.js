@@ -1,5 +1,5 @@
 const NodeEnvironment = require('jest-environment-node');
-const {connectToSocket} = require('./../helpers');
+const { connectToSocket } = require('./../helpers');
 
 class CustomEnvironment extends NodeEnvironment {
     constructor(config, context) {
@@ -19,7 +19,7 @@ class CustomEnvironment extends NodeEnvironment {
     runScript(script) {
         return super.runScript(script);
     }
-     handleTestEvent(event, state) {
+    handleTestEvent(event, state) {
     }
 }
 

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const crypto = require('crypto');
-
+const { test } = require('../../env/test-mocks')
 const Vault = require("../models/vault.model");
 const env = require('../../env/enviroment');
 const createKey = require("../../helpers/create-key");
@@ -26,14 +26,14 @@ module.exports = {
         return Vault.remove({ _id: vaultId })
     },
     list: () => {
-        return Vault.find({}).select({key:1,description:1})
+        return test();
     },
 
     getByKey: (key) => {
         return Vault.find({ key: key })
     },
     getValueByKey: (key) => {
-        return Vault.findOne({ key: key }).then(item=>{
+        return Vault.findOne({ key: key }).then(item => {
             return _decrypt(item.value);
         })
     },

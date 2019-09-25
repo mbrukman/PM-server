@@ -18,10 +18,10 @@ describe('Plugins tests', () => {
             await testDataManager.pushToCollectionAndSave(plugin);
         });
 
-        afterAll(async ()=> {
+        afterAll(async () => {
             await testDataManager.clear();
         });
-        
+
         describe(`POST /upload`, () => {
             it(`should upload plugin`, () => {
                 return request(app)
@@ -145,7 +145,7 @@ describe('Plugins tests', () => {
                 return request(app)
                     .post(`/api/plugins/${pluginId}/settings`)
                     .expect(500)
-                    .then(({body}) => {
+                    .then(({ body }) => {
                         expect(body.message).toEqual(`Settings not found`);
                     });
             });
