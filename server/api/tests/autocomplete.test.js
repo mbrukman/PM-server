@@ -79,9 +79,42 @@ describe('Autocomplete tests', () => {
             });
         });
 
-        /*
-        describe('Vault model', () => { });
-        */
+
+        describe('Vault model', () => {
+            const vaultDataManager = new TestDataManager(Vault);
+            let currentKey;
+            beforeEach(async () => {
+                currentKey = 'test-vault-key-' + Math.random();
+                let vaults = vaultsFactory.generateVaults().map(v => {
+                    v.key = currentKey;
+                    return v;
+                });
+                await vaultDataManager.generateInitialCollection(vaults);
+            });
+
+            it(`should return autocomplete`, () => {
+                return request(app)
+                    .get(`/api/autocomplete/Vault?query=test`)
+                    .expect(200)
+                    .then(res => {
+                        expect(Array.isArray(res.body)).toBe(true);
+                        expect(res.body.length > 0).toBe(true);
+                        expect(res.body.length <= 5).toBe(true);
+                    })
+            });
+
+            it.only(`should return value for given key`, async () => {
+                const vault = await Vault.findOne({ key: currentKey });
+                return request(app)
+                    .get(`/api/autocomplete/Vault/${vault.key}`)
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body.id).toBe(vault.key);
+                        expect(res.body.value).toBe(currentKey);
+                    })
+            });
+        });
+
     });
 
     describe('Negative', () => {
