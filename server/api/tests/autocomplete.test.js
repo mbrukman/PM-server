@@ -12,11 +12,8 @@ describe('Autocomplete tests', () => {
             const projectDataManager = new TestDataManager(Project);
 
             beforeEach(async () => {
-                let projects = projectsFactory.generateProjects();
-                projects = projects.map(p => {
-                    p.name = 'test project';
-                    return p;
-                });
+                const projects = projectsFactory.generateProjects();
+                projects[0].name = 'test project';
                 await projectDataManager.generateInitialCollection(projects);
             });
 
@@ -26,8 +23,7 @@ describe('Autocomplete tests', () => {
                     .expect(200)
                     .then(res => {
                         expect(Array.isArray(res.body)).toBe(true);
-                        expect(res.body.length > 0).toBe(true);
-                        expect(res.body.length <= 5).toBe(true);
+                        expect(res.body.length).toBe(1);
                     })
             });
 
@@ -47,10 +43,8 @@ describe('Autocomplete tests', () => {
             const mapDataManager = new TestDataManager(Map);
 
             beforeEach(async () => {
-                let maps = mapsFactory.generateMany().map(m => {
-                    m.name = 'test map';
-                    return m;
-                });
+                const maps = mapsFactory.generateMany();
+                maps[0].name = 'test map';
                 await mapDataManager.generateInitialCollection(maps);
             });
 
@@ -60,8 +54,7 @@ describe('Autocomplete tests', () => {
                     .expect(200)
                     .then(res => {
                         expect(Array.isArray(res.body)).toBe(true);
-                        expect(res.body.length > 0).toBe(true);
-                        expect(res.body.length <= 5).toBe(true);
+                        expect(res.body.length).toBe(1);
                     })
             });
 
@@ -76,7 +69,6 @@ describe('Autocomplete tests', () => {
                     })
             });
         });
-
 
         describe('Vault model', () => {
             const vaultDataManager = new TestDataManager(Vault);
