@@ -3,8 +3,6 @@ const request = require('supertest');
 const { Project, Map, Vault } = require('../../api/models');
 const { TestDataManager, projectsFactory, mapsFactory, vaultsFactory } = require(`./factories`);
 
-//router.get("/:modelName", autoCompleteController.generateAutoComplete);
-//router.get("/:modelName/:key", autoCompleteController.getValueByKey);
 const app = 'localhost:3000';
 
 describe('Autocomplete tests', () => {
@@ -85,10 +83,8 @@ describe('Autocomplete tests', () => {
             let currentKey;
             beforeEach(async () => {
                 currentKey = 'test-vault-key-' + Math.random();
-                let vaults = vaultsFactory.generateVaults().map(v => {
-                    v.key = currentKey;
-                    return v;
-                });
+                const vaults = vaultsFactory.generateVaults();
+                vaults[0].key = currentKey;
                 await vaultDataManager.generateInitialCollection(vaults);
             });
 
@@ -103,7 +99,7 @@ describe('Autocomplete tests', () => {
                     })
             });
 
-            it.only(`should return value for given key`, async () => {
+            it(`should return value for given key`, async () => {
                 const vault = await Vault.findOne({ key: currentKey });
                 return request(app)
                     .get(`/api/autocomplete/Vault/${vault.key}`)
