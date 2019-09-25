@@ -5,14 +5,16 @@ const {mapStructureFactory, processFactory} = require('./factories');
 const baseUrl = 'localhost:3000';
 const apiURL = `${baseUrl}/api`;
 
-function createStructure(map) {
-    const structure = mapStructureFactory.generateOne(map._id, [map]);
-    structure.processes = processFactory.generateMany([]);
+function createStructure(map, structure) {
+    if (!structure) {
+        structure = mapStructureFactory.generateOne(map._id, [map]);
+        structure.processes = processFactory.generateMany([]);
+    }
+
     return request(apiURL)
         .post(`/maps/${map._id}/structure/create`)
         .send({structure});
 }
-
 
 describe('Websocket listens to events after map update', () => {
     let io, map;
@@ -27,10 +29,10 @@ describe('Websocket listens to events after map update', () => {
         io.close();
     });
 
-    it('should return successful message in WebSocket after well-created structure', async (done) => {
-
+    it('should return successful message through WebSocket after well-created structure', async (done) => {
         io.on('message', ({type, msg}) => {
             if (type === 'saved-map') {
+                expect.assertions(3);
                 expect(msg.title).toBe('Saved');
                 expect(msg.type).toBe('success');
                 expect(msg.mapId).toBe(map._id.toString());
@@ -38,5 +40,18 @@ describe('Websocket listens to events after map update', () => {
             }
         });
         await createStructure(map);
-    })
+    });
+
+    it('should return error message through WebSocket after not created structure', async (done) => {
+        io.on('notification', ({type, message, title}) => {
+            if (type === 'error') {
+                expect.assertions(3);
+                expect(title).toBe('Whoops...');
+                expect(type).toBe('error');
+                expect(message).toBe('Error saving map structure');
+                done();
+            }
+        });
+        await createStructure(map, {});
+    });
 });
