@@ -2,6 +2,7 @@ const { jsf } = require('./jsf.helper');
 
 jsf.option({
     useDefaultValue: true,
+    useExamplesValue: true,
 });
 
 const pluginSchema = {
@@ -21,11 +22,7 @@ const pluginSchema = {
         },
         type: {
             type: 'string',
-            chance: {
-                pickone: [
-                    ["server", "executer", "trigger", "module"]
-                ]
-            }
+            examples: ["server", "executer", "trigger", "module"]
         },
         main: {
             type: 'string',
@@ -74,7 +71,7 @@ const pluginSchema = {
             ]
         },
     },
-    required: ['_id', 'name', 'type', 'main', 'execProgram', 'version', 'file', 'methods', 'settings']
+    required: ['_id', 'name', 'main', 'execProgram', 'version', 'file', 'methods', 'settings', 'type']
 };
 
 const pluginListSchema = {
@@ -85,6 +82,6 @@ const pluginListSchema = {
 };
 
 module.exports = {
-    generatePluginCollection: (options) => jsf.generate(Object.assign(pluginListSchema, options)),
+    generateMany: (options) => jsf.generate(Object.assign(pluginListSchema, options)),
     generatePluginDocument: (options) => jsf.generate(Object.assign(pluginSchema, options))
 };

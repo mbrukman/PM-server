@@ -27,8 +27,7 @@ module.exports = class TestDataManager {
             this.collection.push(savedItem);
             return savedItem;
         } catch (err) {
-            console.log(err.message, 'Something went wrong in _createModel of TestDataManager!');
-            throw new Error('There was an error with adding items to MongoDB!');
+            throw new Error(`There was an error with adding items to MongoDB: ${err.message}`);
         }
     }
 
@@ -39,7 +38,7 @@ module.exports = class TestDataManager {
             try {
                 return this._createModel(item);
             } catch (err) {
-                throw err;
+                throw new Error(`There was issue adding or saving item in collection: ${err.message}`);
             }
     }
 
@@ -72,8 +71,7 @@ module.exports = class TestDataManager {
             this.collection = [];
             return this.collection;
         } catch (err) {
-            console.log(err.message, 'In function clear of TestDataManager');
-            throw 'There was an error with clearing the collection and the database!';
+            throw new Error(`There was an error with clearing the collection and the database: ${err.message}`);
         }
     }
 
@@ -86,7 +84,7 @@ module.exports = class TestDataManager {
             this.collection = await this.currentMongooseModel.insertMany(generatedData, {ordered: true});
             return this.collection;
         } catch (err) {
-            throw err;
+            throw new Error(`Error while generating new collection: ${err.message}`);
         }
     }
 }

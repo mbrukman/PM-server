@@ -1,4 +1,5 @@
 const NodeEnvironment = require('jest-environment-node');
+const {connectToSocket} = require('./../helpers');
 
 class CustomEnvironment extends NodeEnvironment {
     constructor(config, context) {
@@ -6,10 +7,12 @@ class CustomEnvironment extends NodeEnvironment {
     }
 
     async setup() {
+        this.global.io = await connectToSocket(global.websocketURL);
         await super.setup();
     }
 
     async teardown() {
+        this.global.io.close();
         await super.teardown();
     }
 

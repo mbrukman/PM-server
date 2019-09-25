@@ -20,10 +20,13 @@ router.post("/:id/execute/:structure", mapController.execute);
 router.get("/:id/stop-execution", mapController.stopExecution);
 router.get("/:id/stop-execution/:runId", mapController.stopExecution);
 router.post("/:id/cancel-pending", mapController.cancelPending);
+
+// results
 router.get("/:id/results", mapController.results);
 router.get("/:id/results/logs", mapController.logs);
 router.get("/:id/results/:resultId", mapController.resultDetail);
 router.get("/:id/results/:resultId/logs", mapController.logs);
+
 router.put("/:id/update", mapController.update);
 router.put("/:id/archive", mapController.archive);
 

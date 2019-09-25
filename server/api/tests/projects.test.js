@@ -88,51 +88,37 @@ describe('Projects API tests', () => {
             });
         });
 
-        describe(`DELETE /:id/delete `, () => {
+        describe(`DELETE /:id `, () => {
             it(`should respond with 'OK'`, () => {
                 const randomIndex = Math.floor(Math.random() * testDataManager.collection.length);
                 const randomProject = testDataManager.collection[randomIndex];
                 // testDataManager.removeFromCollection(randomProject);
                 return request(baseApiURL)
-                    .delete(`/projects/${randomProject.id}/delete`)
+                    .delete(`/projects/${randomProject.id}`)
                     .expect(200)
                     .expect('OK');
             });
         });
 
-        //BUG (KAH -20)
-        // describe(`PUT /:id/archive `, () => {
-        //     it(`should respond with the archived project`, () => {
-
-        //         const projectName = fixedProjects[1].name;
-        //         const projectId = testDataManager.getProjectIdByName(projectName)
-        //         try{
-        //             request(baseApiURL)
-        //             .put(`/projects/${projectId}/archive`)
-        //             .send({isArchive:true})
-        //             .expect(204)
-        //             .then(res => {
-        //                 testDataManager.updateCollection(projectId,res.body)
-        //                 expect(res.body.name).toEqual(projectName);
-        //                 expect(res.body.archived).toEqual(true);
-        //
-        //             });
-        //         }
-        //         catch(err){
-        //             console.log(err.message);
-        //             throw err;
-        //         }
-        //     });
-        // });
+        describe(`PUT /:id/archive `, () => {
+            it(`should respond with 200 status code`, () => {
+                const randomIndex = randomIdx(testDataManager.collection.length);
+                const projectId = testDataManager.collection[randomIndex].id;
+                return request(baseApiURL)
+                    .put(`/projects/${projectId}/archive`)
+                    .send({isArchive:true})
+                    .expect(200)
+                })
+        });
 
         describe(`GET /:projectId/ `, () => {
 
             it(`should respond with the recent maps of the project`, async () => {
                 const randomIndex = randomIdx(testDataManager.collection.length);
                 const {id, name} = testDataManager.collection[randomIndex];
-                const mapName = 'map 1';
+                const mapName = 'random map name';
                 try {
-                    await mapsFactory.createMap(id, randomIndex, mapName);
+                    await mapsFactory.createMap(id, mapName);
                     await request(baseApiURL)
                         .get(`/projects/${id}`)
                         .expect(200)
@@ -189,7 +175,7 @@ describe('Projects API tests', () => {
         describe(`DELETE /:jobId/ `, () => {
             it(`should respond with a 500 status code`, (done) => {
                 return request(baseApiURL)
-                    .delete(`/projects/0/delete`)
+                    .delete(`/projects/0`)
                     .expect(500, done)
             });
         });

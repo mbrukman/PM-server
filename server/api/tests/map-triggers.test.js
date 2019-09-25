@@ -1,4 +1,5 @@
 const request = require('supertest');
+const {randomIdx} = require('./helpers/index');
 const TriggerModel = require('../../api/models/map-trigger.model');
 const TestDataManager = require('./factories/test-data-manager');
 const triggersFactory = require('./factories/triggers.factory');
@@ -7,7 +8,6 @@ const mapId = triggersFactory.mapId;
 
 describe('Map triggers tests', () => {
     let testDataManager;
-    let triggerId;
 
     describe('Positive', () => {
 
@@ -17,9 +17,6 @@ describe('Map triggers tests', () => {
             await testDataManager.generateInitialCollection(
                 triggerCollection
             );
-            const trigger = triggersFactory.generateTriggerDocument();
-            triggerId = trigger._id;
-            await testDataManager.pushToCollectionAndSave(trigger);
         });
 
         afterEach(() => {
@@ -56,7 +53,9 @@ describe('Map triggers tests', () => {
 
         describe(`DELETE /:mapId/:triggerId`, () => {
             it(`should respond with 'OK'`, function (done) {
-                request(app)
+                const randomIndex = randomIdx(testDataManager.collection.length);
+                const triggerId = testDataManager.collection[randomIndex].id;
+                return request(app)
                     .delete(`/api/triggers/${mapId}/${triggerId}`)
                     .expect(200)
                     .then((res) => {
@@ -68,6 +67,8 @@ describe('Map triggers tests', () => {
 
         describe(`PUT /:mapId/:triggerId`, () => {
             it(`should respond with an updated trigger`, function (done) {
+                const randomIndex = randomIdx(testDataManager.collection.length);
+                const triggerId = testDataManager.collection[randomIndex].id;
                 const newTriggerName = 'test trigger name 2';
                 request(app)
                     .put(`/api/triggers/${mapId}/${triggerId}`)
@@ -98,15 +99,15 @@ describe('Map triggers tests', () => {
             });
         });
 
-        describe(`DELETE /:mapId/:triggerId`, () => {
+        describe(`DELETE /:mapId/:triggerId`, (done) => {
             it(`should respond with status code 500 and proper error msg`, function (done) {
                 request(app)
-                    .delete('/api/triggers/0/0')
+                    .delete('/api/triggers/5d83970f611fb22814c56c07/5d83970f611fb22814c56c07')
                     .expect(500)
-                    .then((res) => {
-                        expect(res.body.message).toEqual("Cast to ObjectId failed for value \"0\" at path \"_id\" for model \"Trigger\"");
-                        done();
-                    });
+                    .then(({body}) => {
+                        expect(body.message).toBe('Trigger not found')
+                        done()
+                    })
             });
         });
 

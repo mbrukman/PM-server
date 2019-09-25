@@ -1,11 +1,11 @@
 const Map = require("../models/map.model");
-const MapStructure = require("../models").Structure;
+const {MapStructure} = require("../models");
 const env = require("../../env/enviroment");
-const MapTrigger = require("../models/map-trigger.model")
+const MapTrigger = require("../models/map-trigger.model");
 const MapResult = require("../models").MapResult;
-const Project = require("../models/project.model")
+const Project = require("../models/project.model");
 const PAGE_SIZE = env.page_size;
-const shared = require("../shared/recents-maps")
+const shared = require("../shared/recents-maps");
 const mongoose = require('mongoose');
 
 function getMapPlugins(mapStructure) {
@@ -20,7 +20,7 @@ function getMapPlugins(mapStructure) {
 
 function getSort(sortString) {
     var sort = {}
-    if (sortString[0] == '-')
+    if (sortString[0] === '-')
         sort[sortString.slice(1)] = -1;
     else
         sort[sortString] = 1;

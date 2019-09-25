@@ -1,6 +1,8 @@
 const {jsf} = require('./jsf.helper');
+const processFactory = require('./process.factory');
 
 function generateSingleSchema(mapId, maps) {
+    const processes = processFactory.generateMany();
     return {
         type: 'object',
         properties: {
@@ -14,12 +16,13 @@ function generateSingleSchema(mapId, maps) {
             },
             map: mapId,
             maps,
+            processes,
             _id: {
                 "type": "string",
                 "format": "mongoID"
             }
         },
-        required: ['code', '_id', 'map'],
+        required: ['code', '_id', 'map', 'processes'],
     };
 
 }

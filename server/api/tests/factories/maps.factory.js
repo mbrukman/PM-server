@@ -1,33 +1,67 @@
-const {jsf} = require('./jsf.helper');
+const { jsf } = require("./jsf.helper");
 const MapModel = require("../../models/map.model");
-const ProjectModel = require('../../models/project.model');
+const ProjectModel = require("../../models/project.model");
 
-function getSimpleMapSchema(name) {
-    return {
-        type: 'object',
-        properties: {
-            name
-        },
-        required: ['name'],
-    };
+function getSimpleMapSchema() {
+  return {
+    type: "object",
+    properties: {
+      _id: {
+        type: "string",
+        format: "mongoID"
+      },
+      name: {
+        type: "string",
+        chance: {
+          word: {
+            length: 10
+          }
+        }
+      }
+    },
+    required: ["_id", "name"]
+  };
 }
 
-function generateSimpleMaps(name) {
-    return jsf.generate(getSimpleMapSchema(name));
+function generateSimpleMap() {
+  return jsf.generate(getSimpleMapSchema());
 }
 
-async function createMap(projectId, index, mapName) {
-    const generatedMap = generateSimpleMaps(mapName);
-    try {
-        const map = await MapModel.create(generatedMap);
-        await ProjectModel.findByIdAndUpdate({_id: projectId}, {$push: {maps: map.id}});
-        return map;
-    } catch (err) {
-        throw err;
-    }
+async function createMap(projectId, mapName) {
+  const generatedMap = generateSimpleMap();
+  generatedMap.name = mapName || generatedMap.name;
+  try {
+    const map = await MapModel.create(generatedMap);
+    await addMapToProject(projectId, map.id);
+    return map;
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function addMapToProject(projectId, mapId) {
+  try {
+    await ProjectModel.findByIdAndUpdate(
+      { _id: projectId },
+      { $push: { maps: mapId } }
+    );
+  } catch (err) {
+    throw err;
+  }
+}
+
+function generateMany() {
+  return jsf.generate({
+    type: "array",
+    items: getSimpleMapSchema(),
+    maxItems: 15,
+    minItems: 5
+  });
 }
 
 module.exports = {
-    createMap,
-    generateSimpleMaps
+  createMap,
+  generateSimpleMap,
+  generateMany,
+  addMapToProject
 };

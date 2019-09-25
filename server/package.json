@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "spec": "speculate --name=kaholo-server",
-    "test": "jest api/tests --forceExit --coverage -w 1",
+    "test": "jest api/tests -w 1",
     "start": "node app.js",
     "build": "cd ../console && ng build",
     "build:prod": "cd ../console && ng build --prod",
@@ -42,6 +42,7 @@
     "jest-circus": "^24.9.0",
     "jest-environment-node": "^24.9.0",
     "json-schema-faker": "^0.5.0-rc17",
+    "socket.io-client": "^2.3.0",
     "speculate": "1.7.4",
     "supertest": "^4.0.2"
   },

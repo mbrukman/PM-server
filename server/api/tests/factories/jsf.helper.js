@@ -6,4 +6,6 @@ jsf.extend('chance', () => chance);
 
 jsf.format('mongoID', () => new ObjectId().toString());
 
+jsf.option('minLength', 5);
+
 module.exports = {jsf};

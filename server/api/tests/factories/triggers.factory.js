@@ -59,15 +59,27 @@ const triggerSchema = {
         active: { type: 'boolean', faker: 'random.boolean' },
         plugin: {
             type: 'string',
-            faker: 'random.word'
+            chance: {
+                word: {
+                    length: 10
+                }
+            }
         },
         method: {
             type: 'string',
-            faker: 'random.word'
+            chance: {
+                word: {
+                    length: 10
+                }
+            }
         },
         configuration: {
             type: 'string',
-            faker: 'random.word'
+            chance: {
+                word: {
+                    length: 10
+                }
+            }
         },
         params: {
             $ref: actionParamsSchema

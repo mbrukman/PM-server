@@ -25,7 +25,8 @@ module.exports = {
     triggerDelete: (req, res) => { 
         hooks.hookPre('trigger-delete', req).then(() => {
             return triggersService.delete(req.params.triggerId);
-        }).then(() => {
+        }).then((response) => {
+            if(!response.n) return res.status(500).send({message:'Trigger not found'})
             req.io.emit('notification', {
                 title: 'Trigger deleted',
                 message: ``,
