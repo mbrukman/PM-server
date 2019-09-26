@@ -1,3 +1,6 @@
+server/diagnostic.data
+server/mongod.lock
+server/storage.bson
 project
 /.idea/
 static_cdn/
