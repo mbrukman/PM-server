@@ -39,9 +39,6 @@ const expressWinstonTranports = [
 
 if (env.dbURI) {
     mongoose.connect(env.dbURI, {
-        // options for mongoose 4.11.3 and above
-        autoReconnect: true,
-        reconnectInterval: 1000,
         useNewUrlParser: true
     }).then(() => {
         winston.add(new winston.transports.MongoDB({
