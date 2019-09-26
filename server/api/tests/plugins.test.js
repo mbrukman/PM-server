@@ -108,7 +108,7 @@ describe("Plugins tests", () => {
     });
 
         describe(`GET /:id`, () => {
-            it.only(`should respond with status 500 and proper error msg for invalid id`, () => {
+            it(`should respond with status 500 and proper error msg for invalid id`, () => {
                 return request(app)
                     .get('/api/plugins/5d83a7dac12c6d695c3cbc66')
                     .expect(404)
