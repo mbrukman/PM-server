@@ -38,13 +38,18 @@ const expressWinstonTranports = [
   })];
 
 if (env.dbURI) {
-  mongoose.connect(env.dbURI).then(() => {
-    winston.add(new winston.transports.MongoDB({
-      db: env.dbURI,
-    }));
-    winston.log('info', `Succesfully Connected to the Mongodb at ${env.dbURI}`);
-  });
-  expressWinstonTranports.push(new winston.transports.MongoDB({db: env.dbURI}));
+    mongoose.connect(env.dbURI, {
+        // options for mongoose 4.11.3 and above
+        autoReconnect: true,
+        reconnectInterval: 1000,
+        useNewUrlParser: true
+    }).then(() => {
+        winston.add(new winston.transports.MongoDB({
+            db: env.dbURI,
+        }));
+        winston.log('info', `Successfully Connected to the Mongodb at ${env.dbURI}`);
+    });
+    expressWinstonTranports.push(new winston.transports.MongoDB({db: env.dbURI}));
 }
 
 // add express winston to router stack
@@ -82,16 +87,16 @@ app.use('/media', express.static(path.join(__dirname, '..media_cdn')));
 // //////////////////
 
 /* api references */
-const settingsApi = require('./routes/settings.routes');
-const mapsApi = require('./routes/maps.routes');
-const pluginsApi = require('./routes/plugins.routes');
-const agentsApi = require('./routes/agents.routes');
-const projectsApi = require('./routes/projects.routes');
-const triggersApi = require('./routes/triggers.routes');
-const scheduledJobsApi = require('./routes/scheduled-jobs.routes');
-const vaultApi = require('./routes/vault.routes');
-const configTokenApi = require('./routes/config-token.routes');
-const autoCompleteApi = require('./routes/autocomplete.routes');
+const settingsApi = require("./routes/settings.routes");
+const mapsApi = require("./routes/maps.routes");
+const pluginsApi = require("./routes/plugins.routes");
+const agentsApi = require("./routes/agents.routes");
+const projectsApi = require("./routes/projects.routes");
+const triggersApi = require("./routes/triggers.routes");
+const scheduledJobsApi = require("./routes/scheduled-jobs.routes");
+const vaultApi = require("./routes/vault.routes");
+const configTokenApi = require("./routes/config-token.routes");
+const autoCompleteApi = require("./routes/autocomplete.routes");
 
 app.use('/api/settings', settingsApi);
 app.use('/api/maps', mapsApi);
