@@ -25,17 +25,21 @@ module.exports = {
     });
   },
 
-  getPlugin: (req, res) => {
-    hooks.hookPre('get-plugin', req).then(() => {
-      return pluginsService.getPlugin(req.params.id);
-    }).then((plugins) => {
-      return res.json(plugins);
-    }).catch((error) => {
-      req.io.emit('notification', {title: 'Whoops', message: `We couldn't get the plugin`, type: 'error'});
-      winston.log('error', 'Error filtering plugin', error);
-      return res.status(500).send(error);
-    });
-  },
+    getPlugin: (req, res) => {
+        hooks.hookPre('get-plugin', req).then(() => {
+            return pluginsService.getPlugin(req.params.id);
+        }).then((plugins) => {
+            if (!plugins) {
+                return res.status(404).send('Plugin not found')
+            }
+            return res.json(plugins);
+        }).catch(error => {
+            req.io.emit('notification', { title: 'Whoops', message: `We couldn't get the plugin`, type: 'error' });
+            winston.log('error', "Error filtering plugin", error);
+            return res.status(500).send(error);
+        })
+
+    },
 
   /**
      * Creating a new plugin

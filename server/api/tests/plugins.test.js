@@ -17,23 +17,23 @@ describe("Plugins tests", () => {
       await testDataManager.pushToCollectionAndSave(plugin);
     });
 
-    afterAll(async () => {
-      await testDataManager.clear();
-    });
+        afterAll(async () => {
+            await testDataManager.clear();
+        });
 
-    describe(`POST /upload`, () => {
-      it(`should upload plugin`, () => {
-        return request(app)
-          .post(`/api/plugins/upload`)
-          .attach("file", pluginFile)
-          .expect(200)
-          .then(res => {
-            expect(res.body.active).toBe(true);
-            expect(Array.isArray(res.body.methods)).toBe(true);
-            expect(Array.isArray(res.body.methods[0].params)).toBe(true);
-          });
-      });
-    });
+        describe(`POST /upload`, () => {
+            it(`should upload plugin`, () => {
+                return request(app)
+                    .post(`/api/plugins/upload`)
+                    .attach('file', pluginFile)
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body.active).toBe(true);
+                        expect(Array.isArray(res.body.methods)).toBe(true);
+                        expect(Array.isArray(res.body.methods[0].params)).toBe(true);
+                    });
+            });
+        });
 
     describe(`GET /`, () => {
       it(`should respond with a list of plugins`, () => {
@@ -82,17 +82,17 @@ describe("Plugins tests", () => {
       });
     });
 
-    // notice: redundant "/delete"
-    describe(`DELETE /:id/delete`, () => {
-      it(`should respond with 200`, () => {
-        // notice: RETURNS 200 for ANY ID
-        return request(app)
-          .delete(`/api/plugins/${pluginId}`)
-          .expect(200)
-          .then();
-      });
+        // notice: redundant "/delete"
+        describe(`DELETE /:id`, () => {
+            it(`should respond with 200`, () => {
+                // notice: RETURNS 200 for ANY ID
+                return request(app)
+                    .delete(`/api/plugins/${pluginId}`)
+                    .expect(200).then();
+            });
+        });
+
     });
-  });
 
   describe("Negative", () => {
     describe(`POST /upload`, () => {
@@ -107,18 +107,16 @@ describe("Plugins tests", () => {
       });
     });
 
-    describe(`GET /:id`, () => {
-      it(`should respond with status 500 and proper error msg for invalid id`, () => {
-        return request(app)
-          .get("/api/plugins/0")
-          .expect(500)
-          .then(res => {
-            expect(res.body.message).toBe(
-              'Cast to ObjectId failed for value "0" at path "_id" for model "Plugin"'
-            );
-          });
-      });
-    });
+        describe(`GET /:id`, () => {
+            it.only(`should respond with status 500 and proper error msg for invalid id`, () => {
+                return request(app)
+                    .get('/api/plugins/5d83a7dac12c6d695c3cbc66')
+                    .expect(404)
+                    .then(({ text }) => {
+                        expect(text).toEqual('Plugin not found')
+                    })
+            });
+        });
 
     describe(`POST /:id/settings`, () => {
       it(`should respond with status 500 and proper error msg for invalid id`, () => {
@@ -142,16 +140,16 @@ describe("Plugins tests", () => {
       });
     });
 
-    describe(`POST /:id/settings`, () => {
-      it(`should respond with status 500 and error message`, () => {
-        return request(app)
-          .post(`/api/plugins/${pluginId}/settings`)
-          .expect(500)
-          .then(({ body }) => {
-            expect(body.message).toEqual(`Settings not found`);
-          });
-      });
-    });
+        describe(`POST /:id/settings`, () => {
+            it(`should respond with status 500 and error message`, () => {
+                return request(app)
+                    .post(`/api/plugins/${pluginId}/settings`)
+                    .expect(500)
+                    .then(({ body }) => {
+                        expect(body.message).toEqual(`Settings not found`);
+                    });
+            });
+        });
 
     describe(`DELETE /:id/delete`, () => {
       it(`should respond with status 500 and proper error msg`, () => {
