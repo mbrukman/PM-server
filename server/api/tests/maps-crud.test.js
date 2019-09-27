@@ -27,7 +27,7 @@ describe("Map crud tests", () => {
 
   beforeEach(async () => {
     await projectTestDataManager.generateInitialCollection(
-      projectsFactory.generateProjects()
+        projectsFactory.generateProjects()
     );
 
     await mapTestDataManager.generateInitialCollection(
@@ -47,7 +47,7 @@ describe("Map crud tests", () => {
     randomIndex = randomIdx(mapTestDataManager.collection.length);
     const map = mapTestDataManager.collection[randomIndex];
     await mapStructureTestDataManager.generateInitialCollection(
-      mapStructureFactory.generateMany(map._id.toString(), [map])
+        mapStructureFactory.generateMany(map._id.toString(), [map])
     );
     const mapStructure = mapStructureTestDataManager.collection[0];
     const process = mapStructure.processes[0];
@@ -64,7 +64,7 @@ describe("Map crud tests", () => {
     ]);
     mapResultTestDataManager.collection = orderBy(
       mapResultTestDataManager.collection,
-      ["startTime"],
+        ["startTime"],
       ["desc"]
     );
   });
@@ -80,35 +80,35 @@ describe("Map crud tests", () => {
       it(`should respond with a list of maps`, () => {
         return request(apiURL)
           .post(`/maps`)
-          .send({ options: {} })
-          .expect(200)
-          .then(({ body }) => {
-            expect(body.items.length).toEqual(
-              mapTestDataManager.collection.length
-            );
+            .send({ options: {} })
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.items.length).toEqual(
+                  mapTestDataManager.collection.length
+              );
             expect(body.totalCount).toEqual(
-              mapTestDataManager.collection.length
+                  mapTestDataManager.collection.length
             );
-          });
+            });
       });
 
       // adding some parameter to the api like page, sort and globalFilter
       it(`should respond with a list of maps`, () => {
         const globalFilter = mapTestDataManager.collection[0].name;
         const filtered = mapTestDataManager.collection.filter(
-          map => map.name === globalFilter
+            map => map.name === globalFilter
         );
         return request(apiURL)
-          .post(`/maps`)
-          .send({ options: { sort: "name", page: 1, globalFilter } })
-          .expect(200)
+            .post(`/maps`)
+            .send({ options: { sort: "name", page: 1, globalFilter } })
+            .expect(200)
           .then(({ body }) => {
-            expect(body.items.length).toEqual(filtered.length);
-            expect(body.totalCount).toEqual(filtered.length);
-            if (body.items.length) {
+              expect(body.items.length).toEqual(filtered.length);
+              expect(body.totalCount).toEqual(filtered.length);
+              if (body.items.length) {
               expect(body.items[0].name).toEqual(globalFilter);
             }
-          });
+            });
       });
     });
 
@@ -121,7 +121,7 @@ describe("Map crud tests", () => {
         return request(apiURL)
           .post(`/maps/create`)
           .send(randomMap)
-          .expect(200)
+            .expect(200)
           .then(res => expect(res.body.name).toEqual(randomMap.name));
       });
     });
@@ -133,9 +133,9 @@ describe("Map crud tests", () => {
         const randomMap = mapTestDataManager.collection[randomIndex];
         randomMap.name = mapName;
         return request(apiURL)
-          .put(`/maps/${randomMap.id}/update`)
-          .send(randomMap)
-          .expect(200)
+            .put(`/maps/${randomMap.id}/update`)
+            .send(randomMap)
+            .expect(200)
           .then(res => expect(res.text).toEqual("OK"));
       });
     });
@@ -147,52 +147,52 @@ describe("Map crud tests", () => {
         return request(apiURL)
           .put(`/maps/${mapId}/archive`)
           .send({ isArchive: true })
-          .expect(204);
+            .expect(204);
       });
     });
 
     describe(`GET /results`, () => {
       it(`should respond with recents maps`, () => {
         const randomIndex = randomIdx(
-          mapResultTestDataManager.collection.length
+            mapResultTestDataManager.collection.length
         );
         const mapId = mapResultTestDataManager.collection[
-          randomIndex
+            randomIndex
         ].map.toString();
         const executionId = mapResultTestDataManager.collection[
-          randomIndex
+            randomIndex
         ]._id.toString();
         return request(apiURL)
           .get(`/maps/results`)
-          .expect(200)
-          .then(({ body }) => {
-            expect(body.length).toBeLessThanOrEqual(16);
-            expect(body[randomIndex].map._id).toEqual(mapId);
-            expect(body[randomIndex]._id).toEqual(mapId);
-            expect(body[randomIndex].exec._id).toEqual(executionId);
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.length).toBeLessThanOrEqual(16);
+              expect(body[randomIndex].map._id).toEqual(mapId);
+              expect(body[randomIndex]._id).toEqual(mapId);
+              expect(body[randomIndex].exec._id).toEqual(executionId);
             expect(body[0].project._id).toEqual(project._id.toString());
-            expect(body[0].project.name).toEqual(project.name);
-          });
+              expect(body[0].project.name).toEqual(project.name);
+            });
       });
     });
 
     describe(`GET /recent`, () => {
       it(`should respond with recents maps`, () => {
         return request(apiURL)
-          .get(`/maps/recent`)
-          .expect(200)
+            .get(`/maps/recent`)
+            .expect(200)
           .then(({ body }) => {
-            const randomIndex = randomIdx(body.length);
-            expect(body.length).toBeLessThanOrEqual(4);
-            expect(body[randomIndex].map._id).toEqual(
+              const randomIndex = randomIdx(body.length);
+              expect(body.length).toBeLessThanOrEqual(4);
+              expect(body[randomIndex].map._id).toEqual(
               mapResultTestDataManager.collection[randomIndex].map.toString()
-            );
-            expect(body[randomIndex]._id).toEqual(
+              );
+              expect(body[randomIndex]._id).toEqual(
               mapResultTestDataManager.collection[randomIndex].map.toString()
-            );
-            expect(body[0].project._id).toEqual(project._id.toString());
+              );
+              expect(body[0].project._id).toEqual(project._id.toString());
             expect(body[0].project.name).toEqual(project.name);
-          });
+            });
       });
     });
 
@@ -201,7 +201,7 @@ describe("Map crud tests", () => {
         const randomIndex = randomIdx(mapTestDataManager.collection.length);
         const deletedMap = mapTestDataManager.collection[randomIndex];
         return request(apiURL)
-          .delete(`/maps/${deletedMap._id}`)
+            .delete(`/maps/${deletedMap._id}`)
           .expect(200);
       });
     });
@@ -211,9 +211,9 @@ describe("Map crud tests", () => {
         const randomIndex = randomIdx(mapTestDataManager.collection.length);
         const randomMap = mapTestDataManager.collection[randomIndex];
         return request(apiURL)
-          .get(`/maps/${randomMap._id}`)
-          .expect(200)
-          .then(res => expect(res.body.id).toEqual(randomMap._id.toString()));
+            .get(`/maps/${randomMap._id}`)
+            .expect(200)
+            .then(res => expect(res.body.id).toEqual(randomMap._id.toString()));
       });
     });
   });
@@ -222,7 +222,7 @@ describe("Map crud tests", () => {
     describe(`POST /`, () => {
       it(`should respond with 500 status code`, done => {
         return request(apiURL)
-          .post(`/maps`)
+            .post(`/maps`)
           .expect(500, done);
       });
     });
@@ -230,25 +230,25 @@ describe("Map crud tests", () => {
     describe(`POST /:create`, () => {
       it(`should respond with 500 status code`, done => {
         return request(apiURL)
-          .post(`/maps/create`)
-          .expect(400, done);
+            .post(`/maps/create`)
+            .expect(400, done);
       });
     });
 
     describe(`PUT /:id/update`, () => {
       it(`should respond with 500 status code`, done => {
         return request(apiURL)
-          .put(`/maps/0/update`)
-          .expect(500, done);
+            .put(`/maps/0/update`)
+            .expect(500, done);
       });
     });
 
     describe(`PUT /:id/archive`, () => {
       it(`should respond with 500 status code`, done => {
         return request(apiURL)
-          .put(`/maps/0/archive`)
-          .send({ isArchive: true })
-          .expect(500, done);
+            .put(`/maps/0/archive`)
+            .send({ isArchive: true })
+            .expect(500, done);
       });
     });
 
@@ -256,7 +256,7 @@ describe("Map crud tests", () => {
       it(`should respond with 500 status code`, done => {
         return request(apiURL)
           .delete(`/maps/0`)
-          .expect(500, done);
+            .expect(500, done);
       });
     });
 
@@ -264,7 +264,7 @@ describe("Map crud tests", () => {
       it(`should respond with 500 status code`, done => {
         return request(apiURL)
           .get(`/maps/0`)
-          .expect(500, done);
+            .expect(500, done);
       });
     });
   });

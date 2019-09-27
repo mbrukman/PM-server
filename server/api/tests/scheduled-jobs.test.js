@@ -16,15 +16,15 @@ describe("Scheduled Jobs tests", () => {
     describe(`GET /`, () => {
       it(`should respond with a list of Scheduled Jobs`, () => {
         const randomIndex = Math.floor(
-          Math.random() * testDataManager.collection.length
+            Math.random() * testDataManager.collection.length
         );
         const jobId = testDataManager.collection[randomIndex].id;
         return request(baseApiURL)
-          .get(`/scheduled-jobs`)
+            .get(`/scheduled-jobs`)
           .expect(200)
           .then(res => {
             expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body[randomIndex].id).toEqual(jobId);
+              expect(res.body[randomIndex].id).toEqual(jobId);
           });
       });
     });
@@ -37,10 +37,10 @@ describe("Scheduled Jobs tests", () => {
         const job = testDataManager.collection[randomIndex];
         job.skip = true;
         return request(baseApiURL)
-          .put(`/scheduled-jobs`)
-          .send(job)
+            .put(`/scheduled-jobs`)
+            .send(job)
           .expect(200)
-          .then(res => expect(res.body.id).toEqual(job.id));
+            .then(res => expect(res.body.id).toEqual(job.id));
       });
     });
 
@@ -51,9 +51,9 @@ describe("Scheduled Jobs tests", () => {
         );
         const job = testDataManager.collection[randomIndex];
         return request(baseApiURL)
-          .delete(`/scheduled-jobs/${job.id}`)
+            .delete(`/scheduled-jobs/${job.id}`)
           .expect(200)
-          .then(() => expect("OK"));
+            .then(() => expect("OK"));
       });
     });
 
@@ -61,7 +61,7 @@ describe("Scheduled Jobs tests", () => {
       it(`should respond with a list of future scheduled jobs`, () => {
         return request(baseApiURL)
           .get(`/scheduled-jobs/getFutureJobs`)
-          .expect(200)
+            .expect(200)
           .then(res => expect(Array.isArray(res.body)).toBe(true));
       });
     });
@@ -70,9 +70,9 @@ describe("Scheduled Jobs tests", () => {
       it(`should respond with a new job`, () => {
         const newJob = scheduledJobsFactory.generateSingleJob();
         return request(baseApiURL)
-          .post(`/scheduled-jobs/`)
+            .post(`/scheduled-jobs/`)
           .send(newJob)
-          .expect(200)
+            .expect(200)
           .then(res => expect(res.body.project).toEqual(newJob.project));
       });
     });
@@ -82,9 +82,9 @@ describe("Scheduled Jobs tests", () => {
     describe(`PUT /`, () => {
       it(`should respond with status code 500 and proper error msg`, done => {
         return request(baseApiURL)
-          .put(`/scheduled-jobs`)
+            .put(`/scheduled-jobs`)
           .send({ type: "once", cron: "cron" })
-          .expect(500, done);
+            .expect(500, done);
       });
     });
 
@@ -92,14 +92,14 @@ describe("Scheduled Jobs tests", () => {
       it(`should respond with status code 500 and proper error msg`, done => {
         return request(baseApiURL)
           .delete(`/scheduled-jobs/0`)
-          .expect(500, done);
+            .expect(500, done);
       });
     });
 
     describe(`POST /`, () => {
       it(`should respond with status code 500 and proper error msg`, done => {
         return request(baseApiURL)
-          .post(`/scheduled-jobs/`)
+            .post(`/scheduled-jobs/`)
           .send({ type: "once", cron: "cron" })
           .expect(500, done);
       });

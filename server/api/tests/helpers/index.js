@@ -26,7 +26,7 @@ module.exports = {
     const mapStructureTestDataManager = new TestDataManager(MapStructure);
     const projectTestDataManager = new TestDataManager(ProjectModel);
     const projects = await projectTestDataManager.generateInitialCollection(
-      projectsFactory.generateProjects()
+        projectsFactory.generateProjects()
     );
 
     const randomIndex = randomIdx(projectTestDataManager.collection.length);
@@ -34,7 +34,7 @@ module.exports = {
 
     const map = await mapsFactory.createMap(project.id, "random map name");
     const mapStructures = await mapStructureTestDataManager.generateInitialCollection(
-      mapStructureFactory.generateMany(map._id.toString(), [map])
+        mapStructureFactory.generateMany(map._id.toString(), [map])
     );
     return {
       map,

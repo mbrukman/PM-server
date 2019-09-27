@@ -12,7 +12,7 @@ describe("Agents tests", () => {
 
   beforeEach(async () => {
     await agentsTestDataManager.generateInitialCollection(
-      agentFactory.generateMany()
+        agentFactory.generateMany()
     );
 
     const agentsIds = agentsTestDataManager.collection.map(agent => {
@@ -20,7 +20,7 @@ describe("Agents tests", () => {
     });
 
     await groupsTestDataManager.generateInitialCollection(
-      groupFactory.generateMany(agentsIds)
+        groupFactory.generateMany(agentsIds)
     );
   });
 
@@ -35,10 +35,10 @@ describe("Agents tests", () => {
         const randomIndex = randomIdx(agentsTestDataManager.collection.length);
         const agentId = agentsTestDataManager.collection[randomIndex].id;
         return request(apiURL)
-          .get(`/agents`)
-          .expect(200)
+            .get(`/agents`)
+            .expect(200)
           .then(({ body }) => {
-            expect(body[randomIndex].id).toEqual(agentId);
+              expect(body[randomIndex].id).toEqual(agentId);
           });
       });
     });
@@ -49,9 +49,9 @@ describe("Agents tests", () => {
         const groupId = groupsTestDataManager.collection[randomIndex].id;
         return request(apiURL)
           .get(`/agents/groups`)
-          .expect(200)
+            .expect(200)
           .then(({ body }) => {
-            expect(body[randomIndex].id).toEqual(groupId);
+              expect(body[randomIndex].id).toEqual(groupId);
           });
       });
     });
@@ -62,11 +62,11 @@ describe("Agents tests", () => {
         const { id, name } = groupsTestDataManager.collection[randomIndex];
         return request(apiURL)
           .post(`/agents/groups`)
-          .send({ name: name, _id: id })
+            .send({ name: name, _id: id })
           .expect(200)
-          .then(({ body }) => {
+            .then(({ body }) => {
             expect(body[0].id).toEqual(id);
-            expect(body[0].name).toEqual(name);
+              expect(body[0].name).toEqual(name);
           });
       });
     });
@@ -79,12 +79,12 @@ describe("Agents tests", () => {
         const groupId = groupsTestDataManager.collection[groupRandomIndex].id;
         const agent = agentFactory.generateOne();
         return request(apiURL)
-          .put(`/agents/groups/${groupId}/add-agent`)
+            .put(`/agents/groups/${groupId}/add-agent`)
           .send([agent._id])
-          .expect(200)
-          .then(({ body }) => {
-            expect(body.agents[body.agents.length - 1]).toEqual(agent._id);
-          });
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.agents[body.agents.length - 1]).toEqual(agent._id);
+            });
       });
     });
 
@@ -96,9 +96,9 @@ describe("Agents tests", () => {
         const groupId = groupsTestDataManager.collection[groupRandomIndex].id;
         const groupName = "random group name";
         return request(apiURL)
-          .put(`/agents/groups/${groupId}`)
+            .put(`/agents/groups/${groupId}`)
           .send({ name: groupName })
-          .expect(200)
+            .expect(200)
           .then(({ body }) => {
             expect(body.name).toEqual(groupName);
           });
@@ -108,7 +108,7 @@ describe("Agents tests", () => {
     describe(`POST /groups/:id/add-filters`, () => {
       it(`should respond with the groups`, () => {
         const groupRandomIndex = randomIdx(
-          groupsTestDataManager.collection.length
+            groupsTestDataManager.collection.length
         );
         const groupId = groupsTestDataManager.collection[groupRandomIndex].id;
         const newFilter = [
@@ -119,12 +119,12 @@ describe("Agents tests", () => {
           }
         ];
         return request(apiURL)
-          .post(`/agents/groups/${groupId}/add-filters`)
-          .send(newFilter)
-          .expect(200)
+            .post(`/agents/groups/${groupId}/add-filters`)
+            .send(newFilter)
+            .expect(200)
           .then(({ body }) => {
-            expect(body.filters[0]).toMatchObject(newFilter[0]);
-          });
+              expect(body.filters[0]).toMatchObject(newFilter[0]);
+            });
       });
     });
 
@@ -132,12 +132,12 @@ describe("Agents tests", () => {
       it(`should respond with the created group`, () => {
         const newGroup = groupFactory.generateOne([]);
         return request(apiURL)
-          .post(`/agents/groups/create`)
+            .post(`/agents/groups/create`)
           .send(newGroup)
-          .expect(200)
+            .expect(200)
           .then(({ body }) => {
-            expect(body.id).toEqual(newGroup._id);
-            expect(body.name).toEqual(newGroup.name);
+              expect(body.id).toEqual(newGroup._id);
+              expect(body.name).toEqual(newGroup.name);
           });
       });
     });
@@ -145,14 +145,14 @@ describe("Agents tests", () => {
     describe(`GET /groups/:id`, () => {
       it(`should respond with the specific group`, () => {
         const groupRandomIndex = randomIdx(
-          groupsTestDataManager.collection.length
+            groupsTestDataManager.collection.length
         );
         const groupId = groupsTestDataManager.collection[groupRandomIndex].id;
         return request(apiURL)
-          .get(`/agents/groups/${groupId}`)
-          .expect(200)
+            .get(`/agents/groups/${groupId}`)
+            .expect(200)
           .then(({ body }) => {
-            expect(body.id).toEqual(groupId);
+              expect(body.id).toEqual(groupId);
           });
       });
     });
@@ -164,10 +164,10 @@ describe("Agents tests", () => {
         );
         const groupId = groupsTestDataManager.collection[groupRandomIndex].id;
         return request(apiURL)
-          .delete(`/agents/groups/${groupId}`)
-          .expect(200)
+            .delete(`/agents/groups/${groupId}`)
+            .expect(200)
           .then(({ text }) => {
-            expect(text).toEqual(groupId);
+              expect(text).toEqual(groupId);
           });
       });
     });
@@ -175,7 +175,7 @@ describe("Agents tests", () => {
     describe(`POST /groups/:id/remove-agent`, () => {
       it(`should respond with the group`, () => {
         const groupRandomIndex = randomIdx(
-          groupsTestDataManager.collection.length
+            groupsTestDataManager.collection.length
         );
         const { id, agents } = groupsTestDataManager.collection[
           groupRandomIndex
@@ -183,11 +183,11 @@ describe("Agents tests", () => {
         const agent = agents[0];
         return request(apiURL)
           .post(`/agents/groups/${id}/remove-agent`)
-          .send({ agentId: agent })
-          .expect(200)
+            .send({ agentId: agent })
+            .expect(200)
           .then(({ body }) => {
-            expect(body.id).toEqual(id);
-            expect(body.agents.includes(agent)).toEqual(false);
+              expect(body.id).toEqual(id);
+              expect(body.agents.includes(agent)).toEqual(false);
           });
       });
     });
@@ -195,18 +195,18 @@ describe("Agents tests", () => {
     describe(`DELETE /groups/:id/filters/:index`, () => {
       it(`should respond with the group`, () => {
         const groupRandomIndex = randomIdx(
-          groupsTestDataManager.collection.length
+            groupsTestDataManager.collection.length
         );
         const { id, filters } = groupsTestDataManager.collection[
-          groupRandomIndex
+            groupRandomIndex
         ];
         const filterRandomIndex = randomIdx(filters.length);
         return request(apiURL)
-          .delete(`/agents/groups/${id}/filters/${filterRandomIndex}`)
-          .expect(200)
-          .then(({ body }) => {
+            .delete(`/agents/groups/${id}/filters/${filterRandomIndex}`)
+            .expect(200)
+            .then(({ body }) => {
             expect(body.id).toEqual(id);
-            expect(body.filters.length).toEqual(filters.length - 1);
+              expect(body.filters.length).toEqual(filters.length - 1);
           });
       });
     });
@@ -217,9 +217,9 @@ describe("Agents tests", () => {
         const agentId = agentsTestDataManager.collection[randomIndex].id;
         return request(apiURL)
           .delete(`/agents/${agentId}`)
-          .expect(200)
+            .expect(200)
           .then(({ text }) => {
-            expect(text).toEqual("OK");
+              expect(text).toEqual("OK");
           });
       });
     });
@@ -231,11 +231,11 @@ describe("Agents tests", () => {
         const newAgentName = "random agent name";
         return request(apiURL)
           .put(`/agents/${agentId}`)
-          .send({ name: newAgentName })
+            .send({ name: newAgentName })
           .expect(200)
-          .then(({ body }) => {
-            expect(body.id).toEqual(agentId);
-            expect(body.name).toEqual(newAgentName);
+            .then(({ body }) => {
+              expect(body.id).toEqual(agentId);
+              expect(body.name).toEqual(newAgentName);
           });
       });
     });
@@ -245,15 +245,15 @@ describe("Agents tests", () => {
     describe(`PUT /groups/:id/add-agent`, () => {
       it(`should respond with 500 status code`, done => {
         return request(apiURL)
-          .put(`/agents/groups/0/add-agent`)
-          .expect(500, done);
+            .put(`/agents/groups/0/add-agent`)
+            .expect(500, done);
       });
     });
 
     describe(`PUT /groups/:id`, () => {
       it(`should respond with 500 status code`, done => {
         return request(apiURL)
-          .put(`/agents/groups/0`)
+            .put(`/agents/groups/0`)
           .expect(500, done);
       });
     });
@@ -268,8 +268,8 @@ describe("Agents tests", () => {
           }
         ];
         return request(apiURL)
-          .post(`/agents/groups/0/add-filters`)
-          .send(newFilter)
+            .post(`/agents/groups/0/add-filters`)
+            .send(newFilter)
           .expect(500, done);
       });
     });
@@ -277,7 +277,7 @@ describe("Agents tests", () => {
     describe(`POST /groups/create`, () => {
       it(`should respond with 500 status code`, done => {
         return request(apiURL)
-          .post(`/agents/groups/create`)
+            .post(`/agents/groups/create`)
           .expect(500, done);
       });
     });
@@ -285,7 +285,7 @@ describe("Agents tests", () => {
     describe(`GET /groups/:id`, () => {
       it(`should respond with 500 status code`, done => {
         return request(apiURL)
-          .get(`/agents/groups/0`)
+            .get(`/agents/groups/0`)
           .expect(500, done);
       });
     });
@@ -309,7 +309,7 @@ describe("Agents tests", () => {
     describe(`DELETE /groups/:id/filters/:index`, () => {
       it(`should respond with 500 status code`, done => {
         return request(apiURL)
-          .delete(`/agents/groups/0/filters/0`)
+            .delete(`/agents/groups/0/filters/0`)
           .expect(500, done);
       });
     });
@@ -317,8 +317,8 @@ describe("Agents tests", () => {
     describe(`DELETE /:id`, () => {
       it(`should respond with 500 status code`, done => {
         return request(apiURL)
-          .delete(`/agents/0`)
-          .expect(500, done);
+            .delete(`/agents/0`)
+            .expect(500, done);
       });
     });
 
@@ -326,7 +326,7 @@ describe("Agents tests", () => {
       it(`should respond with 500 status code`, done => {
         return request(apiURL)
           .put(`/agents/0`)
-          .expect(500, done);
+            .expect(500, done);
       });
     });
   });

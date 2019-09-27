@@ -24,30 +24,30 @@ describe("Map execution tests", () => {
     it(`should handle lack of map`, () => {
       const mapId = mapsFactory.generateSimpleMap()._id;
       return request(app)
-        .post(`/api/maps/${mapId}/execute`)
+          .post(`/api/maps/${mapId}/execute`)
         .expect(500)
         .then(({ text }) => {
           expect(text).toBe("Couldn't find map");
-        });
+          });
     });
 
     it(`should handle lack of map structure`, () => {
       return request(app)
         .post(`/api/maps/${mapId}/execute`)
-        .expect(500)
+          .expect(500)
         .then(({ text }) => {
           expect(text).toBe("No structure found.");
-        });
+          });
     });
 
     it(`should not execute an archived map`, async () => {
       await MapModel.findByIdAndUpdate(mapId, { archived: true });
       return request(app)
         .post(`/api/maps/${mapId}/execute`)
-        .expect(500)
+          .expect(500)
         .then(({ text }) => {
           expect(text).toBe("Can't execute archived map");
-        });
+          });
     });
 
     it(`should handle no agents alive when trigger is 'started manually by user'`, async () => {
@@ -55,12 +55,12 @@ describe("Map execution tests", () => {
         mapStructureFactory.generateOne(mapId)
       );
       return request(app)
-        .post(`/api/maps/${mapId}/execute`)
+          .post(`/api/maps/${mapId}/execute`)
         .send({ trigger: "Started manually by user" })
-        .expect(500)
+          .expect(500)
         .then(res => {
           expect(res.text).toBe("No agents alive");
-        });
+          });
     });
 
     it(`should respond with new runId and current mapId`, async () => {
@@ -68,13 +68,13 @@ describe("Map execution tests", () => {
         mapStructureFactory.generateOne(mapId)
       );
       return request(app)
-        .post(`/api/maps/${mapId}/execute`)
-        .expect(200)
+          .post(`/api/maps/${mapId}/execute`)
+          .expect(200)
         .then(({ body }) => {
           expect(body.runId).toBeDefined();
           expect(typeof body.runId).toBe("string");
-          expect(body.runId.length > 0).toBe(true);
-          expect(body.mapId).toBe(mapId);
+            expect(body.runId.length > 0).toBe(true);
+            expect(body.mapId).toBe(mapId);
         });
     });
   });
@@ -95,52 +95,52 @@ describe("Map execution tests", () => {
       const invalidStructureId = mapId;
       return request(app)
         .post(`/api/maps/${mapId}/execute/${invalidStructureId}`)
-        .expect(500)
+          .expect(500)
         .then(({ text }) => {
           expect(text).toBe("Couldn't find map");
-        });
+          });
     });
 
     it(`should handle lack of map structure`, () => {
       const invalidStructureId = mapId;
       return request(app)
         .post(`/api/maps/${mapId}/execute/${invalidStructureId}`)
-        .expect(500)
+          .expect(500)
         .then(({ text }) => {
           expect(text).toBe("No structure found.");
-        });
+          });
     });
 
     it(`should not execute an archived map`, async () => {
       await MapModel.findByIdAndUpdate(mapId, { archived: true });
       return request(app)
         .post(`/api/maps/${mapId}/execute/${structureId}`)
-        .expect(500)
+          .expect(500)
         .then(({ text }) => {
-          expect(text).toBe("Can't execute archived map");
-        });
+            expect(text).toBe("Can't execute archived map");
+          });
     });
 
     it(`should handle no agents alive when trigger is 'started manually by user'`, () => {
       return request(app)
-        .post(`/api/maps/${mapId}/execute/${structureId}`)
-        .send({ trigger: "Started manually by user" })
+          .post(`/api/maps/${mapId}/execute/${structureId}`)
+          .send({ trigger: "Started manually by user" })
         .expect(500)
-        .then(res => {
+          .then(res => {
           expect(res.text).toBe("No agents alive");
         });
     });
 
     it(`should respond with new runId and current mapId`, () => {
       return request(app)
-        .post(`/api/maps/${mapId}/execute/${structureId}`)
+          .post(`/api/maps/${mapId}/execute/${structureId}`)
         .expect(200)
         .then(({ body }) => {
           expect(body.runId).toBeDefined();
-          expect(typeof body.runId).toBe("string");
+            expect(typeof body.runId).toBe("string");
           expect(body.runId.length > 0).toBe(true);
           expect(body.mapId).toBe(mapId);
-        });
+          });
     });
   });
 
@@ -150,10 +150,10 @@ describe("Map execution tests", () => {
     it(`should return {}`, () => {
       return request(app)
         .get(`/api/maps/${mapId}/stop-execution`)
-        .expect(200)
+          .expect(200)
         .then(({ body }) => {
           expect(body).toEqual({});
-        });
+          });
     });
   });
 
@@ -164,10 +164,10 @@ describe("Map execution tests", () => {
       const random = Math.floor(Math.random() * 10 + 1);
       return request(app)
         .get(`/api/maps/${mapId}/stop-execution/${random}`)
-        .expect(200)
+          .expect(200)
         .then(({ body }) => {
-          expect(body).toEqual({});
-        });
+            expect(body).toEqual({});
+          });
     });
   });
 
@@ -186,8 +186,8 @@ describe("Map execution tests", () => {
   describe("GET /api/maps/currentruns", () => {
     it(`should return {} for no current runs`, () => {
       return request(app)
-        .get(`/api/maps/currentruns`)
-        .expect(200)
+          .get(`/api/maps/currentruns`)
+          .expect(200)
         .then(({ body }) => {
           expect(body).toEqual({});
         });
