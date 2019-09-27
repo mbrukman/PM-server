@@ -28,18 +28,18 @@ describe("Map revisions endpoints should work correctly", () => {
 
   beforeEach(async () => {
     await projectTestDataManager.generateInitialCollection(
-      projectsFactory.generateProjects()
+        projectsFactory.generateProjects()
     );
 
     const agent = await agentsTestDataManager.pushToCollectionAndSave(
-      agentFactory.generateOne()
+        agentFactory.generateOne()
     );
 
     const randomIndex = randomIdx(projectTestDataManager.collection.length);
     project = projectTestDataManager.collection[randomIndex];
     map = await mapsFactory.createMap(
-      project.id,
-      project.name,
+        project.id,
+        project.name,
       "random map name"
     );
 
@@ -52,11 +52,11 @@ describe("Map revisions endpoints should work correctly", () => {
     const processId = process._id.toString();
 
     await mapResultTestDataManager.generateInitialCollection(
-      mapResultFactory.generateMany({
-        agentId: agent._id.toString(),
-        mapStructureId: mapStructure._id.toString(),
+        mapResultFactory.generateMany({
+          agentId: agent._id.toString(),
+          mapStructureId: mapStructure._id.toString(),
         mapId: map._id.toString(),
-        processId,
+          processId,
         actionId
       })
     );
@@ -65,40 +65,40 @@ describe("Map revisions endpoints should work correctly", () => {
   describe("/GET requests for requests of given map", () => {
     it("should return status 200 and all results assigned to the map", () => {
       return request(apiURL)
-        .get(`/maps/${map._id}/results`)
+          .get(`/maps/${map._id}/results`)
         .expect(200)
-        .then(({ body }) => {
+          .then(({ body }) => {
           expect.assertions(1);
-          expect(body.length).toEqual(
-            mapResultTestDataManager.collection.length
-          );
-        });
+            expect(body.length).toEqual(
+                mapResultTestDataManager.collection.length
+            );
+          });
     });
 
     it("should return status 500 and return none of the results assigned to the map", () => {
       return request(apiURL)
         .get(`/maps/undefined/results`)
         .expect(500)
-        .then(({ body }) => {
-          expect.assertions(2);
-          expect(body.name).toEqual("CastError");
+          .then(({ body }) => {
+            expect.assertions(2);
+            expect(body.name).toEqual("CastError");
           expect(body.message).toEqual(
-            'Cast to ObjectId failed for value "undefined" at path "map" for model "MapResult"'
+                'Cast to ObjectId failed for value "undefined" at path "map" for model "MapResult"'
           );
-        });
+          });
     });
 
     it("should return status 200 and chosen result with given map id and result id", () => {
       const idx = randomIdx(mapResultTestDataManager.collection.length);
       const result = mapResultTestDataManager.collection[idx];
       return request(apiURL)
-        .get(`/maps/${map._id}/results/${result._id}`)
+          .get(`/maps/${map._id}/results/${result._id}`)
         .expect(200)
-        .then(({ body }) => {
-          expect.assertions(3);
+          .then(({ body }) => {
+            expect.assertions(3);
           expect(body.reason).toEqual(result.reason);
-          expect(body.trigger).toEqual(result.trigger);
-          expect(body._id).toEqual(result._id.toString());
+            expect(body.trigger).toEqual(result.trigger);
+            expect(body._id).toEqual(result._id.toString());
         });
     });
 
@@ -106,26 +106,26 @@ describe("Map revisions endpoints should work correctly", () => {
       const idx = randomIdx(mapResultTestDataManager.collection.length);
       const result = mapResultTestDataManager.collection[idx];
       return request(apiURL)
-        .get(`/maps/undefined/results/${result._id}`)
-        .expect(200)
+          .get(`/maps/undefined/results/${result._id}`)
+          .expect(200)
         .then(({ body }) => {
-          expect.assertions(3);
+            expect.assertions(3);
           expect(body.reason).toEqual(result.reason);
-          expect(body.trigger).toEqual(result.trigger);
+            expect(body.trigger).toEqual(result.trigger);
           expect(body._id).toEqual(result._id.toString());
-        });
+          });
     });
 
     it("should return status 500 and no result without given result id", () => {
       return request(apiURL)
-        .get(`/maps/${map._id}/results/undefined`)
-        .expect(500)
+          .get(`/maps/${map._id}/results/undefined`)
+          .expect(500)
         .then(({ body }) => {
-          expect.assertions(2);
-          expect(body.name).toEqual("CastError");
-          expect(body.message).toEqual(
-            'Cast to ObjectId failed for value "undefined" at path "_id" for model "MapResult"'
-          );
+            expect.assertions(2);
+            expect(body.name).toEqual("CastError");
+            expect(body.message).toEqual(
+                'Cast to ObjectId failed for value "undefined" at path "_id" for model "MapResult"'
+            );
         });
     });
 
@@ -133,45 +133,45 @@ describe("Map revisions endpoints should work correctly", () => {
       const idx = randomIdx(mapResultTestDataManager.collection.length);
       const result = mapResultTestDataManager.collection[idx];
       return request(apiURL)
-        .get(`/maps/${map._id}/results/${result._id}/logs`)
+          .get(`/maps/${map._id}/results/${result._id}/logs`)
         .expect(200)
-        .then(({ body }) => {
-          expect.assertions(2);
-          expect(Array.isArray(body)).toBeTruthy();
+          .then(({ body }) => {
+            expect.assertions(2);
+            expect(Array.isArray(body)).toBeTruthy();
           expect(body.length).toBeGreaterThan(0);
         });
     });
 
     it("should return status 500 and no logs for chosen result", () => {
       return request(apiURL)
-        .get(`/maps/${map._id}/results/${undefined}/logs`)
+          .get(`/maps/${map._id}/results/${undefined}/logs`)
         .expect(500)
-        .then(({ body }) => {
-          expect.assertions(1);
-          expect(body).toMatchObject({});
+          .then(({ body }) => {
+            expect.assertions(1);
+            expect(body).toMatchObject({});
         });
     });
 
     it("should return status 200 and results logs assigned to the map", () => {
       return request(apiURL)
-        .get(`/maps/${map._id}/results/logs`)
+          .get(`/maps/${map._id}/results/logs`)
         .expect(200)
-        .then(({ body }) => {
-          expect.assertions(2);
+          .then(({ body }) => {
+            expect.assertions(2);
           expect(Array.isArray(body)).toBeTruthy();
-          expect(body.length).toBeGreaterThan(0);
+            expect(body.length).toBeGreaterThan(0);
         });
     });
 
     it("should return status 200 and results logs assigned to the first random map", () => {
       return request(apiURL)
         .get(`/maps/undefined/results/logs`)
-        .expect(200)
-        .then(({ body }) => {
-          expect.assertions(2);
-          expect(Array.isArray(body)).toBeTruthy();
+          .expect(200)
+          .then(({ body }) => {
+            expect.assertions(2);
+            expect(Array.isArray(body)).toBeTruthy();
           expect(body.length).toBeGreaterThan(0);
-        });
+          });
     });
   });
 });

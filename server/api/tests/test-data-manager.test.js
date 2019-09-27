@@ -13,7 +13,7 @@ describe("Make sure DataTestManager is working as expected", () => {
     it("should initialise the collection and return it", async done => {
       try {
         const rawReceived = await testDataManager.generateInitialCollection(
-          vaultsFactory.generateVaults()
+            vaultsFactory.generateVaults()
         );
         const rawExpected = await VaultModel.find({});
 
@@ -48,7 +48,7 @@ describe("Make sure DataTestManager is working as expected", () => {
   describe("Deleting single record via DataTestManager.", () => {
     beforeEach(async () => {
       await testDataManager.generateInitialCollection(
-        vaultsFactory.generateVaults()
+          vaultsFactory.generateVaults()
       );
     });
 

@@ -10,22 +10,22 @@ describe("All vaults endpoints are working as expected.", () => {
   beforeEach(() => {
     testDataManager = new TestDataManager(VaultModel);
     return testDataManager.generateInitialCollection(
-      vaultsFactory.generateVaults(),
-      {},
-      null,
-      "key description id"
+        vaultsFactory.generateVaults(),
+        {},
+        null,
+        "key description id"
     );
   });
 
   describe("Get all vaults, GET /vaults", () => {
     it("should return all vaults in system", () => {
       return request(baseApiURL)
-        .get(`/vault`)
-        .expect(200)
-        .expect("Content-Type", /json/)
+          .get(`/vault`)
+          .expect(200)
+          .expect("Content-Type", /json/)
         .then(res => {
-          expect.assertions(1);
-          expect(res.body.length).toEqual(testDataManager.collection.length);
+            expect.assertions(1);
+            expect(res.body.length).toEqual(testDataManager.collection.length);
         });
     });
   });
@@ -36,28 +36,28 @@ describe("All vaults endpoints are working as expected.", () => {
       testDataManager.pushToCollection(expected);
 
       return request(baseApiURL)
-        .post(`/vault`)
-        .send(expected)
+          .post(`/vault`)
+          .send(expected)
         .expect(200)
-        .expect("Content-Type", /json/)
-        .then(({ body }) => {
+          .expect("Content-Type", /json/)
+          .then(({ body }) => {
           expect.assertions(3);
-          expect(body.key).toBe(expected.key);
+            expect(body.key).toBe(expected.key);
           expect(body._id).toBe(expected._id);
-          expect(body.description).toBe(expected.description);
+            expect(body.description).toBe(expected.description);
         });
     });
 
     it("should not create", done => {
       return request(baseApiURL)
-        .post(`/vault`)
+          .post(`/vault`)
         .send()
-        .expect(500, done);
+          .expect(500, done);
     });
 
     it("should not create, save and return vault with wrong body passed to it", done => {
       return request(baseApiURL)
-        .post(`/vault`)
+          .post(`/vault`)
         .send({ message: "xyz", vault: 6131 })
         .expect(500, done);
     });
@@ -67,16 +67,16 @@ describe("All vaults endpoints are working as expected.", () => {
     it("should update a vault and return old record", () => {
       const expected = testDataManager.collection[0];
       return request(baseApiURL)
-        .put(`/vault/${expected._id}`)
+          .put(`/vault/${expected._id}`)
         .send({
-          description:
+            description:
             "That is a random key with random value, why even bother?"
         })
         .expect(200)
-        .expect("Content-Type", /json/)
-        .then(({ body }) => {
-          expect.assertions(1);
-          expect(body.description).toBe(expected.description);
+          .expect("Content-Type", /json/)
+          .then(({ body }) => {
+            expect.assertions(1);
+            expect(body.description).toBe(expected.description);
         });
     });
   });
@@ -85,11 +85,11 @@ describe("All vaults endpoints are working as expected.", () => {
     it("should respond with OK and deleted count", () => {
       const vault = testDataManager.collection[0];
       return request(baseApiURL)
-        .del(`/vault/${vault._id}`)
+          .del(`/vault/${vault._id}`)
         .expect(204)
-        .then(() => {
+          .then(() => {
           testDataManager.removeFromCollection(vault);
-        });
+          });
     });
   });
 });

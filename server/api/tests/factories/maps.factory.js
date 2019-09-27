@@ -42,8 +42,8 @@ async function createMap(projectId, mapName) {
 async function addMapToProject(projectId, mapId) {
   try {
     await ProjectModel.findByIdAndUpdate(
-      { _id: projectId },
-      { $push: { maps: mapId } }
+        { _id: projectId },
+        { $push: { maps: mapId } }
     );
   } catch (err) {
     throw err;

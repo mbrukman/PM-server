@@ -22,11 +22,11 @@ describe("Map triggers tests", () => {
       it(`should respond with a list of triggers`, function(done) {
         request(app)
           .get(`/api/triggers/${mapId}`)
-          .expect(200)
+            .expect(200)
           .then(res => {
-            expect(Array.isArray(res.body)).toBe(true);
-            done();
-          });
+              expect(Array.isArray(res.body)).toBe(true);
+              done();
+            });
       });
     });
 
@@ -36,12 +36,12 @@ describe("Map triggers tests", () => {
         const plugin = "test trigger plugin";
         const method = "test trigger method";
         request(app)
-          .post(`/api/triggers/${mapId}`)
-          .send({ name: triggerName, plugin: plugin, method: method })
-          .expect(200)
+            .post(`/api/triggers/${mapId}`)
+            .send({ name: triggerName, plugin: plugin, method: method })
+            .expect(200)
           .then(res => {
             expect(res.body.name).toEqual(triggerName);
-            done();
+              done();
           });
       });
     });
@@ -52,11 +52,11 @@ describe("Map triggers tests", () => {
         const triggerId = testDataManager.collection[randomIndex].id;
         return request(app)
           .delete(`/api/triggers/${mapId}/${triggerId}`)
-          .expect(200)
-          .then(() => {
+            .expect(200)
+            .then(() => {
             expect("OK");
             done();
-          });
+            });
       });
     });
 
@@ -66,13 +66,13 @@ describe("Map triggers tests", () => {
         const triggerId = testDataManager.collection[randomIndex].id;
         const newTriggerName = "test trigger name 2";
         request(app)
-          .put(`/api/triggers/${mapId}/${triggerId}`)
-          .send({ name: newTriggerName })
+            .put(`/api/triggers/${mapId}/${triggerId}`)
+            .send({ name: newTriggerName })
           .expect(200)
           .then(res => {
             expect(res.body.name).toEqual(newTriggerName);
-            done();
-          });
+              done();
+            });
       });
     });
   });
@@ -82,14 +82,14 @@ describe("Map triggers tests", () => {
       it(`should respond with status code 500 and proper error msg`, function(done) {
         request(app)
           .get("/api/triggers/0")
-          .expect(500, done);
+            .expect(500, done);
       });
     });
 
     describe(`POST /:mapId`, () => {
       it(`should respond with status code 500 and proper error msg`, function(done) {
         request(app)
-          .post("/api/triggers/0")
+            .post("/api/triggers/0")
           .expect(500, done);
       });
     });
@@ -97,27 +97,27 @@ describe("Map triggers tests", () => {
     describe(`DELETE /:mapId/:triggerId`, () => {
       it(`should respond with status code 500 and proper error msg`, function(done) {
         request(app)
-          .delete(
+            .delete(
             "/api/triggers/5d83970f611fb22814c56c07/5d83970f611fb22814c56c07"
           )
           .expect(500)
           .then(({ body }) => {
             expect(body.message).toBe("Trigger not found");
-            done();
-          });
+              done();
+            });
       });
     });
 
     describe(`PUT /:mapId/:triggerId`, () => {
       it(`should respond with status code 500 and proper error msg`, function(done) {
         request(app)
-          .put("/api/triggers/0/0")
-          .expect(500)
+            .put("/api/triggers/0/0")
+            .expect(500)
           .then(res => {
-            expect(res.body.message).toEqual(
+              expect(res.body.message).toEqual(
               'Cast to ObjectId failed for value "0" at path "_id" for model "Trigger"'
-            );
-            done();
+              );
+              done();
           });
       });
     });

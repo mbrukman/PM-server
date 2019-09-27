@@ -50,13 +50,13 @@ module.exports = class TestDataManager {
   remove(document) {
     if (document && document._id) {
       return this.currentMongooseModel
-        .findByIdAndRemove(document._id)
+          .findByIdAndRemove(document._id)
         .then(response => {
-          this.collection = this.collection.filter(
-            item => item.id !== document.id
-          );
+            this.collection = this.collection.filter(
+            (item) => item.id !== document.id
+            );
           return response;
-        });
+          });
     } else {
       throw new Error("Passed document has no id property!");
     }
@@ -65,7 +65,7 @@ module.exports = class TestDataManager {
   removeFromCollection(document) {
     if (document && document._id) {
       this.collection = this.collection.filter(
-        item => item.id !== document._id
+          (item) => item.id !== document._id
       );
       return this.collection;
     } else {
@@ -81,7 +81,7 @@ module.exports = class TestDataManager {
       return this.collection;
     } catch (err) {
       throw new Error(
-        `There was an error with clearing the collection and the database: ${err.message}`
+          `There was an error with clearing the collection and the database: ${err.message}`
       );
     }
   }
@@ -93,7 +93,7 @@ module.exports = class TestDataManager {
 
     try {
       this.collection = await this.currentMongooseModel.insertMany(
-        generatedData,
+          generatedData,
         { ordered: true }
       );
       return this.collection;

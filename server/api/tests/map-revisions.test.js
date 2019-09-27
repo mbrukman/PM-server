@@ -24,7 +24,7 @@ describe("Map revision endpoints should work correctly", () => {
 
   beforeEach(async () => {
     await projectTestDataManager.generateInitialCollection(
-      projectsFactory.generateProjects()
+        projectsFactory.generateProjects()
     );
 
     const randomIndex = randomIdx(projectTestDataManager.collection.length);
@@ -32,7 +32,7 @@ describe("Map revision endpoints should work correctly", () => {
 
     map = await mapsFactory.createMap(project.id, "random map name");
     await mapStructureTestDataManager.generateInitialCollection(
-      mapStructureFactory.generateMany(map._id.toString(), [map])
+        mapStructureFactory.generateMany(map._id.toString(), [map])
     );
   });
 
@@ -45,36 +45,36 @@ describe("Map revision endpoints should work correctly", () => {
   describe("/GET works correctly", () => {
     it("should return 200 and single structure", () => {
       return request(apiURL)
-        .get(`/maps/${map._id}/structure`)
-        .expect(200)
+          .get(`/maps/${map._id}/structure`)
+          .expect(200)
         .then(({ body }) => {
           expect.assertions(1);
-          expect(body.map).toBe(map._id.toString());
+            expect(body.map).toBe(map._id.toString());
         });
     });
 
     it("should return 500 and error message instead of single structure", () => {
       return request(apiURL)
-        .get(`/maps/undefined/structure`)
-        .expect(500)
+          .get(`/maps/undefined/structure`)
+          .expect(500)
         .then(({ body }) => expect(body.name).toBe("CastError"));
     });
 
     it("should return 200 and all structures in the system", () => {
       return request(apiURL)
-        .get(`/maps/${map._id}/structures`)
+          .get(`/maps/${map._id}/structures`)
         .expect(200)
-        .then(({ body }) => {
-          expect.assertions(1);
-          expect(body.length).toBe(
+          .then(({ body }) => {
+            expect.assertions(1);
+            expect(body.length).toBe(
             mapStructureTestDataManager.collection.length
-          );
+            );
         });
     });
 
     it("should return 500 and error message instead of all structures", () => {
       return request(apiURL)
-        .get(`/maps/undefined/structures`)
+          .get(`/maps/undefined/structures`)
         .expect(500)
         .then(({ body }) => expect(body.name).toBe("CastError"));
     });
@@ -82,30 +82,30 @@ describe("Map revision endpoints should work correctly", () => {
     it("should return 200 and single structure chosen by passed id", () => {
       const structure = mapStructureTestDataManager.collection[0];
       return request(apiURL)
-        .get(`/maps/${map._id}/structure/${structure._id}`)
-        .expect(200)
+          .get(`/maps/${map._id}/structure/${structure._id}`)
+          .expect(200)
         .then(({ body }) => {
-          expect.assertions(2);
-          expect(body._id).toBe(structure._id.toString());
-          expect(body.code).toBe(structure.code);
+            expect.assertions(2);
+            expect(body._id).toBe(structure._id.toString());
+            expect(body.code).toBe(structure.code);
         });
     });
 
     it("should return 500, error message and no single structure chosen by passed id without structure id", () => {
       return request(apiURL)
-        .get(`/maps/${map._id}/structure/undefined`)
+          .get(`/maps/${map._id}/structure/undefined`)
         .expect(500)
-        .then(({ body }) => expect(body.name).toBe("CastError"));
+          .then(({ body }) => expect(body.name).toBe("CastError"));
     });
 
     it("should return 200, error message and no single structure chosen by passed id without map id", () => {
       const structure = mapStructureTestDataManager.collection[0];
       return request(apiURL)
-        .get(`/maps/undefined/structure/${structure._id}`)
-        .expect(200)
-        .then(({ body }) => {
-          expect(body._id).toBe(structure._id.toString());
-          expect(body.code).toBe(structure.code);
+          .get(`/maps/undefined/structure/${structure._id}`)
+          .expect(200)
+          .then(({ body }) => {
+            expect(body._id).toBe(structure._id.toString());
+            expect(body.code).toBe(structure.code);
         });
     });
   });
@@ -115,49 +115,49 @@ describe("Map revision endpoints should work correctly", () => {
       const structure = mapStructureFactory.generateOne(map._id, [map]);
       structure.processes = processFactory.generateMany([]);
       return request(apiURL)
-        .post(`/maps/${map._id}/structure/create`)
+          .post(`/maps/${map._id}/structure/create`)
         .send({ structure })
-        .expect(200)
+          .expect(200)
         .then(({ body }) => {
-          expect.assertions(2);
-          expect(body._id).toBe(structure._id.toString());
-          expect(body.code).toBe(structure.code);
+            expect.assertions(2);
+            expect(body._id).toBe(structure._id.toString());
+            expect(body.code).toBe(structure.code);
         });
     });
 
     it("should not create a structure and return 500 without the POST body", () => {
       return request(apiURL)
-        .post(`/maps/${map._id}/structure/create`)
+          .post(`/maps/${map._id}/structure/create`)
         .send({})
         .expect(500)
-        .then(({ body }) => expect(body).toMatchObject({}));
+          .then(({ body }) => expect(body).toMatchObject({}));
     });
 
     it("should not create a structure and return 500 without the map param id body", () => {
       const structure = mapStructureFactory.generateOne(map._id, [map]);
       structure.processes = processFactory.generateMany([]);
       return request(apiURL)
-        .post(`/maps/undefined/structure/create`)
+          .post(`/maps/undefined/structure/create`)
         .send({ structure })
-        .expect(500)
-        .then(({ body }) => expect(body).toMatchObject({}));
+          .expect(500)
+          .then(({ body }) => expect(body).toMatchObject({}));
     });
 
     it("should create a duplicate of a map with given name and return 200", () => {
       const structure = mapStructureTestDataManager.collection[0];
       const name = "a new name of a map";
       return request(apiURL)
-        .post(`/maps/${map._id}/structure/${structure._id}/duplicate`)
-        .send({
-          options: {
+          .post(`/maps/${map._id}/structure/${structure._id}/duplicate`)
+          .send({
+            options: {
             name
           },
-          projectId: project.id
+            projectId: project.id
         })
         .expect(200)
-        .then(({ body }) => {
-          expect.assertions(1);
-          expect(body.name).toBe(name);
+          .then(({ body }) => {
+            expect.assertions(1);
+            expect(body.name).toBe(name);
         });
     });
 
@@ -165,22 +165,22 @@ describe("Map revision endpoints should work correctly", () => {
       const structure = mapStructureTestDataManager.collection[0];
       return request(apiURL)
         .post(`/maps/${map._id}/structure/${structure._id}/duplicate`)
-        .send({})
+          .send({})
         .expect(500)
-        .then(({ body }) => expect(body).toMatchObject({}));
+          .then(({ body }) => expect(body).toMatchObject({}));
     });
 
     it("should not create a duplicate of a map and return 500 without structure id param", () => {
       const name = "a new name of a map";
       return request(apiURL)
         .post(`/maps/${map._id}/structure/undefined/duplicate`)
-        .send({
-          options: {
+          .send({
+            options: {
             name
           },
-          projectId: project.id
+            projectId: project.id
         })
-        .expect(500)
+          .expect(500)
         .then(({ body }) => expect(body).toMatchObject({}));
     });
 
@@ -188,26 +188,26 @@ describe("Map revision endpoints should work correctly", () => {
       const structure = mapStructureTestDataManager.collection[0];
       const name = "a new name of a map";
       return request(apiURL)
-        .post(`/maps/undefined/structure/${structure._id}/duplicate`)
-        .send({
+          .post(`/maps/undefined/structure/${structure._id}/duplicate`)
+          .send({
           options: {
-            name
+              name
           },
-          projectId: project.id
+            projectId: project.id
         })
         .expect(500)
-        .then(({ body }) => expect(body).toMatchObject({}));
+          .then(({ body }) => expect(body).toMatchObject({}));
     });
 
     it('should not create a duplicate of a map and return 500 with missing "options" property in POST body', () => {
       const structure = mapStructureTestDataManager.collection[0];
       return request(apiURL)
-        .post(`/maps/${map._id}/structure/${structure._id}/duplicate`)
-        .send({
-          projectId: project.id
+          .post(`/maps/${map._id}/structure/${structure._id}/duplicate`)
+          .send({
+            projectId: project.id
         })
         .expect(500)
-        .then(({ body }) => expect(body).toMatchObject({}));
+          .then(({ body }) => expect(body).toMatchObject({}));
     });
 
     // FAILS DUE TO BUG ON BACKEND

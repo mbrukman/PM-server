@@ -11,7 +11,7 @@
     "build:prod": "cd ../console && ng build --prod",
     "watch": "nodemon app.js",
     "install:all": "npm i && cd ../console && npm i",
-    "eslint": "eslint ./api/tests --fix"
+    "eslint": "./node_modules/.bin/eslint ./api/tests --fix"
   },
   "eslintConfig": {
     "env": {
@@ -24,8 +24,12 @@
     },
     "extends": [
       "eslint:recommended",
-      "plugin:prettier/recommended"
-    ]
+      "plugin:prettier/recommended",
+      "google"
+    ],
+    "rules": {
+      "linebreak-style": "off"
+    }
   },
   "author": "",
   "license": "ISC",
@@ -54,13 +58,14 @@
   "devDependencies": {
     "chance": "^1.1.0",
     "eslint": "^6.4.0",
+    "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-prettier": "^3.1.1",
-    "prettier": "^1.18.2",
     "jest": "^24.9.0",
     "jest-circus": "^24.9.0",
     "jest-environment-node": "^24.9.0",
     "json-schema-faker": "^0.5.0-rc17",
+    "prettier": "^1.18.2",
     "socket.io-client": "^2.3.0",
     "speculate": "1.7.4",
     "supertest": "^4.0.2"
