@@ -1,25 +1,25 @@
-const { jsf } = require("./jsf.helper");
-const MapModel = require("../../models/map.model");
-const ProjectModel = require("../../models/project.model");
+const {jsf} = require('./jsf.helper');
+const MapModel = require('../../models/map.model');
+const ProjectModel = require('../../models/project.model');
 
 function getSimpleMapSchema() {
   return {
-    type: "object",
+    type: 'object',
     properties: {
       _id: {
-        type: "string",
-        format: "mongoID"
+        type: 'string',
+        format: 'mongoID',
       },
       name: {
-        type: "string",
+        type: 'string',
         chance: {
           word: {
-            length: 10
-          }
-        }
-      }
+            length: 10,
+          },
+        },
+      },
     },
-    required: ["_id", "name"]
+    required: ['_id', 'name'],
   };
 }
 
@@ -35,27 +35,27 @@ async function createMap(projectId, mapName) {
     await addMapToProject(projectId, map.id);
     return map;
   } catch (err) {
-    throw err;
+    return err;
   }
 }
 
 async function addMapToProject(projectId, mapId) {
   try {
     await ProjectModel.findByIdAndUpdate(
-        { _id: projectId },
-        { $push: { maps: mapId } }
+        {_id: projectId},
+        {$push: {maps: mapId}}
     );
   } catch (err) {
-    throw err;
+    return err;
   }
 }
 
 function generateMany() {
   return jsf.generate({
-    type: "array",
+    type: 'array',
     items: getSimpleMapSchema(),
     maxItems: 15,
-    minItems: 5
+    minItems: 5,
   });
 }
 
@@ -63,5 +63,5 @@ module.exports = {
   createMap,
   generateSimpleMap,
   generateMany,
-  addMapToProject
+  addMapToProject,
 };

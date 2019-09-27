@@ -1,69 +1,69 @@
-const { jsf } = require("./jsf.helper");
-const actionFactory = require("./action.factory");
+const {jsf} = require('./jsf.helper');
+const actionFactory = require('./action.factory');
 
 function generateSingleSchema(usedPlugins, actions) {
   if (!actions || !actions.length) actions = actionFactory.generateMany();
 
   return {
-    type: "object",
+    type: 'object',
     properties: {
       actions,
       uuid: {
-        type: "string",
+        type: 'string',
         chance: {
-          word: {}
-        }
+          word: {},
+        },
       },
       name: {
-        type: "string",
+        type: 'string',
         chance: {
-          word: {}
-        }
+          word: {},
+        },
       },
       description: {
-        type: "string",
+        type: 'string',
         chance: {
           paragraph: {
-            length: 1
-          }
-        }
+            length: 1,
+          },
+        },
       },
       default_execution: {
-        type: "boolean",
+        type: 'boolean',
         chance: {
           bool: {
-            likelihood: 30
-          }
-        }
+            likelihood: 30,
+          },
+        },
       },
       order: {
-        type: "number",
+        type: 'number',
         chance: {
-          integer: {}
-        }
-      }
+          integer: {},
+        },
+      },
     },
     required: [
-      "order",
-      "default_execution",
-      "description",
-      "name",
-      "uuid",
-      "actions"
-    ]
+      'order',
+      'default_execution',
+      'description',
+      'name',
+      'uuid',
+      'actions',
+    ],
   };
 }
 
 function generateMany(usedPlugins) {
   return jsf.generate({
-    type: "array",
+    type: 'array',
     items: generateSingleSchema(usedPlugins),
     maxItems: 15,
-    minItems: 5
+    minItems: 5,
   });
 }
 
 module.exports = {
   generateMany,
-  generateOne: generateSingleSchema
+  generateOne: generateSingleSchema,
 };

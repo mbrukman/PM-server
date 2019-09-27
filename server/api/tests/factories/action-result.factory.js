@@ -1,64 +1,64 @@
-const { jsf } = require("./jsf.helper");
+const {jsf} = require('./jsf.helper');
 
 function generateSingleSchema(action) {
   return {
-    type: "object",
+    type: 'object',
     properties: {
       action,
       result: {
-        type: "string",
+        type: 'string',
         chance: {
-          word: {}
-        }
+          word: {},
+        },
       },
       status: {
-        type: "string",
+        type: 'string',
         enum: [
-          "running",
-          "done",
-          "pending",
-          "error",
-          "stopped",
-          "canceled",
-          "success"
-        ]
+          'running',
+          'done',
+          'pending',
+          'error',
+          'stopped',
+          'canceled',
+          'success',
+        ],
       },
       retriesLeft: {
-        type: "number",
+        type: 'number',
         chance: {
-          integer: {}
-        }
+          integer: {},
+        },
       },
       startTime: {
-        format: "date-time",
-        type: "string"
+        format: 'date-time',
+        type: 'string',
       },
       endTime: {
-        format: "date-time",
-        type: "string"
-      }
+        format: 'date-time',
+        type: 'string',
+      },
     },
     required: [
-      "status",
-      "retriesLeft",
-      "startTime",
-      "endTime",
-      "action",
-      "result"
-    ]
+      'status',
+      'retriesLeft',
+      'startTime',
+      'endTime',
+      'action',
+      'result',
+    ],
   };
 }
 
 function generateMany(action) {
   return jsf.generate({
-    type: "array",
+    type: 'array',
     items: generateSingleSchema(action),
     maxItems: 15,
-    minItems: 5
+    minItems: 5,
   });
 }
 
 module.exports = {
   generateMany,
-  generateOne: generateSingleSchema
+  generateOne: generateSingleSchema,
 };
