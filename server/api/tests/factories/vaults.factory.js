@@ -1,58 +1,58 @@
-const { jsf } = require("./jsf.helper");
+const {jsf} = require('./jsf.helper');
 
 const singleSchema = {
-  type: "object",
+  type: 'object',
   properties: {
     value: {
-      type: "string",
+      type: 'string',
       uniqueItems: true,
       chance: {
         word: {
-          length: 10
-        }
-      }
+          length: 10,
+        },
+      },
     },
     _id: {
-      type: "string",
-      format: "mongoID"
+      type: 'string',
+      format: 'mongoID',
     },
     key: {
-      type: "string",
+      type: 'string',
       uniqueItems: true,
       chance: {
         word: {
-          length: 15
-        }
-      }
+          length: 15,
+        },
+      },
     },
     description: {
-      type: "string",
-      faker: "lorem.paragraph"
-    }
+      type: 'string',
+      faker: 'lorem.paragraph',
+    },
   },
-  required: ["value", "key", "description", "_id"],
+  required: ['value', 'key', 'description', '_id'],
   definitions: {
     positiveInt: {
-      type: "integer",
+      type: 'integer',
       minimum: 0,
-      exclusiveMinimum: true
-    }
-  }
+      exclusiveMinimum: true,
+    },
+  },
 };
 
 const arraySchema = {
-  type: "array",
+  type: 'array',
   items: singleSchema,
   maxItems: 15,
   minItems: 5,
-  uniqueItems: "key",
+  uniqueItems: 'key',
   definitions: {
     positiveInt: {
-      type: "integer",
+      type: 'integer',
       minimum: 0,
-      exclusiveMinimum: true
-    }
-  }
+      exclusiveMinimum: true,
+    },
+  },
 };
 
 // async (preferred way)
@@ -60,7 +60,7 @@ const arraySchema = {
 
 // sync-version)
 module.exports = {
-  generateVaults: options => jsf.generate(Object.assign(arraySchema, options)),
-  generateSingleVault: options =>
-    jsf.generate(Object.assign(singleSchema, options))
+  generateVaults: (options) => jsf.generate(Object.assign(arraySchema, options)),
+  generateSingleVault: (options) =>
+    jsf.generate(Object.assign(singleSchema, options)),
 };

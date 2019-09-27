@@ -1,47 +1,47 @@
-const { jsf } = require("./jsf.helper");
+const {jsf} = require('./jsf.helper');
 
 const singleSchema = {
-  type: "object",
+  type: 'object',
   properties: {
     project: {
-      type: "string",
-      format: "mongoID"
+      type: 'string',
+      format: 'mongoID',
     },
     map: {
-      type: "string",
-      format: "mongoID"
+      type: 'string',
+      format: 'mongoID',
     },
     type: {
-      type: "string",
-      enum: ["once", "repeated"]
+      type: 'string',
+      enum: ['once', 'repeated'],
     },
     datetime: {
-      format: "datetime"
-    }
+      format: 'datetime',
+    },
   },
-  required: ["project", "map", "type", "datetime"],
+  required: ['project', 'map', 'type', 'datetime'],
   definitions: {
     positiveInt: {
-      type: "integer",
+      type: 'integer',
       minimum: 0,
-      exclusiveMinimum: true
-    }
-  }
+      exclusiveMinimum: true,
+    },
+  },
 };
 
 const arraySchema = {
-  type: "array",
+  type: 'array',
   items: singleSchema,
   maxItems: 15,
   minItems: 5,
-  uniqueItems: "key",
+  uniqueItems: 'key',
   definitions: {
     positiveInt: {
-      type: "integer",
+      type: 'integer',
       minimum: 0,
-      exclusiveMinimum: true
-    }
-  }
+      exclusiveMinimum: true,
+    },
+  },
 };
 
 // async (preferred way)
@@ -49,7 +49,7 @@ const arraySchema = {
 
 // sync-version)
 module.exports = {
-  generateJobs: options => jsf.generate(Object.assign(arraySchema, options)),
-  generateSingleJob: options =>
-    jsf.generate(Object.assign(singleSchema, options))
+  generateJobs: (options) => jsf.generate(Object.assign(arraySchema, options)),
+  generateSingleJob: (options) =>
+    jsf.generate(Object.assign(singleSchema, options)),
 };

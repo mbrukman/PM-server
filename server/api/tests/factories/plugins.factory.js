@@ -1,99 +1,99 @@
-const { jsf } = require("./jsf.helper");
+const {jsf} = require('./jsf.helper');
 
 jsf.option({
   useDefaultValue: true,
-  useExamplesValue: true
+  useExamplesValue: true,
 });
 
 const pluginSchema = {
-  type: "object",
+  type: 'object',
   properties: {
     _id: {
-      type: "string",
-      format: "mongoID"
+      type: 'string',
+      format: 'mongoID',
     },
     name: {
-      type: "string",
+      type: 'string',
       chance: {
         word: {
-          length: 10
-        }
-      }
+          length: 10,
+        },
+      },
     },
     type: {
-      type: "string",
-      examples: ["server", "executer", "trigger", "module"]
+      type: 'string',
+      examples: ['server', 'executer', 'trigger', 'module'],
     },
     main: {
-      type: "string",
-      default: "main.js"
+      type: 'string',
+      default: 'main.js',
     },
     execProgram: {
-      type: "string",
+      type: 'string',
       chance: {
         word: {
-          length: 10
-        }
-      }
+          length: 10,
+        },
+      },
     },
     version: {
-      type: "string",
-      default: "1.0.0"
+      type: 'string',
+      default: '1.0.0',
     },
     file: {
-      type: "string",
+      type: 'string',
       chance: {
         word: {
-          length: 10
-        }
-      }
+          length: 10,
+        },
+      },
     },
     methods: {
-      type: "array",
+      type: 'array',
       default: [
         {
-          name: "testMethod",
-          params: []
-        }
-      ]
+          name: 'testMethod',
+          params: [],
+        },
+      ],
     },
     settings: {
-      type: "array",
+      type: 'array',
       default: [
         {
-          name: "testName1",
-          value: "testvalue1"
+          name: 'testName1',
+          value: 'testvalue1',
         },
         {
-          name: "testName2",
-          value: "testvalue2"
-        }
-      ]
-    }
+          name: 'testName2',
+          value: 'testvalue2',
+        },
+      ],
+    },
   },
   required: [
-    "_id",
-    "name",
-    "main",
-    "execProgram",
-    "version",
-    "file",
-    "methods",
-    "settings",
-    "type"
-  ]
+    '_id',
+    'name',
+    'main',
+    'execProgram',
+    'version',
+    'file',
+    'methods',
+    'settings',
+    'type',
+  ],
 };
 
 const pluginListSchema = {
-  type: "array",
+  type: 'array',
   items: pluginSchema,
   maxItems: 9,
-  minItems: 3
+  minItems: 3,
 };
 
 module.exports = {
-  generateMany: options =>
+  generateMany: (options) =>
     jsf.generate(Object.assign(pluginListSchema, options)),
-  generatePluginDocument: options =>
-    jsf.generate(Object.assign(pluginSchema, options))
+  generatePluginDocument: (options) =>
+    jsf.generate(Object.assign(pluginSchema, options)),
 };

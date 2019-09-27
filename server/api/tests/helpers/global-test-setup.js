@@ -1,3 +1,3 @@
-const { setupDB } = require("./test-setup");
+const {setupDB} = require('./test-setup');
 
 setupDB();

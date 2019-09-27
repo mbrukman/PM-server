@@ -1,66 +1,66 @@
-const { jsf } = require("./jsf.helper");
+const {jsf} = require('./jsf.helper');
 
 function generateSingleSchema(agentsIds) {
   return {
-    type: "object",
+    type: 'object',
     properties: {
       _id: {
-        type: "string",
-        format: "mongoID"
+        type: 'string',
+        format: 'mongoID',
       },
       name: {
-        type: "string",
+        type: 'string',
         chance: {
-          word: {}
-        }
+          word: {},
+        },
       },
 
       agents: agentsIds,
 
       filters: {
-        type: "array",
+        type: 'array',
         items: {
-          type: "object",
+          type: 'object',
           properties: {
             field: {
-              type: "string",
+              type: 'string',
               chance: {
-                word: {}
-              }
+                word: {},
+              },
             },
 
             value: {
-              type: "string",
+              type: 'string',
               chance: {
-                word: {}
-              }
+                word: {},
+              },
             },
 
             filterType: {
-              type: "string",
-              enum: ["gte", "gt", "contains", "lte", "lt", "equal"]
-            }
+              type: 'string',
+              enum: ['gte', 'gt', 'contains', 'lte', 'lt', 'equal'],
+            },
           },
-          required: ["field", "value", "filterType"]
+          required: ['field', 'value', 'filterType'],
         },
         maxItems: 5,
-        minItems: 2
-      }
+        minItems: 2,
+      },
     },
-    required: ["name", "agents", "filters", "_id"]
+    required: ['name', 'agents', 'filters', '_id'],
   };
 }
 
 function generateMany(agentsIds) {
   return jsf.generate({
-    type: "array",
+    type: 'array',
     items: generateSingleSchema(agentsIds),
     maxItems: 15,
-    minItems: 5
+    minItems: 5,
   });
 }
 
 module.exports = {
   generateMany,
-  generateOne: agentsIds => jsf.generate(generateSingleSchema(agentsIds))
+  generateOne: (agentsIds) => jsf.generate(generateSingleSchema(agentsIds)),
 };

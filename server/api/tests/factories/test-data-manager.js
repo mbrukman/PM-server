@@ -8,8 +8,8 @@ module.exports = class TestDataManager {
 
   prepareItem(itemData) {
     // if you need ANY additional functionality to be added to items
-    if (!itemData || typeof itemData !== "object") {
-      throw new Error("Passed item is not an object!");
+    if (!itemData || typeof itemData !== 'object') {
+      throw new Error('Passed item is not an object!');
     }
     return itemData;
   }
@@ -28,20 +28,20 @@ module.exports = class TestDataManager {
       return savedItem;
     } catch (err) {
       throw new Error(
-        `There was an error with adding items to MongoDB: ${err.message}`
+          `There was an error with adding items to MongoDB: ${err.message}`
       );
     }
   }
 
   async pushToCollectionAndSave(item) {
     if (!item) {
-      throw new Error("No item to add to collection!");
+      throw new Error('No item to add to collection!');
     } else {
       try {
         return this._createModel(item);
       } catch (err) {
         throw new Error(
-          `There was issue adding or saving item in collection: ${err.message}`
+            `There was issue adding or saving item in collection: ${err.message}`
         );
       }
     }
@@ -51,14 +51,14 @@ module.exports = class TestDataManager {
     if (document && document._id) {
       return this.currentMongooseModel
           .findByIdAndRemove(document._id)
-        .then(response => {
+          .then((response) => {
             this.collection = this.collection.filter(
-            (item) => item.id !== document.id
+                (item) => item.id !== document.id
             );
-          return response;
+            return response;
           });
     } else {
-      throw new Error("Passed document has no id property!");
+      throw new Error('Passed document has no id property!');
     }
   }
 
@@ -69,7 +69,7 @@ module.exports = class TestDataManager {
       );
       return this.collection;
     } else {
-      throw new Error("Passed document has no id property!");
+      throw new Error('Passed document has no id property!');
     }
   }
 
@@ -87,14 +87,14 @@ module.exports = class TestDataManager {
   }
 
   async generateInitialCollection(generatedData) {
-    if (!generatedData || typeof generatedData !== "object") {
-      throw new Error("No generated data was passed!");
+    if (!generatedData || typeof generatedData !== 'object') {
+      throw new Error('No generated data was passed!');
     }
 
     try {
       this.collection = await this.currentMongooseModel.insertMany(
           generatedData,
-        { ordered: true }
+          {ordered: true}
       );
       return this.collection;
     } catch (err) {

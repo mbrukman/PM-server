@@ -1,56 +1,56 @@
-const { jsf } = require("./jsf.helper");
+const {jsf} = require('./jsf.helper');
 
 function generateSingleSchema() {
   return {
-    type: "object",
+    type: 'object',
     properties: {
       name: {
-        type: "string",
+        type: 'string',
         chance: {
           word: {
-            length: 7
-          }
-        }
+            length: 7,
+          },
+        },
       },
       timeout: {
-        type: "number",
+        type: 'number',
         chance: {
-          integer: {}
-        }
+          integer: {},
+        },
       },
       method: {
-        type: "string",
+        type: 'string',
         chance: {
           word: {
-            length: 7
-          }
-        }
+            length: 7,
+          },
+        },
       },
       params: [],
       numParallel: {
-        type: "string",
+        type: 'string',
         chance: {
           integer: {
             min: 0,
-            max: 10
-          }
-        }
-      }
+            max: 10,
+          },
+        },
+      },
     },
-    required: ["method", "timeout", "name", "numParallel", "params"]
+    required: ['method', 'timeout', 'name', 'numParallel', 'params'],
   };
 }
 
 function generateMany() {
   return jsf.generate({
-    type: "array",
+    type: 'array',
     items: generateSingleSchema(),
     maxItems: 15,
-    minItems: 5
+    minItems: 5,
   });
 }
 
 module.exports = {
   generateMany,
-  generateOne: generateSingleSchema
+  generateOne: generateSingleSchema,
 };

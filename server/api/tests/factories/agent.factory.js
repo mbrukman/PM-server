@@ -1,52 +1,52 @@
-const { jsf } = require("./jsf.helper");
+const {jsf} = require('./jsf.helper');
 
 function generateSingleSchema() {
   return {
-    type: "object",
+    type: 'object',
     properties: {
       _id: {
-        type: "string",
-        format: "mongoID"
+        type: 'string',
+        format: 'mongoID',
       },
       name: {
-        type: "string",
+        type: 'string',
         chance: {
-          word: {}
-        }
+          word: {},
+        },
       },
       url: {
-        type: "string",
+        type: 'string',
         chance: {
-          url: {}
-        }
+          url: {},
+        },
       },
       publicUrl: {
-        type: "string",
+        type: 'string',
         chance: {
-          url: {}
-        }
+          url: {},
+        },
       },
       key: {
-        type: "string",
+        type: 'string',
         chance: {
-          guid: {}
-        }
-      }
+          guid: {},
+        },
+      },
     },
-    required: ["key", "publicUrl", "url", "name", "_id"]
+    required: ['key', 'publicUrl', 'url', 'name', '_id'],
   };
 }
 
 function generateMany() {
   return jsf.generate({
-    type: "array",
+    type: 'array',
     items: generateSingleSchema(),
     maxItems: 15,
-    minItems: 5
+    minItems: 5,
   });
 }
 
 module.exports = {
   generateMany,
-  generateOne: () => jsf.generate(generateSingleSchema())
+  generateOne: () => jsf.generate(generateSingleSchema()),
 };

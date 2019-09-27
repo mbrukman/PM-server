@@ -1,23 +1,23 @@
-const request = require("supertest");
+const request = require('supertest');
 // models to test in autocomplete: Project, Map, Vault
-const { Project, Map, Vault } = require("../../api/models");
+const {Project, Map, Vault} = require('../../api/models');
 const {
   TestDataManager,
   projectsFactory,
   mapsFactory,
-  vaultsFactory
+  vaultsFactory,
 } = require(`./factories`);
 
-const app = "localhost:3000";
+const app = 'localhost:3000';
 
-describe("Autocomplete tests", () => {
-  describe("Positive", () => {
-    describe("Project model", () => {
+describe('Autocomplete tests', () => {
+  describe('Positive', () => {
+    describe('Project model', () => {
       const projectDataManager = new TestDataManager(Project);
 
       beforeEach(async () => {
         const projects = projectsFactory.generateProjects();
-        projects[0].name = "test project";
+        projects[0].name = 'test project';
         await projectDataManager.generateInitialCollection(projects);
       });
 
@@ -25,30 +25,30 @@ describe("Autocomplete tests", () => {
         return request(app)
             .get(`/api/autocomplete/Project?query=test`)
             .expect(200)
-            .then(res => {
-            expect(Array.isArray(res.body)).toBe(true);
+            .then((res) => {
+              expect(Array.isArray(res.body)).toBe(true);
               expect(res.body.length).toBe(1);
-          });
+            });
       });
 
       it(`should return value for given key`, async () => {
-        const project = await Project.findOne({ name: "test project" });
+        const project = await Project.findOne({name: 'test project'});
         return request(app)
             .get(`/api/autocomplete/Project/${project.id}`)
-          .expect(200)
-            .then(res => {
+            .expect(200)
+            .then((res) => {
               expect(res.body.id).toBe(project.id);
-              expect(res.body.value).toBe("test project");
-          });
+              expect(res.body.value).toBe('test project');
+            });
       });
     });
 
-    describe("Map model", () => {
+    describe('Map model', () => {
       const mapDataManager = new TestDataManager(Map);
 
       beforeEach(async () => {
         const maps = mapsFactory.generateMany();
-        maps[0].name = "test map";
+        maps[0].name = 'test map';
         await mapDataManager.generateInitialCollection(maps);
       });
 
@@ -56,29 +56,29 @@ describe("Autocomplete tests", () => {
         return request(app)
             .get(`/api/autocomplete/Map?query=test`)
             .expect(200)
-          .then(res => {
+            .then((res) => {
               expect(Array.isArray(res.body)).toBe(true);
               expect(res.body.length).toBe(1);
-          });
+            });
       });
 
       it(`should return value for given key`, async () => {
-        const map = await Map.findOne({ name: "test map" });
+        const map = await Map.findOne({name: 'test map'});
         return request(app)
             .get(`/api/autocomplete/Map/${map.id}`)
             .expect(200)
-            .then(res => {
-            expect(res.body.id).toBe(map.id);
-              expect(res.body.value).toBe("test map");
-          });
+            .then((res) => {
+              expect(res.body.id).toBe(map.id);
+              expect(res.body.value).toBe('test map');
+            });
       });
     });
 
-    describe("Vault model", () => {
+    describe('Vault model', () => {
       const vaultDataManager = new TestDataManager(Vault);
       let currentKey;
       beforeEach(async () => {
-        currentKey = "test-vault-key-" + Math.random();
+        currentKey = 'test-vault-key-' + Math.random();
         const vaults = vaultsFactory.generateVaults();
         vaults[0].key = currentKey;
         await vaultDataManager.generateInitialCollection(vaults);
@@ -88,7 +88,7 @@ describe("Autocomplete tests", () => {
         return request(app)
             .get(`/api/autocomplete/Vault?query=test`)
             .expect(200)
-          .then(res => {
+            .then((res) => {
               expect(Array.isArray(res.body)).toBe(true);
               expect(res.body.length > 0).toBe(true);
               expect(res.body.length <= 5).toBe(true);
@@ -96,28 +96,28 @@ describe("Autocomplete tests", () => {
       });
 
       it(`should return value for given key`, async () => {
-        const vault = await Vault.findOne({ key: currentKey });
+        const vault = await Vault.findOne({key: currentKey});
         return request(app)
-          .get(`/api/autocomplete/Vault/${vault.key}`)
+            .get(`/api/autocomplete/Vault/${vault.key}`)
             .expect(200)
-          .then(res => {
+            .then((res) => {
               expect(res.body.id).toBe(vault.key);
               expect(res.body.value).toBe(currentKey);
-          });
+            });
       });
     });
   });
 
-  describe("Negative", () => {
+  describe('Negative', () => {
     it(`should respond with status 500 on invalid model name`, () => {
-      const invalidModelName = "invalid-model-name";
+      const invalidModelName = 'invalid-model-name';
       return request(app)
           .get(`/api/autocomplete/${invalidModelName}`)
           .expect(500);
     });
 
     it(`should respond with status 500 on invalid model name and invalid key`, () => {
-      const invalidModelName = "invalid-model-name";
+      const invalidModelName = 'invalid-model-name';
       return request(app)
           .get(`/api/autocomplete/${invalidModelName}/test-key`)
           .expect(500);
@@ -125,7 +125,7 @@ describe("Autocomplete tests", () => {
 
     it(`should respond with status 500 on invalid key`, () => {
       return request(app)
-        .get(`/api/autocomplete/Map/test-key`)
+          .get(`/api/autocomplete/Map/test-key`)
           .expect(500);
     });
   });
