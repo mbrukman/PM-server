@@ -1,7 +1,6 @@
 const request = require('supertest');
 const fs = require('fs');
 const path = require('path');
-const _ = require("lodash");
 
 const app = 'localhost:3000';
 let originalConfig = {};
@@ -20,7 +19,6 @@ describe('Settings tests', () => {
     });
 
     describe('GET api/settings', () => {
-
         it(`should respond with 'true' for valid db connection`, () => {
             return request(app)
                 .get('/api/settings')
@@ -36,15 +34,9 @@ describe('Settings tests', () => {
             beforeAll(() => {
                 delete testConfig.dbURI;
                 fs.writeFileSync(path.join(__dirname, '../../env/config.json'), JSON.stringify(testConfig));
-
-                delete require.cache[Object.keys(require.cache).filter(i => i.includes('env/config'))[0]];
-                // TODO: both logs should return the same value
-                console.warn(require('../../env/config'));
-                console.warn(fs.readFileSync(path.join(__dirname, '../../env/config.json'), 'UTF-8'));
             });
 
-            it.only(`should handle lack of setup of dbURI`, () => {
-
+            it(`should handle lack of setup of dbURI`, () => {
                 return request(app)
                     .get('/api/settings')
                     .expect(200)
