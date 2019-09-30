@@ -14,7 +14,9 @@
     "eslint": "./node_modules/.bin/eslint ./api/tests --fix"
   },
   "husky": {
-    "pre-push": "npm run eslint && npm t"
+    "hooks": {
+      "pre-push": "npm run eslint && npm t"
+    }
   },
   "eslintConfig": {
     "env": {
