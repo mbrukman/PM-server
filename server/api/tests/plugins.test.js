@@ -82,7 +82,6 @@ describe("Plugins tests", () => {
       });
     });
 
-        // notice: redundant "/delete"
         describe(`DELETE /:id`, () => {
             it(`should respond with 200`, () => {
                 // notice: RETURNS 200 for ANY ID
@@ -108,7 +107,7 @@ describe("Plugins tests", () => {
     });
 
         describe(`GET /:id`, () => {
-            it(`should respond with status 500 and proper error msg for invalid id`, () => {
+            it(`should respond with status 404 and proper error msg for invalid id`, () => {
                 return request(app)
                     .get('/api/plugins/5d83a7dac12c6d695c3cbc66')
                     .expect(404)
