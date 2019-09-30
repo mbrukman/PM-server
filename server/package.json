@@ -15,7 +15,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm run eslint && npm t"
+      "pre-commit": "npm run eslint && git add .",
+      "pre-push": "npm t"
     }
   },
   "eslintConfig": {
