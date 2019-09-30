@@ -1,8 +1,8 @@
-const request = require('supertest');
-const {generateMapAndProject} = require('./helpers');
-const {mapStructureFactory, processFactory} = require('./factories');
+const request = require("supertest");
+const { generateMapAndProject } = require("./helpers");
+const { mapStructureFactory, processFactory } = require("./factories");
 
-const baseUrl = 'localhost:3000';
+const baseUrl = "localhost:3000";
 const apiURL = `${baseUrl}/api`;
 
 function createStructure(map, structure) {
@@ -12,11 +12,11 @@ function createStructure(map, structure) {
   }
 
   return request(apiURL)
-      .post(`/maps/${map._id}/structure/create`)
-      .send({structure});
+    .post(`/maps/${map._id}/structure/create`)
+    .send({ structure });
 }
 
-describe('Websocket listens to events after map update', () => {
+describe("Websocket listens to events after map update", () => {
   let map;
 
   beforeEach(async () => {
@@ -24,12 +24,12 @@ describe('Websocket listens to events after map update', () => {
     map = data.map;
   });
 
-  it('should return successful message through WebSocket after well-created structure', async (done) => {
-    global.io.on('message', ({type, msg}) => {
-      if (type === 'saved-map') {
+  it("should return successful message through WebSocket after well-created structure", async done => {
+    global.io.on("message", ({ type, msg }) => {
+      if (type === "saved-map") {
         expect.assertions(3);
-        expect(msg.title).toBe('Saved');
-        expect(msg.type).toBe('success');
+        expect(msg.title).toBe("Saved");
+        expect(msg.type).toBe("success");
         expect(msg.mapId).toBe(map._id.toString());
         done();
       }
@@ -37,13 +37,13 @@ describe('Websocket listens to events after map update', () => {
     await createStructure(map);
   });
 
-  it('should return error message through WebSocket after not created structure', async (done) => {
-    global.io.on('notification', ({type, message, title}) => {
-      if (type === 'error') {
+  it("should return error message through WebSocket after not created structure", async done => {
+    global.io.on("notification", ({ type, message, title }) => {
+      if (type === "error") {
         expect.assertions(3);
-        expect(title).toBe('Whoops...');
-        expect(type).toBe('error');
-        expect(message).toBe('Error saving map structure');
+        expect(title).toBe("Whoops...");
+        expect(type).toBe("error");
+        expect(message).toBe("Error saving map structure");
         done();
       }
     });

@@ -1,61 +1,61 @@
-const {jsf} = require('./jsf.helper');
-const actionResultFactory = require('./action-result.factory');
+const { jsf } = require("./jsf.helper");
+const actionResultFactory = require("./action-result.factory");
 
-function generateSingleSchema({processId, actionId}) {
+function generateSingleSchema({ processId, actionId }) {
   const actionsResults = actionResultFactory.generateMany(actionId);
   return {
-    type: 'object',
+    type: "object",
     properties: {
       actions: actionsResults,
       startTime: {
-        format: 'date-time',
-        type: 'string',
+        format: "date-time",
+        type: "string"
       },
       process: processId,
       finishTime: {
-        format: 'date-time',
-        type: 'string',
+        format: "date-time",
+        type: "string"
       },
       status: {
-        type: 'string',
+        type: "string",
         enum: [
-          'running',
-          'done',
-          'pending',
-          'error',
-          'stopped',
-          'canceled',
-          'success',
-        ],
+          "running",
+          "done",
+          "pending",
+          "error",
+          "stopped",
+          "canceled",
+          "success"
+        ]
       },
       iterationIndex: {
-        type: 'number',
+        type: "number",
         chance: {
-          integer: {},
-        },
-      },
+          integer: {}
+        }
+      }
     },
     required: [
-      'status',
-      'startTime',
-      'finishTime',
-      'iterationIndex',
-      'actions',
-      'process',
-    ],
+      "status",
+      "startTime",
+      "finishTime",
+      "iterationIndex",
+      "actions",
+      "process"
+    ]
   };
 }
 
 function generateMany(idsCollection) {
   return jsf.generate({
-    type: 'array',
+    type: "array",
     items: generateSingleSchema(idsCollection),
     maxItems: 15,
-    minItems: 5,
+    minItems: 5
   });
 }
 
 module.exports = {
   generateMany,
-  generateOne: generateSingleSchema,
+  generateOne: generateSingleSchema
 };

@@ -1,67 +1,67 @@
-const {jsf} = require('./jsf.helper');
-const agentResultsFactory = require('./agent-result.factory');
+const { jsf } = require("./jsf.helper");
+const agentResultsFactory = require("./agent-result.factory");
 
 function generateSingleSchema({
   mapId,
   agentId,
   actionId,
   processId,
-  mapStructureId,
+  mapStructureId
 }) {
   const agentsResults = agentResultsFactory.generateMany({
     agentId,
     actionId,
-    processId,
+    processId
   });
 
   return {
-    type: 'object',
+    type: "object",
     properties: {
       structure: mapStructureId,
       status: {
-        type: 'string',
-        enum: ['running', 'done', 'pending', 'error'],
+        type: "string",
+        enum: ["running", "done", "pending", "error"]
       },
       reason: {
-        type: 'string',
+        type: "string",
         chance: {
           word: {
-            length: 5,
-          },
-        },
+            length: 5
+          }
+        }
       },
       trigger: {
-        type: 'string',
+        type: "string",
         chance: {
           word: {
-            length: 5,
-          },
-        },
+            length: 5
+          }
+        }
       },
       map: mapId,
       agentsResults,
       _id: {
-        type: 'string',
-        format: 'mongoID',
-      },
+        type: "string",
+        format: "mongoID"
+      }
     },
     required: [
-      'trigger',
-      'reason',
-      'map',
-      'agentsResults',
-      'status',
-      'structure',
-    ],
+      "trigger",
+      "reason",
+      "map",
+      "agentsResults",
+      "status",
+      "structure"
+    ]
   };
 }
 
 function generateMany(idsCollection) {
   return jsf.generate({
-    type: 'array',
+    type: "array",
     items: generateSingleSchema(idsCollection),
     maxItems: 15,
-    minItems: 5,
+    minItems: 5
   });
 }
 
@@ -71,5 +71,5 @@ function generateOne(idsCollection) {
 
 module.exports = {
   generateOne,
-  generateMany,
+  generateMany
 };

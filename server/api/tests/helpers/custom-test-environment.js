@@ -1,5 +1,5 @@
-const NodeEnvironment = require('jest-environment-node');
-const {connectToSocket} = require('./../helpers');
+const NodeEnvironment = require("jest-environment-node");
+const { connectToSocket } = require("./../helpers");
 
 class CustomEnvironment extends NodeEnvironment {
   constructor(config, context) {
