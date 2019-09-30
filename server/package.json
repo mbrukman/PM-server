@@ -11,7 +11,8 @@
     "build:prod": "cd ../console && ng build --prod",
     "watch": "nodemon app.js",
     "install:all": "npm i && cd ../console && npm i",
-    "eslint": "./node_modules/.bin/eslint ./api/tests --fix"
+    "eslint": "./node_modules/.bin/eslint ./api/tests --fix",
+    "test-watch": "jest api/tests --watch"
   },
   "husky": {
     "hooks": {
@@ -79,6 +80,8 @@
     "jest-environment-node": "^24.9.0",
     "json-schema-faker": "^0.5.0-rc17",
     "prettier": "^1.18.2",
+    "mockserver-client": "^5.6.1",
+    "mockserver-node": "^5.6.1",
     "socket.io-client": "^2.3.0",
     "speculate": "1.7.4",
     "supertest": "^4.0.2"
