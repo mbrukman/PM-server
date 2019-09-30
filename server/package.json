@@ -11,7 +11,7 @@
     "build:prod": "cd ../console && ng build --prod",
     "watch": "nodemon app.js",
     "install:all": "npm i && cd ../console && npm i",
-    "eslint": "./node_modules/.bin/eslint ./api/tests --fix"
+    "eslint": "./node_modules/.bin/eslint ./api/tests"
   },
   "husky": {
     "hooks": {
