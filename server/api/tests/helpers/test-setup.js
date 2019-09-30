@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-const env = require('../../../env/enviroment');
+const mongoose = require("mongoose");
+const env = require("../../../env/enviroment");
 
-mongoose.set('useCreateIndex', true);
+mongoose.set("useCreateIndex", true);
 
 async function removeAllCollections() {
   const collections = Object.keys(mongoose.connection.collections);
@@ -19,9 +19,9 @@ async function dropAllCollections() {
       await collection.drop();
     } catch (error) {
       // Sometimes this error happens, but you can safely ignore it
-      if (error.message === 'ns not found') return;
+      if (error.message === "ns not found") return;
       if (
-        error.message.includes('a background operation is currently running')
+        error.message.includes("a background operation is currently running")
       ) {
         return;
       }
@@ -35,7 +35,7 @@ module.exports = {
   dropAllCollections,
   setupDB() {
     beforeAll(async () => {
-      await mongoose.connect(env.dbURI, {useNewUrlParser: true});
+      await mongoose.connect(env.dbURI, { useNewUrlParser: true });
       await dropAllCollections();
     });
 
@@ -47,5 +47,5 @@ module.exports = {
       await dropAllCollections();
       await mongoose.disconnect();
     });
-  },
+  }
 };

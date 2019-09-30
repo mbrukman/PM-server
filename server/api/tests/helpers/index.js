@@ -1,12 +1,12 @@
-const socket = require('socket.io-client');
-const ProjectModel = require('../../../api/models/project.model');
-const TestDataManager = require('./../factories/test-data-manager');
-const {MapStructure} = require('../../../api/models/map-structure.model');
+const socket = require("socket.io-client");
+const ProjectModel = require("../../../api/models/project.model");
+const TestDataManager = require("./../factories/test-data-manager");
+const { MapStructure } = require("../../../api/models/map-structure.model");
 const {
   mapStructureFactory,
   mapsFactory,
-  projectsFactory,
-} = require('./../factories');
+  projectsFactory
+} = require("./../factories");
 
 function randomIdx(length) {
   return Math.floor(Math.random() * length);
@@ -14,10 +14,10 @@ function randomIdx(length) {
 
 module.exports = {
   randomIdx,
-  connectToSocket(url = 'http://localhost:3000/') {
+  connectToSocket(url = "http://localhost:3000/") {
     const io = socket(url);
-    return new Promise((resolve) => {
-      io.on('connect', () => {
+    return new Promise(resolve => {
+      io.on("connect", () => {
         resolve(io);
       });
     });
@@ -26,20 +26,20 @@ module.exports = {
     const mapStructureTestDataManager = new TestDataManager(MapStructure);
     const projectTestDataManager = new TestDataManager(ProjectModel);
     const projects = await projectTestDataManager.generateInitialCollection(
-        projectsFactory.generateProjects()
+      projectsFactory.generateProjects()
     );
 
     const randomIndex = randomIdx(projectTestDataManager.collection.length);
     const project = projectTestDataManager.collection[randomIndex];
 
-    const map = await mapsFactory.createMap(project.id, 'random map name');
+    const map = await mapsFactory.createMap(project.id, "random map name");
     const mapStructures = await mapStructureTestDataManager.generateInitialCollection(
-        mapStructureFactory.generateMany(map._id.toString(), [map])
+      mapStructureFactory.generateMany(map._id.toString(), [map])
     );
     return {
       map,
       projects,
-      mapStructures,
+      mapStructures
     };
-  },
+  }
 };
