@@ -10,7 +10,38 @@
     "build": "cd ../console && ng build",
     "build:prod": "cd ../console && ng build --prod",
     "watch": "nodemon app.js",
-    "install:all": "npm i && cd ../console && npm i"
+    "install:all": "npm i && cd ../console && npm i",
+    "eslint": "./node_modules/.bin/eslint ./api/tests --fix"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run eslint && npm t"
+    }
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es6": true,
+      "jest": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 8
+    },
+    "extends": [
+      "eslint:recommended",
+      "google",
+      "plugin:prettier/recommended"
+    ],
+    "rules": {
+      "linebreak-style": "off",
+      "max-len": [
+        "warn",
+        {
+          "code": 128
+        }
+      ],
+      "require-jsdoc": "off"
+    }
   },
   "author": "",
   "license": "ISC",
@@ -38,10 +69,16 @@
   },
   "devDependencies": {
     "chance": "^1.1.0",
+    "eslint": "^6.4.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "husky": "^3.0.7",
     "jest": "^24.9.0",
     "jest-circus": "^24.9.0",
     "jest-environment-node": "^24.9.0",
     "json-schema-faker": "^0.5.0-rc17",
+    "prettier": "^1.18.2",
     "socket.io-client": "^2.3.0",
     "speculate": "1.7.4",
     "supertest": "^4.0.2"

@@ -35,7 +35,7 @@ async function createMap(projectId, mapName) {
     await addMapToProject(projectId, map.id);
     return map;
   } catch (err) {
-    throw err;
+    return err;
   }
 }
 
@@ -46,7 +46,7 @@ async function addMapToProject(projectId, mapId) {
       { $push: { maps: mapId } }
     );
   } catch (err) {
-    throw err;
+    return err;
   }
 }
 
