@@ -13,6 +13,9 @@
     "install:all": "npm i && cd ../console && npm i",
     "eslint": "./node_modules/.bin/eslint ./api/tests --fix"
   },
+  "husky": {
+    "pre-push": "npm run eslint && npm t"
+  },
   "eslintConfig": {
     "env": {
       "node": true,
@@ -68,6 +71,7 @@
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-prettier": "^3.1.1",
+    "husky": "^3.0.7",
     "jest": "^24.9.0",
     "jest-circus": "^24.9.0",
     "jest-environment-node": "^24.9.0",
