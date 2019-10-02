@@ -169,13 +169,17 @@ describe("Map execution tests", () => {
     });
   });
 
-  // router.post("/:id/cancel-pending", mapController.cancelPending);
-  // NOTICE: cancel pending will not reject / respond with 500 because of the bug (KAH-36)
-  // NOTICE: not possible to test this route, because the state is kept in memory of the node process
-  /*
-    describe('POST /api/maps/:id/cancel-pending', () => {
+  describe('POST /api/maps/:id/cancel-pending', () => {
+    it(`should return with 500 staus code and proper error message`, () => {
+      return request(app)
+        .post(`/api/maps/0/cancel-pending`)
+        .expect(500)
+        .then(({ text }) => {
+          expect(text).toEqual('Not enough parameters')
+        });
     });
-    */
+  });
+
 
   // router.get("/currentruns", mapController.currentRuns);
   // NOTICE: not able to test a case with existing current runs
