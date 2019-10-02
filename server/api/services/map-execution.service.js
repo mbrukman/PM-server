@@ -1543,18 +1543,18 @@ async function rebuildPending() {
 function cancelPending(mapId, runId, socket) {
     return new Promise(async (resolve, reject) => {
         if (!mapId || !runId) {
-            throw new Error('Not enough parameters');
+            return reject({ message: 'Not enough parameters' });
 
         }
         if (!pending.hasOwnProperty(mapId)) {
-            throw new Error('No pending executions for this map');
+            return reject({ message: 'No pending executions for this map' });
         }
         const runIndex = pending[mapId].findIndex((o) => o === runId);
         if (runIndex === -1) {
-            throw new Error('No such job');
+            return reject({ message: 'No such job' });
         }
 
-        await MapResult.findOneAndUpdate({_id: runId}, {status: statusEnum.CANCELED})
+        await MapResult.findOneAndUpdate({ _id: runId }, { status: statusEnum.CANCELED })
         pending[mapId].splice(runIndex, 1);
         updateClientPending(socket);
         resolve();
