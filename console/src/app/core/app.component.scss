@@ -85,7 +85,7 @@
 
 .search {
     width: 450px;
-    margin-left: $sidebar-Width;
+    z-index: 10;
     position: fixed;
     height: 100%;
     top: 0;
