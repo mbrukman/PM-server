@@ -9,6 +9,15 @@ let config = require('../../env/config');
 
 module.exports = {
     settings: (req, res) => {
+        // delete cache for config and load it again
+        delete require.cache[require.resolve('../../env/config')];
+        config = require('../../env/config');
+        if (!config.dbURI) {
+            return res.send({
+                isSetup: false,
+                version: env.version
+            })
+        }
         mongoose.connect(config.dbURI)
             .then(() => {
                 return true;

@@ -239,7 +239,6 @@ module.exports = {
         hooks.hookPre('map-update', req).then(() => {
             return mapsService.update(mapId, req.body);
         }).then((map) => {
-            console.log(map);
             return req.body.project ? projectsService.updateMap(mapId, req.body.project) : null;
         }).then(() => {
             return res.send('OK');
@@ -262,7 +261,7 @@ module.exports = {
             let data = {
                 type: 'saved-map', 
                 msg: { title: 'Saved', message: `Map saved successfully`, type: 'success', mapId: mapId, initiator : req.body.socketId }
-            }
+            };
             req.io.emit('message', data);
             return res.json(structure)
         }).catch((error) => {
@@ -403,7 +402,7 @@ module.exports = {
         });
     },
 
-    /* triggers */
+     /* triggers */
     /* create trigger */
     triggerCreate: (req, res) => {
         hooks.hookPre('trigger-create', req).then(() => {

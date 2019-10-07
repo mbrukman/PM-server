@@ -47,7 +47,7 @@ export class MapCreateComponent implements OnInit, OnDestroy {
         let projectOptions = this.projects.map(project => {
           return {label:project.name,value:project._id}
         })
-        this.projectsDropDown = [{label:'New Project', value: this.NEW_PROJECT}]
+        this.projectsDropDown = [{label:'Create New Project', value: this.NEW_PROJECT}]
         this.projectsDropDown.push(...projectOptions);
 
         if (params.map) {

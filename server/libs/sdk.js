@@ -1,41 +1,41 @@
 /**
  * @type {MapsService}
  */
-var MapService 
+let MapService;
 
-
-/**	
- * Represents the execution Id	
+/**
+ * Represents the execution Id
  */
 /** @type {KaholoAgent} */
 var currentAgent = {
-    name: '',
-    url: '',
-    attributes: [{ name: '' }]
-}
+  name: "",
+  url: "",
+  attributes: [{ name: "" }]
+};
 
-/**	
- * Represents the execution Id	
+/**
+ * Represents the execution Id
  */
 /** @type {KaholoAgent} */
 var currentAgent;
-var executionId;
+let executionId;
 
 /** @type {KaholoTrigger} */
-var trigger;
+let trigger;
 
-/**	
- * Represents the selected configuration	
+/**
+ * Represents the selected configuration
  */
-var configuration;
+/** @type {KaholoConfiguration} */
+let configuration;
 
 /**
  * Returns a process execution by the process uuid
  * @param {string} processId
- * @returns {object}
+ * @return {object}
  */
-var getProcessById = function (processId) {
-    return processes[processId];
+const getProcessById = function(processId) {
+  return processes[processId];
 };
 
 /**
@@ -43,82 +43,82 @@ var getProcessById = function (processId) {
  * @param index
  * @param process
  */
-var getProcessIteration = function (process, index = -1) {
-    index = (index === -1 || index === 0) ? 0 : index - 1;
-    return process[index];
+const getProcessIteration = function(process, index = -1) {
+  index = index === -1 || index === 0 ? 0 : index - 1;
+  return process[index];
 };
 
 /**
  * Return the first process with the specific name or undefined.
  * @param {string} name the name of the process
  */
-var getProcessByName = function (name) {
-    var processesKey = Object.keys(process);
-    var processesName = processesKey.map(k => processes[k].name);
-    return processes[processesKey[processesName.findIndex(o => o === name)]]
+const getProcessByName = function(name) {
+  const processesKey = Object.keys(process);
+  const processesName = processesKey.map(k => processes[k].name);
+  return processes[processesKey[processesName.findIndex(o => o === name)]];
 };
 
 /**
  * Return the action in the {actionIndex} number in the process specified
  * @param {number} actionIndex the index number of the action.
  * @param process
- * @returns {*|Action}
+ * @return {*|Action}
  */
-var getActionByIndex = function (actionIndex, process) {
-    if (typeof process !== 'object') {
-        throw new Error('invalid parameters: process should be an object');
-    }
-    var actionId = Object.keys(process.actions)[actionIndex];
-    return process.actions[actionId];
+const getActionByIndex = function(actionIndex, process) {
+  if (typeof process !== "object") {
+    throw new Error("invalid parameters: process should be an object");
+  }
+  const actionId = Object.keys(process.actions)[actionIndex];
+  return process.actions[actionId];
 };
 
 /**
  * Returns an object containing the process from all the running agent.
  * @param {string} processId
- * @returns {object} all the process. the keys are the agents urls.
+ * @return {object} all the process. the keys are the agents urls.
  */
-var getProcessCrossAgent = function (processId) {
-    var processes = {};
-    Object.keys(globalContext).forEach(agentKey => {
-        processes[globalContext[agentKey].url] = globalContext[agentKey].processes[processId];
-    });
-    return processes;
+const getProcessCrossAgent = function(processId) {
+  const processes = {};
+  Object.keys(globalContext).forEach(agentKey => {
+    processes[globalContext[agentKey].url] =
+      globalContext[agentKey].processes[processId];
+  });
+  return processes;
 };
-
 
 /**
  * Return the selected configuration or undefined
- * @returns {object | undefined}
+ * @return {object | undefined}
  */
-var getConfiguration = function () {
-    return configuration;
+const getConfiguration = function() {
+  return configuration;
 };
 
 /** @type {KaholoVault} */
-var vault
+let vault;
 
 /* represents the previous action that was running in this process
  when the action is the first one to run will be undefined */
 
- // /* represents the current running action */
+// /* represents the current running action */
 /** @type {KaholoAction} */
-var currentAction;
+let currentAction;
 
 /** @type {KaholoAction} */
-var previousAction;
+let previousAction;
 
 /* represents the previous running process */
 /** @type {KaholoProcess} */
-var previousProcess;
+let previousProcess;
 
 /* represents the current running process */
 /** @type {KaholoProcess} */
-var currentProcess;
+let currentProcess;
 
 /* represents the previous link result (not the process) */
 /** @type {KaholoLink} */
-var previousLink;
+let previousLink;
 
 /* represents the current Link */
 /** @type {KaholoLink} */
-var currentLink;
+let currentLink;
