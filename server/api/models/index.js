@@ -5,7 +5,10 @@ const Map = require("./map.model");
 const {
   MapResult,
   AgentResultModel,
-  ActionResultModel
+  AgentResult,
+  ActionResult,
+  ActionResultModel,
+  statusEnum
 } = require("./map-results.model");
 const {
   MapStructure,
@@ -26,7 +29,10 @@ module.exports = {
   Map,
   MapResult,
   AgentResultModel,
+  AgentResult,
+  ActionResult,
   ActionResultModel,
+  statusEnum,
   MapStructure,
   ActionModel,
   ProcessModel,
