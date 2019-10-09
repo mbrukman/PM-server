@@ -511,7 +511,7 @@ async function executeMap(runId, map, mapStructure, agents, context) {
         stopExecution(runId, clientSocket, "link is missing to start execution")
     }
 
-    let nsp = socketService.getNamespaceSocket('execution-update-' + runId.toString());
+    let nsp = await socketService.getNamespaceSocket('execution-update-' + runId.toString());
     nsp.on('connection', function (socket) {
         Object.keys(nsp.sockets).forEach(socket => {
             nsp.sockets[socket].emit("updateActions", nsp.actions);
@@ -940,8 +940,8 @@ function updateAgentContext(runId, agent, agentData) {
     dbUpdates.updateAgent(options)
 }
 
-function sendFinishTimeToClient(runId, data) {
-    let nsp = socketService.getNamespaceSocket('execution-update-' + runId.toString());
+async function sendFinishTimeToClient(runId, data) {
+    let nsp = await socketService.getNamespaceSocket('execution-update-' + runId.toString());
     nsp.emit('updateFinishTime', data)
 
 }
@@ -1108,7 +1108,7 @@ function runProcess(map, structure, runId, agent, process) {
                 },
 
             }
-            let nsp = socketService.getNamespaceSocket('execution-update-' + runId.toString());
+            let nsp = await socketService.getNamespaceSocket('execution-update-' + runId.toString());
             nsp.actions.push(res)
             nsp.emit('updateAction', res)
             executions[runId].processesDidntPassConditionUuid = executions[runId].processesDidntPassConditionUuid || [];
@@ -1367,7 +1367,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
      * In case of retries- try again
      * @returns {object} - action result
      */
-    function runAction() {
+    async function runAction() {
         let actionResult = actionData;
         let timeoutFunc = helper.generateTimeoutFun(action)
 
@@ -1413,7 +1413,7 @@ async function executeAction(map, structure, runId, agent, process, processIndex
                 }
             }
 
-            let nsp = socketService.getNamespaceSocket('execution-update-' + runId.toString());
+            let nsp = await socketService.getNamespaceSocket('execution-update-' + runId.toString());
             nsp.actions.push(res)
             Object.keys(nsp.sockets).forEach(socket => {
                 nsp.sockets[socket].emit('updateAction', res)
