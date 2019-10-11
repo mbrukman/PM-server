@@ -169,17 +169,16 @@ describe("Map execution tests", () => {
     });
   });
 
-  describe('POST /api/maps/:id/cancel-pending', () => {
+  describe("POST /api/maps/:id/cancel-pending", () => {
     it(`should return with 500 staus code and proper error message`, () => {
       return request(app)
         .post(`/api/maps/0/cancel-pending`)
         .expect(500)
         .then(({ text }) => {
-          expect(text).toEqual('Not enough parameters')
+          expect(text).toEqual("Not enough parameters");
         });
     });
   });
-
 
   // router.get("/currentruns", mapController.currentRuns);
   // NOTICE: not able to test a case with existing current runs
