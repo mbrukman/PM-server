@@ -4,14 +4,12 @@ const { MapStructure } = require("../../api/models/map-structure.model");
 const TestDataManager = require("./factories/test-data-manager");
 const mapsFactory = require("./factories/maps.factory");
 const mapStructureFactory = require("./factories/map-structure.factory");
-const { setupDB } = require("./helpers/test-setup");
 const app = "localhost:3000";
 
 describe("Map execution tests", () => {
   const mapDataManager = new TestDataManager(MapModel);
   const mapStructureDataManager = new TestDataManager(MapStructure);
   let mapId;
-  setupDB();
 
   beforeEach(async () => {
     const map = mapsFactory.generateSimpleMap();
