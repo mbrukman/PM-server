@@ -254,250 +254,273 @@ function deleteAgentFromMap(agentId) {
   );
 }
 
+function add(agent) {
+  return Agent.findOne({ key: agent.key })
+    .then(agentObj => {
+      if (!agentObj) {
+        return Agent.create(agent);
+      }
+      return Agent.findByIdAndUpdate(agentObj._id, {
+        $set: { url: agent.url, publicUrl: agent.publicUrl, isDeleted: false }
+      });
+    })
+    .then(agent => {
+      followAgentStatus(agent);
+      return setDefaultUrl(agent).then(() => {
+        return agent;
+      });
+    });
+}
+
+function getByKey(agentKey) {
+  agents[agentKey].key = agentKey;
+  return agents[agentKey];
+}
+
+// get an object of installed plugins and versions on certain agent.
+function checkPluginsOnAgent(agent) {
+  return new Promise((resolve, reject) => {
+    console.log(" checkPluginsOnAgent", agents[agent.key].defaultUrl);
+    request.post(
+      agents[agent.key].defaultUrl + "/api/plugins",
+      { form: { key: agent.key } },
+      function(error, response, body) {
+        if (error || response.statusCode !== 200) {
+          resolve("{}");
+        }
+        resolve(body);
+      }
+    );
+  });
+}
+
+function deleteAgent(agentId) {
+  return Agent.findByIdAndUpdate(agentId, {
+    $set: { isDeleted: "true" }
+  }).then(async agent => {
+    await deleteAgentFromMap(agentId);
+    if (agents[agent.key]) {
+      clearInterval(agents[agent.key].intervalId);
+    }
+    delete agents[agent.key];
+  });
+}
+/* filter the agents. if no query is passed, will return all agents */
+function filter(query = {}) {
+  query.isDeleted = { $ne: true };
+  return Agent.find(query);
+}
+/* send plugin file to an agent */
+function installPluginOnAgent(pluginPath, agent) {
+  const formData = {
+    file: {
+      value: fs.createReadStream(pluginPath),
+      options: {
+        filename: path.basename(pluginPath)
+      }
+    }
+  };
+  // if there is no agents, send this plugin to all living agents
+  const requestOptions = {
+    uri: "/api/plugins/install",
+    formData: formData
+  };
+
+  if (!agent) {
+    const requests = [];
+    for (const i in agents) {
+      if (!agents[i].alive) {
+        continue;
+      }
+      requests.push(sendRequestToAgent(requestOptions, agents[i]));
+    }
+    return Promise.all(requests);
+  } else {
+    return Promise.all([sendRequestToAgent(requestOptions, agent)]);
+  }
+}
+
+/**
+ *
+ * @param {string} name
+ * @param {Agent} agent
+ * @return {Promise<result[]>}
+ */
+function deletePluginOnAgent(name, agent) {
+  // if there is no agents, send this plugin to all living agents
+  const requestOptions = {
+    body: { name: name },
+    uri: "/api/plugins/delete"
+  };
+
+  if (!agent) {
+    const requests = [];
+    for (const i in agents) {
+      if (!agents[i].alive) {
+        continue;
+      }
+
+      requests.push(sendRequestToAgent(requestOptions, agents[i]));
+    }
+    return Promise.all(requests);
+  } else {
+    return Promise.all([sendRequestToAgent(requestOptions, agent)]);
+  }
+}
+
+/* restarting the agents live status, and updating the status for all agents */
+function restartAgentsStatus() {
+  agents = {};
+  Agent.find({}).then(agents => {
+    agents.forEach(agent => {
+      followAgentStatus(agent);
+    });
+  });
+}
+
+/* update an agent */
+function update(agentId, agent) {
+  return Agent.findByIdAndUpdate(agentId, agent, { new: true });
+}
+
+function updateGroup(groupId, groupUpdated) {
+  return Group.findOne({ _id: groupId }).then(group => {
+    group.name = groupUpdated.name;
+    group.filters = groupUpdated.filters;
+    return group.save();
+  });
+}
+
+/* Groups */
+/**
+ * Creating new group object
+ * @param group
+ * @return {group}
+ */
+function createGroup(group) {
+  return Group.create(group);
+}
+
+function groupsList(query = {}) {
+  return Group.find(query);
+}
+
+/**
+ * Adding agents to group
+ * @param groupId
+ * @param agentsId
+ * @return {Query}
+ */
+function addAgentToGroup(groupId, agentsId) {
+  return Group.findByIdAndUpdate(
+    groupId,
+    { $addToSet: { agents: { $each: agentsId } } },
+    { new: true }
+  );
+}
+
+/**
+ * Adding filters to group
+ * @param groupId
+ * @param filters
+ * @return {Query}
+ */
+function addGroupFilters(groupId, filters) {
+  return Group.findByIdAndUpdate(
+    groupId,
+    { $set: { filters: filters } },
+    { new: true }
+  );
+}
+
+/**
+ * Delete a group.
+ * @param groupId
+ * @return {Query}
+ */
+function deleteGroup(groupId) {
+  return Group.findByIdAndRemove(groupId);
+}
+
+/**
+ * Returning a group by it's id
+ * @param groupId
+ * @return {Query}
+ */
+function groupDetail(groupId) {
+  return Group.findById(groupId);
+}
+
+/**
+ * Removes agents ref from groups.
+ * @param agentId
+ */
+function removeAgentFromGroups(agentId) {
+  return Group.update(
+    { agents: { $in: [agentId] } },
+    { $pull: { agents: { $in: [agentId] } } }
+  );
+}
+
+function deleteFilterFromGroup(groupId, index) {
+  return Group.findOne({ _id: groupId }).then(group => {
+    group.filters.splice(index, 1);
+    return group.save();
+  });
+}
+
+/**
+ * Removing an agent from a group
+ * @param groupId
+ * @param agentId
+ * @return {Query|*}
+ */
+function removeAgentFromGroup(groupId, agentId) {
+  return Group.findOne({ _id: groupId }).then(group => {
+    group.agents.splice(
+      group.agents.findIndex(agent => agent.id == agentId),
+      1
+    );
+    return group.save();
+  });
+}
+/**
+ * Establish a room for agents
+ * @param socket
+ */
+function establishSocket(socket) {
+  const nsp = socket.of("/agents");
+  nsp.on("connection", function(socket) {
+    winston.log("info", "Agent log");
+    // agent send key on connection string
+    addSocketIdToAgent(socket.client.request._query.key, socket);
+  });
+}
+
 module.exports = {
-  add: agent => {
-    return Agent.findOne({ key: agent.key })
-      .then(agentObj => {
-        if (!agentObj) {
-          return Agent.create(agent);
-        }
-        return Agent.findByIdAndUpdate(agentObj._id, {
-          $set: { url: agent.url, publicUrl: agent.publicUrl, isDeleted: false }
-        });
-      })
-      .then(agent => {
-        followAgentStatus(agent);
-        return setDefaultUrl(agent).then(() => {
-          return agent;
-        });
-      });
-  },
-  getByKey: agentKey => {
-    agents[agentKey].key = agentKey;
-    return agents[agentKey];
-  },
-  // get an object of installed plugins and versions on certain agent.
-  checkPluginsOnAgent: agent => {
-    return new Promise((resolve, reject) => {
-      console.log(" checkPluginsOnAgent", agents[agent.key].defaultUrl);
-      request.post(
-        agents[agent.key].defaultUrl + "/api/plugins",
-        { form: { key: agent.key } },
-        function(error, response, body) {
-          if (error || response.statusCode !== 200) {
-            resolve("{}");
-          }
-          resolve(body);
-        }
-      );
-    });
-  },
-  delete: agentId => {
-    return Agent.findByIdAndUpdate(agentId, {
-      $set: { isDeleted: "true" }
-    }).then(async agent => {
-      await deleteAgentFromMap(agentId);
-      if (agents[agent.key]) {
-        clearInterval(agents[agent.key].intervalId);
-      }
-      delete agents[agent.key];
-    });
-  },
-  /* filter the agents. if no query is passed, will return all agents */
-  filter: (query = {}) => {
-    query.isDeleted = { $ne: true };
-    return Agent.find(query);
-  },
-  /* send plugin file to an agent */
-  installPluginOnAgent: (pluginPath, agent) => {
-    const formData = {
-      file: {
-        value: fs.createReadStream(pluginPath),
-        options: {
-          filename: path.basename(pluginPath)
-        }
-      }
-    };
-    // if there is no agents, send this plugin to all living agents
-    const requestOptions = {
-      uri: "/api/plugins/install",
-      formData: formData
-    };
-
-    if (!agent) {
-      const requests = [];
-      for (const i in agents) {
-        if (!agents[i].alive) {
-          continue;
-        }
-        requests.push(sendRequestToAgent(requestOptions, agents[i]));
-      }
-      return Promise.all(requests);
-    } else {
-      return Promise.all([sendRequestToAgent(requestOptions, agent)]);
-    }
-  },
-
-  /**
-   *
-   * @param {string} name
-   * @param {Agent} agent
-   * @return {Promise<result[]>}
-   */
-  deletePluginOnAgent: function(name, agent) {
-    // if there is no agents, send this plugin to all living agents
-    const requestOptions = {
-      body: { name: name },
-      uri: "/api/plugins/delete"
-    };
-
-    if (!agent) {
-      const requests = [];
-      for (const i in agents) {
-        if (!agents[i].alive) {
-          continue;
-        }
-
-        requests.push(sendRequestToAgent(requestOptions, agents[i]));
-      }
-      return Promise.all(requests);
-    } else {
-      return Promise.all([sendRequestToAgent(requestOptions, agent)]);
-    }
-  },
-
-  /* restarting the agents live status, and updating the status for all agents */
-  restartAgentsStatus: () => {
-    agents = {};
-    Agent.find({}).then(agents => {
-      agents.forEach(agent => {
-        followAgentStatus(agent);
-      });
-    });
-  },
-  setDefaultUrl: setDefaultUrl,
+  add,
+  delete: deleteAgent,
+  setDefaultUrl,
   followAgent: followAgentStatus,
   unfollowAgent: unfollowAgentStatus,
-  /* update an agent */
-  update: (agentId, agent) => {
-    return Agent.findByIdAndUpdate(agentId, agent, { new: true });
-  },
-
-  updateGroup: (groupId, groupUpdated) => {
-    return Group.findOne({ _id: groupId }).then(group => {
-      group.name = groupUpdated.name;
-      group.filters = groupUpdated.filters;
-      return group.save();
-    });
-  },
-  /* exporting the agents status */
   agentsStatus: getAgentStatus,
-
-  /* Groups */
-  /**
-   * Creaqting new group object
-   * @param group
-   * @return {group}
-   */
-  createGroup: group => {
-    return Group.create(group);
-  },
-
-  groupsList: (query = {}) => {
-    return Group.find(query);
-  },
-
-  /**
-   * Adding agents to group
-   * @param groupId
-   * @param agentsId
-   * @return {Query}
-   */
-  addAgentToGroup: (groupId, agentsId) => {
-    return Group.findByIdAndUpdate(
-      groupId,
-      { $addToSet: { agents: { $each: agentsId } } },
-      { new: true }
-    );
-  },
-
-  /**
-   * Adding filters to group
-   * @param groupId
-   * @param filters
-   * @return {Query}
-   */
-  addGroupFilters: (groupId, filters) => {
-    return Group.findByIdAndUpdate(
-      groupId,
-      { $set: { filters: filters } },
-      { new: true }
-    );
-  },
-
-  /**
-   * Delete a group.
-   * @param groupId
-   * @return {Query}
-   */
-  deleteGroup: groupId => {
-    return Group.findByIdAndRemove(groupId);
-  },
-
-  /**
-   * Returning a group by it's id
-   * @param groupId
-   * @return {Query}
-   */
-  groupDetail: groupId => {
-    return Group.findById(groupId);
-  },
-
-  evaluateGroupAgents: evaluateGroupAgents,
-
-  /**
-   * Removes agents ref from groups.
-   * @param agentId
-   */
-  removeAgentFromGroups: agentId => {
-    return Group.update(
-      { agents: { $in: [agentId] } },
-      { $pull: { agents: { $in: [agentId] } } }
-    );
-  },
-
-  deleteFilterFromGroup: (groupId, index) => {
-    return Group.findOne({ _id: groupId }).then(group => {
-      group.filters.splice(index, 1);
-      return group.save();
-    });
-  },
-
-  /**
-   * Removing an agent from a group
-   * @param groupId
-   * @param agentId
-   * @return {Query|*}
-   */
-  removeAgentFromGroup: (groupId, agentId) => {
-    return Group.findOne({ _id: groupId }).then(group => {
-      group.agents.splice(
-        group.agents.findIndex(agent => agent.id == agentId),
-        1
-      );
-      return group.save();
-    });
-  },
-  /**
-   * Establish a room for agents
-   * @param socket
-   */
-  establishSocket: socket => {
-    const nsp = socket.of("/agents");
-    nsp.on("connection", function(socket) {
-      winston.log("info", "Agent log");
-      // agent send key on connection string
-      addSocketIdToAgent(socket.client.request._query.key, socket);
-    });
-  }
+  evaluateGroupAgents,
+  getByKey,
+  checkPluginsOnAgent,
+  filter,
+  installPluginOnAgent,
+  deletePluginOnAgent,
+  restartAgentsStatus,
+  update,
+  updateGroup,
+  createGroup,
+  groupsList,
+  addAgentToGroup,
+  addGroupFilters,
+  deleteGroup,
+  groupDetail,
+  removeAgentFromGroups,
+  deleteFilterFromGroup,
+  removeAgentFromGroup,
+  establishSocket
 };
