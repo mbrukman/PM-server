@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const socketSchema = new Schema(
   {
-    namespace: String
+    namespace: { type: String, index: true }
   },
   { timestamps: true }
 );
