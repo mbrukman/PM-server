@@ -1,4 +1,4 @@
-const { scheduleJob, Job } = require("node-schedule");
+const { scheduleJob } = require("node-schedule");
 const mapsExecutionService = require("../services/map-execution.service");
 const ScheduledJob = require("../models").ScheduledJob;
 const winston = require("winston");
@@ -6,19 +6,20 @@ const winston = require("winston");
 class ScheduledJobService {
   constructor() {
     this.socket = null;
+    this.scheduledJob = {};
   }
   /*
    * adding scheduled job
    * we are using node-scheduler for this.
    * */
   addScheduledJob(job) {
-    scheduleJob(job.datetime || job.cron, function() {
-      ScheduledJob.findById(job._id).then(jobObj => {
+    this.scheduledJob[job._id] = scheduleJob(job.datetime || job.cron, () => {
+      ScheduledJob.findById(job._id).then(async jobObj => {
         if (!jobObj) {
           return;
         }
         if (jobObj.skip) {
-          ScheduledJob.findByIdAndUpdate(job._id, {
+          await ScheduledJob.findByIdAndUpdate(job._id, {
             $set: { skip: false }
           }).then(() => {
             console.log("Removed skip from job");
@@ -54,7 +55,7 @@ class ScheduledJobService {
   }
   /* deleting job object from db and removing scheduled job if exists */
   async delete(jobId) {
-    await this.removeScheduledJob(jobId);
+    this.removeScheduledJob(jobId);
 
     return ScheduledJob.remove({ _id: jobId });
   }
@@ -84,9 +85,10 @@ class ScheduledJobService {
 
   /* removing a scheduled job */
   removeScheduledJob(jobId) {
-    const scheduledJob = ScheduledJob.findById(jobId);
-    const job = new Job(scheduledJob);
-    job.cancel();
+    if (this.scheduledJob[jobId]) {
+      this.scheduledJob[jobId].cancel();
+      delete this.scheduledJob[jobId];
+    }
   }
 
   /*
@@ -97,7 +99,7 @@ class ScheduledJobService {
     this.socket = app.io;
     this.getFutureJobs()
       .then(jobs => {
-        jobs.forEach(function(job) {
+        jobs.forEach(job => {
           this.addScheduledJob(job);
         });
       })
