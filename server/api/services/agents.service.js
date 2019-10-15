@@ -22,7 +22,7 @@ const FILTER_TYPES = Object.freeze({
 });
 
 /* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
-const followAgentStatus = agent => {
+function followAgentStatus(agent) {
   const listenInterval = setInterval(() => {
     const start = new Date();
     if (!agents[agent.key]) return;
@@ -78,10 +78,10 @@ const followAgentStatus = agent => {
     setDefaultUrl(agent);
     // agents[agent.key] = { intervalId: listenInterval, alive: false, following: true };
   }
-};
+}
 
 /* stop following an agent */
-const unfollowAgentStatus = agentId => {
+function unfollowAgentStatus(agentId) {
   const agent = _.find(agents, o => {
     return o.id === agentId;
   });
@@ -92,7 +92,7 @@ const unfollowAgentStatus = agentId => {
   clearInterval(agents[agent.key].intervalId);
   agents[agent.key].alive = false;
   agents[agent.key].following = false;
-};
+}
 
 function getAgentStatus() {
   return agents;
