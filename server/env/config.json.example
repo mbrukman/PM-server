@@ -3,5 +3,5 @@
   "interval_time": 5000,
   "retries": 3,
   "page_size": 15,
-  "dbURI": "mongodb://testUser:xyz123@127.0.0.1:27017/test"
+  "dbURI": "mongodb://127.0.0.1:27017/kaholo"
 }
