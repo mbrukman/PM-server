@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 const Project = require('../models/project.model');
 const Map = require('../models/map.model');
-const env = require('../../env/enviroment');
 
-const PAGE_SIZE = env.page_size;
+const PAGE_SIZE = process.env.PAGE_SIZE;
 
 module.exports = {
   count: (filter) => {

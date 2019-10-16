@@ -1,4 +1,4 @@
-const bootstrap = require("../../../helpers/bootstrap").bootstrap;
+const startKaholo = require("../../../helpers/index");
 // const { envDir } = require("../../../env");
 // const fs = require("fs");
 // const { MongoMemoryServer } = require("mongodb-memory-server");
@@ -19,10 +19,5 @@ module.exports = async () => {
   //   Object.keys(require.cache).filter(i => i.includes("env/enviroment"))[0]
   // ];
 
-  const { app, server, port, winston } = require("../../index");
-
-  global.server = server.listen(port, () => {
-    winston.log("info", `Running on localhost:${port}`);
-    bootstrap(app);
-  });
+  global.server = startKaholo();
 };

@@ -4,7 +4,6 @@ const unzip = require('unzipper');
 const child_process = require('child_process');
 const winston = require('winston');
 const del = require('del');
-const env = require('../../env/enviroment');
 const agentsService = require('./agents.service');
 const models = require('../models');
 const Plugin = models.Plugin;
@@ -241,10 +240,10 @@ module.exports = {
   // TODO: delete old files/save the file location at db to install it? Right now, if a plugin is deleted it would reinstall it
   loadPlugins: () => {
     console.log('Loading plugins');
-    fs.readdir(path.join(env.static_cdn, env.upload_path), (err, files) => {
+    fs.readdir(path.join(global.kaholo.STATIC_CDN, process.env.UPLOAD_PATH), (err, files) => {
       Promise.all(files.map((plugin) => {
         return new Promise((resolve, reject) => {
-          const filePath = path.join(env.static_cdn, env.upload_path, plugin);
+          const filePath = path.join(global.kaholo.STATIC_CDN, process.env.UPLOAD_PATH);
           deployPluginFile(filePath)
               .then(() => { })
               .catch((error) => {

@@ -4,8 +4,7 @@ const winston = require('winston');
 const expressWinston = require('express-winston');
 
 const mongoose = require('mongoose');
-const env = require('../../env/enviroment')
-let config = require('../../env/config');
+let config = {};
 
 module.exports = {
     settings: (req, res) => {
@@ -15,7 +14,7 @@ module.exports = {
         if (!config.dbURI) {
             return res.send({
                 isSetup: false,
-                version: env.version
+                version: global.kaholo.VERSION
             })
         }
         mongoose.connect(config.dbURI)
@@ -27,7 +26,7 @@ module.exports = {
             }).then(isSetup => {
                 res.send({
                     isSetup: isSetup,
-                    version: env.version
+                    version: global.kaholo.VERSION
                 })
             })
     },

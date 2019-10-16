@@ -1,10 +1,8 @@
 const Map = require("../models/map.model");
 const {MapStructure} = require("../models");
-const env = require("../../env/enviroment");
 const MapTrigger = require("../models/map-trigger.model");
 const MapResult = require("../models").MapResult;
 const Project = require("../models/project.model");
-const PAGE_SIZE = env.page_size;
 const shared = require("../shared/recents-maps");
 const mongoose = require('mongoose');
 
@@ -15,8 +13,6 @@ function getMapPlugins(mapStructure) {
     });
     return Array.from(plugins);
 }
-
-
 
 function getSort(sortString) {
     var sort = {}
@@ -154,8 +150,8 @@ module.exports = {
 
         let resultsQuery = [...aggregateSteps,
             { $sort: getSort(sort) },
-            { $skip: page ? ((page - 1) * PAGE_SIZE) : 0 },
-            { $limit: filterOptions.options.limit || PAGE_SIZE },
+            { $skip: page ? ((page - 1) * process.env.PAGE_SIZE) : 0 },
+            { $limit: filterOptions.options.limit || process.env.PAGE_SIZE },
             { $unwind: '$project' },
             {
                 $unwind: {
