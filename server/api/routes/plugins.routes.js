@@ -2,10 +2,9 @@ const path = require('path');
 const express = require('express');
 const pluginsController = require('../controllers/plugins.controller');
 const multer = require('multer');
-const env = require('../../env/enviroment');
 
 const multerParams = {
-  dest: path.join(env.static_cdn, env.upload_path),
+  dest: path.join(global.kaholo.STATIC_CDN, process.env.UPLOAD_PATH),
 };
 
 const upload = multer(multerParams);

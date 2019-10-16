@@ -1,8 +1,7 @@
-const fs = require('fs');
+const fs = require('fs'); 
 const crypto = require('crypto');
 
 const Vault = require('../models/vault.model');
-const env = require('../../env/enviroment');
 const createKey = require('../../helpers/create-key');
 
 const algorithm = 'aes-256-cbc';
@@ -11,10 +10,10 @@ const IV_LENGTH = 16; // For AES, this is always 16
 
 let key;
 
-if (!fs.existsSync(env.keyPath)) {
-  key = createKey.generateKey(env.keyPath);
+if (!fs.existsSync(global.kaholo.KEY_PATH)) {
+  key = createKey.generateKey(global.kaholo.KEY_PATH);
 } else {
-  key = fs.readFileSync(env.keyPath, 'utf-8');
+  key = fs.readFileSync(global.kaholo.KEY_PATH, 'utf-8');
 }
 
 module.exports = {

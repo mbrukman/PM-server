@@ -5,14 +5,11 @@ const path = require("path");
 const winston = require("winston");
 const _ = require("lodash");
 const humanize = require("../../helpers/humanize");
-const env = require("../../env/enviroment");
 const Map = require("../models/map.model");
 const Agent = require("../models").Agent;
 const Group = require("../models").Group;
 const ObjectId = require('mongoose').Types.ObjectId;
 
-const LIVE_COUNTER = env.retries; // attempts before agent will be considered dead
-const INTERVAL_TIME = env.interval_time;
 let agents = {}; // store the agents status.
 
 
@@ -65,7 +62,7 @@ let followAgentStatus = (agent) => {
                     agents[agent.key].id = agent.id;
                     agents[agent.key].key = agent.key;
                     agents[agent.key].installed_plugins = body.installed_plugins;
-                    agents[agent.key].liveCounter = LIVE_COUNTER;
+                    agents[agent.key].liveCounter = process.env.RETRIES;
                 } else if ( agents[agent.key] && (--agents[agent.key].liveCounter) === 0) {
                     agents[agent.key].alive = false;
                     if (!agents[agent.key].hostname) {
@@ -80,7 +77,7 @@ let followAgentStatus = (agent) => {
                     agents[agent.key].respTime = 0;
                 }
             })
-    }, INTERVAL_TIME);
+    }, process.env.INTERVAL_TIME);
     if (!agents[agent.key]) {
         agents[agent.key] = agent.toJSON();
         agents[agent.key].alive = false;

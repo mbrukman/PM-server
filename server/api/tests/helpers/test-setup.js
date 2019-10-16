@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const env = require("../../../env/enviroment");
 
 mongoose.set("useCreateIndex", true);
 
@@ -35,7 +34,7 @@ module.exports = {
   dropAllCollections,
   setupDB() {
     beforeAll(async () => {
-      await mongoose.connect(env.dbURI, { useNewUrlParser: true });
+      await mongoose.connect(process.env.DB_URI, { useNewUrlParser: true });
       await dropAllCollections();
     });
 
