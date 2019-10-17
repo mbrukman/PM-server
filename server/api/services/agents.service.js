@@ -62,7 +62,7 @@ let followAgentStatus = (agent) => {
                     agents[agent.key].id = agent.id;
                     agents[agent.key].key = agent.key;
                     agents[agent.key].installed_plugins = body.installed_plugins;
-                    agents[agent.key].liveCounter = process.env.RETRIES;
+                    agents[agent.key].liveCounter = parseInt(process.env.RETRIES, 10);
                 } else if ( agents[agent.key] && (--agents[agent.key].liveCounter) === 0) {
                     agents[agent.key].alive = false;
                     if (!agents[agent.key].hostname) {
@@ -77,7 +77,7 @@ let followAgentStatus = (agent) => {
                     agents[agent.key].respTime = 0;
                 }
             })
-    }, process.env.INTERVAL_TIME);
+    }, parseInt(process.env.INTERVAL_TIME, 10));
     if (!agents[agent.key]) {
         agents[agent.key] = agent.toJSON();
         agents[agent.key].alive = false;
