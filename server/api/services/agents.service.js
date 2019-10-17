@@ -10,7 +10,9 @@ const Map = require("../models/map.model");
 const Agent = require("../models").Agent;
 const Group = require("../models").Group;
 
-let agents = {}; // store the agents status.
+const LIVE_COUNTER = env.retries; // attempts before agent will be considered dead
+const INTERVAL_TIME = env.interval_time;
+//let agents = {}; // store the agents status.
 
 const FILTER_TYPES = Object.freeze({
   gte: "gte",
@@ -21,8 +23,21 @@ const FILTER_TYPES = Object.freeze({
   lt: "lt"
 });
 
-/* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
-function followAgentStatus(agent) {
+function getAgentStatus(agentKey) {
+  // status = Agent.find().status
+  // status.intervalId = ... return interval ?
+  // status.socket = ... return socket based on socketId field
+}
+
+function getAllAgentsStatus() {
+  // Agents.find()
+  // map agents to statuses
+  // create object: key-status
+  return agents;
+}
+
+/* Send a post request to agent every INTERVAL seconds */
+function startFollowingAgentStatus(agent) {
   const listenInterval = setInterval(() => {
     const start = new Date();
     if (!agents[agent.key]) return;
@@ -92,10 +107,6 @@ function unfollowAgentStatus(agentId) {
   clearInterval(agents[agent.key].intervalId);
   agents[agent.key].alive = false;
   agents[agent.key].following = false;
-}
-
-function getAgentStatus() {
-  return agents;
 }
 
 function setDefaultUrl(agent) {
@@ -220,7 +231,7 @@ function evaluateFilter(filter, agents) {
  * @param socket
  */
 function addSocketIdToAgent(agentKey, socket) {
-  if (!Object.prototype.hasOwnProperty.call(agents, agentKey)) {
+  if (!agents[agentKey]) {
     return;
   }
   agents[agentKey].socket = socket;
@@ -265,7 +276,7 @@ function add(agent) {
       });
     })
     .then(agent => {
-      followAgentStatus(agent);
+      startFollowingAgentStatus(agent);
       return setDefaultUrl(agent).then(() => {
         return agent;
       });
@@ -373,7 +384,7 @@ function restartAgentsStatus() {
   agents = {};
   Agent.find({}).then(agents => {
     agents.forEach(agent => {
-      followAgentStatus(agent);
+      startFollowingAgentStatus(agent);
     });
   });
 }
@@ -501,9 +512,9 @@ module.exports = {
   add,
   delete: deleteAgent,
   setDefaultUrl,
-  followAgent: followAgentStatus,
+  followAgent: startFollowingAgentStatus,
   unfollowAgent: unfollowAgentStatus,
-  agentsStatus: getAgentStatus,
+  agentsStatus: getAllAgentsStatus,
   evaluateGroupAgents,
   getByKey,
   checkPluginsOnAgent,
