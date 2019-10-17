@@ -1,3 +1,4 @@
+server/.env
 server/diagnostic.data
 server/mongod.lock
 server/storage.bson
