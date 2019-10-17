@@ -18,9 +18,9 @@ module.exports = function startKaholo() {
 
 let port, server, io;
 
-// ///////////////////
-// configurations //
-// /////////////////
+  if(!process.env.DB_URI) {
+    throw new Error("No DB_URI was provided in environmental variables!");
+  }
 
 // enable cors
 app.use((req, res, next) => {

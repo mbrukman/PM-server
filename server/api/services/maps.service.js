@@ -147,11 +147,11 @@ module.exports = {
                 },
             }
         ]
-
+        const pageSize = parseInt(process.env.PAGE_SIZE, 10);
         let resultsQuery = [...aggregateSteps,
             { $sort: getSort(sort) },
-            { $skip: page ? ((page - 1) * process.env.PAGE_SIZE) : 0 },
-            { $limit: filterOptions.options.limit || process.env.PAGE_SIZE },
+            { $skip: page ? ((page - 1) * pageSize) : 0 },
+            { $limit: filterOptions.options.limit || pageSize },
             { $unwind: '$project' },
             {
                 $unwind: {
