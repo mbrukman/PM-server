@@ -4,7 +4,6 @@ const fs = require("fs");
 const path = require("path");
 const socketService = require("./socket.service");
 const winston = require("winston");
-const _ = require("lodash");
 const humanize = require("../../helpers/humanize");
 const Map = require("../models/map.model");
 const Agent = require("../models").Agent;
@@ -13,8 +12,6 @@ const Group = require("../models").Group;
 const LIVE_COUNTER = env.retries; // attempts before agent will be considered dead
 const INTERVAL_TIME = env.interval_time;
 const socketNamespaceName = "/agents";
-
-// let agents = {};
 
 const FILTER_TYPES = Object.freeze({
   gte: "gte",
@@ -44,10 +41,17 @@ async function getAllAgentsStatus() {
   return agentStatusObject;
 }
 
+function saveStatusToAgent(_agent, agentStatus) {
+  Agent.findOneAndUpdate(
+    { key: _agent.key },
+    { $set: { status: agentStatus } }
+  );
+}
+
 /* Send a post request to agent every INTERVAL seconds */
 async function startFollowingAgentStatus(_agent) {
-  // TODO: when using load balancer
-  // make sure to not duplicate interval on another server
+  // TODO: when using load balancer,
+  //       make sure to not duplicate interval on another server
   const listenInterval = setInterval(() => {
     followAgentStatusIntervalFunction(_agent);
   }, INTERVAL_TIME);
@@ -58,7 +62,8 @@ async function startFollowingAgentStatus(_agent) {
     agentStatus.following = true;
     agentStatus.intervalId = listenInterval;
     setDefaultUrl(_agent);
-    // TODO save agentStatus to agent model
+
+    saveStatusToAgent(_agent, agentStatus);
   }
 }
 
@@ -108,36 +113,37 @@ async function followAgentStatusIntervalFunction(_agent) {
         agentStatus.respTime = 0;
       }
 
-      // TODO save agentStatus to agent model
+      saveStatusToAgent(_agent, agentStatus);
     }
   );
 }
 
 /* stop following an agent */
-function unfollowAgentStatus(agentId) {
-  const agent = _.find(agents, o => {
-    return o.id === agentId;
-  });
-  // stop the check interval
+async function unfollowAgentStatus(agentId) {
+  const agent = await Agent.findOne({ "status.id": agentId });
   if (!agent) {
     return;
   }
-  clearInterval(agents[agent.key].intervalId);
-  agents[agent.key].alive = false;
-  agents[agent.key].following = false;
+  // stop the check interval
+  clearInterval(agent.status.intervalId);
+  agent.status.alive = false;
+  agent.status.following = false;
+  agent.save();
 }
 
-function setDefaultUrl(agent) {
+function setDefaultUrl(_agent) {
   return new Promise((resolve, reject) => {
     request.post(
-      agent.url + "/api/status",
-      { form: { key: agent.key } },
-      function(error, response, body) {
+      _agent.url + "/api/status",
+      { form: { key: _agent.key } },
+      async function(error, response, body) {
+        const agentStatus = await getAgentStatus(_agent.key);
         if (error) {
-          agents[agent.key].defaultUrl = agent.publicUrl;
+          agentStatus[_agent.key].defaultUrl = _agent.publicUrl;
         } else {
-          agents[agent.key].defaultUrl = agent.url;
+          agentStatus[_agent.key].defaultUrl = _agent.url;
         }
+        saveStatusToAgent(_agent, agentStatus);
         resolve();
       }
     );
@@ -149,10 +155,11 @@ function setDefaultUrl(agent) {
  * @param group
  * @return {any}
  */
-function evaluateGroupAgents(group) {
+async function evaluateGroupAgents(group) {
   group = JSON.parse(JSON.stringify(group)); // make sure its not a mongoose document
 
   const agentsCopy = {};
+  const agents = await getAllAgentsStatus();
   Object.keys(agents).map(key => {
     const a = Object.assign({}, agents[key]);
     delete a.socket;
@@ -243,24 +250,23 @@ function evaluateFilter(filter, agents) {
   });
 }
 
-function sendRequestToAgent(options, agent) {
-  return new Promise((resolve, reject) => {
-    options = Object.assign({}, options);
-    options.uri = agents[agent.key].defaultUrl + options.uri;
-    options.method = options.method || "POST";
+async function sendRequestToAgent(_options, _agent) {
+  const options = Object.assign({}, _options);
+  const agentStatus = await getAgentStatus(_agent.key);
+  options.uri = agentStatus.defaultUrl + options.uri;
+  options.method = options.method || "POST";
 
-    if (options.body) {
-      options.json = true;
-      options.body.key = agent.key;
-    } else if (options.formData) options.formData.key = agent.key;
+  if (options.body) {
+    options.json = true;
+    options.body.key = _agent.key;
+  } else if (options.formData) options.formData.key = _agent.key;
 
-    winston.log("info", "Sending request to agent");
-    request(options, function(error, response, body) {
-      if (error) {
-        return reject(error);
-      }
-      resolve(response);
-    });
+  winston.log("info", "Sending request to agent");
+  request(options, function(error, response, body) {
+    if (error) {
+      return error;
+    }
+    return response;
   });
 }
 
@@ -289,18 +295,14 @@ function add(agent) {
     });
 }
 
-function getByKey(agentKey) {
-  agents[agentKey].key = agentKey;
-  return agents[agentKey];
-}
-
 // get an object of installed plugins and versions on certain agent.
-function checkPluginsOnAgent(agent) {
+async function checkPluginsOnAgent(_agent) {
+  const agentStatus = await getAgentStatus(_agent.key);
   return new Promise((resolve, reject) => {
-    console.log(" checkPluginsOnAgent", agents[agent.key].defaultUrl);
+    console.log(" checkPluginsOnAgent", agentStatus.defaultUrl);
     request.post(
-      agents[agent.key].defaultUrl + "/api/plugins",
-      { form: { key: agent.key } },
+      agentStatus.defaultUrl + "/api/plugins",
+      { form: { key: _agent.key } },
       function(error, response, body) {
         if (error || response.statusCode !== 200) {
           resolve("{}");
@@ -316,10 +318,12 @@ function deleteAgent(agentId) {
     $set: { isDeleted: "true" }
   }).then(async agent => {
     await deleteAgentFromMap(agentId);
-    if (agents[agent.key]) {
-      clearInterval(agents[agent.key].intervalId);
+    const agentStatus = await getAgentStatus(agent.key);
+    if (agentStatus) {
+      unfollowAgentStatus(agentId);
     }
-    delete agents[agent.key];
+    // remove status from agent
+    Agent.update({ key: agent.key }, { $unset: { status: 1 } });
   });
 }
 /* filter the agents. if no query is passed, will return all agents */
@@ -328,7 +332,7 @@ function filter(query = {}) {
   return Agent.find(query);
 }
 /* send plugin file to an agent */
-function installPluginOnAgent(pluginPath, agent) {
+async function installPluginOnAgent(pluginPath, agent) {
   const formData = {
     file: {
       value: fs.createReadStream(pluginPath),
@@ -345,11 +349,12 @@ function installPluginOnAgent(pluginPath, agent) {
 
   if (!agent) {
     const requests = [];
-    for (const i in agents) {
-      if (!agents[i].alive) {
+    const agents = await getAllAgentsStatus();
+    for (const key in agents) {
+      if (!agents[key].alive) {
         continue;
       }
-      requests.push(sendRequestToAgent(requestOptions, agents[i]));
+      requests.push(sendRequestToAgent(requestOptions, agents[key]));
     }
     return Promise.all(requests);
   } else {
@@ -363,7 +368,7 @@ function installPluginOnAgent(pluginPath, agent) {
  * @param {Agent} agent
  * @return {Promise<result[]>}
  */
-function deletePluginOnAgent(name, agent) {
+async function deletePluginOnAgent(name, agent) {
   // if there is no agents, send this plugin to all living agents
   const requestOptions = {
     body: { name: name },
@@ -372,12 +377,12 @@ function deletePluginOnAgent(name, agent) {
 
   if (!agent) {
     const requests = [];
-    for (const i in agents) {
-      if (!agents[i].alive) {
+    const agents = await getAllAgentsStatus();
+    for (const key in agents) {
+      if (!agents[key].alive) {
         continue;
       }
-
-      requests.push(sendRequestToAgent(requestOptions, agents[i]));
+      requests.push(sendRequestToAgent(requestOptions, agents[key]));
     }
     return Promise.all(requests);
   } else {
@@ -386,8 +391,9 @@ function deletePluginOnAgent(name, agent) {
 }
 
 /* restarting the agents live status, and updating the status for all agents */
-function restartAgentsStatus() {
-  agents = {};
+async function restartAgentsStatus() {
+  await Agent.update({}, { $unset: { status: 1 } });
+
   Agent.find({}).then(agents => {
     agents.forEach(agent => {
       startFollowingAgentStatus(agent);
@@ -535,9 +541,8 @@ module.exports = {
   setDefaultUrl,
   followAgent: startFollowingAgentStatus,
   unfollowAgent: unfollowAgentStatus,
-  agentsStatus: getAllAgentsStatus,
+  getAllAgentsStatus,
   evaluateGroupAgents,
-  getByKey,
   checkPluginsOnAgent,
   filter,
   installPluginOnAgent,
@@ -554,5 +559,6 @@ module.exports = {
   removeAgentFromGroups,
   deleteFilterFromGroup,
   removeAgentFromGroup,
-  establishSocket
+  establishSocket,
+  getAgentStatus
 };
