@@ -2,7 +2,7 @@
 const request = require("request");
 const fs = require("fs");
 const path = require("path");
-
+const socketService = require("./socket.service");
 const winston = require("winston");
 const _ = require("lodash");
 const humanize = require("../../helpers/humanize");
@@ -12,7 +12,9 @@ const Group = require("../models").Group;
 
 const LIVE_COUNTER = env.retries; // attempts before agent will be considered dead
 const INTERVAL_TIME = env.interval_time;
-//let agents = {}; // store the agents status.
+const socketNamespaceName = "/agents";
+
+// let agents = {};
 
 const FILTER_TYPES = Object.freeze({
   gte: "gte",
@@ -23,76 +25,92 @@ const FILTER_TYPES = Object.freeze({
   lt: "lt"
 });
 
-function getAgentStatus(agentKey) {
-  // status = Agent.find().status
-  // status.intervalId = ... return interval ?
-  // status.socket = ... return socket based on socketId field
+async function getAgentStatus(agentKey) {
+  const agent = await Agent.findOne({ key: agentKey });
+  return agent.status;
 }
 
-function getAllAgentsStatus() {
-  // Agents.find()
+async function getAllAgentsStatus() {
+  const agents = await Agent.find();
   // map agents to statuses
-  // create object: key-status
-  return agents;
+  const agentStatusObject = {};
+  for (const agent of agents) {
+    agentStatusObject[agent.key] = agent.status;
+    // create socket reference based on socketId stored in model
+    agentStatusObject[agent.key].socket = socketService.socket.of(
+      socketNamespaceName
+    ).connected[agent.status.socketId];
+  }
+  return agentStatusObject;
 }
 
 /* Send a post request to agent every INTERVAL seconds */
-function startFollowingAgentStatus(agent) {
+async function startFollowingAgentStatus(_agent) {
+  // TODO: when using load balancer
+  // make sure to not duplicate interval on another server
   const listenInterval = setInterval(() => {
-    const start = new Date();
-    if (!agents[agent.key]) return;
-    request.post(
-      agents[agent.key].defaultUrl + "/api/status",
-      {
-        form: {
-          key: agent.key
-        }
-      },
-      (error, response, body) => {
-        try {
-          body = JSON.parse(body);
-        } catch (e) {
-          body = { res: e };
-        }
-        if (!error && response.statusCode === 200 && agents[agent.key]) {
-          agents[agent.key].name = agent.name;
-          agents[agent.key].attributes = agent.attributes;
-          agents[agent.key].alive = true;
-          agents[agent.key].hostname = body.hostname;
-          agents[agent.key].arch = body.arch;
-          agents[agent.key].freeSpace = humanize.bytes(body.freeSpace);
-          agents[agent.key].respTime = new Date() - start;
-          agents[agent.key].url = agent.url;
-          agents[agent.key].publicUrl = agent.publicUrl;
-          agents[agent.key].defaultUrl = agents[agent.key].defaultUrl || "";
-          agents[agent.key].id = agent.id;
-          agents[agent.key].key = agent.key;
-          agents[agent.key].installed_plugins = body.installed_plugins;
-          agents[agent.key].liveCounter = LIVE_COUNTER;
-        } else if (agents[agent.key] && --agents[agent.key].liveCounter === 0) {
-          agents[agent.key].alive = false;
-          if (!agents[agent.key].hostname) {
-            agents[agent.key].hostname = "unknown";
-          }
-          if (!agents[agent.key].arch) {
-            agents[agent.key].arch = "unknown";
-          }
-          if (!agents[agent.key].freeSpace) {
-            agents[agent.key].freeSpace = 0;
-          }
-          agents[agent.key].respTime = 0;
-        }
-      }
-    );
+    followAgentStatusIntervalFunction(_agent);
   }, INTERVAL_TIME);
-  if (!agents[agent.key]) {
-    agents[agent.key] = agent.toJSON();
-    agents[agent.key].alive = false;
-    agents[agent.key].following = true;
-    agents[agent.key].intervalId = listenInterval;
-    setDefaultUrl(agent);
-    // agents[agent.key] = { intervalId: listenInterval, alive: false, following: true };
+  let agentStatus = await getAgentStatus(_agent.key);
+  if (!agentStatus) {
+    agentStatus = _agent.toJSON();
+    agentStatus.alive = false;
+    agentStatus.following = true;
+    agentStatus.intervalId = listenInterval;
+    setDefaultUrl(_agent);
+    // TODO save agentStatus to agent model
   }
+}
+
+async function followAgentStatusIntervalFunction(_agent) {
+  const start = new Date();
+  const agentStatus = await getAgentStatus(_agent.key);
+  if (!agentStatus) return;
+  request.post(
+    agentStatus.defaultUrl + "/api/status",
+    {
+      form: {
+        key: _agent.key
+      }
+    },
+    (error, response, body) => {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        body = { res: e };
+      }
+      if (!error && response.statusCode === 200 && agentStatus) {
+        agentStatus.name = _agent.name;
+        agentStatus.attributes = _agent.attributes;
+        agentStatus.alive = true;
+        agentStatus.hostname = body.hostname;
+        agentStatus.arch = body.arch;
+        agentStatus.freeSpace = humanize.bytes(body.freeSpace);
+        agentStatus.respTime = new Date() - start;
+        agentStatus.url = _agent.url;
+        agentStatus.publicUrl = _agent.publicUrl;
+        agentStatus.defaultUrl = agentStatus.defaultUrl || "";
+        agentStatus.id = _agent.id;
+        agentStatus.key = _agent.key;
+        agentStatus.installed_plugins = body.installed_plugins;
+        agentStatus.liveCounter = LIVE_COUNTER;
+      } else if (agentStatus && --agentStatus.liveCounter === 0) {
+        agentStatus.alive = false;
+        if (!agentStatus.hostname) {
+          agentStatus.hostname = "unknown";
+        }
+        if (!agentStatus.arch) {
+          agentStatus.arch = "unknown";
+        }
+        if (!agentStatus.freeSpace) {
+          agentStatus.freeSpace = 0;
+        }
+        agentStatus.respTime = 0;
+      }
+
+      // TODO save agentStatus to agent model
+    }
+  );
 }
 
 /* stop following an agent */
@@ -223,18 +241,6 @@ function evaluateFilter(filter, agents) {
       }
     }
   });
-}
-
-/**
- * Adding a socketid to agents statuses (if agentkey exists)
- * @param agentKey
- * @param socket
- */
-function addSocketIdToAgent(agentKey, socket) {
-  if (!agents[agentKey]) {
-    return;
-  }
-  agents[agentKey].socket = socket;
 }
 
 function sendRequestToAgent(options, agent) {
@@ -495,12 +501,27 @@ function removeAgentFromGroup(groupId, agentId) {
     return group.save();
   });
 }
+
+/**
+ * Adding a socket to agents statuses (if agentkey exists)
+ * @param agentKey
+ * @param socket - instance of socket
+ */
+async function addSocketIdToAgent(agentKey, socket) {
+  const agent = await Agent.findOne({ key: agentKey });
+  if (!agent) {
+    return;
+  }
+  agent.status.socketId = socket.id;
+  agent.save();
+}
+
 /**
  * Establish a room for agents
- * @param socket
+ * @param socket - instance of socket
  */
 function establishSocket(socket) {
-  const nsp = socket.of("/agents");
+  const nsp = socket.of(socketNamespaceName);
   nsp.on("connection", function(socket) {
     winston.log("info", "Agent log");
     // agent send key on connection string
