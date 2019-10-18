@@ -1,17 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const agentSchema = new Schema({
-  name: String,
-  url: { type: String, required: true },
-  publicUrl: { type: String, required: true },
-  key: { type: String, required: true },
-  sshKey: String,
-  attributes: [],
-  isDeleted: Boolean
-  //status: agentStatusSchema
-});
-
 const agentStatusSchema = new Schema({
   attributes: [],
   _id: Schema.Types.ObjectId,
@@ -24,6 +13,7 @@ const agentStatusSchema = new Schema({
   following: Boolean,
   defaultUrl: String,
   socketId: String,
+  intervalId: Number,
   hostname: String,
   arch: String,
   freeSpace: String,
@@ -31,6 +21,17 @@ const agentStatusSchema = new Schema({
   key: String,
   installed_plugins: Schema.Types.Mixed,
   liveCounter: Number
+});
+
+const agentSchema = new Schema({
+  name: String,
+  url: { type: String, required: true },
+  publicUrl: { type: String, required: true },
+  key: { type: String, required: true, index: true },
+  sshKey: String,
+  attributes: [],
+  isDeleted: Boolean,
+  status: agentStatusSchema
 });
 
 agentSchema.set("toJSON", {
