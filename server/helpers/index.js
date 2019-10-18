@@ -10,7 +10,7 @@ const parseArgs = require("minimist")(process.argv.slice(2));
 
 const socketService = require("../api/services/socket.service");
 const bootstrap = require('./bootstrap').bootstrap;
-const bootstrapApi = require('./init-routes');
+const bootstrapApi = require('./routes');
 const setupDB = require('./database');
 
 module.exports = function startKaholo() {
