@@ -1,15 +1,16 @@
+/* eslint-disable valid-jsdoc */
 const agentsService = require("./agents.service");
 const _ = require("lodash");
 
 const winston = require("winston");
 const IS_TIMEOUT = "Agent Timeout";
 
-function /**
+/**
  * create configuration
  * @param {*} mapStructure
  * @param {string|Object} configuration
  */
-_createConfiguration(mapStructure, configuration) {
+function _createConfiguration(mapStructure, configuration) {
   if (configuration) {
     if (typeof configuration != "string") {
       return {
@@ -23,7 +24,9 @@ _createConfiguration(mapStructure, configuration) {
           name: "custom",
           value: parsedConfiguration
         };
-      } catch (err) {}
+      } catch (err) {
+        console.error(err);
+      }
     }
   }
 
@@ -44,6 +47,21 @@ _createConfiguration(mapStructure, configuration) {
   return selectedConfiguration
     ? selectedConfiguration.toObject()
     : { name: "custom", value: "" };
+}
+
+async function filterLiveAgents(agents) {
+  const agentsStatus = Object.assign(
+    {},
+    await agentsService.getAllAgentsStatus()
+  );
+  const allAgents = [];
+  agents.forEach(agentObj => {
+    const agentAlive = _.find(agentsStatus, agent => {
+      return agent.id === agentObj.id && agent.alive; // check if this is the condition:
+    });
+    agentAlive ? allAgents.push(agentAlive) : null;
+  });
+  return allAgents;
 }
 
 module.exports = {
@@ -133,7 +151,6 @@ module.exports = {
       value: Object.assign(mainConfig.value, mergeConfig.value)
     };
   },
-
   /**
    * filter agents for execution
    * @param mapCode
@@ -143,22 +160,7 @@ module.exports = {
    * @param executionAgents
    * @return {KaholoAgent[]}
    */
-  getRelevantAgent(groups, mapAgents) {
-    async function filterLiveAgents(agents) {
-      const agentsStatus = Object.assign(
-        {},
-        await agentsService.getAllAgentsStatus()
-      );
-      const allAgents = [];
-      agents.forEach(agentObj => {
-        const agentAlive = _.find(agentsStatus, agent => {
-          return agent.id === agentObj.id && agent.alive; // check if this is the condition:
-        });
-        agentAlive ? allAgents.push(agentAlive) : null;
-      });
-      return allAgents;
-    }
-
+  async getRelevantAgent(groups, mapAgents) {
     let groupsAgents = {};
     groups.forEach(group => {
       groupsAgents = Object.assign(
@@ -171,7 +173,7 @@ module.exports = {
       ...JSON.parse(JSON.stringify(mapAgents)),
       ...JSON.parse(JSON.stringify(groupsAgents))
     ];
-    return filterLiveAgents(totalAgents);
+    return await filterLiveAgents(totalAgents);
   },
 
   /**
@@ -251,7 +253,10 @@ module.exports = {
     for (const i in executionAgents) {
       if (
         i != agentKey &&
-        executionAgents[i].context.processes.hasOwnProperty(processUUID)
+        Object.prototype.hasOwnProperty.call(
+          executionAgents[i].context.processes,
+          processUUID
+        )
       ) {
         return false;
       }
