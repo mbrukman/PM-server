@@ -170,9 +170,9 @@ function setDefaultUrl(_agent) {
       async function(error, response, body) {
         const agentStatus = await getAgentStatus(_agent.key);
         if (error) {
-          agentStatus[_agent.key].defaultUrl = _agent.publicUrl;
+          agentStatus.defaultUrl = _agent.publicUrl;
         } else {
-          agentStatus[_agent.key].defaultUrl = _agent.url;
+          agentStatus.defaultUrl = _agent.url;
         }
         await saveStatusToAgent(_agent, agentStatus);
         resolve();
