@@ -19,7 +19,7 @@ describe("Settings tests", () => {
     it(`should respond with 204 after successful connection to given db uri`, () => {
       return request(app)
         .post("/api/settings/db")
-        .send({ uri: "mongodb://127.0.0.1:27017/kaholo" })
+        .send({ uri: process.env.DB_URI })
         .expect(204);
     });
 
