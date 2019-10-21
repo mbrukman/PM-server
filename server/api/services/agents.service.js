@@ -22,8 +22,27 @@ const FILTER_TYPES = Object.freeze({
   lt: "lt"
 });
 
+// TODO: refactor into scheduler microservice
+// why?
+// - in node.js, setInterval returns a reference to Timout class instance, not intervalId handle number
+// that's why it's impossible to save a reference to it in model
+const runningIntervals = {};
+
+function startInterval(agent) {
+  runningIntervals[agent.key] = setInterval(() => {
+    followAgentStatusIntervalFunction(agent);
+  }, INTERVAL_TIME);
+}
+
+function stopInterval(agent) {
+  clearInterval(runningIntervals[agent.key]);
+}
+
 async function getAgentStatus(agentKey) {
   const agent = await Agent.findOne({ key: agentKey });
+  if (!agent) {
+    return {};
+  }
   return agent.status;
 }
 
@@ -44,8 +63,8 @@ async function getAllAgentsStatus() {
   return agentStatusObject;
 }
 
-function saveStatusToAgent(_agent, agentStatus) {
-  Agent.findOneAndUpdate(
+async function saveStatusToAgent(_agent, agentStatus) {
+  await Agent.findOneAndUpdate(
     { key: _agent.key },
     { $set: { status: agentStatus } }
   );
@@ -53,27 +72,39 @@ function saveStatusToAgent(_agent, agentStatus) {
 
 /* Send a post request to agent every INTERVAL seconds */
 async function startFollowingAgentStatus(_agent) {
-  // TODO: when using load balancer,
-  //       make sure to not duplicate interval on another server
-  const listenInterval = setInterval(() => {
-    followAgentStatusIntervalFunction(_agent);
-  }, INTERVAL_TIME);
+  startInterval(_agent.key);
+
   let agentStatus = await getAgentStatus(_agent.key);
   if (!agentStatus) {
     agentStatus = _agent.toJSON();
     agentStatus.alive = false;
     agentStatus.following = true;
-    agentStatus.intervalId = listenInterval;
+
     setDefaultUrl(_agent);
 
     saveStatusToAgent(_agent, agentStatus);
   }
 }
 
+/* stop following an agent */
+async function stopFollowingAgentStatus(agentId) {
+  const agent = await Agent.findOne({ "status.id": agentId });
+  if (!agent) {
+    return;
+  }
+  // stop the check interval
+  stopInterval(agent);
+  agent.status.alive = false;
+  agent.status.following = false;
+  agent.save();
+}
+
 async function followAgentStatusIntervalFunction(_agent) {
   const start = new Date();
   const agentStatus = await getAgentStatus(_agent.key);
-  if (!agentStatus) return;
+  if (!agentStatus) {
+    return;
+  }
   request.post(
     agentStatus.defaultUrl + "/api/status",
     {
@@ -87,7 +118,15 @@ async function followAgentStatusIntervalFunction(_agent) {
       } catch (e) {
         body = { res: e };
       }
-      if (!error && response.statusCode === 200 && agentStatus) {
+
+      let newLives;
+      if (!agentStatus.liveCounter) {
+        newLives = 0;
+      } else {
+        newLives = agentStatus.liveCounter - 1;
+      }
+
+      if (!error && response.statusCode === 200) {
         agentStatus.name = _agent.name;
         agentStatus.attributes = _agent.attributes;
         agentStatus.alive = true;
@@ -102,7 +141,7 @@ async function followAgentStatusIntervalFunction(_agent) {
         agentStatus.key = _agent.key;
         agentStatus.installed_plugins = body.installed_plugins;
         agentStatus.liveCounter = LIVE_COUNTER;
-      } else if (agentStatus && --agentStatus.liveCounter === 0) {
+      } else if (newLives <= 0) {
         agentStatus.alive = false;
         if (!agentStatus.hostname) {
           agentStatus.hostname = "unknown";
@@ -113,25 +152,14 @@ async function followAgentStatusIntervalFunction(_agent) {
         if (!agentStatus.freeSpace) {
           agentStatus.freeSpace = 0;
         }
+
+        agentStatus.liveCounter = newLives;
         agentStatus.respTime = 0;
       }
 
       saveStatusToAgent(_agent, agentStatus);
     }
   );
-}
-
-/* stop following an agent */
-async function unfollowAgentStatus(agentId) {
-  const agent = await Agent.findOne({ "status.id": agentId });
-  if (!agent) {
-    return;
-  }
-  // stop the check interval
-  clearInterval(agent.status.intervalId);
-  agent.status.alive = false;
-  agent.status.following = false;
-  agent.save();
 }
 
 function setDefaultUrl(_agent) {
@@ -146,7 +174,7 @@ function setDefaultUrl(_agent) {
         } else {
           agentStatus[_agent.key].defaultUrl = _agent.url;
         }
-        saveStatusToAgent(_agent, agentStatus);
+        await saveStatusToAgent(_agent, agentStatus);
         resolve();
       }
     );
@@ -323,7 +351,7 @@ function deleteAgent(agentId) {
     await deleteAgentFromMap(agentId);
     const agentStatus = await getAgentStatus(agent.key);
     if (agentStatus) {
-      unfollowAgentStatus(agentId);
+      stopFollowingAgentStatus(agentId);
     }
     // remove status from agent
     Agent.update({ key: agent.key }, { $unset: { status: 1 } });
@@ -543,7 +571,7 @@ module.exports = {
   delete: deleteAgent,
   setDefaultUrl,
   followAgent: startFollowingAgentStatus,
-  unfollowAgent: unfollowAgentStatus,
+  unfollowAgent: stopFollowingAgentStatus,
   getAllAgentsStatus,
   evaluateGroupAgents,
   checkPluginsOnAgent,

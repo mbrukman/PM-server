@@ -13,7 +13,6 @@ const agentStatusSchema = new Schema({
   following: Boolean,
   defaultUrl: String,
   socketId: String,
-  intervalId: Number,
   hostname: String,
   arch: String,
   freeSpace: String,
