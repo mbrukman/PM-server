@@ -723,7 +723,7 @@ async function execute(
     mapStructure = await models["Structure"].create(checkDuplicate.structure);
   }
 
-  const agents = helper.getRelevantAgent(map.groups, map.agents);
+  const agents = await helper.getRelevantAgent(map.groups, map.agents);
 
   if (agents.length == 0 && triggerReason == "Started manually by user") {
     throw new Error("No agents alive");

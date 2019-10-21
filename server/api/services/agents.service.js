@@ -29,6 +29,9 @@ async function getAgentStatus(agentKey) {
 
 async function getAllAgentsStatus() {
   const agents = await Agent.find();
+  if (!agents) {
+    return {};
+  }
   // map agents to statuses
   const agentStatusObject = {};
   for (const agent of agents) {
