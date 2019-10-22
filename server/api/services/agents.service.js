@@ -131,12 +131,6 @@ async function followAgentStatusIntervalFunction(agent) {
         body = { res: e };
       }
 
-      let newLives;
-      if (!agentStatus.liveCounter) {
-        newLives = 0;
-      } else {
-        newLives = agentStatus.liveCounter - 1;
-      }
 
       if (!error && response.statusCode === 200) {
         agentStatus.name = agent.name;
@@ -153,7 +147,7 @@ async function followAgentStatusIntervalFunction(agent) {
         agentStatus.key = agent.key;
         agentStatus.installed_plugins = body.installed_plugins;
         agentStatus.liveCounter = LIVE_COUNTER;
-      } else if (newLives <= 0) {
+      } else if (--agentStatus.liveCounter === 0) {
         agentStatus.alive = false;
         if (!agentStatus.hostname) {
           agentStatus.hostname = "unknown";
@@ -165,7 +159,6 @@ async function followAgentStatusIntervalFunction(agent) {
           agentStatus.freeSpace = 0;
         }
 
-        agentStatus.liveCounter = newLives;
         agentStatus.respTime = 0;
       }
 
