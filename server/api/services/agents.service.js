@@ -8,8 +8,8 @@ const Map = require("../models/map.model");
 const Agent = require("../models").Agent;
 const Group = require("../models").Group;
 
-const LIVE_COUNTER = env.retries; // attempts before agent will be considered dead
-const INTERVAL_TIME = env.interval_time;
+const LIVE_COUNTER = parseInt(process.env.RETRIES, 10); // attempts before agent will be considered dead
+const INTERVAL_TIME = parseInt(process.env.INTERVAL_TIME, 10);
 const socketNamespaceName = "/agents";
 
 const FILTER_TYPES = Object.freeze({
