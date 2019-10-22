@@ -121,11 +121,10 @@ module.exports = {
         const agents = _.cloneDeep(await agentsService.getAllAgentsStatus());
         const status = Object.keys(agents).reduce((total, current) => {
           current = _.cloneDeep(agents[current]);
-          if (!current.hasOwnProperty("id")) {
+          if (!current.id) {
             return total;
           }
           delete current.key;
-          delete current.intervalId;
           delete current.socket;
           total[current.id] = current;
           return total;
