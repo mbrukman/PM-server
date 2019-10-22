@@ -129,8 +129,6 @@ module.exports = {
           total[current.id] = current;
           return total;
         }, {});
-
-        // console.log(status);
         if (status) {
           return res.json(status);
         }

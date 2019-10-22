@@ -1,4 +1,3 @@
-/* eslint-disable valid-jsdoc */
 const request = require("request");
 const fs = require("fs");
 const path = require("path");
@@ -25,7 +24,7 @@ const FILTER_TYPES = Object.freeze({
 // TODO: refactor into scheduler microservice
 // why?
 // - in node.js, setInterval returns a reference to Timout class instance, not intervalId handle number
-// that's why it's impossible to save a reference to it in model
+//   that's why it's impossible to save a reference to it in a model
 const runningIntervals = {};
 
 function startInterval(agent) {
@@ -38,6 +37,10 @@ function stopInterval(agent) {
   clearInterval(runningIntervals[agent.key]);
 }
 
+/**
+ * @param {string} agentKey - agent.key
+ * @return {agentStatusSchema}
+ */
 async function getAgentStatus(agentKey) {
   const agent = await Agent.findOne({ key: agentKey });
   if (!agent) {
@@ -46,6 +49,11 @@ async function getAgentStatus(agentKey) {
   return agent.status;
 }
 
+/**
+ * @return {Object} - where keys are agent.key
+ * and values are agentStatusSchema from agents.model
+ * plus socket
+ */
 async function getAllAgentsStatus() {
   const agents = await Agent.find();
   if (!agents) {
@@ -63,26 +71,26 @@ async function getAllAgentsStatus() {
   return agentStatusObject;
 }
 
-async function saveStatusToAgent(_agent, agentStatus) {
+async function saveStatusToAgent(agent, agentStatus) {
   await Agent.findOneAndUpdate(
-    { key: _agent.key },
+    { key: agent.key },
     { $set: { status: agentStatus } }
   );
 }
 
-/* Send a post request to agent every INTERVAL seconds */
-async function startFollowingAgentStatus(_agent) {
-  startInterval(_agent.key);
+/* here we initiate following the agent status */
+async function startFollowingAgentStatus(agent) {
+  startInterval(agent);
 
-  let agentStatus = await getAgentStatus(_agent.key);
+  let agentStatus = await getAgentStatus(agent.key);
   if (!agentStatus) {
-    agentStatus = _agent.toJSON();
+    agentStatus = agent.toJSON();
     agentStatus.alive = false;
     agentStatus.following = true;
 
-    setDefaultUrl(_agent);
+    setDefaultUrl(agent);
 
-    saveStatusToAgent(_agent, agentStatus);
+    saveStatusToAgent(agent, agentStatus);
   }
 }
 
@@ -99,9 +107,13 @@ async function stopFollowingAgentStatus(agentId) {
   agent.save();
 }
 
-async function followAgentStatusIntervalFunction(_agent) {
+/**
+ * function being called every interval
+ * @param {agentSchema} agent
+ */
+async function followAgentStatusIntervalFunction(agent) {
   const start = new Date();
-  const agentStatus = await getAgentStatus(_agent.key);
+  const agentStatus = await getAgentStatus(agent.key);
   if (!agentStatus) {
     return;
   }
@@ -109,7 +121,7 @@ async function followAgentStatusIntervalFunction(_agent) {
     agentStatus.defaultUrl + "/api/status",
     {
       form: {
-        key: _agent.key
+        key: agent.key
       }
     },
     (error, response, body) => {
@@ -127,18 +139,18 @@ async function followAgentStatusIntervalFunction(_agent) {
       }
 
       if (!error && response.statusCode === 200) {
-        agentStatus.name = _agent.name;
-        agentStatus.attributes = _agent.attributes;
+        agentStatus.name = agent.name;
+        agentStatus.attributes = agent.attributes;
         agentStatus.alive = true;
         agentStatus.hostname = body.hostname;
         agentStatus.arch = body.arch;
         agentStatus.freeSpace = humanize.bytes(body.freeSpace);
         agentStatus.respTime = new Date() - start;
-        agentStatus.url = _agent.url;
-        agentStatus.publicUrl = _agent.publicUrl;
+        agentStatus.url = agent.url;
+        agentStatus.publicUrl = agent.publicUrl;
         agentStatus.defaultUrl = agentStatus.defaultUrl || "";
-        agentStatus.id = _agent.id;
-        agentStatus.key = _agent.key;
+        agentStatus.id = agent.id;
+        agentStatus.key = agent.key;
         agentStatus.installed_plugins = body.installed_plugins;
         agentStatus.liveCounter = LIVE_COUNTER;
       } else if (newLives <= 0) {
@@ -157,24 +169,24 @@ async function followAgentStatusIntervalFunction(_agent) {
         agentStatus.respTime = 0;
       }
 
-      saveStatusToAgent(_agent, agentStatus);
+      saveStatusToAgent(agent, agentStatus);
     }
   );
 }
 
-function setDefaultUrl(_agent) {
+function setDefaultUrl(agent) {
   return new Promise((resolve, reject) => {
     request.post(
-      _agent.url + "/api/status",
-      { form: { key: _agent.key } },
+      agent.url + "/api/status",
+      { form: { key: agent.key } },
       async function(error, response, body) {
-        const agentStatus = await getAgentStatus(_agent.key);
+        const agentStatus = await getAgentStatus(agent.key);
         if (error) {
-          agentStatus.defaultUrl = _agent.publicUrl;
+          agentStatus.defaultUrl = agent.publicUrl;
         } else {
-          agentStatus.defaultUrl = _agent.url;
+          agentStatus.defaultUrl = agent.url;
         }
-        await saveStatusToAgent(_agent, agentStatus);
+        await saveStatusToAgent(agent, agentStatus);
         resolve();
       }
     );
@@ -183,7 +195,7 @@ function setDefaultUrl(_agent) {
 
 /**
  * Evaluates group dynamic agents and constant agents.
- * @param group
+ * @param {groupSchema} group
  * @return {any}
  */
 async function evaluateGroupAgents(group) {
@@ -222,9 +234,9 @@ async function evaluateGroupAgents(group) {
 
 /**
  * Evaluates group's filter on given agents
- * @param filter
- * @param agents
- * @return array of filtered agents
+ * @param {?} filter
+ * @param {Array} agents
+ * @return {Array} of filtered agents
  */
 function evaluateFilter(filter, agents) {
   return agents.filter(o => {
@@ -281,16 +293,16 @@ function evaluateFilter(filter, agents) {
   });
 }
 
-async function sendRequestToAgent(_options, _agent) {
+async function sendRequestToAgent(_options, agent) {
   const options = Object.assign({}, _options);
-  const agentStatus = await getAgentStatus(_agent.key);
+  const agentStatus = await getAgentStatus(agent.key);
   options.uri = agentStatus.defaultUrl + options.uri;
   options.method = options.method || "POST";
 
   if (options.body) {
     options.json = true;
-    options.body.key = _agent.key;
-  } else if (options.formData) options.formData.key = _agent.key;
+    options.body.key = agent.key;
+  } else if (options.formData) options.formData.key = agent.key;
 
   winston.log("info", "Sending request to agent");
   request(options, function(error, response, body) {
@@ -308,6 +320,11 @@ function deleteAgentFromMap(agentId) {
   );
 }
 
+/**
+ * a remote agent calls this to add himself
+ * @param {agentSchema} agent
+ * @return {Agent}
+ */
 function add(agent) {
   return Agent.findOne({ key: agent.key })
     .then(agentObj => {
@@ -327,13 +344,13 @@ function add(agent) {
 }
 
 // get an object of installed plugins and versions on certain agent.
-async function checkPluginsOnAgent(_agent) {
-  const agentStatus = await getAgentStatus(_agent.key);
+async function checkPluginsOnAgent(agent) {
+  const agentStatus = await getAgentStatus(agent.key);
   return new Promise((resolve, reject) => {
     console.log(" checkPluginsOnAgent", agentStatus.defaultUrl);
     request.post(
       agentStatus.defaultUrl + "/api/plugins",
-      { form: { key: _agent.key } },
+      { form: { key: agent.key } },
       function(error, response, body) {
         if (error || response.statusCode !== 200) {
           resolve("{}");
@@ -448,7 +465,7 @@ function updateGroup(groupId, groupUpdated) {
 /* Groups */
 /**
  * Creating new group object
- * @param group
+ * @param {groupSchema} group
  * @return {group}
  */
 function createGroup(group) {
@@ -461,8 +478,8 @@ function groupsList(query = {}) {
 
 /**
  * Adding agents to group
- * @param groupId
- * @param agentsId
+ * @param {ObjectID} groupId
+ * @param {ObjectID} agentsId
  * @return {Query}
  */
 function addAgentToGroup(groupId, agentsId) {
@@ -475,8 +492,8 @@ function addAgentToGroup(groupId, agentsId) {
 
 /**
  * Adding filters to group
- * @param groupId
- * @param filters
+ * @param {ObjectID} groupId
+ * @param {?} filters
  * @return {Query}
  */
 function addGroupFilters(groupId, filters) {
@@ -489,7 +506,7 @@ function addGroupFilters(groupId, filters) {
 
 /**
  * Delete a group.
- * @param groupId
+ * @param {ObjectID} groupId
  * @return {Query}
  */
 function deleteGroup(groupId) {
@@ -498,7 +515,7 @@ function deleteGroup(groupId) {
 
 /**
  * Returning a group by it's id
- * @param groupId
+ * @param {ObjectID} groupId
  * @return {Query}
  */
 function groupDetail(groupId) {
@@ -507,7 +524,8 @@ function groupDetail(groupId) {
 
 /**
  * Removes agents ref from groups.
- * @param agentId
+ * @param {string} agentId
+ * @return {Promise}
  */
 function removeAgentFromGroups(agentId) {
   return Group.update(
@@ -525,8 +543,8 @@ function deleteFilterFromGroup(groupId, index) {
 
 /**
  * Removing an agent from a group
- * @param groupId
- * @param agentId
+ * @param {ObjectID} groupId
+ * @param {ObjectID} agentId
  * @return {Query|*}
  */
 function removeAgentFromGroup(groupId, agentId) {
@@ -541,8 +559,8 @@ function removeAgentFromGroup(groupId, agentId) {
 
 /**
  * Adding a socket to agents statuses (if agentkey exists)
- * @param agentKey
- * @param socket - instance of socket
+ * @param {string} agentKey
+ * @param {Socket} socket
  */
 async function addSocketIdToAgent(agentKey, socket) {
   const agent = await Agent.findOne({ key: agentKey });
@@ -555,7 +573,7 @@ async function addSocketIdToAgent(agentKey, socket) {
 
 /**
  * Establish a room for agents
- * @param socket - instance of socket
+ * @param {Socket} socket
  */
 function establishSocket(socket) {
   const nsp = socket.of(socketNamespaceName);
