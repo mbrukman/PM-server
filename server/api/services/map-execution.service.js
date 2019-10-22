@@ -572,7 +572,7 @@ async function execute(mapId, structureId, socket, configuration, triggerReason,
 
 
     clientSocket = socket; // save socket in global 
-    map = await mapsService.get(mapId)
+    const map = await mapsService.get(mapId)
     if (!map) {
         throw new Error(`Couldn't find map`);
     }
