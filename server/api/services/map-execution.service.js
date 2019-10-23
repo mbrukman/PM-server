@@ -580,7 +580,7 @@ async function execute(mapId, structureId, socket, configuration, triggerReason,
         throw new Error('Can\'t execute archived map');
     }
 
-    mapStructure = await mapsService.getMapStructure(map._id, structureId)
+    const mapStructure = await mapsService.getMapStructure(map._id, structureId)
     if (!mapStructure) {
         throw new Error('No structure found.');
     }
