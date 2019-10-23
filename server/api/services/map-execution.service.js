@@ -800,7 +800,7 @@ async function execute(
  */
 function runMapOnAgent(map, structure, runId, startNode, agent) {
   return helper
-    .validate_plugin_installation(executions[runId].plugins, agent.key)
+    .validatePluginInstallation(executions[runId].plugins, agent.key)
     .then(() => {
       return runNodeSuccessors(map, structure, runId, agent, startNode.uuid);
     });

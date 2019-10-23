@@ -10,7 +10,7 @@ const IS_TIMEOUT = "Agent Timeout";
  * @param {*} mapStructure
  * @param {string|Object} configuration
  */
-function _createConfiguration(mapStructure, configuration) {
+function createConfiguration(mapStructure, configuration) {
   if (configuration) {
     if (typeof configuration != "string") {
       return {
@@ -57,9 +57,12 @@ async function filterLiveAgents(agents) {
   const allAgents = [];
   agents.forEach(agentObj => {
     const agentAlive = _.find(agentsStatus, agent => {
-      return agent.id === agentObj.id && agent.alive; // check if this is the condition:
+      return agent.id === agentObj.id && agent.alive;
     });
-    agentAlive ? allAgents.push(agentAlive) : null;
+
+    if (agentAlive) {
+      allAgents.push(agentAlive);
+    }
   });
   return allAgents;
 }
@@ -91,7 +94,7 @@ module.exports = {
    * @param agentKey
    * @return {Promise<null>}
    */
-  async validate_plugin_installation(plugins, agentKey) {
+  async validatePluginInstallation(plugins, agentKey) {
     const agentStatus = await agentsService.getAgentStatus(agentKey);
     return new Promise((resolve, reject) => {
       // check if agents has the right version of the plugins.
@@ -138,11 +141,11 @@ module.exports = {
   },
 
   getConfiguration(structure, configuration) {
-    const mainConfig = _createConfiguration(structure, configuration.config);
+    const mainConfig = createConfiguration(structure, configuration.config);
     if (!configuration.mergeConfig) {
       return mainConfig;
     }
-    const mergeConfig = _createConfiguration(
+    const mergeConfig = createConfiguration(
       structure,
       configuration.mergeConfig
     );
@@ -235,7 +238,7 @@ module.exports = {
    * @return {string[]} - array of uuids
    */
   findSuccessors(nodeUuid, structure) {
-    const links = structure.links.filter(o => o.sourceId === nodeUuid);
+    const links = structure.links.filter(link => link.sourceId === nodeUuid);
     return links.reduce((total, current) => {
       total.push(current.targetId);
       return total;
@@ -250,11 +253,11 @@ module.exports = {
    * @return {boolean} - false in case another agent got to process first
    */
   isThisTheFirstAgentToGetToTheProcess(executionAgents, processUUID, agentKey) {
-    for (const i in executionAgents) {
+    for (const agent in executionAgents) {
       if (
-        i != agentKey &&
+        agent != agentKey &&
         Object.prototype.hasOwnProperty.call(
-          executionAgents[i].context.processes,
+          executionAgents[agent].context.processes,
           processUUID
         )
       ) {
@@ -271,7 +274,7 @@ module.exports = {
    * @return {Array} - uuid of ancestors
    */
   findAncestors(nodeUuid, structure) {
-    const links = structure.links.filter(o => o.targetId === nodeUuid);
+    const links = structure.links.filter(link => link.targetId === nodeUuid);
     return links.reduce((total, current) => {
       total.push(current.sourceId);
       return total;
