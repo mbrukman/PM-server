@@ -42,17 +42,15 @@ function stopInterval(agent) {
  * @return {agentStatusSchema}
  */
 async function getAgentStatus(agentKey) {
-  const agent = await Agent.findOne({ key: agentKey });
-  if (!agent) {
-    return {};
-  }
-  return agent.status;
+  const allAgentStatus = await getAllAgentsStatus();
+  return allAgentStatus[agentKey];
 }
 
 /**
  * @return {Object} - where keys are agent.key
  * and values are agentStatusSchema from agents.model
  * plus socket
+ * plus some field required by legacy code
  */
 async function getAllAgentsStatus() {
   const agents = await Agent.find();
@@ -62,11 +60,18 @@ async function getAllAgentsStatus() {
   // map agents to statuses
   const agentStatusObject = {};
   for (const agent of agents) {
+    if (!agent.status) {
+      agentStatusObject[agent.key] = {};
+      continue;
+    }
     agentStatusObject[agent.key] = agent.status;
     // create socket reference based on socketId stored in model
     agentStatusObject[agent.key].socket = socketService.socket.of(
       socketNamespaceName
     ).connected[agent.status.socketId];
+
+    agentStatusObject[agent.key].id = agent.id;
+    agentStatusObject[agent.key].key = agent.key;
   }
   return agentStatusObject;
 }
@@ -113,8 +118,8 @@ async function stopFollowingAgentStatus(agentId) {
  */
 async function followAgentStatusIntervalFunction(agent) {
   const start = new Date();
-  const agentStatus = await getAgentStatus(agent.key);
-  if (!agentStatus) {
+  let agentStatus = await getAgentStatus(agent.key);
+  if (!agentStatus || !agentStatus.defaultUrl) {
     return;
   }
   request.post(
@@ -131,40 +136,45 @@ async function followAgentStatusIntervalFunction(agent) {
         body = { res: e };
       }
 
-
       if (!error && response.statusCode === 200) {
-        agentStatus.name = agent.name;
-        agentStatus.attributes = agent.attributes;
-        agentStatus.alive = true;
-        agentStatus.hostname = body.hostname;
-        agentStatus.arch = body.arch;
-        agentStatus.freeSpace = humanize.bytes(body.freeSpace);
-        agentStatus.respTime = new Date() - start;
-        agentStatus.url = agent.url;
-        agentStatus.publicUrl = agent.publicUrl;
-        agentStatus.defaultUrl = agentStatus.defaultUrl || "";
-        agentStatus.id = agent.id;
-        agentStatus.key = agent.key;
-        agentStatus.installed_plugins = body.installed_plugins;
-        agentStatus.liveCounter = LIVE_COUNTER;
-      } else if (--agentStatus.liveCounter === 0) {
-        agentStatus.alive = false;
-        if (!agentStatus.hostname) {
-          agentStatus.hostname = "unknown";
+        agentStatus = updateAliveAgent(agentStatus, body, start);
+        saveStatusToAgent(agent, agentStatus);
+      } else {
+        agentStatus.liveCounter -= 1;
+        if (agentStatus.liveCounter === 0) {
+          agentStatus = updateDeadAgent(agentStatus);
+          saveStatusToAgent(agent, agentStatus);
         }
-        if (!agentStatus.arch) {
-          agentStatus.arch = "unknown";
-        }
-        if (!agentStatus.freeSpace) {
-          agentStatus.freeSpace = 0;
-        }
-
-        agentStatus.respTime = 0;
       }
-
-      saveStatusToAgent(agent, agentStatus);
     }
   );
+}
+
+function updateDeadAgent(agentStatus) {
+  agentStatus.alive = false;
+  if (!agentStatus.hostname) {
+    agentStatus.hostname = "unknown";
+  }
+  if (!agentStatus.arch) {
+    agentStatus.arch = "unknown";
+  }
+  if (!agentStatus.freeSpace) {
+    agentStatus.freeSpace = 0;
+  }
+  agentStatus.respTime = 0;
+  return agentStatus;
+}
+
+function updateAliveAgent(agentStatus, body, start) {
+  agentStatus.alive = true;
+  agentStatus.hostname = body.hostname;
+  agentStatus.arch = body.arch;
+  agentStatus.freeSpace = humanize.bytes(body.freeSpace);
+  agentStatus.respTime = new Date() - start;
+  agentStatus.defaultUrl = agentStatus.defaultUrl || "";
+  agentStatus.installed_plugins = body.installed_plugins;
+  agentStatus.liveCounter = LIVE_COUNTER;
+  return agentStatus;
 }
 
 function setDefaultUrl(agent) {
@@ -195,14 +205,15 @@ async function evaluateGroupAgents(group) {
   group = JSON.parse(JSON.stringify(group)); // make sure its not a mongoose document
 
   const agentsCopy = {};
-  const agents = await getAllAgentsStatus();
-  Object.keys(agents).map(key => {
-    const a = Object.assign({}, agents[key]);
+  const allAgentsStatus = await getAllAgentsStatus();
+  // remove socket
+  Object.keys(allAgentsStatus).map(key => {
+    const a = Object.assign({}, allAgentsStatus[key]);
     delete a.socket;
     agentsCopy[key] = a;
   });
 
-  let filteredAgents = Object.keys(agents).map(key => agentsCopy[key]);
+  let filteredAgents = Object.keys(allAgentsStatus).map(key => agentsCopy[key]);
   group.filters.forEach(filter => {
     filteredAgents = evaluateFilter(filter, filteredAgents);
   });
@@ -286,16 +297,17 @@ function evaluateFilter(filter, agents) {
   });
 }
 
-async function sendRequestToAgent(_options, agent) {
+async function sendRequestToAgent(_options, agentStatus) {
   const options = Object.assign({}, _options);
-  const agentStatus = await getAgentStatus(agent.key);
   options.uri = agentStatus.defaultUrl + options.uri;
   options.method = options.method || "POST";
 
   if (options.body) {
     options.json = true;
-    options.body.key = agent.key;
-  } else if (options.formData) options.formData.key = agent.key;
+    options.body.key = agentStatus.key;
+  } else if (options.formData) {
+    options.formData.key = agentStatus.key;
+  }
 
   winston.log("info", "Sending request to agent");
   request(options, function(error, response, body) {
@@ -340,7 +352,6 @@ function add(agent) {
 async function checkPluginsOnAgent(agent) {
   const agentStatus = await getAgentStatus(agent.key);
   return new Promise((resolve, reject) => {
-    console.log(" checkPluginsOnAgent", agentStatus.defaultUrl);
     request.post(
       agentStatus.defaultUrl + "/api/plugins",
       { form: { key: agent.key } },
@@ -373,7 +384,7 @@ function filter(query = {}) {
   return Agent.find(query);
 }
 /* send plugin file to an agent */
-async function installPluginOnAgent(pluginPath, agent) {
+async function installPluginOnAgent(pluginPath, agentStatus) {
   const formData = {
     file: {
       value: fs.createReadStream(pluginPath),
@@ -388,18 +399,18 @@ async function installPluginOnAgent(pluginPath, agent) {
     formData: formData
   };
 
-  if (!agent) {
+  if (!agentStatus) {
     const requests = [];
-    const agents = await getAllAgentsStatus();
-    for (const key in agents) {
-      if (!agents[key].alive) {
+    const agentStatuses = await getAllAgentsStatus();
+    for (const key in agentStatuses) {
+      if (!agentStatuses[key].alive) {
         continue;
       }
-      requests.push(sendRequestToAgent(requestOptions, agents[key]));
+      requests.push(sendRequestToAgent(requestOptions, agentStatuses[key]));
     }
     return Promise.all(requests);
   } else {
-    return Promise.all([sendRequestToAgent(requestOptions, agent)]);
+    return Promise.all([sendRequestToAgent(requestOptions, agentStatus)]);
   }
 }
 

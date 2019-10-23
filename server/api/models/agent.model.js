@@ -2,13 +2,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const agentStatusSchema = new Schema({
-  attributes: [],
-  _id: Schema.Types.ObjectId,
-  name: String,
-  url: String,
-  publicUrl: String,
-  __v: Number,
-  id: String,
   alive: Boolean,
   following: Boolean,
   defaultUrl: String,
@@ -17,7 +10,6 @@ const agentStatusSchema = new Schema({
   arch: String,
   freeSpace: String,
   respTime: Number,
-  key: String,
   installed_plugins: Schema.Types.Mixed,
   liveCounter: Number
 });
@@ -28,7 +20,6 @@ const agentSchema = new Schema({
   publicUrl: { type: String, required: true },
   key: { type: String, required: true, index: true },
   sshKey: String,
-  attributes: [],
   isDeleted: Boolean,
   status: agentStatusSchema
 });

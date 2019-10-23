@@ -118,13 +118,14 @@ module.exports = {
     hooks
       .hookPre("agent-status-list", req)
       .then(async () => {
-        const agents = _.cloneDeep(await agentsService.getAllAgentsStatus());
-        const status = Object.keys(agents).reduce((total, current) => {
-          current = _.cloneDeep(agents[current]);
+        const allAgentsStatus = _.cloneDeep(
+          await agentsService.getAllAgentsStatus()
+        );
+        const status = Object.keys(allAgentsStatus).reduce((total, current) => {
+          current = _.cloneDeep(allAgentsStatus[current]);
           if (!current.id) {
             return total;
           }
-          delete current.key;
           delete current.socket;
           total[current.id] = current;
           return total;
