@@ -50,7 +50,6 @@ async function getAgentStatus(agentKey) {
  * @return {Object} - where keys are agent.key
  * and values are agentStatusSchema from agents.model
  * plus socket
- * plus some field required by legacy code
  */
 async function getAllAgentsStatus() {
   const agents = await Agent.find();
@@ -70,6 +69,7 @@ async function getAllAgentsStatus() {
       socketNamespaceName
     ).connected[agent.status.socketId];
 
+    // TODO: check if we can remove these
     agentStatusObject[agent.key].id = agent.id;
     agentStatusObject[agent.key].key = agent.key;
   }
@@ -85,18 +85,16 @@ async function saveStatusToAgent(agent, agentStatus) {
 
 /* here we initiate following the agent status */
 async function startFollowingAgentStatus(agent) {
-  startInterval(agent);
-
   let agentStatus = await getAgentStatus(agent.key);
-  if (!agentStatus) {
+  if (!agentStatus || !agentStatus.following) {
     agentStatus = agent.toJSON();
     agentStatus.alive = false;
     agentStatus.following = true;
 
-    setDefaultUrl(agent);
-
-    saveStatusToAgent(agent, agentStatus);
+    await setDefaultUrl(agent);
+    await saveStatusToAgent(agent, agentStatus);
   }
+  startInterval(agent);
 }
 
 /* stop following an agent */
@@ -106,10 +104,10 @@ async function stopFollowingAgentStatus(agentId) {
     return;
   }
   // stop the check interval
-  stopInterval(agent);
   agent.status.alive = false;
   agent.status.following = false;
   agent.save();
+  stopInterval(agent);
 }
 
 /**
@@ -143,8 +141,8 @@ async function followAgentStatusIntervalFunction(agent) {
         agentStatus.liveCounter -= 1;
         if (agentStatus.liveCounter === 0) {
           agentStatus = updateDeadAgent(agentStatus);
-          saveStatusToAgent(agent, agentStatus);
         }
+        saveStatusToAgent(agent, agentStatus);
       }
     }
   );
@@ -568,7 +566,7 @@ function removeAgentFromGroup(groupId, agentId) {
  */
 async function addSocketIdToAgent(agentKey, socket) {
   const agent = await Agent.findOne({ key: agentKey });
-  if (!agent) {
+  if (!agent || !agent.status) {
     return;
   }
   agent.status.socketId = socket.id;
