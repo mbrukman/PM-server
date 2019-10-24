@@ -10,7 +10,7 @@ import { SharedModule } from './shared/shared.module';
 import { MapsService } from './maps/maps.service';
 import { SocketService } from './shared/socket.service';
 import { PluginsService } from './plugins/plugins.service';
-import { AgentsService } from './agents/agents.service';
+import { AgentsService } from './services/agent/agents.service';
 import { ProjectsService } from './projects/projects.service';
 import { CalendarService } from './services/calendar/calendar.service';
 import { CoreModule } from './core/core.module';

@@ -1,5 +1,5 @@
 import { ActionResult } from "../execution-result.model";
-import { Agent } from '@agents/models/agent.model';
+import { Agent } from '@app/services/agent/agent.model';
 
 export class ActionResultView {
     key: string;

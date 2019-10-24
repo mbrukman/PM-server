@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
 
-import { Observable } from 'rxjs';
+import {Observable} from 'rxjs';
 
-import { AgentsGroupFilter, Group } from '@agents/models/group.model';
-import { Agent } from './models/agent.model';
-import { Subject } from 'rxjs';
+import {AgentsGroupFilter, Group} from '@agents/models/group.model';
+import {Agent} from '@app/services/agent/agent.model';
+import {Subject} from 'rxjs';
 
 
 @Injectable()
@@ -20,7 +20,7 @@ export class AgentsService {
   }
 
   delete(agentId) {
-    return this.http.delete(`api/agents/${agentId}`, { responseType: 'text' as 'json' });
+    return this.http.delete(`api/agents/${agentId}`, {responseType: 'text' as 'json'});
   }
 
   list() {
@@ -52,10 +52,10 @@ export class AgentsService {
    * @returns {Observable<Object>}
    */
   groupDelete(groupId: string) {
-    return this.http.delete<string>(`api/agents/groups/${groupId}`, { responseType: 'text' as 'json' });
+    return this.http.delete<string>(`api/agents/groups/${groupId}`, {responseType: 'text' as 'json'});
   }
 
-  deleteFilterFromGroup(groupId,index){
+  deleteFilterFromGroup(groupId, index) {
     return this.http.delete<Group>(`api/agents/groups/${groupId}/filters/${index}`);
   }
 
@@ -121,7 +121,6 @@ export class AgentsService {
   }
 
 
-  
   /**
    * Returns observable of selected group
    * @returns {Observable<Group>}
@@ -138,7 +137,7 @@ export class AgentsService {
     this.updatedGroup.next(group);
   }
 
-  updateGroupToServer(group: Group){
+  updateGroupToServer(group: Group) {
     return this.http.put<Group>(`api/agents/groups/${group._id}`, group);
   }
 
@@ -172,7 +171,7 @@ export class AgentsService {
    * @param {string} groupId
    */
   removeAgentFromGroup(agentId: string, groupId: string) {
-    return this.http.post<Group>(`api/agents/groups/${groupId}/remove-agent`, { agentId });
+    return this.http.post<Group>(`api/agents/groups/${groupId}/remove-agent`, {agentId});
   }
 
 }

@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 import {PopupService} from '@shared/services/popup.service'
 import { AgentResult, ProcessResult, ActionResultView } from '@maps/models';
-import { Agent } from '@agents/models/agent.model';
+import { Agent } from '@app/services/agent/agent.model';
 
 
 
@@ -47,8 +47,8 @@ export class ProcessResultComponent implements OnChanges {
     let msgs = [];
     results.stdout.forEach(text => { msgs.push(text)});
     results.stderr.forEach(text => { msgs.push(text)});
-    
-    results.result.forEach(res => { 
+
+    results.result.forEach(res => {
       if(typeof res == 'string'){
         msgs.push(res)
       }
@@ -56,7 +56,7 @@ export class ProcessResultComponent implements OnChanges {
         msgs.push(JSON.stringify(res))
       }
     });
-    
+
     messages.push(msgs.join('\n'));
     this.popupService.openComponent(RawOutputComponent,{messages:messages})
   }
@@ -79,7 +79,7 @@ export class ProcessResultComponent implements OnChanges {
       }
     })
     this.actions = actions;
-    
+
     // aggregating status for each action
     let agActions = this.actions.reduce((total, current) => {
       if (!total[current.key]) {

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { timer, Subscription } from 'rxjs';
 
-import { AgentsService } from '@agents/agents.service';
+import { AgentsService } from '@app/services/agent/agents.service';
 import { MapsService } from '@maps/maps.service';
 import { Map } from '@maps/models/map.model';
 

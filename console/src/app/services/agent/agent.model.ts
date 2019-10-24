@@ -1,4 +1,4 @@
-import { IAgent } from '../interfaces/agent.interface';
+import { IAgent } from '@agents/interfaces/agent.interface';
 
 export class Agent implements IAgent {
   _id?: string;

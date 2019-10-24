@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Subject, of, forkJoin } from 'rxjs';
 import { BsModalRef } from 'ngx-bootstrap';
 
-import { AgentsService } from '@agents/agents.service';
+import { AgentsService } from '@app/services/agent/agents.service';
 import { Agent, Group } from '@agents/models';
 import { mergeMap } from 'rxjs/operators';
 

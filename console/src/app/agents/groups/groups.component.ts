@@ -1,14 +1,14 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 
-import { retry, take, map, filter, mergeMap } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
+import {retry, take, filter, mergeMap} from 'rxjs/operators';
+import {Subscription} from 'rxjs';
 
-import { AgentsService } from '@agents/agents.service';
-import { Group } from '@agents/models/group.model';
-import {PopupService} from '@shared/services/popup.service'
-import { InputPopupComponent } from '@agents/groups/input-popup/input-popup.component';
-import { Agent } from '@agents/models/agent.model';
-import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-group-upsertcomponent'
+import {AgentsService} from '@app/services/agent/agents.service';
+import {Group} from '@agents/models/group.model';
+import {PopupService} from '@shared/services/popup.service';
+import {InputPopupComponent} from '@agents/groups/input-popup/input-popup.component';
+import {Agent} from '@app/services/agent/agent.model';
+import {AgentsGroupUpsertComponent} from '@agents/agents-group-upsert/agents-group-upsertcomponent';
 
 @Component({
   selector: 'app-agents-groups',
@@ -19,124 +19,129 @@ export class GroupsComponent implements OnInit, OnDestroy {
   @Input('agents') agents: Agent[];
   groups: Group[];
   draggedItem: any;
-  draggetItemSubscription: Subscription;
   selectedGroup: Group;
-  selectedDropGroupIndex : string;
-  currentGroupIndex : number;
+  selectedDropGroupIndex: string;
+  currentGroupIndex: number;
 
-  constructor(private agentsService: AgentsService, private popupService:PopupService) {
+  private mainSubscription = new Subscription();
+
+  constructor(
+    private agentsService: AgentsService,
+    private popupService: PopupService
+  ) {
   }
 
   ngOnInit() {
     // getting groups list
-    this.agentsService.groupsList().pipe(
-        retry(3),
-        map(groups => {
-          let g = new Group();
-          groups.forEach(group => {
-            let gr = new Group();
-            gr = group;
-            group = gr;
-          });
-          return groups;
-        })
-      ).subscribe(groups => {
-        this.groups = groups;
-      });
+    const agentGroupSubscription = this.agentsService.groupsList().pipe(
+      retry(3)
+    ).subscribe(groups => this.groups = groups);
 
     // getting the item that is dragged from the service
-    this.draggetItemSubscription = this.agentsService
+    const draggedItemSubscription = this.agentsService
       .getDragAsObservable()
       .subscribe(item => this.draggedItem = item);
 
-    this.agentsService.getSelectedGroupAsObservable().subscribe(group => {
-      this.selectedGroup = group
-    })  
-    
-    this.agentsService.getUpdateGroupAsObservable().subscribe(group => {
+    const selectedGroupSubscription = this.agentsService.getSelectedGroupAsObservable().subscribe(group => {
+      this.selectedGroup = group;
+    });
+
+    const updateGroupSubscription = this.agentsService.getUpdateGroupAsObservable().subscribe(group => {
       this.groups[this.groups.findIndex(o => o._id === group._id)] = group;
     });
+
+    this.mainSubscription.add(agentGroupSubscription);
+    this.mainSubscription.add(draggedItemSubscription);
+    this.mainSubscription.add(selectedGroupSubscription);
+    this.mainSubscription.add(updateGroupSubscription);
   }
 
-  allAgents(){
+  allAgents() {
     this.currentGroupIndex = null;
     this.agentsService.selectGroup(null);
   }
 
   ngOnDestroy() {
-    if (this.draggetItemSubscription) {
-      this.draggetItemSubscription.unsubscribe();
-    }
+    this.mainSubscription.unsubscribe();
   }
 
   /**
    * Fired when a group tab is opened
-   * @param event
+   * @param group
+   * @param groupIndex
    */
-  selectGroup(group : Group, groupIndex : number) {
+  selectGroup(group: Group, groupIndex: number) {
     this.currentGroupIndex = groupIndex;
     this.agentsService.selectGroup(group);
   }
 
   /**
    * Called when an agent is dropped on a group.
-   * @param groupIndex
-   * @param groupId
    */
 
-   onDragLeave(){
-    this.selectedDropGroupIndex = null
-   }
+  onDragLeave() {
+    this.selectedDropGroupIndex = null;
+  }
 
-   allowDrop(i){
-    this.selectedDropGroupIndex = i
-   }
+  allowDrop(i) {
+    this.selectedDropGroupIndex = i;
+  }
 
   drop(groupIndex, groupId) {
-    this.selectedDropGroupIndex = null
+    this.selectedDropGroupIndex = null;
     if ((<string[]>this.groups[groupIndex].agents).indexOf(this.draggedItem.id) > -1) {
       return;
     }
-    this.agentsService
+    const agentAddedSubscription = this.agentsService
       .addAgentToGroup(groupId, [this.draggedItem.id]).pipe(
         take(1)
       ).subscribe(group => this.groups[groupIndex] = group);
+
+    this.mainSubscription.add(agentAddedSubscription);
   }
 
   /**
    * Creating a new group and adding it to groups array.
    */
   createGroup() {
-    this.popupService.openComponent(InputPopupComponent,{})
-    .pipe(
+    const popupSubscription = this.popupService.openComponent(
+      InputPopupComponent,
+      {}
+    ).pipe(
       take(1),
       filter(name => !!name),
-      mergeMap(name => this.agentsService.groupCreate(<Group>{ name: name }))
+      mergeMap(name => this.agentsService.groupCreate(<Group>{name: name}))
     ).subscribe(group => this.groups.push(group));
+    this.mainSubscription.add(popupSubscription);
   }
 
-  editGroup(index){
+  editGroup(index) {
     let group = this.groups[index];
-    this.popupService.openComponent(AgentsGroupUpsertComponent,{name:group.name})
-    .pipe(
-      take(1),
-      filter(r => !!r)
-    ).subscribe(r => {
+    const editGroupSubscription = this.popupService.openComponent
+    (AgentsGroupUpsertComponent,
+      {name: group.name}
+    )
+      .pipe(
+        take(1),
+        filter(r => !!r)
+      ).subscribe(r => {
         group.name = r.name;
         this.updateGroup(group);
       });
+
+    this.mainSubscription.add(editGroupSubscription);
   }
 
-  updateGroup(group:Group){
-    this.agentsService.updateGroupToServer(group).subscribe((group) => {
-      this.agentsService.updateGroup(group)
-    });
+  updateGroup(group: Group) {
+    const updateGroupSubscription = this.agentsService.updateGroupToServer(group)
+      .subscribe((updatedGroup) => this.agentsService.updateGroup(updatedGroup));
+    this.mainSubscription.add(updateGroupSubscription);
   }
 
   deleteGroup(groupIndex, groupId) {
-    this.agentsService.groupDelete(groupId).subscribe(() => {
+    const deleteGroupSubscription = this.agentsService.groupDelete(groupId).subscribe(() => {
       this.groups.splice(groupIndex, 1);
     });
+    this.mainSubscription.add(deleteGroupSubscription);
   }
-
 }
