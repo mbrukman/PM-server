@@ -21,13 +21,13 @@ const agentSchema = new Schema({
   key: { type: String, required: true, index: true },
   sshKey: String,
   isDeleted: Boolean,
+  attributes: [],
   status: agentStatusSchema
 });
 
 agentSchema.set("toJSON", {
   transform: function(doc, ret, options) {
     ret.id = ret._id;
-    delete ret.key;
   }
 });
 
