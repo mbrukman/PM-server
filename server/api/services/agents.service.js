@@ -50,6 +50,7 @@ async function getAgentStatus(agentKey) {
  * @return {Object} - where keys are agent.key
  * and values are agentStatusSchema from agents.model
  * plus socket
+ * plus agent model properties
  */
 async function getAllAgentsStatus() {
   const agents = await Agent.find();
@@ -58,20 +59,26 @@ async function getAllAgentsStatus() {
   }
   // map agents to statuses
   const agentStatusObject = {};
-  for (const agent of agents) {
+  for (let agent of agents) {
+    // convert agent Doc to plain object
+    agent = JSON.parse(JSON.stringify(agent));
+
+    agentStatusObject[agent.key] = {};
+
+    // assign agent properties
+    Object.assign(agentStatusObject[agent.key], agent);
+
     if (!agent.status) {
-      agentStatusObject[agent.key] = {};
       continue;
     }
-    agentStatusObject[agent.key] = agent.status;
+
+    // assign status
+    Object.assign(agentStatusObject[agent.key], agent.status);
+
     // create socket reference based on socketId stored in model
     agentStatusObject[agent.key].socket = socketService.socket.of(
       socketNamespaceName
     ).connected[agent.status.socketId];
-
-    // TODO: check if we can remove these
-    agentStatusObject[agent.key].id = agent.id;
-    agentStatusObject[agent.key].key = agent.key;
   }
   return agentStatusObject;
 }
