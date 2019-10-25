@@ -1,27 +1,21 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 
-import { Subject } from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
 import {
-  addDays,
-  addHours,
-  addWeeks,
-  endOfDay,
-  endOfMonth,
   isSameDay,
   isSameMonth,
-  startOfDay,
-  subDays
+  startOfDay
 } from 'date-fns';
-import { CalendarEvent } from 'angular-calendar';
+import {CalendarEvent} from 'angular-calendar';
 import * as cronParser from 'cron-parser';
 import * as moment from 'moment';
 
-import { CalendarService } from '../calendar.service';
-import { Job } from '../models/job.model';
-import { Map } from '@maps/models';
-import { takeUntil, take } from 'rxjs/operators';
+import {CalendarService} from '@app/services/calendar/calendar.service';
+import {Job} from '@app/services/calendar/models/job.model';
+import {Map} from '@maps/models';
+import {take} from 'rxjs/operators';
 import {PopupService} from '@shared/services/popup.service';
-import {SeoService,PageTitleTypes} from '@app/seo.service';
+import {SeoService, PageTitleTypes} from '@app/seo.service';
 
 const colors: any = {
   // TODO: add color pallet
@@ -55,35 +49,36 @@ export class CalendarComponent implements OnInit, OnDestroy {
   events: CalendarEvent[] = [];
   activeDayIsOpen: boolean = false;
   refreshCalendar: Subject<any> = new Subject();
-  destroy$: Subject<boolean> = new Subject<boolean>();
 
-  constructor(private calendarService: CalendarService, 
-    private seoService:SeoService,
-    private popupService:PopupService) {
+  private mainSubscription = new Subscription();
+
+  constructor(private calendarService: CalendarService,
+              private seoService: SeoService,
+              private popupService: PopupService) {
   }
 
-  ngOnInit() { 
-    this.seoService.setTitle(PageTitleTypes.Calendar)
-    this.calendarService.list().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(jobs => {
+  ngOnInit() {
+    this.seoService.setTitle(PageTitleTypes.Calendar);
+    const calendarListSubscription = this.calendarService.list()
+      .subscribe(jobs => {
         jobs.forEach(job => {
           this.addNewEvent(this.createCalendarEventFromJob(job));
         });
       });
 
-    this.calendarService.newJobAsObservable().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(job => {
+    const calendarNewJobSubscription = this.calendarService.newJobAsObservable()
+      .subscribe(job => {
         if (job) {
           this.addNewEvent(this.createCalendarEventFromJob(job));
         }
       });
+
+    this.mainSubscription.add(calendarListSubscription);
+    this.mainSubscription.add(calendarNewJobSubscription);
   }
 
   ngOnDestroy() {
-    this.destroy$.next(true);
-    this.destroy$.unsubscribe();
+    this.mainSubscription.unsubscribe();
   }
 
   addNewEvent(event) {
@@ -93,9 +88,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   createMonthEventsFromCron(job) {
-    let crons = [];
+    const crons = [];
     let endDate = moment().add('6', 'M').toDate(); // setting end date to 6 month from now;
-    const interval = cronParser.parseExpression(job.cron, { endDate });
+    const interval = cronParser.parseExpression(job.cron, {endDate});
     let flag = true;
     while (flag) {
       try {
@@ -111,7 +106,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
           datetime: job.datetime,
           map: job.map
         });
-      } catch (e) { flag = false; }
+      } catch (e) {
+        flag = false;
+      }
     }
 
     return crons;
@@ -132,7 +129,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
   }
 
-  dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
+  dayClicked({date, events}: { date: Date; events: CalendarEvent[] }): void {
     if (isSameMonth(date, this.viewDate)) { // will not open details if it is not a day at current month
       if ((isSameDay(this.viewDate, date) && this.activeDayIsOpen === true) || events.length === 0) {
         // close the panel if it is the selected day or if that day has no events
@@ -144,14 +141,18 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
   }
 
-closeDayBar(){
-  for (let i = 0; i < this.events.length; i++) {
-    if(this.events[i].start.getDay() === this.viewDate.getDay() && this.events[i].start.getMonth() === this.viewDate.getMonth() && this.events[i].start.getFullYear() === this.viewDate.getFullYear()){
-      return;
+  closeDayBar() {
+    for (let i = 0; i < this.events.length; i++) {
+      if (
+        (this.events[i].start.getDay() === this.viewDate.getDay()) &&
+        (this.events[i].start.getMonth() === this.viewDate.getMonth()) &&
+        (this.events[i].start.getFullYear() === this.viewDate.getFullYear())
+      ) {
+        return;
+      }
     }
+    this.activeDayIsOpen = false;
   }
-  this.activeDayIsOpen = false;
-}
 
   deleteJob(job) {
     const jobIndex = this.events.findIndex((o, i) => {
@@ -162,42 +163,48 @@ closeDayBar(){
       return this.calendarService.deleteJob(job.id).pipe(
         take(1)
       ).subscribe(() => {
-          this.events.splice(jobIndex, 1);
-          this.refreshCalendar.next();
-          this.closeDayBar();
-        });
-    }
-    this.popupService.openConfirm('Delete Job','How would you like to proceed?',DeleteOptions.delete,DeleteOptions.cancel,DeleteOptions.skip)
-    .pipe(
-      take(1),
-    ).subscribe(result => {
-        switch (result) {
-          case DeleteOptions.delete:
-            this.calendarService.deleteJob(job.id).pipe(
-              take(1)
-            ).subscribe(() => {
-                this.events = this.events.reduce((total, current) => {
-                  if ((<any>current).job.id !== job.id) {
-                    total.push(current);
-                  }
-                  return total;
-                }, []);
-
-                this.refreshCalendar.next();
-                this.closeDayBar();
-              });
-            break;
-          case DeleteOptions.skip:
-            job.skip = true;
-            this.calendarService.updateJob(job).pipe(
-              take(1)
-            ).subscribe();
-                this.closeDayBar();
-            break;
-          default:
-            break;
-        }
+        this.events.splice(jobIndex, 1);
+        this.refreshCalendar.next();
+        this.closeDayBar();
       });
     }
+    this.popupService.openConfirm(
+      'Delete Job',
+      'How would you like to proceed?',
+      DeleteOptions.delete,
+      DeleteOptions.cancel,
+      DeleteOptions.skip
+    )
+      .pipe(
+        take(1),
+      ).subscribe(result => {
+      switch (result) {
+        case DeleteOptions.delete:
+          this.calendarService.deleteJob(job.id).pipe(
+            take(1)
+          ).subscribe(() => {
+            this.events = this.events.reduce((total, current) => {
+              if ((<any>current).job.id !== job.id) {
+                total.push(current);
+              }
+              return total;
+            }, []);
+
+            this.refreshCalendar.next();
+            this.closeDayBar();
+          });
+          break;
+        case DeleteOptions.skip:
+          job.skip = true;
+          this.calendarService.updateJob(job).pipe(
+            take(1)
+          ).subscribe();
+          this.closeDayBar();
+          break;
+        default:
+          break;
+      }
+    });
+  }
 
 }

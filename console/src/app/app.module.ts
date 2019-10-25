@@ -12,7 +12,7 @@ import { SocketService } from './shared/socket.service';
 import { PluginsService } from './plugins/plugins.service';
 import { AgentsService } from './agents/agents.service';
 import { ProjectsService } from './projects/projects.service';
-import { CalendarService } from './calendar/calendar.service';
+import { CalendarService } from './services/calendar/calendar.service';
 import { CoreModule } from './core/core.module';
 import { SettingsService } from './core/setup/settings.service';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
@@ -28,7 +28,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 @NgModule({
   imports: [
-    CoreModule, 
+    CoreModule,
     BrowserModule,
     BrowserAnimationsModule,
     SharedModule,
