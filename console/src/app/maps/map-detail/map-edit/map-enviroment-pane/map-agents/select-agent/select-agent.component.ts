@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
-import { Subject, of, forkJoin } from 'rxjs';
-import { BsModalRef } from 'ngx-bootstrap';
+import {Subject, of, forkJoin} from 'rxjs';
+import {BsModalRef} from 'ngx-bootstrap';
 
-import { AgentsService } from '@app/services/agent/agents.service';
-import { Agent, Group } from '@agents/models';
-import { mergeMap } from 'rxjs/operators';
+import {AgentsService} from '@app/services/agent/agents.service';
+import {Group} from '@agents/models';
+import {mergeMap} from 'rxjs/operators';
+import {Agent} from '@app/services/agent/agent.model';
 
 @Component({
   selector: 'app-select-agent',
@@ -22,30 +23,31 @@ export class SelectAgentComponent implements OnInit {
   isAgentTab: boolean = true;
 
 
-  constructor(public bsModalRef: BsModalRef, private agentsService: AgentsService) { }
+  constructor(public bsModalRef: BsModalRef, private agentsService: AgentsService) {
+  }
 
   ngOnInit() {
     this.agentsService.list().pipe(
-        mergeMap(agents => {
-          return forkJoin(
-            of(agents),
-            this.agentsService.status()
-          );
-        })
+      mergeMap(agents => {
+        return forkJoin(
+          of(agents),
+          this.agentsService.status()
+        );
+      })
     ).subscribe(data => {
-        let [agents, agentsStatus] = data;
-        agents.map(agent => Object.assign(agent, { status: agentsStatus[agent.id] }));
-        this.agents = agents;
-      });
+      let [agents, agentsStatus] = data;
+      agents.map(agent => Object.assign(agent, {status: agentsStatus[agent.id]}));
+      this.agents = agents;
+    });
 
     this.agentsService.groupsList().subscribe(groups => {
-        this.groups = groups;
+      this.groups = groups;
     });
 
   }
 
   onConfirm(): void {
-    let res = { agents: this.selectedAgents, groups: this.selectedGroups }
+    let res = {agents: this.selectedAgents, groups: this.selectedGroups};
     this.result.next(res);
     this.onClose();
   }

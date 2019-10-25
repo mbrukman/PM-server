@@ -1,5 +1,4 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-
 import {retry, take, filter, mergeMap} from 'rxjs/operators';
 import {Subscription} from 'rxjs';
 

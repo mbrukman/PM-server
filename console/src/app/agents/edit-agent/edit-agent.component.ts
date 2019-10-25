@@ -2,8 +2,7 @@ import {Component} from '@angular/core';
 
 import {Subject} from 'rxjs';
 import {BsModalRef} from 'ngx-bootstrap';
-
-import {Agent} from '@agents/models';
+import {Agent} from '@app/services/agent/agent.model';
 
 @Component({
   selector: 'app-edit-agent',

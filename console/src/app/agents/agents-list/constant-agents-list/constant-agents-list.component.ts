@@ -2,9 +2,10 @@ import {Component, OnDestroy, OnInit, Input} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {PopupService} from '@shared/services/popup.service';
 import {AgentsService} from '@app/services/agent/agents.service';
-import {Agent, Group} from '@agents/models';
+import {Group} from '@agents/models';
 import {EditAgentComponent} from '@agents/edit-agent/edit-agent.component';
 import {filter, map, switchMap, take} from 'rxjs/operators';
+import {Agent} from '@app/services/agent/agent.model';
 
 @Component({
   selector: 'app-constant-agents-list',
@@ -21,7 +22,8 @@ export class ConstantAgentsListComponent implements OnInit, OnDestroy {
   constructor(
     private agentsService: AgentsService,
     private popupService: PopupService
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     const updateGroupSubscription = this.agentsService.getUpdateGroupAsObservable()

@@ -1,9 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-
-import {Subject} from 'rxjs';
 import {BsModalRef} from 'ngx-bootstrap';
-
 import {Group} from '@agents/models';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-agents-group-upsert',

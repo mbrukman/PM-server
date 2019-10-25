@@ -1,11 +1,12 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {AgentsService} from '@app/services/agent/agents.service';
-import {Agent, AgentsGroupFilter, Group} from '@agents/models';
+import {AgentsGroupFilter, Group} from '@agents/models';
 import {timer} from 'rxjs';
 import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
 import {switchMap, take, tap} from 'rxjs/operators';
 import {PopupService} from '@shared/services/popup.service';
+import {Agent} from '@app/services/agent/agent.model';
 
 @Component({
   selector: 'app-agents-list',
