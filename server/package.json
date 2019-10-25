@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "spec": "speculate --name=kaholo-server",
-    "test": "jest api/tests -w 1",
+    "test": "jest api/tests -w 1 --forceExit",
     "start": "node app.js",
     "build": "cd ../console && ng build",
     "build:prod": "cd ../console && ng build --prod",
