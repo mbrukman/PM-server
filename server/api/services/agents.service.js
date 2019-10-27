@@ -302,16 +302,23 @@ function evaluateFilter(filter, agents) {
   });
 }
 
-async function sendRequestToAgent(_options, agentStatus) {
+async function sendRequestToAgent(_options, agent) {
   const options = Object.assign({}, _options);
+  const agentStatus = await getAgentStatus(agent.key);
+
+  if (!agentStatus.defaultUrl) {
+    console.error("No defaultUrl:", agentStatus.defaultUrl);
+    return new Error("No defaultUrl");
+  }
+
   options.uri = agentStatus.defaultUrl + options.uri;
   options.method = options.method || "POST";
 
   if (options.body) {
     options.json = true;
-    options.body.key = agentStatus.key;
+    options.body.key = agent.key;
   } else if (options.formData) {
-    options.formData.key = agentStatus.key;
+    options.formData.key = agent.key;
   }
 
   winston.log("info", "Sending request to agent");
@@ -389,7 +396,7 @@ function filter(query = {}) {
   return Agent.find(query);
 }
 /* send plugin file to an agent */
-async function installPluginOnAgent(pluginPath, agentStatus) {
+async function installPluginOnAgent(pluginPath, agent) {
   const formData = {
     file: {
       value: fs.createReadStream(pluginPath),
@@ -398,13 +405,14 @@ async function installPluginOnAgent(pluginPath, agentStatus) {
       }
     }
   };
-  // if there is no agents, send this plugin to all living agents
+
   const requestOptions = {
     uri: "/api/plugins/install",
     formData: formData
   };
 
-  if (!agentStatus) {
+  // if there is no agents, send this plugin to all living agents
+  if (!agent) {
     const requests = [];
     const agentStatuses = await getAllAgentsStatus();
     for (const key in agentStatuses) {
@@ -415,7 +423,7 @@ async function installPluginOnAgent(pluginPath, agentStatus) {
     }
     return Promise.all(requests);
   } else {
-    return Promise.all([sendRequestToAgent(requestOptions, agentStatus)]);
+    return Promise.all([sendRequestToAgent(requestOptions, agent)]);
   }
 }
 
