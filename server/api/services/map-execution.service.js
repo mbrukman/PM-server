@@ -341,7 +341,7 @@ async function startPendingExecution(mapId, socket) {
     pendingExec.structure
   );
 
-  agents = helper.getRelevantAgent(map.groups, map.agents);
+  agents = await helper.getRelevantAgent(map.groups, map.agents);
   if (agents.length == 0) {
     // If no living agents, stop execution with status error
     return updateMapResult(
@@ -948,7 +948,7 @@ async function runAgentsFlowControlPendingProcesses(
  * @param {*} agent
  * @return {boolean}
  */
-function checkAgentFlowCondition(runId, process, map, structure, agent) {
+async function checkAgentFlowCondition(runId, process, map, structure, agent) {
   if (process.flowControl === "race") {
     return helper.isThisTheFirstAgentToGetToTheProcess(
       executions[runId].executionAgents,
@@ -959,7 +959,10 @@ function checkAgentFlowCondition(runId, process, map, structure, agent) {
 
   if (process.flowControl === "wait") {
     // TODO: check how to handle race condition between agents status and check
-    if (!helper.areAllAgentsAlive(executions[runId].executionAgents)) {
+    const allAgentsAlive = await helper.areAllAgentsAlive(
+      executions[runId].executionAgents
+    );
+    if (!allAgentsAlive) {
       // if not all agents are still alive, the wait condition will never be met, should stop the map execution
       stopExecution(runId);
       return false;
@@ -1073,7 +1076,7 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
     return endRunPathResults(runId, agent, map);
   }
   let promises = [];
-  successors.forEach((successor, successorIdx) => {
+  successors.forEach(async (successor, successorIdx) => {
     // go over all successors and checks if successor pass execution conditions
     let process = findProcessByUuid(successor, structure);
     process = Object.assign({}, process.toObject());
@@ -1084,7 +1087,7 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
       agent,
       structure
     );
-    let passAgentFlowCondition = checkAgentFlowCondition(
+    let passAgentFlowCondition = await checkAgentFlowCondition(
       runId,
       process,
       map,
@@ -1330,9 +1333,10 @@ function _getProcessActionsToExec(runId, process, agent, map, structure) {
  */
 function runProcess(map, structure, runId, agent, process) {
   return new Promise(async (resolve, reject) => {
-    if (
-      !helper.isAgentShuldContinue(executions[runId].executionAgents[agent.key])
-    ) {
+    const shouldContinue = await helper.isAgentShuldContinue(
+      executions[runId].executionAgents[agent.key]
+    );
+    if (!shouldContinue) {
       return resolve();
     }
 
