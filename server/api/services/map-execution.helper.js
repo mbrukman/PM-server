@@ -165,10 +165,10 @@ module.exports = {
    */
   async getRelevantAgent(groups, mapAgents) {
     let groupsAgents = {};
-    groups.forEach(group => {
+    groups.forEach(async group => {
       groupsAgents = Object.assign(
         groupsAgents,
-        agentsService.evaluateGroupAgents(group)
+        await agentsService.evaluateGroupAgents(group)
       );
     });
     groupsAgents = Object.keys(groupsAgents).map(key => groupsAgents[key]);
@@ -183,9 +183,12 @@ module.exports = {
    * @param {*} executionAgents
    * @return {boolean}
    */
-  areAllAgentsAlive(executionAgents) {
+  async areAllAgentsAlive(executionAgents) {
     for (const key in executionAgents) {
-      if (!this.isAgentShuldContinue(executionAgents[key])) {
+      const shouldContinue = await this.isAgentShuldContinue(
+        executionAgents[key]
+      );
+      if (!shouldContinue) {
         return false;
       }
     }
