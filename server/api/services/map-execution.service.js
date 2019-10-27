@@ -1497,8 +1497,8 @@ function sendActionViaSocket(socket, uniqueRunId, actionForm) {
  * @param actionForm
  * @return {Promise<any>}
  */
-function sendActionViaRequest(agent, actionForm) {
-  const agentStatus = agentsService.getAgentStatus(agent.key);
+async function sendActionViaRequest(agent, actionForm) {
+  const agentStatus = await agentsService.getAgentStatus(agent.key);
   return new Promise((resolve, reject) => {
     request.post(
       agentStatus.defaultUrl + "/api/task/add",

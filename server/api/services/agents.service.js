@@ -86,7 +86,11 @@ async function getAllAgentsStatus() {
 async function saveStatusToAgent(agent, agentStatus) {
   await Agent.findOneAndUpdate(
     { key: agent.key },
-    { $set: { status: agentStatus } }
+    {
+      $set: {
+        status: agentStatus
+      }
+    }
   );
 }
 
@@ -124,7 +128,9 @@ async function stopFollowingAgentStatus(agentId) {
 async function followAgentStatusIntervalFunction(agent) {
   const start = new Date();
   let agentStatus = await getAgentStatus(agent.key);
+
   if (!agentStatus || !agentStatus.defaultUrl) {
+    console.error("no defaultUrl, can't follow agent status");
     return;
   }
   request.post(
@@ -140,7 +146,6 @@ async function followAgentStatusIntervalFunction(agent) {
       } catch (e) {
         body = { res: e };
       }
-
       if (!error && response.statusCode === 200) {
         agentStatus = updateAliveAgent(agentStatus, body, start);
         saveStatusToAgent(agent, agentStatus);
@@ -457,9 +462,9 @@ async function deletePluginOnAgent(name, agent) {
 
 /* restarting the agents live status, and updating the status for all agents */
 async function restartAgentsStatus() {
-  await Agent.update({}, { $unset: { status: 1 } });
+  await Agent.update({}, { $set: { alive: false, following: false } });
 
-  Agent.find({}).then(agents => {
+  await Agent.find({}).then(agents => {
     agents.forEach(agent => {
       startFollowingAgentStatus(agent);
     });
