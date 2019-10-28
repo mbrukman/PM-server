@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
 
-import { Subscription } from 'rxjs';
-import { ToastOptions, ToastyConfig, ToastyService } from 'ng2-toasty';
+import {Subscription} from 'rxjs';
+import {ToastOptions, ToastyConfig, ToastyService} from 'ng2-toasty';
 
-import { SocketService } from '../shared/socket.service';
-import { SettingsService } from '@core/setup/settings.service';
-import { MapsService } from '@maps/maps.service';
+import {SocketService} from '@shared/socket.service';
+import {SettingsService} from '@app/services/settings/settings.service';
+import {MapsService} from '@maps/maps.service';
 import {Map} from '@maps/models/map.model';
 import {ActivatedRoute} from '@angular/router';
 
@@ -15,42 +15,51 @@ import {ActivatedRoute} from '@angular/router';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'app';
   search: boolean = false;
-  notificationSubscription: Subscription;
   currentMap: Map;
 
-  constructor(private mapsService: MapsService,
+  private mainSubscription = new Subscription();
+
+  constructor(
+    private mapsService: MapsService,
     private router: Router,
     private socketService: SocketService,
     public settingsService: SettingsService,
     private toastyService: ToastyService,
     private toastyConfig: ToastyConfig,
-    private route:ActivatedRoute) {
+    private route: ActivatedRoute
+  ) {
     this.toastyConfig.theme = 'material';
     this.toastyConfig.position = 'bottom-center';
   }
 
   ngOnInit() {
-    this.route.queryParams.subscribe((param) => {
-      if(param.configToken){
-        this.settingsService.configToken = param.configToken
+    const queryParamsSubscription = this.route.queryParams.subscribe((param) => {
+      if (param.configToken) {
+        this.settingsService.configToken = param.configToken;
       }
-    }) 
-    this.mapsService.getCurrentMap().subscribe(map => {
-      this.currentMap = map
-    })
-    this.notificationSubscription = this.socketService.getNotificationAsObservable().subscribe(notification => {
+    });
+
+    const currentMapSubscription = this.mapsService.getCurrentMap().subscribe(map => {
+      this.currentMap = map;
+    });
+
+    const notificationSubscription = this.socketService.getNotificationAsObservable().subscribe(notification => {
       if (notification.mapId) {
 
-        if ((this.currentMap) && (this.currentMap.id == notification.mapId)) {
-          this.showMessage(notification)
+        if ((this.currentMap) && (this.currentMap.id === notification.mapId)) {
+          this.showMessage(notification);
         }
       } else {
         this.showMessage(notification);
       }
     });
+
+    this.mainSubscription.add(queryParamsSubscription);
+    this.mainSubscription.add(currentMapSubscription);
+    this.mainSubscription.add(notificationSubscription);
   }
 
 
@@ -59,8 +68,9 @@ export class AppComponent implements OnInit {
       title: notification.title,
       msg: notification.message,
       showClose: true,
-      timeout: 5000 
+      timeout: 5000
     };
+
     switch (notification.type) {
       case 'default':
         return this.toastyService.default(toastOptions);
@@ -77,10 +87,11 @@ export class AppComponent implements OnInit {
     }
   }
 
-
   toggleSearch() {
     this.search = !this.search;
   }
 
-
+  ngOnDestroy(): void {
+    this.mainSubscription.unsubscribe();
+  }
 }
