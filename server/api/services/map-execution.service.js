@@ -1076,7 +1076,12 @@ async function runNodeSuccessors(map, structure, runId, agent, node) {
     return await endRunPathResults(runId, agent, map);
   }
   const promises = [];
-  successors.forEach(async (successor, successorIdx) => {
+  for (
+    let successorIdx = 0, length = successors.length;
+    successorIdx < length;
+    successorIdx++
+  ) {
+    let successor = successors[successorIdx];
     // go over all successors and checks if successor pass execution conditions
     let process = findProcessByUuid(successor, structure);
     process = Object.assign({}, process.toObject());
@@ -1140,7 +1145,7 @@ async function runNodeSuccessors(map, structure, runId, agent, node) {
         executeProcessParallel(runId, agent, process, successor, map, structure)
       );
     }
-  });
+  }
   Promise.all(promises)
     .then(processesRusult => {
       processesRusult.forEach(processPromiseArr => {
