@@ -14,7 +14,7 @@ import { AgentsService } from './services/agent/agents.service';
 import { ProjectsService } from './projects/projects.service';
 import { CalendarService } from './services/calendar/calendar.service';
 import { CoreModule } from './core/core.module';
-import { SettingsService } from './core/setup/settings.service';
+import { SettingsService } from './services/settings/settings.service';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
 import { VaultService } from '@shared/vault.service';
 import {SeoService} from './seo.service';

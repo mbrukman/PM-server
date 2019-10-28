@@ -5,7 +5,7 @@ import { DistinctMapResult } from '@shared/model/distinct-map-result.model';
 import { Map, MapExecutionLogs, MapResult, MapStructure, MapTrigger } from './models';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { MapDuplicateOptions } from './models/map-duplicate-options.model'
-import { SettingsService } from '@core/setup/settings.service';
+import { SettingsService } from '@app/services/settings/settings.service';
 import { IEntityList } from '@shared/interfaces/entity-list.interface';
 import { PopupService } from '@shared/services/popup.service';
 import { SocketService } from '@app/shared/socket.service';
@@ -24,7 +24,7 @@ export class MapsService {
   init() {
     this.socketService.getMessageAsObservable().subscribe(data => {
       if (data.type != 'saved-map') { return }
-      if (data.msg.initiator != this.socketService.socketID && this.currentMapId == data.msg.mapId) { // if another user or in another tab map was saved 
+      if (data.msg.initiator != this.socketService.socketID && this.currentMapId == data.msg.mapId) { // if another user or in another tab map was saved
         this.checkSyncMap()
       } else {
         this.socketService.setNotification(data.msg);
