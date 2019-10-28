@@ -1062,7 +1062,7 @@ function executeProcessParallel(
  * @param node
  * @return {Promise[]}
  */
-function runNodeSuccessors(map, structure, runId, agent, node) {
+async function runNodeSuccessors(map, structure, runId, agent, node) {
   if (
     !executions[runId] ||
     executions[runId].status == statusEnum.ERROR ||
@@ -1073,21 +1073,21 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
 
   const successors = node ? helper.findSuccessors(node, structure) : [];
   if (successors.length === 0) {
-    return endRunPathResults(runId, agent, map);
+    return await endRunPathResults(runId, agent, map);
   }
-  let promises = [];
+  const promises = [];
   successors.forEach(async (successor, successorIdx) => {
     // go over all successors and checks if successor pass execution conditions
     let process = findProcessByUuid(successor, structure);
     process = Object.assign({}, process.toObject());
 
-    let passProcessCoordination = checkProcessCoordination(
+    const passProcessCoordination = checkProcessCoordination(
       process,
       runId,
       agent,
       structure
     );
-    let passAgentFlowCondition = await checkAgentFlowCondition(
+    const passAgentFlowCondition = await checkAgentFlowCondition(
       runId,
       process,
       map,
@@ -1101,7 +1101,12 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
       process.coordination === "race" &&
       successors.length - 1 == successorIdx
     ) {
-      endRunPathResults(runId, agent, executions[runId].clientSocket, map);
+      await endRunPathResults(
+        runId,
+        agent,
+        executions[runId].clientSocket,
+        map
+      );
     }
 
     // if there is an agent that already got to this process, the current agent should continue to the next process in the flow.
@@ -1112,7 +1117,7 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
             process.uuid
           ] = []; // indication that process uuid run (in case of race coordination)
         }
-        runNodeSuccessors(map, structure, runId, agent, process.uuid);
+        await runNodeSuccessors(map, structure, runId, agent, process.uuid);
       }
 
       if (
@@ -1140,8 +1145,8 @@ function runNodeSuccessors(map, structure, runId, agent, node) {
     .then(processesRusult => {
       processesRusult.forEach(processPromiseArr => {
         processPromiseArr.forEach(p => {
-          p.then(res => {
-            res.endPath ? endRunPathResults(runId, agent, map) : null;
+          p.then(async res => {
+            res.endPath ? await endRunPathResults(runId, agent, map) : null;
           });
         });
       });
@@ -1179,7 +1184,7 @@ async function sendFinishTimeToClient(runId, data) {
  * @param {*} agent
  * @param {*} map
  */
-function endRunPathResults(runId, agent, map) {
+async function endRunPathResults(runId, agent, map) {
   if (!executions[runId]) {
     return;
   }
@@ -1189,7 +1194,8 @@ function endRunPathResults(runId, agent, map) {
 
   updateAgentContext(runId, agent, { status: statusEnum.DONE });
 
-  if (!areAllAgentsDone(runId)) {
+  const allAgentsDone = await areAllAgentsDone(runId);
+  if (!allAgentsDone) {
     return;
   }
 
@@ -1209,7 +1215,7 @@ function endRunPathResults(runId, agent, map) {
   };
   dbUpdates.updateMapResult(options);
 
-  let socket = executions[runId].clientSocket;
+  const socket = executions[runId].clientSocket;
 
   if (map.queue) {
     startPendingExecution(map.id, socket);
@@ -1474,7 +1480,7 @@ async function actionsExecutionCallback(map, structure, runId, agent, process) {
     status: statusEnum.DONE,
     finishTime: new Date()
   });
-  runNodeSuccessors(map, structure, runId, agent, process.uuid);
+  await runNodeSuccessors(map, structure, runId, agent, process.uuid);
 }
 
 /**
