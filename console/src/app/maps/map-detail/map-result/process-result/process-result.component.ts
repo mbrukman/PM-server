@@ -1,9 +1,9 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import * as _ from 'lodash';
 import * as moment from 'moment';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 import {PopupService} from '@shared/services/popup.service'
-import { AgentResult, ProcessResult, ActionResultView } from '@maps/models';
+import {AgentResult, ProcessResult} from '@app/services/map/models/execution-result.model';
+import { ActionResultView } from '@maps/models';
 import { Agent } from '@app/services/agent/agent.model';
 
 

@@ -1,10 +1,10 @@
-import { FormGroup, FormControl, FormArray } from '@angular/forms';
+import {FormGroup, FormControl, FormArray} from '@angular/forms';
 
-import { Serializable } from '@core/models/serializable.model';
-import { PluginMethod } from '@plugins/models/plugin-method.model';
+import {Serializable} from '@core/models/serializable.model';
+import {PluginMethod} from '@plugins/models/plugin-method.model';
 
-import { IAction } from '../interfaces/map-structure.interface';
-import { ActionParam } from './action-param.model';
+import {IAction} from '../interfaces/map-structure.interface';
+import {ActionParam} from './action-param.model';
 
 export class Action extends Serializable implements IAction {
   id?: string;
@@ -16,8 +16,8 @@ export class Action extends Serializable implements IAction {
   mandatory: boolean;
   method: PluginMethod | string;
   params?: ActionParam[];
-  isEnabled: boolean
-  numParallel?: string; 
+  isEnabled: boolean;
+  numParallel?: string;
 
   static getFormGroup(action?: Action): FormGroup {
     if (!action) {

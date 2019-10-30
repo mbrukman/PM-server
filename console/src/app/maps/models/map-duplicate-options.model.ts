@@ -1,4 +1,4 @@
-export class MapDuplicateOptions{
-    name:string
-    isChecked:boolean
+export class MapDuplicateOptions {
+  name: string;
+  isChecked: boolean;
 }

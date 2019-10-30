@@ -1,9 +1,9 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, Host } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { MapsService } from '@maps/maps.service';
-import { Map } from '@maps/models/map.model';
+import { MapsService } from '@app/services/map/maps.service';
+import { Map } from '@app/services/map/models/map.model';
 import { IProcessList } from '@maps/interfaces/process-list.interface';
-import { MapResult, AgentResult, ProcessResult } from '@maps/models/execution-result.model';
+import { MapResult, AgentResult, ProcessResult } from '@app/services/map/models/execution-result.model';
 import { SocketService } from '@shared/socket.service';
 import { Agent } from '@app/services/agent/agent.model';
 import { ProcessResultByProcessIndex } from '@maps/models';

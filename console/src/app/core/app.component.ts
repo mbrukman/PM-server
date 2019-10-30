@@ -4,11 +4,11 @@ import {Router} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {ToastOptions, ToastyConfig, ToastyService} from 'ng2-toasty';
 
-import {SocketService} from '@shared/socket.service';
-import {SettingsService} from '@app/services/settings/settings.service';
-import {MapsService} from '@maps/maps.service';
-import {Map} from '@maps/models/map.model';
+import {SocketService} from '../shared/socket.service';
+import {MapsService} from '@app/services/map/maps.service';
+import {Map} from '@app/services/map/models/map.model';
 import {ActivatedRoute} from '@angular/router';
+import {SettingsService} from '@app/services/settings/settings.service';
 
 @Component({
   selector: 'app-root',

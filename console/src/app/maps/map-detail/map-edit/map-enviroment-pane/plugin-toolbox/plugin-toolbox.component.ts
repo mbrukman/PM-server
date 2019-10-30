@@ -1,11 +1,12 @@
-import { AfterViewInit, Component } from '@angular/core';
+import {AfterViewInit, Component} from '@angular/core';
 
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
 
-import { PluginsService } from '@plugins/plugins.service';
-import { Plugin } from '@plugins/models/plugin.model';
-import { MapDesignService } from '../../map-design.service';
+import {PluginsService} from '@plugins/plugins.service';
+import {Plugin} from '@plugins/models/plugin.model';
+import {MapDesignService} from '../../map-design.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-plugin-toolbox',
@@ -17,14 +18,16 @@ export class PluginToolboxComponent implements AfterViewInit {
   stencilPaper: joint.dia.Paper;
 
   plugins: Plugin[];
-  pluginCell: any;
-  pluginsSearch : Plugin[];
-  searchText : string;
+  pluginsSearch: Plugin[];
+  searchText: string;
+
+  private mainSubscription = new Subscription();
 
   constructor(
     private pluginsService: PluginsService,
     private designService: MapDesignService
-  ) {}
+  ) {
+  }
 
   ngAfterViewInit() {
     this.stencilGraph = new joint.dia.Graph();
@@ -86,22 +89,27 @@ export class PluginToolboxComponent implements AfterViewInit {
       )
     });
 
-    this.pluginsService.list().subscribe(plugins => {
+    const listPlugins = this.pluginsService.list().subscribe(plugins => {
       this.plugins = plugins.filter(plugin => {
         return plugin.type === 'executer';
       });
-      this.pluginsSearch =  this.plugins;
+      this.pluginsSearch = this.plugins;
       this.addPluginsToGraph();
     });
 
     this.stencilPaper.on('cell:pointerdown', (cellView, event, x, y) => {
       this.flyCell(cellView, event, x, y);
     });
+
+    this.mainSubscription.add(listPlugins);
+
   }
 
 
-  filter(){
-    this.pluginsSearch =  this.plugins.filter(plugin => {return plugin.name.toLowerCase().includes(this.searchText.toLowerCase())})
+  filter() {
+    this.pluginsSearch = this.plugins.filter(plugin => {
+      return plugin.name.toLowerCase().includes(this.searchText.toLowerCase());
+    });
     this.addPluginsToGraph();
   }
 
@@ -129,14 +137,14 @@ export class PluginToolboxComponent implements AfterViewInit {
       left: event.pageX - offset.x,
       top: event.pageY - offset.y
     });
-    $('body').on('mousemove.fly', function(e) {
+    $('body').on('mousemove.fly', function (e) {
       $('#flyPaper').offset({
         left: e.pageX - offset.x,
         top: e.pageY - offset.y
       });
     });
 
-    $('body').on('mouseup.fly', function(e) {
+    $('body').on('mouseup.fly', function (e) {
       $('body')
         .off('mousemove.fly')
         .off('mouseup.fly');
@@ -168,8 +176,8 @@ export class PluginToolboxComponent implements AfterViewInit {
           height: pluginHeight
         },
         attrs: {
-          '.label': { text: this.getPluginCubeText(plugin.name) },
-          '.p_id': { text: plugin._id },
+          '.label': {text: this.getPluginCubeText(plugin.name)},
+          '.p_id': {text: plugin._id},
           image: {
             'xlink:href': plugin.fullImageUrl,
             width: 46,
@@ -178,14 +186,14 @@ export class PluginToolboxComponent implements AfterViewInit {
             'ref-y': 50,
             ref: 'rect',
             'x-alignment': 'middle',
-            'y-alignment': 'middle' 
+            'y-alignment': 'middle'
           }
         }
       });
       plugins.push(imageModel);
       iteration++;
     });
-    this.stencilPaper.svg.style.height = `${Math.ceil(iteration/2) * (pluginHeight + 13)}px`
+    this.stencilPaper.svg.style.height = `${Math.ceil(iteration / 2) * (pluginHeight + 13)}px`;
     this.stencilGraph.clear();
     this.stencilGraph.addCells(plugins);
   }

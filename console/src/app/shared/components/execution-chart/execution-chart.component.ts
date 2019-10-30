@@ -1,5 +1,5 @@
 import { Component,Input, OnChanges } from '@angular/core';
-import {MapResult, AgentResult, ProcessResult} from '@maps/models/execution-result.model';
+import {MapResult, AgentResult, ProcessResult} from '@app/services/map/models/execution-result.model';
 
 @Component({
   selector: 'app-execution-chart',

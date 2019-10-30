@@ -1,5 +1,5 @@
 import { Plugin } from '@plugins/models/plugin.model';
-import { IMapStructure } from '../interfaces/map-structure.interface';
+import { IMapStructure } from '@maps/interfaces/map-structure.interface';
 import { MapStructureConfiguration, Process, UsedPlugin, Link } from '.';
 
 export class MapStructure implements IMapStructure {

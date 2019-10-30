@@ -4,7 +4,7 @@ import * as $ from 'jquery';
 import * as joint from 'jointjs';
 import { DiffEditorModel } from 'ngx-monaco-editor';
 import {PopupService} from '@shared/services/popup.service'
-import { MapsService } from '../../maps.service';
+import { MapsService } from '../../../services/map/maps.service';
 import { MapStructure, Process } from '@maps/models';
 import { JOINT_OPTIONS } from '@maps/constants'
 import { Project } from '@projects/models/project.model';

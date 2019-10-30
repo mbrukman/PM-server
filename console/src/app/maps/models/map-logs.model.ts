@@ -1,4 +1,4 @@
-import { Map } from "./map.model";
+import { Map } from "../../services/map/models/map.model";
 
 export class MapExecutionLogs {
   id?: string;

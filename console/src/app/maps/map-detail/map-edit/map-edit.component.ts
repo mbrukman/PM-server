@@ -1,8 +1,8 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { MapsService } from '../../maps.service';
-import { Map } from '../../models/map.model';
-import { MapStructure } from '../../models/map-structure.model';
+import { MapsService } from '@app/services/map/maps.service';
+import { Map } from '@app/services/map/models/map.model';
+import { MapStructure } from '@maps/models';
 import { MapDesignService } from './map-design.service';
 
 @Component({

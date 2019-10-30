@@ -2,8 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import * as _ from 'lodash';
-import { MapsService } from '../maps.service';
-import { MapStructureConfiguration, Map, MapStructure } from '@maps/models';
+import { MapsService } from '@app/services/map/maps.service';
+import {Map} from '@app/services/map/models/map.model';
+import { MapStructureConfiguration, MapStructure } from '@maps/models';
 import { PopupService } from '@shared/services/popup.service';
 import { SocketService } from '@shared/socket.service';
 import { filter, take } from 'rxjs/operators';
@@ -141,7 +142,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         if(this.configurationDropDown.length == 0){
           this.configurationDropDown.push({label:"No config",value:''})
         }
-        
+
         if ((this.mapStructure.configurations && this.mapStructure.configurations.length > 0 && !this.initiated) || (!this.selected && this.mapStructure.configurations.length > 0)) {
           this.selected = this.mapStructure.configurations[0].name;
         }
@@ -172,7 +173,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.routeReq.unsubscribe();  
+    this.routeReq.unsubscribe();
     this.mapsService.clearCurrentMap();
     this.mapsService.clearCurrentMapStructure();
     this.mapExecutionSubscription.unsubscribe();

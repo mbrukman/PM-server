@@ -1,15 +1,15 @@
-import { FormGroup, FormControl } from '@angular/forms';
-import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
+import {FormGroup, FormControl} from '@angular/forms';
+import {PluginMethodParam} from '@plugins/models/plugin-method-param.model';
 import {
   IActionParam,
 } from '../interfaces/map-structure.interface';
 
-import { Serializable } from '@core/models/serializable.model';
+import {Serializable} from '@core/models/serializable.model';
 
 export class ActionParam extends Serializable implements IActionParam {
   id?: string;
   _id?: string;
-  value: any= undefined;
+  value: any = undefined;
   code: boolean = undefined;
   viewName?: string;
   name?: string;

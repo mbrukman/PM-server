@@ -1,4 +1,4 @@
-import { ILink } from '../interfaces/map-structure.interface';
+import { ILink } from '@maps/interfaces/map-structure.interface';
 
 export class Link implements ILink {
   id?: string;

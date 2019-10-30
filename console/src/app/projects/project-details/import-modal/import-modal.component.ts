@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 import { BsModalRef } from 'ngx-bootstrap';
 import { environment } from '@env/environment';
-import { MapsService } from '@app/maps/maps.service';
+import { MapsService } from '@app/services/map/maps.service';
 
 @Component({
   templateUrl: './import-modal.component.html',

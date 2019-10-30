@@ -3,8 +3,8 @@ import {Subscription} from 'rxjs';
 import {filter, tap, mergeMap} from "rxjs/operators";
 
 ;
-import {MapsService} from '../../maps.service';
-import {Map} from '@maps/models/map.model';
+import {MapsService} from '../../../services/map/maps.service';
+import {Map} from '@app/services/map/models/map.model';
 import {ProjectsService} from '@projects/projects.service';
 import {Project} from '@projects/models/project.model';
 import {SelectItem} from 'primeng/primeng';

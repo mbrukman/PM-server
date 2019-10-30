@@ -1,4 +1,4 @@
-import { Map } from './map.model';
+import { Map } from '../../services/map/models/map.model';
 import { ITriggerActionParam } from '../interfaces/map-trigger.interface';
 import { IParam } from '@shared/interfaces/param.interface';
 import { PluginMethod, PluginMethodParam } from '@plugins/models';
