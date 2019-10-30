@@ -85,7 +85,7 @@ app.io = io;
 
 // Send all other requests to the Angular app
 app.all("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
+  res.sendFile(path.join(__dirname, "../dist", "index.html"));
 });
 
 
