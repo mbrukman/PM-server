@@ -103,7 +103,6 @@ async function startFollowingAgentStatus(agent) {
     agentStatus.following = true;
 
     await setDefaultUrl(agent);
-    await saveStatusToAgent(agent, agentStatus);
   }
   startInterval(agent);
 }
@@ -462,7 +461,7 @@ async function deletePluginOnAgent(name, agent) {
 
 /* restarting the agents live status, and updating the status for all agents */
 async function restartAgentsStatus() {
-  await Agent.update({}, { $set: { alive: false, following: false } });
+  await Agent.updateMany({}, { $set: { "status.alive": false, "status.following": false } });
 
   await Agent.find({}).then(agents => {
     agents.forEach(agent => {
