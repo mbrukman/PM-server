@@ -287,18 +287,6 @@ function updateActionContext(
     executions[runId].executionAgents[agentKey].context.previousAction = action;
 
   let result = "";
-  if (
-    actionData.status == statusEnum.ERROR &&
-    action.mandatory &&
-    !actionData.hasOwnProperty("retriesLeft")
-  ) {
-    result = "Mandatory Action Faild";
-    actionData.result.result += " - " + result;
-
-    let msg = `result: ${JSON.stringify(result)}`;
-    _updateRawOutput(map._id, runId, msg, statusEnum.ERROR);
-  }
-
   const options = {
     data: actionData,
     mapResultId: runId,
@@ -311,15 +299,6 @@ function updateActionContext(
   };
 
   dbUpdates.updateAction(options);
-
-  // mandatory action faild. stop execution (if no have retries)
-  if (
-    actionData.status == statusEnum.ERROR &&
-    action.mandatory &&
-    !actionData.hasOwnProperty("retriesLeft")
-  ) {
-    return stopExecution(runId, null, result);
-  }
 }
 
 /**
@@ -1756,6 +1735,17 @@ async function executeAction(
         Object.keys(nsp.sockets).forEach(socket => {
           nsp.sockets[socket].emit("updateAction", res);
         });
+
+        let mandatoryActionFailed = actionResult.status == statusEnum.ERROR &&
+                              action.mandatory &&
+                              (!actionResult.hasOwnProperty("retriesLeft") || !actionResult.retriesLeft);
+
+
+        // mandatory action faild. stop execution (if no have retries)
+        if (mandatoryActionFailed) {
+            stopExecution(runId, null, result);
+            throw `Execution ${runId}: Mandatory action failed. Stopping execution`;
+        }
 
         return result;
       });
