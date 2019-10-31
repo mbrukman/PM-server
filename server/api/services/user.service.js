@@ -1,4 +1,6 @@
 const User = require("../models/user.model");
+const crypto = require("crypto");
+const serverKey = process.env.SERVER_KEY;
 
 function getSort(sortString) {
   const sort = {};
@@ -8,6 +10,18 @@ function getSort(sortString) {
     sort[sortString] = 1;
   }
   return sort;
+}
+
+function hashPassword(pass, salt) {
+  const hash = crypto.createHash("sha256");
+  hash.update(pass + salt);
+  return hash.digest("hex");
+}
+
+function createUser(userData) {
+  const user = new User(userData);
+  user.password = hashPassword(user.password, serverKey);
+  return user.save();
 }
 
 class UserService {

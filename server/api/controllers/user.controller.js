@@ -1,14 +1,20 @@
-const usersService = require("../services/user.service");
+const userService = require("../services/user.service");
 
 function filter(req, res) {
-  usersService
-    .filter(req.body)
-    .then(x => {
-      return res.send(x);
+  userService.filter(req.body).then(x => {
+    return res.send(x);
+  });
+}
+
+function createUser(req, res) {
+  userService
+    .createUser(req.body)
+    .then(createdUser => {
+      res.json(createdUser);
     })
     .catch(err => {
       res.status(500).json(err);
     });
 }
 
-module.exports = { filter };
+module.exports = { filter, createUser };
