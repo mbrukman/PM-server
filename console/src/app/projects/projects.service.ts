@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Project } from './models/project.model';
-import { Map } from '@maps/models/map.model';
+import { Map } from '@app/services/map/models/map.model';
 import { MapStructure } from '@maps/models/map-structure.model';
 import {FilterOptions} from '@shared/model/filter-options.model';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';

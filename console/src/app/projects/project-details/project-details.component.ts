@@ -8,8 +8,8 @@ import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import { FilterOptions } from '@shared/model/filter-options.model'
 import { debounceTime } from 'rxjs/operators';
 import { Subscription, fromEvent } from 'rxjs';
-import {MapsService} from '@maps/maps.service';
-import {Map} from '@maps/models/map.model';
+import {MapsService} from '@app/services/map/maps.service';
+import {Map} from '@app/services/map/models/map.model';
 import {SeoService,PageTitleTypes} from '@app/seo.service';
 
 @Component({
@@ -62,7 +62,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     })
     return data;
   }
-  
+
   updateUrl(): void {
     let data =  Object.assign({}, this._getObjectFrom(this.filterOptions))
     delete data.filter
@@ -114,7 +114,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   openImportModal() {
     this.popupService.openComponent(ImportModalComponent,{projectId:this.id});
   }
-  
+
 
 
   onConfirmDelete(id) {

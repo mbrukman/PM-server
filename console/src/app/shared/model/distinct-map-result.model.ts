@@ -1,4 +1,4 @@
-import {AgentResult} from '@maps/models/execution-result.model';
+import {AgentResult} from '@app/services/map/models/execution-result.model';
 
 export class DistinctMapResult{
     _id:string;

@@ -28,6 +28,7 @@ export class ConstantAgentsListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const updateGroupSubscription = this.agentsService.getUpdateGroupAsObservable()
       .subscribe((group) => this.group = group);
+    
     this.mainSubscription.add(updateGroupSubscription);
   }
 

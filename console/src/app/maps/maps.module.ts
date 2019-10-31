@@ -15,7 +15,6 @@ import { MapTriggersComponent } from './map-detail/map-edit/map-enviroment-pane/
 import { MapDesignComponent } from './map-detail/map-edit/map-design/map-design.component';
 import { MapDetailComponent } from './map-detail/map-detail.component';
 import { MapsListComponent } from './maps-list/maps-list.component';
-import { TriggerFormComponent } from './map-detail/map-edit/map-enviroment-pane/map-triggers/trigger-form/trigger-form.component';
 import { MapEditComponent } from './map-detail/map-edit/map-edit.component';
 import { MapAgentsComponent } from './map-detail/map-edit/map-enviroment-pane/map-agents/map-agents.component';
 import { MapCodeComponent } from './map-detail/map-edit/map-code/map-code.component';
@@ -30,7 +29,7 @@ import { ProcessResultComponent } from './map-detail/map-result/process-result/p
 import { ProcessListItemComponent } from './map-detail/map-result/process-list-item/process-list-item.component';
 import { MapConfigurationsComponent } from './map-detail/map-configurations/map-configurations.component';
 import { ProcessViewComponent } from './map-detail/map-revisions/process-view/process-view.component';
-import { monacoConfig } from './monaco-config' 
+import { monacoConfig } from './monaco-config';
 import {AutoCompleteModule} from 'primeng/primeng';
 import { MapsResolver } from './resolvers/maps.resolver';
 import {InputSwitchModule} from 'primeng/inputswitch';
@@ -54,7 +53,7 @@ import {InputSwitchModule} from 'primeng/inputswitch';
     InfiniteScrollModule,
     AutoCompleteModule,
     InputSwitchModule
-    
+
   ],
   declarations: [
     MapDetailComponent,
@@ -75,9 +74,9 @@ import {InputSwitchModule} from 'primeng/inputswitch';
     ProcessResultComponent,
     ProcessListItemComponent,
     ProcessViewComponent,
-    
+
   ],
   entryComponents: [ ],
-  providers:[MapsResolver]
+  providers: [MapsResolver]
 })
 export class MapsModule {}

@@ -1,9 +1,9 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
-import {ProcessResult} from '@app/maps/models';
 import {Data, ActivatedRoute} from '@angular/router';
 import {SeoService, PageTitleTypes} from '@app/seo.service';
 import {Subscription} from 'rxjs';
+import {ProcessResult} from '@app/services/map/models/execution-result.model';
 
 @Component({
   selector: 'app-dashboard',

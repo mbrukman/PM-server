@@ -7,7 +7,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { UnsavedGuard } from './shared/guards/unsaved.guard';
 import { SharedModule } from './shared/shared.module';
-import { MapsService } from './maps/maps.service';
+import { MapsService } from './services/map/maps.service';
 import { SocketService } from './shared/socket.service';
 import { PluginsService } from './plugins/plugins.service';
 import { AgentsService } from './services/agent/agents.service';

@@ -1,8 +1,8 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { MapsService } from '../../maps.service';
-import { Map } from '../../models/map.model';
-import { MapStructure } from '../../models/map-structure.model';
+import { MapsService } from '@app/services/map/maps.service';
+import { Map } from '@app/services/map/models/map.model';
+import { MapStructure } from '@maps/models';
 import { MapDesignService } from './map-design.service';
 
 @Component({
@@ -14,8 +14,9 @@ import { MapDesignService } from './map-design.service';
 export class MapEditComponent implements OnInit, OnDestroy {
   mapStructure: MapStructure;
   map: Map;
-  mapSubscription: Subscription;
   activeTab: any;
+
+  private mainSubscription = new Subscription();
 
   envTabs = [
     {key : 'agents', label: 'Agents', icon: 'icon-agent'},
@@ -30,19 +31,18 @@ export class MapEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.mapSubscription = this.mapsService.getCurrentMap().subscribe(map => {
+    const mapSubscription = this.mapsService.getCurrentMap().subscribe(map => {
       if (map) {
         this.map = map;
       }
     });
 
-    this.mapsService.getCurrentMapStructure().subscribe(structure => {
+    const currentMapSubscription = this.mapsService.getCurrentMapStructure().subscribe(structure => {
       this.mapStructure = structure;
     });
-  }
 
-  ngOnDestroy() {
-    this.mapSubscription.unsubscribe();
+    this.mainSubscription.add(mapSubscription);
+    this.mainSubscription.add(currentMapSubscription);
   }
 
   closeTabs() {
@@ -55,4 +55,7 @@ export class MapEditComponent implements OnInit, OnDestroy {
     this.designService.tabOpen = true;
   }
 
+  ngOnDestroy(): void {
+    this.mainSubscription.unsubscribe();
+  }
 }

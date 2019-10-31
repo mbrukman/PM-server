@@ -1,5 +1,3 @@
-export * from './execution-result.model';
-export * from './map.model';
 export * from './map-logs.model';
 export * from './map-structure.model';
 export * from './map-trigger.model';
@@ -12,5 +10,4 @@ export * from './used-plugin.model';
 export * from './action.model';
 export * from './action-param.model';
 export * from './link.model';
-export * from './view-models/process-view-wrapper.model';
 export * from './view-models/action-result-view.model';

@@ -1,15 +1,14 @@
-import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Subscription } from 'rxjs';
-import * as _ from 'lodash';
-import { MapsService } from '../maps.service';
-import { Map } from '../models/map.model';
-import { PopupService } from '@shared/services/popup.service';
-import { FilterOptions } from '@shared/model/filter-options.model'
-import { fromEvent } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
-import { DistinctMapResult } from '@shared/model/distinct-map-result.model';
-import { Data, ActivatedRoute, Router } from '@angular/router';
-import {SeoService,PageTitleTypes} from '@app/seo.service';
+import {Component, OnDestroy, OnInit, ViewChild, ElementRef} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {MapsService} from '@app/services/map/maps.service';
+import {Map} from '@app/services/map/models/map.model';
+import {PopupService} from '@shared/services/popup.service';
+import {FilterOptions} from '@shared/model/filter-options.model';
+import {fromEvent} from 'rxjs';
+import {debounceTime, map} from 'rxjs/operators';
+import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
+import {Data, ActivatedRoute, Router} from '@angular/router';
+import {SeoService, PageTitleTypes} from '@app/seo.service';
 
 @Component({
   selector: 'app-maps-list',
@@ -21,68 +20,72 @@ export class MapsListComponent implements OnInit, OnDestroy {
   resultCount: number = 0;
   filterOptions: FilterOptions = new FilterOptions();
   recentMaps: DistinctMapResult[];
-  filterKeyUpSubscribe: Subscription;
-  isInit:boolean=true;
+  isInit: boolean = true;
 
   readonly tablePageSize = 15;
 
+  private mainSubscription = new Subscription();
+
   @ViewChild('globalFilter') globalFilterElement: ElementRef;
 
-  constructor(private mapsService: MapsService,
+  constructor(
+    private mapsService: MapsService,
     private popupService: PopupService,
     private route: ActivatedRoute,
-    private seoService:SeoService,
-    private readonly router: Router) {
-    this.onDataLoad = this.onDataLoad.bind(this)
+    private seoService: SeoService,
+    private readonly router: Router
+  ) {
+    this.onDataLoad = this.onDataLoad.bind(this);
   }
 
 
   ngOnInit() {
-    this.filterOptions = this._getObjectFrom(this.route.snapshot.queryParams)
-    this.seoService.setTitle(PageTitleTypes.MapsList)
-    this.route.data.subscribe((data: Data) => {
+    this.filterOptions = this._getObjectFrom(this.route.snapshot.queryParams);
+    this.seoService.setTitle(PageTitleTypes.MapsList);
+
+    const routeDataSubscription = this.route.data.subscribe((data: Data) => {
       this.onDataLoad(data['maps']);
-    })
+    });
 
-    this.mapsService.recentMaps().subscribe(maps => {
+    const recentMapsSubscription = this.mapsService.recentMaps().subscribe(maps => {
       this.recentMaps = maps;
-    })
+    });
 
-    this.filterKeyUpSubscribe = fromEvent(this.globalFilterElement.nativeElement, 'keyup').pipe(debounceTime(300))
+    const filterKeyUpSubscription = fromEvent(this.globalFilterElement.nativeElement, 'keyup').pipe(debounceTime(300))
       .subscribe(() => {
         this.loadMapsLazy();
-      })
+      });
 
+    this.mainSubscription.add(routeDataSubscription);
+    this.mainSubscription.add(recentMapsSubscription);
+    this.mainSubscription.add(filterKeyUpSubscription);
   }
 
   reloadMaps(fields = null, filter = this.filterOptions) {
-    this.updateUrl()
-    this.mapsService.filterMaps(fields, filter).subscribe(this.onDataLoad);
+    this.updateUrl();
+    const reloadMapSubscription = this.mapsService.filterMaps(fields, filter).subscribe(this.onDataLoad);
+    this.mainSubscription.add(reloadMapSubscription);
   }
 
-  ngOnDestroy() {
-    this.filterKeyUpSubscribe.unsubscribe();
-  }
-
-  _getObjectFrom(obj) : FilterOptions{
-    let data = this.filterOptions
-    let filterKeys = Object.keys(obj)
-    filterKeys.forEach(field=>{
-      data[field] = obj[field] || this.filterOptions[field]
-    })
+  _getObjectFrom(obj): FilterOptions {
+    const data = this.filterOptions;
+    const filterKeys = Object.keys(obj);
+    filterKeys.forEach(field => {
+      data[field] = obj[field] || this.filterOptions[field];
+    });
     return data;
   }
-  
+
   updateUrl(): void {
-    let data = this._getObjectFrom(this.filterOptions)
-        
-    this.router.navigate(['maps'], { queryParams: data});
+    const data = this._getObjectFrom(this.filterOptions);
+
+    this.router.navigate(['maps'], {queryParams: data});
   }
-  
-  clearSearchFilter(){
+
+  clearSearchFilter() {
     this.filterOptions.globalFilter = undefined;
-    this.loadMapsLazy()
-    this.updateUrl()
+    this.loadMapsLazy();
+    this.updateUrl();
   }
 
 
@@ -95,25 +98,28 @@ export class MapsListComponent implements OnInit, OnDestroy {
         this.filterOptions.sort = event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
-    if(this.isInit){
-      this.isInit=false;
+    if (this.isInit) {
+      this.isInit = false;
       return;
     }
-    this.filterOptions.page = page
-    this.reloadMaps(fields, this.filterOptions)
+    this.filterOptions.page = page;
+    this.reloadMaps(fields, this.filterOptions);
   }
 
   deleteMap(id) {
+    const deleteMapSubscription = this.mapsService.delete(id)
+      .pipe(
+        map(() => {
+          for (let i = 0, length = this.recentMaps.length; i < length; i++) {
+            if (this.recentMaps[i]._id === id) {
+              this.recentMaps.splice(i, 1);
+              break;
+            }
+          }
+        })
+      ).subscribe(() => this.loadMapsLazy());
 
-    this.mapsService.delete(id).subscribe(() => {
-      for (let i = 0, lenght = this.recentMaps.length; i < lenght; i++) {
-        if (this.recentMaps[i]._id == id) {
-          this.recentMaps.splice(i, 1);
-          break;
-        }
-      }
-      this.loadMapsLazy();
-    });
+    this.mainSubscription.add(deleteMapSubscription);
   }
 
 
@@ -122,7 +128,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
       this.maps = null;
       this.resultCount = 0;
       return;
-    };
+    }
     this.maps = data.items;
     this.resultCount = data.totalCount;
   }
@@ -130,13 +136,22 @@ export class MapsListComponent implements OnInit, OnDestroy {
 
   onConfirmDelete(id) {
     // will be triggered by deactivate guard
-    let confirm ='Delete';
-    this.popupService.openConfirm(null,'Are you sure you want to delete? all data related to the map will get permanently lost',confirm,'Cancel',null)
-    .subscribe(ans => {
+    const confirm = 'Delete';
+    const confirmDeleteSubscription = this.popupService.openConfirm(
+      null,
+      'Are you sure you want to delete? all data related to the map will get permanently lost',
+      confirm,
+      'Cancel',
+      null
+    ).subscribe(ans => {
       if (ans === confirm) {
         this.deleteMap(id);
       }
-    })
+    });
+    this.mainSubscription.add(confirmDeleteSubscription);
+  }
 
+  ngOnDestroy(): void {
+    this.mainSubscription.unsubscribe();
   }
 }
