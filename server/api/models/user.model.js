@@ -18,7 +18,7 @@ const userSchema = new Schema(
       validate: validateEmail
     },
     phoneNumber: { type: String },
-    changePassOnNextLogin: { type: Boolean },
+    changePasswordOnNextLogin: { type: Boolean },
     password: { type: String }
   },
   { timestamps: true }
