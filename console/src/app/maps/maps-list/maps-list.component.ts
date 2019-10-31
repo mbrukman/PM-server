@@ -68,8 +68,8 @@ export class MapsListComponent implements OnInit, OnDestroy {
   }
 
   _getObjectFrom(obj): FilterOptions {
-    let data = this.filterOptions;
-    let filterKeys = Object.keys(obj);
+    const data = this.filterOptions;
+    const filterKeys = Object.keys(obj);
     filterKeys.forEach(field => {
       data[field] = obj[field] || this.filterOptions[field];
     });
@@ -77,7 +77,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
   }
 
   updateUrl(): void {
-    let data = this._getObjectFrom(this.filterOptions);
+    const data = this._getObjectFrom(this.filterOptions);
 
     this.router.navigate(['maps'], {queryParams: data});
   }
@@ -118,6 +118,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
           }
         })
       ).subscribe(() => this.loadMapsLazy());
+
     this.mainSubscription.add(deleteMapSubscription);
   }
 
@@ -135,7 +136,7 @@ export class MapsListComponent implements OnInit, OnDestroy {
 
   onConfirmDelete(id) {
     // will be triggered by deactivate guard
-    let confirm = 'Delete';
+    const confirm = 'Delete';
     const confirmDeleteSubscription = this.popupService.openConfirm(
       null,
       'Are you sure you want to delete? all data related to the map will get permanently lost',

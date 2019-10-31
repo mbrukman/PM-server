@@ -1,50 +1,42 @@
-import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
-import { DiffEditorModel } from 'ngx-monaco-editor';
-import {PopupService} from '@shared/services/popup.service'
-import { MapsService } from '../../../services/map/maps.service';
-import { MapStructure, Process } from '@maps/models';
-import { JOINT_OPTIONS } from '@maps/constants'
-import { Project } from '@projects/models/project.model';
-import { ProjectsService } from '@projects/projects.service';
-import { SocketService } from '@shared/socket.service';
-import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
-import { FilterOptions } from '@shared/model/filter-options.model';
-import { take, filter, mergeMap } from 'rxjs/operators';
-import { MapDuplicateOptions } from '@maps/models/map-duplicate-options.model';
-import { Subscription } from 'rxjs';
+import {DiffEditorModel} from 'ngx-monaco-editor';
+import {PopupService} from '@shared/services/popup.service';
+import {MapsService} from '@app/services/map/maps.service';
+import {MapStructure, Process} from '@maps/models';
+import {JOINT_OPTIONS} from '@maps/constants';
+import {Project} from '@projects/models/project.model';
+import {ProjectsService} from '@projects/projects.service';
+import {SocketService} from '@shared/socket.service';
+import {MapDuplicateComponent} from '@maps/map-detail/map-revisions/mapduplicate-popup/mapduplicate-popup.component';
+import {FilterOptions} from '@shared/model/filter-options.model';
+import {take, filter, mergeMap} from 'rxjs/operators';
+import {MapDuplicateOptions} from '@maps/models/map-duplicate-options.model';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-map-revisions',
   templateUrl: './map-revisions.component.html',
   styleUrls: ['./map-revisions.component.scss']
 })
-export class MapRevisionsComponent implements OnInit {
-  load_structures = 25;
+export class MapRevisionsComponent implements OnInit, OnDestroy {
+  loadStructures = 25;
   previewProcess: Process;
   structures: MapStructure[] = [];
-  maxLengthReached:boolean = false;
-  structureId: string;
+  maxLengthReached: boolean = false;
   mapId: string;
   currentGraph: joint.dia.Graph;
   latestGraph: joint.dia.Graph;
   currentPaper: joint.dia.Paper;
   latestPaper: joint.dia.Paper;
   project: Project;
-  scrollCallback: any;
   page: number = 1;
-  morePages: boolean = true;
   currentStructure: MapStructure;
   viewMode: 'code' | 'design' = 'design';
   latestStructure: MapStructure;
   @ViewChild('wrapper') wrapper: ElementRef;
-  editorOptions = {
-    theme: 'vs-dark',
-    language: 'javascript',
-    readOnly: true
-  };
   latestCode: string;
   currentCode: string;
 
@@ -52,15 +44,29 @@ export class MapRevisionsComponent implements OnInit {
     theme: 'vs-dark'
   };
 
+  originalModel: DiffEditorModel = {
+    code: this.latestCode,
+    language: 'text/javascript'
+  };
 
-  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private popupService:PopupService) {}
+  modifiedModel: DiffEditorModel = {
+    code: this.currentCode,
+    language: 'text/javascript'
+  };
+
+  private mainSubscription = new Subscription();
+
+
+  constructor(private mapsService: MapsService, private router: Router, private route: ActivatedRoute, private projectsService: ProjectsService, private socketService: SocketService, private popupService: PopupService) {
+  }
 
   ngOnInit() {
-    this.route.parent.params.subscribe(params => {
-      this.mapId = params.id;
-      this.getMapProject();
-      this.loadStructureOnScroll(this.mapId,true);
-    });
+    const routeParamsSubscription = this.route.parent.params
+      .subscribe(params => {
+        this.mapId = params.id;
+        this.getMapProject();
+        this.loadStructureOnScroll(this.mapId, true);
+      });
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
     this.currentGraph = new joint.dia.Graph;
     this.latestGraph = new joint.dia.Graph;
@@ -85,32 +91,25 @@ export class MapRevisionsComponent implements OnInit {
     this.latestPaper.scale(0.75, 0.75);
     this.addPaperDrag();
     this.listeners();
+
+    this.mainSubscription.add(routeParamsSubscription);
   }
 
-  originalModel: DiffEditorModel = {
-    code: this.latestCode,
-    language: 'text/javascript'
-  };
-
-  modifiedModel: DiffEditorModel = {
-    code: this.currentCode,
-    language: 'text/javascript'
-  };
 
   addPaperDrag() {
-    let initialPosition = { x: 0, y: 0 };
+    let initialPosition = {x: 0, y: 0};
     let move = false;
 
-    let paperOnPointerDown = (event, x, y) => {
-      initialPosition = { x: x * 0.75, y: y * 0.75 };
+    const paperOnPointerDown = (event, x, y) => {
+      initialPosition = {x: x * 0.75, y: y * 0.75};
       move = true;
     };
 
-    let paperOnPointerUp = (event, x, y) => {
+    const paperOnPointerUp = () => {
       move = false;
     };
 
-    let graphMouseMove = (paper) => (event)=>{
+    const graphMouseMove = (paper) => (event) => {
       if (move) {
         paper.translate(event.offsetX - initialPosition.x, event.offsetY - initialPosition.y);
       }
@@ -126,13 +125,13 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   listeners() {
-    this.currentPaper.on('cell:pointerup', (cellView, evt, x, y) => {
+    this.currentPaper.on('cell:pointerup', (cellView) => {
       if (cellView.model.isLink()) {
         return;
       }
       this.previewProcess = this.currentStructure.processes.find(p => p.uuid === cellView.model.id);
     });
-    this.latestPaper.on('cell:pointerup', (cellView, evt, x, y) => {
+    this.latestPaper.on('cell:pointerup', (cellView) => {
       if (cellView.model.isLink()) {
         return;
       }
@@ -140,22 +139,24 @@ export class MapRevisionsComponent implements OnInit {
     });
   }
 
-  loadStructureOnScroll(mapId = this.mapId,OnInit = false){
-    this.mapsService.structuresList(mapId,this.page)
-    .subscribe(structures => {
-      if(OnInit && structures.length){
-        this.previewStructure(structures[0].id)
-      }
-      if(structures.length < this.load_structures){
-        this.maxLengthReached = true
-      }
-      for(let i=0,length = structures.length;i<length;i++){
-        this.structures.push(structures[i])
-      }
-    })
+  loadStructureOnScroll(mapId = this.mapId, onInit = false) {
+    const listStructureSubscription = this.mapsService.structuresList(mapId, this.page)
+      .subscribe(structures => {
+        if (onInit && structures.length) {
+          this.previewStructure(structures[0].id);
+        }
+        if (structures.length < this.loadStructures) {
+          this.maxLengthReached = true;
+        }
+        for (let i = 0, length = structures.length; i < length; i++) {
+          this.structures.push(structures[i]);
+        }
+      });
+
+    this.mainSubscription.add(listStructureSubscription);
   }
 
-  onScroll(){
+  onScroll() {
     if (!this.maxLengthReached) {
       return;
     }
@@ -164,25 +165,35 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   getMapProject() {
-    let mapIdFilter = {maps:{$in:[this.mapId]}}
-    var filterOptions : FilterOptions = {isArchived:false,globalFilter:null,sort:'-createdAt',filter:mapIdFilter};
-    this.projectsService.filter(null,filterOptions).subscribe(data => {
+    const mapIdFilter = {maps: {$in: [this.mapId]}};
+    const filterOptions: FilterOptions = {
+      isArchived: false,
+      globalFilter: null,
+      sort: '-createdAt',
+      filter: mapIdFilter
+    };
+
+    const filterProjectSubscription = this.projectsService.filter(null, filterOptions).subscribe(data => {
       data.items.forEach(project => {
         if ((<string[]>project.maps).indexOf(this.mapId) > -1) {
           this.project = project;
         }
       });
     });
+
+    this.mainSubscription.add(filterProjectSubscription);
   }
 
   changeStructure(structureId) {
-    this.mapsService.getMapStructure(this.mapId, structureId).subscribe(structure => {
+    const getMapStructSubscription = this.mapsService.getMapStructure(this.mapId, structureId).subscribe(structure => {
       this.mapsService.setCurrentMapStructure(structure);
       this.socketService.setNotification({
         title: 'Changed version',
         type: 'info'
       });
     });
+
+    this.mainSubscription.add(getMapStructSubscription);
   }
 
   defineShape() {
@@ -241,25 +252,28 @@ export class MapRevisionsComponent implements OnInit {
   }
 
   duplicateMap(structureId: string) {
-    this.popupService.openComponent(MapDuplicateComponent,{})
-    .pipe(
-      take(1),
-      filter(obj => !!(<MapDuplicateOptions>obj).name), // filtering only results with a name
-    mergeMap(obj =>  this.mapsService.duplicateMap(this.mapId, structureId, this.project.id,<MapDuplicateOptions>obj))
-      ).subscribe(map => { this.router.navigate(['/maps', map.id]);
-    });
+    const popUpSubscription = this.popupService.openComponent(MapDuplicateComponent, {})
+      .pipe(
+        take(1),
+        filter(obj => !!(<MapDuplicateOptions>obj).name), // filtering only results with a name
+        mergeMap(obj => this.mapsService.duplicateMap(this.mapId, structureId, this.project.id, <MapDuplicateOptions>obj))
+      ).subscribe(map => {
+        this.router.navigate(['/maps', map.id]);
+      });
+
+    this.mainSubscription.add(popUpSubscription);
   }
 
   previewStructure(structureId: string) {
     this.previewProcess = null;
-    this.mapsService.getMapStructure(this.mapId, structureId)
+    const getMapStructSubscription = this.mapsService.getMapStructure(this.mapId, structureId)
       .subscribe(structure => {
         this.currentStructure = structure;
         this.currentGraph.fromJSON(JSON.parse(structure.content));
         this.originalModel = {
-          code : structure.code,
-          language : 'javascript'
-        }
+          code: structure.code,
+          language: 'javascript'
+        };
         if (!this.latestStructure) {
           this.setLatestStructure(this.mapId, this.structures[0].id);
         }
@@ -269,22 +283,13 @@ export class MapRevisionsComponent implements OnInit {
         }
       });
 
-
+    this.mainSubscription.add(getMapStructSubscription);
   }
 
-  onResize(event) {
+  onResize() {
     // when resizing window currentPaper size should be updated
     this.currentPaper.setDimensions(this.wrapper.nativeElement.offsetWidth, this.wrapper.nativeElement.offsetHeight);
     this.latestPaper.setDimensions(this.wrapper.nativeElement.offsetWidth, this.wrapper.nativeElement.offsetHeight);
-  }
-
-  onVersionScroll(event) {
-  }
-
-  loadRevisions() {
-
-    this.page++;
-    this.loadStructureOnScroll();
   }
 
   changeMode(mode: 'code' | 'design') {
@@ -294,7 +299,6 @@ export class MapRevisionsComponent implements OnInit {
       this.loadCodeDiff();
     } else {
       setTimeout(() => {
-
         this.currentGraph.fromJSON(JSON.parse(this.currentStructure.content));
       }, 0);
     }
@@ -307,15 +311,21 @@ export class MapRevisionsComponent implements OnInit {
 
   setLatestStructure(mapId: string, structureId: string) {
     this.mapsService.getMapStructure(mapId, structureId).pipe(
-    take(1)
+      take(1)
     ).subscribe(structure => {
-        this.latestStructure = structure
-        this.latestGraph.fromJSON(JSON.parse(this.latestStructure.content));
-        this.modifiedModel.code = structure.code;
-      });
+      this.latestStructure = structure;
+      this.latestGraph.fromJSON(JSON.parse(this.latestStructure.content));
+      this.modifiedModel.code = structure.code;
+    });
   }
 
   onClose() {
     this.previewProcess = null;
   }
+
+  ngOnDestroy(): void {
+    this.mainSubscription.unsubscribe();
+  }
+
+
 }

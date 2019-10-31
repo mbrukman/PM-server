@@ -75,7 +75,7 @@
       "check-else",
       "check-whitespace"
     ],
-    "prefer-const": false,
+    "prefer-const": true,
     "quotemark": [
       true,
       "single"
@@ -101,7 +101,9 @@
     ],
     "typeof-compare": true,
     "unified-signatures": true,
-    "variable-name": false,
+    "variable-name": {
+      "options": [ "check-format"]
+    },
     "whitespace": [
       true,
       "check-branch",

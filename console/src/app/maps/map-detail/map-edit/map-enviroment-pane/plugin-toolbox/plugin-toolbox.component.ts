@@ -114,12 +114,12 @@ export class PluginToolboxComponent implements AfterViewInit {
   }
 
   flyCell(cellView, event, x, y) {
-    let self = this;
+    const self = this;
     $('body').append(
       '<div id="flyPaper" style="position:fixed;z-index:100;opacity:.7;pointer-event:none;background: transparent"></div>'
     );
-    let flyGraph = new joint.dia.Graph(),
-      flyPaper = new joint.dia.Paper({
+    const flyGraph = new joint.dia.Graph();
+    const flyPaper = new joint.dia.Paper({
         el: $('#flyPaper'),
         model: flyGraph,
         interactive: false
@@ -162,11 +162,11 @@ export class PluginToolboxComponent implements AfterViewInit {
   }
 
   addPluginsToGraph() {
-    let plugins = [];
+    const plugins = [];
     let iteration = 0;
     const pluginHeight = 73;
     this.pluginsSearch.forEach(plugin => {
-      let imageModel = new joint.shapes.devs['MyImageModel']({
+      const imageModel = new joint.shapes.devs['MyImageModel']({
         position: {
           x: iteration % 2 ? 115 : 5,
           y: (iteration % 2 ? (iteration - 1) * 42 : iteration * 42) + 15

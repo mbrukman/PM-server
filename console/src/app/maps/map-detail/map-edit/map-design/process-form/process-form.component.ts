@@ -24,8 +24,6 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
   @Output() clone: EventEmitter<any> = new EventEmitter<any>();
-  formValueChangeSubscription: Subscription;
-  processUpdateSubscription: Subscription;
   processForm: FormGroup;
   action: boolean = false;
   index: number;

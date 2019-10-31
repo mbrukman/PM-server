@@ -70,8 +70,8 @@ export class MapTriggersComponent implements OnInit, OnDestroy {
   }
 
   removeTrigger(index: number) {
-    let trigger = this.triggers[index];
-    let confirm = 'Yes';
+    const trigger = this.triggers[index];
+    const confirm = 'Yes';
     const popupSubscription = this.popupService.openConfirm(
       'Delete Trigger',
       `Are you sure you want to delete ${trigger.name}?`,

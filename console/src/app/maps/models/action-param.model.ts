@@ -8,6 +8,7 @@ import {Serializable} from '@core/models/serializable.model';
 
 export class ActionParam extends Serializable implements IActionParam {
   id?: string;
+  // tslint:disable-next-line:variable-name
   _id?: string;
   value: any = undefined;
   code: boolean = undefined;

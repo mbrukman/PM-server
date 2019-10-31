@@ -8,6 +8,7 @@ import {Action} from '@maps/models/action.model';
 
 export class Process extends Serializable implements IProcess {
   id: string;
+  // tslint:disable-next-line:variable-name
   _id?: string;
   name?: string;
   description?: string;

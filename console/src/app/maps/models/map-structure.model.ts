@@ -4,6 +4,7 @@ import { MapStructureConfiguration, Process, UsedPlugin, Link } from '.';
 
 export class MapStructure implements IMapStructure {
   id?: string;
+  // tslint:disable-next-line:variable-name
   _id?: string;
   createdAt: Date;
   updatedAt: Date;

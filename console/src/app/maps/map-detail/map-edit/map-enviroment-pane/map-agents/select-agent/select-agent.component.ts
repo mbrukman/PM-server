@@ -39,7 +39,7 @@ export class SelectAgentComponent implements OnInit, OnDestroy {
         );
       })
     ).subscribe(data => {
-      let [agents, agentsStatus] = data;
+      const [agents, agentsStatus] = data;
       agents.map(agent => Object.assign(agent, {status: agentsStatus[agent.id]}));
       this.agents = agents;
     });
@@ -53,7 +53,7 @@ export class SelectAgentComponent implements OnInit, OnDestroy {
   }
 
   onConfirm(): void {
-    let res = {agents: this.selectedAgents, groups: this.selectedGroups};
+    const res = {agents: this.selectedAgents, groups: this.selectedGroups};
     this.result.next(res);
     this.onClose();
   }

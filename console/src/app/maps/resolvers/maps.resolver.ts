@@ -14,7 +14,7 @@ export class MapsResolver implements Resolve<IEntityList<Map>> {
   }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<IEntityList<Map>> {
-    let filterKeys = Object.keys(route.queryParams);
+    const filterKeys = Object.keys(route.queryParams);
     filterKeys.forEach(field => {
       this.filterOptions[field] = route.queryParams[field] || this.filterOptions[field];
     });

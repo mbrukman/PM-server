@@ -17,7 +17,9 @@ export class MapResultResolver implements Resolve<any> {
 
   resolve(route: ActivatedRouteSnapshot) {
     return forkJoin(
-      this.mapsService.executionResultDetail(route.parent.paramMap.get('id'), route.paramMap.get('resultId')).pipe(
+      this.mapsService.executionResultDetail(
+        route.parent.paramMap.get('id'),
+        route.paramMap.get('resultId')).pipe(
         catchError(err => {
           this.router.navigate(['/not-found']);
           return of(null);
@@ -34,7 +36,6 @@ export class MapResultResolver implements Resolve<any> {
       })
     );
   }
-
 }
 
 

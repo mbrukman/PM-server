@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { Subject } from 'rxjs';
-import { BsModalRef } from 'ngx-bootstrap';
-import {MapDuplicateOptions} from '@maps/models/map-duplicate-options.model'
+import {Component} from '@angular/core';
+import {Subject} from 'rxjs';
+import {BsModalRef} from 'ngx-bootstrap';
+import {MapDuplicateOptions} from '@maps/models/map-duplicate-options.model';
 
 @Component({
   selector: 'app-mapduplicate-popup',
@@ -9,7 +9,7 @@ import {MapDuplicateOptions} from '@maps/models/map-duplicate-options.model'
   styleUrls: ['./mapduplicate-popup.component.scss']
 })
 export class MapDuplicateComponent {
-  optionsPopup:MapDuplicateOptions = new MapDuplicateOptions()
+  optionsPopup: MapDuplicateOptions = new MapDuplicateOptions();
   public result: Subject<MapDuplicateOptions> = new Subject<MapDuplicateOptions>();
 
   constructor(public bsModalRef: BsModalRef) {
@@ -23,5 +23,4 @@ export class MapDuplicateComponent {
     this.result.next(this.optionsPopup);
     this.onClose();
   }
-
 }

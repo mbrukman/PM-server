@@ -42,7 +42,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   editing: boolean = false;
   plugins: Plugin[];
   process: Process;
-  mapStructureSubscription: Subscription;
   link: Link;
   init: boolean = false;
   scale: number = 1;

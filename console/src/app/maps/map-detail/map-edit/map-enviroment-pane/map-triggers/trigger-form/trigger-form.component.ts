@@ -87,7 +87,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
   }
 
   onSelectTrigger(pluginToUse?: string) {
-    let pluginName = pluginToUse ? pluginToUse : (this.triggerForm.value.plugin.name ? this.triggerForm.value.plugin.name : this.triggerForm.value.plugin);
+    const pluginName = pluginToUse ? pluginToUse : (this.triggerForm.value.plugin.name ? this.triggerForm.value.plugin.name : this.triggerForm.value.plugin);
     if (this.plugin) {
 
       this.removeParamForm();
@@ -100,7 +100,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
   }
 
   onSelectMethod(methodToUse?: string) {
-    let methodName = methodToUse ? methodToUse : (this.triggerForm.value.method.name ? this.triggerForm.value.method.name : this.triggerForm.value.method);
+    const methodName = methodToUse ? methodToUse : (this.triggerForm.value.method.name ? this.triggerForm.value.method.name : this.triggerForm.value.method);
     if (this.method) {
       this.removeParamForm();
     }
@@ -112,7 +112,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
   }
 
   addParamForm(params?: IParam[]) {
-    let paramsControl = <FormArray>this.triggerForm.controls['params'];
+    const paramsControl = <FormArray>this.triggerForm.controls['params'];
     params = params || this.method.params;
     params.forEach(param => {
       paramsControl.push(this.initParamsForm(param.value, param._id, param.viewName, param.name, param.type));
@@ -120,7 +120,7 @@ export class TriggerFormComponent implements AfterContentInit, OnDestroy {
   }
 
   removeParamForm() {
-    let paramsControl = <FormArray>this.triggerForm.controls['params'];
+    const paramsControl = <FormArray>this.triggerForm.controls['params'];
     for (let i = 0, length = this.method.params.length; i < length; i++) {
       paramsControl.removeAt(0);
     }

@@ -8,6 +8,7 @@ import {ActionParam} from './action-param.model';
 
 export class Action extends Serializable implements IAction {
   id?: string;
+  // tslint:disable-next-line:variable-name
   _id?: string;
   name: string;
   timeout?: number;
