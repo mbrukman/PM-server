@@ -16,7 +16,7 @@ export class ManagementTableComponent {
   @Output() edit: EventEmitter<string | object> = new EventEmitter<string | object>();
   @Output() load: EventEmitter<string | object> = new EventEmitter<any>();
 
-  constructor() {}
+  constructor() { }
 
   isArray(item: object) {
     return Array.isArray(item);
@@ -34,11 +34,11 @@ export class ManagementTableComponent {
     this.edit.emit(id);
   }
 
-  showToolTip(e){
+  showToolTip(e) {
     e.srcElement.children[0].style['display'] = 'block';
   }
 
-  hideToolTip(e){
+  hideToolTip(e) {
     e.srcElement.children[0].style['display'] = 'none';
   }
 

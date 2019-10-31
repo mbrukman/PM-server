@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { User } from '../models/user.model';
 import { Subscription, fromEvent } from 'rxjs';
 import { UsersManagementService } from '../users-management.service';
@@ -11,12 +11,14 @@ import { FilterOptions } from '@app/shared/model/filter-options.model';
   templateUrl: './users-list.component.html',
   styleUrls: ['./users-list.component.scss']
 })
-export class UsersListComponent implements OnInit {
+export class UsersListComponent implements OnInit, OnDestroy {
   filterOptions: FilterOptions = new FilterOptions();
   resultCount: number = 0;
   users: User[];
   filterKeyUpSubscribe: Subscription;
   isInit: boolean = true;
+
+  private mainSubscription = new Subscription();
 
   fields = [
     { label: 'Name', value: 'name' },
@@ -28,15 +30,15 @@ export class UsersListComponent implements OnInit {
     private usersManagementService: UsersManagementService,
     private route: ActivatedRoute,
     private popupService: PopupService
-  ) {}
+  ) { }
   @ViewChild('globalFilter') globalFilterElement: ElementRef;
 
   ngOnInit() {
-    this.route.data.subscribe((data: Data) => {
+    const routerSubscription = this.route.data.subscribe((data: Data) => {
       this.users = data['users'].items;
       this.resultCount = data['users'].totalCount;
     });
-    this.filterKeyUpSubscribe = fromEvent(
+    const filterSubscription = this.filterKeyUpSubscribe = fromEvent(
       this.globalFilterElement.nativeElement,
       'keyup'
     )
@@ -45,19 +47,26 @@ export class UsersListComponent implements OnInit {
         this.filterOptions.page = 1;
         this.onDataLoad();
       });
+    this.mainSubscription.add(filterSubscription);
+    this.mainSubscription.add(routerSubscription);
+  }
+
+  ngOnDestroy(): void {
+    this.mainSubscription.unsubscribe();
   }
 
   onDataLoad() {
-    this.usersManagementService.getAllUsers(null, this.filterOptions).subscribe(users => {
+    const getAllUserSubscription = this.usersManagementService.getAllUsers(null, this.filterOptions).subscribe(users => {
       this.users = users.items;
       this.resultCount = users.totalCount;
     });
+    this.mainSubscription.add(getAllUserSubscription);
   }
 
-  upsertUser(user = {}, isEdit = false) {}
+  upsertUser(user = {}, isEdit = false) { }
 
-  editUser(i) {
-    this.upsertUser(this.users[i], true);
+  editUser(index) {
+    this.upsertUser(this.users[index], true);
   }
 
   deleteUser(id) {
