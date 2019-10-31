@@ -1,5 +1,6 @@
-import * as joint from "jointjs"
-export let PMCell = joint.dia.Element.define('examples.Ellipse', {
+import * as joint from 'jointjs';
+
+export const PMCell = joint.dia.Element.define('examples.Ellipse', {
   markup: '<ellipse/>',
   attrs: {
     rect: {

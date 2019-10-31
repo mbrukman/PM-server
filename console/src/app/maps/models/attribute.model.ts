@@ -1,4 +1,4 @@
-import { IAttribute } from "../interfaces/attribute.interface";
+import { IAttribute } from '@maps/interfaces/attribute.interface';
 
 export class Attribute implements IAttribute {
   name: string;

@@ -4,7 +4,8 @@ import { environment } from '@env/environment';
 import * as io from 'socket.io-client';
 import { Subject, Observable } from 'rxjs';
 
-import { MapResult, Pending } from '@maps/models';
+import { Pending } from '@maps/models';
+import {MapResult} from '@app/services/map/models/execution-result.model';
 
 @Injectable()
 export class SocketService {
@@ -25,7 +26,7 @@ export class SocketService {
     let self = this
     this.socket.on('connect', function () {
       self.socketID = this.id;
-    }); 
+    });
     this.socketListener(this.socket);
   }
 

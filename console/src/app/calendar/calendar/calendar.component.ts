@@ -11,8 +11,8 @@ import * as cronParser from 'cron-parser';
 import * as moment from 'moment';
 
 import {CalendarService} from '@app/services/calendar/calendar.service';
+import {Map} from '@app/services/map/models/map.model';
 import {Job} from '@app/services/calendar/models/job.model';
-import {Map} from '@maps/models';
 import {take} from 'rxjs/operators';
 import {PopupService} from '@shared/services/popup.service';
 import {SeoService, PageTitleTypes} from '@app/seo.service';

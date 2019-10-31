@@ -1,17 +1,17 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { FormArray, FormGroup } from '@angular/forms';
-import * as _ from 'lodash';
-import { distinctUntilChanged, filter, debounceTime} from 'rxjs/operators';
-import { Subscription } from 'rxjs';
-import { Process, Action, ProcessViewWrapper } from '@maps/models';
-import { PluginMethod } from '@plugins/models/plugin-method.model';
-import { PluginMethodParam } from '@plugins/models/plugin-method-param.model';
-import { SocketService } from '@shared/socket.service';
-import { MapDesignService } from '@maps/map-detail/map-edit/map-design.service';
-import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
-import { PopupService } from '@shared/services/popup.service';
-import {FLOW_CONTROL_TYPES, COORDINATION_TYPES, ACTIONS_EXECUTIONS_TYPES}  from '@maps/constants'
-import { SelectItem } from 'primeng/primeng';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {FormArray, FormGroup} from '@angular/forms';
+import {distinctUntilChanged, filter, debounceTime} from 'rxjs/operators';
+import {Subscription} from 'rxjs';
+import {Process, Action} from '@maps/models';
+import {PluginMethod} from '@plugins/models/plugin-method.model';
+import {PluginMethodParam} from '@plugins/models/plugin-method-param.model';
+import {SocketService} from '@shared/socket.service';
+import {MapDesignService} from '@maps/map-detail/map-edit/map-design.service';
+import {BsModalRef} from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import {PopupService} from '@shared/services/popup.service';
+import {FLOW_CONTROL_TYPES, COORDINATION_TYPES, ACTIONS_EXECUTIONS_TYPES} from '@maps/constants';
+import {SelectItem} from 'primeng/primeng';
+import {ProcessViewWrapper} from '@maps/models/view-models/process-view-wrapper.model';
 
 @Component({
   selector: 'app-process-form',
@@ -24,66 +24,72 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
   @Output() clone: EventEmitter<any> = new EventEmitter<any>();
-  formValueChangeSubscription: Subscription;
-  processUpdateSubscription: Subscription;
   processForm: FormGroup;
   action: boolean = false;
   index: number;
   methods: object = {};
   bsModalRef: BsModalRef;
   selectedMethod: PluginMethod;
-  FLOW_CONTROL_TYPES  = FLOW_CONTROL_TYPES;
+  FLOW_CONTROL_TYPES = FLOW_CONTROL_TYPES;
   COORDINATION_TYPES = COORDINATION_TYPES;
-  flowControlDropDown :SelectItem[] = [];
+  flowControlDropDown: SelectItem[] = [];
   actionsExecutionsDropDown: SelectItem[] = [];
-  coordinationDropDown :SelectItem[] = []
-  methodsDropDown:SelectItem[];
+  coordinationDropDown: SelectItem[] = [];
+  methodsDropDown: SelectItem[];
+
+  private mainSubscription = new Subscription();
 
   constructor(
     private socketService: SocketService,
     private mapDesignService: MapDesignService,
     private popupService: PopupService
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
-    
-    if(this.processViewWrapper.plugin){
+
+    if (this.processViewWrapper.plugin) {
       this.methodsDropDown = this.processViewWrapper.plugin.methods.map(method => {
-        this.methods[method.name] = method
-        return {label:method.viewName,value:method.name}
-      })
+        this.methods[method.name] = method;
+        return {label: method.viewName, value: method.name};
+      });
     }
     if (!this.processViewWrapper.process) {
       this.closePane();
       return;
     }
-    let flowControlType =  Object.keys(this.FLOW_CONTROL_TYPES)
+    let flowControlType = Object.keys(this.FLOW_CONTROL_TYPES);
     this.flowControlDropDown = flowControlType.map(key => {
-      return {value:this.FLOW_CONTROL_TYPES[key].id,label:this.FLOW_CONTROL_TYPES[key].label}
-    })
+      return {value: this.FLOW_CONTROL_TYPES[key].id, label: this.FLOW_CONTROL_TYPES[key].label};
+    });
 
-    let actionsExecutionsType =  Object.keys(ACTIONS_EXECUTIONS_TYPES);
+    let actionsExecutionsType = Object.keys(ACTIONS_EXECUTIONS_TYPES);
     this.actionsExecutionsDropDown = actionsExecutionsType.map(key => {
-      return {value:ACTIONS_EXECUTIONS_TYPES[key].id,label:ACTIONS_EXECUTIONS_TYPES[key].label}
-    })
+      return {value: ACTIONS_EXECUTIONS_TYPES[key].id, label: ACTIONS_EXECUTIONS_TYPES[key].label};
+    });
 
-    let coordinationType = Object.keys(this.COORDINATION_TYPES)
-    for(let i=0,length=coordinationType.length;i<length;i++){
+    let coordinationType = Object.keys(this.COORDINATION_TYPES);
+    for (let i = 0, length = coordinationType.length; i < length; i++) {
       let indexName = coordinationType[i];
-      if(indexName=='wait'){
-        if(!this.processViewWrapper.isInsideLoop){
-          this.coordinationDropDown.push({label:this.COORDINATION_TYPES[indexName].label,value:this.COORDINATION_TYPES[indexName].id})
+      if (indexName === 'wait') {
+        if (!this.processViewWrapper.isInsideLoop) {
+          this.coordinationDropDown.push({
+            label: this.COORDINATION_TYPES[indexName].label,
+            value: this.COORDINATION_TYPES[indexName].id
+          });
         }
-      }
-      else{
-        this.coordinationDropDown.push({label:this.COORDINATION_TYPES[indexName].label,value:this.COORDINATION_TYPES[indexName].id})
+      } else {
+        this.coordinationDropDown.push({
+          label: this.COORDINATION_TYPES[indexName].label,
+          value: this.COORDINATION_TYPES[indexName].id
+        });
       }
     }
 
 
     this.processForm = Process.getFormGroup(this.processViewWrapper.process);
 
-    this.processUpdateSubscription = this.mapDesignService
+    const processUpdateSubscription = this.mapDesignService
       .getUpdateProcessAsObservable().pipe(
         filter(process => process.uuid === this.processViewWrapper.process.uuid)
       ).subscribe(process => {
@@ -97,47 +103,39 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
       this.processViewWrapper.process.actions.forEach((action, actionIndex) => {
         const actionControl = <FormArray>this.processForm.controls['actions'];
         actionControl.push(this.initActionController(action));
-        
-       if(this.processViewWrapper.plugin){
-        let pluginMethod = this.processViewWrapper.plugin.methods.find(o => o.name === action.method)
-        if (pluginMethod && pluginMethod.params && pluginMethod.params.length > 0) {
-          pluginMethod.params.forEach(pluginParam => {
-            let actionParam = action.params.find(p => p.name == pluginParam.name)
-            actionControl.controls[actionIndex]['controls'].params.push(PluginMethodParam.getFormGroup( pluginParam ,actionParam));
-          });
+
+        if (this.processViewWrapper.plugin) {
+          let pluginMethod = this.processViewWrapper.plugin.methods.find(o => o.name === action.method);
+          if (pluginMethod && pluginMethod.params && pluginMethod.params.length > 0) {
+            pluginMethod.params.forEach(pluginParam => {
+              let actionParam = action.params.find(p => p.name === pluginParam.name);
+              actionControl.controls[actionIndex]['controls'].params.push(PluginMethodParam.getFormGroup(pluginParam, actionParam));
+            });
+          }
         }
-       }
       });
     }
 
     // subscribe to changes in form
-    this.formValueChangeSubscription = this.processForm.valueChanges.pipe(
+    const formValueChangeSubscription = this.processForm.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-      filter(formvalue => this.processForm.valid)
-    ).subscribe(formValue => {
-        this.saved.emit(this.processForm.value);
-      });
+      filter(() => this.processForm.valid)
+    ).subscribe(() => {
+      this.saved.emit(this.processForm.value);
+    });
+
+    this.mainSubscription.add(processUpdateSubscription);
+    this.mainSubscription.add(formValueChangeSubscription);
   }
 
-  
-  ngOnDestroy(): void {
-    if (this.processUpdateSubscription) {
-      this.processUpdateSubscription.unsubscribe();
-    }
-    if (this.formValueChangeSubscription) {
-      this.formValueChangeSubscription.unsubscribe();
-    }
-  }
-
-  runAction(action){
-    if(this.processViewWrapper.plugin){
+  runAction(action) {
+    if (this.processViewWrapper.plugin) {
       return action();
-    }
-    else{
-      let message = `This process uses the plugin ${this.processViewWrapper.process.used_plugin.name} which have been removed.\nPlease reinstall the plugin to enable editing.`
-      this.popupService.openConfirm('Plugin missing',message,'Confirm',null,null)
-      
+    } else {
+      let message = `This process uses the plugin ${this.processViewWrapper.process.used_plugin.name} which have been removed.\nPlease reinstall the plugin to enable editing.`;
+      this.popupService.openConfirm('Plugin missing', message, 'Confirm', null, null);
+
     }
   }
 
@@ -145,11 +143,11 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * Add a new action to process
    */
   addNewAction() {
-    this.runAction(()=>{
+    this.runAction(() => {
       const actionControl = <FormArray>this.processForm.controls['actions'];
       actionControl.push(this.initActionController());
-      this.editAction(actionControl.length - 1,true); // switch to edit the new action
-    })
+      this.editAction(actionControl.length - 1, true); // switch to edit the new action
+    });
   }
 
   backToProcessView() {
@@ -170,14 +168,14 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * Setting editing as action
    * @param {number} index
    */
-  editAction(index: number,addAction = false) {
-      this.runAction(()=>{
-        this.action = true;
-        this.index = index;
-        if(!addAction){
-          this.onSelectMethod(false)
-        }
-      })
+  editAction(index: number, addAction = false) {
+    this.runAction(() => {
+      this.action = true;
+      this.index = index;
+      if (!addAction) {
+        this.onSelectMethod(false);
+      }
+    });
   }
 
   /**
@@ -185,7 +183,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * @param action
    * @returns {FormGroup}
    */
-   initActionController(action?: Action): FormGroup {
+  initActionController(action?: Action): FormGroup {
     return Action.getFormGroup(action);
   }
 
@@ -193,11 +191,11 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
    * Called from the template once user changes a method
    */
   onSelectMethod(clearParams = true) {
-  
+
     const methodName = this.processForm.value.actions[this.index].method;
     const action = this.processForm.controls['actions']['controls'][this.index];
     this.selectedMethod = this.processViewWrapper.plugin.methods.find(o => o.name === methodName);
-    if(!clearParams){
+    if (!clearParams) {
       return;
     }
     this.clearFormArray(action.controls.params);
@@ -210,10 +208,8 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     }
     this.selectedMethod.params.forEach(param => {
       action.controls.params.push(PluginMethodParam.getFormGroup(param));
-    })
+    });
   }
-
-
   /**
    * Emitting close event
    */
@@ -228,7 +224,7 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     this.delete.emit();
   }
 
-  cloneProcess(){
+  cloneProcess() {
     this.clone.emit();
   }
 
@@ -246,5 +242,9 @@ export class ProcessFormComponent implements OnInit, OnDestroy {
     while (formArray.length !== 0) {
       formArray.removeAt(0);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.mainSubscription.unsubscribe();
   }
 }

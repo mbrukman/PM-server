@@ -1,23 +1,23 @@
-import { AfterContentInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {AfterContentInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 
 import * as $ from 'jquery';
 import * as joint from 'jointjs';
 import * as _ from 'lodash';
-import { Subscription } from 'rxjs';
+import {Subscription} from 'rxjs';
 
-import { MapDesignService } from '../map-design.service';
-import { Link, MapStructure, Process, ProcessViewWrapper } from '@maps/models';
-import { MapsService } from '@maps/maps.service';
-import { PluginsService } from '@plugins/plugins.service';
-import { Plugin } from '@plugins/models/plugin.model';
-import { COORDINATION_TYPES, JOINT_OPTIONS } from '@maps/constants'
-import { filter, tap } from 'rxjs/operators';
-
+import {MapDesignService} from '../map-design.service';
+import {Link, MapStructure, Process} from '@maps/models';
+import {MapsService} from '@app/services/map/maps.service';
+import {PluginsService} from '@plugins/plugins.service';
+import {Plugin} from '@plugins/models/plugin.model';
+import {COORDINATION_TYPES, JOINT_OPTIONS} from '@maps/constants';
+import {filter, tap} from 'rxjs/operators';
+import {ProcessViewWrapper} from '@maps/models/view-models/process-view-wrapper.model';
 
 
 export const linkAttrs = {
-  router: { name: 'manhattan' },
-  connector: { name: 'rounded' },
+  router: {name: 'manhattan'},
+  connector: {name: 'rounded'},
   attrs: {
     '.connection': {
       stroke: JOINT_OPTIONS.LINK_COLOR,
@@ -39,48 +39,47 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   graph: joint.dia.Graph;
   paper: joint.dia.Paper;
   mapStructure: MapStructure;
-  dropSubscription: Subscription;
   editing: boolean = false;
   plugins: Plugin[];
   process: Process;
-  mapStructureSubscription: Subscription;
   link: Link;
   init: boolean = false;
   scale: number = 1;
-  cellView:any;
+  cellView: any;
   processViewWrapper: ProcessViewWrapper;
   scaleX = 430;
   scaleY = 240;
   @ViewChild('wrapper') wrapper: ElementRef;
 
+  private mainSubscription = new Subscription();
+
   constructor(
     private mapsService: MapsService,
     private pluginsService: PluginsService,
-    private mapDesignService: MapDesignService) { }
+    private mapDesignService: MapDesignService) {
+  }
 
   ngOnInit() {
     this.defineShape();
-    this.pluginsService.list().subscribe(plugins => {
+    const listPluginSubscription = this.pluginsService.list().subscribe(plugins => {
       this.plugins = plugins;
       this.initMapDraw();
       this.getCurrentMapStructure();
     });
 
     this.wrapper.nativeElement.maxHeight = this.wrapper.nativeElement.offsetHeight;
-    this.dropSubscription = this.mapDesignService
-      .getDrop().pipe(
+    const dropSubscription = this.mapDesignService
+      .getDrop()
+      .pipe(
         filter(obj => this.isDroppedOnMap(obj.x, obj.y))
       ).subscribe(obj => {
         this.cellView = obj.cell;
-        this.addNewProcess(obj,new Process());
+        this.addNewProcess(obj, new Process());
       });
 
-  }
+    this.mainSubscription.add(listPluginSubscription);
+    this.mainSubscription.add(dropSubscription);
 
-  ngOnDestroy() {
-    this.dropSubscription.unsubscribe();	
-    this.mapStructureSubscription.unsubscribe();
-    this.deselectAllCellsAndUpdateStructure();
   }
 
   ngAfterContentInit() {
@@ -91,12 +90,12 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       height: this.wrapper.nativeElement.offsetHeight - 80,
       gridSize: this.scale,
       model: this.graph,
-      snapLinks: { radius: 75 },
+      snapLinks: {radius: 75},
       linkPinning: true,
       embeddingMode: false,
       defaultLink: new joint.dia.Link(linkAttrs),
       markAvailable: true,
-      validateConnection: function (cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
+      validateConnection: function (cellViewS, magnetS, cellViewT, magnetT) {
         // Prevent linking from input ports.
         if (magnetS && magnetS.getAttribute('port-group') === 'in') {
           return false;
@@ -112,7 +111,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       interactive: (cellView: any): any => {
         if (cellView.model instanceof joint.dia.Link) {
           // Disable the default vertex add functionality on pointerdown.
-          return { vertexAdd: false };
+          return {vertexAdd: false};
         }
         return true;
       }
@@ -120,32 +119,42 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.listeners();
   }
 
- getCurrentMapStructure(){
-  this.mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(
-    tap(structure => this.mapStructure = structure),
-    filter(structure => !!structure)
-  ).subscribe(structure => {
-    this.initMapDraw();
-    for(let i=0,length=structure.processes.length;i<length;i++){
-      let imageProcess = this.graph.getCell(structure.processes[i].uuid)
-      if (!imageProcess) continue;
-      for(let j =0,pluginsLength = this.plugins.length;j<pluginsLength;j++){
-        if((imageProcess.attributes.attrs['.p_id'].text == '' || imageProcess.attributes.attrs['.p_id'].text != this.plugins[j].id) && this.plugins[j].name == structure.processes[i].used_plugin.name){
-          this.updateNodePid(structure.processes[i].uuid,this.plugins[j].id);
-          break;
+  getCurrentMapStructure() {
+    const mapStructureSubscription = this.mapsService.getCurrentMapStructure().pipe(
+      tap(structure => this.mapStructure = structure),
+      filter(structure => !!structure)
+    ).subscribe(structure => {
+      this.initMapDraw();
+      for (let i = 0, length = structure.processes.length; i < length; i++) {
+        let imageProcess = this.graph.getCell(structure.processes[i].uuid);
+        if (!imageProcess) {
+          continue;
+        }
+        for (let j = 0, pluginsLength = this.plugins.length; j < pluginsLength; j++) {
+          if (
+            (
+              (imageProcess.attributes.attrs['.p_id'].text === '') ||
+              (imageProcess.attributes.attrs['.p_id'].text !== this.plugins[j].id)
+            ) &&
+            (this.plugins[j].name === structure.processes[i].used_plugin.name)
+          ) {
+            this.updateNodePid(structure.processes[i].uuid, this.plugins[j].id);
+            break;
+          }
         }
       }
-    }
-    this.onMapContentUpdate()
-  });
- }
+      this.onMapContentUpdate();
+    });
+
+    this.mainSubscription.add(mapStructureSubscription);
+  }
 
   initMapDraw() {
     if (!this.init && this.plugins && this.mapStructure) {
       this.drawGraph();
       this.init = true;
       this.graph.getElements().forEach(cell => {
-        this.setCellSelectState(cell,false);
+        this.setCellSelectState(cell, false);
       });
 
       if ((<any>(this.mapStructure)).imported) {
@@ -184,11 +193,11 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     if (!this.link) {
       return;
     }
-    const link = _.find(this.mapStructure.links, (o) => {
+    const foundLink = _.find(this.mapStructure.links, (o) => {
       return (o.targetId === this.link.targetId && o.sourceId === this.link.sourceId);
     });
-    if (link) {
-      link.uuid = cell.model.id;
+    if (foundLink) {
+      foundLink.uuid = cell.model.id;
       return;
     }
 
@@ -200,8 +209,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       const processIndex = this.mapStructure.processes.findIndex(process => process.uuid === this.link.targetId);
       if (this.isLoopInProcessByAncestors(ancestors)) {
         this.mapStructure.processes[processIndex].coordination = COORDINATION_TYPES.race.id;
-      }
-      else if (!this.mapStructure.processes[processIndex].coordination) {
+      } else if (!this.mapStructure.processes[processIndex].coordination) {
         this.mapStructure.processes[processIndex].coordination = COORDINATION_TYPES.wait.id;
       }
       this.mapDesignService.updateProcess(this.mapStructure.processes[processIndex]);
@@ -210,12 +218,20 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   isLoopInProcessByAncestors(ancestors) {
-    return ancestors.find(link => link.sourceId == link.targetId) ? true : false;
+    return ancestors.find(link => link.sourceId === link.targetId);
   }
 
   defineShape() {
     joint.shapes.devs['MyImageModel'] = joint.shapes.devs.Model.extend({
-      markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><image/><image class="warning"/><text class="label"/><g class="p_id"/><g class="inPorts"/><g class="outPorts"/></g>',
+      markup: `<g class="rotatable">
+<g class="scalable">
+<rect class="body"/>
+</g>
+<image/><image class="warning"/>
+<text class="label"/>
+<g class="p_id"/>
+<g class="inPorts"/>
+<g class="outPorts"/></g>`,
       defaults: joint.util.deepSupplement({
         type: 'devs.MyImageModel',
         size: {
@@ -230,7 +246,6 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
             rx: 3,
             ry: 3,
             fill: JOINT_OPTIONS.RECT_FILL_COLOR
-            // 'fill-opacity': .5
           },
           circle: {
             stroke: 'gray'
@@ -241,7 +256,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
             'font-size': 14,
             fill: JOINT_OPTIONS.LABEL_FILL_COLOR
           },
-          '.p_id': { text:''},
+          '.p_id': {text: ''},
           image: {
             'xlink:href': 'http://via.placeholder.com/350x150',
             width: 46,
@@ -269,27 +284,26 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     });
   }
 
-  addNewProcess(obj: { x: number, y: number, cell: any },process : Process) {
+  addNewProcess(obj: { x: number, y: number, cell: any }, process: Process) {
     const pluginDisplayName = obj.cell.model.attributes.attrs['.label'].text;
     const pluginId = obj.cell.model.attributes.attrs['.p_id'].text;
     const plugin = this.plugins.find((o) => {
       return o._id === pluginId;
     });
 
-    //TODO: ask David why
-    if(process._id){
+    if (process._id) {
       delete process._id;
     }
     let imageModel = this.getPluginCube({
       x: obj.x - (this.scaleX * this.scale) - this.paper.translate().tx,
       y: obj.y - (this.scaleY * this.scale) - this.paper.translate().ty
-    }, pluginDisplayName, plugin.fullImageUrl,pluginId);
+    }, pluginDisplayName, plugin.fullImageUrl, pluginId);
 
     this.graph.addCell(imageModel);
 
-    process.used_plugin = { name: plugin.name, version: plugin.version };
+    process.used_plugin = {name: plugin.name, version: plugin.version};
     process.uuid = <string>imageModel.id;
-    
+
     if (!this.mapStructure.processes) {
       this.mapStructure.processes = [process];
     } else {
@@ -301,21 +315,22 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   drawGraph() {
     if (this.mapStructure.content) {
-      var cells = JSON.parse(this.mapStructure.content).cells
+      const cells = JSON.parse(this.mapStructure.content).cells;
       for (let i = 0, cellsLength = cells.length; i < cellsLength; i++) {
-        if (cells[i].type != 'devs.MyImageModel')
+        if (cells[i].type !== 'devs.MyImageModel') {
           continue;
+        }
 
         for (let j = 0, procLength = this.mapStructure.processes.length; j < procLength; j++) {
-          if (cells[i].id == this.mapStructure.processes[j].uuid) {
-            this.processViewWrapper = new ProcessViewWrapper(this.mapStructure.processes[j], this.mapStructure, this.plugins)
+          if (cells[i].id === this.mapStructure.processes[j].uuid) {
+            this.processViewWrapper = new ProcessViewWrapper(this.mapStructure.processes[j], this.mapStructure, this.plugins);
             this.setProcessWarning(cells[i].attrs);
             break;
           }
         }
       }
 
-      var content = JSON.parse(this.mapStructure.content);
+      const content = JSON.parse(this.mapStructure.content);
       content.cells = cells;
       this.graph.fromJSON(content);
 
@@ -334,9 +349,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           let imageModel = this.getPluginCube({
             x: ((i + 1) * 160),
             y: 200
-          }, process.name || process.used_plugin.name, plugin.fullImageUrl,plugin.id, process.uuid);
+          }, process.name || process.used_plugin.name, plugin.fullImageUrl, plugin.id, process.uuid);
 
-          this.processViewWrapper = new ProcessViewWrapper(this.process, this.mapStructure, this.plugins)
+          this.processViewWrapper = new ProcessViewWrapper(this.process, this.mapStructure, this.plugins);
           this.setProcessWarning(imageModel);
           this.graph.addCell(imageModel);
         });
@@ -369,18 +384,18 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   center() {
     let bbox = this.graph.getBBox(this.graph.getElements());
-    let y = 10 + Math.abs(bbox.y)
-    let x = 10 + Math.abs(bbox.x)
-    this.paper.translate(x, y)
+    let y = 10 + Math.abs(bbox.y);
+    let x = 10 + Math.abs(bbox.x);
+    this.paper.translate(x, y);
   }
 
   editProcess(process) {
-    this.graph.getElements().forEach(c => this.setCellSelectState(c,false));
+    this.graph.getElements().forEach(c => this.setCellSelectState(c, false));
     const cell = this.graph.getCell(process.uuid);
     this.setCellSelectState(cell);
     this.paper.setDimensions(this.wrapper.nativeElement.offsetWidth - 250, this.wrapper.nativeElement.offsetHeight);
     this.process = process;
-    this.processViewWrapper = new ProcessViewWrapper(this.process, this.mapStructure, this.plugins)
+    this.processViewWrapper = new ProcessViewWrapper(this.process, this.mapStructure, this.plugins);
 
     if (this.editing) {
       this.editing = false;
@@ -395,9 +410,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   listeners() {
     let self = this;
     let move = false;
-    let initialPosition = { x: 0, y: 0 };
+    let initialPosition = {x: 0, y: 0};
     this.paper.on('blank:pointerdown', (event, x, y) => {
-      initialPosition = { x: x * this.scale, y: y * this.scale };
+      initialPosition = {x: x * this.scale, y: y * this.scale};
       move = true;
     });
 
@@ -427,8 +442,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           this.addNewLink(cellView);
         }
       } else {
-        if(cellView.model.attributes.type == "devs.PMStartPoint"){
-          return
+        if (cellView.model.attributes.type === 'devs.PMStartPoint') {
+          return;
         }
         this.cellView = cellView;
         const id = cellView.model.id;
@@ -445,10 +460,10 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.graph.on('change:source change:target', function (link) {
       let sourceId = link.get('source').id;
       let targetId = link.get('target').id;
-      let id = link.get('id')
+      let id = link.get('id');
 
       if (sourceId && targetId) {
-        self.link = { uuid: id, sourceId: sourceId, targetId: targetId };
+        self.link = {uuid: id, sourceId: sourceId, targetId: targetId};
         for (let j = 0, linklenght = self.mapStructure.links.length; j < linklenght; j++) {
           if (self.mapStructure.links[j].uuid === id) {
             self.mapStructure.links[j] = self.link;
@@ -489,7 +504,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   onClose(event?) {
-    this.setCellSelectState(this.graph.getCell(this.process.uuid),false);
+    this.setCellSelectState(this.graph.getCell(this.process.uuid), false);
 
     this.editing = false;
     this.process = null;
@@ -507,23 +522,23 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.deselectAllCellsAndUpdateStructure();
   }
 
-  onClone(){
+  onClone() {
     let cell = _.cloneDeep(this.cellView);
-    let processName =  cell.model.attributes.attrs['.label'].text;
-    cell.model.attributes.attrs['.label'].text=processName+ ' (copy)';
+    let processName = cell.model.attributes.attrs['.label'].text;
+    cell.model.attributes.attrs['.label'].text = processName + ' (copy)';
     let p = _.cloneDeep(this.process);
     p.name = cell.model.attributes.attrs['.label'].text;
-    this.addNewProcess(this.getClonePosition(cell),p)
-  } 
+    this.addNewProcess(this.getClonePosition(cell), p);
+  }
 
-  getClonePosition(cellView){
+  getClonePosition(cellView) {
 
-    let cell =  this.graph.getCell(this.process.uuid)
+    let cell = this.graph.getCell(this.process.uuid);
     return {
-      x:cell.attributes.position.x + (this.scaleX * this.scale) + this.paper.translate().tx + 90,// 90 and 63 represents the distance between the clone and the original process in x and y absciss respectively.
-      y:cell.attributes.position.y + (this.scaleY * this.scale) + this.paper.translate().ty + 63,
-      cell:cellView
-    }
+      x: cell.attributes.position.x + (this.scaleX * this.scale) + this.paper.translate().tx + 90, // 90 and 63 represents the distance between the clone and the original process in x and y absciss respectively.
+      y: cell.attributes.position.y + (this.scaleY * this.scale) + this.paper.translate().ty + 63,
+      cell: cellView
+    };
   }
 
   onSave(process) {
@@ -531,9 +546,9 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       return o.uuid === this.process.uuid;
     });
     this.updateNodeLabel(process.uuid, process.name || this.process.used_plugin.name);
-    let updateFields = ['numProcessParallel', 'name', 'description', 'mandatory', 'condition', 'coordination', 'actions', 'correlateAgents', 'flowControl', 'filterAgents', 'postRun', 'preRun', 'actionsExecution']
-    for (let i=0, length=updateFields.length;i<length;i++){
-      this.mapStructure.processes[index][updateFields[i]] =  process[updateFields[i]];
+    let updateFields = ['numProcessParallel', 'name', 'description', 'mandatory', 'condition', 'coordination', 'actions', 'correlateAgents', 'flowControl', 'filterAgents', 'postRun', 'preRun', 'actionsExecution'];
+    for (let i = 0, length = updateFields.length; i < length; i++) {
+      this.mapStructure.processes[index][updateFields[i]] = process[updateFields[i]];
     }
     this.mapsService.setCurrentMapStructure(this.mapStructure);
   }
@@ -545,18 +560,18 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
    */
   updateNodeLabel(uuid: string, label: string): void {
     let cell = this.graph.getCell(uuid);
-    cell.attr('.label/text',label);
+    cell.attr('.label/text', label);
     cell.attr('text/text', label);
-    if(this.cellView.model.cid != cell.cid){
-      console.error("cellView is not the cell to update!");
+    if (this.cellView.model.cid !== cell.cid) {
+      console.error('cellView is not the cell to update!');
       return;
     }
-    this.onMapContentUpdate()
+    this.onMapContentUpdate();
   }
 
-  updateNodePid(uuid:string,id:string){
+  updateNodePid(uuid: string, id: string) {
     let cell = this.graph.getCell(uuid);
-    cell.attr('.p_id/text',id);
+    cell.attr('.p_id/text', id);
   }
 
   onScale(scale) {
@@ -564,12 +579,12 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
     this.paper.scale(this.scale, this.scale);
   }
 
-  setCellSelectState(cell, mode:boolean = true) {
+  setCellSelectState(cell, mode: boolean = true) {
     cell.attr('rect/fill', mode ? '#000' : '#2d3236');
   }
 
   setProcessWarning(model) {
-    model['.warning'] = !this.processViewWrapper.plugin ?{
+    model['.warning'] = !this.processViewWrapper.plugin ? {
       'xlink:href': 'assets/images/warning.png',
       width: 19,
       height: 19,
@@ -578,12 +593,11 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
       ref: 'rect',
       'x-alignment': 'right',
       'y-alignment': 'top'
-    } : {}
+    } : {};
   }
 
 
-  
-  private getPluginCube(position: { x: number, y: number }, text: string, imageUrl: string, pluginId,id?) {
+  private getPluginCube(position: { x: number, y: number }, text: string, imageUrl: string, pluginId, id?) {
     if (text.length > 15) {
       text = `${text.substr(0, 12)}...`;
     }
@@ -603,8 +617,8 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           'font-size': 14,
           fill: JOINT_OPTIONS.LABEL_FILL_COLOR
         },
-        '.p_id':{
-          text:pluginId
+        '.p_id': {
+          text: pluginId
         },
         rect: {
           'stroke-width': 1,
@@ -633,7 +647,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
           fill: JOINT_OPTIONS.OUTPORT_FILL_COLOR
         }
       }
-    }
+    };
 
 
     return new joint.shapes.devs['MyImageModel'](options);
@@ -641,11 +655,14 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   private onMapContentUpdate() {
     let graphContent = JSON.stringify(this.graph.toJSON());
-    if ((graphContent != this.mapStructure.content) && (this.mapStructure)) {
+    if ((graphContent !== this.mapStructure.content) && (this.mapStructure)) {
       this.mapStructure.content = graphContent;
       this.mapsService.setCurrentMapStructure(this.mapStructure);
     }
   }
 
-
+  ngOnDestroy(): void {
+    this.mainSubscription.unsubscribe();
+    this.deselectAllCellsAndUpdateStructure();
+  }
 }

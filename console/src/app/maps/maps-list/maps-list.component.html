@@ -44,9 +44,9 @@
             <a [routerLink]="['../projects', map.project.id]">{{ map.project.name }}</a>
           </ng-template>
         </p-column>
-        <p-column field="latestExectionResult.finishTime" header="Last Run" [sortable]="true">
+        <p-column field="latestExecutionResult.finishTime" header="Last Run" [sortable]="true">
           <ng-template let-col let-map="rowData" pTemplate="body">
-            <span>{{ (map.latestExectionResult?.finishTime | date: 'dd/MM/yyyy HH:mm') || '' }}</span>
+            <span>{{ (map.latestExecutionResult?.finishTime | date: 'dd/MM/yyyy HH:mm') || '' }}</span>
           </ng-template>
         </p-column>
         <p-column field="description" header="Description" [sortable]="true">

@@ -1,4 +1,4 @@
-import { Map } from './map.model';
+import { Map } from '@app/services/map/models/map.model';
 import { ITriggerActionParam } from '../interfaces/map-trigger.interface';
 import { IParam } from '@shared/interfaces/param.interface';
 import { PluginMethod, PluginMethodParam } from '@plugins/models';
@@ -13,6 +13,7 @@ export class TriggerActionParam implements ITriggerActionParam, IParam {
 
 export class MapTrigger {
   id?: string;
+  // tslint:disable-next-line:variable-name
   _id?: string;
   map: string | Map;
   name: string;
@@ -22,6 +23,6 @@ export class MapTrigger {
   active?: boolean;
   plugin: string | Plugin;
   method: string | PluginMethod;
-  params: [TriggerActionParam]
+  params: [TriggerActionParam];
 }
 

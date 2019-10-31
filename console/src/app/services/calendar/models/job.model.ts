@@ -1,5 +1,5 @@
 import { Project } from '@projects/models/project.model';
-import { Map } from '@maps/models';
+import {Map} from '@app/services/map/models/map.model';
 
 export class Job {
   project: string | Project;

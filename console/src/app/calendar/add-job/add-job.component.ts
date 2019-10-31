@@ -4,7 +4,7 @@ import {ProjectsService} from '@projects/projects.service';
 import {Project} from '@projects/models/project.model';
 import {CalendarService} from '@app/services/calendar/calendar.service';
 import {CronJobsConfig} from 'ngx-cron-jobs/src/app/lib/contracts/contracts';
-import {MapsService} from '@maps/maps.service';
+import {MapsService} from '@app/services/map/maps.service';
 import {FilterOptions} from '@shared/model/filter-options.model';
 import {filter} from 'rxjs/operators';
 import {SelectItem} from 'primeng/primeng';

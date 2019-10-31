@@ -42,7 +42,6 @@ export class ProcessViewComponent implements OnInit, OnChanges {
 
   showAction(index: number) {
     this.action = this.process.actions[index];
-    console.log(this.action);
   }
 
   closePane() {
@@ -52,6 +51,4 @@ export class ProcessViewComponent implements OnInit, OnChanges {
       this.close.emit();
     }
   }
-
-
 }

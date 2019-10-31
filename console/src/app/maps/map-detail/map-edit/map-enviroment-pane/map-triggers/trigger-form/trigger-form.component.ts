@@ -1,45 +1,46 @@
-import { AfterContentInit, Component } from '@angular/core';
+import {AfterContentInit, Component, OnDestroy} from '@angular/core';
 
-import { Subject } from 'rxjs';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import {Subject, Subscription} from 'rxjs';
+import {FormArray, FormControl, FormGroup, Validators} from '@angular/forms';
 
-import { BsModalRef } from 'ngx-bootstrap';
+import {BsModalRef} from 'ngx-bootstrap';
 import * as _ from 'lodash';
 
-import { PluginsService } from '@plugins/plugins.service';
-import { Plugin, PluginMethod, PluginMethodParam } from '@plugins/models';
-import { MapTrigger } from '@maps/models';
-import { IParam } from '@shared/interfaces/param.interface';
+import {PluginsService} from '@plugins/plugins.service';
+import {Plugin, PluginMethod, PluginMethodParam} from '@plugins/models';
+import {MapTrigger} from '@maps/models';
+import {IParam} from '@shared/interfaces/param.interface';
 
 @Component({
   selector: 'app-trigger-form',
   templateUrl: './trigger-form.component.html',
   styleUrls: ['./trigger-form.component.scss']
 })
-export class TriggerFormComponent implements AfterContentInit {
+export class TriggerFormComponent implements AfterContentInit, OnDestroy {
   params: PluginMethodParam[];
   public result: Subject<any> = new Subject();
-  configurations: string[]; 
-  configDropDown:any;
+  configurations: string[];
+  configDropDown: any;
   triggerForm: FormGroup;
   triggers: Plugin[];
   trigger: MapTrigger;
   method: PluginMethod;
   plugin: Plugin;
 
+  private mainSubscription = new Subscription();
 
   constructor(public bsModalRef: BsModalRef, private pluginsService: PluginsService) {
   }
 
   ngAfterContentInit() {
-    this.pluginsService.list().subscribe(plugins => {
+    const listPluginSubscription = this.pluginsService.list().subscribe(plugins => {
       this.triggers = plugins.filter(plugin => {
         return plugin.type === 'trigger' || plugin.type === 'server' || plugin.type === 'module';
       });
       this.configDropDown = this.configurations.map(config => {
-        return {name:config}
-      })
-      
+        return {name: config};
+      });
+
       if (this.trigger) {
         this.onSelectTrigger(<string>this.trigger.plugin);
         this.onSelectMethod(<string>this.trigger.method);
@@ -49,6 +50,8 @@ export class TriggerFormComponent implements AfterContentInit {
         this.initTriggerForm();
       }
     });
+
+    this.mainSubscription.add(listPluginSubscription);
   }
 
   initTriggerForm() {
@@ -57,7 +60,7 @@ export class TriggerFormComponent implements AfterContentInit {
       description: new FormControl(),
       plugin: new FormControl(this.plugin ? this.plugin : null, Validators.required),
       configuration: new FormControl(this.trigger ? this.trigger.method : null),
-      method: new FormControl( this.method ? this.method : null, Validators.required),
+      method: new FormControl(this.method ? this.method : null, Validators.required),
       params: new FormArray([])
     });
   }
@@ -83,45 +86,47 @@ export class TriggerFormComponent implements AfterContentInit {
     this.onClose();
   }
 
-  onSelectTrigger(pluginToUse? : string) {
-    let pluginName = pluginToUse ? pluginToUse : (this.triggerForm.value.plugin.name ?  this.triggerForm.value.plugin.name :  this.triggerForm.value.plugin);
-    if(this.plugin){
-  
-      this.removeParamForm()
+  onSelectTrigger(pluginToUse?: string) {
+    const pluginName = pluginToUse ? pluginToUse : (this.triggerForm.value.plugin.name ? this.triggerForm.value.plugin.name : this.triggerForm.value.plugin);
+    if (this.plugin) {
+
+      this.removeParamForm();
       this.plugin = _.find(this.triggers, (o) => o.name === pluginName);
-      this.method = this.plugin.methods[0] // if there is a plugin, by default the method will be the first element
-      this.addParamForm()
-    }
-    else{
+      this.method = this.plugin.methods[0]; // if there is a plugin, by default the method will be the first element
+      this.addParamForm();
+    } else {
       this.plugin = _.find(this.triggers, (o) => o.name === pluginName);
     }
   }
 
-  onSelectMethod(methodToUse? :string) {
-    let methodName = methodToUse ? methodToUse : (this.triggerForm.value.method.name ? this.triggerForm.value.method.name:this.triggerForm.value.method);
-    if(this.method){
-      this.removeParamForm()
+  onSelectMethod(methodToUse?: string) {
+    const methodName = methodToUse ? methodToUse : (this.triggerForm.value.method.name ? this.triggerForm.value.method.name : this.triggerForm.value.method);
+    if (this.method) {
+      this.removeParamForm();
     }
     this.method = _.find(this.plugin.methods, (o) => o.name === methodName);
     this.params = this.method.params;
-    if(this.triggerForm){
+    if (this.triggerForm) {
       this.addParamForm();
     }
   }
 
-  addParamForm(params? : IParam[]){
-    let paramsControl = <FormArray>this.triggerForm.controls['params'];
+  addParamForm(params?: IParam[]) {
+    const paramsControl = <FormArray>this.triggerForm.controls['params'];
     params = params || this.method.params;
     params.forEach(param => {
-      paramsControl.push(this.initParamsForm(param.value, param._id, param.viewName, param.name,param.type));
+      paramsControl.push(this.initParamsForm(param.value, param._id, param.viewName, param.name, param.type));
     });
   }
 
-  removeParamForm(){
-    let paramsControl = <FormArray>this.triggerForm.controls['params'];
-      for(let i =0,length = this.method.params.length;i<length;i++){
-        paramsControl.removeAt(0)
-      }
+  removeParamForm() {
+    const paramsControl = <FormArray>this.triggerForm.controls['params'];
+    for (let i = 0, length = this.method.params.length; i < length; i++) {
+      paramsControl.removeAt(0);
+    }
   }
 
+  ngOnDestroy(): void {
+    this.mainSubscription.unsubscribe();
+  }
 }

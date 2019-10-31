@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 
-import { Subscription } from "rxjs";
+import {Subscription} from 'rxjs';
 
-import { MapsService } from "../../../maps.service";
-import { MapStructure } from "../../../models/map-structure.model";
+import {MapsService} from '@app/services/map/maps.service';
+import {MapStructure} from '@maps/models';
 
 @Component({
   selector: 'app-map-code',
@@ -22,26 +22,24 @@ export class MapCodeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    
-    this.mapSubscription = this.mapsService.getCurrentMapStructure().subscribe(structure => {
-      if (structure) {
-        this.structure = structure;
-      }
-    });
+    this.mapSubscription = this.mapsService.getCurrentMapStructure()
+      .subscribe(structure => {
+        if (structure) {
+          this.structure = structure;
+        }
+      });
   }
- 
-  ngOnDestroy() {
-    this.mapSubscription .unsubscribe()
-  }
-  onKeyDown($event) {
 
+  onKeyDown($event) {
     let charCode = String.fromCharCode($event.which).toLowerCase();
     if ($event.ctrlKey && charCode === 's') {
-        return;
-    } 
-
+      return;
+    }
     this.structure.code = this.structure.code || undefined;
     this.mapsService.setCurrentMapStructure(this.structure);
   }
 
+  ngOnDestroy(): void {
+    this.mapSubscription.unsubscribe();
+  }
 }
