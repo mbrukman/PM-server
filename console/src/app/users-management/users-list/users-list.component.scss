@@ -1,0 +1,7 @@
+@import "~src/assets/sass/mixins";
+@import "~src/assets/sass/variables";
+.main-users-list {
+  .list-management {
+    @include users-page();
+  }
+}

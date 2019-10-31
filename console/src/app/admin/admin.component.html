@@ -2,25 +2,56 @@
   <div class="side-nav">
     <ul class="nav flex-column">
       <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" routerLink="plugins"
-           tooltip="Plugins"
-           placement="right"><i class="icon-plugins" aria-hidden="true"></i></a>
+        <a
+          class="nav-link"
+          routerLink="plugins"
+          tooltip="Plugins"
+          placement="right"
+          ><i class="icon-plugins" aria-hidden="true"></i
+        ></a>
       </li>
-      <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        <a class="nav-link" routerLink="agents"
-           tooltip="Agents"
-           placement="right"><i class="icon-agent" aria-hidden="true"></i></a>
+      <li
+        class="nav-item"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <a
+          class="nav-link"
+          routerLink="agents"
+          tooltip="Agents"
+          placement="right"
+          ><i class="icon-agent" aria-hidden="true"></i
+        ></a>
       </li>
-      <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        <a class="nav-link" routerLink="calendar"
-           tooltip="Calendar"
-           placement="right"><i class="material-icons">date_range</i>
+      <li
+        class="nav-item"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <a
+          class="nav-link"
+          routerLink="calendar"
+          tooltip="Calendar"
+          placement="right"
+          ><i class="material-icons">date_range</i>
         </a>
       </li>
-      <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        <a class="nav-link" routerLink="vault"
-           tooltip="Vault"
-           placement="right"><i class="material-icons">lock</i>
+      <li
+        class="nav-item"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <a class="nav-link" routerLink="vault" tooltip="Vault" placement="right"
+          ><i class="material-icons">lock</i>
+        </a>
+      </li>
+      <li class="nav-item" routerLinkActive="active">
+        <a
+          class="nav-link"
+          routerLink="users-management"
+          tooltip="IAM"
+          placement="right"
+          ><i class="material-icons">perm_identity_outlined</i>
         </a>
       </li>
     </ul>
@@ -29,4 +60,3 @@
     <router-outlet></router-outlet>
   </div>
 </div>
-

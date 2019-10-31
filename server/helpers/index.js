@@ -1,4 +1,4 @@
-require('./setup-env');
+require("./setup-env");
 
 const path = require("path");
 const http = require("http");
@@ -9,90 +9,94 @@ const expressWinston = require("express-winston");
 const parseArgs = require("minimist")(process.argv.slice(2));
 
 const socketService = require("../api/services/socket.service");
-const bootstrap = require('./bootstrap').bootstrap;
-const bootstrapApi = require('./routes');
-const setupDB = require('./database');
+const bootstrap = require("./bootstrap").bootstrap;
+const bootstrapApi = require("./routes");
+const setupDB = require("./database");
 
 module.exports = function startKaholo() {
   const app = express();
 
-let port, server, io;
+  let port, server, io;
 
-  if(!process.env.DB_URI) {
+  if (!process.env.DB_URI) {
     throw new Error("No DB_URI was provided in environmental variables!");
   }
 
-// enable cors
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, OPTIONS");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
+  // enable cors
+  app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+      "Access-Control-Allow-Methods",
+      "PUT, GET, POST, DELETE, OPTIONS"
+    );
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    res.setHeader("Access-Control-Allow-Credentials", true);
+    next();
+  });
+
+  // winston logger
+  const expressWinstonTranports = [
+    new winston.transports.Console({
+      json: false,
+      colorize: true
+    })
+  ];
+
+  setupDB(expressWinstonTranports);
+
+  // add express winston to router stack
+  app.use(
+    expressWinston.logger({
+      transports: expressWinstonTranports,
+      meta: true, // optional: control whether you want to log the meta data about the request (default to true)
+      msg: "HTTP {{req.method}} {{req.url}} {{req.statusCode}}",
+      expressFormat: false, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
+      colorize: false // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
+    })
   );
-  res.setHeader("Access-Control-Allow-Credentials", true);
-  next();
-});
 
-// winston logger
-const expressWinstonTranports = [
-  new winston.transports.Console({
-    json: false,
-    colorize: true
-  })
-];
+  server = http.createServer(app);
+  io = socketService.init(server);
 
-setupDB(expressWinstonTranports);
+  app.use(
+    bodyParser.urlencoded({
+      extended: false
+    })
+  );
+  app.use(bodyParser.json());
 
+  app.use((req, res, next) => {
+    req.io = io;
+    req.app = app;
+    next();
+  });
 
-// add express winston to router stack
-app.use(
-  expressWinston.logger({
-    transports: expressWinstonTranports,
-    meta: true, // optional: control whether you want to log the meta data about the request (default to true)
-    msg: "HTTP {{req.method}} {{req.url}} {{req.statusCode}}",
-    expressFormat: false, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
-    colorize: false // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
-  })
-);
+  bootstrapApi(app);
 
-server = http.createServer(app);
-io = socketService.init(server);
+  // Angular dist output folder
+  app.use(express.static(path.join(__dirname, "../dist")));
+  app.use(
+    "/plugins",
+    express.static(path.join(__dirname, "../libs", "plugins"))
+  );
+  app.use("/media", express.static(path.join(__dirname, "..media_cdn")));
 
-app.use(
-  bodyParser.urlencoded({
-    extended: false
-  })
-);
-app.use(bodyParser.json());
+  port = parseArgs.PORT || process.env.PORT;
+  app.set("port", port);
+  app.io = io;
 
-app.use((req, res, next) => {
-  req.io = io;
-  req.app = app;
-  next();
-});
+  // Send all other requests to the Angular app
+  app.all("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "dist", "index.html"));
+  });
 
-bootstrapApi(app);
+  server.listen(port, () => {
+    winston.log("info", `Running on localhost:${port}`);
+    bootstrap(app);
+  });
 
-// Angular dist output folder
-app.use(express.static(path.join(__dirname, "../dist")));
-app.use("/plugins", express.static(path.join(__dirname, "../libs", "plugins")));
-app.use("/media", express.static(path.join(__dirname, "..media_cdn")));
-
-port = parseArgs.PORT || process.env.PORT;
-app.set("port", port);
-app.io = io;
-
-// Send all other requests to the Angular app
-app.all("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../dist", "index.html"));
-});
-
-
-server.listen(port, () => {
-  winston.log('info', `Running on localhost:${port}`);
-  bootstrap(app);
-});
-
-return server;
-}
+  return server;
+};

@@ -1,0 +1,70 @@
+<div class="table-wrapper">
+  <p-dataTable
+    [value]="elements"
+    [lazy]="isLazy"
+    [rows]="15"
+    [paginator]="true"
+    [pageLinks]="4"
+    [totalRecords]="resultCount"
+    (onLazyLoad)="loadElementLazy($event)"
+  >
+    <ng-container *ngFor="let field of fields">
+      <p-column [field]="field.value" [header]="field.label" [sortable]="true">
+        <ng-template let-col let-item="rowData" pTemplate="body">
+          <div class="name-wrapper" *ngIf="field.label == 'Name'">
+            <a [routerLink]="['/admin/users-management/', name, item._id]">{{
+              item[field.value]
+            }}</a>
+          </div>
+          <div
+            class="name-wrapper"
+            *ngIf="field.label != 'Name' && !isArray(item[field.value])"
+          >
+            <span>{{ item[field.value] }}</span>
+          </div>
+          <div class="name-wrapper" *ngIf="isArray(item[field.value])">
+            <div class="cube tooltiptext">
+              <span [tooltip]="popTemplate" triggers="click" placement="right">
+                {{ item[field.value].length }}
+              </span>
+              <ng-template #popTemplate>
+                <div class="tooltipTemplate">
+                  <li *ngFor="let link of item[field.value]">
+                    <a
+                      [routerLink]="[
+                        '/admin/users-management/',
+                        field.value,
+                        link.id
+                      ]"
+                      >{{ link.label }}</a
+                    >
+                  </li>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </ng-template>
+      </p-column>
+    </ng-container>
+    <p-column
+      field=""
+      header="Actions"
+      [sortable]="true"
+      [style]="{ width: '120px' }"
+    >
+      <ng-template let-col let-i="rowIndex" let-item="rowData" pTemplate="body">
+        <div class="actions-wrapper">
+          <i
+            class="material-icons hover"
+            (click)="onConfirmDelete(item._id)"
+            tooltip="Delete"
+            >delete_outline</i
+          >
+          <i class="material-icons hover" (click)="onEdit(i)" tooltip="Edit"
+            >edit</i
+          >
+        </div>
+      </ng-template>
+    </p-column>
+  </p-dataTable>
+</div>

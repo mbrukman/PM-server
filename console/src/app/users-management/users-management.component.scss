@@ -1,0 +1,57 @@
+@import "~src/assets/sass/mixins";
+@import "~src/assets/sass/variables";
+
+.main {
+  width: 100%;
+  .main-content {
+    display: flex;
+    height: 100%;
+    padding: 40px 60px;
+    .entity-tab {
+      width: 250px;
+      .sections {
+        list-style-type: none;
+        padding: 0 40px;
+        padding-top: 7px;
+        li {
+          padding: 7px 0 5px 8px;
+          line-height: 41px;
+          color: #ddd;
+          border-top: 1px solid $cool-grey;
+          &:last-of-type {
+            border-bottom: 1px solid $cool-grey;
+          }
+          &.active {
+            border-left: 3px solid $turquoise-blue;
+          }
+          a {
+            padding: 0;
+            font-size: 14px;
+            color: $turquoise-blue;
+          }
+          &:hover {
+            cursor: pointer;
+            background: $hover-color;
+            text-decoration: none;
+          }
+        }
+      }
+    }
+    .content {
+      float: left;
+      flex-grow: 6;
+      border-left: 1px solid $cool-grey;
+      .content-wrapper {
+        padding: 0;
+        padding-left: 40px;
+        ::ng-deep {
+          > *:not(router-outlet) {
+            width: 100%;
+            height: 100%;
+            max-width: 1430px;
+          }
+        }
+      }
+    }
+  }
+}

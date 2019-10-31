@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule,Title } from '@angular/platform-browser';
+import { BrowserModule, Title } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './core/app.component';
@@ -17,14 +17,12 @@ import { CoreModule } from './core/core.module';
 import { SettingsService } from './services/settings/settings.service';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
 import { VaultService } from '@shared/vault.service';
-import {SeoService} from './seo.service';
+import { SeoService } from './seo.service';
 import { AutoCompleteService } from '@shared/components/params/autocomplete.service';
-import {PopupService} from '@shared/services/popup.service';
+import { PopupService } from '@shared/services/popup.service';
 import { KaholoHttpInterceptor } from './http-interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-
-
-
+import { UsersManagementService } from './users-management/users-management.service';
 
 @NgModule({
   imports: [
@@ -34,8 +32,24 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
     SharedModule,
     AppRoutingModule
   ],
-  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService,AutoCompleteService,PopupService, { provide: HTTP_INTERCEPTORS, useClass: KaholoHttpInterceptor, multi: true }],
+  providers: [
+    MapsService,
+    PluginsService,
+    AgentsService,
+    ProjectsService,
+    SocketService,
+    CalendarService,
+    UnsavedGuard,
+    SettingsService,
+    IsSetUpGuard,
+    VaultService,
+    Title,
+    SeoService,
+    UsersManagementService,
+    AutoCompleteService,
+    PopupService,
+    { provide: HTTP_INTERCEPTORS, useClass: KaholoHttpInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-}
+export class AppModule {}

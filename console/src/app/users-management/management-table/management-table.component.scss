@@ -1,0 +1,49 @@
+@import "~src/assets/sass/mixins";
+@import "~src/assets/sass/variables";
+
+.array-link {
+  a {
+    margin-right: 5px;
+  }
+}
+
+.tooltipTemplate {
+  padding: 17px;
+
+  li {
+    list-style-type: none;
+    max-width: 120px;
+    a {
+      color: $turquoise-blue;
+      text-decoration: underline;
+      font-size: 14px;
+    }
+  }
+}
+
+.tooltiptext {
+  position: relative;
+  ::ng-deep {
+    bs-tooltip-container {
+      top: -10px !important;
+      left: 30px !important;
+      .tooltip {
+        pointer-events: none;
+      }
+      .arrow {
+        top: 10px !important;
+        background-color: $kh-background;
+      }
+      .tooltip-inner {
+        background-color: $kh-background;
+        border: 2px solid $border-tooltip;
+      }
+      .tooltip-arrow::before {
+        border-right-color: $kh-background;
+        // border: 1px solid $border-tooltip;
+      }
+    }
+  }
+}
+
+@include user-table();

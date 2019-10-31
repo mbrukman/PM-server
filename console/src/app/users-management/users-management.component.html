@@ -1,0 +1,28 @@
+<div class="main">
+  <div class="head-title">
+    <h1 class="section-title">Identity and Access Management</h1>
+  </div>
+  <div class="main-content">
+    <div class="entity-tab">
+      <div class="sections">
+        <li
+          class="nav-item"
+          routerLinkActive="active"
+          *ngFor="let navItem of navItems"
+        >
+          <a
+            class="nav-link"
+            [routerLink]="navItem.routerLink"
+            (click)="changeCurrentTab(navItem.name)"
+            >{{ navItem.name }}</a
+          >
+        </li>
+      </div>
+    </div>
+    <div class="content">
+      <div class="main-content content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</div>
