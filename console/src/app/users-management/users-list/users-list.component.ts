@@ -16,9 +16,7 @@ export class UsersListComponent implements OnInit {
   resultCount: number = 0;
   users: User[];
   filterKeyUpSubscribe: Subscription;
-  page: number;
   isInit: boolean = true;
-  sort: string;
 
   fields = [
     { label: 'Name', value: 'name' },
@@ -38,14 +36,13 @@ export class UsersListComponent implements OnInit {
       this.users = data['users'].items;
       this.resultCount = data['users'].totalCount;
     });
-    this.resultCount = 1;
     this.filterKeyUpSubscribe = fromEvent(
       this.globalFilterElement.nativeElement,
       'keyup'
     )
       .pipe(debounceTime(300))
       .subscribe(() => {
-        this.page = 1;
+        this.filterOptions.page = 1;
         this.onDataLoad();
       });
   }
@@ -60,7 +57,6 @@ export class UsersListComponent implements OnInit {
   upsertUser(user = {}, isEdit = false) {}
 
   editUser(i) {
-    console.log(i);
     this.upsertUser(this.users[i], true);
   }
 
@@ -69,11 +65,13 @@ export class UsersListComponent implements OnInit {
   }
 
   loadUserLazy(event) {
+    let page;
+    let sort;
     if (event) {
 
-      this.page = event.first / 15 + 1;
+      page = event.first / 15 + 1;
       if (event.sortField) {
-        this.sort =
+        sort =
           event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
       }
     }
@@ -81,6 +79,8 @@ export class UsersListComponent implements OnInit {
       this.isInit = false;
       return;
     }
+    this.filterOptions.page = page;
+    this.filterOptions.sort = sort;
     this.onDataLoad();
   }
 }

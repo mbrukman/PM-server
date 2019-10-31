@@ -6,41 +6,78 @@
     margin-right: 5px;
   }
 }
-
-.tooltipTemplate {
-  padding: 17px;
-
-  li {
-    list-style-type: none;
-    max-width: 120px;
-    a {
-      color: $turquoise-blue;
-      text-decoration: underline;
-      font-size: 14px;
-    }
-  }
-}
-
-.tooltiptext {
+.tooltip-wrapper {
   position: relative;
-  ::ng-deep {
-    bs-tooltip-container {
-      top: -10px !important;
-      left: 30px !important;
-      .tooltip {
-        pointer-events: none;
+  cursor: default;
+  .cube {
+    display: inline-block;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid $turquoise-blue;
+    padding: 0px 7px;
+    color: $turquoise-blue;
+    margin-left: 19px;
+
+    .tooltipTemplate {
+      width: 200px;
+      border: 2px solid $border-tooltip;
+      position: absolute;
+      display: none;
+      background-color: $kh-background;
+      border-radius: 7px;
+      left: 62px;
+      top: -7px;
+      &:before {
+        content: "";
+        position: absolute;
+        top: -16px;
+        left: 14px;
       }
-      .arrow {
-        top: 10px !important;
-        background-color: $kh-background;
+      &::after {
+        content: "";
+        position: absolute;
+        right: 100%;
+        top: 10px;
+        border-width: 7px;
+        border-style: solid;
+        border-color: transparent $kh-background transparent transparent;
       }
-      .tooltip-inner {
-        background-color: $kh-background;
-        border: 2px solid $border-tooltip;
-      }
-      .tooltip-arrow::before {
-        border-right-color: $kh-background;
-        // border: 1px solid $border-tooltip;
+      .lists {
+        @include ellipsis;
+        max-height: 444px;
+        overflow: scroll;
+        padding: 20px 30px;
+        &::-webkit-scrollbar {
+          width: 17px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          border-right: 6px solid rgba(0, 0, 0, 0);
+          border-left: 6px solid rgba(0, 0, 0, 0);
+          background-clip: padding-box;
+          border-radius: 7px;
+          background-color: #404549;
+          box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.05),
+            inset 1px 1px 0px rgba(0, 0, 0, 0.05);
+        }
+        &::-webkit-scrollbar-button {
+          width: 0;
+          height: 0;
+          display: none;
+        }
+        &::-webkit-scrollbar-corner {
+          background-color: transparent;
+        }
+        li {
+          list-style-type: none;
+
+          a {
+            font-size: 13px;
+            line-height: 2.14;
+            color: $turquoise-blue;
+            text-decoration: underline;
+          }
+        }
       }
     }
   }

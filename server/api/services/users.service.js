@@ -1,51 +1,61 @@
+const User = require("../models/user.model");
+
+function getSort(sortString) {
+  const sort = {};
+  if (sortString[0] === "-") sort[sortString.slice(1)] = -1;
+  else sort[sortString] = 1;
+
+  return sort;
+}
+
 module.exports = {
-  filter: () => {
-    const users = [
-      {
-        _id: 0,
-        email: "david.gahnassia@kaholo.io",
-        name: "David Gahnassia",
-        date_created: new Date(),
-        groups: [
-          {
-            id: 1,
-            label: "Products"
+  filter: (filterOptions = {}) => {
+    const fields = filterOptions.fields;
+    const sort = filterOptions.options.sort || "name";
+    const page = Number(filterOptions.options.page);
+    if (fields) {
+      Object.keys(fields).map(key => {
+        fields[key] = { $regex: `.*${fields[key]}.*` };
+      });
+    }
+
+    const $match = {};
+    if (filterOptions.options.globalFilter) {
+      $match.$or = [
+        {
+          name: { $regex: new RegExp(filterOptions.options.globalFilter, "ig") }
+        },
+        {
+          email: {
+            $regex: new RegExp(filterOptions.options.globalFilter, "ig")
           }
-        ]
-      },
+        }
+      ];
+    }
+    const aggregateSteps = [
       {
-        _id: 1,
-        email: "magic@kaholo.io",
-        name: "Magic",
-        date_created: new Date(),
-        groups: [
-          {
-            id: 1,
-            label: "Products"
-          }
-        ]
-      },
-      {
-        _id: 2,
-        email: "chris@kaholo.io",
-        name: "Chris",
-        date_created: new Date(),
-        groups: [
-          {
-            id: 1,
-            label: "Products"
-          },
-          {
-            id: 2,
-            label: "Developper"
-          }
-        ]
+        $match: $match
       }
     ];
-    const result = {
-      items: users,
-      totalCount: 3
-    };
-    return Promise.resolve(result);
+    const pageSize = parseInt(process.env.PAGE_SIZE, 10);
+    const resultsQuery = [
+      ...aggregateSteps,
+      { $sort: getSort(sort) },
+      { $skip: page ? (page - 1) * pageSize : 0 },
+      { $limit: filterOptions.options.limit || pageSize }
+    ];
+
+    const countQuery = [
+      ...aggregateSteps,
+      {
+        $count: "count"
+      }
+    ];
+
+    return User.aggregate(resultsQuery).then(users => {
+      return User.aggregate(countQuery).then(r => {
+        return { items: users, totalCount: r.length ? r[0].count : 0 };
+      });
+    });
   }
 };

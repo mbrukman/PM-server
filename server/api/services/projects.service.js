@@ -1,31 +1,35 @@
-const mongoose = require('mongoose');
-const Project = require('../models/project.model');
-const Map = require('../models/map.model');
+const mongoose = require("mongoose");
+const Project = require("../models/project.model");
+const Map = require("../models/map.model");
 
 const PAGE_SIZE = parseInt(process.env.PAGE_SIZE, 10);
 
 module.exports = {
-  count: (filter) => {
+  count: filter => {
     return Project.count(filter);
   },
   /* add a new project */
-  create: (project) => {
+  create: project => {
     return Project.create(project);
   },
 
   /* add a map to project */
   addMap: (projectId, mapId) => {
-    return Project.findByIdAndUpdate({_id: projectId}, {$push: {maps: mapId}}, {new: true});
+    return Project.findByIdAndUpdate(
+      { _id: projectId },
+      { $push: { maps: mapId } },
+      { new: true }
+    );
   },
 
   /* get project details */
-  detail: (projectId) => {
+  detail: projectId => {
     return Project.findById(projectId);
   },
 
   /* delete a project */
-  delete: (projectId) => {
-    return Project.remove({_id: projectId});
+  delete: projectId => {
+    return Project.remove({ _id: projectId });
   },
 
   /* filter projects */
@@ -33,16 +37,24 @@ module.exports = {
     let q = filterOptions.options.filter || {};
     if (filterOptions.fields) {
       // This will change the fields in the filterOptions to filterOptions that we can use with mongoose (using regex for contains)
-      Object.keys(filterOptions.fields).map((key) => {
-        filterOptions.fields[key] = {'$regex': `.*${filterOptions.fields[key]}.*`};
+      Object.keys(filterOptions.fields).map(key => {
+        filterOptions.fields[key] = {
+          $regex: `.*${filterOptions.fields[key]}.*`
+        };
       });
       q = filterOptions.fields;
     }
 
     if (filterOptions.options.globalFilter) {
       const filterQueryOptions = [
-        {name: {'$regex': new RegExp(filterOptions.options.globalFilter, 'ig')}},
-        {description: {'$regex': new RegExp(filterOptions.options.globalFilter, 'ig')}},
+        {
+          name: { $regex: new RegExp(filterOptions.options.globalFilter, "ig") }
+        },
+        {
+          description: {
+            $regex: new RegExp(filterOptions.options.globalFilter, "ig")
+          }
+        }
       ];
       q.$or = filterQueryOptions;
     }
@@ -62,138 +74,129 @@ module.exports = {
       p.limit(pageSize).skip((filterOptions.options.page - 1) * pageSize);
     }
 
-    return p.then((projects) => {
-      return module.exports.count(q).then((r) => {
-        return {items: projects, totalCount: r};
+    return p.then(projects => {
+      return module.exports.count(q).then(r => {
+        return { items: projects, totalCount: r };
       });
     });
   },
 
-
-  filterRecentMaps: (id) => {
+  filterRecentMaps: id => {
     const aggregation = Project.aggregate([
       {
         $match: {
-          _id: mongoose.Types.ObjectId(id),
-        },
+          _id: mongoose.Types.ObjectId(id)
+        }
       },
       {
-        $project:
-                    {
-                      name: 1,
-                      maps: 1,
-                    },
+        $project: {
+          name: 1,
+          maps: 1
+        }
       },
-      {'$unwind': '$maps'},
+      { $unwind: "$maps" },
       {
-        $lookup:
-                    {
-                      from: 'mapResults',
-                      let: {mapId: '$maps'},
-                      pipeline: [
-                        {
-                          $match: {
-                            $expr: {
-                              $eq: ['$$mapId', '$map'],
-                            },
-                          },
-                        },
-                        {
-                          $project:
-                                    {
-                                      startTime: 1,
-                                      trigger: 1,
-                                    },
-                        },
-                        {$sort: {'startTime': -1}},
-                        {$limit: 1},
-
-                      ],
-                      as: 'exec',
-                    },
+        $lookup: {
+          from: "mapResults",
+          let: { mapId: "$maps" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$$mapId", "$map"]
+                }
+              }
+            },
+            {
+              $project: {
+                startTime: 1,
+                trigger: 1
+              }
+            },
+            { $sort: { startTime: -1 } },
+            { $limit: 1 }
+          ],
+          as: "exec"
+        }
       },
       {
-        $unwind:
-                    {
-                      'path': '$exec',
-                      'preserveNullAndEmptyArrays': true,
-                    },
+        $unwind: {
+          path: "$exec",
+          preserveNullAndEmptyArrays: true
+        }
       },
       {
-        $lookup:
+        $lookup: {
+          from: "maps",
+          let: { mapId: "$maps" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
                     {
-                      from: 'maps',
-                      let: {mapId: '$maps'},
-                      pipeline: [
-                        {
-                          $match: {
-                            $expr: {
-                              $and: [
-                                {
-                                  $eq: ['$$mapId', '$_id'],
-                                },
-                                {$ne: ['$archived', true]},
-                              ],
-                            },
-                          },
-                        },
-                        {
-                          $project:
-                                    {
-                                      _id: 0,
-                                      name: 1,
-                                    },
-                        },
-
-                      ],
-                      as: 'map',
+                      $eq: ["$$mapId", "$_id"]
                     },
+                    { $ne: ["$archived", true] }
+                  ]
+                }
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                name: 1
+              }
+            }
+          ],
+          as: "map"
+        }
       },
       {
-        $unwind:
-                    {
-                      'path': '$map',
-                      'preserveNullAndEmptyArrays': false,
-                    },
+        $unwind: {
+          path: "$map",
+          preserveNullAndEmptyArrays: false
+        }
       },
       {
-        $group:
-                    {
-                      _id: '$maps',
-                      exec: {$first: '$exec'},
-                      project: {$first: '$name'},
-                      map: {$first: '$map'},
-                    },
+        $group: {
+          _id: "$maps",
+          exec: { $first: "$exec" },
+          project: { $first: "$name" },
+          map: { $first: "$map" }
+        }
       },
-      {$sort: {'exec.startTime': -1}},
-      {$limit: 4},
+      { $sort: { "exec.startTime": -1 } },
+      { $limit: 4 }
     ]);
-    return aggregation.then((collection) => {
-      return collection.map((item) => {
+    return aggregation.then(collection => {
+      return collection.map(item => {
         return {
           _id: item._id,
           map: item.map,
           exec: item.exec,
-          project: {name: item.project},
+          project: { name: item.project }
         };
       });
     });
   },
 
   /* update a project */
-  update: (project) => {
-    return Project.findByIdAndUpdate(project._id, project, {new: true});
+  update: project => {
+    return Project.findByIdAndUpdate(project._id, project, { new: true });
   },
   /* Updating the maps list of the project.
-     */
+   */
   updateMap: (mapId, projectId) => {
-    return Project.update({maps: mapId}, {$pull: {maps: mapId}}) // remove the map from all
-        .then((projects) => {
-          return module.exports.addMap(projectId, mapId); // add map to the selected project
-        });
+    return Project.update({ maps: mapId }, { $pull: { maps: mapId } }) // remove the map from all
+      .then(projects => {
+        return module.exports.addMap(projectId, mapId); // add map to the selected project
+      });
   },
-  getProjectNamesByMapsIds: (mapsIds) => {
-    return Project.find({maps: {$in: mapsIds}}, {_id: 1, name: 1, maps: 1});
-  },
-
+  getProjectNamesByMapsIds: mapsIds => {
+    return Project.find(
+      { maps: { $in: mapsIds } },
+      { _id: 1, name: 1, maps: 1 }
+    );
+  }
 };
