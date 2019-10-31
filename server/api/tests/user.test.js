@@ -40,40 +40,39 @@ describe("User tests", () => {
         .send()
         .expect(500, done);
     });
+  });
 
-    describe("POST api/users/create", () => {
-      it(`should respond with created user's data for correct request`, () => {
-        return request(app)
-          .post("/api/users/create")
-          .send({
-            name: "test user",
-            email: "test@testy.co",
-            password: "test-password",
-            phoneNumber: "0-700-888-888",
-            changePasswordOnNextLogin: false
-          })
-          .expect(200)
-          .then(({ body }) => {
-            expect(body.name).toBe("test user");
-            expect(body.email).toBe("test@testy.co");
-            expect(body.phoneNumber).toBe("0-700-888-888");
-            expect(body.password).toBeDefined();
-            expect(body.password).not.toBe("test-password");
-            expect(body.password.length).toBe(64);
-            expect(body.changePasswordOnNextLogin).toBe(false);
-          });
-      });
+  describe("POST api/users/create", () => {
+    const testUser = usersFactory.generateSingleUser();
+    it(`should respond with created user's data for correct request`, () => {
+      return request(app)
+        .post("/api/users/create")
+        .send(testUser)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.name).toBe(testUser.name);
+          expect(body.email).toBe(testUser.email);
+          expect(body.phoneNumber).toBe(testUser.phoneNumber);
+          expect(body.password).toBeDefined();
+          expect(body.password).not.toBe(testUser.password);
+          expect(body.password.length).toBe(64);
+          expect(body.changePasswordOnNextLogin).toBe(
+            testUser.changePasswordOnNextLogin
+          );
+        });
+    });
 
-      it(`should respond with 400 for request with incorrect user data`, () => {
-        return request(app)
-          .post("/api/users/create")
-          .send({ name: "bad-user", email: "haxor@nothing" })
-          .expect(400)
-          .then(({ body }) => {
-            expect(body.name).toBe("ValidationError");
-            expect(body.errors.email.name).toBe("ValidatorError");
-          });
-      });
+    it(`should respond with 400 for request with incorrect user data`, () => {
+      const incorrectTestUser = testUser;
+      incorrectTestUser.email = "incorrect@invalid";
+      return request(app)
+        .post("/api/users")
+        .send(incorrectTestUser)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.name).toBe("ValidationError");
+          expect(body.errors.email.name).toBe("ValidatorError");
+        });
     });
   });
 });
