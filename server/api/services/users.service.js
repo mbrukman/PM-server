@@ -8,8 +8,8 @@ function getSort(sortString) {
   return sort;
 }
 
-module.exports = {
-  filter: (filterOptions = {}) => {
+class UserService {
+  filter(filterOptions = {}) {
     const fields = filterOptions.fields;
     const sort = filterOptions.options.sort || "name";
     const page = Number(filterOptions.options.page);
@@ -58,4 +58,8 @@ module.exports = {
       });
     });
   }
-};
+}
+
+const userService = new UserService();
+
+module.exports = userService;

@@ -1,16 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { SeoService, PageTitleTypes } from '@app/seo.service';
-
+import { NavItemInterface } from './interfaces/nav-item.interface';
 @Component({
   selector: 'app-users-management',
   templateUrl: './users-management.component.html',
   styleUrls: ['./users-management.component.scss']
 })
 export class UsersManagementComponent implements OnInit {
-  navItems: {
-    name: string;
-    routerLink: string[];
-  }[];
+  navItems: Array<NavItemInterface>;
   title: string = 'Users';
 
   constructor(private seoService: SeoService) {

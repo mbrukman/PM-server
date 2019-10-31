@@ -8,9 +8,9 @@ import { FilterOptions } from '@app/shared/model/filter-options.model';
   providedIn: 'root'
 })
 export class UsersManagementService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getAllUsers(fields?: any,  options?: FilterOptions){
+  getAllUsers(fields?: object, options?: FilterOptions) {
     return this.http.post<IEntityList<User>>(`api/users/`, { fields, options });
   }
 }

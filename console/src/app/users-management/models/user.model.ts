@@ -4,5 +4,4 @@ export class User {
   name: string;
   email: string;
   dateCreated: Date;
-  groups: any[];
 }

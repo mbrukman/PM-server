@@ -6,6 +6,7 @@ import { ActivatedRoute, Data } from '@angular/router';
 import { PopupService } from '@app/shared/services/popup.service';
 import { debounceTime } from 'rxjs/operators';
 import { FilterOptions } from '@app/shared/model/filter-options.model';
+
 @Component({
   selector: 'app-users-list',
   templateUrl: './users-list.component.html',
@@ -63,7 +64,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
     this.mainSubscription.add(getAllUserSubscription);
   }
 
-  upsertUser(user = {}, isEdit = false) { }
+  upsertUser(user = new User(), isEdit = false) { }
 
   editUser(index) {
     this.upsertUser(this.users[index], true);
@@ -77,11 +78,10 @@ export class UsersListComponent implements OnInit, OnDestroy {
     let page;
     let sort;
     if (event) {
-
       page = event.first / 15 + 1;
       if (event.sortField) {
         sort =
-          event.sortOrder === -1 ? '-' + event.sortField : event.sortField;
+          event.sortOrder === -1 ? `-${event.sortField}` : event.sortField;
       }
     }
     if (this.isInit) {
