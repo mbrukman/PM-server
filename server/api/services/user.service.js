@@ -3,11 +3,10 @@ const User = require("../models/user.model");
 function getSort(sortString) {
   const sort = {};
   if (sortString[0] === "-") {
-    sort[sortString.slice(1)] = -1
+    sort[sortString.slice(1)] = -1;
+  } else {
+    sort[sortString] = 1;
   }
-  else {
-    sort[sortString] = 1
-  };
   return sort;
 }
 
