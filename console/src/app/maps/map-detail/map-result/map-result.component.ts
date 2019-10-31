@@ -246,11 +246,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
           selectedExecution = <MapResult> exec;
           this.selectedExecution = selectedExecution;
           actions.forEach(action => {
-            this.setActionToSelectedExecution(selectedExecution,action)
-            //TODO: ask David why
-            this.selectedExecution.agentsResults.forEach(agent => {
-                this.selectedProcess.push(agent.processes[0])
-            })
+            this.setActionToSelectedExecution(selectedExecution,action);
           })
 
       });
@@ -383,7 +379,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     this.result.forEach(res => {
       res.processes.forEach(o=>{
         if(o.uuid === process.uuid && o.index === process.index){
-          res.agent? processes.push({...o, agentKey: (<Agent>res.agent).id})  : null
+          res.agent? processes.push({...o, agentKey: (<Agent>res.agent).id || (<Agent>res.agent)._id})  : null
         }
       })
     });

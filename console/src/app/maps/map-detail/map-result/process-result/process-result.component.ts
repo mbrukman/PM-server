@@ -67,7 +67,7 @@ export class ProcessResultComponent implements OnChanges {
     this.process.forEach(process => {
       let agent : Agent;
       for(let i=0, length = this.result.length; i<length; i++){
-        if ((<Agent>(this.result[i].agent)).id == process.agentKey){
+        if (((<Agent>(this.result[i].agent))._id || (<Agent>(this.result[i].agent)).id) == process.agentKey){
           agent = <Agent>this.result[i].agent;
           break;
         }
