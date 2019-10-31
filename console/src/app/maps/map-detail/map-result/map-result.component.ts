@@ -7,14 +7,14 @@ import { MapResult, AgentResult, ProcessResult } from '@maps/models/execution-re
 import { SocketService } from '@shared/socket.service';
 import { Agent } from '@app/services/agent/agent.model';
 import { ProcessResultByProcessIndex } from '@maps/models';
-import { PopupService } from '@shared/services/popup.service'
+import { PopupService } from '@shared/services/popup.service';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
 import { filter, take, tap, mergeMap } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { ActivatedRoute, Router } from '@angular/router';
 
 
-const defaultAgentValue = 'default'
+const defaultAgentValue = 'default';
 
 @Component({
   selector: 'app-map-result',
@@ -54,6 +54,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   };
 
   ongoingExecutionSocket;
+
   constructor(private route: ActivatedRoute, private router: Router, private mapsService: MapsService, private socketService: SocketService, private popupService: PopupService) {
   }
 
@@ -62,7 +63,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
     // getting current map and requesting the executions list
     this.mapSubscription = this.mapsService.getCurrentMap().pipe(filter(map => map)).subscribe(map => {
       this.map = map;
-      this.loadResultOnScroll(map)
+      this.loadResultOnScroll(map);
     });
 
 
@@ -99,21 +100,21 @@ export class MapResultComponent implements OnInit, OnDestroy {
         }
       });
 
-      this.route.data.subscribe(data => {
-        this.selectedExecution = data.execution['selectedExecution'];
-        this.executing = Object.keys(data.execution['onGoing']);
-        this.selectExecution(this.selectedExecution);
-      })
+    this.route.data.subscribe(data => {
+      this.selectedExecution = data.execution['selectedExecution'];
+      this.executing = Object.keys(data.execution['onGoing']);
+      this.selectExecution(this.selectedExecution);
+    });
   }
 
   loadResultOnScroll(map = this.map) {
     this.mapsService.executionResults(map.id, this.page)
       .subscribe(executions => {
         if (executions.length < this.load_results) {
-          this.maxLengthReached = true
+          this.maxLengthReached = true;
         }
         this.executionsList.push(...executions);
-      })
+      });
   }
 
   onScroll() {
@@ -134,48 +135,46 @@ export class MapResultComponent implements OnInit, OnDestroy {
     if (this.mapExecutionMessagesSubscription) {
       this.mapExecutionMessagesSubscription.unsubscribe();
     }
-    if(this.ongoingExecutionSocket){
-      this.socketService.closeSocket(this.ongoingExecutionSocket.nsp)
+    if (this.ongoingExecutionSocket) {
+      this.socketService.closeSocket(this.ongoingExecutionSocket.nsp);
     }
   }
 
 
   expandOutput() {
-    let messages = []
-    this.selectedExecutionLogs.forEach(item => { messages.push(item.message) });
-    this.popupService.openComponent(RawOutputComponent, { messages: messages })
+    let messages = [];
+    this.selectedExecutionLogs.forEach(item => { messages.push(item.message); });
+    this.popupService.openComponent(RawOutputComponent, { messages: messages });
   }
 
-  buildExecutionFromSocket(selectedExecution,result){
+  buildExecutionFromSocket(selectedExecution, result) {
 
-    let agentIndex = selectedExecution.agentsResults.findIndex(agent => agent.agent['_id'] == result.agent._id);
-    if(agentIndex == -1){
+    let agentIndex = selectedExecution.agentsResults.findIndex(agent => agent.agent['_id'] === result.agent._id);
+    if (agentIndex === -1) {
       let process = result.process;
       process['actions'] = [result.action];
       let agentResult = {
-        agent:result.agent,
-        processes:[process]
+        agent: result.agent,
+        processes: [process]
       };
       selectedExecution.agentsResults.push(<AgentResult>agentResult);
-    }
-    else{
+    } else {
       let isProcessFound;
       let sameProcessIndex = -1;
-      selectedExecution.agentsResults[agentIndex].processes.forEach((process,index) => {
-        if(process.uuid == result.process.uuid){
+      selectedExecution.agentsResults[agentIndex].processes.forEach((process, index) => {
+        if (process.uuid === result.process.uuid) {
           isProcessFound = true;
-          if(result.process.index == process.index){
+          if (result.process.index === process.index) {
             sameProcessIndex = index;
           }
         }
-      })
-      if(!isProcessFound || sameProcessIndex == -1){
+      });
+      if (!isProcessFound || sameProcessIndex === -1) {
         let process = result.process;
         process['actions'] = result.action ? [result.action] : [];
-        selectedExecution.agentsResults[agentIndex].processes.push(<ProcessResult>process)
-      }
-      else{
-          selectedExecution.agentsResults[agentIndex].processes[sameProcessIndex].actions.push(result.action);
+        selectedExecution.agentsResults[agentIndex].processes.push(<ProcessResult>process);
+      } else {
+        selectedExecution.agentsResults[agentIndex].processes[sameProcessIndex].actions.push(result.action);
       }
     }
 
@@ -184,7 +183,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
   }
 
 
-  agentsConfiguration(){
+  agentsConfiguration() {
     this.agents = this.selectedExecution.agentsResults.map(agentResult => {
       return { label: agentResult.agent ? (<Agent>agentResult.agent).name : '', value: agentResult };
     });
@@ -192,16 +191,15 @@ export class MapResultComponent implements OnInit, OnDestroy {
     if (this.agents.length > 1) { // if there is more than one agent, add an aggregated option.
       this.agents.unshift({ label: 'Aggregate', value: defaultAgentValue });
       this.selectedAgent = defaultAgentValue;
-    }
-    else if (this.agents.length){
-      this.selectedAgent = this.agents[0].value
+    } else if (this.agents.length) {
+      this.selectedAgent = this.agents[0].value;
     }
 
     this.changeAgent();
   }
 
-  setActionToSelectedExecution(selectedExecution,action){
-    selectedExecution = this.buildExecutionFromSocket(selectedExecution,action);
+  setActionToSelectedExecution(selectedExecution, action) {
+    selectedExecution = this.buildExecutionFromSocket(selectedExecution, action);
     this.selectedExecution = this._mapperResult(selectedExecution);
     this.agentsConfiguration();
   }
@@ -219,46 +217,47 @@ export class MapResultComponent implements OnInit, OnDestroy {
    * Selecting execution and getting result from the server
    * @param executionId
    */
-  selectExecution(execution : MapResult) {
-    if(!execution){return }
+  selectExecution(execution: MapResult) {
+    if (!execution) { return; }
 
     let selectedExecution = null;
-    if(this.ongoingExecutionSocket){
-        this.socketService.closeSocket(this.ongoingExecutionSocket.nsp)
+    if (this.ongoingExecutionSocket) {
+      this.socketService.closeSocket(this.ongoingExecutionSocket.nsp);
     }
     this.gotoExecution(execution.id);
-    if(this.executing.indexOf(execution.id) > -1){ //if ongoing
-      this.ongoingExecutionSocket = this.socketService.addNewSocket("execution-update-"+execution.id);
+    // if ongoing
+    if (this.executing.indexOf(execution.id) > -1) {
+      this.ongoingExecutionSocket = this.socketService.addNewSocket('execution-update-' + execution.id);
       this.processesList = [];
       this.selectedProcess = null;
       this.selectedExecutionLogs = [];
-      this.ongoingExecutionSocket.on('updateAction',(action) => {
-        this.setActionToSelectedExecution(this.selectedExecution,action);
+      this.ongoingExecutionSocket.on('updateAction', (action) => {
+        this.setActionToSelectedExecution(this.selectedExecution, action);
       });
-      this.ongoingExecutionSocket.on('updateActions',(actions) => {
+      this.ongoingExecutionSocket.on('updateActions', (actions) => {
 
-          let exec = {
-            agentsResults:[],
-            id:execution.id,
-            structure:execution.structure,
-            trigger:execution.trigger
-          }
-          selectedExecution = <MapResult> exec;
-          this.selectedExecution = selectedExecution;
-          actions.forEach(action => {
-            this.setActionToSelectedExecution(selectedExecution,action);
-          })
+        let exec = {
+          agentsResults: [],
+          id: execution.id,
+          structure: execution.structure,
+          trigger: execution.trigger
+        };
+        selectedExecution = <MapResult>exec;
+        this.selectedExecution = selectedExecution;
+        actions.forEach(action => {
+          this.setActionToSelectedExecution(selectedExecution, action);
+        });
 
       });
 
-      this.ongoingExecutionSocket.on('updateFinishTime',(data) => {
+      this.ongoingExecutionSocket.on('updateFinishTime', (data) => {
         this.selectedExecution.finishTime = data.execution;
-        if(data.process){
-          for(let i=0,length = this.selectedExecution.agentsResults.length;i<length;i++){
+        if (data.process) {
+          for (let i = 0, length = this.selectedExecution.agentsResults.length; i < length; i++) {
             let agent = this.selectedExecution.agentsResults[i];
-            for(let j=0,length = agent.processes.length;j<length;j++){
+            for (let j = 0, processesLength = agent.processes.length; j < processesLength; j++) {
               let process = agent.processes[j];
-              if(process.uuid == data.process.uuid){
+              if (process.uuid === data.process.uuid) {
                 process.finishTime = data.process.finishTime;
                 break;
               }
@@ -267,8 +266,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
         }
       });
 
-    }
-    else{
+    } else {
       this.selectedExecutionLogs = [];
       this.selectedProcess = null;
       this.agentsConfiguration();
@@ -303,27 +301,27 @@ export class MapResultComponent implements OnInit, OnDestroy {
     if (!agentResult) { // if not found it aggregate
       this.result = this.selectedExecution.agentsResults;
       this.selectedExecution.agentsResults.forEach(agent => {
-        this.pieChartExecution.push(...agent.processes)
-      })
+        this.pieChartExecution.push(...agent.processes);
+      });
 
     } else {
-      this.pieChartExecution.push(...agentResult.processes)
+      this.pieChartExecution.push(...agentResult.processes);
       this.result = [agentResult];
     }
     this.generateProcessesList();
   }
 
-  resultsByProcessUuid(uuid){
+  resultsByProcessUuid(uuid) {
     let processes = [];
     this.result.forEach(res => {
       processes = [...processes, ...res.processes];
     });
     let resultProcess = [];
     processes.forEach((process) => {
-      if(process.uuid == uuid){
-        resultProcess.push(process)
+      if (process.uuid === uuid) {
+        resultProcess.push(process);
       }
-    })
+    });
     return resultProcess;
   }
 
@@ -373,15 +371,15 @@ export class MapResultComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectProcess(process,i=0) {
+  selectProcess(process, i = 0) {
 
     let processes = [];
     this.result.forEach(res => {
-      res.processes.forEach(o=>{
-        if(o.uuid === process.uuid && o.index === process.index){
-          res.agent? processes.push({...o, agentKey: (<Agent>res.agent).id || (<Agent>res.agent)._id})  : null
+      res.processes.forEach(o => {
+        if (o.uuid === process.uuid && o.index === process.index && res.agent) {
+          processes.push({ ...o, agentKey: (<Agent>res.agent).id || (<Agent>res.agent)._id });
         }
-      })
+      });
     });
     this.selectedProcess = processes;
     this.processIndex = i;
@@ -396,41 +394,45 @@ export class MapResultComponent implements OnInit, OnDestroy {
   }
 
 
-  _mapperResult(execResult, processNames=null) {
-    let newResult = Object.assign({},execResult)
-    if(!execResult.agentsResults){return }
+  _mapperResult(execResult, processNames = null) {
+    let newResult = Object.assign({}, execResult);
+    if (!execResult.agentsResults) { return; }
     execResult.agentsResults.forEach((agentResult, agentIndex) => {
-        agentResult.processes.forEach((process, processIndex) => {
-            process = Object.assign({},process)
-            let processResult = []
-            let statuses = [];
-            process.actions.forEach(action => {
+      agentResult.processes.forEach((process, processIndex) => {
+        process = Object.assign({}, process);
+        let processResult = [];
+        let statuses = [];
+        process.actions.forEach(action => {
 
-                  statuses.push(action.status)
-                  if(!action.result){
-                      action.result = {stdout:action.status}
-                  }
-                  processResult.push(action.result)
+          statuses.push(action.status);
+          if (!action.result) {
+            action.result = { stdout: action.status };
+          }
+          processResult.push(action.result);
 
-            })
-            let processStatus = 'error'
-            let mapS = {}
-            if(statuses){
-                statuses.map(s => {
-                  if(s){
-                    mapS[s] = 1
-                  }
-                 })
-                if (mapS['error'] && mapS['success']) { processStatus = 'partial' }
-                else if (!mapS['error'] && Object.keys(mapS).length) { processStatus = 'success' }
-                process.status = processStatus
+        });
+        let processStatus = 'error';
+        let mapS = {};
+        if (statuses) {
+          statuses.map(s => {
+            if (s) {
+              mapS[s] = 1;
             }
+          });
+          if (mapS['error'] && mapS['success']) {
+            processStatus = 'partial';
+          } else if (!mapS['error'] && Object.keys(mapS).length) { processStatus = 'success'; }
+          process.status = processStatus;
+        }
 
-            process.result = processResult
-            processNames ? process.name = processNames[process.uuid] : null
-            newResult.agentsResults[agentIndex].processes[processIndex] = process
-        })
-    })
-    return newResult
+        process.result = processResult;
+        if (processNames) {
+          process.name = processNames[process.uuid];
+
+        }
+        newResult.agentsResults[agentIndex].processes[processIndex] = process;
+      });
+    });
+    return newResult;
   }
 }

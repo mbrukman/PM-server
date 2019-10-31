@@ -2,7 +2,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { RawOutputComponent } from '@shared/raw-output/raw-output.component';
-import {PopupService} from '@shared/services/popup.service'
+import { PopupService } from '@shared/services/popup.service';
 import { AgentResult, ProcessResult, ActionResultView } from '@maps/models';
 import { Agent } from '@app/services/agent/agent.model';
 
@@ -16,17 +16,17 @@ import { Agent } from '@app/services/agent/agent.model';
 export class ProcessResultComponent implements OnChanges {
   @Input('process') process: ProcessResult[];
   @Input('result') result: AgentResult[];
-  aggregate:boolean;
+  aggregate: boolean;
   actions: ActionResultView[];
   generalInfo: ProcessResult;
   agProcessActionsStatus: any;
   agActionsStatus: any;
 
 
-  constructor(private popupService:PopupService) { }
+  constructor(private popupService: PopupService) { }
 
   ngOnChanges() {
-    this.aggregate =  this.result.length > 1 ? true : false;
+    this.aggregate = this.result.length > 1 ? true : false;
     this.agProcessActionsStatus = null;
     this.agActionsStatus = null;
     this.generalInfo = null;
@@ -37,47 +37,47 @@ export class ProcessResultComponent implements OnChanges {
   }
 
 
-  isObject(item){
-    return typeof item == 'object' ? true : false;
+  isObject(item) {
+    return typeof item === 'object' ? true : false;
   }
 
   expandOutput(action: ActionResultView) {
     let messages = [];
     let results = this.agActionsStatus[action.key].results;
     let msgs = [];
-    results.stdout.forEach(text => { msgs.push(text)});
-    results.stderr.forEach(text => { msgs.push(text)});
+    results.stdout.forEach(text => { msgs.push(text); });
+    results.stderr.forEach(text => { msgs.push(text); });
 
     results.result.forEach(res => {
-      if(typeof res == 'string'){
-        msgs.push(res)
-      }
-      else{
-        msgs.push(JSON.stringify(res))
+      if (typeof res === 'string') {
+        msgs.push(res);
+      } else {
+        msgs.push(JSON.stringify(res));
       }
     });
 
     messages.push(msgs.join('\n'));
-    this.popupService.openComponent(RawOutputComponent,{messages:messages})
+    this.popupService.openComponent(RawOutputComponent, { messages: messages });
   }
 
 
   aggregateProcessActionResults() {
     let actions = [];
     this.process.forEach(process => {
-      let agent : Agent;
-      for(let i=0, length = this.result.length; i<length; i++){
-        if (((<Agent>(this.result[i].agent))._id || (<Agent>(this.result[i].agent)).id) == process.agentKey){
+      let agent: Agent;
+      for (let i = 0, length = this.result.length; i < length; i++) {
+        if (((<Agent>(this.result[i].agent))._id || (<Agent>(this.result[i].agent)).id) === process.agentKey) {
           agent = <Agent>this.result[i].agent;
           break;
         }
       }
-      for (let i =0, length = process.actions.length; i<length; i++){
-        if (!process.actions[i].finishTime)
+      for (let i = 0, length = process.actions.length; i < length; i++) {
+        if (!process.actions[i].finishTime) {
           continue;
-        actions.push(new ActionResultView(process.actions[i],agent));
+        }
+        actions.push(new ActionResultView(process.actions[i], agent));
       }
-    })
+    });
     this.actions = actions;
 
     // aggregating status for each action
@@ -105,7 +105,7 @@ export class ProcessResultComponent implements OnChanges {
       agActions[o].total = this.calculateFinalStatus(agActions[o].status);
       // formatting for graph
       agActions[o].status = Object.keys(agActions[o].status).map((key) => {
-        return { name: key, value: agActions[o].status[key] }
+        return { name: key, value: agActions[o].status[key] };
       });
     });
     this.agActionsStatus = agActions;
