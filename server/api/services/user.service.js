@@ -12,19 +12,19 @@ function getSort(sortString) {
   return sort;
 }
 
-function hashPassword(pass, salt) {
-  const hash = crypto.createHash("sha256");
-  hash.update(pass + salt);
-  return hash.digest("hex");
-}
-
-function createUser(userData) {
-  const user = new User(userData);
-  user.password = hashPassword(user.password, serverKey);
-  return user.save();
-}
-
 class UserService {
+  hashPassword(password, salt) {
+    const hash = crypto.createHash("sha256");
+    hash.update(password + salt);
+    return hash.digest("hex");
+  }
+
+  createUser(userData) {
+    const user = new User(userData);
+    user.password = this.hashPassword(user.password, serverKey);
+    return user.save();
+  }
+
   filter(filterOptions = {}) {
     const fields = filterOptions.fields;
     const sort = filterOptions.options.sort || "name";
