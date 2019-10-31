@@ -6,7 +6,6 @@ import {IProcessList} from '@maps/interfaces/process-list.interface';
 import {MapResult, AgentResult, ProcessResult} from '@app/services/map/models/execution-result.model';
 import {SocketService} from '@shared/socket.service';
 import {Agent} from '@app/services/agent/agent.model';
-import {ProcessResultByProcessIndex} from '@maps/models';
 import {PopupService} from '@shared/services/popup.service';
 import {RawOutputComponent} from '@shared/raw-output/raw-output.component';
 import {filter} from 'rxjs/operators';
@@ -219,6 +218,7 @@ export class MapResultComponent implements OnInit, OnDestroy {
       this.socketService.closeSocket(this.ongoingExecutionSocket.nsp);
     }
     this.gotoExecution(execution.id);
+    // if ongoing
     if (this.executing.indexOf(execution.id) > -1) {
       this.ongoingExecutionSocket = this.socketService.addNewSocket('execution-update-' + execution.id);
       this.processesList = [];
@@ -228,7 +228,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
         this.setActionToSelectedExecution(this.selectedExecution, action);
       });
       this.ongoingExecutionSocket.on('updateActions', (actions) => {
-
         const exec = {
           agentsResults: [],
           id: execution.id,
@@ -239,9 +238,6 @@ export class MapResultComponent implements OnInit, OnDestroy {
         this.selectedExecution = selectedExecution;
         actions.forEach(action => {
           this.setActionToSelectedExecution(selectedExecution, action);
-          this.selectedExecution.agentsResults.forEach(agent => {
-            this.selectedProcess.push(agent.processes[0]);
-          });
         });
 
       });
@@ -368,10 +364,8 @@ export class MapResultComponent implements OnInit, OnDestroy {
     const processes = [];
     this.result.forEach(res => {
       res.processes.forEach(o => {
-        if (o.uuid === process.uuid && o.index === process.index) {
-          if (res.agent) {
-            processes.push({...o, agentKey: (<Agent>res.agent).id});
-          }
+        if (o.uuid === process.uuid && o.index === process.index && res.agent) {
+          processes.push({ ...o, agentKey: (<Agent>res.agent).id || (<Agent>res.agent)._id });
         }
       });
     });

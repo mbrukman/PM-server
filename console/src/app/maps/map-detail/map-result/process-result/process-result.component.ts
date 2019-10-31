@@ -6,7 +6,6 @@ import {AgentResult, ProcessResult} from '@app/services/map/models/execution-res
 import {ActionResultView} from '@maps/models';
 import {Agent} from '@app/services/agent/agent.model';
 
-
 @Component({
   selector: 'app-process-result',
   templateUrl: './process-result.component.html',
@@ -70,7 +69,7 @@ export class ProcessResultComponent implements OnChanges {
     this.process.forEach(process => {
       let agent: Agent;
       for (let i = 0, length = this.result.length; i < length; i++) {
-        if ((<Agent>(this.result[i].agent)).id === process.agentKey) {
+        if (((<Agent>(this.result[i].agent))._id || (<Agent>(this.result[i].agent)).id) === process.agentKey) {
           agent = <Agent>this.result[i].agent;
           break;
         }
@@ -109,7 +108,7 @@ export class ProcessResultComponent implements OnChanges {
       agActions[o].total = this.calculateFinalStatus(agActions[o].status);
       // formatting for graph
       agActions[o].status = Object.keys(agActions[o].status).map((key) => {
-        return {name: key, value: agActions[o].status[key]};
+        return { name: key, value: agActions[o].status[key] };
       });
     });
     this.agActionsStatus = agActions;
