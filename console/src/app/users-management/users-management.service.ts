@@ -11,6 +11,6 @@ export class UsersManagementService {
   constructor(private http: HttpClient) { }
 
   getAllUsers(fields?: object, options?: FilterOptions) {
-    return this.http.post<IEntityList<User>>(`api/users/`, { fields, options });
+    return this.http.post<IEntityList<User>>(`api/users/filter`, { fields, options });
   }
 }

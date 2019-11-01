@@ -66,7 +66,7 @@ describe("User tests", () => {
       const incorrectTestUser = testUser;
       incorrectTestUser.email = "incorrect@invalid";
       return request(app)
-        .post("/api/users")
+        .post("/api/users/create")
         .send(incorrectTestUser)
         .expect(400)
         .then(({ body }) => {
