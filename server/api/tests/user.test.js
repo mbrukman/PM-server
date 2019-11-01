@@ -10,7 +10,7 @@ describe("User tests", () => {
 
   beforeEach(async () => {
     await usersTestDataManager.generateInitialCollection(
-      usersFactory.generateMany()
+      usersFactory.generateUsers()
     );
   });
 
