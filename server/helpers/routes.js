@@ -8,7 +8,7 @@ const scheduledJobsApi = require("../api/routes/scheduled-jobs.routes");
 const vaultApi = require("../api/routes/vault.routes");
 const configTokenApi = require("../api/routes/config-token.routes");
 const autoCompleteApi = require("../api/routes/autocomplete.routes");
-const usersApi = require("../api/routes/users.routes");
+const usersApi = require("../api/routes/user.routes");
 
 module.exports = function bootstrapApi(app) {
   app.use("/api/settings", settingsApi);
