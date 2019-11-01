@@ -1,4 +1,4 @@
-const usersService = require("../services/users.service");
+const usersService = require("../services/user.service");
 
 function filter(req, res) {
   usersService
