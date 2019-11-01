@@ -23,6 +23,10 @@ import { PopupService } from '@shared/services/popup.service';
 import { KaholoHttpInterceptor } from './http-interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { UsersManagementService } from './users-management/users-management.service';
+import {IAMModule} from '@app/iam/iam.module';
+
+
+
 
 @NgModule({
   imports: [
@@ -30,7 +34,8 @@ import { UsersManagementService } from './users-management/users-management.serv
     BrowserModule,
     BrowserAnimationsModule,
     SharedModule,
-    AppRoutingModule
+    AppRoutingModule,
+    IAMModule
   ],
   providers: [
     MapsService,
