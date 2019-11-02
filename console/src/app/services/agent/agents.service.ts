@@ -8,7 +8,7 @@ import {Agent} from '@app/services/agent/agent.model';
 import {Subject} from 'rxjs';
 
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class AgentsService {
   draggedItem: any;
   private updatedGroup: Subject<Group> = new Subject();

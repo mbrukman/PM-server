@@ -3,7 +3,7 @@ import { Subject } from 'rxjs';
 import { Observable } from 'rxjs';
 import { Process } from '@maps/models';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class MapDesignService {
   private updateProcessSubject: Subject<Process> = new Subject();
   public dropped: Subject<any> = new Subject<any>();

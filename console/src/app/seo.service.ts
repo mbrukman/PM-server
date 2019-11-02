@@ -15,7 +15,7 @@ export enum PageTitleTypes {
   UsersManagement = 'Users Management - Manage'
 }
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class SeoService {
   constructor(private titleService: Title) {}
 

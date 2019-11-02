@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { MapsService } from '../services/map/maps.service';
 import { Map } from '../services/map/models/map.model';
-import { Project } from '../projects/models/project.model';
-import { ProjectsService } from '../projects/projects.service';
+import { Project } from '@projects/models/project.model';
+import { ProjectsService } from '@projects/projects.service';
 import { FilterOptions } from '@shared/model/filter-options.model';
 
 

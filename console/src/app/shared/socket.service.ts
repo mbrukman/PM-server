@@ -7,7 +7,7 @@ import { Subject, Observable } from 'rxjs';
 import { Pending } from '@maps/models';
 import {MapResult} from '@app/services/map/models/execution-result.model';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class SocketService {
   socket: any;
   socketNamespaces: object = {};

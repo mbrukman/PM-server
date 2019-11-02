@@ -4,7 +4,7 @@ import { Injectable } from "@angular/core";
 import { Subscribable } from "rxjs";
 
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class VaultService {
 
     constructor(private http: HttpClient) {

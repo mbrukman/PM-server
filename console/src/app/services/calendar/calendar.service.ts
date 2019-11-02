@@ -6,7 +6,7 @@ import { Job } from './models/job.model';
 
 
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class CalendarService {
   newJob: Subject<any> = new Subject();
 

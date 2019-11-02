@@ -13,7 +13,7 @@ import {PopupService} from '@shared/services/popup.service';
 import {SocketService} from '@shared/socket.service';
 import {SettingsService} from '@app/services/settings/settings.service';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class MapsService {
   currentMap: BehaviorSubject<Map> = new BehaviorSubject<Map>(null);
   currentMapId: string;

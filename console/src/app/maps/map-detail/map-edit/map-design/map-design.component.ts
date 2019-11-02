@@ -655,7 +655,7 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   private onMapContentUpdate() {
     let graphContent = JSON.stringify(this.graph.toJSON());
-    if ((graphContent !== this.mapStructure.content) && (this.mapStructure)) {
+    if ((this.mapStructure) && (graphContent !== this.mapStructure.content)) {
       this.mapStructure.content = graphContent;
       this.mapsService.setCurrentMapStructure(this.mapStructure);
     }

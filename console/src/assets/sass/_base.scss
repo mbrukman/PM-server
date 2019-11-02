@@ -1,5 +1,8 @@
 @import "variables";
 
+.modal-header {
+  border-bottom: 1px solid $cool-grey;// !important;
+}
 
 .section-title {
   font-size: 28px;

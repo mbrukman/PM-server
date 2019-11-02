@@ -64,7 +64,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
     this.mainSubscription.add(getAllUserSubscription);
   }
 
-  upsertUser(user = new User(), isEdit = false) { }
+  upsertUser(user, isEdit = false) { }
 
   editUser(index) {
     this.upsertUser(this.users[index], true);

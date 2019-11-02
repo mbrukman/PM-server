@@ -2,11 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Plugin } from './models/plugin.model';
+import { Plugin } from '@plugins/models';
 import { map } from 'rxjs/operators';
 
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class PluginsService {
 
   constructor(private http: HttpClient) {
@@ -35,5 +35,5 @@ export class PluginsService {
   getById(pluginId){
     return this.http.get<Plugin>(`api/plugins/${pluginId}`)
   }
-  
+
 }

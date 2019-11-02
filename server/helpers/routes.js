@@ -24,4 +24,4 @@ module.exports = function bootstrapApi(app) {
     app.use("/api/autocomplete", autoCompleteApi);
     app.use("/api/users", usersApi);
     app.use("/api/user-groups", userGroupApi);
-}
+};

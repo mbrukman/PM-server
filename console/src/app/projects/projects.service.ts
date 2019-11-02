@@ -2,13 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Project } from './models/project.model';
-import { Map } from '@app/services/map/models/map.model';
-import { MapStructure } from '@maps/models/map-structure.model';
 import {FilterOptions} from '@shared/model/filter-options.model';
 import {DistinctMapResult} from '@shared/model/distinct-map-result.model';
 import {IEntityList} from '@shared/interfaces/entity-list.interface';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class ProjectsService {
 
   constructor(private http: HttpClient) {
@@ -32,7 +30,7 @@ export class ProjectsService {
 
   filterRecentMaps(projectId:string){
     return this.http.get<DistinctMapResult[]>(`api/projects/${projectId}`);
-  } 
+  }
 
   list(fields?: any, page?: number, options?:FilterOptions) {
     return this.http.post<IEntityList<Project>>('api/projects',{fields,page,options});

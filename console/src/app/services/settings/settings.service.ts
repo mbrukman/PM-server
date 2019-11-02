@@ -8,7 +8,7 @@ class Settings {
   version: string;
 }
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class SettingsService {
   public settings: Settings;
   configToken: string;

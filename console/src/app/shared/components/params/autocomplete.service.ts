@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import {AutoCompleteItem} from '@shared/model/autocomplete.model';
 
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class AutoCompleteService {
 
   constructor(private http: HttpClient) {
@@ -12,8 +12,8 @@ export class AutoCompleteService {
   generateAutoCompleteParams(modelName,options) {
     return this.http.get<AutoCompleteItem[]>(`api/autocomplete/${modelName}?query=${options.query}`);
   }
-  
+
   getValueById(id,modelName){
     return this.http.get<AutoCompleteItem>(`api/autocomplete/${modelName}/${id}`);
   }
-} 
+}
