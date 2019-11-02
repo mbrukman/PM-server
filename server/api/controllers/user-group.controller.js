@@ -7,13 +7,24 @@ module.exports = {
       const { body } = req;
       const userGroup = await userGroupService.create(body);
       req.io.emit("notification", {
-        title: "User group saved",
+        title: "Group saved",
         message: `${userGroup.name} saved successfully`,
         type: "success"
       });
       return res.json(userGroup);
     } catch (err) {
       winston.log("error", "Error creating user group.", err);
+      return res.status(500).json(err);
+    }
+  },
+
+  async filter(req, res) {
+    try {
+      const { body } = req;
+      const userGroup = await userGroupService.filter(body);
+      return res.json(userGroup);
+    } catch (err) {
+      winston.log("error", "Error filtering user group.", err);
       return res.status(500).json(err);
     }
   }

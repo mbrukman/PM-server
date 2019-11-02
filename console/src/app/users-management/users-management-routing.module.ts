@@ -3,7 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { UsersManagementComponent } from './users-management.component';
 import { UsersListComponent } from './users-list/users-list.component';
 import { UsersListResolver } from './resolvers/users-list.resolver';
-import {UserGroupListComponent} from '@app/users-management/user-group/user-group-list/user-group-list.component';
+import { UserGroupListComponent } from '@app/users-management/user-group/user-group-list/user-group-list.component';
+import { UserGroupResolver } from './resolvers/user-group.resolver';
 
 const routes: Routes = [
   {
@@ -18,12 +19,12 @@ const routes: Routes = [
       {
         path: 'users',
         component: UsersListComponent,
-        resolve: {users: UsersListResolver}
+        resolve: { users: UsersListResolver }
       },
       {
         path: 'groups',
         component: UserGroupListComponent,
-        // resolve: {users: UsersListResolver}
+        resolve: { groups: UserGroupResolver }
       }
     ]
   }
@@ -33,4 +34,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class UsersManagementRoutingModule {}
+export class UsersManagementRoutingModule { }

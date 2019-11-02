@@ -1,7 +1,7 @@
-<div class="main-users-list">
+<div class="main-iam-list">
   <div class="list-management">
     <div class="title">
-      <i class="material-icons">group</i>
+      <i class="material-icons">perm_identity</i>
       <h5>Groups</h5>
     </div>
     <div class="row">
@@ -20,15 +20,15 @@
       </div>
     </div>
   </div>
-  <div class="users-list">
-    <!--    <app-management-table-->
-    <!--      [resultCount]="resultCount"-->
-    <!--      [name]="'users'"-->
-    <!--      [value]="users"-->
-    <!--      (delete)="deleteUser($event)"-->
-    <!--      (edit)="editUser($event)"-->
-    <!--      [fields]="fields"-->
-    <!--      (load)="loadUserLazy($event)"-->
-    <!--    ></app-management-table>-->
+  <div class="groups-list">
+    <app-management-table
+      [resultCount]="resultCount"
+      [name]="'groups'"
+      [value]="groups"
+      (delete)="deleteGroup($event)"
+      (edit)="editGroup($event)"
+      [fields]="fields"
+      (load)="loadGroupLazy($event)"
+    ></app-management-table>
   </div>
 </div>

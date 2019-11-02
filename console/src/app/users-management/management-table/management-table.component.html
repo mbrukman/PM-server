@@ -1,48 +1,29 @@
 <div class="table-wrapper">
-  <p-dataTable
-    [value]="value"
-    [lazy]="isLazy"
-    [rows]="15"
-    [paginator]="true"
-    [pageLinks]="4"
-    [totalRecords]="resultCount"
-    (onLazyLoad)="loadElementLazy($event)"
-  >
+  <p-dataTable [value]="value" [lazy]="isLazy" [rows]="15" [paginator]="true" [pageLinks]="4"
+    [totalRecords]="resultCount" (onLazyLoad)="loadElementLazy($event)">
     <ng-container *ngFor="let field of fields">
       <p-column [field]="field.value" [header]="field.label" [sortable]="true">
         <ng-template let-col let-item="rowData" pTemplate="body">
-          <div class="name-wrapper" *ngIf="field.label == 'Name'">
+          <div class="name-wrapper" *ngIf="field.value == 'name'">
             <a [routerLink]="['/admin/users-management/', name, item._id]">{{
               item[field.value]
             }}</a>
           </div>
-          <div
-            class="name-wrapper"
-            *ngIf="field.label != 'Name' && !isArray(item[field.value])"
-          >
+          <div class="name-wrapper" *ngIf="field.value != 'name' && !isArray(item[field.value])">
             <span>{{ item[field.value] }}</span>
           </div>
-          <div
-            class="name-wrapper tooltip-wrapper"
-            *ngIf="isArray(item[field.value])"
-          >
-            <div
-              class="cube tooltiptext"
-              (mouseenter)="showToolTip($event)"
-              (mouseleave)="hideToolTip($event)"
-            >
+          <div class="name-wrapper tooltip-wrapper" *ngIf="isArray(item[field.value])">
+            <div class="cube tooltiptext" (mouseenter)="showToolTip($event,item[field.value].length)"
+              (mouseleave)="hideToolTip($event)">
               {{ item[field.value].length }}
               <div class="tooltipTemplate">
                 <div class="lists">
                   <li *ngFor="let link of item[field.value]">
-                    <a
-                      [routerLink]="[
+                    <a [routerLink]="[
                         '/admin/users-management/',
                         field.value,
-                        link.id
-                      ]"
-                      >{{ link.label }}</a
-                    >
+                        link._id
+                      ]">{{ link.name }}</a>
                   </li>
                 </div>
               </div>
@@ -51,23 +32,11 @@
         </ng-template>
       </p-column>
     </ng-container>
-    <p-column
-      field=""
-      header="Actions"
-      [sortable]="true"
-      [style]="{ width: '120px' }"
-    >
+    <p-column field="" header="Actions" [sortable]="true" [style]="{ width: '120px' }">
       <ng-template let-col let-i="rowIndex" let-item="rowData" pTemplate="body">
         <div class="actions-wrapper">
-          <i
-            class="material-icons hover"
-            (click)="onConfirmDelete(item._id)"
-            tooltip="Delete"
-            >delete_outline</i
-          >
-          <i class="material-icons hover" (click)="onEdit(i)" tooltip="Edit"
-            >edit</i
-          >
+          <i class="material-icons hover" (click)="onConfirmDelete(item._id)" tooltip="Delete">delete_outline</i>
+          <i class="material-icons hover" (click)="onEdit(i)" tooltip="Edit">edit</i>
         </div>
       </ng-template>
     </p-column>

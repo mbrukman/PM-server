@@ -1,4 +1,4 @@
-<div class="main-users-list">
+<div class="main-iam-list">
   <div class="list-management">
     <div class="title">
       <i class="material-icons">perm_identity</i>
@@ -9,26 +9,14 @@
       <div class="filter-text">
         <div>
           <i class="material-icons">search</i>
-          <input
-            class="form-control"
-            [(ngModel)]="filterOptions.globalFilter"
-            type="text"
-            placeholder="Filter"
-            #globalFilter
-          />
+          <input class="form-control" [(ngModel)]="filterOptions.globalFilter" type="text" placeholder="Filter"
+            #globalFilter />
         </div>
       </div>
     </div>
   </div>
   <div class="users-list">
-    <app-management-table
-      [resultCount]="resultCount"
-      [name]="'users'"
-      [value]="users"
-      (delete)="deleteUser($event)"
-      (edit)="editUser($event)"
-      [fields]="fields"
-      (load)="loadUserLazy($event)"
-    ></app-management-table>
+    <app-management-table [resultCount]="resultCount" [name]="'users'" [value]="users" (delete)="deleteUser($event)"
+      (edit)="editUser($event)" [fields]="fields" (load)="loadUserLazy($event)"></app-management-table>
   </div>
 </div>

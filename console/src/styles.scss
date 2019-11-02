@@ -35,6 +35,12 @@ body {
   }
 }
 
+.main-iam-list {
+  .list-management {
+    @include users-page();
+  }
+}
+
 .kh-btn {
   border: none;
   outline: none !important;

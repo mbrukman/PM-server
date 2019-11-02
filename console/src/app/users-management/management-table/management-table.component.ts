@@ -6,7 +6,6 @@ import { EventEmitter } from '@angular/core';
   styleUrls: ['./management-table.component.scss']
 })
 export class ManagementTableComponent {
-  elements = [];
   @Input('value') value;
   @Input('name') name;
   @Input('fields') fields: { label: string; value: string }[];
@@ -34,8 +33,10 @@ export class ManagementTableComponent {
     this.edit.emit(id);
   }
 
-  showToolTip(e) {
-    e.srcElement.children[0].style['display'] = 'block';
+  showToolTip(e, tooltipLength) {
+    if (tooltipLength) {
+      e.srcElement.children[0].style['display'] = 'block';
+    }
   }
 
   hideToolTip(e) {
