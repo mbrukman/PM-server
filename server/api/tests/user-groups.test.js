@@ -1,4 +1,7 @@
-const { generateGroupUser, generateGroupUserCollection } = require("./factories/user-group.factory");
+const {
+  generateGroupUser,
+  generateGroupUserCollection
+} = require("./factories/user-group.factory");
 const { TestDataManager } = require("./factories");
 const UserGroupModel = require("../../api/models/user-group.model");
 const request = require("supertest");
@@ -6,41 +9,40 @@ const request = require("supertest");
 const baseApiURL = "http://127.0.0.1:3000/api";
 
 describe("All user group endpoints are working as expected.", () => {
-    let testDataManager;
+  let testDataManager;
 
-    beforeEach(() => {
-        testDataManager = new TestDataManager(UserGroupModel);
-        return testDataManager.generateInitialCollection(
-            generateGroupUserCollection(),
-            {},
-            null,
-        );
-    });
+  beforeEach(() => {
+    testDataManager = new TestDataManager(UserGroupModel);
+    return testDataManager.generateInitialCollection(
+      generateGroupUserCollection(),
+      {},
+      null
+    );
+  });
 
+  describe("POST /vault, save new vault", () => {
+    it("should create, save and return new vault", () => {
+      const expected = generateGroupUser();
+      testDataManager.pushToCollection(expected);
 
-    describe("POST /vault, save new vault", () => {
-        it("should create, save and return new vault", () => {
-            const expected = generateGroupUser();
-            testDataManager.pushToCollection(expected);
-
-            return request(baseApiURL)
-                .post(`/user-groups`)
-                .send(expected)
-                .expect(200)
-                .expect("Content-Type", /json/)
-                .then(({ body }) => {
-                    expect.assertions(3);
-                    expect(body.name).toBe(expected.name);
-                    expect(body._id).toBe(expected._id);
-                    expect(body.description).toBe(expected.description);
-                });
-        });
-
-        it("should not create", done => {
-            return request(baseApiURL)
-                .post(`/user-groups`)
-                .send()
-                .expect(500, done);
+      return request(baseApiURL)
+        .post(`/user-groups`)
+        .send(expected)
+        .expect(200)
+        .expect("Content-Type", /json/)
+        .then(({ body }) => {
+          expect.assertions(3);
+          expect(body.name).toBe(expected.name);
+          expect(body._id).toBe(expected._id);
+          expect(body.description).toBe(expected.description);
         });
     });
+
+    it("should not create", done => {
+      return request(baseApiURL)
+        .post(`/user-groups`)
+        .send()
+        .expect(500, done);
+    });
+  });
 });

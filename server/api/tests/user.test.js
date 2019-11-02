@@ -2,7 +2,6 @@ const request = require("supertest");
 const usersFactory = require("../tests/factories/users.factory");
 const User = require("../models/user.model");
 const TestDataManager = require("../tests/factories/test-data-manager");
-
 const app = "localhost:3000";
 
 describe("User tests", () => {

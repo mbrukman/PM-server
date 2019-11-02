@@ -11,8 +11,6 @@ import { CoreModule } from '@core/core.module';
 import { IsSetUpGuard } from '@core/setup/issetup.guard';
 import { KaholoHttpInterceptor } from './http-interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import {IAMModule} from '@app/iam/iam.module';
-
 
 
 
@@ -22,8 +20,7 @@ import {IAMModule} from '@app/iam/iam.module';
     BrowserModule,
     BrowserAnimationsModule,
     SharedModule,
-    AppRoutingModule,
-    IAMModule
+    AppRoutingModule
   ],
   providers: [
     UnsavedGuard,
