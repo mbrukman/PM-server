@@ -5,7 +5,7 @@
       <h5>Groups</h5>
     </div>
     <div class="row">
-      <a class="kh-btn kh-btn-blue" (click)="upsertGroup()">Create Group</a>
+      <a class="kh-btn kh-btn-blue" (click)="openCreateModal()">Create Group</a>
       <div class="filter-text">
         <div>
           <i class="material-icons">search</i>
@@ -24,7 +24,7 @@
     <app-management-table
       [resultCount]="resultCount"
       [name]="'groups'"
-      [value]="groups"
+      [value]="userGroups"
       (delete)="deleteGroup($event)"
       (edit)="editGroup($event)"
       [fields]="fields"

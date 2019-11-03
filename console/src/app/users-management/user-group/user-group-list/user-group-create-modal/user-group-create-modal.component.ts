@@ -17,12 +17,12 @@ export class UserGroupCreateModalComponent {
     description: new FormControl()
   });
 
-  public result = new Subject<UserGroupDataInterface>();
+  public onClose = new Subject<UserGroupDataInterface>();
 
   constructor(public bsModalRef: BsModalRef) {
   }
   onCreateGroup() {
-    this.result.next(this.userGroupForm.value);
+    this.onClose.next(this.userGroupForm.value);
     this.bsModalRef.hide();
   }
 }

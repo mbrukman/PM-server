@@ -58,7 +58,7 @@ export class UserGroupListComponent implements OnInit, OnDestroy {
     const modal = this.modalService.show(UserGroupCreateModalComponent);
     const onCloseSubscription = modal.content.onClose
       .pipe(switchMap((userGroupData: UserGroupDataInterface) => this.userGroupService.createUserGroup(userGroupData)))
-      .subscribe((newGroup) => this.userGroups.push(newGroup));
+      .subscribe(() => this.onDataLoad());
 
     this.mainSubscription.add(onCloseSubscription);
   }
