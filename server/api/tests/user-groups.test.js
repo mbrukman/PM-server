@@ -20,8 +20,28 @@ describe("All user group endpoints are working as expected.", () => {
     );
   });
 
-  describe("POST /vault, save new vault", () => {
-    it("should create, save and return new vault", () => {
+  describe("POST api/user-groups/filter", () => {
+    it(`should respond with list of groups`, () => {
+      return request(baseApiURL)
+        .post("/user-groups/filter")
+        .send({ options: {} })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.items.length).toEqual(testDataManager.collection.length);
+          expect(body.totalCount).toEqual(testDataManager.collection.length);
+        });
+    });
+
+    it(`should respond with 500`, done => {
+      return request(baseApiURL)
+        .post("/user-groups/filter")
+        .send()
+        .expect(500, done);
+    });
+  });
+
+  describe("POST /user-group, save new user-group", () => {
+    it("should create, save and return new user-group", () => {
       const expected = generateGroupUser();
       testDataManager.pushToCollection(expected);
 
