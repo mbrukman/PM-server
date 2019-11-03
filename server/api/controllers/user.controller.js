@@ -1,4 +1,5 @@
 const userService = require("../services/user.service");
+const winston = require("winston");
 
 function filter(req, res) {
   const params = JSON.parse(JSON.stringify(req.query));
@@ -6,6 +7,27 @@ function filter(req, res) {
   userService.filter(params).then(x => {
     return res.send(x);
   });
+}
+
+async function deleteUser(req, res) {
+  try {
+    const userDeleted = await userService.deleteUser(req.params.id);
+    req.io.emit("notification", {
+      title: "User deleted",
+      message: ``,
+      type: "success"
+    });
+    return res.status(200).send(userDeleted);
+  } catch (err) {
+    req.io.emit("notification", {
+      title: "Whoops..",
+      message: `Error deleting user`,
+      type: "error"
+    });
+
+    winston.log("error", "Error deleting user", err);
+    return res.status(500).send(err);
+  }
 }
 
 function createUser(req, res) {
@@ -29,4 +51,4 @@ function createUser(req, res) {
     });
 }
 
-module.exports = { filter, createUser };
+module.exports = { filter, createUser, deleteUser };

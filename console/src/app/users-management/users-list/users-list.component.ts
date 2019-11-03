@@ -1,7 +1,7 @@
 import { Component, OnInit, ElementRef, ViewChild, OnDestroy } from '@angular/core';
-import { User } from '../models/user.model';
+import { User } from '../../services/users/user.model';
 import { Subscription, fromEvent } from 'rxjs';
-import { UsersManagementService } from '../users-management.service';
+import { UserService } from '@app/services/users/user.service';
 import { ActivatedRoute, Data } from '@angular/router';
 import { debounceTime, switchMap, tap } from 'rxjs/operators';
 import { FilterOptions } from '@app/shared/model/filter-options.model';
@@ -30,7 +30,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
     { label: 'Date Created', value: 'createdAt' }
   ];
   constructor(
-    private usersManagementService: UsersManagementService,
+    private userService: UserService,
     private route: ActivatedRoute,
     private modalService: BsModalService
   ) { }
@@ -59,13 +59,14 @@ export class UsersListComponent implements OnInit, OnDestroy {
   }
 
   onDataLoad(): void {
-    const getAllUserSubscription = this.usersManagementService.getAllUsers(null, this.filterOptions).subscribe(users => {
+    const getAllUserSubscription = this.userService.getAllUsers(null, this.filterOptions).subscribe(users => {
       this.users = users.items;
       this.resultCount = users.totalCount;
     });
     this.mainSubscription.add(getAllUserSubscription);
   }
 
+  upsertUser(user = new User('', '', '', new Date()), isEdit = false) { }
 
   openCreateModal() {
     const modal = this.modalService.show(CreateUserComponent);
@@ -84,8 +85,9 @@ export class UsersListComponent implements OnInit, OnDestroy {
     throw new Error('Method not implemented.');
   }
 
-  deleteUser(id: string) {
-    throw new Error('Method not implemented.');
+  deleteUser(id: string): void {
+    const deleteUserSubScription = this.userService.deleteUser(id).subscribe(() => this.onDataLoad());
+    this.mainSubscription.add(deleteUserSubScription);
   }
 
   loadUserLazy(event: { first: number; sortField: any; sortOrder: number; }) {

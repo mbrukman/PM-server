@@ -6,6 +6,7 @@ const userController = require("../controllers/user.controller");
 
 router.get("/", userController.filter);
 
-router.post("/", userController.createUser);
+router.post("/create", userController.createUser);
+router.delete("/:id", userController.deleteUser);
 
 module.exports = router;

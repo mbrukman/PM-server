@@ -74,6 +74,10 @@ class UserService {
       });
     });
   }
+
+  deleteUser(userId) {
+    return User.deleteOne({ _id: userId });
+  }
 }
 
 const userService = new UserService();

@@ -3,6 +3,7 @@ const usersFactory = require("../tests/factories/users.factory");
 const User = require("../models/user.model");
 const TestDataManager = require("../tests/factories/test-data-manager");
 const app = "localhost:3000";
+const { randomIdx } = require("./helpers");
 
 describe("User tests", () => {
   const usersTestDataManager = new TestDataManager(User);
@@ -70,6 +71,26 @@ describe("User tests", () => {
           expect(body.name).toBe("ValidationError");
           expect(body.errors.email.name).toBe("ValidatorError");
         });
+    });
+  });
+
+  describe("DELETE api/users/", () => {
+    it(`should respond with list of users`, () => {
+      const randomIndex = randomIdx(usersTestDataManager.collection.length);
+      const userId = usersTestDataManager.collection[randomIndex]._id;
+      return request(app)
+        .delete(`/api/users/${userId}`)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.n).toEqual(1);
+        });
+    });
+
+    it(`should respond with 500`, done => {
+      return request(app)
+        .delete("/api/users/1")
+        .send()
+        .expect(500, done);
     });
   });
 });
