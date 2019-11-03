@@ -13,11 +13,6 @@
     "install:all": "npm i && cd ../console && npm i",
     "eslint": "./node_modules/.bin/eslint ./api/tests"
   },
-  "husky": {
-    "hooks": {
-      "pre-push": "npm run eslint && npm t"
-    }
-  },
   "eslintConfig": {
     "env": {
       "node": true,

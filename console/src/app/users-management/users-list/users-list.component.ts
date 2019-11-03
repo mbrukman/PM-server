@@ -6,6 +6,7 @@ import { ActivatedRoute, Data } from '@angular/router';
 import { PopupService } from '@app/shared/services/popup.service';
 import { debounceTime } from 'rxjs/operators';
 import { FilterOptions } from '@app/shared/model/filter-options.model';
+import UserGroupDataInterface from "@app/services/user-group/user-group-data.interface";
 
 @Component({
   selector: 'app-users-list',
@@ -64,7 +65,12 @@ export class UsersListComponent implements OnInit, OnDestroy {
     this.mainSubscription.add(getAllUserSubscription);
   }
 
-  upsertUser(user, isEdit = false) { }
+  upsertUser(user = new User({
+    _id: '',
+    name: '',
+    email: '',
+    dataCreated: new Date()
+  }), isEdit = false) { }
 
   editUser(index) {
     this.upsertUser(this.users[index], true);
