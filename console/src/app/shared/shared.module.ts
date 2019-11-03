@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DataTableModule, DropdownModule, SharedModule as PrimeSharedModule, TreeTableModule } from 'primeng/primeng';
 import { DragDropModule } from 'primeng/dragdrop';
-import { AccordionModule as PMAccordionModule } from 'primeng/accordion'; 
+import { AccordionModule as PMAccordionModule } from 'primeng/accordion';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AccordionModule } from 'ngx-bootstrap/accordion';
@@ -35,7 +35,7 @@ import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplica
 import { PluginUploadComponent } from '@plugins/plugin-upload/plugin-upload.component';
 import { ImportModalComponent } from '@projects/project-details/import-modal/import-modal.component';
 import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-vault-items.component';
-
+import {UserGroupCreateModalComponent} from '@app/users-management/user-group/user-group-list/user-group-create-modal/user-group-create-modal.component';
 
 @NgModule({
   imports: [
@@ -80,7 +80,8 @@ import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-va
     MapDuplicateComponent,
     PluginUploadComponent,
     ImportModalComponent,
-    UpsertVaultItemsComponent
+    UpsertVaultItemsComponent,
+    UserGroupCreateModalComponent
 
   ],
   exports: [
@@ -102,9 +103,10 @@ import  { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-va
     InPipe,
     MapsCardsComponents,
     ExecutionChartComponent,
-    ParamsComponent
+    ParamsComponent,
+    UserGroupCreateModalComponent
   ],
-  entryComponents: [ConfirmComponent, RawOutputComponent,AgentsGroupUpsertFilterComponent,EditAgentComponent,InputPopupComponent,AgentsGroupUpsertComponent,AddConfigurationComponent,SelectAgentComponent,TriggerFormComponent,MapDuplicateComponent,PluginUploadComponent,ImportModalComponent,UpsertVaultItemsComponent]
+  entryComponents: [ConfirmComponent, RawOutputComponent, AgentsGroupUpsertFilterComponent, EditAgentComponent, InputPopupComponent, AgentsGroupUpsertComponent, AddConfigurationComponent, SelectAgentComponent, TriggerFormComponent, MapDuplicateComponent, PluginUploadComponent, ImportModalComponent, UpsertVaultItemsComponent, UserGroupCreateModalComponent]
 })
 export class SharedModule {
 }

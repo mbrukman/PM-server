@@ -10,18 +10,19 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
   styleUrls: ['./user-group-create-modal.component.scss']
 })
 export class UserGroupCreateModalComponent {
+  edit: boolean = false;
 
   public userGroupForm = new FormGroup({
     name: new FormControl('', [Validators.required]),
     description: new FormControl()
   });
 
-  public onClose = new Subject<UserGroupDataInterface>();
+  public result = new Subject<UserGroupDataInterface>();
 
   constructor(public bsModalRef: BsModalRef) {
   }
   onCreateGroup() {
-    this.onClose.next(this.userGroupForm.value);
+    this.result.next(this.userGroupForm.value);
     this.bsModalRef.hide();
   }
 }

@@ -1,4 +1,4 @@
-import {User} from '@app/users-management/models/user.model';
+import { User } from '@app/users-management/models/user.model';
 
 export default interface UserGroupDataInterface {
   name: string;

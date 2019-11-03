@@ -17,8 +17,8 @@ export class PopupService {
     return modal.content.result;
   }
 
-  openConfirm(title, message, confirmText, cancelText, thirdButtonText) {
-    let content = {
+  openConfirm(title, message, confirmText, cancelText, thirdButtonText ) {
+    const content = {
       message: message,
       confirm: confirmText,
       title: title,

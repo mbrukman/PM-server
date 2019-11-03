@@ -7,9 +7,9 @@ import {debounceTime, switchMap} from 'rxjs/operators';
 import UserGroup from '@app/services/user-group/user-group.model';
 import {FilterOptions} from '@app/shared/model/filter-options.model';
 import {UserGroupService} from '@app/services/user-group/user-group.service';
-import UserGroupDataInterface from '@app/services/user-group/user-group-data.interface';
 import {UserGroupCreateModalComponent} from '@app/users-management/user-group/user-group-list/user-group-create-modal/user-group-create-modal.component';
-
+import UserGroupDataInterface from '@app/services/user-group/user-group-data.interface';
+import { PopupService } from '@app/shared/services/popup.service';
 
 @Component({
   selector: 'app-user-group-list',
@@ -34,7 +34,7 @@ export class UserGroupListComponent implements OnInit, OnDestroy {
   constructor(
     private userGroupService: UserGroupService,
     private route: ActivatedRoute,
-    private modalService: BsModalService
+    private popupService: PopupService
   ) {
   }
 

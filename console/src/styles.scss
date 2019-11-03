@@ -8,7 +8,8 @@
   src: url("./assets/fonts/OpenSans-Regular.ttf");
 }
 
-html, body {
+html,
+body {
   font-family: "Roboto";
   height: 100%;
   @extend .main-background;
@@ -17,7 +18,7 @@ html, body {
 .section-title {
   @extend .section-title;
 }
-.pointer{
+.pointer {
   cursor: pointer;
 }
 
@@ -27,16 +28,15 @@ html, body {
   background-color: #bbb;
   border-radius: 50%;
   &.green {
-      background-color: #38ba24;
+    background-color: #38ba24;
   }
   &.red {
-      background-color: #de293f;
+    background-color: #de293f;
   }
 }
 
-
-.kh-btn{
-  border:none;
+.kh-btn {
+  border: none;
   outline: none !important;
   cursor: pointer;
   height: 38px;
@@ -49,37 +49,37 @@ html, body {
   justify-content: center;
   align-items: center;
   color: #ffffff;
-  
-  &:not(:last-child){
+
+  &:not(:last-child) {
     margin-right: 15px !important;
   }
- 
-  &:hover{ 
+
+  &:hover {
     text-decoration: none;
-    color : #ffffff;
+    color: #ffffff;
   }
 
-  &:disabled{
+  &:disabled {
     cursor: default;
   }
 
-  &-blue{
-    background-color:#44acdf;
-    &:hover{
-      background-color:#2897ce
+  &-blue {
+    background-color: #44acdf;
+    &:hover {
+      background-color: #2897ce;
     }
-    &:disabled{
+    &:disabled {
       background-color: #35627a;
-      color : #698a9c;
+      color: #698a9c;
     }
   }
 
-  &-gray{
-    background-color:#828384;
-    &:hover{
-      background-color: #737475
+  &-gray {
+    background-color: #828384;
+    &:hover {
+      background-color: #737475;
     }
-    &:disabled{
+    &:disabled {
       background-color: #484b4f;
       color: #727477;
     }
@@ -99,7 +99,9 @@ html, body {
   background: $dark-color;
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   border: 1px solid $input-border !important;
   background-color: $input-bg !important;
   outline: none !important;
@@ -127,10 +129,8 @@ textarea {
   background: transparent; /* make scrollbar invisible */
 }
 
-
 .main {
   overflow-y: auto;
-
 }
 
 .card {
@@ -142,7 +142,8 @@ textarea {
   border-color: $blue-dark-2;
 }
 
-.bs-datepicker-body, bs-datepicker-head {
+.bs-datepicker-body,
+bs-datepicker-head {
   background: $grey-dark-1;
   border: 1px solid $grey-light-1;
   border-radius: 5px;
@@ -173,7 +174,8 @@ a {
   border-bottom: 1px solid $cool-grey;
 }
 
-.ui-datatable th.ui-state-default, .ui-datatable .ui-datatable-thead > tr > th {
+.ui-datatable th.ui-state-default,
+.ui-datatable .ui-datatable-thead > tr > th {
   border: none;
   background: none;
   color: $greyish-text;
@@ -186,12 +188,12 @@ a {
   padding: 5px;
 }
 
-.ui-widget-content, .ui-datatable tbody > tr.ui-widget-content.ui-datatable-odd {
+.ui-widget-content,
+.ui-datatable tbody > tr.ui-widget-content.ui-datatable-odd {
   border: none;
   background: none;
   color: $greyish-text;
   border-bottom: 1px solid $cool-grey;
-
 }
 
 tr.ui-widget-content.ui-datatable-odd {
@@ -217,7 +219,8 @@ tr.ui-widget-content.ui-datatable-odd {
   text-align: left;
 }
 
-.ui-paginator .ui-paginator-page, .ui-state-default {
+.ui-paginator .ui-paginator-page,
+.ui-state-default {
   background: none;
   border: 0;
   &.ui-state-active {
@@ -257,7 +260,8 @@ tr.ui-widget-content.ui-datatable-odd {
 
 /*------*/
 
-table, .table {
+table,
+.table {
   color: $greyish-text;
   font-size: 14px;
   thead {
@@ -275,19 +279,19 @@ table, .table {
       &:hover {
         background-color: $hover-color !important;
         box-shadow: -4px 0px 0px 0px $turquoise-blue;
-        .ui-cell-data{
-          color:#dddddd;
+        .ui-cell-data {
+          color: #dddddd;
         }
       }
     }
   }
-  th, td {
+  th,
+  td {
     border-top: 0px;
     border-bottom: 1px solid $cool-grey;
     a {
       text-decoration: underline;
     }
-
   }
 }
 
@@ -302,18 +306,16 @@ table, .table {
   .panel.card {
     background: transparent !important;
   }
-
 }
 
 // dropdown
-
 
 .dropdown-menu {
   border-radius: 3px;
   border: 1px solid #868e96;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
   background: $kh-background;
-  padding:  9px 7px;
+  padding: 9px 7px;
   margin: 0px;
   font-size: 14px;
   .dropdown-item {
@@ -327,9 +329,9 @@ table, .table {
       color: white;
       background: $pale-blue;
     }
-    &.disabled{
+    &.disabled {
       pointer-events: none;
-      color:#727477!important;
+      color: #727477 !important;
     }
   }
 }
@@ -339,7 +341,6 @@ table, .table {
   &:hover {
     background: $turquoise-blue !important;
     color: #000 !important;
-
   }
 }
 
@@ -377,32 +378,31 @@ rect.body {
     }
 
     > i {
-      margin-left : 10px;
+      margin-left: 10px;
     }
   }
 }
-.modal-content{
+.modal-content {
   background: $background;
   .modal-content-wrapper {
     background: $background;
     border-radius: 6px;
     box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.75);
-    &.no-title{
-      .modal-header{
+    &.no-title {
+      .modal-header {
         border: none;
         position: absolute;
         right: 40px;
         top: 2px;
         z-index: 1;
-        .close{
+        .close {
           position: absolute;
-          margin:-5px -24px -28px auto;
+          margin: -5px -24px -28px auto;
         }
       }
     }
-    &:not(.no-title){
-      .modal-body{
-
+    &:not(.no-title) {
+      .modal-body {
         padding: 40px 38px 0px;
       }
     }
@@ -414,7 +414,7 @@ rect.body {
       padding-top: 0 !important;
       height: 64px;
       position: relative;
-      h4{
+      h4 {
         font-size: 22px;
         font-weight: 300;
         margin: auto;
@@ -433,38 +433,43 @@ rect.body {
       border-bottom: 0;
       padding: 53px 38px 0px;
 
-      .form-group{
+      .form-group {
         margin-bottom: 25px;
-        label{
-          color:$greyish-text;
-          font-size:14px;
-          &:not(:first-of-type){
+        &:last-child {
+          margin-bottom: 0;
+        }
+        textarea {
+          height: 146px;
+        }
+        label {
+          color: $greyish-text;
+          font-size: 14px;
+          &:not(:first-of-type) {
             margin-top: 25px;
           }
-          &:not(.checkbox.ui-dropdown-label){
+          &:not(.checkbox.ui-dropdown-label) {
             margin-bottom: 14px;
           }
         }
       }
-      &.no-button{
+      &.no-button {
         margin-bottom: 38px;
       }
 
-      .form-group:last-child{
-        margin-bottom: 0px; 
+      .form-group:last-child {
+        margin-bottom: 0px;
       }
     }
     .modal-footer {
       border-top: 0;
       padding: 38px 38px 38px;
-      button{
+      button {
         margin-left: 0px;
       }
-
-    } 
+    }
   }
 }
-  
+
 .ui-datepicker {
   background: $background;
   .ui-datepicker-header {
@@ -519,7 +524,6 @@ rect.body {
         border: 3px solid $turquoise-blue;
       }
     }
-
   }
   .cal-day-cell {
     &:not(:last-child) {
@@ -538,7 +542,6 @@ rect.body {
     border: 1px solid $cool-grey;
     .cal-cell-row {
       border-bottom: 1px solid $cool-grey;
-
     }
   }
 }
@@ -552,14 +555,14 @@ rect.body {
   }
 }
 
-span[contenteditable=true]{
+span[contenteditable="true"] {
   display: inline-block;
-  &:hover{
+  &:hover {
     cursor: text;
   }
 
-  &:empty{
-    &:before{
+  &:empty {
+    &:before {
       content: attr(placeholder);
       color: gray;
     }
@@ -568,48 +571,49 @@ span[contenteditable=true]{
 
 .pm-inline-edit {
   padding: 5px;
-  &:hover, &:focus, &:empty {
+  &:hover,
+  &:focus,
+  &:empty {
     background: $input-bg;
     border-radius: 5px;
     border: 1px solid $input-border;
     outline: none !important;
   }
 }
-.head-title{
+.head-title {
   width: 100%;
   height: 70px;
   background-color: $kh-background;
   display: flex;
   align-items: center;
-  h1{
-      font-weight: 300;
-      margin: 0px 0px 0px 40px;
-      font-size: 22px;
-      line-height: normal;
-      color: $kaholo-orange;
-      padding-right: 10px
-  }    
+  h1 {
+    font-weight: 300;
+    margin: 0px 0px 0px 40px;
+    font-size: 22px;
+    line-height: normal;
+    color: $kaholo-orange;
+    padding-right: 10px;
+  }
 }
 
-
-.pm-main-wrapper{
-  padding : 20px 30px;
+.pm-main-wrapper {
+  padding: 20px 30px;
 }
 
-.row{
-  margin-left : 0;
-  margin-right : 0;
+.row {
+  margin-left: 0;
+  margin-right: 0;
 }
 
-.fas{
-    font-family: fontawesome !important;
+.fas {
+  font-family: fontawesome !important;
 }
 
-.ellipsis{
+.ellipsis {
   @include ellipsis();
 }
 
-.material-icons{
+.material-icons {
   // to fix issues with Edge browsers
-  font-feature-settings: 'liga';
+  font-feature-settings: "liga";
 }
