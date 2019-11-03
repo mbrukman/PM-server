@@ -20,8 +20,7 @@ describe("User tests", () => {
   describe("POST api/users/filter", () => {
     it(`should respond with list of users`, () => {
       return request(app)
-        .post("/api/users/filter")
-        .send({ options: {} })
+        .get("/api/users/filter?options=''")
         .expect(200)
         .then(({ body }) => {
           expect(body.items.length).toEqual(
@@ -35,8 +34,7 @@ describe("User tests", () => {
 
     it(`should respond with 500`, done => {
       return request(app)
-        .post("/api/users/filter")
-        .send()
+        .get("/api/users/filter")
         .expect(500, done);
     });
   });

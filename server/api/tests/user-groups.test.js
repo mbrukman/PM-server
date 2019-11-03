@@ -23,8 +23,7 @@ describe("All user group endpoints are working as expected.", () => {
   describe("POST api/user-groups/filter", () => {
     it(`should respond with list of groups`, () => {
       return request(baseApiURL)
-        .post("/user-groups/filter")
-        .send({ options: {} })
+        .get("/user-groups/filter?options=''")
         .expect(200)
         .then(({ body }) => {
           expect(body.items.length).toEqual(testDataManager.collection.length);
@@ -34,8 +33,7 @@ describe("All user group endpoints are working as expected.", () => {
 
     it(`should respond with 500`, done => {
       return request(baseApiURL)
-        .post("/user-groups/filter")
-        .send()
+        .get("/user-groups/filter")
         .expect(500, done);
     });
   });
