@@ -1,22 +1,22 @@
 <div class="modal-content">
-  <div class="modal-header pr-3 pl-3">
-    <h4 class="modal-title pull-left">Create Group</h4>
-    <i class="material-icons text-white close" (click)="bsModalRef.hide()">close</i>
+  <div class="modal-header pr-0 pl-0 pt-0">
+      <h4 class="modal-title">Create Group</h4>
+      <i class="material-icons text-white close" (click)="bsModalRef.hide()">close</i>
   </div>
-  <div class="modal-body pr-3 pl-3">
+  <div class="modal-body  pr-0 pl-0 pb-0">
     <form [formGroup]="userGroupForm" (ngSubmit)="onCreateGroup()">
       <div class="form-group">
         <label>Group Name</label>
-        <input type="text" placeholder="My Group Name" class="form-control" formControlName="name">
+        <input type="text" class="form-control" formControlName="name">
       </div>
-      <div class="form-group">
+      <div class="form-group m-0">
         <label>Group Name</label>
-        <textarea placeholder="My Group description" class="form-control"
+        <textarea class="form-control m-0"
                   formControlName="description"></textarea>
       </div>
-      <div class="d-flex flex-row justify-content-end pr-3 pl-3 pb-3">
+      <div class="d-flex flex-row justify-content-end pr-0 pl-0 pb-0 btn-row">
         <button type="button" class="kh-btn kh-btn-gray" (click)="bsModalRef.hide()">Cancel</button>
-        <button type="submit" class="kh-btn kh-btn-blue" [disabled]="userGroupForm.invalid">Create group</button>
+        <button type="submit" class="kh-btn kh-btn-blue" [disabled]="userGroupForm.invalid">Create</button>
       </div>
     </form>
   </div>
