@@ -9,22 +9,29 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { UsersListResolver } from './resolvers/users-list.resolver';
 import { UserGroupModule } from '@app/users-management/user-group/user-group.module';
 import { UserGroupResolver } from './resolvers/user-group.resolver';
+import { CreateUserComponent } from './users-list/create-user/create-user.component';
+import { ModalModule } from 'ngx-bootstrap';
+import { ManagementTableComponent } from './management-table/management-table.component';
 
 @NgModule({
+  entryComponents: [CreateUserComponent],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     SharedModule,
     UsersManagementRoutingModule,
-    UserGroupModule,
-    TooltipModule.forRoot()
+    UserGroupModule ,
+    TooltipModule.forRoot(),
+    ModalModule,
+
   ],
   declarations: [
     UsersManagementComponent,
-    UsersListComponent
+    UsersListComponent,
+    ManagementTableComponent,
+    CreateUserComponent
   ],
-  providers: [UsersListResolver, UserGroupResolver],
-  entryComponents: []
+  providers: [UsersListResolver, UserGroupResolver]
 })
 export class UsersManagementModule { }

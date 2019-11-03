@@ -19,4 +19,9 @@ export class UsersManagementService {
     params = params.set('options', JSON.stringify(options));
     return this.http.get<IEntityList<User>>(`api/users`, { params: params });
   }
+
+  createUser(name, email, password, phoneNumber?, changePasswordOnNextLogin = false) {
+    console.log(arguments);
+    throw new Error('Not implemented');
+  }
 }

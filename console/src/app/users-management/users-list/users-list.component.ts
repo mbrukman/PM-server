@@ -3,10 +3,11 @@ import { User } from '../models/user.model';
 import { Subscription, fromEvent } from 'rxjs';
 import { UsersManagementService } from '../users-management.service';
 import { ActivatedRoute, Data } from '@angular/router';
-import { PopupService } from '@app/shared/services/popup.service';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { FilterOptions } from '@app/shared/model/filter-options.model';
 import UserGroupDataInterface from '@app/services/user-group/user-group-data.interface';
+import { BsModalService } from 'ngx-bootstrap';
+import { CreateUserComponent } from './create-user/create-user.component';
 
 @Component({
   selector: 'app-users-list',
@@ -31,7 +32,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
   constructor(
     private usersManagementService: UsersManagementService,
     private route: ActivatedRoute,
-    private popupService: PopupService
+    private modalService: BsModalService
   ) { }
   @ViewChild('globalFilter') globalFilterElement: ElementRef;
 
@@ -65,19 +66,27 @@ export class UsersListComponent implements OnInit, OnDestroy {
     this.mainSubscription.add(getAllUserSubscription);
   }
 
-  upsertUser(user = new User('', '', '', new Date()), isEdit = false) { }
 
-  editUser(index: number): void {
-    this.upsertUser(this.users[index], true);
+  openCreateModal() {
+    const modal = this.modalService.show(CreateUserComponent);
+    // const onCloseSubscription = modal.content.onClose
+    //   .pipe(switchMap((userData: User) => this.usersManagementService.createUser( {...userData} )))
+    //   .subscribe((newUser: User) => this.users.push(newUser));
+
+    // this.mainSubscription.add(onCloseSubscription);
   }
 
-  deleteUser(id: string): void {
-    console.log(id);
+  editUser(index: string | number) {
+    // this.upsertUser(this.users[index], true);
   }
 
-  loadUserLazy(event: any): void {
-    let page;
-    let sort;
+  deleteUser(id: string) {
+    throw new Error('Method not implemented.');
+  }
+
+  loadUserLazy(event: { first: number; sortField: any; sortOrder: number; }) {
+    let page: number;
+    let sort: string;
     if (event) {
       page = event.first / 15 + 1;
       if (event.sortField) {
