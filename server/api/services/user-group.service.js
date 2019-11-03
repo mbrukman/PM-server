@@ -11,14 +11,14 @@ function getSort(sortString) {
 }
 
 class UserGroupService {
-  constructor() { }
+  constructor() {}
 
   create(groupData) {
     const newUserGroup = new UserGroupModel(groupData);
     return newUserGroup.save();
   }
 
-  filter(filterOptions = {}) {
+  async filter(filterOptions = {}) {
     const fields = filterOptions.fields;
     const sort = filterOptions.options.sort || "name";
     const page = Number(filterOptions.options.page);
@@ -61,13 +61,19 @@ class UserGroupService {
       }
     ];
 
-    return UserGroupModel.aggregate(resultsQuery).then(groups => {
-      return UserGroupModel.populate(groups, { path: 'users' }).then(groups => {
-        return UserGroupModel.aggregate(countQuery).then(r => {
-          return { items: groups, totalCount: r.length ? r[0].count : 0 };
-        });
-      })
-    });
+    try {
+      const groups = await UserGroupModel.aggregate(resultsQuery);
+      const populatedGroups = await UserGroupModel.populate(groups, {
+        path: "users"
+      });
+      const totalGroupLength = await UserGroupModel.aggregate(countQuery);
+      return {
+        items: populatedGroups,
+        totalCount: totalGroupLength.length ? totalGroupLength[0].count : 0
+      };
+    } catch (err) {
+      return err;
+    }
   }
 }
 

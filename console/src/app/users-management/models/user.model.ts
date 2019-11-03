@@ -5,7 +5,7 @@ export class User {
   email: string;
   dateCreated: Date;
 
-  constructor({_id, name, email, dataCreated}) {
+  constructor(_id, name, email, dataCreated) {
     this._id = _id;
     this.name = name;
     this.email = email;

@@ -18,9 +18,9 @@ export class PluginsService {
 
   list() {
     return this.http.get<Plugin[]>(`api/plugins`).pipe(
-      map(plugins=>{
-      return plugins.map(plugin=> new Plugin(plugin));
-    }))
+      map(plugins => {
+      return plugins.map(plugin => new Plugin(plugin));
+    }));
   }
 
 
@@ -28,12 +28,12 @@ export class PluginsService {
     return this.http.post(`api/plugins/upload`, file);
   }
 
-  updateSettings(pluginId,settings):Observable<any>{
+  updateSettings(pluginId, settings): Observable<any>{
     return this.http.post(`api/plugins/${pluginId}/settings`, settings);
   }
 
-  getById(pluginId){
-    return this.http.get<Plugin>(`api/plugins/${pluginId}`)
+  getById(pluginId): Observable<any>{
+    return this.http.get<Plugin>(`api/plugins/${pluginId}`);
   }
 
 }

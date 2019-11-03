@@ -6,7 +6,7 @@ import { ActivatedRoute, Data } from '@angular/router';
 import { PopupService } from '@app/shared/services/popup.service';
 import { debounceTime } from 'rxjs/operators';
 import { FilterOptions } from '@app/shared/model/filter-options.model';
-import UserGroupDataInterface from "@app/services/user-group/user-group-data.interface";
+import UserGroupDataInterface from '@app/services/user-group/user-group-data.interface';
 
 @Component({
   selector: 'app-users-list',
@@ -57,7 +57,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
     this.mainSubscription.unsubscribe();
   }
 
-  onDataLoad() {
+  onDataLoad(): void {
     const getAllUserSubscription = this.usersManagementService.getAllUsers(null, this.filterOptions).subscribe(users => {
       this.users = users.items;
       this.resultCount = users.totalCount;
@@ -72,15 +72,15 @@ export class UsersListComponent implements OnInit, OnDestroy {
     dataCreated: new Date()
   }), isEdit = false) { }
 
-  editUser(index) {
+  editUser(index: number): void {
     this.upsertUser(this.users[index], true);
   }
 
-  deleteUser(id) {
+  deleteUser(id: string): void {
     console.log(id);
   }
 
-  loadUserLazy(event) {
+  loadUserLazy(event: any): void {
     let page;
     let sort;
     if (event) {

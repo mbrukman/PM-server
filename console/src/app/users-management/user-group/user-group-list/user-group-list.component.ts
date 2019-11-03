@@ -76,11 +76,11 @@ export class UserGroupListComponent implements OnInit, OnDestroy {
   //   this.upsertGroup(this.userGroups[index], true);
   // }
 
-  deleteGroup(id) {
+  deleteGroup(id: string): void {
     console.log(id);
   }
 
-  loadGroupLazy(event) {
+  loadGroupLazy(event: any): void {
     let page;
     let sort;
     if (event) {

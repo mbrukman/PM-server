@@ -13,27 +13,27 @@ export class ManagementTableComponent {
   @Input('isLazy') isLazy: boolean = true;
   @Output() delete: EventEmitter<string | object> = new EventEmitter<string | object>();
   @Output() edit: EventEmitter<string | object> = new EventEmitter<string | object>();
-  @Output() load: EventEmitter<string | object> = new EventEmitter<any>();
+  @Output() load: EventEmitter<string | object> = new EventEmitter<string | object>();
 
   constructor() { }
 
-  isArray(item: object) {
+  isArray(item: object): boolean {
     return Array.isArray(item);
   }
 
-  loadElementLazy(event: object) {
+  loadElementLazy(event: object): void {
     this.load.emit(event);
   }
 
-  onConfirmDelete(id: string) {
+  onConfirmDelete(id: string): void {
     this.delete.emit(id);
   }
 
-  onEdit(id: string) {
+  onEdit(id: string): void {
     this.edit.emit(id);
   }
 
-  showToolTip(e, tooltipLength) {
+  showToolTip(e: any, tooltipLength: number): void {
     if (tooltipLength) {
       e.srcElement.children[0].style['display'] = 'block';
     }
