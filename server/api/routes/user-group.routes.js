@@ -5,6 +5,6 @@ const router = express.Router();
 const userGroupController = require("../controllers/user-group.controller");
 
 router.post("/", userGroupController.create);
-router.post("/filter", userGroupController.filter);
+router.get("/filter", userGroupController.filter);
 
 module.exports = router;

@@ -1,7 +1,8 @@
 const userService = require("../services/user.service");
 
 function filter(req, res) {
-  userService.filter(req.body).then(x => {
+  const params = JSON.parse(JSON.stringify(req.query));
+  userService.filter(params).then(x => {
     return res.send(x);
   });
 }

@@ -19,9 +19,9 @@ module.exports = {
   },
 
   async filter(req, res) {
+    const params = JSON.parse(JSON.stringify(req.query));
     try {
-      const { body } = req;
-      const userGroup = await userGroupService.filter(body);
+      const userGroup = await userGroupService.filter(params);
       return res.json(userGroup);
     } catch (err) {
       winston.log("error", "Error filtering user group.", err);

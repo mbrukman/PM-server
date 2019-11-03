@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import UserGroupDataInterface from '@app/services/user-group/user-group-data.interface';
 import UserGroup from '@app/services/user-group/user-group.model';
 import { Observable } from 'rxjs';
@@ -20,6 +20,11 @@ export class UserGroupService {
   }
 
   getAllGroups(fields?: object, options?: FilterOptions): Observable<IEntityList<UserGroup>> {
-    return this.http.post<IEntityList<UserGroup>>('api/user-groups/filter', { fields, options });
+    let params = new HttpParams();
+    if (fields){
+      params = params.set('fields', JSON.stringify(fields));
+    }
+    params = params.set('options', JSON.stringify(options));
+    return this.http.get<IEntityList<UserGroup>>('api/user-groups/filter', { params: params });
   }
 }

@@ -4,7 +4,7 @@ const router = express.Router();
 
 const userController = require("../controllers/user.controller");
 
-router.post("/filter", userController.filter);
+router.get("/filter", userController.filter);
 
 router.post("/create", userController.createUser);
 
