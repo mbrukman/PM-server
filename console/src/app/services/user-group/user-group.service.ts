@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import UserGroupDataInterface from '@app/services/user-group/user-group-data.interface';
 import UserGroup from '@app/services/user-group/user-group.model';
 import {Observable} from 'rxjs';
-import {map, tap} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 
 
 @Injectable({providedIn: 'root'})
