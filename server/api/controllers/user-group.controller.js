@@ -20,6 +20,7 @@ module.exports = {
 
   async filter(req, res) {
     const params = JSON.parse(JSON.stringify(req.query));
+    params.options = JSON.parse(params["options"]);
     try {
       const userGroup = await userGroupService.filter(params);
       return res.json(userGroup);
