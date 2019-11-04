@@ -17,6 +17,6 @@ export class UsersManagementService {
       params = params.set('fields', JSON.stringify(fields));
     }
     params = params.set('options', JSON.stringify(options));
-    return this.http.get<IEntityList<User>>(`api/users/filter`, { params: params });
+    return this.http.get<IEntityList<User>>(`api/users`, { params: params });
   }
 }

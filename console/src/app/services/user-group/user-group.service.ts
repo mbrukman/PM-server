@@ -25,6 +25,6 @@ export class UserGroupService {
       params = params.set('fields', JSON.stringify(fields));
     }
     params = params.set('options', JSON.stringify(options));
-    return this.http.get<IEntityList<UserGroup>>('api/user-groups/filter', { params: params });
+    return this.http.get<IEntityList<UserGroup>>('api/user-groups', { params: params });
   }
 }
