@@ -9,7 +9,7 @@ import { Subject } from 'rxjs';
   templateUrl: './create-user.component.html',
   styleUrls: ['./create-user.component.scss']
 })
-export class CreateUserComponent implements OnInit {
+export class CreateUserComponent {
 
   constructor(public bsModalRef: BsModalRef, private formBuilder: FormBuilder) {}
 
@@ -38,9 +38,6 @@ export class CreateUserComponent implements OnInit {
   onCreateUser() {
     this.onClose.next(this.createUserForm.value);
     this.bsModalRef.hide();
-  }
-
-  ngOnInit() {
   }
 
 }
