@@ -7,7 +7,7 @@ export class User {
   phoneNumber: string;
   changePasswordOnNextLogin: boolean;
 
-  constructor({_id, name, email, createdAt, phoneNumber}) {
+  constructor({_id = null, name, email, createdAt, phoneNumber}) {
     this._id = _id;
     this.name = name;
     this.email = email;
