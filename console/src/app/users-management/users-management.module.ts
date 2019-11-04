@@ -11,7 +11,6 @@ import { UserGroupModule } from '@app/users-management/user-group/user-group.mod
 import { UserGroupResolver } from './resolvers/user-group.resolver';
 import { CreateUserComponent } from './users-list/create-user/create-user.component';
 import { ModalModule } from 'ngx-bootstrap';
-import { ManagementTableComponent } from './management-table/management-table.component';
 
 @NgModule({
   entryComponents: [CreateUserComponent],
@@ -29,7 +28,6 @@ import { ManagementTableComponent } from './management-table/management-table.co
   declarations: [
     UsersManagementComponent,
     UsersListComponent,
-    ManagementTableComponent,
     CreateUserComponent
   ],
   providers: [UsersListResolver, UserGroupResolver]

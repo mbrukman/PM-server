@@ -18,7 +18,8 @@ export class CreateUserComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     phoneNumber: '',
     password: ['', [Validators.required, Validators.pattern('^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{8,}$')]],
-    confirmPassword: ['', [Validators.required]]
+    confirmPassword: ['', [Validators.required]],
+    changePasswordOnNextLogin: false,
   }, {validator: this.checkPasswords });
 
   public onClose = new Subject<User>();

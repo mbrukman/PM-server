@@ -17,10 +17,10 @@ describe("User tests", () => {
     usersTestDataManager.clear();
   });
 
-  describe("POST api/users/filter", () => {
+  describe("GET api/users", () => {
     it(`should respond with list of users`, () => {
       return request(app)
-        .get("/api/users/filter?options=''")
+        .get("/api/users?options=''")
         .expect(200)
         .then(({ body }) => {
           expect(body.items.length).toEqual(
@@ -34,16 +34,16 @@ describe("User tests", () => {
 
     it(`should respond with 500`, done => {
       return request(app)
-        .get("/api/users/filter")
+        .get("/api/users")
         .expect(500, done);
     });
   });
 
-  describe("POST api/users/create", () => {
+  describe("POST api/users", () => {
     const testUser = usersFactory.generateSingleUser();
     it(`should respond with created user's data for correct request`, () => {
       return request(app)
-        .post("/api/users/create")
+        .post("/api/users")
         .send(testUser)
         .expect(200)
         .then(({ body }) => {
@@ -63,7 +63,7 @@ describe("User tests", () => {
       const incorrectTestUser = testUser;
       incorrectTestUser.email = "incorrect@invalid";
       return request(app)
-        .post("/api/users/create")
+        .post("/api/users")
         .send(incorrectTestUser)
         .expect(400)
         .then(({ body }) => {
