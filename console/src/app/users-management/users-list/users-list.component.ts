@@ -3,7 +3,7 @@ import { User } from '../models/user.model';
 import { Subscription, fromEvent } from 'rxjs';
 import { UsersManagementService } from '../users-management.service';
 import { ActivatedRoute, Data } from '@angular/router';
-import { debounceTime, switchMap } from 'rxjs/operators';
+import { debounceTime, switchMap, tap } from 'rxjs/operators';
 import { FilterOptions } from '@app/shared/model/filter-options.model';
 import UserGroupDataInterface from '@app/services/user-group/user-group-data.interface';
 import { BsModalService } from 'ngx-bootstrap';
@@ -70,10 +70,11 @@ export class UsersListComponent implements OnInit, OnDestroy {
   openCreateModal() {
     const modal = this.modalService.show(CreateUserComponent);
     const onCloseSubscription = modal.content.onClose
-      .pipe(switchMap((userData: User) => this.usersManagementService.createUser(userData)))
+      .pipe(
+        switchMap((userData: User) => this.usersManagementService.createUser(userData)),
+      )
       .subscribe((newUser: User) => {
-        console.log(newUser);
-        this.users.push(newUser);
+        this.users = [...this.users, newUser] ;
       });
 
     this.mainSubscription.add(onCloseSubscription);
