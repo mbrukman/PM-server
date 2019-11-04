@@ -3,6 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { IEntityList } from '@app/shared/interfaces/entity-list.interface';
 import { User } from './models/user.model';
 import { FilterOptions } from '@app/shared/model/filter-options.model';
+import {map} from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 
 @Injectable({
@@ -20,8 +22,14 @@ export class UsersManagementService {
     return this.http.get<IEntityList<User>>(`api/users`, { params: params });
   }
 
-  createUser(name, email, password, phoneNumber?, changePasswordOnNextLogin = false) {
-    console.log(arguments);
-    throw new Error('Not implemented');
+  createUser(userData: User): Observable<User> {
+    return this.http.post<User>('api/users/create', userData)
+      .pipe(map((createdUser: User) => new User({
+        _id: createdUser._id,
+        name: createdUser.name,
+        createdAt: createdUser.createdAt,
+        phoneNumber: createdUser.phoneNumber,
+        email: createdUser.email
+      })));
   }
 }

@@ -3,14 +3,17 @@ export class User {
   _id?: string;
   name: string;
   email: string;
-  dateCreated: Date;
+  createdAt: Date;
+  phoneNumber: string;
+  changePasswordOnNextLogin: boolean;
 
-  constructor(_id, name, email, dataCreated) {
+  constructor({_id, name, email, createdAt, phoneNumber}) {
     this._id = _id;
     this.name = name;
     this.email = email;
-    if (dataCreated) {
-      this.dateCreated = new Date(dataCreated);
+    this.phoneNumber = phoneNumber;
+    if (createdAt) {
+      this.createdAt = new Date(createdAt);
     }
   }
 }

@@ -1,3 +1,76 @@
-<p>
-  create-user works!
-</p>
+<div class="modal-content">
+  <div class="modal-header pr-0 pl-0 pt-0">
+    <h4 class="modal-title">Create User</h4>
+    <i class="material-icons text-white close" (click)="bsModalRef.hide()"
+      >close</i
+    >
+  </div>
+  <div class="modal-body  pr-0 pl-0 pb-0">
+    <form [formGroup]="createUserForm" (ngSubmit)="onCreateUser()">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" class="form-control" formControlName="name" />
+      </div>
+      <div class="form-group m-0">
+        <label>Email</label>
+        <input type="email" class="form-control" formControlName="email" />
+        <div
+          *ngIf="email.invalid && (email.dirty || email.touched)"
+          class="alert alert-danger"
+        >
+          Please enter valid email address
+        </div>
+      </div>
+      <div class="form-group m-0">
+        <label>Phone number (optional)</label>
+        <input type="tel" class="form-control" formControlName="phoneNumber" />
+      </div>
+      <div class="form-group m-0">
+        <label>Password</label>
+        <input
+          type="password"
+          class="form-control"
+          formControlName="password"
+        />
+        <div
+          *ngIf="password.invalid && (password.dirty || password.touched)"
+          class="alert alert-danger"
+        >
+          Password should be at least 8 characters long and contain at least one
+          letter and one digit.
+        </div>
+      </div>
+      <div class="form-group m-0">
+        <label>Repeat password</label>
+        <input
+          type="password"
+          class="form-control"
+          formControlName="password2"
+        />
+      </div>
+      <div
+        *ngIf="(password2.dirty || password2.touched) && createUserForm.invalid"
+        class="alert alert-danger"
+      >
+        Passwords don't match.
+      </div>
+
+      <div class="d-flex flex-row justify-content-end pr-0 pl-0 pb-0 btn-row">
+        <button
+          type="button"
+          class="kh-btn kh-btn-gray"
+          (click)="bsModalRef.hide()"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="kh-btn kh-btn-blue"
+          [disabled]="createUserForm.invalid"
+        >
+          Create
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

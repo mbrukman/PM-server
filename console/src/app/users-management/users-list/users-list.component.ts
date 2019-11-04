@@ -27,7 +27,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
     { label: 'Name', value: 'name' },
     { label: 'Email', value: 'email' },
     { label: 'Groups', value: 'groups' },
-    { label: 'Date Created', value: 'date_created' }
+    { label: 'Date Created', value: 'createdAt' }
   ];
   constructor(
     private usersManagementService: UsersManagementService,
@@ -69,15 +69,18 @@ export class UsersListComponent implements OnInit, OnDestroy {
 
   openCreateModal() {
     const modal = this.modalService.show(CreateUserComponent);
-    // const onCloseSubscription = modal.content.onClose
-    //   .pipe(switchMap((userData: User) => this.usersManagementService.createUser( {...userData} )))
-    //   .subscribe((newUser: User) => this.users.push(newUser));
+    const onCloseSubscription = modal.content.onClose
+      .pipe(switchMap((userData: User) => this.usersManagementService.createUser(userData)))
+      .subscribe((newUser: User) => {
+        console.log(newUser);
+        this.users.push(newUser);
+      });
 
-    // this.mainSubscription.add(onCloseSubscription);
+    this.mainSubscription.add(onCloseSubscription);
   }
 
   editUser(index: string | number) {
-    // this.upsertUser(this.users[index], true);
+    throw new Error('Method not implemented.');
   }
 
   deleteUser(id: string) {

@@ -1,0 +1,38 @@
+.modal-content {
+  padding: 14px 39px 39px 39px;
+  .modal-header {
+    padding-bottom: 19px;
+    .modal-title {
+      margin-left: auto;
+      margin-right: auto;
+      font-weight: 300;
+      font-family: "Roboto";
+    }
+
+    .close {
+      color: #828384;
+      cursor: pointer;
+      margin: -20px -15px -15px -40px;
+    }
+  }
+
+  .modal-body {
+    .btn-row {
+      padding-top: 34px;
+      & > .btn {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+    }
+    padding-top: 24px;
+    .form-group {
+      font-family: "Roboto";
+      font-size: 14px;
+      font-weight: 300;
+      textarea {
+        height: 146px;
+        resize: none;
+      }
+    }
+  }
+}
