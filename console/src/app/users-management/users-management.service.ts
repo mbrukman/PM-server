@@ -23,13 +23,7 @@ export class UsersManagementService {
   }
 
   createUser(userData: User): Observable<User> {
-    return this.http.post<User>('api/users/create', userData)
-      .pipe(map((createdUser: User) => new User({
-        _id: createdUser._id,
-        name: createdUser.name,
-        createdAt: createdUser.createdAt,
-        phoneNumber: createdUser.phoneNumber,
-        email: createdUser.email
-      })));
+    return this.http.post<User>('api/users', userData)
+      .pipe(map((createdUser: User) => new User(createdUser)));
   }
 }

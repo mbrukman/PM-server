@@ -18,20 +18,20 @@ export class CreateUserComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     phoneNumber: '',
     password: ['', [Validators.required, Validators.pattern('^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{8,}$')]],
-    password2: ['', [Validators.required]]
+    confirmPassword: ['', [Validators.required]]
   }, {validator: this.checkPasswords });
 
   public onClose = new Subject<User>();
 
   get email() { return this.createUserForm.get('email'); }
   get password() { return this.createUserForm.get('password'); }
-  get password2() { return this.createUserForm.get('password2'); }
+  get confirmPassword() { return this.createUserForm.get('confirmPassword'); }
 
   checkPasswords(group: FormGroup) {
-    const pass = group.get('password').value;
-    const confirmPass = group.get('password2').value;
+    const password = group.get('password').value;
+    const confirmPassword = group.get('confirmPassword').value;
 
-    return pass === confirmPass ? null : { notSame: true };
+    return password === confirmPassword ? null : { notSame: true };
   }
 
   onCreateUser() {
