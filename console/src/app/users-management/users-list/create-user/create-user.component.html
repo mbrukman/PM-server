@@ -15,7 +15,7 @@
         <label>Email</label>
         <input type="email" class="form-control" formControlName="email" />
         <div
-          *ngIf="email.invalid && (email.dirty || email.touched)"
+          *ngIf="form.email.invalid && (form.email.dirty || form.email.touched)"
           class="text-danger"
         >
           Please enter valid email address
@@ -33,7 +33,10 @@
           formControlName="password"
         />
         <div
-          *ngIf="password.invalid && (password.dirty || password.touched)"
+          *ngIf="
+            form.password.invalid &&
+            (form.password.dirty || form.password.touched)
+          "
           class="text-danger"
         >
           Password should be at least 8 characters long and contain at least one
@@ -49,8 +52,7 @@
         />
         <div
           *ngIf="
-            (confirmPassword.dirty || confirmPassword.touched) &&
-            createUserForm.invalid
+            form.confirmPassword.dirty && form.confirmPassword.errors?.mustMatch
           "
           class="text-danger"
         >
