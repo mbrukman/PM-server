@@ -93,4 +93,20 @@ describe("User tests", () => {
         .expect(500, done);
     });
   });
+
+  describe("PATCH api/users", () => {
+    it(`should respond with updated user`, () => {
+      const randomIndex = randomIdx(usersTestDataManager.collection.length);
+      const userId = usersTestDataManager.collection[randomIndex]._id;
+      const newUserData = usersFactory.generateSingleUser();
+      return request(app)
+        .patch(`/api/users/${userId}`)
+        .send(newUserData)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.name).toEqual(newUserData.name);
+          expect(body.email).toEqual(newUserData.email);
+        });
+    });
+  });
 });
