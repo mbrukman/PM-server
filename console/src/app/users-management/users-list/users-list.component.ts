@@ -29,6 +29,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
     { label: 'Groups', value: 'groups' },
     { label: 'Date Created', value: 'createdAt' }
   ];
+
   constructor(
     private userService: UserService,
     private route: ActivatedRoute,
@@ -66,13 +67,12 @@ export class UsersListComponent implements OnInit, OnDestroy {
     this.mainSubscription.add(getAllUserSubscription);
   }
 
-  upsertUser(user = new User('', '', '', new Date()), isEdit = false) { }
 
   openCreateModal() {
     const modal = this.modalService.show(CreateUserComponent);
     const onCloseSubscription = modal.content.onClose
       .pipe(
-        switchMap((userData: User) => this.usersManagementService.createUser(userData)),
+        switchMap((userData: User) => this.userService.createUser(userData)),
       )
       .subscribe((newUser: User) => {
         this.users = [...this.users, newUser] ;

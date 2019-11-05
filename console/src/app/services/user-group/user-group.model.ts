@@ -8,7 +8,7 @@ export default class UserGroup {
   users: Array<User>;
 
   // tslint:disable-next-line: variable-name
-  constructor (_id: string, name: string, description: string, users: Array<User>) {
+  constructor ({_id, name, description, users}) {
     this._id = _id;
     this.name = name;
     this.description = description;
