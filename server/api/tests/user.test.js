@@ -82,7 +82,7 @@ describe("User tests", () => {
   });
 
   describe("DELETE api/users/", () => {
-    it(`should respond with amount of deleted users`, () => {
+    it(`should respond with number of deleted users`, () => {
       const randomIndex = randomIdx(usersTestDataManager.collection.length);
       const userId = usersTestDataManager.collection[randomIndex]._id;
       return request(app)
