@@ -18,10 +18,21 @@ class UserGroupService {
     return newUserGroup.save();
   }
 
+  remove(_id) {
+    return UserGroupModel.deleteOne({ _id });
+  }
+
   async filter(filterOptions = {}) {
+    let page;
     const fields = filterOptions.fields;
     const sort = filterOptions.options.sort || "name";
-    const page = Number(filterOptions.options.page);
+
+    if (typeof filterOptions.options.page === "string") {
+      page = 0;
+    } else {
+      page = parseInt(filterOptions.options.page, 10);
+    }
+
     if (fields) {
       Object.keys(fields).map(key => {
         fields[key] = { $regex: `.*${fields[key]}.*` };

@@ -20,21 +20,24 @@ describe("All user group endpoints are working as expected.", () => {
     );
   });
 
-  describe("POST api/user-groups/filter", () => {
+  describe("POST api/user-groups", () => {
     it(`should respond with list of groups`, () => {
       return request(baseApiURL)
-        .get("/user-groups/filter?options=''")
+        .get("/user-groups?options=")
         .expect(200)
         .then(({ body }) => {
           expect(body.items.length).toEqual(testDataManager.collection.length);
           expect(body.totalCount).toEqual(testDataManager.collection.length);
         });
     });
-
-    it(`should respond with 500`, done => {
+    it(`should respond with list of groups without queryparams`, () => {
       return request(baseApiURL)
-        .get("/user-groups/filter")
-        .expect(500, done);
+        .get("/user-groups")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.items.length).toEqual(testDataManager.collection.length);
+          expect(body.totalCount).toEqual(testDataManager.collection.length);
+        });
     });
   });
 
@@ -61,6 +64,23 @@ describe("All user group endpoints are working as expected.", () => {
         .post(`/user-groups`)
         .send()
         .expect(500, done);
+    });
+  });
+
+  describe("DELETE /user-groups, Delete previously created user group", () => {
+    it("should respond with OK and deleted count", () => {
+      const userGroup = testDataManager.collection[0];
+      return request(baseApiURL)
+        .del(`/user-groups/${userGroup._id}`)
+        .expect(204)
+        .then(() => {
+          testDataManager.removeFromCollection(userGroup);
+        });
+    });
+    it("should respond with 500", () => {
+      return request(baseApiURL)
+        .del(`/user-groups/${undefined}`)
+        .expect(500);
     });
   });
 });

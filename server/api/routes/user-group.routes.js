@@ -6,5 +6,6 @@ const userGroupController = require("../controllers/user-group.controller");
 
 router.post("/", userGroupController.create);
 router.get("/", userGroupController.filter);
+router.delete("/:id", userGroupController.remove);
 
 module.exports = router;

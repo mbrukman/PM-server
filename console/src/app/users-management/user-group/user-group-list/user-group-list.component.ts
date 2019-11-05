@@ -84,7 +84,9 @@ export class UserGroupListComponent implements OnInit, OnDestroy {
   }
 
   deleteGroup(id: string): void {
-    console.warn('Not implemented yet!');
+    const deleteGroupSubscription = this.userGroupService.deleteUserGroup(id)
+      .subscribe(() => this.userGroups = this.userGroups.filter(group => group._id !== id));
+    this.mainSubscription.add(deleteGroupSubscription);
   }
 
   loadGroupLazy(event: any): void {

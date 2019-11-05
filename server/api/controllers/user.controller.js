@@ -13,12 +13,14 @@ function returnUserWithPickedFields(userDocument) {
   ]);
 }
 
-function filter(req, res) {
-  const params = JSON.parse(JSON.stringify(req.query));
-  params.options = JSON.parse(params["options"]);
-  userService.filter(params).then(x => {
-    return res.send(x);
-  });
+async function filter(req, res) {
+  const { query } = req;
+  query.options = query.options || {};
+  try {
+    return userService.filter(query).then(param => res.send(param));
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 async function deleteUser(req, res) {

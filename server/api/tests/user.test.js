@@ -19,9 +19,9 @@ describe("User tests", () => {
   });
 
   describe("GET api/users", () => {
-    it(`should respond with list of users`, () => {
+    it(`should respond with list of users with query prams`, () => {
       return request(app)
-        .get("/api/users?options=''")
+        .get("/api/users?options=")
         .expect(200)
         .then(({ body }) => {
           expect(body.items.length).toEqual(
@@ -32,11 +32,18 @@ describe("User tests", () => {
           );
         });
     });
-
-    it(`should respond with 500`, done => {
+    it(`should respond with list of users without query prams`, () => {
       return request(app)
         .get("/api/users")
-        .expect(500, done);
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.items.length).toEqual(
+            usersTestDataManager.collection.length
+          );
+          expect(body.totalCount).toEqual(
+            usersTestDataManager.collection.length
+          );
+        });
     });
   });
 
@@ -75,7 +82,7 @@ describe("User tests", () => {
   });
 
   describe("DELETE api/users/", () => {
-    it(`should respond with list of users`, () => {
+    it(`should respond with amount of deleted users`, () => {
       const randomIndex = randomIdx(usersTestDataManager.collection.length);
       const userId = usersTestDataManager.collection[randomIndex]._id;
       return request(app)
