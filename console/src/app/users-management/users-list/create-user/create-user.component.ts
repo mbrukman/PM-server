@@ -32,6 +32,10 @@ export class CreateUserComponent implements OnInit {
   }
 
   onCreateUser() {
+    if (this.createUserForm.invalid) {
+      throw new Error('Invalid form submission');
+      return;
+    }
     this.onClose.next(this.createUserForm.value);
     this.bsModalRef.hide();
   }
