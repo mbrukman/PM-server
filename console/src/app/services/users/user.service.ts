@@ -28,6 +28,6 @@ export class UserService {
 
   createUser(userData: UserDataInterface): Observable<User> {
     return this.http.post<User>('api/users', userData)
-      .pipe(map((createdUser: User) => new User(createdUser)));
+      .pipe(map((createdUser: User) => new User(createdUser._id, createdUser.name, createdUser.email, createdUser.createdAt, createdUser.phoneNumber)));
   }
 }

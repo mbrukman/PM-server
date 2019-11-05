@@ -16,7 +16,7 @@ export class UserGroupService {
 
   createUserGroup(userGroupData: UserGroupDataInterface): Observable<UserGroup> {
     return this.http.post<UserGroup>('api/user-groups', userGroupData)
-      .pipe(map((userGroup: UserGroup) => new UserGroup(userGroup)));
+      .pipe(map((userGroup: UserGroup) => new UserGroup(userGroup._id, userGroup.name, userGroup.description, userGroup.users)));
   }
 
   getAllGroups(fields?: object, options?: FilterOptions): Observable<IEntityList<UserGroup>> {

@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { BsModalRef } from 'ngx-bootstrap';
-import { User } from '@app/users-management/models/user.model';
 import { Subject } from 'rxjs';
 import { MustMatch } from '@app/shared/must-match.validator';
+import { User } from '@app/services/users/user.model';
 
 @Component({
   selector: 'app-create-user',
