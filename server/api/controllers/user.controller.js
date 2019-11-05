@@ -3,7 +3,7 @@ const winston = require("winston");
 
 function filter(req, res) {
   const params = JSON.parse(JSON.stringify(req.query));
-  params.options = JSON.parse(params["options"] || "{}");
+  params.options = JSON.parse(params["options"]);
   userService.filter(params).then(x => {
     return res.send(x);
   });
