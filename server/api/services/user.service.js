@@ -78,6 +78,10 @@ class UserService {
   deleteUser(userId) {
     return User.deleteOne({ _id: userId });
   }
+
+  updateUser(userId, newUserData) {
+    return User.findOneAndUpdate({ _id: userId }, newUserData, { new: true });
+  }
 }
 
 const userService = new UserService();

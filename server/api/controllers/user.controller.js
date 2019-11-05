@@ -3,7 +3,7 @@ const winston = require("winston");
 
 function filter(req, res) {
   const params = JSON.parse(JSON.stringify(req.query));
-  params.options = JSON.parse(params["options"]);
+  params.options = JSON.parse(params["options"] || "{}");
   userService.filter(params).then(x => {
     return res.send(x);
   });
@@ -51,4 +51,30 @@ function createUser(req, res) {
     });
 }
 
-module.exports = { filter, createUser, deleteUser };
+async function updateUser(req, res) {
+  try {
+    const updatedUser = await userService.updateUser(req.params.id, req.body);
+    req.io.emit("notification", {
+      title: "User updated",
+      message: `${updatedUser.name} updated successfully`,
+      type: "success"
+    });
+    return res.status(200).send(updatedUser);
+  } catch (err) {
+    req.io.emit("notification", {
+      title: "Whoops..",
+      message: `Error updating user`,
+      type: "error"
+    });
+
+    winston.log("error", "Error updating user", err);
+    return res.status(500).send(err);
+  }
+}
+
+module.exports = {
+  filter,
+  createUser,
+  deleteUser,
+  updateUser
+};
