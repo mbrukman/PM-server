@@ -5,6 +5,7 @@ import { UsersListComponent } from './users-list/users-list.component';
 import { UsersListResolver } from './resolvers/users-list.resolver';
 import { UserGroupListComponent } from '@app/users-management/user-group/user-group-list/user-group-list.component';
 import { UserGroupResolver } from './resolvers/user-group.resolver';
+import { ManageUserComponent } from './manage-user/manage-user.component';
 
 const routes: Routes = [
   {
@@ -20,6 +21,10 @@ const routes: Routes = [
         path: 'users',
         component: UsersListComponent,
         resolve: { users: UsersListResolver }
+      },
+      {
+        path: 'users/:id',
+        component: ManageUserComponent
       },
       {
         path: 'groups',
