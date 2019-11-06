@@ -15,7 +15,11 @@ function returnUserWithPickedFields(userDocument) {
 
 async function filter(req, res) {
   const { query } = req;
-  query.options = query.options || {};
+  if (typeof query.options === "string") {
+    query.options = JSON.parse(query.options);
+  } else {
+    query.options = {};
+  }
   try {
     return userService.filter(query).then(param => res.send(param));
   } catch (err) {

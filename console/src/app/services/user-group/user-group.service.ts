@@ -6,6 +6,7 @@ import {Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 import {FilterOptions} from '@app/shared/model/filter-options.model';
 import {IEntityList} from '@app/shared/interfaces/entity-list.interface';
+import RemoveResponseInterface from "@shared/interfaces/remove-response.interface";
 
 
 @Injectable({providedIn: 'root'})
@@ -14,8 +15,8 @@ export class UserGroupService {
   constructor(private http: HttpClient) {
   }
 
-  deleteUserGroup(id: string): Observable<UserGroup> {
-    return this.http.delete<UserGroup>(`api/user-groups/${id}`);
+  deleteUserGroup(id: string): Observable<RemoveResponseInterface> {
+    return this.http.delete<RemoveResponseInterface>(`api/user-groups/${id}`);
   }
 
 

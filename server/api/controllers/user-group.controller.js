@@ -21,13 +21,13 @@ module.exports = {
   async remove(req, res) {
     try {
       const { id } = req.params;
-      const { nRemoved } = await userGroupService.remove(id);
+      const { deletedCount } = await userGroupService.remove(id);
       req.io.emit("notification", {
         title: "Group removal",
         message: `The group was removed successfully.`,
         type: "success"
       });
-      return res.status(204).json({ removed: nRemoved });
+      return res.status(200).json({ deletedCount });
     } catch (err) {
       req.io.emit("notification", {
         title: "Group removal",
@@ -41,7 +41,11 @@ module.exports = {
 
   async filter(req, res) {
     const { query } = req;
-    query.options = query.options || {};
+    if (typeof query.options === "string") {
+      query.options = JSON.parse(query.options);
+    } else {
+      query.options = {};
+    }
     try {
       const userGroup = await userGroupService.filter(query);
       return res.status(200).json(userGroup);
