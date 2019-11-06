@@ -51,7 +51,7 @@ function createUser(req, res) {
         message: `${createdUser.name} created successfully`,
         type: "success"
       });
-      res.json(createdUser);
+      return res.status(200).send(returnUserWithPickedFields(createdUser));
     })
     .catch(err => {
       req.io.emit("notification", {
@@ -59,7 +59,7 @@ function createUser(req, res) {
         message: `Error: ${err}`,
         type: "error"
       });
-      res.status(400).json(err);
+      return res.status(400).json(err);
     });
 }
 
