@@ -25,6 +25,16 @@ class UserService {
     return user.save();
   }
 
+  updateUser(userId, newUserData) {
+    if (newUserData.password) {
+      newUserData.password = this.hashPassword(newUserData.password, serverKey);
+    }
+    return User.findOneAndUpdate({ _id: userId }, newUserData, {
+      runValidators: true,
+      new: true
+    });
+  }
+
   filter(filterOptions = {}) {
     const fields = filterOptions.fields;
     const sort = filterOptions.options.sort || "name";
@@ -77,10 +87,6 @@ class UserService {
 
   deleteUser(userId) {
     return User.deleteOne({ _id: userId });
-  }
-
-  updateUser(userId, newUserData) {
-    return User.findOneAndUpdate({ _id: userId }, newUserData, { new: true });
   }
 }
 
