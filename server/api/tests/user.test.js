@@ -95,7 +95,7 @@ describe("User tests", () => {
   });
 
   describe("PATCH api/users", () => {
-    it(`should respond with updated user`, () => {
+    it(`should respond with updated user for proper request`, () => {
       const randomIndex = randomIdx(usersTestDataManager.collection.length);
       const userId = usersTestDataManager.collection[randomIndex]._id;
       const newUserData = usersFactory.generateSingleUser();
@@ -106,6 +106,15 @@ describe("User tests", () => {
         .then(({ body }) => {
           expect(body.name).toEqual(newUserData.name);
           expect(body.email).toEqual(newUserData.email);
+        });
+    });
+
+    it(`should respond with 500 on error`, () => {
+      return request(app)
+        .patch(`/api/users/0`)
+        .expect(500)
+        .then(({ body }) => {
+          expect(body.name).toEqual("CastError");
         });
     });
   });
