@@ -41,7 +41,8 @@ module.exports = {
 
   async filter(req, res) {
     const { query } = req;
-    if (typeof query.options === "string") {
+    console.log(query);
+    if (typeof query.options === "string" && query.options) {
       query.options = JSON.parse(query.options);
     } else {
       query.options = {};

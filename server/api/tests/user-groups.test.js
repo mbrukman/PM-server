@@ -20,10 +20,10 @@ describe("All user group endpoints are working as expected.", () => {
     );
   });
 
-  describe("POST api/user-groups", () => {
+  describe("GET api/user-groups", () => {
     it(`should respond with list of groups`, () => {
       return request(baseApiURL)
-        .get("/user-groups?options=")
+        .get("/user-groups?options={}")
         .expect(200)
         .then(({ body }) => {
           expect(body.items.length).toEqual(testDataManager.collection.length);
@@ -72,8 +72,9 @@ describe("All user group endpoints are working as expected.", () => {
       const userGroup = testDataManager.collection[0];
       return request(baseApiURL)
         .del(`/user-groups/${userGroup._id}`)
-        .expect(204)
-        .then(() => {
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.deletedCount).toBe(1);
           testDataManager.removeFromCollection(userGroup);
         });
     });

@@ -15,7 +15,7 @@ function returnUserWithPickedFields(userDocument) {
 
 async function filter(req, res) {
   const { query } = req;
-  if (typeof query.options === "string") {
+  if (typeof query.options === "string" && query.options) {
     query.options = JSON.parse(query.options);
   } else {
     query.options = {};

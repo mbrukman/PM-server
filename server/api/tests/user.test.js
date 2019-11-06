@@ -19,9 +19,9 @@ describe("User tests", () => {
   });
 
   describe("GET api/users", () => {
-    it(`should respond with list of users with query prams`, () => {
+    it(`should respond with list of users with query params`, () => {
       return request(app)
-        .get("/api/users?options=")
+        .get("/api/users?options={}")
         .expect(200)
         .then(({ body }) => {
           expect(body.items.length).toEqual(
@@ -58,9 +58,6 @@ describe("User tests", () => {
           expect(body.name).toBe(testUser.name);
           expect(body.email).toBe(testUser.email);
           expect(body.phoneNumber).toBe(testUser.phoneNumber);
-          expect(body.password).toBeDefined();
-          expect(body.password).not.toBe(testUser.password);
-          expect(body.password.length).toBe(64);
           expect(body.changePasswordOnNextLogin).toBe(
             testUser.changePasswordOnNextLogin
           );
