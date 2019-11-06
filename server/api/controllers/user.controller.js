@@ -1,5 +1,17 @@
 const userService = require("../services/user.service");
 const winston = require("winston");
+const _ = require("lodash");
+
+function returnUserWithPickedFields(userDocument) {
+  return _.pick(userDocument, [
+    "_id",
+    "name",
+    "email",
+    "createdAt",
+    "phoneNumber",
+    "changePasswordOnNextLogin"
+  ]);
+}
 
 function filter(req, res) {
   const params = JSON.parse(JSON.stringify(req.query));
@@ -59,7 +71,7 @@ async function updateUser(req, res) {
       message: `${updatedUser.name} updated successfully`,
       type: "success"
     });
-    return res.status(200).send(updatedUser);
+    return res.status(200).send(returnUserWithPickedFields(updatedUser));
   } catch (err) {
     req.io.emit("notification", {
       title: "Whoops..",
