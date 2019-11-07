@@ -51,6 +51,9 @@ async function deleteUser(req, res) {
 async function getUser(req, res) {
   try {
     const user = await userService.getUser(req.params.id);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
     return res.status(200).send(returnUserWithPickedFields(user));
   } catch (err) {
     req.io.emit("notification", {

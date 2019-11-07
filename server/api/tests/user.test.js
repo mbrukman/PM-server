@@ -98,6 +98,33 @@ describe("User tests", () => {
     });
   });
 
+  describe("GET api/users/:id", () => {
+    it(`should respond with a user of given id`, () => {
+      const randomIndex = randomIdx(usersTestDataManager.collection.length);
+      const user = usersTestDataManager.collection[randomIndex];
+      return request(app)
+        .get(`/api/users/${user.id}`)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.name).toEqual(user.name);
+        });
+    });
+
+    it(`should respond with 404 for non-existing user`, done => {
+      return request(app)
+        .get("/api/users/5dc27eeb0cf1474100000000")
+        .send()
+        .expect(404, done);
+    });
+
+    it(`should respond with 500 on error`, done => {
+      return request(app)
+        .get("/api/users/1")
+        .send()
+        .expect(500, done);
+    });
+  });
+
   describe("PATCH api/users", () => {
     it(`should respond with updated user for proper request`, () => {
       const randomIndex = randomIdx(usersTestDataManager.collection.length);

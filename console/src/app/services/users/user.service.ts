@@ -15,7 +15,7 @@ export class UserService {
 
   getAllUsers(fields?: object, options?: FilterOptions) {
     let params = new HttpParams();
-    if (fields){
+    if (fields) {
       params = params.set('fields', JSON.stringify(fields));
     }
     params = params.set('options', JSON.stringify(options));
