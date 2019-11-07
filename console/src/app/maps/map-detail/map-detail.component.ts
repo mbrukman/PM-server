@@ -81,7 +81,8 @@ export class MapDetailComponent implements OnInit, OnDestroy {
         }),
         map(structure => outerStructure = Object.assign({}, structure))
       ).subscribe(
-        () => {
+        (outerStructure) => {
+          this.createMapStructure(outerStructure, outerParams);
         },
         (errMessage) => {
           switch (errMessage) {
@@ -92,11 +93,7 @@ export class MapDetailComponent implements OnInit, OnDestroy {
           }
         },
         () => {
-          if (!outerStructure) {
-            outerStructure = new MapStructure();
-            outerStructure.map = outerParams['id'];
-          }
-          this.mapsService.setCurrentMapStructure(outerStructure);
+         this.createMapStructure(outerStructure, outerParams);
         }
       );
 
@@ -183,6 +180,14 @@ export class MapDetailComponent implements OnInit, OnDestroy {
     this.mainSubscription.add(mapStructureSubscription);
     this.mainSubscription.add(isMapChangedSubscription);
     this.mainSubscription.add(mapExecutionSubscription);
+  }
+
+  createMapStructure(structure, params){
+    if (!Object.keys(structure).length) {
+      structure = new MapStructure();
+      structure.map = params['id'];
+    }
+    this.mapsService.setCurrentMapStructure(structure);
   }
 
 
