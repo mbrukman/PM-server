@@ -1,0 +1,17 @@
+@import "~src/assets/sass/mixins";
+@import "~src/assets/sass/variables";
+
+.title {
+  font-size: 20px;
+  display: flex;
+  font-weight: normal;
+  color: $kaholo-orange;
+  margin-bottom: 15px;
+  line-height: 25px;
+}
+
+.creation-date {
+  font-size: 14;
+  color: $greyish-text;
+  margin-bottom: 30px;
+}
