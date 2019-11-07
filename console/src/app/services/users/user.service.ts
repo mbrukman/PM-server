@@ -22,6 +22,10 @@ export class UserService {
     return this.http.get<IEntityList<User>>('api/users', { params: params });
   }
 
+  getUser(userId: string): Observable<User> {
+    return this.http.get<User>(`api/users/${userId}`);
+  }
+
   deleteUser(userId: string): Observable<any> {
     return this.http.delete(`api/users/${userId}`);
   }

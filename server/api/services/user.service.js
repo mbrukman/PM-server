@@ -25,6 +25,10 @@ class UserService {
     return user.save();
   }
 
+  getUser(userId) {
+    return User.findOne({ _id: userId });
+  }
+
   updateUser(userId, newUserData) {
     if (newUserData.password) {
       newUserData.password = this.hashPassword(newUserData.password, serverKey);

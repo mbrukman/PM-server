@@ -2,15 +2,21 @@
   <span class="mr-2"><i class="material-icons">perm_identity</i></span>
   <span class="mr-2">User</span>
   <span class="mr-2"><i class="material-icons">arrow_forward</i></span>
-  <span class="mr-2">{{ "magic man" }}</span>
+  <span class="mr-2" *ngIf="user">{{ user.name }}</span>
 </div>
 
-<div class="creation-date">Creation date: 12-12-2012</div>
-
-<div>
-  <tabset>
-    <tab heading="Policies">Policies content</tab>
-    <tab heading="Groups">Groups content </tab>
-    <tab heading="Settings">Settings content </tab>
-  </tabset>
+<div class="creation-date" *ngIf="user">
+  Creation date: {{ user.createdAt | date: "short" }}
 </div>
+
+<tabset>
+  <tab heading="Policies" customClass="kh-tab">
+    TODO: Manage user's Policies component
+  </tab>
+  <tab heading="Groups" customClass="kh-tab">
+    TODO: Manage user's Groups component
+  </tab>
+  <tab heading="Settings" customClass="kh-tab">
+    TODO: Manage user's Settings component
+  </tab>
+</tabset>

@@ -48,6 +48,21 @@ async function deleteUser(req, res) {
   }
 }
 
+async function getUser(req, res) {
+  try {
+    const user = await userService.getUser(req.params.id);
+    return res.status(200).send(user);
+  } catch (err) {
+    req.io.emit("notification", {
+      title: "Whoops..",
+      message: `Error getting user`,
+      type: "error"
+    });
+    winston.log("error", "Error getting user", err);
+    return res.status(500).send(err);
+  }
+}
+
 function createUser(req, res) {
   userService
     .createUser(req.body)
@@ -94,5 +109,6 @@ module.exports = {
   filter,
   createUser,
   deleteUser,
-  updateUser
+  updateUser,
+  getUser
 };
