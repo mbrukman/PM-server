@@ -1,66 +1,74 @@
 module.exports = {
   items: {
-    type: 'object',
+    type: "object",
     properties: {
-      name: {type: 'string'},
-      viewName: {type: 'string'},
-      description: {type: 'string'},
+      name: { type: "string" },
+      viewName: { type: "string" },
+      description: { type: "string" },
       type: {
-        type: 'string',
-        enum: ['string', 'int', 'float', 'options', 'autocomplete', 'file', 'text', 'boolean', 'vault'],
+        type: "string",
+        enum: [
+          "string",
+          "int",
+          "float",
+          "options",
+          "autocomplete",
+          "file",
+          "text",
+          "boolean",
+          "vault"
+        ]
       },
       options: {
         items: {
-          type: 'object',
+          type: "object",
           properties: {
             id: {
-              type: 'string',
+              type: "string"
             },
             name: {
-              type: 'string',
+              type: "string"
             },
             type: {
-              type: 'string',
-            },
+              type: "string"
+            }
           },
           additionalProperties: true,
-          required: ['id', 'name'],
-        },
+          required: ["id", "name"]
+        }
       },
       model: {
-        type: 'string',
+        type: "string"
       },
       propertyName: {
-        type: 'string',
-      },
+        type: "string"
+      }
     },
     allOf: [
       {
         if: {
           properties: {
             type: {
-              const: 'options',
-            },
-          },
+              const: "options"
+            }
+          }
         },
         then: {
-          required: ['options'],
-        },
-
+          required: ["options"]
+        }
       },
       {
         if: {
           properties: {
             type: {
-              const: 'autocomplete',
-            },
-          },
+              const: "autocomplete"
+            }
+          }
         },
         then: {
-          required: ['model', 'propertyName'],
-        },
-
-      },
-    ],
-  },
+          required: ["model", "propertyName"]
+        }
+      }
+    ]
+  }
 };

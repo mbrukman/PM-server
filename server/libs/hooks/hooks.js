@@ -2,7 +2,6 @@
  * simple hook mechanism. can write pre and post hooks that will be executed when calling hookPre and hookPost functions.
  * */
 
-
 const prehooks = {};
 const posthooks = {};
 
@@ -10,12 +9,12 @@ TIMEOUT = 20000;
 
 function runHooks(fns, context, resolve) {
   let timeout = setTimeout(() => {
-    throw new Error('timeout error');
+    throw new Error("timeout error");
   }, TIMEOUT);
   const next = function(error) {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
-      throw new Error('timeout');
+      throw new Error("timeout");
     }, TIMEOUT);
     if (error) {
       throw new Error(error);
@@ -32,7 +31,6 @@ function runHooks(fns, context, resolve) {
 function callNextHook(fn, context, next) {
   fn.call(context, next);
 }
-
 
 const Hook = {
   pre: function(name, fn) {
@@ -56,7 +54,7 @@ const Hook = {
       if (!fn) {
         return resolve();
       }
-      runHooks(fn, {obj: context}, resolve);
+      runHooks(fn, { obj: context }, resolve);
     });
   },
   hookPost: function(name) {
@@ -65,9 +63,9 @@ const Hook = {
       if (!fn) {
         return resolve();
       }
-      runHooks(fn, {obj: context}, resolve);
+      runHooks(fn, { obj: context }, resolve);
     });
-  },
+  }
 };
 
 module.exports = Hook;
