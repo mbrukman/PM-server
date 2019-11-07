@@ -12,6 +12,7 @@ import { UserGroupResolver } from './resolvers/user-group.resolver';
 import { CreateUserComponent } from './users-list/create-user/create-user.component';
 import { ModalModule } from 'ngx-bootstrap';
 import { ManageUserComponent } from './manage-user/manage-user.component';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 
 @NgModule({
   entryComponents: [CreateUserComponent],
@@ -24,7 +25,7 @@ import { ManageUserComponent } from './manage-user/manage-user.component';
     UserGroupModule ,
     TooltipModule.forRoot(),
     ModalModule,
-
+    TabsModule.forRoot(),
   ],
   declarations: [
     UsersManagementComponent,
