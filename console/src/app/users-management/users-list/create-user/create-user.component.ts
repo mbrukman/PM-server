@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap';
 import { Subject } from 'rxjs';
-import { MustMatch } from '@app/shared/must-match.validator';
 import { User } from '@app/services/users/user.model';
+import { EditUserComponent } from '@app/users-management/edit-user/edit-user.component';
 
 @Component({
   selector: 'app-create-user',
@@ -12,32 +11,22 @@ import { User } from '@app/services/users/user.model';
 })
 export class CreateUserComponent implements OnInit {
 
-  createUserForm: FormGroup;
+  @ViewChild(EditUserComponent, {static: false})
+  private editUserComponent: EditUserComponent;
 
-  constructor(public bsModalRef: BsModalRef, private formBuilder: FormBuilder) {}
+  constructor(public bsModalRef: BsModalRef) {}
 
   public onClose = new Subject<User>();
 
-  get form() { return this.createUserForm.controls; }
-
-  ngOnInit() {
-    this.createUserForm = this.formBuilder.group({
-      name: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      phoneNumber: '',
-      password: ['', [Validators.required, Validators.pattern('^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{8,}$')]],
-      confirmPassword: ['', [Validators.required]],
-      changePasswordOnNextLogin: false,
-    }, {validator: MustMatch('password', 'confirmPassword') });
-  }
+  ngOnInit() {}
 
   onCreateUser() {
-    if (this.createUserForm.invalid) {
-      throw new Error('Invalid form submission');
-      return;
-    }
-    this.onClose.next(this.createUserForm.value);
-    this.bsModalRef.hide();
+    // if (this.createUserForm.invalid) {
+    //   throw new Error('Invalid form submission');
+    //   return;
+    // }
+    // this.onClose.next(this.createUserForm.value);
+    // this.bsModalRef.hide();
   }
 
 }

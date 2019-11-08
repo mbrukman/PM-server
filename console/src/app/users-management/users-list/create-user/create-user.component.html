@@ -6,83 +6,22 @@
     >
   </div>
   <div class="modal-body pr-0 pl-0 pb-0">
-    <form [formGroup]="createUserForm" (ngSubmit)="onCreateUser()">
-      <div class="form-group">
-        <label>Name</label>
-        <input type="text" class="form-control" formControlName="name" />
-      </div>
-      <div class="form-group m-0">
-        <label>Email</label>
-        <input type="email" class="form-control" formControlName="email" />
-        <div
-          *ngIf="form.email.invalid && (form.email.dirty || form.email.touched)"
-          class="text-danger"
-        >
-          Please enter valid email address
-        </div>
-      </div>
-      <div class="form-group m-0">
-        <label>Phone number (optional)</label>
-        <input type="tel" class="form-control" formControlName="phoneNumber" />
-      </div>
-      <div class="form-group m-0">
-        <label>Password</label>
-        <input
-          type="password"
-          class="form-control"
-          formControlName="password"
-        />
-        <div
-          *ngIf="
-            form.password.invalid &&
-            (form.password.dirty || form.password.touched)
-          "
-          class="text-danger"
-        >
-          Password should be at least 8 characters long and contain at least one
-          letter and one digit.
-        </div>
-      </div>
-      <div class="form-group m-0">
-        <label>Repeat password</label>
-        <input
-          type="password"
-          class="form-control"
-          formControlName="confirmPassword"
-        />
-        <div
-          *ngIf="
-            form.confirmPassword.dirty && form.confirmPassword.errors?.mustMatch
-          "
-          class="text-danger"
-        >
-          Passwords don't match.
-        </div>
-      </div>
-      <div class="change-password-checkbox">
-        <label class="checkbox-container">
-          Change password on next login
-          <input type="checkbox" formControlName="changePasswordOnNextLogin" />
-          <span class="checkmark"></span>
-        </label>
-      </div>
-
-      <div class="d-flex flex-row justify-content-end pr-0 pl-0 pb-0 btn-row">
-        <button
-          type="button"
-          class="kh-btn kh-btn-gray"
-          (click)="bsModalRef.hide()"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          class="kh-btn kh-btn-blue"
-          [disabled]="createUserForm.invalid"
-        >
-          Create
-        </button>
-      </div>
-    </form>
+    <app-edit-user></app-edit-user>
+    <div class="d-flex flex-row justify-content-end pr-0 pl-0 pb-0 btn-row">
+      <button
+        type="button"
+        class="kh-btn kh-btn-gray"
+        (click)="bsModalRef.hide()"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="kh-btn kh-btn-blue"
+        [disabled]="createUserForm.invalid"
+      >
+        Create
+      </button>
+    </div>
   </div>
 </div>

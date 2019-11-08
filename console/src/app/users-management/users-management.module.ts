@@ -13,6 +13,7 @@ import { CreateUserComponent } from './users-list/create-user/create-user.compon
 import { ModalModule } from 'ngx-bootstrap';
 import { ManageUserComponent } from './manage-user/manage-user.component';
 import { TabsModule } from 'ngx-bootstrap/tabs';
+import { EditUserComponent } from './edit-user/edit-user.component';
 
 @NgModule({
   entryComponents: [CreateUserComponent],
@@ -31,7 +32,8 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
     UsersManagementComponent,
     UsersListComponent,
     CreateUserComponent,
-    ManageUserComponent
+    ManageUserComponent,
+    EditUserComponent
   ],
   providers: [UsersListResolver, UserGroupResolver]
 })
