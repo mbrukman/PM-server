@@ -1,6 +1,7 @@
 const User = require("../models/user.model");
 const crypto = require("crypto");
 const serverKey = process.env.SERVER_KEY;
+const mongoose = require("mongoose");
 
 function getSort(sortString) {
   const sort = {};
@@ -39,6 +40,19 @@ class UserService {
     });
   }
 
+  bulkUpdateUser(usersData) {
+    const entries = Object.entries(usersData);
+    const updates = entries.map(([_id, value]) => {
+      return {
+        updateOne: {
+          filter: { _id },
+          update: { $set: value }
+        }
+      };
+    });
+    return User.bulkWrite(updates);
+  }
+
   async filter(filterOptions = {}) {
     let page;
     const fields = filterOptions.fields;
@@ -69,6 +83,17 @@ class UserService {
         }
       ];
     }
+
+    if (filterOptions.options.notInGroup) {
+      $match.$and = [
+        {
+          groups: {
+            $ne: mongoose.Types.ObjectId(filterOptions.options.notInGroup)
+          }
+        }
+      ];
+    }
+
     const aggregateSteps = [
       {
         $match: $match

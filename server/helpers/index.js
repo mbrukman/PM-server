@@ -27,7 +27,7 @@ module.exports = function startKaholo() {
     res.header("Access-Control-Allow-Origin", "*");
     res.header(
       "Access-Control-Allow-Methods",
-      "PUT, GET, POST, PATCH, DELETE, OPTIONS"
+      "PUT, GET, POST, DELETE, OPTIONS, PATCH"
     );
     res.header(
       "Access-Control-Allow-Headers",

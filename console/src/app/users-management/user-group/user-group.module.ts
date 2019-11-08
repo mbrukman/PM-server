@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {UserGroupListComponent} from '@app/users-management/user-group/user-group-list/user-group-list.component';
-import {ModalModule} from 'ngx-bootstrap';
+import {ModalModule, TooltipModule} from 'ngx-bootstrap';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from '@app/shared/shared.module';
 import {UserGroupDetailsComponent} from './user-group-details/user-group-details.component';
@@ -11,6 +11,7 @@ import { UserGroupAttachUsersModalComponent } from './user-group-details-users/u
 import {GeneralModalTemplateModule} from '@shared/general-modal-template/general-modal-template.module';
 import {TableModule} from 'primeng/table';
 import {InputsModule} from '@shared/inputs/inputs.module';
+import {RouterModule} from '@angular/router';
 
 @NgModule({
   entryComponents: [
@@ -23,10 +24,12 @@ import {InputsModule} from '@shared/inputs/inputs.module';
     UserGroupAttachUsersModalComponent
   ],
   imports: [
+    TooltipModule,
     CommonModule,
     FormsModule,
     ModalModule,
     TableModule,
+    RouterModule,
     InputsModule,
     SharedModule,
     ReactiveFormsModule,

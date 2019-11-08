@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 
 class Settings {
@@ -17,10 +18,11 @@ export class SettingsService {
   }
 
   getSettings(): Observable<Settings> {
-    return this.http.get<Settings>(`api/settings`).map(settings => {
-      this.settings = settings;
-      return settings;
-    });
+    return this.http.get<Settings>(`api/settings`)
+      .pipe(map(settings => {
+        this.settings = settings;
+        return settings;
+      }));
   }
 
   setupDbConnectionString(data) {

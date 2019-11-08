@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap';
 import {UserService} from '@app/services/users/user.service';
 import {User} from '@app/services/users/user.model';
-import {Subject, Subscription} from 'rxjs';
+import {forkJoin, Subject, Subscription} from 'rxjs';
 import UserGroup from '@app/services/user-group/user-group.model';
 import {UserGroupService} from '@app/services/user-group/user-group.service';
 import {map} from 'rxjs/operators';
@@ -32,9 +32,9 @@ export class UserGroupAttachUsersModalComponent implements OnInit, OnDestroy {
     const userCheckSubscription = this.userSubject
       .subscribe(([isAdded, user]) => {
         if (isAdded) {
-          this.newUsersList[user.id] = user;
+          this.newUsersList[user._id] = user;
         } else {
-          delete this.newUsersList[user.id];
+          delete this.newUsersList[user._id];
         }
       });
 
@@ -48,11 +48,34 @@ export class UserGroupAttachUsersModalComponent implements OnInit, OnDestroy {
     this.mainSubscription.add(listUsersSubscription);
   }
 
+  private prepareUserGroups() {
+    const usersToPatch = {};
+    Object.entries(this.newUsersList)
+      .forEach(([userId, user]) => {
+        user.groups.push(this.userGroup);
+        usersToPatch[userId] = {groups: user.groups};
+      });
+    return this.userService.patchMany(usersToPatch);
+  }
+
+  private preparePatchGroupData() {
+    const users = Object.values(this.newUsersList)
+      .concat(this.userGroup.users);
+    return this.userGroupService.patchOne(this.userGroup._id, {
+      users,
+    });
+  }
+
   saveGroups() {
-    this.userGroupService.patchOne({
-      users: Object.values(this.newUsersList)
-    })
-      .pipe(map(userGroup => this.onClose.next(userGroup)))
+    forkJoin(
+      this.prepareUserGroups(),
+      this.preparePatchGroupData()
+    )
+      .pipe(map(([user, userGroup]) => {
+        if (userGroup.name) {
+          this.onClose.next(userGroup);
+        }
+      }))
       .subscribe(() => this.bsModalRef.hide());
   }
 

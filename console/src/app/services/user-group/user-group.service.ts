@@ -9,7 +9,7 @@ import {Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 import {FilterOptions} from '@app/shared/model/filter-options.model';
 import {IEntityList} from '@app/shared/interfaces/entity-list.interface';
-import RemoveResponseInterface from "@shared/interfaces/remove-response.interface";
+import RemoveResponseInterface from '@shared/interfaces/remove-response.interface';
 
 
 @Injectable({providedIn: 'root'})
@@ -29,12 +29,14 @@ export class UserGroupService {
     }
     return this.http.get<UserGroup>(`api/user-groups/${id}`)
       .pipe(map(userGroup => new UserGroup(userGroup)));
-
   }
 
-  patchOne(userGroupPatchableData: UserGroupPatchableDataInterface): Observable<UserGroup> {
-    return this.http.patch<UserGroup>('api/user-groups', userGroupPatchableData)
-      .pipe(map((userGroup: UserGroup) => new UserGroup(userGroup)));
+  // tslint:disable-next-line:variable-name
+  patchOne(_id: string, userGroupPatchableData: UserGroupPatchableDataInterface): Observable<UserGroup> {
+    return this.http.patch<UserGroup>(`api/user-groups/${_id}`, userGroupPatchableData)
+      .pipe(
+        tap(console.log),
+        map((userGroup: UserGroup) => new UserGroup(userGroup)));
   }
 
 

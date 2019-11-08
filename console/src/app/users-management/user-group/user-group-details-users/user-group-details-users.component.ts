@@ -1,7 +1,7 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {UserGroupService} from '@app/services/user-group/user-group.service';
 import {ActivatedRoute} from '@angular/router';
-import {concat, fromEvent, Observable, Subject, Subscription} from 'rxjs';
+import {fromEvent, merge, Observable, Subject, Subscription} from 'rxjs';
 import UserGroup from '@app/services/user-group/user-group.model';
 import {switchMap, tap} from 'rxjs/operators';
 import {BsModalService} from 'ngx-bootstrap';
@@ -39,11 +39,12 @@ export class UserGroupDetailsUsersComponent implements OnInit, OnDestroy {
       switchMap((e: KeyboardEvent) => this.userGroupService.getOne(id, (e.target as HTMLInputElement).value))
     );
 
-    this.userGroup$ = concat(
+    this.userGroup$ = merge(
       getGroup$,
       getFilteredGroup$,
       this.updateSubject
-    ).pipe(tap(group => this.userGroup = group));
+    ).pipe(
+      tap(group => this.userGroup = group));
   }
 
   openAttachUsersModal() {
@@ -54,6 +55,7 @@ export class UserGroupDetailsUsersComponent implements OnInit, OnDestroy {
     const modal = this.modalService.show(UserGroupAttachUsersModalComponent, {
       initialState
     });
+
     modal.content.userGroup = this.userGroup;
     const onCloseSubscription = modal.content.onClose
       .subscribe((userGroup: UserGroup) => this.updateSubject.next(userGroup));

@@ -8,7 +8,7 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 export class BasicInputComponent implements OnInit {
   @Output() debounceTime?: number = 300;
   @Output() label?: string = '';
-  @Output() public onChange? = new EventEmitter<string>();
+  @Output() public onChange? = new EventEmitter<any>(); // literally any type might be here.
   constructor() { }
 
   ngOnInit() {

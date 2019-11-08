@@ -52,6 +52,30 @@ module.exports = {
     }
   },
 
+  async patch(req, res) {
+    const { id } = req.params;
+    const { body } = req;
+
+    try {
+      const user = await userGroupService.patch(id, body);
+      req.io.emit("notification", {
+        title: "Group removal",
+        message: `The group was updated due to error.`,
+        type: "success"
+      });
+      return res.status(200).json(user);
+    } catch (err) {
+      req.io.emit("notification", {
+        title: "Group removal",
+        message: `The group was not updated due to error.`,
+        type: "error"
+      });
+      console.log(err, "err");
+      winston.log("error", "Error patching user group.", err);
+      return res.status(500).json(err);
+    }
+  },
+
   async filter(req, res) {
     const { query } = req;
     if (typeof query.options === "string" && query.options) {
@@ -63,6 +87,7 @@ module.exports = {
       const userGroup = await userGroupService.filter(query);
       return res.status(200).json(userGroup);
     } catch (err) {
+      console.log(err);
       winston.log("error", "Error filtering user group.", err);
       return res.status(500).json(err);
     }

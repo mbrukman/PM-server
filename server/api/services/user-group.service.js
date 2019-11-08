@@ -23,60 +23,73 @@ class UserGroupService {
   }
 
   getOne(_id, filters) {
-    return UserGroupModel.findById(_id).populate("users");
+    return UserGroupModel.findById(_id).populate({
+      path: "users",
+      populate: {
+        path: "groups"
+      }
+    });
+  }
+
+  patch(_id, objectToUpdate) {
+    return UserGroupModel.findOneAndUpdate({ _id }, objectToUpdate, {
+      runValidators: true,
+      new: true
+    }).populate("users");
   }
 
   async filter(filterOptions = {}) {
-    let page;
-    const fields = filterOptions.fields;
-    const sort = filterOptions.options.sort || "name";
+    try {
+      let page;
+      const fields = filterOptions.fields;
+      const sort = filterOptions.options.sort || "name";
 
-    if (typeof filterOptions.options.page === "string") {
-      page = 0;
-    } else {
-      page = parseInt(filterOptions.options.page, 10);
-    }
+      if (typeof filterOptions.options.page === "string") {
+        page = 0;
+      } else {
+        page = parseInt(filterOptions.options.page, 10);
+      }
 
-    if (fields) {
-      Object.keys(fields).map(key => {
-        fields[key] = { $regex: `.*${fields[key]}.*` };
-      });
-    }
+      if (fields) {
+        Object.keys(fields).map(key => {
+          fields[key] = { $regex: `.*${fields[key]}.*` };
+        });
+      }
 
-    const $match = {};
-    if (filterOptions.options.globalFilter) {
-      $match.$or = [
-        {
-          name: { $regex: new RegExp(filterOptions.options.globalFilter, "ig") }
-        },
-        {
-          email: {
-            $regex: new RegExp(filterOptions.options.globalFilter, "ig")
+      const $match = {};
+      if (filterOptions.options.globalFilter) {
+        $match.$or = [
+          {
+            name: {
+              $regex: new RegExp(filterOptions.options.globalFilter, "ig")
+            }
+          },
+          {
+            email: {
+              $regex: new RegExp(filterOptions.options.globalFilter, "ig")
+            }
           }
+        ];
+      }
+      const aggregateSteps = [
+        {
+          $match: $match
         }
       ];
-    }
-    const aggregateSteps = [
-      {
-        $match: $match
-      }
-    ];
-    const pageSize = parseInt(process.env.PAGE_SIZE, 10);
-    const resultsQuery = [
-      ...aggregateSteps,
-      { $sort: getSort(sort) },
-      { $skip: page ? (page - 1) * pageSize : 0 },
-      { $limit: filterOptions.options.limit || pageSize }
-    ];
+      const pageSize = parseInt(process.env.PAGE_SIZE, 10);
+      const resultsQuery = [
+        ...aggregateSteps,
+        { $sort: getSort(sort) },
+        { $skip: page ? (page - 1) * pageSize : 0 },
+        { $limit: filterOptions.options.limit || pageSize }
+      ];
 
-    const countQuery = [
-      ...aggregateSteps,
-      {
-        $count: "count"
-      }
-    ];
-
-    try {
+      const countQuery = [
+        ...aggregateSteps,
+        {
+          $count: "count"
+        }
+      ];
       const groups = await UserGroupModel.aggregate(resultsQuery);
       const populatedGroups = await UserGroupModel.populate(groups, {
         path: "users"
@@ -87,6 +100,7 @@ class UserGroupService {
         totalCount: totalGroupLength.length ? totalGroupLength[0].count : 0
       };
     } catch (err) {
+      console.log(err);
       return err;
     }
   }

@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
-import UserGroupDataInterface from '@app/services/user-group/user-group-data.interface';
+import {UserGroupDataInterface} from '@app/services/user-group/user-group-data.interface';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 
 @Component({

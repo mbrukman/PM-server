@@ -5,7 +5,6 @@ import { UserService } from '@app/services/users/user.service';
 import { ActivatedRoute, Data } from '@angular/router';
 import { debounceTime, switchMap, tap } from 'rxjs/operators';
 import { FilterOptions } from '@app/shared/model/filter-options.model';
-import UserGroupDataInterface from '@app/services/user-group/user-group-data.interface';
 import { BsModalService } from 'ngx-bootstrap';
 import { CreateUserComponent } from './create-user/create-user.component';
 

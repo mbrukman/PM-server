@@ -1,4 +1,4 @@
-import { User } from '../users/user.model';
+import {User} from '../users/user.model';
 
 
 export default class UserGroup {
@@ -9,10 +9,15 @@ export default class UserGroup {
   users: Array<User>;
 
   // tslint:disable-next-line: variable-name
-  constructor ({_id, name, description, users}: UserGroup) {
+  constructor({_id, name, description, users}: UserGroup) {
     this._id = _id;
     this.name = name;
     this.description = description;
-    this.users = users.map(user => new User(user._id, user.name, user.email, user.createdAt, user.phoneNumber ));
+    this.users = users.map(user => {
+      if (typeof user === 'string') {
+        return new User(user);
+      }
+      return user;
+    });
   }
 }

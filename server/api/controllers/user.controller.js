@@ -15,8 +15,7 @@ function returnUserWithPickedFields(userDocument) {
 
 async function filter(req, res) {
   const { query } = req;
-  if (typeof query.options === "string" && _.isUndefined(query.options)) {
-    console.log(query);
+  if (typeof query.options === "string" && !_.isUndefined(query.options)) {
     query.options = JSON.parse(query.options);
   } else {
     query.options = {};
@@ -88,6 +87,29 @@ function createUser(req, res) {
     });
 }
 
+async function updateManyUsers(req, res) {
+  try {
+    const { body } = req;
+    const users = userService.bulkUpdateUser(body);
+    req.io.emit("notification", {
+      title: "Users updated",
+      message: `Users updated successfully`,
+      type: "success"
+    });
+    console.log(users);
+    return res.status(200).json(users);
+  } catch (err) {
+    req.io.emit("notification", {
+      title: "Whoops..",
+      message: `Error updating users`,
+      type: "error"
+    });
+
+    winston.log("error", "Error updating users", err);
+    return res.status(500).send(err);
+  }
+}
+
 async function updateUser(req, res) {
   try {
     const updatedUser = await userService.updateUser(req.params.id, req.body);
@@ -113,6 +135,7 @@ module.exports = {
   filter,
   createUser,
   deleteUser,
+  updateManyUsers,
   updateUser,
   getUser
 };

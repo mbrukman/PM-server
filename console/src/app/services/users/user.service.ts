@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {IEntityList} from '@app/shared/interfaces/entity-list.interface';
-import {User} from './user.model';
-import {FilterOptions} from '@app/shared/model/filter-options.model';
+import {User} from '@app/services/users/user.model';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import UserDataInterface from './user-data.interface';
+import UserDataInterface, {UserDataPatchableInterface} from './user-data.interface';
+import UserFilterOptions from '@app/services/users/user-filter-options.model';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +25,8 @@ export class UserService {
     return userData;
   }
 
-  getAllUsers(fields?: object, options?: FilterOptions) {
+
+  getAllUsers(fields?: object, options?: UserFilterOptions) {
     let params = new HttpParams();
     if (fields) {
       params = params.set('fields', JSON.stringify(fields));
@@ -49,6 +50,11 @@ export class UserService {
 
   createUser(userData: UserDataInterface): Observable<User> {
     return this.http.post<User>('api/users', userData)
-      .pipe(map((createdUser: User) => new User(createdUser._id, createdUser.name, createdUser.email, createdUser.createdAt, createdUser.phoneNumber)));
+      .pipe(map((createdUser: User) => new User(createdUser)));
+  }
+
+  patchMany(userGroupsPatchableData: {[key: string]: UserDataPatchableInterface}): Observable<Array<User>> {
+    return this.http.patch<Array<User>>(`api/users`, userGroupsPatchableData);
+      // .pipe(map((users: Array<User>) => users.map(user => new User(user))));
   }
 }
