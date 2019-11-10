@@ -18,12 +18,15 @@ export class CreateUserComponent implements OnInit {
 
   public onClose = new Subject<User>();
 
+  get formInvalid(): boolean {
+    return this.editUserComponent.editUserForm.invalid;
+  }
+
   ngOnInit() {}
 
   onCreateUser() {
-    if (this.editUserComponent.editUserForm.invalid) {
+    if (this.formInvalid) {
       throw new Error('Invalid form submission');
-      return;
     }
     this.onClose.next(this.editUserComponent.editUserForm.value);
     this.bsModalRef.hide();

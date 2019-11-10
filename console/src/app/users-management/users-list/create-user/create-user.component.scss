@@ -1,5 +1,3 @@
-@import "~src/assets/sass/mixins";
-
 .modal-content {
   padding: 14px 39px 39px 39px;
   .modal-header {
@@ -27,16 +25,5 @@
       }
     }
     padding-top: 24px;
-    .form-group {
-      font-family: "Roboto";
-      font-size: 14px;
-      font-weight: 300;
-      padding-bottom: 16px;
-      margin-bottom: 0px;
-    }
-
-    .change-password-checkbox {
-      @include custom-checkbox();
-    }
   }
 }

@@ -18,7 +18,8 @@
       <button
         type="submit"
         class="kh-btn kh-btn-blue"
-        [disabled]="createUserForm.invalid"
+        [disabled]="formInvalid"
+        (click)="onCreateUser()"
       >
         Create
       </button>

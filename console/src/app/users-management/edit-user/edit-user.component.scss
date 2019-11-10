@@ -1,0 +1,13 @@
+@import "~src/assets/sass/mixins";
+
+.form-group {
+  font-family: "Roboto";
+  font-size: 14px;
+  font-weight: 300;
+  padding-bottom: 16px;
+  margin-bottom: 0px;
+}
+
+.change-password-checkbox {
+  @include custom-checkbox();
+}
