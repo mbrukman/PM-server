@@ -13,6 +13,17 @@ import UserDataInterface from './user-data.interface';
 export class UserService {
   constructor(private http: HttpClient) { }
 
+  private removeEmptyFields(userData: UserDataInterface): UserDataInterface {
+    for (const key in userData) {
+      if (userData.hasOwnProperty(key)) {
+        if (!userData[key]) { // empty
+          delete userData[key];
+        }
+      }
+    }
+    return userData;
+  }
+
   getAllUsers(fields?: object, options?: FilterOptions) {
     let params = new HttpParams();
     if (fields) {
@@ -31,6 +42,7 @@ export class UserService {
   }
 
   updateUser(userId: string, userData: UserDataInterface): Observable<User> {
+    userData = this.removeEmptyFields(userData);
     return this.http.patch<User>(`api/users/${userId}`, userData);
   }
 
