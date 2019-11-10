@@ -11,7 +11,7 @@ import { EditUserComponent } from '@app/users-management/edit-user/edit-user.com
 })
 export class CreateUserComponent implements OnInit {
 
-  @ViewChild(EditUserComponent, {static: false})
+  @ViewChild(EditUserComponent)
   private editUserComponent: EditUserComponent;
 
   constructor(public bsModalRef: BsModalRef) {}
@@ -21,12 +21,12 @@ export class CreateUserComponent implements OnInit {
   ngOnInit() {}
 
   onCreateUser() {
-    // if (this.createUserForm.invalid) {
-    //   throw new Error('Invalid form submission');
-    //   return;
-    // }
-    // this.onClose.next(this.createUserForm.value);
-    // this.bsModalRef.hide();
+    if (this.editUserComponent.editUserForm.invalid) {
+      throw new Error('Invalid form submission');
+      return;
+    }
+    this.onClose.next(this.editUserComponent.editUserForm.value);
+    this.bsModalRef.hide();
   }
 
 }

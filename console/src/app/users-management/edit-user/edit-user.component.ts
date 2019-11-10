@@ -12,8 +12,6 @@ export class EditUserComponent implements OnInit {
 
   editUserForm: FormGroup;
 
-  // @Output() submitForm: EventEmitter<User> = new EventEmitter();
-
   constructor(private formBuilder: FormBuilder) { }
 
   get form() { return this.editUserForm.controls; }
