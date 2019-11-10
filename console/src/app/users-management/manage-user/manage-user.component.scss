@@ -15,3 +15,12 @@
   color: $greyish-text;
   margin-bottom: 30px;
 }
+
+.tab-settings {
+  width: 362px;
+
+  div.buttons {
+    display: flex;
+    padding: 30px 0px;
+  }
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MustMatch } from '@app/shared/must-match.validator';
 import { User } from '@app/services/users/user.model';
@@ -10,20 +10,30 @@ import { User } from '@app/services/users/user.model';
 })
 export class EditUserComponent implements OnInit {
 
+  @Input() user: User;
+
   editUserForm: FormGroup;
 
   constructor(private formBuilder: FormBuilder) { }
 
   get form() { return this.editUserForm.controls; }
 
+  private getInitialField(fieldName: string): string | boolean {
+    if (this.user && this.user[fieldName]) {
+      return this.user[fieldName];
+    } else {
+      return '';
+    }
+  }
+
   ngOnInit() {
     this.editUserForm = this.formBuilder.group({
-      name: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      phoneNumber: '',
+      name: [this.getInitialField('name') , [Validators.required]],
+      email: [this.getInitialField('email'), [Validators.required, Validators.email]],
+      phoneNumber: this.getInitialField('phoneNumber'),
       password: ['', [Validators.required, Validators.pattern('^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{8,}$')]],
       confirmPassword: ['', [Validators.required]],
-      changePasswordOnNextLogin: false,
+      changePasswordOnNextLogin: this.getInitialField('changePasswordOnNextLogin'),
     }, {validator: MustMatch('password', 'confirmPassword') });
   }
 

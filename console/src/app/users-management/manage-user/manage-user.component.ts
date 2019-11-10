@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { User } from '@app/services/users/user.model';
 import { UserService } from '@app/services/users/user.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { EditUserComponent } from '../edit-user/edit-user.component';
 
 @Component({
   selector: 'app-manage-user',
@@ -11,6 +12,9 @@ import { switchMap } from 'rxjs/operators';
   styleUrls: ['./manage-user.component.scss']
 })
 export class ManageUserComponent implements OnInit, OnDestroy {
+
+  @ViewChild(EditUserComponent)
+  private editUserComponent: EditUserComponent;
 
   public user: User;
   private mainSubscription = new Subscription();
@@ -26,6 +30,20 @@ export class ManageUserComponent implements OnInit, OnDestroy {
       })
     );
   }
+
+  deleteUser() {
+    throw new Error('not implemented');
+  }
+
+  saveUser() {
+    this.mainSubscription.add(
+      this.userService.updateUser(this.user._id, this.editUserComponent.editUserForm.value)
+      .subscribe(updatedUser => {
+        this.user = updatedUser;
+      })
+    );
+  }
+
 
   ngOnDestroy(): void {
     this.mainSubscription.unsubscribe();

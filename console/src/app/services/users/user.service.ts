@@ -30,6 +30,10 @@ export class UserService {
     return this.http.delete(`api/users/${userId}`);
   }
 
+  updateUser(userId: string, userData: UserDataInterface): Observable<User> {
+    return this.http.patch<User>(`api/users/${userId}`, userData);
+  }
+
   createUser(userData: UserDataInterface): Observable<User> {
     return this.http.post<User>('api/users', userData)
       .pipe(map((createdUser: User) => new User(createdUser._id, createdUser.name, createdUser.email, createdUser.createdAt, createdUser.phoneNumber)));
