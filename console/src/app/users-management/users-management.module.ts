@@ -14,6 +14,7 @@ import { ModalModule } from 'ngx-bootstrap';
 import { ManageUserComponent } from './manage-user/manage-user.component';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { EditUserComponent } from './edit-user/edit-user.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 @NgModule({
   entryComponents: [CreateUserComponent],
@@ -33,7 +34,8 @@ import { EditUserComponent } from './edit-user/edit-user.component';
     UsersListComponent,
     CreateUserComponent,
     ManageUserComponent,
-    EditUserComponent
+    EditUserComponent,
+    ResetPasswordComponent
   ],
   providers: [UsersListResolver, UserGroupResolver]
 })
