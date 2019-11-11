@@ -21,6 +21,8 @@ export class EditUserComponent implements OnInit {
   private getInitialField(fieldName: string): string | boolean {
     if (this.user && this.user[fieldName]) {
       return this.user[fieldName];
+    } else if (fieldName === 'changePasswordOnNextLogin') {
+      return false;
     } else {
       return '';
     }
@@ -28,13 +30,13 @@ export class EditUserComponent implements OnInit {
 
   ngOnInit() {
     this.editUserForm = this.formBuilder.group({
-      name: [this.getInitialField('name') , [Validators.required]],
+      name: [this.getInitialField('name'), [Validators.required]],
       email: [this.getInitialField('email'), [Validators.required, Validators.email]],
       phoneNumber: this.getInitialField('phoneNumber'),
       password: ['', [Validators.required, Validators.pattern('^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{8,}$')]],
       confirmPassword: ['', [Validators.required]],
       changePasswordOnNextLogin: this.getInitialField('changePasswordOnNextLogin'),
-    }, {validator: MustMatch('password', 'confirmPassword') });
+    }, { validator: MustMatch('password', 'confirmPassword') });
   }
 
 }
