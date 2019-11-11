@@ -30,14 +30,24 @@ class UserService {
     return User.findOne({ _id: userId });
   }
 
-  updateUser(userId, newUserData) {
+  updateUser(_id, newUserData) {
     if (newUserData.password) {
       newUserData.password = this.hashPassword(newUserData.password, serverKey);
     }
-    return User.findOneAndUpdate({ _id: userId }, newUserData, {
-      runValidators: true,
-      new: true
-    });
+    try {
+      return User.findOneAndUpdate(
+        { _id: mongoose.Types.ObjectId(_id) },
+        { $set: newUserData },
+        {
+          runValidators: true,
+          new: true
+        }
+      ).populate({
+        path: "groups"
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   bulkUpdateUser(usersData) {

@@ -1,4 +1,4 @@
-export interface IEntityList<T>{
-    items : T[],
-    totalCount : number
+export interface IEntityList<T> {
+  items: T[];
+  totalCount: number;
 }

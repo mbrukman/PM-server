@@ -11,8 +11,9 @@ export class User implements UserDataInterface {
   groups: Array<UserGroup | string>;
   changePasswordOnNextLogin: boolean;
 
-  // @ts-ignore
-  constructor({_id, name, email, phoneNumber, createdAt, groups}: UserDataInterface) {
+  constructor(userData = {} as UserDataInterface) {
+    // @ts-ignore
+    const {_id, name, email, phoneNumber, createdAt, groups} = userData;
     this._id = _id;
     this.name = name;
     this.email = email;
@@ -20,7 +21,10 @@ export class User implements UserDataInterface {
     if (createdAt) {
       this.createdAt = new Date(createdAt);
     }
-    this.groups = groups.map(group => {
+    this.groups = this.mapGroups(groups);
+  }
+  private mapGroups(groups = [] as Array<UserGroup | string>) {
+    return groups.map(group => {
       if (typeof group !== 'string') {
         return new UserGroup(group);
       }

@@ -3,14 +3,18 @@
   [modalRef]="bsModalRef">
 
   <div class="row">
-    <app-filter-text-input></app-filter-text-input>
+    <app-filter-text-input
+    (onChange)="userFilterSubject.next($event)"></app-filter-text-input>
   </div>
 
   <p-table
+    [totalRecords]="totalUsersCount"
     [value]="users"
     [rows]="15"
     [paginator]="true"
     [pageLinks]="4"
+    [lazy]="true"
+    (onLazyLoad)="this.lazyLoadUsers($event)"
   >
     <ng-template pTemplate="header">
       <tr>
@@ -29,6 +33,6 @@
   </p-table>
   <div class="btn-container w-100 d-flex justify-content-end">
     <button class="kh-btn" (click)="bsModalRef.hide()">Cancel</button>
-    <button class="kh-btn btn-primary" (click)="saveGroups()">Save</button>
+    <button class="kh-btn kh-btn-blue" [disabled]="!newUsersCollectionLength" (click)="saveGroups()">Save</button>
   </div>
 </app-general-modal-template>

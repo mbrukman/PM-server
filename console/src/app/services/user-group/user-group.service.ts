@@ -22,12 +22,20 @@ export class UserGroupService {
     return this.http.delete<RemoveResponseInterface>(`api/user-groups/${id}`);
   }
 
-  getOne(id: string, filter?: string) {
+  private createFilterQuery(fields, options): HttpParams {
     let params = new HttpParams();
-    if (filter) {
-      params = params.set('filter', JSON.stringify(filter));
+    if (!options && !fields) {
+      return params;
     }
-    return this.http.get<UserGroup>(`api/user-groups/${id}`)
+    if (fields) {
+      params = params.set('fields', JSON.stringify(fields));
+    }
+    return params.set('options', JSON.stringify(options));
+  }
+
+  getOne(id: string, filter?: FilterOptions) {
+    const params = this.createFilterQuery(null, filter);
+    return this.http.get<UserGroup>(`api/user-groups/${id}`, {params})
       .pipe(map(userGroup => new UserGroup(userGroup)));
   }
 
@@ -35,8 +43,8 @@ export class UserGroupService {
   patchOne(_id: string, userGroupPatchableData: UserGroupPatchableDataInterface): Observable<UserGroup> {
     return this.http.patch<UserGroup>(`api/user-groups/${_id}`, userGroupPatchableData)
       .pipe(
-        tap(console.log),
-        map((userGroup: UserGroup) => new UserGroup(userGroup)));
+        map((userGroup: UserGroup) => new UserGroup(userGroup))
+      );
   }
 
 
@@ -46,11 +54,7 @@ export class UserGroupService {
   }
 
   getAllGroups(fields?: object, options?: FilterOptions): Observable<IEntityList<UserGroup>> {
-    let params = new HttpParams();
-    if (fields) {
-      params = params.set('fields', JSON.stringify(fields));
-    }
-    params = params.set('options', JSON.stringify(options));
-    return this.http.get<IEntityList<UserGroup>>('api/user-groups', {params: params});
+    const params = this.createFilterQuery(fields, options);
+    return this.http.get<IEntityList<UserGroup>>('api/user-groups', {params});
   }
 }

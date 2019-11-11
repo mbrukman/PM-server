@@ -6,15 +6,19 @@ export default class UserGroup {
   _id: string;
   name: string;
   description: string;
-  users: Array<User>;
+  users: Array<User| string>;
 
   // tslint:disable-next-line: variable-name
-  constructor({_id, name, description, users}: UserGroup) {
+  constructor(userGroup = {} as UserGroup) {
+    const {_id, name, description, users} = userGroup;
     this._id = _id;
     this.name = name;
     this.description = description;
-    this.users = users.map(user => {
-      if (typeof user === 'string') {
+    this.users = this.mapUsers(users);
+  }
+  private mapUsers (users = [] as Array<User | string>) {
+    return users.map(user => {
+      if (typeof user !== 'string') {
         return new User(user);
       }
       return user;

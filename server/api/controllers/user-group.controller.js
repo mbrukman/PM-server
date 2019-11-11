@@ -1,6 +1,16 @@
 const userGroupService = require("../services/user-group.service");
 const winston = require("winston");
 
+function parseQuery(req) {
+  const { query } = req;
+  if (typeof query.options === "string" && query.options) {
+    query.options = JSON.parse(query.options);
+  } else {
+    query.options = {};
+  }
+  return query;
+}
+
 module.exports = {
   async create(req, res) {
     try {
@@ -41,7 +51,7 @@ module.exports = {
 
   async getOne(req, res) {
     const { id } = req.params;
-    const { query } = req;
+    const query = parseQuery(req);
 
     try {
       const user = await userGroupService.getOne(id, query);
@@ -59,30 +69,24 @@ module.exports = {
     try {
       const user = await userGroupService.patch(id, body);
       req.io.emit("notification", {
-        title: "Group removal",
+        title: "Group update",
         message: `The group was updated due to error.`,
         type: "success"
       });
       return res.status(200).json(user);
     } catch (err) {
       req.io.emit("notification", {
-        title: "Group removal",
+        title: "Group update",
         message: `The group was not updated due to error.`,
         type: "error"
       });
-      console.log(err, "err");
       winston.log("error", "Error patching user group.", err);
       return res.status(500).json(err);
     }
   },
 
   async filter(req, res) {
-    const { query } = req;
-    if (typeof query.options === "string" && query.options) {
-      query.options = JSON.parse(query.options);
-    } else {
-      query.options = {};
-    }
+    const query = parseQuery(req);
     try {
       const userGroup = await userGroupService.filter(query);
       return res.status(200).json(userGroup);

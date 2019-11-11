@@ -1,12 +1,12 @@
 import { Component, OnInit, ElementRef, ViewChild, OnDestroy } from '@angular/core';
-import { User } from '../../services/users/user.model';
+import { User } from '@app/services/users/user.model';
 import { Subscription, fromEvent } from 'rxjs';
 import { UserService } from '@app/services/users/user.service';
 import { ActivatedRoute, Data } from '@angular/router';
-import { debounceTime, switchMap, tap } from 'rxjs/operators';
-import { FilterOptions } from '@app/shared/model/filter-options.model';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { BsModalService } from 'ngx-bootstrap';
 import { CreateUserComponent } from './create-user/create-user.component';
+import UserFilterOptions from '@app/services/users/user-filter-options.model';
 
 @Component({
   selector: 'app-users-list',
@@ -14,7 +14,7 @@ import { CreateUserComponent } from './create-user/create-user.component';
   styleUrls: ['./users-list.component.scss']
 })
 export class UsersListComponent implements OnInit, OnDestroy {
-  filterOptions: FilterOptions = new FilterOptions();
+  filterOptions = new UserFilterOptions();
   resultCount: number = 0;
   users: User[];
   filterKeyUpSubscribe: Subscription;

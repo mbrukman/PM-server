@@ -14,6 +14,14 @@ export class UserService {
   constructor(private http: HttpClient) {
   }
 
+  // tslint:disable-next-line:variable-name
+  patchOne(_id: string, userPatchableData: UserDataPatchableInterface): Observable<User> {
+    return this.http.patch<User>(`api/users/${_id}`, userPatchableData)
+      .pipe(
+        map((user: User) => new User(user))
+      );
+  }
+
   private removeEmptyFields(userData: UserDataInterface): UserDataInterface {
     for (const key in userData) {
       if (userData.hasOwnProperty(key)) {

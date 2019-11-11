@@ -1,17 +1,9 @@
 <div>
-  <div class="row">
+  <div class="row pt-5 pb-5 d-flex justify-content-between text-white">
     <a class="kh-btn kh-btn-blue" (click)="openAttachUsersModal()">Attach Users</a>
-    <div class="filter-text">
-      <div>
-        <i class="material-icons">search</i>
-        <input
-          class="form-control"
-          type="text"
-          placeholder="Filter"
-          #filterInput
-        />
-      </div>
-    </div>
+    <app-filter-text-input
+      (onChange)="this.userFilterSubject.next($event)"
+    ></app-filter-text-input>
   </div>
   <p-table
     *ngIf="userGroup$ | async as userGroup"
@@ -48,6 +40,9 @@
           </a>
         </td>
         <td rowspan="1">
+          <button class="btn btn-link" (click)="detachUserSubject.next(user)">
+            <i class="fa fa-minus-circle" aria-hidden="true"></i>
+          </button>
         </td>
       </tr>
     </ng-template>
