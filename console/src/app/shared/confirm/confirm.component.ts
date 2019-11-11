@@ -27,7 +27,6 @@ export class ConfirmComponent {
 
   closeModal() {
     this.bsModalRef.hide();
-
   }
 
 }

@@ -63,10 +63,14 @@ class UserGroupService {
   }
 
   patch(_id, objectToUpdate) {
-    return UserGroupModel.findOneAndUpdate({ _id }, objectToUpdate, {
-      runValidators: true,
-      new: true
-    }).populate("users");
+    return UserGroupModel.findOneAndUpdate(
+      { _id },
+      { $set: objectToUpdate },
+      {
+        runValidators: true,
+        new: true
+      }
+    ).populate("users");
   }
 
   async filter(filterOptions = {}) {

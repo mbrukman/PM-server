@@ -34,20 +34,14 @@ class UserService {
     if (newUserData.password) {
       newUserData.password = this.hashPassword(newUserData.password, serverKey);
     }
-    try {
-      return User.findOneAndUpdate(
-        { _id: mongoose.Types.ObjectId(_id) },
-        { $set: newUserData },
-        {
-          runValidators: true,
-          new: true
-        }
-      ).populate({
-        path: "groups"
-      });
-    } catch (err) {
-      console.log(err);
-    }
+    return User.findOneAndUpdate(
+      { _id },
+      { $set: newUserData },
+      {
+        runValidators: true,
+        new: true
+      }
+    ).populate("groups");
   }
 
   bulkUpdateUser(usersData) {

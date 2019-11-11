@@ -25,6 +25,7 @@ import {RouterModule} from '@angular/router';
   ],
   imports: [
     TooltipModule,
+    SharedModule, // TODO: divide shared module into small, reusable and flexible modules
     CommonModule,
     FormsModule,
     ModalModule,

@@ -1,13 +1,32 @@
 @import "~src/assets/sass/_variables";
 
 
-.tooltip.bs-tooltip-right .tooltip-arrow.arrow::before {
-  border-right-color: #6a7077;
+.tooltip.bs-tooltip-right .tooltip-arrow.arrow {
+}
+.tooltip.bs-tooltip-right .tooltip-arrow.arrow:before {
+  margin-top: -4px;
+  border-width: 9px 9px 9px 0;
+  border-right-color: $dropdown-border;
+}
+
+.tooltip .arrow::after {
+  position: absolute;
+  border-color: transparent;
+  border-style: solid;
+}
+
+.tooltip.bs-tooltip-right .tooltip-arrow.arrow:after {
+  margin-top: -3px;
+  margin-left: 1px;
+  content: "";
+  border-width: 8px 8px 8px 0;
+  border-right-color: $kh-background;
 }
 
 bs-tooltip-container {
   .tooltip-inner {
-    background-color: $background;
-    border: 1px solid #6a7077;
+    background-color: $kh-background;
+    margin-left: 3px;
+    border: 1px solid $dropdown-border;
   }
 }

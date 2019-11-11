@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {UserGroupService} from '@app/services/user-group/user-group.service';
 import {ActivatedRoute} from '@angular/router';
 import {forkJoin, merge, Observable, Subject, Subscription} from 'rxjs';
@@ -9,6 +9,7 @@ import {UserGroupAttachUsersModalComponent} from '@app/users-management/user-gro
 import {FilterOptions} from '@shared/model/filter-options.model';
 import {User} from '@app/services/users/user.model';
 import {UserService} from '@app/services/users/user.service';
+import {ConfirmComponent} from "@shared/confirm/confirm.component";
 
 @Component({
   selector: 'app-user-group-details-users',
@@ -16,6 +17,8 @@ import {UserService} from '@app/services/users/user.service';
   styleUrls: ['./user-group-details-users.component.scss']
 })
 export class UserGroupDetailsUsersComponent implements OnInit, OnDestroy {
+
+  @Input() getGroup$: Observable<UserGroup>;
 
   public updateSubject = new Subject<UserGroup>();
   public detachUserSubject = new Subject();
@@ -35,19 +38,31 @@ export class UserGroupDetailsUsersComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const id: string = this.activeRoute.snapshot.paramMap.get('id');
-
-    const getGroup$ = this.userGroupService.getOne(id);
     const getFilteredGroup$ = this.userFilterSubject.pipe(
       switchMap((name: string) => this.userGroupService.getOne(id, new FilterOptions({globalFilter: name})))
     );
 
     this.userGroup$ = merge(
-      getGroup$,
+      this.getGroup$,
       this.getDetachUser$(),
       getFilteredGroup$,
       this.updateSubject
     ).pipe(
-      tap(group => this.userGroup = group));
+      tap(group => this.userGroup = group)
+    );
+  }
+
+  openDetachConfirmationModal(user) {
+    const modal = this.modalService.show(ConfirmComponent, {
+      initialState: {
+        title: 'You are about to detach the user from the group...'
+      }
+    });
+    modal.content.result.subscribe((result) => {
+      if (result === modal.content.confirm) {
+        this.detachUserSubject.next(user);
+      }
+    });
   }
 
   getDetachUser$(): Observable<UserGroup> {
@@ -55,7 +70,7 @@ export class UserGroupDetailsUsersComponent implements OnInit, OnDestroy {
       .pipe(
         map((userToDetach: User) => {
           this.userGroup.users = this.userGroup.users.filter((user: User) => user._id !== userToDetach._id);
-          userToDetach.groups = userToDetach.groups.filter((group: UserGroup) => group._id !== this.userGroup._id);
+          userToDetach.groups = userToDetach.groups.filter((group: string) => group !== this.userGroup._id);
           return userToDetach;
         }),
         switchMap((userToDetach: User) => {
@@ -64,7 +79,7 @@ export class UserGroupDetailsUsersComponent implements OnInit, OnDestroy {
             this.userService.patchOne(userToDetach._id, {groups: (userToDetach.groups as Array<UserGroup>)})
           );
         }),
-        map(([userGroup, user]) =>  userGroup)
+        map(([userGroup, user]) => userGroup)
       );
   }
 

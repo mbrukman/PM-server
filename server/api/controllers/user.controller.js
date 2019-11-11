@@ -7,6 +7,7 @@ function returnUserWithPickedFields(userDocument) {
     "_id",
     "name",
     "email",
+    "groups",
     "createdAt",
     "phoneNumber",
     "changePasswordOnNextLogin"

@@ -42,7 +42,8 @@
               "src/assets/sass/icons.css",
               "src/assets/sass/material.css",
               "src/assets/sass/roboto.css",
-              "src/styles.scss"
+              "src/styles.scss",
+              "node_modules/primeicons/primeicons.css"
             ],
             "scripts": []
           },

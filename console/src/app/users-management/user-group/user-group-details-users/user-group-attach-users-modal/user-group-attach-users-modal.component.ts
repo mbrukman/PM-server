@@ -81,10 +81,14 @@ export class UserGroupAttachUsersModalComponent implements OnInit, OnDestroy {
 
   private preparePatchGroupData() {
     const users = Object.values(this.newUsersCollection)
-      .concat(this.userGroup.users);
+      .concat(this.userGroup.users as Array<User>);
     return this.userGroupService.patchOne(this.userGroup._id, {
       users,
     });
+  }
+
+  openConfirmationModal() {
+
   }
 
   saveGroups() {

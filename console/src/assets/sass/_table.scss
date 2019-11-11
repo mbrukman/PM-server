@@ -42,6 +42,15 @@ table,
 
 .ui-table.ui-widget {
   & table {
+    thead.ui-table-thead > tr > th {
+      font-size: 18px;
+    }
+
+    tbody.ui-table-tbody > tr,
+    tbody.ui-table-tbody > tr:nth-child(even) {
+      font-size: 14px;
+    }
+
     thead.ui-table-thead > tr > th,
     tbody.ui-table-tbody > tr,
     tbody.ui-table-tbody > tr:nth-child(even) {
