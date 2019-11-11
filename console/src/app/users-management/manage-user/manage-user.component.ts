@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ChangeDetectorRef, AfterContentInit, AfterContentChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, AfterContentChecked } from '@angular/core';
 import { User } from '@app/services/users/user.model';
 import { UserService } from '@app/services/users/user.service';
-import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription, pipe } from 'rxjs';
+import { switchMap, filter, tap } from 'rxjs/operators';
 import { EditUserComponent } from '../edit-user/edit-user.component';
 import { PopupService } from '@app/shared/services/popup.service';
 
@@ -25,11 +25,8 @@ export class ManageUserComponent implements OnInit, OnDestroy, AfterContentCheck
     private userService: UserService,
     private route: ActivatedRoute,
     private popupService: PopupService,
-    private cd: ChangeDetectorRef) { }
-
-  get formInvalid(): boolean {
-    return this.editUserComponent && this.editUserComponent.editUserForm.invalid;
-  }
+    private cd: ChangeDetectorRef,
+    private router: Router) { }
 
   ngAfterContentChecked() {
     this.cd.detectChanges();
@@ -47,12 +44,17 @@ export class ManageUserComponent implements OnInit, OnDestroy, AfterContentCheck
 
   deleteUser() {
     const confirm = 'Yes, delete.';
-    this.popupService.openConfirm('Are you sure?', 'Are you sure you want to delete the user: ' + this.user.name , confirm, null, null)
-    .subscribe((result: string) => {
-      if (result === confirm) {
-        alert('deleted');
-      }
-    });
+    this.mainSubscription.add(
+      this.popupService.openConfirm('Are you sure?',
+      'Are you sure you want to delete the user: ' + this.user.name , confirm, null, null)
+      .pipe(
+          filter( result => result === confirm),
+          switchMap(() => this.userService.deleteUser(this.user._id))
+      ).subscribe(() => {
+        alert('User ' + this.user.name + ' has been deleted.');
+        this.router.navigateByUrl('/admin/users-management/users');
+      })
+    );
   }
 
   saveUser() {
@@ -63,7 +65,6 @@ export class ManageUserComponent implements OnInit, OnDestroy, AfterContentCheck
       })
     );
   }
-
 
   ngOnDestroy(): void {
     this.mainSubscription.unsubscribe();
