@@ -21,6 +21,10 @@ export class ManageUserComponent implements OnInit, OnDestroy {
 
   constructor(private userService: UserService, private route: ActivatedRoute) { }
 
+  get formInvalid(): boolean {
+    return this.editUserComponent.editUserForm.invalid;
+  }
+
   ngOnInit() {
     this.mainSubscription.add(this.route.paramMap
       .pipe(
