@@ -1,28 +1,38 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ChangeDetectorRef, AfterContentInit, AfterContentChecked } from '@angular/core';
 import { User } from '@app/services/users/user.model';
 import { UserService } from '@app/services/users/user.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { EditUserComponent } from '../edit-user/edit-user.component';
+import { PopupService } from '@app/shared/services/popup.service';
 
 @Component({
   selector: 'app-manage-user',
   templateUrl: './manage-user.component.html',
   styleUrls: ['./manage-user.component.scss']
 })
-export class ManageUserComponent implements OnInit, OnDestroy {
+export class ManageUserComponent implements OnInit, OnDestroy, AfterContentChecked {
+
+  public user: User;
 
   @ViewChild(EditUserComponent)
   private editUserComponent: EditUserComponent;
 
-  public user: User;
   private mainSubscription = new Subscription();
 
-  constructor(private userService: UserService, private route: ActivatedRoute) { }
+  constructor(
+    private userService: UserService,
+    private route: ActivatedRoute,
+    private popupService: PopupService,
+    private cd: ChangeDetectorRef) { }
 
   get formInvalid(): boolean {
-    return this.editUserComponent.editUserForm.invalid;
+    return this.editUserComponent && this.editUserComponent.editUserForm.invalid;
+  }
+
+  ngAfterContentChecked() {
+    this.cd.detectChanges();
   }
 
   ngOnInit() {
@@ -36,7 +46,13 @@ export class ManageUserComponent implements OnInit, OnDestroy {
   }
 
   deleteUser() {
-    throw new Error('not implemented');
+    const confirm = 'Yes, delete.';
+    this.popupService.openConfirm('Are you sure?', 'Are you sure you want to delete the user: ' + this.user.name , confirm, null, null)
+    .subscribe((result: string) => {
+      if (result === confirm) {
+        alert('deleted');
+      }
+    });
   }
 
   saveUser() {
