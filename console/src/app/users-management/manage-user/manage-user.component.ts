@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, AfterContentChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef} from '@angular/core';
 import { User } from '@app/services/users/user.model';
 import { UserService } from '@app/services/users/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription, pipe } from 'rxjs';
-import { switchMap, filter, tap } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+import { switchMap, filter } from 'rxjs/operators';
 import { EditUserComponent } from '../edit-user/edit-user.component';
 import { PopupService } from '@app/shared/services/popup.service';
 
@@ -12,7 +12,7 @@ import { PopupService } from '@app/shared/services/popup.service';
   templateUrl: './manage-user.component.html',
   styleUrls: ['./manage-user.component.scss']
 })
-export class ManageUserComponent implements OnInit, OnDestroy, AfterContentChecked {
+export class ManageUserComponent implements OnInit, OnDestroy {
 
   public user: User;
 
@@ -27,10 +27,6 @@ export class ManageUserComponent implements OnInit, OnDestroy, AfterContentCheck
     private popupService: PopupService,
     private cd: ChangeDetectorRef,
     private router: Router) { }
-
-  ngAfterContentChecked() {
-    this.cd.detectChanges();
-  }
 
   ngOnInit() {
     this.mainSubscription.add(this.route.paramMap
@@ -69,5 +65,4 @@ export class ManageUserComponent implements OnInit, OnDestroy, AfterContentCheck
   ngOnDestroy(): void {
     this.mainSubscription.unsubscribe();
   }
-
 }
