@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MustMatch } from '@app/shared/must-match.validator';
+import { passwordValidator } from '@app/shared/password.validator';
 import { User } from '@app/services/users/user.model';
 
 @Component({
@@ -33,7 +34,7 @@ export class EditUserComponent implements OnInit {
       name: [this.getInitialField('name'), [Validators.required]],
       email: [this.getInitialField('email'), [Validators.required, Validators.email]],
       phoneNumber: this.getInitialField('phoneNumber'),
-      password: ['', [Validators.required, Validators.pattern('^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{8,}$')]],
+      password: ['', [Validators.required, passwordValidator]],
       confirmPassword: ['', [Validators.required]],
       changePasswordOnNextLogin: this.getInitialField('changePasswordOnNextLogin'),
     }, { validator: MustMatch('password', 'confirmPassword') });
