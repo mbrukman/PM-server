@@ -1,0 +1,13 @@
+@import "~src/assets/sass/_variables";
+
+
+.tooltip.bs-tooltip-right .tooltip-arrow.arrow::before {
+  border-right-color: #6a7077;
+}
+
+bs-tooltip-container {
+  .tooltip-inner {
+    background-color: $background;
+    border: 1px solid #6a7077;
+  }
+}
