@@ -20,7 +20,35 @@ describe("All user group endpoints are working as expected.", () => {
     );
   });
 
+  describe("PATCH api/user-groups", () => {
+    it("should respond with updated user group", () => {
+      const user = testDataManager.collection[0];
+      const id = user._id.toString();
+      const name = "ET Go Home";
+      return request(baseApiURL)
+        .patch(`/user-groups/${id}`)
+        .send({ name })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body._id).toBe(id);
+          expect(body.name).toEqual(name);
+        });
+    });
+  });
+
   describe("GET api/user-groups", () => {
+    it(`should respond with a group`, () => {
+      const userGroup = testDataManager.collection[0];
+      const id = userGroup._id.toString();
+      return request(baseApiURL)
+        .get(`/user-groups/${id}`)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body._id).toEqual(id);
+          expect(body.name).tomEqual(userGroup.name);
+          expect(body.description).toEqual(userGroup.description);
+        });
+    });
     it(`should respond with list of groups`, () => {
       return request(baseApiURL)
         .get("/user-groups?options={}")

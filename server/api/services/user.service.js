@@ -44,7 +44,7 @@ class UserService {
     ).populate("groups");
   }
 
-  bulkUpdateUser(usersData) {
+  async bulkUpdateUser(usersData) {
     const entries = Object.entries(usersData);
     const updates = entries.map(([_id, value]) => {
       return {
@@ -54,7 +54,12 @@ class UserService {
         }
       };
     });
-    return User.bulkWrite(updates);
+    await User.bulkWrite(updates);
+    return User.find({
+      _id: {
+        $in: Object.keys(usersData)
+      }
+    }).populate("groups");
   }
 
   async filter(filterOptions = {}) {

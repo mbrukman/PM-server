@@ -91,13 +91,12 @@ function createUser(req, res) {
 async function updateManyUsers(req, res) {
   try {
     const { body } = req;
-    const users = userService.bulkUpdateUser(body);
+    const users = await userService.bulkUpdateUser(body);
     req.io.emit("notification", {
       title: "Users updated",
       message: `Users updated successfully`,
       type: "success"
     });
-    console.log(users);
     return res.status(200).json(users);
   } catch (err) {
     req.io.emit("notification", {

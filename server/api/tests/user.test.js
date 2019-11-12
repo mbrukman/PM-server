@@ -18,6 +18,41 @@ describe("User tests", () => {
     usersTestDataManager.clear();
   });
 
+  describe("PATCH api/users", () => {
+    it("should respond with updated user", () => {
+      const user = usersTestDataManager.collection[0];
+      const id = user._id.toString();
+      const name = "ET Go Home";
+      return request(app)
+        .patch(`/api/users/${id}`)
+        .send({ name })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body._id).toBe(id);
+          expect(body.name).toEqual(name);
+        });
+    });
+    it("should respond with updated users", () => {
+      const users = usersTestDataManager.collection;
+
+      const userCollection = {};
+      users.forEach(user => {
+        userCollection[user._id] = {
+          name: "new name"
+        };
+      });
+      return request(app)
+        .patch(`/api/users`)
+        .send(userCollection)
+        .expect(200)
+        .then(({ body }) => {
+          body.forEach(({ name, _id }) => {
+            expect(userCollection[_id].name).toBe(name);
+          });
+        });
+    });
+  });
+
   describe("GET api/users", () => {
     it(`should respond with list of users with query params`, () => {
       return request(app)

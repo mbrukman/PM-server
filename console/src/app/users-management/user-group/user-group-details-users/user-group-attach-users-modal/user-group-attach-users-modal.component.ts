@@ -87,10 +87,6 @@ export class UserGroupAttachUsersModalComponent implements OnInit, OnDestroy {
     });
   }
 
-  openConfirmationModal() {
-
-  }
-
   saveGroups() {
     forkJoin(
       this.prepareUserGroups(),
