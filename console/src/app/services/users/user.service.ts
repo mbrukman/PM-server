@@ -63,6 +63,10 @@ export class UserService {
     return this.http.patch<User>(`api/users/${userId}`, userData);
   }
 
+  changeUserPassword(userId: string, newPassword: string): Observable<User> {
+    return this.http.patch<User>(`api/users/${userId}`, {password: newPassword});
+  }
+
   createUser(userData: UserDataInterface): Observable<User> {
     return this.http.post<User>('api/users', userData)
       .pipe(map((createdUser: User) => new User(createdUser)));

@@ -42,7 +42,7 @@ const appRoutes: Routes = [
     canActivate: [IsSetUpGuard]
   },
   {
-    path: 'reset-password',
+    path: 'reset-password/:token',
     component: ResetPasswordComponent,
   },
   { path: '**', component: NotFoundComponent }
