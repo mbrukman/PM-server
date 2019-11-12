@@ -63,8 +63,10 @@ export class UserService {
     return this.http.patch<User>(`api/users/${userId}`, userData);
   }
 
-  changeUserPassword(userId: string, newPassword: string): Observable<User> {
-    return this.http.patch<User>(`api/users/${userId}`, {password: newPassword});
+  changeUserPassword(newPassword: string): Observable<boolean> {
+    // by using angular-jwt, auth is added to each http request
+    // user's id is in the payload of that auth, so we send only the new password
+    return this.http.post<boolean>(`api/users/reset-password`, {password: newPassword});
   }
 
   createUser(userData: UserDataInterface): Observable<User> {
