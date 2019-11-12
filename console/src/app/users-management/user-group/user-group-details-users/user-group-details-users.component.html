@@ -2,6 +2,7 @@
   <div class="row pt-5 pb-5 d-flex justify-content-between text-white">
     <a class="kh-btn kh-btn-blue" (click)="openAttachUsersModal()">Attach Users</a>
     <app-filter-text-input
+      placeholder="Search"
       (onChange)="this.userFilterSubject.next($event)"
     ></app-filter-text-input>
   </div>
@@ -36,9 +37,13 @@
       </ng-template>
 
       <tr>
-        <td colspan="1">{{user.name}}</td>
+        <td colspan="1">
+          <span class="ml-1">
+            {{user.name}}
+          </span>
+        </td>
         <td rowspan="1">
-          <a class="group-size"
+          <a class="cube-bordered"
              [tooltip]="tooltip"
              placement="right"
              triggers="click">
@@ -46,7 +51,7 @@
           </a>
         </td>
         <td rowspan="1">
-          <button class="btn btn-link text-white" (click)="openDetachConfirmationModal(user)">
+          <button class="btn btn-link text-white ml-2" (click)="openDetachConfirmationModal(user)">
             <svg version="1.1" id="Detach" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                  x="0px" y="0px"
                  stroke="white"

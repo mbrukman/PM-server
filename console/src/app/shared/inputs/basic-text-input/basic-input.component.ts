@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'app-basic-input',
@@ -6,8 +6,9 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
   styleUrls: ['./basic-input.component.scss']
 })
 export class BasicInputComponent implements OnInit {
-  @Output() debounceTime?: number = 300;
-  @Output() label?: string = '';
+  @Input() debounceTime?: number = 300;
+  @Input() label?: string = '';
+  @Input() placeholder?: string = '';
   @Output() public onChange? = new EventEmitter<any>(); // literally any type might be here.
   constructor() { }
 

@@ -1,11 +1,5 @@
 @import "~src/assets/sass/_variables";
 
-.group-size {
-  padding: 12px 14px 12px 14px;
-  border: 1px $pale-blue solid;
-  cursor: pointer;
-  border-radius: 6px;
-}
 .tooltip-list {
   list-style: none;
   pointer-events: all !important;

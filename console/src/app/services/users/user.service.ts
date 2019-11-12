@@ -62,7 +62,7 @@ export class UserService {
   }
 
   patchMany(userGroupsPatchableData: {[key: string]: UserDataPatchableInterface}): Observable<Array<User>> {
-    return this.http.patch<Array<User>>(`api/users`, userGroupsPatchableData);
-      // .pipe(map((users: Array<User>) => users.map(user => new User(user))));
+    return this.http.patch<Array<User>>(`api/users`, userGroupsPatchableData)
+      .pipe(map((users: Array<User>) => users.map(user => new User(user))));
   }
 }

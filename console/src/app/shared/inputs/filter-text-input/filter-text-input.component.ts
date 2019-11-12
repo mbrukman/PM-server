@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BasicInputComponent} from '@shared/inputs/basic-text-input/basic-input.component';
 import {fromEvent, Subscription} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
@@ -10,6 +10,8 @@ import {debounceTime} from 'rxjs/operators';
 })
 export class FilterTextInputComponent extends BasicInputComponent implements OnInit, OnDestroy {
   @ViewChild('filterInput') filterInput: ElementRef;
+
+  @Input() placeholder = 'Filter';
   private subscription: Subscription;
 
   constructor() {

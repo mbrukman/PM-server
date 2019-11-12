@@ -19,6 +19,16 @@ body {
   @extend .main-background;
 }
 
+.cube-bordered {
+  display: inline-block;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid $turquoise-blue;
+  padding: 0px 7px;
+  color: $turquoise-blue;
+  margin-left: 19px;
+}
+
 .section-title {
   @extend .section-title;
 }
