@@ -34,12 +34,19 @@ export class UserService {
   }
 
 
-  getAllUsers(fields?: object, options?: UserFilterOptions) {
+  private createFilterQuery(fields, options): HttpParams { // todo move to standalone file
     let params = new HttpParams();
+    if (!options && !fields) {
+      return params;
+    }
     if (fields) {
       params = params.set('fields', JSON.stringify(fields));
     }
-    params = params.set('options', JSON.stringify(options));
+    return params.set('options', JSON.stringify(options));
+  }
+
+  getAllUsers(fields?: object, options?: UserFilterOptions) {
+    const params = this.createFilterQuery(fields, options);
     return this.http.get<IEntityList<User>>('api/users', {params: params});
   }
 
@@ -61,7 +68,7 @@ export class UserService {
       .pipe(map((createdUser: User) => new User(createdUser)));
   }
 
-  patchMany(userGroupsPatchableData: {[key: string]: UserDataPatchableInterface}): Observable<Array<User>> {
+  patchMany(userGroupsPatchableData: { [key: string]: UserDataPatchableInterface }): Observable<Array<User>> {
     return this.http.patch<Array<User>>(`api/users`, userGroupsPatchableData)
       .pipe(map((users: Array<User>) => users.map(user => new User(user))));
   }
