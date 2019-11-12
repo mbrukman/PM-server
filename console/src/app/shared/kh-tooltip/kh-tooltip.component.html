@@ -1,0 +1,14 @@
+<div
+  (mouseenter)="showToolTip($event)"
+  (mouseleave)="hideToolTip($event)">
+
+  <ng-content
+    select="[hoverOverElement]">
+
+  </ng-content>
+<div class="tooltipBodyContainer">
+  <ng-content select="[tooltipBody]" *ngIf="show">
+
+  </ng-content>
+</div>
+</div>

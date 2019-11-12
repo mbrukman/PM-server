@@ -26,15 +26,6 @@
     </ng-template>
     <ng-template pTemplate="body" let-user>
 
-      <ng-template #tooltip>
-        <ul class="tooltip-list pl-2 pr-2" *ngIf="user.groups.length">
-          <li *ngFor="let userGroup of user.groups" class="pb-1 pt-1">
-            <a href="" routerLink="/admin/users-management/groups/{{userGroup._id}}">
-              {{userGroup.name}}
-            </a>
-          </li>
-        </ul>
-      </ng-template>
 
       <tr>
         <td colspan="1">
@@ -43,12 +34,23 @@
           </span>
         </td>
         <td rowspan="1">
-          <a class="cube-bordered"
-             [tooltip]="tooltip"
-             placement="right"
-             triggers="click">
-            {{user.groups.length}}
-          </a>
+          <app-kh-tooltip>
+            <div class="cube-bordered"
+                 hoverOverElement
+                 triggers="hover:focus"
+                 placement="right">
+              {{user.groups.length}}
+            </div>
+            <div class="tooltipTemplate" tooltipBody>
+              <ul class="tooltip-list pl-2 pr-2" *ngIf="user.groups.length">
+                <li *ngFor="let userGroup of user.groups" class="pb-1 pt-1">
+                  <a href="" routerLink="/admin/users-management/groups/{{userGroup._id}}">
+                    {{userGroup.name}}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </app-kh-tooltip>
         </td>
         <td rowspan="1">
           <button class="btn btn-link text-white ml-2" (click)="openDetachConfirmationModal(user)">
@@ -70,7 +72,8 @@
 			L0.2,6.5l3.9,3.9l-3,3L0,16l2.6-1.1l3-3l3.9,3.9l1.1-1.1l0.3-0.4c0.2-0.4,0.3-0.8,0.3-1.1l0-0.3L9.4,11.1z"/>
                 </g>
                 <g>
-	            	  <rect x="7.3" y="-2.2" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -3.0827 8.0957)" width="1.9" height="20"/>
+	            	  <rect x="7.3" y="-2.2" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -3.0827 8.0957)" width="1.9"
+                        height="20"/>
 	              </g>
               </g>
             </svg>

@@ -4,3 +4,75 @@
   list-style: none;
   pointer-events: all !important;
 }
+
+.tooltipTemplate {
+  width: 200px;
+  border: 2px solid $border-tooltip;
+  position: absolute;
+  background-color: $kh-background;
+  border-radius: 7px;
+  right: 30px;
+  bottom: -20px;
+  display: inline-block;
+
+  &:before {
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: 14px;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: 10px;
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent $kh-background transparent transparent;
+  }
+
+  .lists {
+    //@include ellipsis;
+    max-height: 444px;
+    overflow: scroll;
+    padding: 20px 30px;
+
+    &::-webkit-scrollbar {
+      width: 17px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-right: 6px solid rgba(0, 0, 0, 0);
+      border-left: 6px solid rgba(0, 0, 0, 0);
+      background-clip: padding-box;
+      border-radius: 7px;
+      background-color: #404549;
+      box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.05),
+      inset 1px 1px 0px rgba(0, 0, 0, 0.05);
+    }
+
+    &::-webkit-scrollbar-button {
+      width: 0;
+      height: 0;
+      display: none;
+    }
+
+    &::-webkit-scrollbar-corner {
+      background-color: transparent;
+    }
+
+    li {
+      list-style-type: none;
+
+      a {
+        font-size: 13px;
+        line-height: 2.14;
+        color: $turquoise-blue;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+
