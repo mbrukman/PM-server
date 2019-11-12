@@ -13,11 +13,6 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ResetPasswordComponent implements OnInit {
 
-  /**
-   * we need a JWT in the link here
-   */
-  token: string;
-
   formGroup: FormGroup;
   user: User;
 
@@ -32,7 +27,7 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.token = this.route.snapshot.paramMap.get('token');
+    // TODO: inject user based on auth token
 
     this.formGroup = this.formBuilder.group({
       password: ['', [Validators.required, passwordValidator]],
@@ -41,7 +36,7 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   submit() {
-    // throw new Error('not implemented');
+    // TODO: auth
     this.userService.changeUserPassword(this.user._id, this.form['password'].value);
   }
 
