@@ -461,7 +461,10 @@ async function deletePluginOnAgent(name, agent) {
 
 /* restarting the agents live status, and updating the status for all agents */
 async function restartAgentsStatus() {
-  await Agent.updateMany({}, { $set: { "status.alive": false, "status.following": false } });
+  await Agent.updateMany(
+    {},
+    { $set: { "status.alive": false, "status.following": false } }
+  );
 
   await Agent.find({}).then(agents => {
     agents.forEach(agent => {

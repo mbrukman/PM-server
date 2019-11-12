@@ -1,0 +1,13 @@
+@import "~src/assets/sass/_mixins";
+
+:host {
+  max-height: 580px;
+
+  .form-control {
+    max-width: 195px;
+  }
+
+  .custom-checkbox {
+    @include custom-checkbox();
+  }
+}

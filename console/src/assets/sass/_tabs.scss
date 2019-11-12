@@ -1,0 +1,18 @@
+.nav-tabs {
+  border-bottom: none;
+
+  .kh-tab {
+    background: none;
+    background-color: inherit;
+    color: $pale-blue;
+    & > .nav-link {
+      &:hover,
+      &.active {
+        color: inherit;
+        background-color: inherit;
+        border: none;
+        border-bottom: 3px solid $pale-blue;
+      }
+    }
+  }
+}

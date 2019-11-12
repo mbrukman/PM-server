@@ -1,0 +1,26 @@
+<div>
+  <div class="row">
+    <a class="kh-btn kh-btn-blue" (click)="openAttachUsersModal()">Attach Users</a>
+    <div class="filter-text">
+      <div>
+        <i class="material-icons">search</i>
+        <input
+          class="form-control"
+          type="text"
+          placeholder="Filter"
+          #filterInput
+        />
+      </div>
+    </div>
+  </div>
+  <p-dataTable
+    *ngIf="userGroup$ | async as userGroup"
+    [paginator]="true"
+    [value]="userGroup.users"
+  >
+    <p-column field="name" header="Name"></p-column>
+    <p-column field="groups.length" header="Groups"></p-column>
+    <p-column field="amount" header="Amount"></p-column>
+  </p-dataTable>
+
+</div>

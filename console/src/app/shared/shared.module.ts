@@ -83,7 +83,7 @@ import { ManagementTableComponent } from '../users-management/management-table/m
     ImportModalComponent,
     UpsertVaultItemsComponent,
     UserGroupCreateModalComponent,
-    ManagementTableComponent
+    ManagementTableComponent,
 
   ],
   exports: [

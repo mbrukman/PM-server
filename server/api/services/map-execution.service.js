@@ -1736,15 +1736,16 @@ async function executeAction(
           nsp.sockets[socket].emit("updateAction", res);
         });
 
-        let mandatoryActionFailed = actionResult.status == statusEnum.ERROR &&
-                              action.mandatory &&
-                              (!actionResult.hasOwnProperty("retriesLeft") || !actionResult.retriesLeft);
-
+        let mandatoryActionFailed =
+          actionResult.status == statusEnum.ERROR &&
+          action.mandatory &&
+          (!actionResult.hasOwnProperty("retriesLeft") ||
+            !actionResult.retriesLeft);
 
         // mandatory action faild. stop execution (if no have retries)
         if (mandatoryActionFailed) {
-            stopExecution(runId, null, result);
-            throw `Execution ${runId}: Mandatory action failed. Stopping execution`;
+          stopExecution(runId, null, result);
+          throw `Execution ${runId}: Mandatory action failed. Stopping execution`;
         }
 
         return result;

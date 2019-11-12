@@ -5,7 +5,7 @@ import {debounceTime, switchMap, tap} from 'rxjs/operators';
 import {FilterOptions} from '@app/shared/model/filter-options.model';
 import UserGroup from '@app/services/user-group/user-group.model';
 import {UserGroupCreateModalComponent} from '@app/users-management/user-group/user-group-list/user-group-create-modal/user-group-create-modal.component';
-import UserGroupDataInterface from '@app/services/user-group/user-group-data.interface';
+import {UserGroupDataInterface} from '@app/services/user-group/user-group-data.interface';
 import {UserGroupService} from '@app/services/user-group/user-group.service';
 import {BsModalService} from 'ngx-bootstrap';
 

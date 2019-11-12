@@ -1,0 +1,11 @@
+<div class="modal-content">
+  <div class="modal-header pr-3 pl-3 pt-0">
+    <h4 class="modal-title">{{modalTitle}}</h4>
+    <i class="material-icons text-white close" (click)="modalRef.hide()"
+    >close</i
+    >
+  </div>
+  <div class="modal-body  mr-3 ml-3">
+    <ng-content></ng-content>
+  </div>
+</div>

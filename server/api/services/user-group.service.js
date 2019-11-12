@@ -22,6 +22,10 @@ class UserGroupService {
     return UserGroupModel.deleteOne({ _id });
   }
 
+  getOne(_id, filters) {
+    return UserGroupModel.findById(_id).populate("users");
+  }
+
   async filter(filterOptions = {}) {
     let page;
     const fields = filterOptions.fields;

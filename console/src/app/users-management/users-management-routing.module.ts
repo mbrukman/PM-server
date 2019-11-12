@@ -1,11 +1,12 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { UsersManagementComponent } from './users-management.component';
-import { UsersListComponent } from './users-list/users-list.component';
-import { UsersListResolver } from './resolvers/users-list.resolver';
-import { UserGroupListComponent } from '@app/users-management/user-group/user-group-list/user-group-list.component';
-import { UserGroupResolver } from './resolvers/user-group.resolver';
-import { ManageUserComponent } from './manage-user/manage-user.component';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {UsersManagementComponent} from '@app/users-management/users-management.component';
+import {UsersListComponent} from '@app/users-management/users-list/users-list.component';
+import {UsersListResolver} from '@app/users-management/resolvers/users-list.resolver';
+import {UserGroupListComponent} from '@app/users-management/user-group/user-group-list/user-group-list.component';
+import {UserGroupResolver} from '@app/users-management/resolvers/user-group.resolver';
+import {UserGroupDetailsComponent} from '@app/users-management/user-group/user-group-details/user-group-details.component';
+import { ManageUserComponent } from '@app/users-management/manage-user/manage-user.component';
 
 const routes: Routes = [
   {
@@ -20,7 +21,7 @@ const routes: Routes = [
       {
         path: 'users',
         component: UsersListComponent,
-        resolve: { users: UsersListResolver }
+        resolve: {users: UsersListResolver}
       },
       {
         path: 'users/:id',
@@ -29,7 +30,10 @@ const routes: Routes = [
       {
         path: 'groups',
         component: UserGroupListComponent,
-        resolve: { groups: UserGroupResolver }
+        resolve: {groups: UserGroupResolver}
+      }, {
+        path: 'groups/:id',
+        component: UserGroupDetailsComponent
       }
     ]
   }
@@ -39,4 +43,5 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class UsersManagementRoutingModule { }
+export class UsersManagementRoutingModule {
+}

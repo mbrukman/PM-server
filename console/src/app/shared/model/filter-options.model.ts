@@ -5,4 +5,5 @@ export class FilterOptions {
   limit?: number;
   filter?: any;
   page?: number = 1;
+  notInGroup?: string;
 }

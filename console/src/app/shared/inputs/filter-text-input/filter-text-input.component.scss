@@ -1,0 +1,12 @@
+.filter-text {
+  & > div {
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    i {
+      position: absolute;
+      right: 10px;
+    }
+  }
+}

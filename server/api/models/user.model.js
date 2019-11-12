@@ -14,7 +14,8 @@ const userSchema = new Schema(
     },
     phoneNumber: { type: String },
     changePasswordOnNextLogin: { type: Boolean },
-    password: { type: String }
+    password: { type: String },
+    groups: [{ type: Schema.Types.ObjectId, ref: "UserGroup" }]
   },
   { timestamps: true }
 );

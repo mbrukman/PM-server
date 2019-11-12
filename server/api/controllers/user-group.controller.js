@@ -39,9 +39,21 @@ module.exports = {
     }
   },
 
+  async getOne(req, res) {
+    const { id } = req.params;
+    const { query } = req;
+
+    try {
+      const user = await userGroupService.getOne(id, query);
+      return res.status(200).json(user);
+    } catch (err) {
+      winston.log("error", "Error filtering user group.", err);
+      return res.status(500).json(err);
+    }
+  },
+
   async filter(req, res) {
     const { query } = req;
-    console.log(query);
     if (typeof query.options === "string" && query.options) {
       query.options = JSON.parse(query.options);
     } else {

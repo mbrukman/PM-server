@@ -39,7 +39,7 @@ class UserService {
     });
   }
 
-  filter(filterOptions = {}) {
+  async filter(filterOptions = {}) {
     let page;
     const fields = filterOptions.fields;
     const sort = filterOptions.options.sort || "name";
@@ -89,11 +89,19 @@ class UserService {
       }
     ];
 
-    return User.aggregate(resultsQuery).then(users => {
-      return User.aggregate(countQuery).then(r => {
-        return { items: users, totalCount: r.length ? r[0].count : 0 };
+    try {
+      const users = await User.aggregate(resultsQuery);
+      const populatedUsers = await User.populate(users, {
+        path: "groups"
       });
-    });
+      const totalUsersLength = await User.aggregate(countQuery);
+      return {
+        items: populatedUsers,
+        totalCount: totalUsersLength.length ? totalUsersLength[0].count : 0
+      };
+    } catch (err) {
+      throw err;
+    }
   }
 
   deleteUser(userId) {

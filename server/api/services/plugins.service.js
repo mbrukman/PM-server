@@ -1,23 +1,23 @@
-const fs = require('fs');
-const path = require('path');
-const unzip = require('unzipper');
-const child_process = require('child_process');
-const winston = require('winston');
-const del = require('del');
-const agentsService = require('./agents.service');
-const models = require('../models');
+const fs = require("fs");
+const path = require("path");
+const unzip = require("unzipper");
+const child_process = require("child_process");
+const winston = require("winston");
+const del = require("del");
+const agentsService = require("./agents.service");
+const models = require("../models");
 const Plugin = models.Plugin;
-const rimraf = require('rimraf');
-const pluginConfigValidationSchema = require('../validation-schema/plugin-config.schema');
+const rimraf = require("rimraf");
+const pluginConfigValidationSchema = require("../validation-schema/plugin-config.schema");
 const pluginsPath = path.join(
-    path.dirname(path.dirname(__dirname)),
-    'libs',
-    'plugins'
+  path.dirname(path.dirname(__dirname)),
+  "libs",
+  "plugins"
 );
 const pluginsTmpPath = path.join(
-    path.dirname(path.dirname(__dirname)),
-    'tmp',
-    'plugins'
+  path.dirname(path.dirname(__dirname)),
+  "tmp",
+  "plugins"
 );
 
 function installPluginOnAgent(pluginDir, obj) {
@@ -62,27 +62,27 @@ function loadModule(plugin, app) {
     const fullPath = path.join(pluginsPath, plugin.name, plugin.main);
     plugin.dir = path.dirname(fullPath);
     const pluginModule = require(path.join(
-        path.dirname(fullPath),
-        path.basename(fullPath, path.extname(fullPath))
+      path.dirname(fullPath),
+      path.basename(fullPath, path.extname(fullPath))
     ));
-    plugin.methods.forEach((method) => {
+    plugin.methods.forEach(method => {
       if (method.route) {
-        const route = method.route.split(' ');
+        const route = method.route.split(" ");
         if (route.length === 2) {
-          if (route[0] === 'post' || route[0] === '*') {
+          if (route[0] === "post" || route[0] === "*") {
             app.post(route[1], pluginModule[method.name]);
-          } else if (route[0] === 'get' || route[0] === '*') {
+          } else if (route[0] === "get" || route[0] === "*") {
             app.get(route[1], pluginModule[method.name]);
-          } else if (route[0] === 'put' || route[0] === '*') {
+          } else if (route[0] === "put" || route[0] === "*") {
             app.put(route[1], pluginModule[method.name]);
-          } else if (route[0] === 'delete' || route[0] === '*') {
+          } else if (route[0] === "delete" || route[0] === "*") {
             app.delete(route[1], pluginModule[method.name]);
           }
         }
       }
     });
   } catch (e) {
-    console.log('Error binding new routes', e);
+    console.log("Error binding new routes", e);
   }
 
   app._router.stack.push(wildcard);
@@ -97,137 +97,141 @@ function installPluginOnServer(pluginDir, obj) {
 
     // unziping the file and installing the modules
     fs.createReadStream(pluginDir)
-        .pipe(unzip.Extract({path: outputPath}))
-        .on('finish', () => {
+      .pipe(unzip.Extract({ path: outputPath }))
+      .on("finish", () => {
         // when done unzipping, install the packages.
-          console.log('Close');
-          const cmd =
-          'cd ' + outputPath + ' &&' + ' npm install ' + ' && cd ' + outputPath;
-          child_process.exec(cmd, function(error, stdout, stderr) {
-            if (error) {
-              winston.log('error', 'ERROR', error, stderr);
-            }
-            return resolve();
-          });
+        console.log("Close");
+        const cmd =
+          "cd " + outputPath + " &&" + " npm install " + " && cd " + outputPath;
+        child_process.exec(cmd, function(error, stdout, stderr) {
+          if (error) {
+            winston.log("error", "ERROR", error, stderr);
+          }
+          return resolve();
         });
+      });
   });
 }
 
-
 function deleteContent(path) {
-  return del([path], {force: true})
-      .then((paths) => {
-        winston.log('info', 'deleted static file', paths);
-      })
-      .catch((error) => {
-        winston.log('error', 'Error deleted extracted directory', error);
-      });
+  return del([path], { force: true })
+    .then(paths => {
+      winston.log("info", "deleted static file", paths);
+    })
+    .catch(error => {
+      winston.log("error", "Error deleted extracted directory", error);
+    });
 }
-
 
 // the function of file (should be an archived file), and process it to install plugin
 function deployPluginFile(pluginPath, req) {
   return new Promise((resolve, reject) => {
-    const extPath = path.join(pluginsTmpPath, '' + new Date().getTime());
+    const extPath = path.join(pluginsTmpPath, "" + new Date().getTime());
 
     fs.createReadStream(pluginPath)
-        .pipe(unzip.Extract({path: extPath}))
-        .on('finish', () => {
-          const configPath = path.join(extPath, 'config.json');
-          fs.exists(configPath, (exists) => {
+      .pipe(unzip.Extract({ path: extPath }))
+      .on("finish", () => {
+        const configPath = path.join(extPath, "config.json");
+        fs.exists(configPath, exists => {
+          try {
+            if (!exists) {
+              throw "No config file found!";
+            }
+          } catch (e) {
+            deleteContent(pluginPath);
+            deleteContent(extPath);
+            return reject(e);
+          }
+          fs.readFile(configPath, "utf8", (err, body) => {
             try {
-              if (!exists) {
-                throw 'No config file found!';
+              if (err) {
+                throw "Error reading config file: " + err;
               }
+
+              let obj;
+
+              try {
+                obj = Object.assign({}, JSON.parse(body), { file: pluginPath });
+              } catch (e) {
+                throw "Error parsing config file: " + e;
+              }
+
+              const valid = pluginConfigValidationSchema(obj);
+              if (!valid) {
+                throw err;
+              }
+
+              // check the plugin type
+              let oldFile;
+              Plugin.findOne({ name: obj.name })
+                .then(plugin => {
+                  if (obj.settings) {
+                    obj.settings = obj.settings.map(s => {
+                      s.valueType = s.type;
+                      delete s.type;
+                      if (plugin && plugin.settings) {
+                        for (
+                          let i = 0, length = plugin.settings.length;
+                          i < length;
+                          i++
+                        ) {
+                          if (s.name == plugin.settings[i].name) {
+                            s.value = plugin.settings[i].value;
+                          }
+                        }
+                      }
+                      return s;
+                    });
+                  }
+                  if (!plugin) {
+                    return Plugin.create(obj);
+                  }
+                  oldFile = plugin.file;
+                  return Plugin.findByIdAndUpdate(plugin._id, obj);
+                })
+                .then(plugin => {
+                  if (oldFile) {
+                    deleteContent(oldFile);
+                    deleteContent(extPath);
+                  }
+                  if (obj.type === "executer") {
+                    // copy image file
+                    copyPluginImageFile(obj, extPath);
+                    installPluginOnAgent(pluginPath, obj);
+                    return plugin;
+                  } else if (
+                    obj.type === "trigger" ||
+                    obj.type === "module" ||
+                    obj.type === "server"
+                  ) {
+                    installPluginOnServer(pluginPath, obj).then(() => {
+                      loadModule(plugin, req.app);
+                      return plugin;
+                    });
+                  } else return reject("No type was provided for this plugin");
+                })
+                .then(plugin => {
+                  resolve(plugin);
+                })
+                .catch(error => {
+                  winston.log("error", "Error creating plugin", error);
+                  console.log("error deployPluginFile  : ", error);
+                  deleteContent(pluginPath);
+                  deleteContent(extPath);
+                  return reject(error);
+                })
+                .finally(() => {
+                  // delete extracted tmp dir
+                  deleteContent(extPath);
+                });
             } catch (e) {
               deleteContent(pluginPath);
               deleteContent(extPath);
               return reject(e);
             }
-            fs.readFile(configPath, 'utf8', (err, body) => {
-              try {
-                if (err) {
-                  throw 'Error reading config file: '+ err;
-                }
-
-                let obj;
-
-                try {
-                  obj = Object.assign({}, JSON.parse(body), {file: pluginPath});
-                } catch (e) {
-                  throw 'Error parsing config file: '+e;
-                }
-
-
-                const valid = pluginConfigValidationSchema(obj);
-                if (!valid) {
-                  throw err;
-                }
-
-                // check the plugin type
-                let oldFile;
-                Plugin.findOne({name: obj.name})
-                    .then((plugin) => {
-                      if (obj.settings) {
-                        obj.settings = obj.settings.map((s) => {
-                          s.valueType = s.type;
-                          delete s.type;
-                          if (plugin && plugin.settings) {
-                            for (let i=0, length=plugin.settings.length; i<length; i++) {
-                              if (s.name == plugin.settings[i].name) {
-                                s.value = plugin.settings[i].value;
-                              }
-                            }
-                          }
-                          return s;
-                        });
-                      }
-                      if (!plugin) {
-                        return Plugin.create(obj);
-                      }
-                      oldFile = plugin.file;
-                      return Plugin.findByIdAndUpdate(plugin._id, obj);
-                    })
-                    .then((plugin) => {
-                      if (oldFile) {
-                        deleteContent(oldFile);
-                        deleteContent(extPath);
-                      }
-                      if (obj.type === 'executer') {
-                      // copy image file
-                        copyPluginImageFile(obj, extPath);
-                        installPluginOnAgent(pluginPath, obj);
-                        return plugin;
-                      } else if (
-                        obj.type === 'trigger' ||
-                      obj.type === 'module' ||
-                      obj.type === 'server'
-                      ) {
-                        installPluginOnServer(pluginPath, obj).then(() => {
-                          loadModule(plugin, req.app);
-                          return plugin;
-                        });
-                      } else return reject('No type was provided for this plugin');
-                    }).then((plugin) => {
-                      resolve(plugin);
-                    }).catch((error) => {
-                      winston.log('error', 'Error creating plugin', error);
-                      console.log('error deployPluginFile  : ', error);
-                      deleteContent(pluginPath);
-                      deleteContent(extPath);
-                      return reject(error);
-                    }).finally(() => {
-                    // delete extracted tmp dir
-                      deleteContent(extPath);
-                    });
-              } catch (e) {
-                deleteContent(pluginPath);
-                deleteContent(extPath);
-                return reject(e);
-              }
-            });
           });
         });
+      });
   });
 }
 
@@ -239,70 +243,77 @@ module.exports = {
   /* get all plugins files from the static dir, and installs them on agent */
   // TODO: delete old files/save the file location at db to install it? Right now, if a plugin is deleted it would reinstall it
   loadPlugins: () => {
-    console.log('Loading plugins');
-    fs.readdir(path.join(global.kaholo.STATIC_CDN, process.env.UPLOAD_PATH), (err, files) => {
-      Promise.all(files.map((plugin) => {
-        return new Promise((resolve, reject) => {
-          const filePath = path.join(global.kaholo.STATIC_CDN, process.env.UPLOAD_PATH);
-          deployPluginFile(filePath)
-              .then(() => { })
-              .catch((error) => {
-                winston.log('error', 'Error installing plugin: ', error);
-              });
-          resolve();
-        });
-      }));
-    });
+    console.log("Loading plugins");
+    fs.readdir(
+      path.join(global.kaholo.STATIC_CDN, process.env.UPLOAD_PATH),
+      (err, files) => {
+        Promise.all(
+          files.map(plugin => {
+            return new Promise((resolve, reject) => {
+              const filePath = path.join(
+                global.kaholo.STATIC_CDN,
+                process.env.UPLOAD_PATH
+              );
+              deployPluginFile(filePath)
+                .then(() => {})
+                .catch(error => {
+                  winston.log("error", "Error installing plugin: ", error);
+                });
+              resolve();
+            });
+          })
+        );
+      }
+    );
   },
 
-  pluginDelete: (id) => {
-    return Plugin.findById(id).then((obj) => {
-      if (!obj) {
-        return;
-      }
-      deleteContent(obj.file);
-      if (obj.type === 'executer') {
-        return deletePluginOnAgent(obj.name);
-      } else {
-        return deletePluginOnServer(obj.name);
-      }
-    }).finally(() => {
-      return Plugin.remove({_id: id});
-    });
+  pluginDelete: id => {
+    return Plugin.findById(id)
+      .then(obj => {
+        if (!obj) {
+          return;
+        }
+        deleteContent(obj.file);
+        if (obj.type === "executer") {
+          return deletePluginOnAgent(obj.name);
+        } else {
+          return deletePluginOnServer(obj.name);
+        }
+      })
+      .finally(() => {
+        return Plugin.remove({ _id: id });
+      });
   },
   deletePluginByPath(path) {
-    return Plugin.findOne({file: path}).then((plugin) => {
+    return Plugin.findOne({ file: path }).then(plugin => {
       if (plugin) {
         return pluginDelete(plugin.id);
       }
     });
   },
-  getPlugin: (id) => {
-    return Plugin.findOne({_id: id});
+  getPlugin: id => {
+    return Plugin.findOne({ _id: id });
   },
   /* load server plugins modules */
-  loadModules: (app) => {
-    Plugin.find({type: {$in: ['module', 'trigger', 'server']}}).then(
-        (plugins) => {
-          plugins.forEach((plugin) => {
-            loadModule(plugin, app);
-          });
-        }
+  loadModules: app => {
+    Plugin.find({ type: { $in: ["module", "trigger", "server"] } }).then(
+      plugins => {
+        plugins.forEach(plugin => {
+          loadModule(plugin, app);
+        });
+      }
     );
   },
 
   updateSettings: (id, settings) => {
     if (!settings.length) {
-      return Promise.reject({message: 'Settings not found'});
+      return Promise.reject({ message: "Settings not found" });
     }
-    return Plugin.findOne({_id: id}).then((plugin) => {
+    return Plugin.findOne({ _id: id }).then(plugin => {
       for (let i = 0, length = plugin.settings.length; i < length; i++) {
         plugin.settings[i].value = settings[i].value;
       }
       return plugin.save();
     });
-  },
-
-
+  }
 };
-

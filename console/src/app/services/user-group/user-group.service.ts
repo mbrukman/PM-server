@@ -1,6 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import UserGroupDataInterface from '@app/services/user-group/user-group-data.interface';
+import {
+  UserGroupDataInterface,
+  UserGroupPatchableDataInterface
+} from '@app/services/user-group/user-group-data.interface';
 import UserGroup from '@app/services/user-group/user-group.model';
 import {Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
@@ -19,10 +22,25 @@ export class UserGroupService {
     return this.http.delete<RemoveResponseInterface>(`api/user-groups/${id}`);
   }
 
+  getOne(id: string, filter?: string) {
+    let params = new HttpParams();
+    if (filter) {
+      params = params.set('filter', JSON.stringify(filter));
+    }
+    return this.http.get<UserGroup>(`api/user-groups/${id}`)
+      .pipe(map(userGroup => new UserGroup(userGroup)));
+
+  }
+
+  patchOne(userGroupPatchableData: UserGroupPatchableDataInterface): Observable<UserGroup> {
+    return this.http.patch<UserGroup>('api/user-groups', userGroupPatchableData)
+      .pipe(map((userGroup: UserGroup) => new UserGroup(userGroup)));
+  }
+
 
   createUserGroup(userGroupData: UserGroupDataInterface): Observable<UserGroup> {
     return this.http.post<UserGroup>('api/user-groups', userGroupData)
-      .pipe(map((userGroup: UserGroup) => new UserGroup(userGroup._id, userGroup.name, userGroup.description, userGroup.users)));
+      .pipe(map((userGroup: UserGroup) => new UserGroup(userGroup)));
   }
 
   getAllGroups(fields?: object, options?: FilterOptions): Observable<IEntityList<UserGroup>> {

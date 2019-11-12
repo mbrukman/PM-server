@@ -2,7 +2,8 @@
 @import "~src/assets/sass/variables";
 @import "~src/assets/sass/base";
 @import "~src/assets/sass/mixins";
-@import "~src/assets/sass/tabs";
+@import "~src/assets/sass/_tabs";
+@import "~src/assets/sass/_table";
 
 @font-face {
   font-family: "OpenSans";
@@ -267,40 +268,6 @@ tr.ui-widget-content.ui-datatable-odd {
 
 /*------*/
 
-table,
-.table {
-  color: $greyish-text;
-  font-size: 14px;
-  thead {
-    th {
-      border-bottom: 1px solid $cool-grey;
-      &:hover {
-        background: none !important;
-        color: inherit !important;
-      }
-    }
-  }
-  tbody {
-    tr {
-      height: 48px;
-      &:hover {
-        background-color: $hover-color !important;
-        box-shadow: -4px 0px 0px 0px $turquoise-blue;
-        .ui-cell-data {
-          color: #dddddd;
-        }
-      }
-    }
-  }
-  th,
-  td {
-    border-top: 0px;
-    border-bottom: 1px solid $cool-grey;
-    a {
-      text-decoration: underline;
-    }
-  }
-}
 
 //
 .btn-link {
