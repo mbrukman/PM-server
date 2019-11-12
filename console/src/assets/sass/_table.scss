@@ -2,7 +2,6 @@ table,
 .table {
   color: $greyish-text;
   font-size: 14px;
-
   thead {
     th {
       border-bottom: 1px solid $cool-grey;
@@ -41,6 +40,11 @@ table,
 }
 
 .ui-table.ui-widget {
+
+  .ui-sortable-column:not(.ui-state-highlight):hover {
+    border-bottom: 1px solid $cool-grey;
+
+  }
   & table {
     thead.ui-table-thead > tr > th {
       font-size: 18px;
