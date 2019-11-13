@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
-
 import { NotFoundComponent } from './core/not-found/not-found.component';
 import { DashboardComponent } from './core/dashboard/dashboard.component';
 import { SetupComponent } from './core/setup/setup.component';
@@ -8,8 +7,8 @@ import { IsSetUpGuard } from './core/setup/issetup.guard';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressRouterModule } from '@ngx-progressbar/router';
 import {DashboardResolver} from '@core/resolver/dashboard.resolver';
-import { ResetPasswordComponent } from './users-management/reset-password/reset-password.component';
-import { UsersManagementModule } from './users-management/users-management.module';
+import { ResetPasswordComponent } from './core/auth/reset-password/reset-password.component';
+
 
 const appRoutes: Routes = [
   {
@@ -55,7 +54,6 @@ const appRoutes: Routes = [
     RouterModule.forRoot(appRoutes, { preloadingStrategy: PreloadAllModules }),
     NgProgressModule,
     NgProgressRouterModule,
-    UsersManagementModule,
   ],
   exports: [
     RouterModule

@@ -17,6 +17,7 @@ import {SetupComponent} from './setup/setup.component';
 import {NgProgressModule} from '@ngx-progressbar/core';
 import {NgProgressRouterModule} from '@ngx-progressbar/router';
 import {DashboardResolver} from '@core/resolver/dashboard.resolver';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 
 @NgModule({
   imports: [
@@ -38,11 +39,13 @@ import {DashboardResolver} from '@core/resolver/dashboard.resolver';
     SearchComponent,
     NotFoundComponent,
     DashboardComponent,
-    SetupComponent
+    SetupComponent,
+    ResetPasswordComponent,
   ],
   exports: [
     DashboardComponent,
-    SetupComponent
+    SetupComponent,
+    ResetPasswordComponent,
   ],
   providers: [DashboardResolver]
 })
