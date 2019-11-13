@@ -2,6 +2,7 @@ table,
 .table {
   color: $greyish-text;
   font-size: 14px;
+
   thead {
     th {
       border-bottom: 1px solid $cool-grey;
@@ -44,10 +45,22 @@ table,
   .ui-sortable-column:not(.ui-state-highlight):hover {
     border-bottom: 1px solid $cool-grey;
 
+    p-sortIcon {
+      i {
+        color: white;
+      }
+    }
   }
+
   & table {
     thead.ui-table-thead > tr > th {
       font-size: 18px;
+
+      p-sortIcon {
+        i {
+          color: white;
+        }
+      }
     }
 
     tbody.ui-table-tbody > tr,
