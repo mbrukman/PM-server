@@ -12,4 +12,8 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
   }
 
+  onLogin() {
+    throw new Error('not implemented');
+  }
+
 }
