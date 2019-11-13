@@ -25,6 +25,7 @@
     "@angular/platform-browser": "7.2.3",
     "@angular/platform-browser-dynamic": "7.2.3",
     "@angular/router": "7.2.3",
+    "@auth0/angular-jwt": "^3.0.1",
     "@ngx-progressbar/core": "5.3.2",
     "@ngx-progressbar/router": "5.3.2",
     "@swimlane/dragula": "3.7.3",
