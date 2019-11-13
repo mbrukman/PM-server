@@ -29,7 +29,7 @@ class UserService {
   }
 
   getUser(userId) {
-    return User.findOne({ _id: userId });
+    return User.findOne({ _id: userId }).populate("groups");
   }
 
   updateUser(_id, newUserData) {

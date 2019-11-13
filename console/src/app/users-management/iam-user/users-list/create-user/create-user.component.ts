@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap';
 import { Subject } from 'rxjs';
 import { User } from '@app/services/users/user.model';
-import { EditUserComponent } from '@app/users-management/edit-user/edit-user.component';
+import { EditUserComponent } from '@app/users-management/iam-user/users-list/edit-user/edit-user.component';
 
 @Component({
   selector: 'app-create-user',

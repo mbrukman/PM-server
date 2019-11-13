@@ -22,7 +22,7 @@ export class UserService {
       );
   }
 
-  private removeEmptyFields(userData: UserDataInterface): UserDataInterface {
+  private removeEmptyFields(userData: UserDataPatchableInterface): UserDataPatchableInterface {
     for (const key in userData) {
       if (userData.hasOwnProperty(key)) {
         if (!userData[key]) { // empty
@@ -50,15 +50,16 @@ export class UserService {
     return this.http.get<IEntityList<User>>('api/users', { params: params });
   }
 
-  getUser(userId: string): Observable<User> {
-    return this.http.get<User>(`api/users/${userId}`);
+  getUser(userId: string, fields?: object, filterOptions?: UserFilterOptions): Observable<User> {
+    const params = this.createFilterQuery(fields, filterOptions);
+    return this.http.get<User>(`api/users/${userId}`, {params: params});
   }
 
   deleteUser(userId: string): Observable<any> {
     return this.http.delete(`api/users/${userId}`);
   }
 
-  updateUser(userId: string, userData: UserDataInterface): Observable<User> {
+  updateUser(userId: string, userData: UserDataPatchableInterface): Observable<User> {
     userData = this.removeEmptyFields(userData);
     return this.http.patch<User>(`api/users/${userId}`, userData);
   }

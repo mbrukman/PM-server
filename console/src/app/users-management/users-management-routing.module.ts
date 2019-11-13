@@ -1,12 +1,12 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { UsersManagementComponent } from '@app/users-management/users-management.component';
-import { UsersListComponent } from '@app/users-management/users-list/users-list.component';
-import { UsersListResolver } from '@app/users-management/resolvers/users-list.resolver';
-import { UserGroupListComponent } from '@app/users-management/user-group/user-group-list/user-group-list.component';
-import { UserGroupResolver } from '@app/users-management/resolvers/user-group.resolver';
-import { UserGroupDetailsComponent } from '@app/users-management/user-group/user-group-details/user-group-details.component';
-import { ManageUserComponent } from '@app/users-management/manage-user/manage-user.component';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {UsersManagementComponent} from '@app/users-management/users-management.component';
+import {UsersListComponent} from '@app/users-management/iam-user/users-list/users-list.component';
+import {UsersListResolver} from '@app/users-management/resolvers/users-list.resolver';
+import {UserGroupListComponent} from '@app/users-management/user-group/user-group-list/user-group-list.component';
+import {UserGroupResolver} from '@app/users-management/resolvers/user-group.resolver';
+import {UserGroupDetailsComponent} from '@app/users-management/user-group/user-group-details/user-group-details.component';
+import {UserDetailsComponent} from '@app/users-management/iam-user/user-details/user-details.component';
 
 const routes: Routes = [
   {
@@ -25,7 +25,7 @@ const routes: Routes = [
       },
       {
         path: 'users/:id',
-        component: ManageUserComponent
+        component: UserDetailsComponent
       },
       {
         path: 'groups',
