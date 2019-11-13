@@ -1,3 +1,77 @@
-<p>
-  login works!
-</p>
+<div class="auth-main-wrapper">
+  <div class="content">
+    <div class="content-wrapper">
+      <div>
+        <div>
+          <div class="content-header">
+            <img
+              class="logo"
+              src="../../../../assets/images/logo-white-text.svg"
+              alt=""
+              class="logo"
+            />
+          </div>
+          <div class="content-form">
+            <div class="content-title">
+              <span>Log In</span>
+            </div>
+
+            <form class="form-login">
+              <div class="content-input">
+                <div class="content-data">
+                  <div>
+                    <span>Username</span>
+                  </div>
+                  <div>
+                    <input
+                      class="input"
+                      name="email"
+                      required
+                      [(ngModel)]="email"
+                    />
+                  </div>
+                </div>
+                <div class="content-data">
+                  <div>
+                    <span>Password</span>
+                  </div>
+                  <div>
+                    <input
+                      class="input"
+                      type="password"
+                      name="password"
+                      required
+                      [(ngModel)]="password"
+                      (keyup)="onKeyUp($event)"
+                    />
+                  </div>
+                </div>
+              </div>
+              <button
+                id="login-button"
+                class="submit-wraper kh-btn kh-btn-blue"
+              >
+                <a (click)="onLogin()">Login</a>
+              </button>
+              <span class="error-message">{{ errorMessage }}</span>
+            </form>
+            <div class="login-footer">
+              <div class="checkbox">
+                <label class="form-check-label control control-checkbox">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    name="remember"
+                    [(ngModel)]="remember"
+                  />
+                  <div class="control_indicator check-control"></div>
+                  <span>Keep me logged in</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

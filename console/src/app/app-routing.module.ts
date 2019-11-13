@@ -8,7 +8,7 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressRouterModule } from '@ngx-progressbar/router';
 import { DashboardResolver } from '@core/resolver/dashboard.resolver';
 import { ResetPasswordComponent } from './core/auth/reset-password/reset-password.component';
-
+import { LoginComponent } from './core/auth/login/login.component';
 
 const appRoutes: Routes = [
   {
@@ -41,11 +41,14 @@ const appRoutes: Routes = [
     canActivate: [IsSetUpGuard]
   },
   {
+    path: 'login',
+    component: LoginComponent
+  },
+  {
     path: 'reset-password',
     component: ResetPasswordComponent,
   },
   { path: '**', component: NotFoundComponent }
-
 ];
 
 
