@@ -6,7 +6,7 @@ import { SetupComponent } from './core/setup/setup.component';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressRouterModule } from '@ngx-progressbar/router';
-import {DashboardResolver} from '@core/resolver/dashboard.resolver';
+import { DashboardResolver } from '@core/resolver/dashboard.resolver';
 import { ResetPasswordComponent } from './core/auth/reset-password/reset-password.component';
 
 
@@ -14,7 +14,7 @@ const appRoutes: Routes = [
   {
     path: '',
     component: DashboardComponent,
-    resolve: {dashboardItems: DashboardResolver},
+    resolve: { dashboardItems: DashboardResolver },
     canActivate: [IsSetUpGuard]
   },
   {

@@ -1,10 +1,10 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
-import {IEntityList} from '@app/shared/interfaces/entity-list.interface';
-import {User} from '@app/services/users/user.model';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
-import UserDataInterface, {UserDataPatchableInterface} from './user-data.interface';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { IEntityList } from '@app/shared/interfaces/entity-list.interface';
+import { User } from '@app/services/users/user.model';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import UserDataInterface, { UserDataPatchableInterface } from './user-data.interface';
 import UserFilterOptions from '@app/services/users/user-filter-options.model';
 
 @Injectable({
@@ -47,7 +47,7 @@ export class UserService {
 
   getAllUsers(fields?: object, options?: UserFilterOptions) {
     const params = this.createFilterQuery(fields, options);
-    return this.http.get<IEntityList<User>>('api/users', {params: params});
+    return this.http.get<IEntityList<User>>('api/users', { params: params });
   }
 
   getUser(userId: string): Observable<User> {
@@ -66,7 +66,7 @@ export class UserService {
   changeUserPassword(newPassword: string): Observable<boolean> {
     // by using angular-jwt, auth is added to each http request
     // user's id is in the payload of that auth, so we send only the new password
-    return this.http.post<boolean>(`api/users/reset-password`, {password: newPassword});
+    return this.http.post<boolean>(`api/users/reset-password`, { password: newPassword });
   }
 
   createUser(userData: UserDataInterface): Observable<User> {
