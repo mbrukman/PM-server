@@ -2,8 +2,8 @@
   <div class="title">
     <h5 class="d-flex align-items-center">
       <i class="kh-orange-text material-icons">
-      group
-    </i>
+        group
+      </i>
       <span class="kh-orange-text pl-2 pr-2">Group</span>
       <i class="kh-orange-text material-icons pr-2">
         arrow_right_alt
@@ -11,10 +11,10 @@
       {{userGroup.name}}</h5>
   </div>
   <tabset>
-    <tab class="text-primary" customClass="kh-tab" heading="Policies">
+    <tab heading="Users" customClass="kh-tab">
       <app-user-group-details-users [getGroup$]="userGroup$"></app-user-group-details-users>
     </tab>
-    <tab heading="Users" customClass="kh-tab">
+    <tab customClass="kh-tab" heading="Policies">
       Nothing yet.
     </tab>
     <tab heading="Settings" customClass="kh-tab">
