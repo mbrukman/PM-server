@@ -69,8 +69,19 @@ export class UserGroupDetailsUsersComponent implements OnInit, OnDestroy {
     return this.detachUserSubject
       .pipe(
         map((userToDetach: User) => {
-          this.userGroup.users = this.userGroup.users.filter((user: User) => user._id !== userToDetach._id);
-          userToDetach.groups = userToDetach.groups.filter((group: string) => group !== this.userGroup._id);
+          this.userGroup.users = this.userGroup.users.filter((user: User | string) => {
+            if (typeof user === 'string') {
+              return user !== userToDetach._id;
+            }
+            return user._id !== userToDetach._id;
+          });
+          userToDetach.groups = userToDetach.groups.filter((userGroup: string | UserGroup) => {
+            if (typeof userGroup === 'string') {
+              return userGroup !== this.userGroup._id;
+            }
+            return userGroup._id !== this.userGroup._id;
+
+          });
           return userToDetach;
         }),
         switchMap((userToDetach: User) => {
