@@ -18,6 +18,7 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressRouterModule } from '@ngx-progressbar/router';
 import { DashboardResolver } from '@core/resolver/dashboard.resolver';
 import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
+import { LoginComponent } from './auth/login/login.component';
 
 @NgModule({
   imports: [
@@ -41,6 +42,7 @@ import { ResetPasswordComponent } from './auth/reset-password/reset-password.com
     DashboardComponent,
     SetupComponent,
     ResetPasswordComponent,
+    LoginComponent
   ],
   exports: [
     DashboardComponent,
