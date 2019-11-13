@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MustMatch } from '@app/shared/must-match.validator';
-import { passwordValidator } from '@app/shared/password.validator';
+import { MustMatch } from '@app/shared/validators/must-match.validator';
+import { passwordValidator } from '@app/shared/validators/password.validator';
 import { User } from '@app/services/users/user.model';
 
 @Component({

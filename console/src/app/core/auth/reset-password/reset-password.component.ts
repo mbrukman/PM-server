@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { passwordValidator } from '@app/shared/password.validator';
-import { MustMatch } from '@app/shared/must-match.validator';
+import { passwordValidator } from '@app/shared/validators/password.validator';
+import { MustMatch } from '@app/shared/validators/must-match.validator';
 import { UserService } from '@app/services/users/user.service';
 import { User } from '@app/services/users/user.model';
 import { ActivatedRoute } from '@angular/router';
