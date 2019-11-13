@@ -20,7 +20,7 @@
               <div class="content-input">
                 <div class="content-data">
                   <div>
-                    <span>Username</span>
+                    <span>Email</span>
                   </div>
                   <div>
                     <input
@@ -42,7 +42,6 @@
                       name="password"
                       required
                       [(ngModel)]="password"
-                      (keyup)="onKeyUp($event)"
                     />
                   </div>
                 </div>
@@ -51,10 +50,12 @@
                 id="login-button"
                 class="submit-wraper kh-btn kh-btn-blue"
               >
-                <a (click)="onLogin()">Login</a>
+                <a (click)="login()">Login</a>
               </button>
-              <span class="error-message">{{ errorMessage }}</span>
             </form>
+            <div class="message">
+              <p class="error-message">{{ errorMessage }}</p>
+            </div>
             <div class="login-footer">
               <div class="checkbox">
                 <label class="form-check-label control control-checkbox">

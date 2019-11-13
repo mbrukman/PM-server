@@ -71,11 +71,6 @@
               font-size: 14px;
               color: $greyish-text;
             }
-            .error-message {
-              margin-top: 14px;
-              margin-bottom: 13px;
-              color: red;
-            }
           }
         }
         .content-btn {
@@ -83,25 +78,18 @@
             margin-bottom: 36px;
           }
         }
-        .success-message {
-          color: $greyish-text;
-          font-size: 19px;
-          text-align: center;
-          display: none;
-          span {
+        .message {
+          margin: 20px 0px;
+          .error-message {
+            color: red;
             display: block;
+            font-size: 14px;
+            text-align: center;
           }
         }
-        .error-message {
-          margin-top: 30px;
-          height: 14px;
-          margin-bottom: 15px;
-          color: red;
-          display: block;
-          font-size: 14px;
-          text-align: center;
-        }
+
         .login-footer {
+          height: 30px;
           display: flex;
           justify-content: space-between;
           align-items: center;
