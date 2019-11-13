@@ -22,6 +22,10 @@ import {IAMUserModule} from '@app/users-management/iam-user/iam-user.module';
   ],
   declarations: [
     UsersManagementComponent,
+    UsersListComponent,
+    CreateUserComponent,
+    // ManageUserComponent,
+    // EditUserComponent,
   ],
   providers: [UsersListResolver, UserGroupResolver]
 })
