@@ -92,7 +92,6 @@ export class UserAttachUserGroupModalComponent implements OnInit, OnDestroy {
       this.preparePatchUserData()
     )
       .pipe(map(([userGroups, user]) => {
-        console.log(user)
         if (user.name) {
           this.onClose.next(user);
         }
