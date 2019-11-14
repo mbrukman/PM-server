@@ -6,11 +6,10 @@ import {
 } from '@app/services/user-group/user-group-data.interface';
 import UserGroup from '@app/services/user-group/user-group.model';
 import {Observable} from 'rxjs';
-import {map, tap} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {FilterOptions} from '@app/shared/model/filter-options.model';
 import {IEntityList} from '@app/shared/interfaces/entity-list.interface';
 import RemoveResponseInterface from '@shared/interfaces/remove-response.interface';
-
 
 @Injectable({providedIn: 'root'})
 export class UserGroupService {
@@ -37,6 +36,11 @@ export class UserGroupService {
     const params = this.createFilterQuery(null, filter);
     return this.http.get<UserGroup>(`api/user-groups/${id}`, {params})
       .pipe(map(userGroup => new UserGroup(userGroup)));
+  }
+
+  patchMany(userGroupsPatchableData: { [key: string]: UserGroupPatchableDataInterface }): Observable<Array<UserGroup>> {
+    return this.http.patch<Array<UserGroup>>(`api/user-groups`, userGroupsPatchableData)
+      .pipe(map((userGroups: Array<UserGroup>) => userGroups.map(userGroup => new UserGroup(userGroup))));
   }
 
   // tslint:disable-next-line:variable-name

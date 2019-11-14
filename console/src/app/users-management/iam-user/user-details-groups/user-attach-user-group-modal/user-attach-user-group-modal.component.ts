@@ -73,13 +73,12 @@ export class UserAttachUserGroupModalComponent implements OnInit, OnDestroy {
     Object.entries(this.newUserGroupsCollection)
       .forEach(([userGroupId, userGroup]) => {
         userGroup.users.push(this.user);
-        userGroupsToPatch[userGroupId] = {groups: userGroup.users};
+        userGroupsToPatch[userGroupId] = {users: userGroup.users};
       });
-    return this.userService.patchMany(userGroupsToPatch);
+    return this.userGroupService.patchMany(userGroupsToPatch);
   }
 
   private preparePatchUserData() {
-    console.log(this.user.groups)
     const groups = Object.values(this.newUserGroupsCollection)
       .concat(this.user.groups as Array<UserGroup>);
     return this.userService.updateUser(this.user._id, {

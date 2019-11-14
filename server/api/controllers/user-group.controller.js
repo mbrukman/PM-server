@@ -12,6 +12,27 @@ function parseQuery(req) {
 }
 
 module.exports = {
+  async updateManyUserGroups(req, res) {
+    try {
+      const { body } = req;
+      const userGroups = await userGroupService.bulkUpdateUserGroup(body);
+      req.io.emit("notification", {
+        title: "User groups updated",
+        message: `User groups updated successfully`,
+        type: "success"
+      });
+      return res.status(200).json(userGroups);
+    } catch (err) {
+      req.io.emit("notification", {
+        title: "Whoops..",
+        message: `Error updating user groups`,
+        type: "error"
+      });
+
+      winston.log("error", "Error updating user groups", err);
+      return res.status(500).send(err);
+    }
+  },
   async create(req, res) {
     try {
       const { body } = req;

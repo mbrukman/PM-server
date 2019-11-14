@@ -135,6 +135,7 @@ class UserService {
       $match.$and = [
         {
           groups: {
+            // eslint-disable-next-line new-cap
             $ne: mongoose.Types.ObjectId(filterOptions.options.notInGroup)
           }
         }

@@ -1,4 +1,5 @@
 const UserGroupModel = require("../models/user-group.model");
+const mongoose = require("mongoose");
 
 function getSort(sortString) {
   const sort = {};
@@ -106,10 +107,11 @@ class UserGroupService {
           }
         ];
       }
-      if (filterOptions.options.notInGroup) {
+      if (filterOptions.options.notInUsers) {
         $match.$and = [
           {
             users: {
+              // eslint-disable-next-line new-cap
               $ne: mongoose.Types.ObjectId(filterOptions.options.notInUsers)
             }
           }
@@ -147,6 +149,24 @@ class UserGroupService {
       console.log(err);
       return err;
     }
+  }
+
+  async bulkUpdateUserGroup(userGroupsData) {
+    const entries = Object.entries(userGroupsData);
+    const updates = entries.map(([_id, value]) => {
+      return {
+        updateOne: {
+          filter: { _id },
+          update: { $set: value }
+        }
+      };
+    });
+    await UserGroupModel.bulkWrite(updates);
+    return UserGroupModel.find({
+      _id: {
+        $in: Object.keys(userGroupsData)
+      }
+    }).populate("users");
   }
 }
 
