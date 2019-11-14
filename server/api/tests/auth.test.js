@@ -7,10 +7,11 @@ const { randomIdx } = require("./helpers");
 
 describe("Auth tests", () => {
   const usersTestDataManager = new TestDataManager(User);
+  const testPassword = "testpassword1234";
 
   beforeEach(async () => {
     await usersTestDataManager.generateInitialCollection(
-      usersFactory.generateUsers()
+      usersFactory.generateSingleUser(testPassword)
     );
   });
 
@@ -21,14 +22,17 @@ describe("Auth tests", () => {
   describe("POST api/auth/login", () => {
     it("should respond with status 200, user in body and a token in authorization header", () => {
       const randomIndex = randomIdx(usersTestDataManager.collection.length);
-      const { email, password } = usersTestDataManager.collection[randomIndex];
+      const { email, name } = usersTestDataManager.collection[randomIndex];
+      console.log(usersTestDataManager.collection);
+      console.log(email, testPassword);
       return request(app)
         .post(`/api/auth/login`)
-        .expect("Authorization", /Bearer/)
-        .send({ email, password })
+        .send({ email, testPassword })
         .expect(200)
+        .expect("Authorization", /Bearer/)
         .then(({ body }) => {
           expect(body.email).toEqual(email);
+          expect(body.name).toEqual(name);
         });
     });
   });

@@ -1,4 +1,5 @@
 const { jsf } = require("./jsf.helper");
+const userService = require("../../services/user.service");
 
 const singleUserSchema = {
   type: "object",
@@ -32,7 +33,7 @@ const singleUserSchema = {
       chance: { bool: { likelihood: 0 } }
     }
   },
-  required: ["name", "email"]
+  required: ["name", "email", "password"]
 };
 
 const arrayUserSchema = {
@@ -44,5 +45,11 @@ const arrayUserSchema = {
 
 module.exports = {
   generateUsers: () => jsf.generate(arrayUserSchema),
-  generateSingleUser: () => jsf.generate(singleUserSchema)
+  generateSingleUser: password => {
+    const user = jsf.generate(singleUserSchema);
+    if (password) {
+      user.password = userService.hashPassword(password);
+    }
+    return user;
+  }
 };
