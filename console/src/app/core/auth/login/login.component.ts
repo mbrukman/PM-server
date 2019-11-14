@@ -16,6 +16,7 @@ export class LoginComponent implements OnDestroy {
   password: string;
   errorMessage: string;
   subscription: Subscription;
+  keepMeLoggedIn: boolean;
 
   constructor(private authService: AuthService, private router: Router) { }
 
