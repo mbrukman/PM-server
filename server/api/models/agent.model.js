@@ -4,7 +4,6 @@ const Schema = mongoose.Schema;
 const agentStatusSchema = new Schema({
   alive: Boolean,
   following: Boolean,
-  defaultUrl: String,
   socketId: String,
   hostname: String,
   arch: String,
@@ -18,6 +17,7 @@ const agentSchema = new Schema({
   name: String,
   url: { type: String, required: true },
   publicUrl: { type: String, required: true },
+  defaultUrl: String,
   key: { type: String, required: true, index: true },
   sshKey: String,
   isDeleted: Boolean,

@@ -28,7 +28,7 @@ const FILTER_TYPES = Object.freeze({
 const runningIntervals = {};
 
 function startInterval(agent) {
-  runningIntervals[agent.key] = setTimeout(async () => {
+  runningIntervals[agent.key] = setInterval(async () => {
     await followAgentStatusIntervalFunction(agent);
   }, INTERVAL_TIME);
 }
@@ -128,12 +128,12 @@ async function followAgentStatusIntervalFunction(agent) {
   const start = new Date();
   let agentStatus = await getAgentStatus(agent.key);
 
-  if (!agentStatus || !agentStatus.defaultUrl) {
+  if (!agentStatus || !agent.defaultUrl) {
     console.error("no defaultUrl, can't follow agent status");
     return;
   }
   request.post(
-    agentStatus.defaultUrl + "/api/status",
+    agent.defaultUrl + "/api/status",
     {
       form: {
         key: agent.key
@@ -154,9 +154,6 @@ async function followAgentStatusIntervalFunction(agent) {
         }
       }
       await saveStatusToAgent(agent, agentStatus);
-      setTimeout(async () => {
-        await followAgentStatusIntervalFunction(agent);
-      }, INTERVAL_TIME);
     }
   );
 }
@@ -182,7 +179,6 @@ function updateAliveAgent(agentStatus, body, start) {
   agentStatus.arch = body.arch;
   agentStatus.freeSpace = humanize.bytes(body.freeSpace);
   agentStatus.respTime = new Date() - start;
-  agentStatus.defaultUrl = agentStatus.defaultUrl || "";
   agentStatus.installed_plugins = body.installed_plugins;
   agentStatus.liveCounter = LIVE_COUNTER;
   return agentStatus;
@@ -194,13 +190,11 @@ function setDefaultUrl(agent) {
       agent.url + "/api/status",
       { form: { key: agent.key } },
       async function(error, response, body) {
-        const agentStatus = await getAgentStatus(agent.key);
         if (error) {
-          agentStatus.defaultUrl = agent.publicUrl;
+          agent.defaultUrl = agent.publicUrl;
         } else {
-          agentStatus.defaultUrl = agent.url;
+          agent.defaultUrl = agent.url;
         }
-        await saveStatusToAgent(agent, agentStatus);
         resolve();
       }
     );
@@ -310,14 +304,13 @@ function evaluateFilter(filter, agents) {
 
 async function sendRequestToAgent(_options, agent) {
   const options = Object.assign({}, _options);
-  const agentStatus = await getAgentStatus(agent.key);
 
-  if (!agentStatus.defaultUrl) {
-    console.error("No defaultUrl:", agentStatus.defaultUrl);
+  if (!agent.defaultUrl) {
+    console.error("No defaultUrl:", agent.defaultUrl);
     return new Error("No defaultUrl");
   }
 
-  options.uri = agentStatus.defaultUrl + options.uri;
+  options.uri = agent.defaultUrl + options.uri;
   options.method = options.method || "POST";
 
   if (options.body) {
@@ -366,10 +359,9 @@ function add(agent) {
 
 // get an object of installed plugins and versions on certain agent.
 async function checkPluginsOnAgent(agent) {
-  const agentStatus = await getAgentStatus(agent.key);
   return new Promise((resolve, reject) => {
     request.post(
-      agentStatus.defaultUrl + "/api/plugins",
+      agent.defaultUrl + "/api/plugins",
       { form: { key: agent.key } },
       function(error, response, body) {
         if (error || response.statusCode !== 200) {
