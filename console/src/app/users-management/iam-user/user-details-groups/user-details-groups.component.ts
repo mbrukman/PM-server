@@ -99,6 +99,7 @@ export class UserDetailsGroupsComponent implements OnInit, OnDestroy {
     };
 
     const modal = this.modalService.show(UserAttachUserGroupModalComponent, {
+      class: 'modal-lg',
       initialState
     });
 

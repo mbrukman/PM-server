@@ -33,7 +33,7 @@ export class UserAttachUserGroupModalComponent implements OnInit, OnDestroy {
   ) {
   }
 
-  get newUserGroupsCollectionLength (): number {
+  get newUserGroupsCollectionLength(): number {
     return Object.keys(this.newUserGroupsCollection).length;
   }
 
@@ -55,7 +55,6 @@ export class UserAttachUserGroupModalComponent implements OnInit, OnDestroy {
       .pipe(
         switchMap((globalFilter: UserGroupFilterOptions) => {
           const filters = _.merge({
-            sort: 'asc',
             globalFilter: name,
             notInUsers: this.user._id
           }, globalFilter);
@@ -89,13 +88,12 @@ export class UserAttachUserGroupModalComponent implements OnInit, OnDestroy {
   }
 
   saveGroups() {
-    console.log(this.user)
     forkJoin(
       this.prepareUserGroups(),
       this.preparePatchUserData()
     )
       .pipe(map(([userGroups, user]) => {
-          console.log(user)
+        console.log(user)
         if (user.name) {
           this.onClose.next(user);
         }
