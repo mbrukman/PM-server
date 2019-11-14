@@ -16,7 +16,7 @@ class AuthService {
   }
 
   sign(userId) {
-    jwt.sign({ sub: userId }, serverKey);
+    return jwt.sign({ sub: userId }, serverKey);
   }
 
   verify(jwtPayload, done) {
@@ -42,8 +42,11 @@ class AuthService {
 
     if (!user) {
       throw new Error("User does not exist.");
-    } else if (userService.hashPassword(password) !== user.password) {
-      throw new Error("Wrong email and/or password.");
+    }
+
+    const hashedPassword = userService.hashPassword(password);
+    if (hashedPassword !== user.password) {
+      throw new Error("Invalid password.");
     } else {
       return user;
     }

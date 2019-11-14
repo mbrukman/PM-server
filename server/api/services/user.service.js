@@ -15,15 +15,16 @@ function getSort(sortString) {
 }
 
 class UserService {
-  hashPassword(password, salt) {
+  hashPassword(password) {
     const hash = crypto.createHash("sha256");
+    const salt = serverKey;
     hash.update(password + salt);
     return hash.digest("hex");
   }
 
   createUser(userData) {
     const user = new User(userData);
-    user.password = this.hashPassword(user.password, serverKey);
+    user.password = this.hashPassword(user.password);
     return user.save();
   }
 
@@ -33,7 +34,7 @@ class UserService {
 
   updateUser(_id, newUserData) {
     if (newUserData.password) {
-      newUserData.password = this.hashPassword(newUserData.password, serverKey);
+      newUserData.password = this.hashPassword(newUserData.password);
     }
     return User.findOneAndUpdate(
       { _id },
