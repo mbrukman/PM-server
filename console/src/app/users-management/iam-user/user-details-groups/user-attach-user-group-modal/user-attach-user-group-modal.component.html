@@ -19,18 +19,22 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th></th>
+        <th class="w-10"></th>
         <th [pSortableColumn]="'name'" class="font-weight-normal font-roboto">
           Groups
           <p-sortIcon [field]="'name'"></p-sortIcon></th>
+        <th class="font-weight-normal font-roboto">
+          Description
+        </th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-userGroup>
-      <tr>
+      <tr class="w-10">
         <td rowspan="1">
           <app-checkbox (onChange)="userGroupSubject.next([$event, userGroup])"></app-checkbox>
         </td>
-        <td colspan="4">{{userGroup.name}}</td>
+        <td class="w-40" colspan="4">{{userGroup.name}}</td>
+        <td class="w-40 text-break">{{userGroup.description}}</td>
       </tr>
     </ng-template>
   </p-table>

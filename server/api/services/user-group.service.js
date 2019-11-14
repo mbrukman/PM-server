@@ -106,6 +106,15 @@ class UserGroupService {
           }
         ];
       }
+      if (filterOptions.options.notInGroup) {
+        $match.$and = [
+          {
+            users: {
+              $ne: mongoose.Types.ObjectId(filterOptions.options.notInUsers)
+            }
+          }
+        ];
+      }
       const aggregateSteps = [
         {
           $match: $match

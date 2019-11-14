@@ -2,13 +2,30 @@ const userService = require("../services/user.service");
 const winston = require("winston");
 const _ = require("lodash");
 
-async function filter(req, res) {
+function returnUserWithPickedFields(userDocument) {
+  return _.pick(userDocument, [
+    "_id",
+    "name",
+    "email",
+    "groups",
+    "createdAt",
+    "phoneNumber",
+    "changePasswordOnNextLogin"
+  ]);
+}
+
+function parseQuery(req) {
   const { query } = req;
-  if (typeof query.options === "string" && !_.isUndefined(query.options)) {
+  if (typeof query.options === "string" && query.options) {
     query.options = JSON.parse(query.options);
   } else {
     query.options = {};
   }
+  return query;
+}
+
+async function filter(req, res) {
+  const query = parseQuery(req);
   try {
     return userService.filter(query).then(param => res.send(param));
   } catch (err) {
@@ -38,8 +55,9 @@ async function deleteUser(req, res) {
 }
 
 async function getUser(req, res) {
+  const query = parseQuery(req);
   try {
-    const user = await userService.getUser(req.params.id);
+    const user = await userService.getUser(req.params.id, query);
     if (!user) {
       return res.status(404).send("User not found");
     }

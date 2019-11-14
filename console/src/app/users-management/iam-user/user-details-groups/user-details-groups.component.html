@@ -19,36 +19,19 @@
         </th>
         <th class="font-weight-normal font-roboto">
           Description
-          <p-sortIcon field="groups.length"></p-sortIcon>
         </th>
         <th class="font-weight-normal font-roboto">Detach</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-group>
-
-      <ng-template #tooltip>
-        <ul class="tooltip-list pl-2 pr-2" *ngIf="group.users.length">
-          <li *ngFor="let user of group.users" class="pb-1 pt-1">
-            <a href="" routerLink="/admin/users-management/groups/{{user._id}}">
-              {{user.name}}
-            </a>
-          </li>
-        </ul>
-      </ng-template>
-
       <tr>
         <td colspan="1">
           <span class="ml-1">
             {{group.name}}
           </span>
         </td>
-        <td rowspan="1">
-          <a class="cube-bordered"
-             [tooltip]="tooltip"
-             placement="right"
-             triggers="click">
-            {{group.users.length}}
-          </a>
+        <td rowspan="1" class="text-break">
+          {{group.description}}
         </td>
         <td rowspan="1">
           <button class="btn btn-link text-white ml-2" (click)="openDetachConfirmationModal(group)">

@@ -28,8 +28,44 @@ class UserService {
     return user.save();
   }
 
-  getUser(userId) {
-    return User.findOne({ _id: userId }).populate("groups");
+  getUser(userId, filterOptions = {}) {
+    let page;
+    const fields = filterOptions.fields;
+    const sort = filterOptions.options.sort || "name";
+
+    if (typeof filterOptions.options.page === "string") {
+      page = 0;
+    } else {
+      page = parseInt(filterOptions.options.page, 10);
+    }
+
+    if (fields) {
+      Object.keys(fields).map(key => {
+        fields[key] = { $regex: `.*${fields[key]}.*` };
+      });
+    }
+    const match = {};
+    if (filterOptions.options.globalFilter) {
+      match.name = {
+        $regex: new RegExp(filterOptions.options.globalFilter, "ig")
+      };
+    }
+
+    const pageSize = parseInt(process.env.PAGE_SIZE, 10);
+    const options = {
+      sort: getSort(sort),
+      skip: page ? (page - 1) * pageSize : 0,
+      limit: filterOptions.options.limit || pageSize
+    };
+
+    return User.findById(userId).populate({
+      path: "groups",
+      match,
+      options,
+      populate: {
+        path: "users"
+      }
+    });
   }
 
   updateUser(_id, newUserData) {
