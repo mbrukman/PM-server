@@ -10,6 +10,7 @@ const configTokenApi = require("../api/routes/config-token.routes");
 const autoCompleteApi = require("../api/routes/autocomplete.routes");
 const userGroupApi = require("../api/routes/user-group.routes");
 const usersApi = require("../api/routes/user.routes");
+const authApi = require("../api/routes/auth.routes");
 
 module.exports = function bootstrapApi(app) {
   app.use("/api/settings", settingsApi);
@@ -24,4 +25,5 @@ module.exports = function bootstrapApi(app) {
   app.use("/api/autocomplete", autoCompleteApi);
   app.use("/api/users", usersApi);
   app.use("/api/user-groups", userGroupApi);
+  app.use("/api/auth", authApi);
 };

@@ -19,7 +19,7 @@ export class AuthService {
   }
 
   public login(email: string, password: string): Observable<User> {
-    return this.http.post<User>(`api/users/authenticate`, { email, password }, { observe: 'response' })
+    return this.http.post<User>(`api/auth/login`, { email, password }, { observe: 'response' })
       .pipe(
         tap((response: HttpResponse<User>) => {
           this.saveToken(response.headers.get('authorization'));

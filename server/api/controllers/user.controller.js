@@ -2,18 +2,6 @@ const userService = require("../services/user.service");
 const winston = require("winston");
 const _ = require("lodash");
 
-function returnUserWithPickedFields(userDocument) {
-  return _.pick(userDocument, [
-    "_id",
-    "name",
-    "email",
-    "groups",
-    "createdAt",
-    "phoneNumber",
-    "changePasswordOnNextLogin"
-  ]);
-}
-
 async function filter(req, res) {
   const { query } = req;
   if (typeof query.options === "string" && !_.isUndefined(query.options)) {
@@ -55,7 +43,7 @@ async function getUser(req, res) {
     if (!user) {
       return res.status(404).send("User not found");
     }
-    return res.status(200).send(returnUserWithPickedFields(user));
+    return res.status(200).send(userService.returnUserWithPickedFields(user));
   } catch (err) {
     req.io.emit("notification", {
       title: "Whoops..",
@@ -76,7 +64,9 @@ function createUser(req, res) {
         message: `${createdUser.name} created successfully`,
         type: "success"
       });
-      return res.status(200).send(returnUserWithPickedFields(createdUser));
+      return res
+        .status(200)
+        .send(userService.returnUserWithPickedFields(createdUser));
     })
     .catch(err => {
       req.io.emit("notification", {
@@ -118,7 +108,9 @@ async function updateUser(req, res) {
       message: `${updatedUser.name} updated successfully`,
       type: "success"
     });
-    return res.status(200).send(returnUserWithPickedFields(updatedUser));
+    return res
+      .status(200)
+      .send(userService.returnUserWithPickedFields(updatedUser));
   } catch (err) {
     req.io.emit("notification", {
       title: "Whoops..",

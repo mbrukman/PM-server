@@ -2,6 +2,7 @@ const User = require("../models/user.model");
 const crypto = require("crypto");
 const serverKey = process.env.SERVER_KEY;
 const mongoose = require("mongoose");
+const _ = require("lodash");
 
 function getSort(sortString) {
   const sort = {};
@@ -140,6 +141,18 @@ class UserService {
 
   deleteUser(userId) {
     return User.deleteOne({ _id: userId });
+  }
+
+  returnUserWithPickedFields(userDocument) {
+    return _.pick(userDocument, [
+      "_id",
+      "name",
+      "email",
+      "groups",
+      "createdAt",
+      "phoneNumber",
+      "changePasswordOnNextLogin"
+    ]);
   }
 }
 
