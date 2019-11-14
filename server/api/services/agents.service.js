@@ -28,8 +28,8 @@ const FILTER_TYPES = Object.freeze({
 const runningIntervals = {};
 
 function startInterval(agent) {
-  runningIntervals[agent.key] = setInterval(() => {
-    followAgentStatusIntervalFunction(agent);
+  runningIntervals[agent.key] = setTimeout(async () => {
+    await followAgentStatusIntervalFunction(agent);
   }, INTERVAL_TIME);
 }
 
@@ -43,7 +43,7 @@ function stopInterval(agent) {
  */
 async function getAgentStatus(agentKey) {
   const allAgentStatus = await getAllAgentsStatus();
-  return allAgentStatus[agentKey];
+  return allAgentStatus[agentKey].status;
 }
 
 /**
@@ -104,7 +104,7 @@ async function startFollowingAgentStatus(agent) {
 
     await setDefaultUrl(agent);
   }
-  startInterval(agent);
+  await startInterval(agent);
 }
 
 /* stop following an agent */
@@ -139,7 +139,7 @@ async function followAgentStatusIntervalFunction(agent) {
         key: agent.key
       }
     },
-    (error, response, body) => {
+    async (error, response, body) => {
       try {
         body = JSON.parse(body);
       } catch (e) {
@@ -147,14 +147,16 @@ async function followAgentStatusIntervalFunction(agent) {
       }
       if (!error && response.statusCode === 200) {
         agentStatus = updateAliveAgent(agentStatus, body, start);
-        saveStatusToAgent(agent, agentStatus);
       } else {
         agentStatus.liveCounter -= 1;
         if (agentStatus.liveCounter === 0) {
           agentStatus = updateDeadAgent(agentStatus);
         }
-        saveStatusToAgent(agent, agentStatus);
       }
+      await saveStatusToAgent(agent, agentStatus);
+      setTimeout(async () => {
+        await followAgentStatusIntervalFunction(agent);
+      }, INTERVAL_TIME);
     }
   );
 }
@@ -356,11 +358,9 @@ function add(agent) {
         $set: { url: agent.url, publicUrl: agent.publicUrl, isDeleted: false }
       });
     })
-    .then(agent => {
-      startFollowingAgentStatus(agent);
-      return setDefaultUrl(agent).then(() => {
-        return agent;
-      });
+    .then(async agent => {
+      await startFollowingAgentStatus(agent);
+      return agent;
     });
 }
 
@@ -464,8 +464,8 @@ async function restartAgentsStatus() {
   await Agent.updateMany({}, { $set: { "status.alive": false, "status.following": false } });
 
   await Agent.find({}).then(agents => {
-    agents.forEach(agent => {
-      startFollowingAgentStatus(agent);
+    agents.forEach(async agent => {
+      await startFollowingAgentStatus(agent);
     });
   });
 }

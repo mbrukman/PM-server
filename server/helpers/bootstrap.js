@@ -8,7 +8,7 @@ module.exports = {
     winston.log("info", "Restarting agents status");
     await agentsService.restartAgentsStatus();
     winston.log("info", "Establish agents socket");
-    agentsService.establishSocket(app.io);
+    await agentsService.establishSocket(app.io);
     winston.log("info", "Reloading plugins");
     pluginsService.loadModules(app);
     winston.log("info", "Loading scheduled jobs");
