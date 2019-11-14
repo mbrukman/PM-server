@@ -10,7 +10,7 @@ class AuthController {
       if (error.message === "User does not exist.") {
         res.status(404);
       } else if (error.message === "Invalid password.") {
-        res.status(400);
+        res.status(401);
       } else {
         res.status(500);
       }
