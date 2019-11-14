@@ -4,6 +4,7 @@ const ExtractJwt = require("passport-jwt").ExtractJwt;
 const User = require("../models/user.model");
 const serverKey = process.env.SERVER_KEY;
 const userService = require("../services/user.service");
+const jwt = require("jsonwebtoken");
 
 class AuthService {
   constructor() {
@@ -14,8 +15,12 @@ class AuthService {
     passport.use(new JwtStrategy(strategyOptions, this.verify));
   }
 
+  sign(userId) {
+    jwt.sign({ sub: userId }, serverKey);
+  }
+
   verify(jwtPayload, done) {
-    User.findOne({ id: jwtPayload.sub }, function(err, user) {
+    User.findOne({ _id: jwtPayload.sub }, function(err, user) {
       if (err) {
         return done(err, false);
       }

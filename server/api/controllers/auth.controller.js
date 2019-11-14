@@ -1,4 +1,5 @@
 const authService = require("../services/auth.service");
+const userService = require("../services/user.service");
 
 class AuthController {
   async login(req, res) {
@@ -16,7 +17,9 @@ class AuthController {
 
       res.send(error.message);
     }
-    res.status(200).send(user);
+    const token = authService.sign(user._id);
+    res.header("Authorization", "Bearer " + token);
+    res.status(200).send(userService.returnUserWithPickedFields(user));
   }
 }
 
