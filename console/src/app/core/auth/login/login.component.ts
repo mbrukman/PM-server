@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginComponent implements OnDestroy {
 
   email: string;
   password: string;
@@ -19,15 +19,10 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   constructor(private authService: AuthService, private router: Router) { }
 
-  ngOnInit() {
-
-  }
-
   login() {
     this.subscription = this.authService.login(this.email, this.password)
       .subscribe(
         (user: User) => {
-          console.log('User logged in:', user);
           this.router.navigateByUrl('/');
         },
         (error: HttpErrorResponse) => {
