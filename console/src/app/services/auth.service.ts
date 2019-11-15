@@ -14,10 +14,6 @@ export class AuthService {
     return localStorage.getItem('access_token');
   }
 
-  private saveToken(token: string) {
-    localStorage.setItem('access_token', token);
-  }
-
   public login(email: string, password: string, keepLoggedIn: boolean): Observable<User> {
     return this.http.post<User>(`api/auth/login`, { email, password, keepLoggedIn }, { observe: 'response' })
       .pipe(
@@ -28,7 +24,11 @@ export class AuthService {
       );
   }
 
-  logout() {
+  public logout() {
     localStorage.removeItem('access_token');
+  }
+
+  private saveToken(token: string) {
+    localStorage.setItem('access_token', token);
   }
 }
