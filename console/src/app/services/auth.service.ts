@@ -18,7 +18,12 @@ export class AuthService {
     return this.http.post<User>(`api/auth/login`, { email, password, keepLoggedIn }, { observe: 'response' })
       .pipe(
         tap((response: HttpResponse<User>) => {
-          this.saveToken(response.headers.get('authorization'));
+          const authorizationHeaderValue = response.headers.get('Authorization');
+          if (!authorizationHeaderValue) {
+            console.log(response.headers);
+            throw new Error('No Authorization header in server login response.');
+          }
+          this.saveToken(authorizationHeaderValue);
         }),
         map(response => response.body as User)
       );
@@ -28,7 +33,8 @@ export class AuthService {
     localStorage.removeItem('access_token');
   }
 
-  private saveToken(token: string) {
+  private saveToken(authorizationHeaderValue: string) {
+    const token = authorizationHeaderValue.split(' ')[1];
     localStorage.setItem('access_token', token);
   }
 }

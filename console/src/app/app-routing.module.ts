@@ -19,28 +19,24 @@ const appRoutes: Routes = [
     resolve: { dashboardItems: DashboardResolver },
     canActivate: [IsSetUpGuard, AuthGuard]
   },
-  {
-    path: 'setup',
-    component: SetupComponent
-  },
   // maps
   {
     path: 'maps',
     loadChildren: './maps/maps.module#MapsModule',
-    canActivate: [IsSetUpGuard]
+    canActivate: [IsSetUpGuard, AuthGuard]
   },
   // projects
   {
     path: 'projects',
     loadChildren: './projects/projects.module#ProjectsModule',
-    canActivate: [IsSetUpGuard]
+    canActivate: [IsSetUpGuard, AuthGuard]
 
   },
   // admin
   {
     path: 'admin',
     loadChildren: './admin/admin.module#AdminModule',
-    canActivate: [IsSetUpGuard]
+    canActivate: [IsSetUpGuard, AuthGuard]
   },
   {
     path: 'login',
@@ -49,6 +45,7 @@ const appRoutes: Routes = [
   {
     path: 'reset-password',
     component: ResetPasswordComponent,
+    canActivate: [AuthGuard]
   },
   { path: '**', component: NotFoundComponent }
 ];

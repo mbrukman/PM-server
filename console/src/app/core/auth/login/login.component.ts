@@ -12,8 +12,8 @@ import { Subscription } from 'rxjs';
 })
 export class LoginComponent implements OnInit, OnDestroy {
 
-  email: string;
-  password: string;
+  email: string = 'tatty@tat.co';
+  password: string = 'asdf1234';
   errorMessage: string;
   mainSubscription = new Subscription();
   keepLoggedIn: boolean;
@@ -47,7 +47,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.errorMessage = 'Error connecting to server.';
             return;
           }
-          this.errorMessage = error.message;
+          this.errorMessage = error.message || error.name;
         }
       ));
   }
