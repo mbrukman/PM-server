@@ -45,7 +45,7 @@ describe("All user group endpoints are working as expected.", () => {
         .expect(200)
         .then(({ body }) => {
           expect(body._id).toEqual(id);
-          expect(body.name).tomEqual(userGroup.name);
+          expect(body.name).toEqual(userGroup.name);
           expect(body.description).toEqual(userGroup.description);
         });
     });
