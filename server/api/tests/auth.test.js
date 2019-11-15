@@ -23,16 +23,36 @@ describe("Auth tests", () => {
     it("should respond with status 200, user in body and a token in authorization header", () => {
       const randomIndex = randomIdx(usersTestDataManager.collection.length);
       const { email, name } = usersTestDataManager.collection[randomIndex];
-      console.log(usersTestDataManager.collection);
-      console.log(email, testPassword);
       return request(app)
         .post(`/api/auth/login`)
-        .send({ email, testPassword })
+        .send({ email, password: testPassword })
         .expect(200)
         .expect("Authorization", /Bearer/)
         .then(({ body }) => {
           expect(body.email).toEqual(email);
           expect(body.name).toEqual(name);
+        });
+    });
+
+    it("should respond with status 401 for invalid password", () => {
+      const randomIndex = randomIdx(usersTestDataManager.collection.length);
+      const { email } = usersTestDataManager.collection[randomIndex];
+      return request(app)
+        .post(`/api/auth/login`)
+        .send({ email, password: "invalid777" })
+        .expect(401)
+        .then(response => {
+          expect(response.text).toEqual("Invalid password.");
+        });
+    });
+
+    it("should respond with status 404 for non existing user", () => {
+      return request(app)
+        .post(`/api/auth/login`)
+        .send({ email: "wrong@email.nowhere", password: testPassword })
+        .expect(404)
+        .then(response => {
+          expect(response.text).toEqual("User does not exist.");
         });
     });
   });
