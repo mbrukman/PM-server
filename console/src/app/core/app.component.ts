@@ -1,14 +1,15 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
-import {Subscription} from 'rxjs';
-import {ToastOptions, ToastyConfig, ToastyService} from 'ng2-toasty';
+import { Subscription } from 'rxjs';
+import { ToastOptions, ToastyConfig, ToastyService } from 'ng2-toasty';
 
-import {SocketService} from '../shared/socket.service';
-import {MapsService} from '@app/services/map/maps.service';
-import {Map} from '@app/services/map/models/map.model';
-import {ActivatedRoute} from '@angular/router';
-import {SettingsService} from '@app/services/settings/settings.service';
+import { SocketService } from '../shared/socket.service';
+import { MapsService } from '@app/services/map/maps.service';
+import { Map } from '@app/services/map/models/map.model';
+import { ActivatedRoute } from '@angular/router';
+import { SettingsService } from '@app/services/settings/settings.service';
+import { AuthService } from '@app/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -33,6 +34,10 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {
     this.toastyConfig.theme = 'material';
     this.toastyConfig.position = 'bottom-center';
+  }
+
+  public get isUserLoggedIn(): boolean {
+    return AuthService.token ? true : false;
   }
 
   ngOnInit() {

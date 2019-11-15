@@ -1,71 +1,111 @@
 <div class="row root">
   <ng-progress #progressBar></ng-progress>
-  <div class="pm-sidebar" *ngIf="settingsService.settings?.isSetup">
+  <div
+    class="pm-sidebar"
+    *ngIf="settingsService.settings?.isSetup && isUserLoggedIn"
+  >
     <div class="logo-wrapper">
-      <img src="/assets/images/logo-app.svg">
+      <img src="/assets/images/logo-app.svg" />
     </div>
     <ul class="nav flex-column">
       <div>
-      <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        <a class="nav-link" routerLink=""
-           tooltip="Dashboard"
-           placement="right"><i class="icon-dashboard" aria-hidden="true"></i></a>
-      </li>
+        <li
+          class="nav-item"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <a
+            class="nav-link"
+            routerLink=""
+            tooltip="Dashboard"
+            placement="right"
+            ><i class="icon-dashboard" aria-hidden="true"></i
+          ></a>
+        </li>
 
-      <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" routerLink="/projects"
-           tooltip="Projects"
-           placement="right"><i class="icon-folder1" aria-hidden="true"></i></a>
-      </li>
+        <li class="nav-item" routerLinkActive="active">
+          <a
+            class="nav-link"
+            routerLink="/projects"
+            tooltip="Projects"
+            placement="right"
+            ><i class="icon-folder1" aria-hidden="true"></i
+          ></a>
+        </li>
 
-      <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" routerLink="/maps"
-           tooltip="Maps"
-           placement="right"><i class="icon-map" aria-hidden="true"></i></a>
-      </li>
+        <li class="nav-item" routerLinkActive="active">
+          <a
+            class="nav-link"
+            routerLink="/maps"
+            tooltip="Maps"
+            placement="right"
+            ><i class="icon-map" aria-hidden="true"></i
+          ></a>
+        </li>
 
-      <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" routerLink="/admin"
-           tooltip="Manage"
-           placement="right"><i class="icon-admin" aria-hidden="true"></i></a>
-      </li>
+        <li class="nav-item" routerLinkActive="active">
+          <a
+            class="nav-link"
+            routerLink="/admin"
+            tooltip="Manage"
+            placement="right"
+            ><i class="icon-admin" aria-hidden="true"></i
+          ></a>
+        </li>
 
-      <li class="nav-item">
-        <a class="nav-link" (click)="toggleSearch()"
-           tooltip="Search"
-           placement="right"><i class="icon-search1" aria-hidden="true"></i></a>
-      </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            (click)="toggleSearch()"
+            tooltip="Search"
+            placement="right"
+            ><i class="icon-search1" aria-hidden="true"></i
+          ></a>
+        </li>
 
-      <li dropdown class="nav-item dropdown">
-        <a class="nav-link" href dropdownToggle (click)="false"
-           tooltip="Create"
-           placement="right">
-          <i class="icon-add-new" aria-hidden="true"></i>
-        </a>
+        <li dropdown class="nav-item dropdown">
+          <a
+            class="nav-link"
+            href
+            dropdownToggle
+            (click)="(false)"
+            tooltip="Create"
+            placement="right"
+          >
+            <i class="icon-add-new" aria-hidden="true"></i>
+          </a>
 
-        <div *dropdownMenu class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" routerLink="/maps/create">New Map</a>
-          <a class="dropdown-item" routerLink="/projects/create">New Project</a>
-        </div>
-      </li>
-    </div>
+          <div
+            *dropdownMenu
+            class="dropdown-menu"
+            aria-labelledby="navbarDropdownMenuLink"
+          >
+            <a class="dropdown-item" routerLink="/maps/create">New Map</a>
+            <a class="dropdown-item" routerLink="/projects/create"
+              >New Project</a
+            >
+          </div>
+        </li>
+      </div>
       <div>
-      <li class="nav-item">
-        <a class="nav-link"
-           href="https://www.kaholo.io/documents/kaholo-user-guide/"
-           tooltip="Help"
-           target="_blank"
-           placement="right"><i class="material-icons">help_outline</i></a>
-      </li>
-      <li class="version">{{settingsService.settings.version}}</li>
-    </div>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            href="https://www.kaholo.io/documents/kaholo-user-guide/"
+            tooltip="Help"
+            target="_blank"
+            placement="right"
+            ><i class="material-icons">help_outline</i></a
+          >
+        </li>
+        <li class="version">{{ settingsService.settings.version }}</li>
+      </div>
     </ul>
   </div>
   <div class="main">
     <router-outlet></router-outlet>
   </div>
 </div>
-
 
 <div class="search col-4 animated slideInLeft" *ngIf="search">
   <app-search (close)="toggleSearch()"></app-search>

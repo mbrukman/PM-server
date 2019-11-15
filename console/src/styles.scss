@@ -152,6 +152,7 @@ textarea {
 
 .main {
   overflow-y: auto;
+  @extend .main-background;
 }
 
 .card {
@@ -280,7 +281,6 @@ tr.ui-widget-content.ui-datatable-odd {
 }
 
 /*------*/
-
 
 //
 .btn-link {
@@ -590,6 +590,9 @@ span[contenteditable="true"] {
 .row {
   margin-left: 0;
   margin-right: 0;
+  &.root {
+    background-color: $cool-grey;
+  }
 }
 
 .fas {
