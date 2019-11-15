@@ -14,7 +14,7 @@ describe("User tests", () => {
     );
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     usersTestDataManager.clear();
   });
 

@@ -34,6 +34,27 @@ describe("All user group endpoints are working as expected.", () => {
           expect(body.name).toEqual(name);
         });
     });
+    it("should respond with updated user groups", () => {
+      const userGroups = testDataManager.collection;
+
+      const userGroupCollection = {};
+      userGroups.forEach(userGroup => {
+        userGroupCollection[userGroup._id] = {
+          name: "new name",
+          description: "new desc"
+        };
+      });
+      return request(baseApiURL)
+        .patch(`/user-groups`)
+        .send(userGroupCollection)
+        .expect(200)
+        .then(({ body }) => {
+          body.forEach(({ name, description, _id }) => {
+            expect(userGroupCollection[_id].name).toBe(name);
+            expect(userGroupCollection[_id].description).toBe(description);
+          });
+        });
+    });
   });
 
   describe("GET api/user-groups", () => {
