@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) {
     // redirect to home if token exists
-    if (this.authService.token) {
+    if (AuthService.token) {
       this.router.navigate(['/']);
     }
   }
