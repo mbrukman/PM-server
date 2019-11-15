@@ -14,6 +14,9 @@ import { JwtModule } from '@auth0/angular-jwt';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from './services/auth.service';
 
+export function tokenGetter(): string {
+  return AuthService.token;
+}
 
 @NgModule({
   imports: [
@@ -25,10 +28,10 @@ import { AuthService } from './services/auth.service';
     HttpClientModule,
     JwtModule.forRoot({
       config: {
-        tokenGetter: () => AuthService.token,
+        tokenGetter,
         whitelistedDomains: ['localhost', 'kaholo.io']
       }
-    })
+    }),
   ],
   providers: [
     UnsavedGuard,
@@ -36,7 +39,8 @@ import { AuthService } from './services/auth.service';
     Title,
     { provide: HTTP_INTERCEPTORS, useClass: KaholoHttpInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    AuthService,
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule { }
