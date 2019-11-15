@@ -8,13 +8,13 @@ import { AuthService } from '@app/services/auth.service';
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private authService: AuthService) { }
 
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
-    const token = AuthService.token;
+    const token = this.authService.token;
     if (token) {
       return true;
     }

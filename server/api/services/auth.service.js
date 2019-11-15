@@ -1,6 +1,3 @@
-const passport = require("passport");
-const JwtStrategy = require("passport-jwt").Strategy;
-const ExtractJwt = require("passport-jwt").ExtractJwt;
 const User = require("../models/user.model");
 const serverKey = process.env.SERVER_KEY;
 const userService = require("../services/user.service");

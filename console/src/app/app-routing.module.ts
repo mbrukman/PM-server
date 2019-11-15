@@ -10,13 +10,14 @@ import { NgProgressRouterModule } from '@ngx-progressbar/router';
 import { DashboardResolver } from '@core/resolver/dashboard.resolver';
 import { ResetPasswordComponent } from './core/auth/reset-password/reset-password.component';
 import { LoginComponent } from './core/auth/login/login.component';
+import { AuthGuard } from './core/auth/auth.guard';
 
 const appRoutes: Routes = [
   {
     path: '',
     component: DashboardComponent,
     resolve: { dashboardItems: DashboardResolver },
-    canActivate: [IsSetUpGuard]
+    canActivate: [IsSetUpGuard, AuthGuard]
   },
   {
     path: 'setup',

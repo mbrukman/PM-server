@@ -11,6 +11,7 @@ import { CoreModule } from '@core/core.module';
 import { IsSetUpGuard } from '@core/setup/issetup.guard';
 import { KaholoHttpInterceptor } from './http-interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ErrorInterceptor } from './core/auth/error-interceptor';
 
 
 
@@ -26,8 +27,9 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
     UnsavedGuard,
     IsSetUpGuard,
     Title,
-    { provide: HTTP_INTERCEPTORS, useClass: KaholoHttpInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: KaholoHttpInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }
