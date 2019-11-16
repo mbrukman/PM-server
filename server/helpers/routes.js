@@ -12,6 +12,9 @@ const userGroupApi = require("../api/routes/user-group.routes");
 const usersApi = require("../api/routes/user.routes");
 const authApi = require("../api/routes/auth.routes");
 
+const authMiddleware = require("./auth.middleware");
+mapsApi.use(authMiddleware);
+
 module.exports = function bootstrapApi(app) {
   app.use("/api/settings", settingsApi);
   app.use("/api/maps", mapsApi);

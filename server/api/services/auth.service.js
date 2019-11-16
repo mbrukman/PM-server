@@ -7,29 +7,10 @@ const userService = require("../services/user.service");
 const jwt = require("jsonwebtoken");
 
 class AuthService {
-  constructor() {
-    const strategyOptions = {
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: serverKey
-    };
-    passport.use(new JwtStrategy(strategyOptions, this.verify));
-  }
+  constructor() {}
 
   sign(userId) {
     return jwt.sign({ sub: userId }, serverKey);
-  }
-
-  verify(jwtPayload, done) {
-    User.findOne({ _id: jwtPayload.sub }, function(err, user) {
-      if (err) {
-        return done(err, false);
-      }
-      if (user) {
-        return done(null, user);
-      } else {
-        return done(null, false);
-      }
-    });
   }
 
   async login(email, password) {
