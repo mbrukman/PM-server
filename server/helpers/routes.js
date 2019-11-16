@@ -13,7 +13,18 @@ const usersApi = require("../api/routes/user.routes");
 const authApi = require("../api/routes/auth.routes");
 
 const authMiddleware = require("./auth.middleware");
+
 mapsApi.use(authMiddleware);
+pluginsApi.use(authMiddleware);
+triggersApi.use(authMiddleware);
+// TODO: examine agents & their auth
+// agentsApi.use(authMiddleware);
+projectsApi.use(authMiddleware);
+scheduledJobsApi.use(authMiddleware);
+vaultApi.use(authMiddleware);
+autoCompleteApi.use(authMiddleware);
+usersApi.use(authMiddleware);
+userGroupApi.use(authMiddleware);
 
 module.exports = function bootstrapApi(app) {
   app.use("/api/settings", settingsApi);
