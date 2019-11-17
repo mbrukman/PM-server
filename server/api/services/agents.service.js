@@ -43,7 +43,7 @@ function stopInterval(agent) {
  */
 async function getAgentStatus(agentKey) {
   const allAgentStatus = await getAllAgentsStatus();
-  return allAgentStatus[agentKey].status;
+  return allAgentStatus[agentKey];
 }
 
 /**
@@ -88,7 +88,17 @@ async function saveStatusToAgent(agent, agentStatus) {
     { key: agent.key },
     {
       $set: {
-        status: agentStatus
+        status: {
+          alive: agentStatus.alive,
+          following: agentStatus.following,
+          socketId: agentStatus.socketId,
+          hostname: agentStatus.hostname,
+          arch: agentStatus.arch,
+          freeSpace: agentStatus.freeSpace,
+          respTime: agentStatus.respTime,
+          installed_plugins: agentStatus.installed_plugins,
+          liveCounter: agentStatus.liveCounter
+        }
       }
     }
   );
