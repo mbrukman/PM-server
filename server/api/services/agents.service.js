@@ -64,10 +64,7 @@ async function getAllAgentsStatus() {
     agent = JSON.parse(JSON.stringify(agent));
 
     agentStatusObject[agent.key] = {};
-
-    // assign agent properties
-    Object.assign(agentStatusObject[agent.key], agent);
-
+    Object.assign(agentStatusObject[agent.key], { agentId: agent.id });
     if (!agent.status) {
       continue;
     }
