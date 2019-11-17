@@ -28,8 +28,8 @@ const FILTER_TYPES = Object.freeze({
 const runningIntervals = {};
 
 function startInterval(agent) {
-  runningIntervals[agent.key] = setInterval(async () => {
-    await followAgentStatusIntervalFunction(agent);
+  runningIntervals[agent.key] = setInterval(() => {
+    followAgentStatusIntervalFunction(agent);
   }, INTERVAL_TIME);
 }
 
@@ -112,7 +112,7 @@ async function startFollowingAgentStatus(agent) {
 
     await setDefaultUrl(agent);
   }
-  await startInterval(agent);
+  startInterval(agent);
 }
 
 /* stop following an agent */
