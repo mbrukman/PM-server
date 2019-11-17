@@ -10,14 +10,14 @@ const agentStatusSchema = new Schema({
   freeSpace: String,
   respTime: Number,
   installed_plugins: Schema.Types.Mixed,
-  liveCounter: Number
+  liveCounter: Number,
+  defaultUrl: String
 });
 
 const agentSchema = new Schema({
   name: String,
   url: { type: String, required: true },
   publicUrl: { type: String, required: true },
-  defaultUrl: String,
   key: { type: String, required: true, index: true },
   sshKey: String,
   isDeleted: Boolean,

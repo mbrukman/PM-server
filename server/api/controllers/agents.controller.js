@@ -123,11 +123,11 @@ module.exports = {
         );
         const status = Object.keys(allAgentsStatus).reduce((total, current) => {
           current = _.cloneDeep(allAgentsStatus[current]);
-          if (!current.agentId) {
+          if (!current.id) {
             return total;
           }
           delete current.socket;
-          total[current.agentId] = current;
+          total[current.id] = current;
           return total;
         }, {});
         if (status) {

@@ -64,14 +64,14 @@ async function getAllAgentsStatus() {
     agent = JSON.parse(JSON.stringify(agent));
 
     agentStatusObject[agent.key] = {};
-    Object.assign(agentStatusObject[agent.key], { agentId: agent.id });
+    Object.assign(agentStatusObject[agent.key], agent);
     if (!agent.status) {
       continue;
     }
 
     // assign status
     Object.assign(agentStatusObject[agent.key], agent.status);
-
+    delete agentStatusObject[agent.key].status;
     // create socket reference based on socketId stored in model
     agentStatusObject[agent.key].socket = socketService.socket.of(
       socketNamespaceName
@@ -80,22 +80,23 @@ async function getAllAgentsStatus() {
   return agentStatusObject;
 }
 
+function pickRelevantStatusFields(status) {
+  const statusFields = Object.keys(Agent.schema.tree.status.tree);
+  Object.keys(status).forEach(statusKey => {
+    if (!statusFields.includes(statusKey)) {
+      delete status[statusKey];
+    }
+  });
+  return status;
+}
+
 async function saveStatusToAgent(agent, agentStatus) {
+  const fieldsToUpdate = pickRelevantStatusFields(agentStatus);
   await Agent.findOneAndUpdate(
     { key: agent.key },
     {
       $set: {
-        status: {
-          alive: agentStatus.alive,
-          following: agentStatus.following,
-          socketId: agentStatus.socketId,
-          hostname: agentStatus.hostname,
-          arch: agentStatus.arch,
-          freeSpace: agentStatus.freeSpace,
-          respTime: agentStatus.respTime,
-          installed_plugins: agentStatus.installed_plugins,
-          liveCounter: agentStatus.liveCounter
-        }
+        status: fieldsToUpdate
       }
     }
   );
@@ -135,12 +136,12 @@ async function followAgentStatusIntervalFunction(agent) {
   const start = new Date();
   let agentStatus = await getAgentStatus(agent.key);
 
-  if (!agentStatus || !agent.defaultUrl) {
+  if (!agentStatus || !agentStatus.defaultUrl) {
     console.error("no defaultUrl, can't follow agent status");
     return;
   }
   request.post(
-    agent.defaultUrl + "/api/status",
+    agentStatus.defaultUrl + "/api/status",
     {
       form: {
         key: agent.key
@@ -191,17 +192,19 @@ function updateAliveAgent(agentStatus, body, start) {
   return agentStatus;
 }
 
-function setDefaultUrl(agent) {
+async function setDefaultUrl(agent) {
   return new Promise((resolve, reject) => {
     request.post(
       agent.url + "/api/status",
       { form: { key: agent.key } },
       async function(error, response, body) {
+        const agentStatus = await getAgentStatus(agent.key);
         if (error) {
-          agent.defaultUrl = agent.publicUrl;
+          agentStatus.defaultUrl = agent.publicUrl;
         } else {
-          agent.defaultUrl = agent.url;
+          agentStatus.defaultUrl = agent.url;
         }
+        await saveStatusToAgent(agent, agentStatus);
         resolve();
       }
     );
@@ -311,13 +314,13 @@ function evaluateFilter(filter, agents) {
 
 async function sendRequestToAgent(_options, agent) {
   const options = Object.assign({}, _options);
-
-  if (!agent.defaultUrl) {
-    console.error("No defaultUrl:", agent.defaultUrl);
+  const agentStatus = await getAgentStatus(agent.key);
+  if (!agentStatus.defaultUrl) {
+    console.error("No defaultUrl:", agentStatus.defaultUrl);
     return new Error("No defaultUrl");
   }
 
-  options.uri = agent.defaultUrl + options.uri;
+  options.uri = agentStatus.defaultUrl + options.uri;
   options.method = options.method || "POST";
 
   if (options.body) {
@@ -358,17 +361,18 @@ function add(agent) {
         $set: { url: agent.url, publicUrl: agent.publicUrl, isDeleted: false }
       });
     })
-    .then(async agent => {
-      await startFollowingAgentStatus(agent);
+    .then(agent => {
+      startFollowingAgentStatus(agent);
       return agent;
     });
 }
 
 // get an object of installed plugins and versions on certain agent.
 async function checkPluginsOnAgent(agent) {
+  const agentStatus = await getAgentStatus(agent.key);
   return new Promise((resolve, reject) => {
     request.post(
-      agent.defaultUrl + "/api/plugins",
+      agentStatus.defaultUrl + "/api/plugins",
       { form: { key: agent.key } },
       function(error, response, body) {
         if (error || response.statusCode !== 200) {
@@ -460,11 +464,14 @@ async function deletePluginOnAgent(name, agent) {
 
 /* restarting the agents live status, and updating the status for all agents */
 async function restartAgentsStatus() {
-  await Agent.updateMany({}, { $set: { "status.alive": false, "status.following": false } });
+  await Agent.updateMany(
+    {},
+    { $set: { "status.alive": false, "status.following": false } }
+  );
 
   await Agent.find({}).then(agents => {
-    agents.forEach(async agent => {
-      await startFollowingAgentStatus(agent);
+    agents.forEach(agent => {
+      startFollowingAgentStatus(agent);
     });
   });
 }
