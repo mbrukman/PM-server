@@ -361,8 +361,8 @@ function add(agent) {
         $set: { url: agent.url, publicUrl: agent.publicUrl, isDeleted: false }
       });
     })
-    .then(agent => {
-      startFollowingAgentStatus(agent);
+    .then(async agent => {
+      await startFollowingAgentStatus(agent);
       return agent;
     });
 }
