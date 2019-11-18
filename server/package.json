@@ -12,7 +12,8 @@
     "watch": "nodemon app.js",
     "install:all": "npm i && cd ../console && npm i",
     "eslint": "./node_modules/.bin/eslint ./api/tests",
-    "jest": "npm run jest"
+    "jest": "npm run jest",
+    "create-admin": "node ./helpers/create-admin.js"
   },
   "eslintConfig": {
     "env": {
