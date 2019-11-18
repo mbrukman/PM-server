@@ -14,30 +14,19 @@ const authApi = require("../api/routes/auth.routes");
 
 const authMiddleware = require("./auth.middleware");
 
-mapsApi.use(authMiddleware);
-pluginsApi.use(authMiddleware);
-triggersApi.use(authMiddleware);
-// TODO: examine agents & their auth
-// agentsApi.use(authMiddleware);
-projectsApi.use(authMiddleware);
-scheduledJobsApi.use(authMiddleware);
-vaultApi.use(authMiddleware);
-autoCompleteApi.use(authMiddleware);
-usersApi.use(authMiddleware);
-userGroupApi.use(authMiddleware);
-
 module.exports = function bootstrapApi(app) {
-  app.use("/api/settings", settingsApi);
-  app.use("/api/maps", mapsApi);
-  app.use("/api/plugins", pluginsApi);
-  app.use("/api/triggers", triggersApi);
+  app.use("/api/settings", authMiddleware, settingsApi);
+  app.use("/api/maps", authMiddleware, mapsApi);
+  app.use("/api/plugins", authMiddleware, pluginsApi);
+  app.use("/api/triggers", authMiddleware, triggersApi);
+  // TODO: agents auth
   app.use("/api/agents", agentsApi);
-  app.use("/api/projects", projectsApi);
-  app.use("/api/scheduled-jobs", scheduledJobsApi);
-  app.use("/api/vault", vaultApi);
-  app.use("/api/config-token", configTokenApi);
-  app.use("/api/autocomplete", autoCompleteApi);
-  app.use("/api/users", usersApi);
-  app.use("/api/user-groups", userGroupApi);
+  app.use("/api/projects", authMiddleware, projectsApi);
+  app.use("/api/scheduled-jobs", authMiddleware, scheduledJobsApi);
+  app.use("/api/vault", authMiddleware, vaultApi);
+  app.use("/api/config-token", authMiddleware, configTokenApi);
+  app.use("/api/autocomplete", authMiddleware, autoCompleteApi);
+  app.use("/api/users", authMiddleware, usersApi);
+  app.use("/api/user-groups", authMiddleware, userGroupApi);
   app.use("/api/auth", authApi);
 };
