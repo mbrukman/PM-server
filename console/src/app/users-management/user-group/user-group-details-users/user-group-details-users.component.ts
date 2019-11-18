@@ -9,7 +9,7 @@ import {UserGroupAttachUsersModalComponent} from '@app/users-management/user-gro
 import {FilterOptions} from '@shared/model/filter-options.model';
 import {User} from '@app/services/users/user.model';
 import {UserService} from '@app/services/users/user.service';
-import {ConfirmComponent} from "@shared/confirm/confirm.component";
+import {ConfirmComponent} from '@shared/confirm/confirm.component';
 
 @Component({
   selector: 'app-user-group-details-users',

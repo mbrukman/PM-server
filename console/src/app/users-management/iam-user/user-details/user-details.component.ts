@@ -15,12 +15,12 @@ import { PopupService } from '@shared/services/popup.service';
 export class UserDetailsComponent implements OnInit, OnDestroy {
 
   public user: User;
+  public user$: Observable<User>;
 
   @ViewChild(EditUserComponent)
   private editUserComponent: EditUserComponent;
 
   private mainSubscription = new Subscription();
-  private user$: Observable<User>;
 
   constructor(
     private userService: UserService,
