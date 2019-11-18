@@ -35,7 +35,7 @@ import { MapDuplicateComponent } from '@maps/map-detail/map-revisions/mapduplica
 import { PluginUploadComponent } from '@plugins/plugin-upload/plugin-upload.component';
 import { ImportModalComponent } from '@projects/project-details/import-modal/import-modal.component';
 import { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-vault-items.component';
-import { UserGroupCreateModalComponent } from '@app/users-management/user-group/user-group-list/user-group-create-modal/user-group-create-modal.component';
+import { UserGroupCreateModalComponent } from '@app/users-management/iam-user-group/user-group-list/user-group-create-modal/user-group-create-modal.component';
 import { ManagementTableComponent } from '../users-management/management-table/management-table.component';
 
 @NgModule({

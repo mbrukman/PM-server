@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { UsersManagementComponent } from './users-management.component';
 import { UsersManagementRoutingModule } from './users-management-routing.module';
 import { UsersListResolver } from './resolvers/users-list.resolver';
-import { UserGroupModule } from '@app/users-management/user-group/user-group.module';
+import { IAMUserGroup } from '@app/users-management/iam-user-group/iam-user-group';
 import { UserGroupResolver } from './resolvers/user-group.resolver';
 import { CreateUserComponent } from './iam-user/users-list/create-user/create-user.component';
 import {IAMUserModule} from '@app/users-management/iam-user/iam-user.module';
@@ -14,7 +14,7 @@ import {IAMUserModule} from '@app/users-management/iam-user/iam-user.module';
     IAMUserModule,
     CommonModule,
     UsersManagementRoutingModule,
-    UserGroupModule,
+    IAMUserGroup,
   ],
   declarations: [
     UsersManagementComponent,

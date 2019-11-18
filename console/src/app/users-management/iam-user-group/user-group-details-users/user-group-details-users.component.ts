@@ -5,7 +5,7 @@ import {forkJoin, merge, Observable, Subject, Subscription} from 'rxjs';
 import UserGroup from '@app/services/user-group/user-group.model';
 import {map, switchMap, tap} from 'rxjs/operators';
 import {BsModalService} from 'ngx-bootstrap';
-import {UserGroupAttachUsersModalComponent} from '@app/users-management/user-group/user-group-details-users/user-group-attach-users-modal/user-group-attach-users-modal.component';
+import {UserGroupAttachUsersModalComponent} from '@app/users-management/iam-user-group/user-group-details-users/user-group-attach-users-modal/user-group-attach-users-modal.component';
 import {FilterOptions} from '@shared/model/filter-options.model';
 import {User} from '@app/services/users/user.model';
 import {UserService} from '@app/services/users/user.service';

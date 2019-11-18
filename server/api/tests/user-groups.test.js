@@ -90,8 +90,8 @@ describe("All user group endpoints are working as expected.", () => {
     });
   });
 
-  describe("POST /user-group, save new user-group", () => {
-    it("should create, save and return new user-group", () => {
+  describe("POST /iam-user-group, save new iam-user-group", () => {
+    it("should create, save and return new iam-user-group", () => {
       const expected = generateGroupUser();
       testDataManager.pushToCollection(expected);
 

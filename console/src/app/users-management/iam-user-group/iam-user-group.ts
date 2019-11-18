@@ -1,6 +1,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {UserGroupListComponent} from '@app/users-management/user-group/user-group-list/user-group-list.component';
+import {UserGroupListComponent} from '@app/users-management/iam-user-group/user-group-list/user-group-list.component';
 import {ModalModule, TooltipModule} from 'ngx-bootstrap';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from '@app/shared/shared.module';
@@ -40,5 +40,5 @@ import {KhTooltipModule} from '@shared/kh-tooltip/kh-tooltip.module';
     GeneralModalTemplateModule,
   ]
 })
-export class UserGroupModule {
+export class IAMUserGroup {
 }
