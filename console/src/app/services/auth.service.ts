@@ -18,8 +18,8 @@ export class AuthService {
     localStorage.setItem('access_token', token);
   }
 
-  public login(email: string, password: string): Observable<User> {
-    return this.http.post<User>(`api/auth/login`, { email, password }, { observe: 'response' })
+  public login(email: string, password: string, keepLoggedIn: boolean): Observable<User> {
+    return this.http.post<User>(`api/auth/login`, { email, password, keepLoggedIn }, { observe: 'response' })
       .pipe(
         tap((response: HttpResponse<User>) => {
           this.saveToken(response.headers.get('authorization'));

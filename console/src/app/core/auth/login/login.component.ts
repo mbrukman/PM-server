@@ -15,13 +15,13 @@ export class LoginComponent implements OnDestroy {
   email: string;
   password: string;
   errorMessage: string;
-  keepMeLoggedIn: boolean;
   mainSubscription = new Subscription();
+  keepLoggedIn: boolean;
 
   constructor(private authService: AuthService, private router: Router) { }
 
   login() {
-    this.mainSubscription.add(this.authService.login(this.email, this.password)
+    this.mainSubscription.add(this.authService.login(this.email, this.password, this.keepLoggedIn)
       .subscribe(
         (user: User) => {
           this.router.navigateByUrl('/');

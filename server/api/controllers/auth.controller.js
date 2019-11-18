@@ -17,7 +17,7 @@ class AuthController {
 
       return res.send(error.message);
     }
-    const token = authService.sign(user.id);
+    const token = authService.sign(user.id, req.body.keepLoggedIn);
     res.header("Authorization", "Bearer " + token);
     res.status(200).send(userService.returnUserWithPickedFields(user));
   }

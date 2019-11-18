@@ -7,8 +7,10 @@ const userService = require("../services/user.service");
 const jwt = require("jsonwebtoken");
 
 class AuthService {
-  sign(userId) {
-    return jwt.sign({ sub: userId }, serverKey);
+  sign(userId, keepLoggedIn = false) {
+    // ~6 months or 24 hours
+    const expiresIn = keepLoggedIn ? "180d" : "24h";
+    return jwt.sign({ sub: userId }, serverKey, { expiresIn });
   }
 
   async login(email, password) {
