@@ -205,16 +205,29 @@ describe("User tests", () => {
         .send({ newPassword: "test2" })
         .expect(200)
         .then(({ body }) => {
-          expect(body._id).toEqual();
+          expect(body._id).toEqual(userId);
         });
     });
     it(`should respond with 400 for bad request`, () => {
+      const randomIndex = randomIdx(usersTestDataManager.collection.length);
+      const userId = usersTestDataManager.collection[randomIndex]._id;
+      const token = authService.sign(userId);
       return request(app)
         .post(`api/users/reset-password`)
+        .set("Authorization", "Bearer " + token)
         .send({})
         .expect(400)
         .then(response => {
           expect(response.text).toEqual("Missing auth or password.");
+        });
+    });
+
+    it(`should respond with 401 for no auth`, () => {
+      return request(app)
+        .post(`api/users/reset-password`)
+        .expect(401)
+        .then(response => {
+          expect(response.text).toEqual("Unauthorized.");
         });
     });
   });
