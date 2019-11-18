@@ -9,7 +9,6 @@ import {UserGroupAttachUsersModalComponent} from '@app/users-management/user-gro
 import {FilterOptions} from '@shared/model/filter-options.model';
 import {User} from '@app/services/users/user.model';
 import {UserService} from '@app/services/users/user.service';
-import {ConfirmComponent} from '@shared/confirm/confirm.component';
 
 @Component({
   selector: 'app-user-group-details-users',
@@ -53,16 +52,7 @@ export class UserGroupDetailsUsersComponent implements OnInit, OnDestroy {
   }
 
   openDetachConfirmationModal(user) {
-    const modal = this.modalService.show(ConfirmComponent, {
-      initialState: {
-        title: 'You are about to detach the user from the group...'
-      }
-    });
-    modal.content.result.subscribe((result) => {
-      if (result === modal.content.confirm) {
-        this.detachUserSubject.next(user);
-      }
-    });
+    this.detachUserSubject.next(user);
   }
 
   getDetachUser$(): Observable<UserGroup> {
