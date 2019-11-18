@@ -141,11 +141,39 @@ async function updateUser(req, res) {
   }
 }
 
+async function resetPassword(req, res) {
+  if (!req.user || !req.body.newPassword) {
+    return res.status(400).send("Missing auth or password.");
+  }
+  try {
+    const updatedUser = await userService.updateUser(req.user._id, {
+      password: req.body.newPassword
+    });
+    req.io.emit("notification", {
+      title: "Password reset",
+      message: `Password reset successful`,
+      type: "success"
+    });
+    return res
+      .status(200)
+      .send(userService.returnUserWithPickedFields(updatedUser));
+  } catch (err) {
+    req.io.emit("notification", {
+      title: "Whoops..",
+      message: `Error resetting password`,
+      type: "error"
+    });
+    winston.log("error", "Error resetting password", err);
+    return res.status(500).send(err);
+  }
+}
+
 module.exports = {
   filter,
   createUser,
   deleteUser,
   updateManyUsers,
   updateUser,
-  getUser
+  getUser,
+  resetPassword
 };
