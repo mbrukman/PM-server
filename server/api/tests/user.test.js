@@ -191,7 +191,7 @@ describe("User tests", () => {
       process.env.NODE_ENV = "auth-test";
     });
 
-    beforeAll(() => {
+    afterAll(() => {
       process.env.NODE_ENV = "test";
     });
 
