@@ -187,6 +187,14 @@ describe("User tests", () => {
   });
 
   describe("POST api/users/reset-password", () => {
+    beforeAll(() => {
+      process.env.NODE_ENV = "auth-test";
+    });
+
+    beforeAll(() => {
+      process.env.NODE_ENV = "test";
+    });
+
     it(`should respond with user for proper request`, () => {
       const randomIndex = randomIdx(usersTestDataManager.collection.length);
       const userId = usersTestDataManager.collection[randomIndex]._id;
