@@ -11,6 +11,15 @@
   border-right-color: $dropdown-border;
 }
 
+.tooltip-list {
+  list-style: none;
+  pointer-events: all !important;
+  li {
+    min-width: 30px;
+  }
+}
+
+
 .tooltip .arrow::after {
   position: absolute;
   border-color: transparent;
@@ -30,5 +39,6 @@ bs-tooltip-container {
     background-color: $kh-background;
     margin-left: 3px;
     border: 1px solid $dropdown-border;
+    max-width: 500px;
   }
 }

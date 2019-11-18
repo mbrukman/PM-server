@@ -12,8 +12,6 @@ import {GeneralModalTemplateModule} from '@shared/general-modal-template/general
 import {TableModule} from 'primeng/table';
 import {InputsModule} from '@shared/inputs/inputs.module';
 import {RouterModule} from '@angular/router';
-import {KhTooltipModule} from '@shared/kh-tooltip/kh-tooltip.module';
-
 @NgModule({
   entryComponents: [
     UserGroupAttachUsersModalComponent
@@ -32,7 +30,6 @@ import {KhTooltipModule} from '@shared/kh-tooltip/kh-tooltip.module';
     ModalModule,
     TableModule,
     RouterModule,
-    KhTooltipModule,
     InputsModule,
     SharedModule,
     ReactiveFormsModule,
@@ -40,5 +37,5 @@ import {KhTooltipModule} from '@shared/kh-tooltip/kh-tooltip.module';
     GeneralModalTemplateModule,
   ]
 })
-export class IAMUserGroup {
+export class IAMUserGroupModule {
 }

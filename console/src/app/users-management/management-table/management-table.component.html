@@ -13,8 +13,8 @@
         <ng-template let-col let-item="rowData" pTemplate="body">
           <div class="name-wrapper" *ngIf="field.value == 'name'">
             <a [routerLink]="['/admin/users-management/', name, item._id]">{{
-              item[field.value]
-            }}</a>
+                item[field.value]
+              }}</a>
           </div>
           <div
             class="name-wrapper"
@@ -22,32 +22,37 @@
           >
             <span>{{ item[field.value] }}</span>
           </div>
-          <div
+          <ng-container
             class="name-wrapper tooltip-wrapper"
             *ngIf="isArray(item[field.value])"
           >
-            <div
-              class="cube tooltiptext"
-              (mouseenter)="showToolTip($event, item[field.value].length)"
-              (mouseleave)="hideToolTip($event)"
-            >
-              {{ item[field.value].length }}
-              <div class="tooltipTemplate">
-                <div class="lists">
-                  <li *ngFor="let link of item[field.value]">
+
+            <ng-template #tooltip>
+                <ul class="tooltip-list pl-2 pr-2">
+                  <li *ngFor="let link of item[field.value]" class="pb-1 pt-1">
                     <a
+                      href=""
                       [routerLink]="[
                         '/admin/users-management/',
                         field.value,
                         link._id
                       ]"
-                      >{{ link.name }}</a
+                    >{{ link.name }}</a
                     >
                   </li>
-                </div>
-              </div>
+                </ul>
+            </ng-template>
+
+            <div
+              [tooltip]="tooltip"
+              placement="right"
+              triggers="click:click"
+              class="cube-bordered tooltiptext"
+            >
+              {{ item[field.value].length }}
             </div>
-          </div>
+
+          </ng-container>
         </ng-template>
       </p-column>
     </ng-container>
@@ -63,10 +68,10 @@
             class="material-icons hover"
             (click)="onConfirmDelete(item._id)"
             tooltip="Delete"
-            >delete_outline</i
+          >delete_outline</i
           >
           <i class="material-icons hover" (click)="onEdit(i)" tooltip="Edit"
-            >edit</i
+          >edit</i
           >
         </div>
       </ng-template>
