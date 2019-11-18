@@ -6,6 +6,8 @@
 .tooltip.bs-tooltip-right .tooltip-arrow.arrow:before {
   margin-top: -4px;
   border-width: 9px 9px 9px 0;
+  margin-right: -4px;
+  content: "";
   border-right-color: $dropdown-border;
 }
 
@@ -17,7 +19,7 @@
 
 .tooltip.bs-tooltip-right .tooltip-arrow.arrow:after {
   margin-top: -3px;
-  margin-left: 1px;
+  margin-left: 3px;
   content: "";
   border-width: 8px 8px 8px 0;
   border-right-color: $kh-background;
