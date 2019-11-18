@@ -15,13 +15,13 @@ export class LoginComponent implements OnDestroy {
   email: string;
   password: string;
   errorMessage: string;
-  subscription: Subscription;
   keepMeLoggedIn: boolean;
+  mainSubscription = new Subscription();
 
   constructor(private authService: AuthService, private router: Router) { }
 
   login() {
-    this.subscription = this.authService.login(this.email, this.password)
+    this.mainSubscription.add(this.authService.login(this.email, this.password)
       .subscribe(
         (user: User) => {
           this.router.navigateByUrl('/');
@@ -34,13 +34,10 @@ export class LoginComponent implements OnDestroy {
           }
           this.errorMessage = error.message;
         }
-      );
+      ));
   }
 
   ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    this.mainSubscription.unsubscribe();
   }
-
 }

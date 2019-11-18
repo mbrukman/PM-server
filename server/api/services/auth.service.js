@@ -7,8 +7,6 @@ const userService = require("../services/user.service");
 const jwt = require("jsonwebtoken");
 
 class AuthService {
-  constructor() {}
-
   sign(userId) {
     return jwt.sign({ sub: userId }, serverKey);
   }
