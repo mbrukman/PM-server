@@ -15,8 +15,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   email: string;
   password: string;
   errorMessage: string;
-  mainSubscription = new Subscription();
   keepLoggedIn: boolean;
+  mainSubscription = new Subscription();
   returnUrl: string;
 
   constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) {
