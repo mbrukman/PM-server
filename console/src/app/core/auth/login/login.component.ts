@@ -12,8 +12,8 @@ import { Subscription } from 'rxjs';
 })
 export class LoginComponent implements OnInit, OnDestroy {
 
-  email: string = 'tatty@tat.co';
-  password: string = 'asdf1234';
+  email: string;
+  password: string;
   errorMessage: string;
   mainSubscription = new Subscription();
   keepLoggedIn: boolean;

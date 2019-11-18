@@ -37,7 +37,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public get isUserLoggedIn(): boolean {
-    return AuthService.token ? true : false;
+    return !!AuthService.token;
   }
 
   ngOnInit() {

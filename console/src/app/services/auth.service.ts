@@ -20,7 +20,6 @@ export class AuthService {
         tap((response: HttpResponse<User>) => {
           const authorizationHeaderValue = response.headers.get('Authorization');
           if (!authorizationHeaderValue) {
-            console.log(response.headers);
             throw new Error('No Authorization header in server login response.');
           }
           this.saveToken(authorizationHeaderValue);
