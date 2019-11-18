@@ -187,25 +187,20 @@ describe("User tests", () => {
   });
 
   describe("POST api/users/reset-password", () => {
-    beforeAll(() => {
-      process.env.NODE_ENV = "auth-test";
-    });
-
-    afterAll(() => {
-      process.env.NODE_ENV = "test";
-    });
-
+    // TODO: currently these tests will only work if you
+    // change this value in auth.middleware.js:
+    // process.env.NODE_ENV === "test"
     it(`should respond with user for proper request`, () => {
       const randomIndex = randomIdx(usersTestDataManager.collection.length);
       const userId = usersTestDataManager.collection[randomIndex]._id;
       const token = authService.sign(userId);
       return request(app)
-        .post(`api/users/reset-password`)
+        .post(`/api/users/reset-password`)
         .set("Authorization", "Bearer " + token)
         .send({ newPassword: "test2" })
         .expect(200)
         .then(({ body }) => {
-          expect(body._id).toEqual(userId);
+          expect(body._id).toBe("" + userId);
         });
     });
     it(`should respond with 400 for bad request`, () => {
@@ -213,21 +208,21 @@ describe("User tests", () => {
       const userId = usersTestDataManager.collection[randomIndex]._id;
       const token = authService.sign(userId);
       return request(app)
-        .post(`api/users/reset-password`)
+        .post(`/api/users/reset-password`)
         .set("Authorization", "Bearer " + token)
         .send({})
         .expect(400)
         .then(response => {
-          expect(response.text).toEqual("Missing auth or password.");
+          expect(response.text).toEqual("Missing newPassword");
         });
     });
 
     it(`should respond with 401 for no auth`, () => {
       return request(app)
-        .post(`api/users/reset-password`)
+        .post(`/api/users/reset-password`)
         .expect(401)
         .then(response => {
-          expect(response.text).toEqual("Unauthorized.");
+          expect(response.text).toEqual("Unauthorized");
         });
     });
   });

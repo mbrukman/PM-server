@@ -142,9 +142,14 @@ async function updateUser(req, res) {
 }
 
 async function resetPassword(req, res) {
-  if (!req.user || !req.body.newPassword) {
-    return res.status(400).send("Missing auth or password.");
+  if (!req.user) {
+    return res.status(400).send("Missing auth");
   }
+
+  if (!req.body.newPassword) {
+    return res.status(400).send("Missing newPassword");
+  }
+
   try {
     const updatedUser = await userService.updateUser(req.user._id, {
       password: req.body.newPassword
