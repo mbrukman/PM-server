@@ -4,6 +4,7 @@ const User = require("../models/user.model");
 const TestDataManager = require("../tests/factories/test-data-manager");
 const app = "localhost:3000";
 const { randomIdx } = require("./helpers");
+const authService = require("../services/auth.service");
 
 describe("User tests", () => {
   const usersTestDataManager = new TestDataManager(User);
@@ -181,6 +182,31 @@ describe("User tests", () => {
         .expect(500)
         .then(({ body }) => {
           expect(body.name).toEqual("CastError");
+        });
+    });
+  });
+
+  describe("POST api/users/reset-password", () => {
+    it(`should respond with user for proper request`, () => {
+      const randomIndex = randomIdx(usersTestDataManager.collection.length);
+      const userId = usersTestDataManager.collection[randomIndex]._id;
+      const token = authService.sign(userId);
+      return request(app)
+        .post(`api/users/reset-password`)
+        .set("Authorization", "Bearer " + token)
+        .send({ newPassword: "test2" })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body._id).toEqual();
+        });
+    });
+    it(`should respond with 400 for bad request`, () => {
+      return request(app)
+        .post(`api/users/reset-password`)
+        .send({})
+        .expect(400)
+        .then(response => {
+          expect(response.text).toEqual("Missing auth or password.");
         });
     });
   });
