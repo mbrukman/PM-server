@@ -3,6 +3,7 @@ const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 const User = require("../api/models/user.model");
 const serverKey = process.env.SERVER_KEY;
+const getEnvHelper = require("./get-env");
 
 function verify(jwtPayload, done) {
   User.findOne({ _id: jwtPayload.sub }, function(err, user) {
@@ -23,7 +24,7 @@ const strategyOptions = {
 passport.use(new JwtStrategy(strategyOptions, verify));
 
 function authMiddleware(req, res, next) {
-  if (req.method === "OPTIONS" || process.env.NODE_ENV === "test") {
+  if (req.method === "OPTIONS" || getEnvHelper.isTestEnvironment()) {
     next();
     return;
   }

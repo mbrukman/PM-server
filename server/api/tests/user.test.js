@@ -187,9 +187,8 @@ describe("User tests", () => {
   });
 
   describe("POST api/users/reset-password", () => {
-    // TODO: currently these tests will only work if you
-    // change this value in auth.middleware.js:
-    // process.env.NODE_ENV === "test"
+    // TODO: currently these tests will only work if
+    // getEnvHelper.isTestEnvironment() is false
     it(`should respond with user for proper request`, () => {
       const randomIndex = randomIdx(usersTestDataManager.collection.length);
       const userId = usersTestDataManager.collection[randomIndex]._id;
