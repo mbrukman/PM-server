@@ -36,6 +36,10 @@ export class LoginComponent implements OnInit, OnDestroy {
       .subscribe(
         (user: User) => {
           if (user) {
+            if (user.changePasswordOnNextLogin === true) {
+              this.router.navigateByUrl('/reset-password');
+              return;
+            }
             this.router.navigateByUrl('/');
           } else {
             throw new Error('No user returned for server');
