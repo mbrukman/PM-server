@@ -52,7 +52,7 @@ export class UserService {
 
   getUser(userId: string, fields?: object, filterOptions?: UserFilterOptions): Observable<User> {
     const params = this.createFilterQuery(fields, filterOptions);
-    return this.http.get<User>(`api/users/${userId}`, {params: params});
+    return this.http.get<User>(`api/users/${userId}`, { params: params });
   }
 
   deleteUser(userId: string): Observable<any> {
@@ -64,10 +64,8 @@ export class UserService {
     return this.http.patch<User>(`api/users/${userId}`, userData);
   }
 
-  changeUserPassword(newPassword: string): Observable<boolean> {
-    // by using angular-jwt, auth is added to each http request
-    // user's id is in the payload of that auth, so we send only the new password
-    return this.http.post<boolean>(`api/users/reset-password`, { password: newPassword });
+  resetPassword(newPassword: string): Observable<User> {
+    return this.http.post<User>(`api/users/reset-password`, { newPassword });
   }
 
   createUser(userData: UserDataInterface): Observable<User> {
