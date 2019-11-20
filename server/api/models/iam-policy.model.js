@@ -11,6 +11,6 @@ const iamPolicySchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "User" }
 });
 
-const IAMPolicy = mongoose.model("IAMPolicy", iamPolicySchema, "iamPolicy");
+const IAMPolicy = mongoose.model("IAMPolicy", iamPolicySchema, "iamPolicies");
 
 module.exports = IAMPolicy;
