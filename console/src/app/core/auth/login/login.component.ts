@@ -51,7 +51,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.errorMessage = 'Error connecting to server.';
             return;
           }
-          this.errorMessage = error.message || error.name;
+          this.errorMessage = error.toString();
         }
       ));
   }
