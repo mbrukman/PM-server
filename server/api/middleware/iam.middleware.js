@@ -3,6 +3,9 @@ const _ = require("lodash");
 
 async function checkPolicy(req, policy) {
   const user = await User.findById(req.user);
+  if (user.isAdmin === true) {
+    return true;
+  }
   const foundPolicy = _.get(user.toObject(), policy);
   return foundPolicy === true;
 }
