@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef} from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { User } from '@app/services/users/user.model';
 import { UserService } from '@app/services/users/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import {Observable, Subscription} from 'rxjs';
-import {switchMap, filter, tap} from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { switchMap, filter, tap } from 'rxjs/operators';
 import { EditUserComponent } from '../users-list/edit-user/edit-user.component';
 import { PopupService } from '@shared/services/popup.service';
 
@@ -41,14 +41,14 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     const confirm = 'Yes, delete.';
     this.mainSubscription.add(
       this.popupService.openConfirm('Are you sure?',
-        'Are you sure you want to delete the user: ' + this.user.name , confirm, null, null)
+        'Are you sure you want to delete the user: ' + this.user.name, confirm, null, null)
         .pipe(
-          filter( result => result === confirm),
+          filter(result => result === confirm),
           switchMap(() => this.userService.deleteUser(this.user._id))
         ).subscribe(() => {
-        alert('User ' + this.user.name + ' has been deleted.');
-        this.router.navigateByUrl('/admin/users-management/users');
-      })
+          alert('User ' + this.user.name + ' has been deleted.');
+          this.router.navigateByUrl('/admin/users-management/users');
+        })
     );
   }
 
@@ -59,6 +59,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
           this.user = updatedUser;
         })
     );
+  }
+
+  savePolicies() {
+    // this.userService.updatePolicies();
   }
 
   ngOnDestroy(): void {

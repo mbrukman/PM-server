@@ -1,0 +1,30 @@
+<div class="policy-container p-2 mt-3">
+  <div class="policy-toggle">
+    <app-checkbox
+      [label]="'IAM'"
+      (onChange)="toggleWholePolicy($event)"
+    ></app-checkbox>
+  </div>
+  <div class="permission-toggles ml-3 d-flex justify-content-start">
+    <app-checkbox
+      class="mr-2"
+      [label]="'Read'"
+      (onChange)="togglePermission('read', $event)"
+    ></app-checkbox>
+    <app-checkbox
+      class="mr-2"
+      [label]="'Create'"
+      (onChange)="togglePermission('create', $event)"
+    ></app-checkbox>
+    <app-checkbox
+      class="mr-2"
+      [label]="'Update'"
+      (onChange)="togglePermission('update', $event)"
+    ></app-checkbox>
+    <app-checkbox
+      class="mr-2"
+      [label]="'Delete'"
+      (onChange)="togglePermission('remove', $event)"
+    ></app-checkbox>
+  </div>
+</div>

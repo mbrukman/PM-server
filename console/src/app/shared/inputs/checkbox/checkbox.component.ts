@@ -1,6 +1,6 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BasicInputComponent} from '@shared/inputs/basic-text-input/basic-input.component';
-import {fromEvent, Subscription} from 'rxjs';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, Input } from '@angular/core';
+import { BasicInputComponent } from '@shared/inputs/basic-text-input/basic-input.component';
+import { fromEvent, Subscription } from 'rxjs';
 import ChangeEvent = JQuery.ChangeEvent;
 
 @Component({
@@ -11,6 +11,8 @@ import ChangeEvent = JQuery.ChangeEvent;
 export class CheckboxComponent extends BasicInputComponent implements OnInit, OnDestroy {
   @ViewChild('checkboxInput') filterInput: ElementRef;
   private subscription: Subscription;
+
+  @Input() label: string;
 
   constructor() {
     super();
