@@ -32,7 +32,8 @@ async function createAdmin() {
       name,
       email,
       password,
-      changePasswordOnNextLogin: true
+      changePasswordOnNextLogin: true,
+      isAdmin: true
     });
     console.log(
       "\x1b[35m",

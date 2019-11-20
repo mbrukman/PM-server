@@ -17,7 +17,8 @@ const userSchema = new Schema(
     password: { type: String },
     groups: [{ type: Schema.Types.ObjectId, ref: "UserGroup" }],
     // projectPolicy: { type: Schema.Types.ObjectId, ref: "Policy" },
-    iamPolicy: { type: Schema.Types.ObjectId, ref: "IAMPolicy" }
+    iamPolicy: { type: Schema.Types.ObjectId, ref: "IAMPolicy" },
+    isAdmin: Boolean
   },
   { timestamps: true }
 );
