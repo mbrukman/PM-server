@@ -6,9 +6,21 @@ const iamMiddleware = require("../middleware/iam.middleware");
 
 router.get("/", userController.filter);
 router.post("/", iamMiddleware.checkCreatePolicy, userController.createUser);
-router.delete("/:id", userController.deleteUser);
-router.patch("/:id", userController.updateUser);
-router.patch("/", userController.updateManyUsers);
+router.delete(
+  "/:id",
+  iamMiddleware.checkRemovePolicy,
+  userController.deleteUser
+);
+router.patch(
+  "/:id",
+  iamMiddleware.checkUpdatePolicy,
+  userController.updateUser
+);
+router.patch(
+  "/",
+  iamMiddleware.checkUpdatePolicy,
+  userController.updateManyUsers
+);
 router.get("/:id", userController.getUser);
 router.post("/reset-password", userController.resetPassword);
 
