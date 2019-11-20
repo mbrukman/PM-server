@@ -15,7 +15,7 @@ export class UsersManagementComponent implements OnInit {
       { name: 'Dashboard', routerLink: ['*'] },
       { name: 'Users', routerLink: ['users'] },
       { name: 'Groups', routerLink: ['groups'] },
-      { name: 'Policies', routerLink: ['policies'] }
+      { name: 'Plugin Policies', routerLink: ['policies'] }
     ];
   }
 
