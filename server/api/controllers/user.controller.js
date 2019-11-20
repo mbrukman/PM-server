@@ -1,18 +1,5 @@
 const userService = require("../services/user.service");
 const winston = require("winston");
-const _ = require("lodash");
-
-function returnUserWithPickedFields(userDocument) {
-  return _.pick(userDocument, [
-    "_id",
-    "name",
-    "email",
-    "groups",
-    "createdAt",
-    "phoneNumber",
-    "changePasswordOnNextLogin"
-  ]);
-}
 
 function parseQuery(req) {
   const { query } = req;
