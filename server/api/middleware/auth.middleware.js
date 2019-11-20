@@ -1,9 +1,9 @@
 const passport = require("passport");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
-const User = require("../api/models/user.model");
+const User = require("../models/user.model");
 const serverKey = process.env.SERVER_KEY;
-const getEnvHelper = require("./get-env");
+const getEnvHelper = require("../../helpers/get-env");
 
 function verify(jwtPayload, done) {
   User.findOne({ _id: jwtPayload.sub }, function(err, user) {
