@@ -25,7 +25,7 @@ const projectPermissionsSchema = new Schema({
 
 const policySchema = new Schema(
   {
-    IAM: new Schema({
+    iam: new Schema({
       read: { type: Boolean, default: false },
       create: { type: Boolean, default: false },
       update: { type: Boolean, default: false },
