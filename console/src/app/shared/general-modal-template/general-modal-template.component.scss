@@ -1,6 +1,7 @@
 .modal-content {
   padding-top: 14px;
   padding-bottom: 39px;
+  border: none;
   .modal-header {
     padding-bottom: 19px;
     .modal-title {
@@ -15,5 +16,10 @@
       cursor: pointer;
       margin: -20px -15px -15px -40px;
     }
+  }
+  .modal-footer {
+    border-top: none;
+    padding-right: 30px !important;
+    padding-bottom: 0;
   }
 }

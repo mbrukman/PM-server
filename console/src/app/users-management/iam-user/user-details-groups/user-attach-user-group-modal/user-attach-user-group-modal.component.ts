@@ -86,6 +86,14 @@ export class UserAttachUserGroupModalComponent implements OnInit, OnDestroy {
     });
   }
 
+  onAction(e: string){
+    if (e === 'save') {
+      this.saveGroups();
+    }else {
+      this.bsModalRef.hide();
+    }
+  }
+
   saveGroups() {
     forkJoin(
       this.prepareUserGroups(),

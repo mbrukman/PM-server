@@ -12,4 +12,6 @@
   flex: 5;
 }
 
-@include table_popup();
+.table-wrapper {
+  @include table_popup();
+}
