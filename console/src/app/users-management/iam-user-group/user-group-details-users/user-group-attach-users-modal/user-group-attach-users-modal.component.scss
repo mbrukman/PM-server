@@ -3,6 +3,10 @@
 :host {
   max-height: 580px;
 
+  .filter {
+    padding-left: 0;
+  }
+
   .form-control {
     max-width: 195px;
   }
