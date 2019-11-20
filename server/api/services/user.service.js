@@ -81,6 +81,7 @@ class UserService {
   updateUser(_id, newUserData) {
     if (newUserData.password) {
       newUserData.password = this.hashPassword(newUserData.password);
+      newUserData.changePasswordOnNextLogin = false;
     }
     return User.findOneAndUpdate(
       { _id },
