@@ -1,11 +1,8 @@
-<app-general-modal-template
-  modalTitle="Attach Users"
-  [modalRef]="bsModalRef">
-
+<app-general-modal-template modalTitle="Attach Users" [modalRef]="bsModalRef">
   <div class="row mb-2 mt-2">
     <app-filter-text-input
-    (onChange)="filterUsers($event)"
-    placeholder="Search"
+      (onChange)="filterUsers($event)"
+      placeholder="Search"
     ></app-filter-text-input>
   </div>
 
@@ -20,22 +17,33 @@
     <ng-template pTemplate="header">
       <tr>
         <th class="w-10"></th>
-        <th [pSortableColumn]="'name'" class="w-90">
+        <th [pSortableColumn]="'name'" class="w-90 font-weight-normal">
           Users
-          <p-sortIcon [field]="'name'"></p-sortIcon></th>
+          <p-sortIcon [field]="'name'"></p-sortIcon>
+        </th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-user>
       <tr>
         <td rowspan="1">
-          <app-checkbox (onChange)="userSubject.next([$event, user])"></app-checkbox>
+          <app-checkbox
+            (onChange)="userSubject.next([$event, user])"
+          ></app-checkbox>
         </td>
-        <td colspan="4">{{user.name}}</td>
+        <td colspan="4">{{ user.name }}</td>
       </tr>
     </ng-template>
   </p-table>
   <div class="btn-container w-100 d-flex justify-content-end mt-3">
-    <button class="kh-btn kh-btn-gray" (click)="bsModalRef.hide()">Cancel</button>
-    <button class="kh-btn kh-btn-blue" [disabled]="!newUsersCollectionLength" (click)="saveGroups()">Save</button>
+    <button class="kh-btn kh-btn-gray" (click)="bsModalRef.hide()">
+      Cancel
+    </button>
+    <button
+      class="kh-btn kh-btn-blue"
+      [disabled]="!newUsersCollectionLength"
+      (click)="saveGroups()"
+    >
+      Save
+    </button>
   </div>
 </app-general-modal-template>
