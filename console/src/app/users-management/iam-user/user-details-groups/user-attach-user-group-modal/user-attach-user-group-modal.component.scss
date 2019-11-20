@@ -1,3 +1,15 @@
+@import "~src/assets/sass/_mixins";
+@import "~src/assets/sass/_variables";
+
 .filter {
   padding-left: 0;
 }
+
+.name {
+  flex: 4;
+}
+.description {
+  flex: 5;
+}
+
+@include table_popup();

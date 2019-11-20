@@ -1,5 +1,68 @@
 @import "~src/assets/sass/variables";
 
+@mixin custom_scrollbar() {
+  &::-webkit-scrollbar {
+    width: 18px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-right: 6px solid rgba(0, 0, 0, 0);
+    border-left: 6px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: 7px;
+    background-color: $cool-grey;
+    box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.05),
+      inset 1px 1px 0px rgba(0, 0, 0, 0.05);
+  }
+  &::-webkit-scrollbar-button {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+  &::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+}
+
+@mixin table_popup() {
+  ::ng-deep {
+    p-table {
+      table {
+        width: 100%;
+      }
+
+      tbody,
+      tr {
+        display: block;
+      }
+
+      tr {
+        border-bottom: 1px solid $cool-grey;
+        padding-top: 4px;
+        display: flex;
+        align-items: center;
+        th,
+        td {
+          border-bottom: none !important;
+        }
+      }
+
+      tr:after {
+        content: " ";
+        display: block;
+        visibility: hidden;
+        clear: both;
+      }
+
+      tbody {
+        max-height: 244px;
+        overflow-y: auto;
+        @include custom_scrollbar();
+      }
+    }
+  }
+}
+
 @mixin users-page() {
   @include page-list-items();
 
