@@ -25,12 +25,6 @@ const projectPermissionsSchema = new Schema({
 
 const policySchema = new Schema(
   {
-    iam: new Schema({
-      read: { type: Boolean, default: false },
-      create: { type: Boolean, default: false },
-      update: { type: Boolean, default: false },
-      remove: { type: Boolean, default: false }
-    }),
     projects: [projectPermissionsSchema],
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
   },
@@ -40,6 +34,10 @@ const policySchema = new Schema(
 // policySchema.statics.autocompleteKey = "name";
 policySchema.statics.autocompleteValueField = "_id";
 
-const Policy = mongoose.model("Project", policySchema, "projects");
+const ProjectPolicy = mongoose.model(
+  "ProjectPolicy",
+  projectPolicySchema,
+  "projectPolicy"
+);
 
-module.exports = Policy;
+module.exports = ProjectPolicy;

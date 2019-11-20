@@ -11,6 +11,7 @@ const autoCompleteApi = require("../api/routes/autocomplete.routes");
 const userGroupApi = require("../api/routes/user-group.routes");
 const usersApi = require("../api/routes/user.routes");
 const authApi = require("../api/routes/auth.routes");
+const iamPoliciesApi = require("../api/routes/iam-policies.routes");
 
 const authMiddleware = require("../api/middleware/auth.middleware");
 
@@ -18,6 +19,7 @@ module.exports = function bootstrapApi(app) {
   app.use("/api/settings", authMiddleware, settingsApi);
   app.use("/api/maps", authMiddleware, mapsApi);
   app.use("/api/plugins", authMiddleware, pluginsApi);
+  app.use("/api/iam-policies", authMiddleware, iamPoliciesApi);
   app.use("/api/triggers", authMiddleware, triggersApi);
   // TODO: agents auth
   app.use("/api/agents", agentsApi);

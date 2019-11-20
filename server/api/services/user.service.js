@@ -1,4 +1,5 @@
 const User = require("../models/user.model");
+const IAMPolicy = require("../models/iam-policy.model");
 const crypto = require("crypto");
 const serverKey = process.env.SERVER_KEY;
 const mongoose = require("mongoose");
@@ -22,9 +23,13 @@ class UserService {
     return hash.digest("hex");
   }
 
-  createUser(userData) {
+  async createUser(userData) {
     const user = new User(userData);
+    const iamPolicy = new IAMPolicy();
+    iamPolicy.user = user._id;
+    user.iamPolicy = iamPolicy;
     user.password = this.hashPassword(user.password);
+    await iamPolicy.save();
     return user.save();
   }
 
@@ -58,14 +63,19 @@ class UserService {
       limit: filterOptions.options.limit || pageSize
     };
 
-    return User.findById(userId).populate({
-      path: "groups",
-      match,
-      options,
-      populate: {
-        path: "users"
+    return User.findById(userId).populate([
+      {
+        path: "iamPolicy"
+      },
+      {
+        path: "groups",
+        match,
+        options,
+        populate: {
+          path: "users"
+        }
       }
-    });
+    ]);
   }
 
   updateUser(_id, newUserData) {
@@ -164,9 +174,14 @@ class UserService {
 
     try {
       const users = await User.aggregate(resultsQuery);
-      const populatedUsers = await User.populate(users, {
-        path: "groups"
-      });
+      const populatedUsers = await User.populate(users, [
+        {
+          path: "groups"
+        },
+        {
+          path: "iamPolicy"
+        }
+      ]);
       const totalUsersLength = await User.aggregate(countQuery);
       return {
         items: populatedUsers,
@@ -187,6 +202,7 @@ class UserService {
       "name",
       "email",
       "groups",
+      "iamPolicy",
       "createdAt",
       "phoneNumber",
       "changePasswordOnNextLogin"
