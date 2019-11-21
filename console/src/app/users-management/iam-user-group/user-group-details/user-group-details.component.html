@@ -1,5 +1,5 @@
 <div *ngIf="userGroup$ | async as userGroup">
-  <div class="title">
+  <div class="title mb-3">
     <h5 class="d-flex align-items-center">
       <i class="kh-orange-text material-icons">
         group
@@ -8,11 +8,14 @@
       <i class="kh-orange-text material-icons pr-2">
         arrow_right_alt
       </i>
-      {{userGroup.name}}</h5>
+      {{ userGroup.name }}
+    </h5>
   </div>
   <tabset>
     <tab heading="Users" customClass="kh-tab">
-      <app-user-group-details-users [getGroup$]="userGroup$"></app-user-group-details-users>
+      <app-user-group-details-users
+        [getGroup$]="userGroup$"
+      ></app-user-group-details-users>
     </tab>
     <tab customClass="kh-tab" heading="Policies">
       Nothing yet.

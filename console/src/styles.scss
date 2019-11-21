@@ -42,7 +42,7 @@ body {
   max-height: 444px;
   overflow-y: scroll;
   margin: 0;
-  padding: 0;
+  padding: 15px;
   @include custom_scrollbar();
   li {
     list-style-type: none;

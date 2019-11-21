@@ -6,4 +6,11 @@
     margin-right: 5px;
   }
 }
+
+::ng-deep {
+  bs-tooltip-container {
+    z-index: 0 !important;
+  }
+}
+
 @include user-table();
