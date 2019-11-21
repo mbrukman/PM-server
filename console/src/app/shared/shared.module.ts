@@ -37,6 +37,7 @@ import { ImportModalComponent } from '@projects/project-details/import-modal/imp
 import { UpsertVaultItemsComponent} from '../vault/upsert-vault-items/upsert-vault-items.component';
 import { UserGroupCreateModalComponent } from '@app/users-management/iam-user-group/user-group-list/user-group-create-modal/user-group-create-modal.component';
 import { ManagementTableComponent } from '../users-management/management-table/management-table.component';
+import {PermissionsCheckDirective} from "@shared/directives/permissions-check.directive";
 
 @NgModule({
   imports: [
@@ -84,6 +85,7 @@ import { ManagementTableComponent } from '../users-management/management-table/m
     UpsertVaultItemsComponent,
     UserGroupCreateModalComponent,
     ManagementTableComponent,
+    PermissionsCheckDirective,
 
   ],
   exports: [
