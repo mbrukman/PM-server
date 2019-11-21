@@ -8,7 +8,9 @@ import { Subject } from 'rxjs';
 })
 export class PolicyComponent implements OnInit {
 
-  public policyToggled: Subject<boolean> = new Subject<boolean>();
+  public toggleCheckboxes: Subject<boolean> = new Subject<boolean>();
+
+  public policyValue: Policy = { create: false, read: false, update: false, remove: false };
 
   constructor() { }
 
@@ -16,13 +18,16 @@ export class PolicyComponent implements OnInit {
   }
 
   toggleWholePolicy(newValue: boolean) {
-    console.log(newValue);
-    this.policyToggled.next(newValue);
+    this.toggleCheckboxes.next(newValue);
+    for (const policy in this.policyValue) {
+      if (this.policyValue.hasOwnProperty(policy)) {
+        this.policyValue[policy] = newValue;
+      }
+    }
   }
 
   togglePermission(permissionName: string, newValue: boolean) {
-    console.log(permissionName, newValue);
-    throw new Error('not implemented');
+    this.policyValue[permissionName] = newValue;
   }
 
 }

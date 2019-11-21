@@ -10,25 +10,25 @@
       class="mr-2"
       [label]="'Read'"
       (onChange)="togglePermission('read', $event)"
-      [toggle]="policyToggled"
+      [toggle]="toggleCheckboxes"
     ></app-checkbox>
     <app-checkbox
       class="mr-2"
       [label]="'Create'"
       (onChange)="togglePermission('create', $event)"
-      [toggle]="policyToggled"
+      [toggle]="toggleCheckboxes"
     ></app-checkbox>
     <app-checkbox
       class="mr-2"
       [label]="'Update'"
       (onChange)="togglePermission('update', $event)"
-      [toggle]="policyToggled"
+      [toggle]="toggleCheckboxes"
     ></app-checkbox>
     <app-checkbox
       class="mr-2"
       [label]="'Delete'"
       (onChange)="togglePermission('remove', $event)"
-      [toggle]="policyToggled"
+      [toggle]="toggleCheckboxes"
     ></app-checkbox>
   </div>
 </div>
