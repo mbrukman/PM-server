@@ -1,8 +1,9 @@
 <div class="policy-container p-2 mt-3">
   <div class="policy-toggle">
     <app-checkbox
-      [label]="'IAM'"
+      [label]="name"
       (onChange)="toggleWholePolicy($event)"
+      [checked]="wholePolicyTrue"
     ></app-checkbox>
   </div>
   <div class="permission-toggles ml-3 d-flex justify-content-start">
@@ -10,24 +11,28 @@
       class="mr-2"
       [label]="'Read'"
       (onChange)="togglePermission('read', $event)"
+      [checked]="policyValue.read"
       [toggle]="toggleCheckboxes"
     ></app-checkbox>
     <app-checkbox
       class="mr-2"
       [label]="'Create'"
       (onChange)="togglePermission('create', $event)"
+      [checked]="policyValue.create"
       [toggle]="toggleCheckboxes"
     ></app-checkbox>
     <app-checkbox
       class="mr-2"
       [label]="'Update'"
       (onChange)="togglePermission('update', $event)"
+      [checked]="policyValue.update"
       [toggle]="toggleCheckboxes"
     ></app-checkbox>
     <app-checkbox
       class="mr-2"
       [label]="'Delete'"
       (onChange)="togglePermission('remove', $event)"
+      [checked]="policyValue.remove"
       [toggle]="toggleCheckboxes"
     ></app-checkbox>
   </div>

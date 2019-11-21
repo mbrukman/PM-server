@@ -12,7 +12,10 @@
 
   <tabset>
     <tab heading="Policies" customClass="kh-tab">
-      <app-policy></app-policy>
+      <app-policy
+        [name]="'IAM'"
+        [policyValue]="user.iamPolicy.permissions"
+      ></app-policy>
     </tab>
     <tab heading="Groups" customClass="kh-tab">
       <app-user-details-groups [getUser$]="user$"></app-user-details-groups>
