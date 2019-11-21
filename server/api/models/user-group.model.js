@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const groupSchema = new Schema({
   name: { type: String, required: true },
   description: { type: String },
+  iamPolicy: { type: Schema.Types.ObjectId, ref: "IAMPolicy" },
   users: [{ type: Schema.Types.ObjectId, ref: "User" }]
 });
 

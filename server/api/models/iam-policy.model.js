@@ -8,7 +8,8 @@ const iamPolicySchema = new Schema({
     update: { type: Boolean, default: false },
     remove: { type: Boolean, default: false }
   },
-  user: { type: Schema.Types.ObjectId, ref: "User" }
+  user: { type: Schema.Types.ObjectId, ref: "User" },
+  group: { type: Schema.Types.ObjectId, ref: "UserGroup" }
 });
 
 const IAMPolicy = mongoose.model("IAMPolicy", iamPolicySchema, "iamPolicies");
