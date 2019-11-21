@@ -53,14 +53,19 @@ class UserGroupService {
       limit: filterOptions.options.limit || pageSize
     };
 
-    return UserGroupModel.findById(_id).populate({
-      path: "users",
-      match,
-      options,
-      populate: {
-        path: "groups"
+    return UserGroupModel.findById(_id).populate([
+      {
+        path: "users",
+        match,
+        options,
+        populate: {
+          path: "groups"
+        }
+      },
+      {
+        path: "iamPolicy"
       }
-    });
+    ]);
   }
 
   patch(_id, objectToUpdate) {
@@ -137,9 +142,14 @@ class UserGroupService {
         }
       ];
       const groups = await UserGroupModel.aggregate(resultsQuery);
-      const populatedGroups = await UserGroupModel.populate(groups, {
-        path: "users"
-      });
+      const populatedGroups = await UserGroupModel.populate(groups, [
+        {
+          path: "users"
+        },
+        {
+          path: "iamPolicy"
+        }
+      ]);
       const totalGroupLength = await UserGroupModel.aggregate(countQuery);
       return {
         items: populatedGroups,
