@@ -14,8 +14,18 @@
     <tab heading="Policies" customClass="kh-tab">
       <app-policy
         [name]="'IAM'"
-        [policyValue]="user.iamPolicy.permissions"
+        [permissions]="user.iamPolicy.permissions"
+        [policy]="iamPolicy"
       ></app-policy>
+      <div class="buttons">
+        <button
+          type="submit"
+          class="kh-btn kh-btn-blue ml-4 float-right"
+          (click)="savePolicies()"
+        >
+          Save
+        </button>
+      </div>
     </tab>
     <tab heading="Groups" customClass="kh-tab">
       <app-user-details-groups [getUser$]="user$"></app-user-details-groups>
