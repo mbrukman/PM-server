@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Subject } from 'rxjs';
+import { Permissions } from './permissions.interface';
 
 @Component({
   selector: 'app-policy',
@@ -12,7 +13,7 @@ export class PolicyComponent implements OnInit {
 
   // public policyValue: Policy = { create: false, read: false, update: false, remove: false };
   @Input() name: String;
-  @Input() policyValue: Policy = { create: false, read: false, update: false, remove: false };
+  @Input() policyValue: Permissions = { create: false, read: false, update: false, remove: false };
   constructor() { }
 
   get wholePolicyTrue() {
@@ -32,7 +33,7 @@ export class PolicyComponent implements OnInit {
     }
   }
 
-  updateCheckboxes(newValue: Policy) {
+  updateCheckboxes(newValue: Permissions) {
 
   }
 
