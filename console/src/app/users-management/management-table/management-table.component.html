@@ -45,6 +45,7 @@
             <div
               [tooltip]="tooltip"
               placement="right"
+              [isDisabled]="!item[field.value].length"
               triggers="click:click"
               class="cube-bordered tooltiptext"
             >

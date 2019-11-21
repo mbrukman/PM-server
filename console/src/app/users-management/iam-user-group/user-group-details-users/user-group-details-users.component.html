@@ -31,7 +31,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-user>
       <ng-template #tooltip>
-        <ul class="tooltip-list" *ngIf="user.groups.length">
+        <ul class="tooltip-list">
           <li *ngFor="let userGroup of user.groups" class="pb-1 pt-1">
             <a
               href=""
@@ -52,6 +52,7 @@
           <div
             class="cube-bordered"
             [tooltip]="tooltip"
+            [isDisabled]="!user.groups.length"
             triggers="click:click"
             placement="right"
           >
