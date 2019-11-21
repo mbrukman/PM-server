@@ -14,8 +14,8 @@ export class AuthService {
     return localStorage.getItem('access_token');
   }
 
-  static get resetPasswordFulfilled(): string {
-    return localStorage.getItem('resetPasswordFulfilled');
+  static get resetPasswordUnfulfilled(): string {
+    return localStorage.getItem('resetPasswordUnfulfilled');
   }
 
   public login(email: string, password: string, keepLoggedIn: boolean): Observable<User> {

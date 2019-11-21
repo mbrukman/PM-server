@@ -14,7 +14,7 @@ export class AuthGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
-    if (AuthService.token && (AuthService.resetPasswordFulfilled === 'true')) {
+    if (AuthService.token && (AuthService.resetPasswordUnfulfilled === null)) {
       return true;
     }
     if (!AuthService.token) {

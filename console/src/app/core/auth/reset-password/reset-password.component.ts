@@ -22,11 +22,11 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private router: Router
   ) {
-    if (AuthService.token && (AuthService.resetPasswordFulfilled === 'true')) {
-      this.router.navigate(['/']);
-    }
     if (!AuthService.token) {
       this.router.navigate(['/login']);
+    }
+    if (AuthService.token && (AuthService.resetPasswordUnfulfilled === null)) {
+      this.router.navigate(['/']);
     }
   }
 
@@ -56,7 +56,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
           .subscribe(
             user => {
               if (user) {
-                localStorage.setItem('resetPasswordFulfilled', 'true');
+                localStorage.removeItem('resetPasswordUnfulfilled');
                 this.router.navigateByUrl('/');
               }
             },
