@@ -18,7 +18,22 @@
       ></app-user-group-details-users>
     </tab>
     <tab customClass="kh-tab" heading="Policies">
-      Nothing yet.
+      <div class="iam-policy">
+        <app-policy
+          [name]="'IAM'"
+          [permissions]="userGroup.iamPolicy.permissions"
+          [policy]="iamPolicy"
+        ></app-policy>
+        <div class="buttons">
+          <button
+            type="submit"
+            class="kh-btn kh-btn-blue ml-4 float-right"
+            (click)="saveIAMPolicy()"
+          >
+            Save
+          </button>
+        </div>
+      </div>
     </tab>
     <tab heading="Settings" customClass="kh-tab">
       Nothing yet.

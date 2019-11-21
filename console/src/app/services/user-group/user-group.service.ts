@@ -1,17 +1,18 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   UserGroupDataInterface,
   UserGroupPatchableDataInterface
 } from '@app/services/user-group/user-group-data.interface';
 import UserGroup from '@app/services/user-group/user-group.model';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
-import {FilterOptions} from '@app/shared/model/filter-options.model';
-import {IEntityList} from '@app/shared/interfaces/entity-list.interface';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { FilterOptions } from '@app/shared/model/filter-options.model';
+import { IEntityList } from '@app/shared/interfaces/entity-list.interface';
 import RemoveResponseInterface from '@shared/interfaces/remove-response.interface';
+import { IAMPolicy } from '../policy/iam-policy.interface';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class UserGroupService {
 
   constructor(private http: HttpClient) {
@@ -34,7 +35,7 @@ export class UserGroupService {
 
   getOne(id: string, filter?: FilterOptions) {
     const params = this.createFilterQuery(null, filter);
-    return this.http.get<UserGroup>(`api/user-groups/${id}`, {params})
+    return this.http.get<UserGroup>(`api/user-groups/${id}`, { params })
       .pipe(map(userGroup => new UserGroup(userGroup)));
   }
 
@@ -59,6 +60,6 @@ export class UserGroupService {
 
   getAllGroups(fields?: object, options?: FilterOptions): Observable<IEntityList<UserGroup>> {
     const params = this.createFilterQuery(fields, options);
-    return this.http.get<IEntityList<UserGroup>>('api/user-groups', {params});
+    return this.http.get<IEntityList<UserGroup>>('api/user-groups', { params });
   }
 }
