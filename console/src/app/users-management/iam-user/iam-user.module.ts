@@ -14,8 +14,7 @@ import { GeneralModalTemplateModule } from '@shared/general-modal-template/gener
 import { TableModule } from 'primeng/table';
 import { RouterModule } from '@angular/router';
 import { UserAttachUserGroupModalComponent } from '@app/users-management/iam-user/user-details-groups/user-attach-user-group-modal/user-attach-user-group-modal.component';
-import { PolicyComponent } from '../policies/policy/policy.component';
-
+import { PolicyModule } from '@app/shared/policy/policy.module';
 
 @NgModule({
   entryComponents: [UserAttachUserGroupModalComponent],
@@ -26,7 +25,6 @@ import { PolicyComponent } from '../policies/policy/policy.component';
     UsersListComponent,
     UserDetailsGroupsComponent,
     UserAttachUserGroupModalComponent,
-    PolicyComponent
   ],
   imports: [
     CommonModule,
@@ -40,6 +38,7 @@ import { PolicyComponent } from '../policies/policy/policy.component';
     TableModule,
     RouterModule,
     TabsModule.forRoot(),
+    PolicyModule
   ]
 })
 export class IAMUserModule { }
