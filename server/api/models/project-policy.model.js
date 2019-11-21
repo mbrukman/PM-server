@@ -23,7 +23,7 @@ const projectPermissionsSchema = new Schema({
   ]
 });
 
-const policySchema = new Schema(
+const projectPolicySchema = new Schema(
   {
     projects: [projectPermissionsSchema],
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
@@ -32,12 +32,12 @@ const policySchema = new Schema(
 );
 // in case we will want to have name for policies
 // policySchema.statics.autocompleteKey = "name";
-policySchema.statics.autocompleteValueField = "_id";
+projectPolicySchema.statics.autocompleteValueField = "_id";
 
 const ProjectPolicy = mongoose.model(
   "ProjectPolicy",
   projectPolicySchema,
-  "projectPolicy"
+  "projectPolicies"
 );
 
 module.exports = ProjectPolicy;
