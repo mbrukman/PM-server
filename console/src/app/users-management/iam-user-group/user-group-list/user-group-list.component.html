@@ -5,7 +5,9 @@
       <h5>Groups</h5>
     </div>
     <div class="row">
-      <a class="kh-btn kh-btn-blue" (click)="openCreateModal()">Create Group</a>
+      <button
+        appPermissionsCheck permission="create"
+        class="kh-btn kh-btn-blue" (click)="openCreateModal()">Create Group</button>
       <div class="filter-text">
         <div>
           <i class="material-icons">search</i>

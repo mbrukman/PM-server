@@ -20,6 +20,12 @@ body {
   @extend .main-background;
 }
 
+*:not(button)[disabled="true"] {
+  opacity: 0.2;
+  cursor: default;
+  pointer-events: none;
+}
+
 .cube-bordered {
   display: inline-block;
   border-radius: 4px;

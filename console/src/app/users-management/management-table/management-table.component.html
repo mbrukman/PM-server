@@ -65,12 +65,14 @@
       <ng-template let-col let-i="rowIndex" let-item="rowData" pTemplate="body">
         <div class="actions-wrapper">
           <i
+            appPermissionsCheck permission="remove"
             class="material-icons hover"
             (click)="onConfirmDelete(item._id)"
             tooltip="Delete"
           >delete_outline</i
           >
           <i class="material-icons hover" (click)="onEdit(i)" tooltip="Edit"
+             appPermissionsCheck permission="update"
           >edit</i
           >
         </div>

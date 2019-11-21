@@ -2,30 +2,34 @@ import {
   AfterViewInit,
   Directive,
   ElementRef,
-  Input,
-  OnChanges,
   Renderer2,
-  SimpleChanges
 } from '@angular/core';
+import {IAMPolicyService} from '@app/services/iam-policy/iam-policy.service';
+import {Permissions} from '@app/services/iam-policy/permissions.interface';
 
 @Directive({
   selector: '[appPermissionsCheck]',
-  providers: []
+  providers: [IAMPolicyService],
+  inputs: ['permission']
 })
-export class PermissionsCheckDirective implements AfterViewInit, OnChanges {
-  inputEvent: any;
-  @Input('inlineEdit') model: any;
+export class PermissionsCheckDirective implements AfterViewInit {
+  permission: string;
 
-  constructor(private elm: ElementRef, private renderer: Renderer2) {
-    this.renderer.setAttribute(this.elm.nativeElement, 'contenteditable', 'true');
-    this.renderer.addClass(this.elm.nativeElement, 'pm-inline-edit');
+  constructor(
+    private elm: ElementRef,
+    private renderer: Renderer2,
+    private iamPolicyService: IAMPolicyService
+  ) {
   }
 
   ngAfterViewInit() {
-  }
-
-  ngOnChanges(change: SimpleChanges) {
-    this.elm.nativeElement.innerText = this.model;
+    this.iamPolicyService
+      .iamPolicySubject
+      .subscribe((permissions: Permissions) => {
+        const hasPermission = permissions && permissions[this.permission];
+        const isDisabled = !hasPermission;
+          this.renderer.setAttribute(this.elm.nativeElement, 'disabled', isDisabled.toString());
+      });
   }
 
 }

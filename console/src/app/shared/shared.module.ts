@@ -64,6 +64,7 @@ import {PermissionsCheckDirective} from "@shared/directives/permissions-check.di
     FeatureComponent,
     ConfirmComponent,
     InlineEditDirective,
+    PermissionsCheckDirective,
     LinebreakPipe,
     InPipe,
     EditAgentComponent,
@@ -85,7 +86,6 @@ import {PermissionsCheckDirective} from "@shared/directives/permissions-check.di
     UpsertVaultItemsComponent,
     UserGroupCreateModalComponent,
     ManagementTableComponent,
-    PermissionsCheckDirective,
 
   ],
   exports: [
@@ -102,6 +102,7 @@ import {PermissionsCheckDirective} from "@shared/directives/permissions-check.di
     NgxChartsModule,
     DropdownModule,
     InlineEditDirective,
+    PermissionsCheckDirective,
     ConfirmComponent,
     LinebreakPipe,
     InPipe,
