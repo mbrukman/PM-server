@@ -6,6 +6,7 @@ import { UserService } from '@app/services/users/user.service';
 import { User } from '@app/services/users/user.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { AuthService } from '@app/services/auth.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -20,7 +21,14 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private userService: UserService,
     private router: Router
-  ) { }
+  ) {
+    if (AuthService.token && (AuthService.resetPasswordFulfilled === 'true')) {
+      this.router.navigate(['/']);
+    }
+    if (!AuthService.token) {
+      this.router.navigate(['/login']);
+    }
+  }
 
   get form() {
     return this.formGroup.controls;
@@ -48,6 +56,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
           .subscribe(
             user => {
               if (user) {
+                localStorage.setItem('resetPasswordFulfilled', 'true');
                 this.router.navigateByUrl('/');
               }
             },

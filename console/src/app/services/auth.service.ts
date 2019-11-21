@@ -14,6 +14,10 @@ export class AuthService {
     return localStorage.getItem('access_token');
   }
 
+  static get resetPasswordFulfilled(): string {
+    return localStorage.getItem('resetPasswordFulfilled');
+  }
+
   public login(email: string, password: string, keepLoggedIn: boolean): Observable<User> {
     return this.http.post<User>(`api/auth/login`, { email, password, keepLoggedIn }, { observe: 'response' })
       .pipe(

@@ -21,12 +21,13 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) {
     // redirect to home if token exists
-    if (AuthService.token) {
+    if (AuthService.token && (AuthService.resetPasswordFulfilled === 'true')) {
       this.router.navigate(['/']);
     }
   }
 
   ngOnInit() {
+    localStorage.setItem('resetPasswordFulfilled', 'true');
     // get return url from route parameters or default to '/'
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
@@ -37,8 +38,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         (user: User) => {
           if (user) {
             if (user.changePasswordOnNextLogin === true) {
-              this.router.navigateByUrl('/reset-password');
-              return;
+              localStorage.setItem('resetPasswordFulfilled', 'false');
             }
             this.router.navigateByUrl('/');
           } else {

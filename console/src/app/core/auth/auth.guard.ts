@@ -14,12 +14,15 @@ export class AuthGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
-    if (AuthService.token) {
+    if (AuthService.token && (AuthService.resetPasswordFulfilled === 'true')) {
       return true;
     }
-
+    if (!AuthService.token) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+      return false;
+    }
     // not logged in so redirect to login page with the return url
-    this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+    this.router.navigate(['/reset-password'], { queryParams: { returnUrl: state.url } });
     return false;
   }
 

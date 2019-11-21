@@ -43,8 +43,7 @@ const appRoutes: Routes = [
   },
   {
     path: 'reset-password',
-    component: ResetPasswordComponent,
-    canActivate: [AuthGuard]
+    component: ResetPasswordComponent
   },
   { path: '**', component: NotFoundComponent }
 ];
