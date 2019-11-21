@@ -1,4 +1,5 @@
 const UserGroupModel = require("../models/user-group.model");
+const IAMPolicyModel = require("../models/iam-policy.model");
 const mongoose = require("mongoose");
 
 function getSort(sortString) {
@@ -14,8 +15,12 @@ function getSort(sortString) {
 class UserGroupService {
   constructor() {}
 
-  create(groupData) {
+  async create(groupData) {
     const newUserGroup = new UserGroupModel(groupData);
+    const newIAMPolicy = new IAMPolicyModel();
+    newIAMPolicy.group = newUserGroup._id;
+    newUserGroup.iamPolicy = newIAMPolicy;
+    await newIAMPolicy.save();
     return newUserGroup.save();
   }
 
@@ -76,7 +81,7 @@ class UserGroupService {
         runValidators: true,
         new: true
       }
-    ).populate("users");
+    ).populate([{ path: "users" }, { path: "iamPolicy" }]);
   }
 
   async filter(filterOptions = {}) {
@@ -176,7 +181,7 @@ class UserGroupService {
       _id: {
         $in: Object.keys(userGroupsData)
       }
-    }).populate("users");
+    }).populate([{ path: "users" }, { path: "iamPolicy" }]);
   }
 }
 
