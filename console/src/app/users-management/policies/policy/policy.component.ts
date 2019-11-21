@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Subject } from 'rxjs';
-import { Permissions } from '../../../services/users/permissions.interface';
-import { IAMPolicy } from '@app/services/users/iam-policy.interface';
+import { Permissions } from '../../../services/iam-policy/permissions.interface';
+import { IAMPolicy } from '@app/services/iam-policy/iam-policy.interface';
 
 @Component({
   selector: 'app-policy',

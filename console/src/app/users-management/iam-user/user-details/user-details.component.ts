@@ -12,8 +12,9 @@ import { Observable, Subscription, Subject } from 'rxjs';
 import { switchMap, filter, tap } from 'rxjs/operators';
 import { EditUserComponent } from '../users-list/edit-user/edit-user.component';
 import { PopupService } from '@shared/services/popup.service';
-import { Permissions } from '@app/services/users/permissions.interface';
-import { IAMPolicy } from '@app/services/users/iam-policy.interface';
+import { Permissions } from '@app/services/iam-policy/permissions.interface';
+import { IAMPolicy } from '@app/services/iam-policy/iam-policy.interface';
+import {IAMPolicyService} from "@app/services/iam-policy/iam-policy.service";
 
 @Component({
   selector: 'app-user-details',
@@ -34,6 +35,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private userService: UserService,
     private route: ActivatedRoute,
+    private iamPolicyService: IAMPolicyService,
     private popupService: PopupService,
     private cd: ChangeDetectorRef,
     private router: Router
@@ -86,7 +88,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   saveIAMPolicy() {
     this.mainSubscription.add(
-      this.userService.updateIAMPolicy(this.user.iamPolicy).subscribe()
+      this.iamPolicyService.updateIAMPolicy(this.user.iamPolicy).subscribe()
     );
   }
 

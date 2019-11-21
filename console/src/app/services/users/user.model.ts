@@ -1,6 +1,6 @@
 import UserGroup from '@app/services/user-group/user-group.model';
 import UserDataInterface from '@app/services/users/user-data.interface';
-import { IAMPolicy } from './iam-policy.interface';
+import { IAMPolicy } from '../iam-policy/iam-policy.interface';
 
 export class User implements UserDataInterface {
   // tslint:disable-next-line:variable-name

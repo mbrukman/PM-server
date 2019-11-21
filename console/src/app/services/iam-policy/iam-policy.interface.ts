@@ -1,5 +1,5 @@
 import { Permissions } from './permissions.interface';
-import { User } from './user.model';
+import { User } from '../users/user.model';
 
 export interface IAMPolicy {
   _id?: string;
