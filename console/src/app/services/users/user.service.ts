@@ -7,6 +7,7 @@ import { map } from 'rxjs/operators';
 import UserDataInterface, { UserDataPatchableInterface } from './user-data.interface';
 import UserFilterOptions from '@app/services/users/user-filter-options.model';
 import { Permissions } from './permissions.interface';
+import { IAMPolicy } from './iam-policy.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -79,8 +80,7 @@ export class UserService {
       .pipe(map((users: Array<User>) => users.map(user => new User(user))));
   }
 
-  updateIAMPolicy(policyId: string, permissions: Permissions) {
-    // return this.http.patch<
-    console.error(policyId, permissions);
+  updateIAMPolicy(iamPolicy: IAMPolicy): Observable<IAMPolicy> {
+    return this.http.patch<IAMPolicy>(`api/iam-policies/${iamPolicy._id}`, iamPolicy);
   }
 }

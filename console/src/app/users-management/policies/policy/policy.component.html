@@ -11,28 +11,28 @@
       class="mr-2"
       [label]="'Read'"
       (onChange)="togglePermission('read', $event)"
-      [checked]="policyValue.read"
+      [checked]="permissions.read"
       [toggle]="toggleCheckboxes"
     ></app-checkbox>
     <app-checkbox
       class="mr-2"
       [label]="'Create'"
       (onChange)="togglePermission('create', $event)"
-      [checked]="policyValue.create"
+      [checked]="permissions.create"
       [toggle]="toggleCheckboxes"
     ></app-checkbox>
     <app-checkbox
       class="mr-2"
       [label]="'Update'"
       (onChange)="togglePermission('update', $event)"
-      [checked]="policyValue.update"
+      [checked]="permissions.update"
       [toggle]="toggleCheckboxes"
     ></app-checkbox>
     <app-checkbox
       class="mr-2"
       [label]="'Delete'"
       (onChange)="togglePermission('remove', $event)"
-      [checked]="policyValue.remove"
+      [checked]="permissions.remove"
       [toggle]="toggleCheckboxes"
     ></app-checkbox>
   </div>
