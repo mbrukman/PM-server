@@ -36,6 +36,27 @@ body {
   margin-left: 19px;
 }
 
+.tooltip-list {
+  max-width: 200px;
+  min-width: 100px;
+  max-height: 444px;
+  overflow-y: scroll;
+  margin: 0;
+  padding: 0;
+  @include custom_scrollbar();
+  li {
+    list-style-type: none;
+    @include ellipsis;
+    color: $turquoise-blue;
+    a {
+      font-size: 13px;
+      line-height: 2.14;
+      color: $turquoise-blue;
+      text-decoration: underline;
+    }
+  }
+}
+
 .section-title {
   @extend .section-title;
 }
