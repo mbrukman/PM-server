@@ -6,11 +6,13 @@
     background-color: inherit;
     color: $pale-blue;
     & > .nav-link {
+      border: none;
       &:hover,
       &.active {
         color: inherit;
         background-color: inherit;
-        border: none;
+      }
+      &.active {
         border-bottom: 3px solid $pale-blue;
       }
     }
