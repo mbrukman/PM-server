@@ -15,6 +15,7 @@ import { PopupService } from '@shared/services/popup.service';
 import { IAMPolicyService } from '@app/services/iam-policy/iam-policy.service';
 import { IAMPolicy } from '@app/services/iam-policy/iam-policy.interface';
 
+
 @Component({
   selector: 'app-user-details',
   templateUrl: './user-details.component.html',
@@ -25,6 +26,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public user$: Observable<User>;
 
   public iamPolicySubject: Subject<IAMPolicy> = new Subject<IAMPolicy>();
+  public projectPolicySubject: Subject<ProjectPolicy> = new Subject<ProjectPolicy>();
 
   @ViewChild(EditUserComponent)
   private editUserComponent: EditUserComponent;

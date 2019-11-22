@@ -5,19 +5,20 @@ const projectPermissionsSchema = new Schema({
   project: { type: mongoose.Schema.Types.ObjectId, ref: "Project" },
   permissions: new Schema({
     read: { type: Boolean, default: false },
-    create: { type: Boolean, default: false },
+    createMap: { type: Boolean, default: false },
     update: { type: Boolean, default: false },
-    remove: { type: Boolean, default: false }
+    remove: { type: Boolean, default: false },
+    archive: { type: Boolean, default: false }
   }),
   maps: [
     new Schema({
       map: { type: mongoose.Schema.Types.ObjectId, ref: "Map" },
       permissions: new Schema({
         read: { type: Boolean, default: false },
-        create: { type: Boolean, default: false },
         update: { type: Boolean, default: false },
         remove: { type: Boolean, default: false },
-        execute: { type: Boolean, default: false }
+        execute: { type: Boolean, default: false },
+        archive: { type: Boolean, default: false }
       })
     })
   ]

@@ -16,7 +16,7 @@ const userSchema = new Schema(
     changePasswordOnNextLogin: { type: Boolean },
     password: { type: String },
     groups: [{ type: Schema.Types.ObjectId, ref: "UserGroup" }],
-    // projectPolicy: { type: Schema.Types.ObjectId, ref: "Policy" },
+    projectPolicy: { type: Schema.Types.ObjectId, ref: "ProjectPolicy" },
     iamPolicy: { type: Schema.Types.ObjectId, ref: "IAMPolicy" },
     isAdmin: Boolean
   },
