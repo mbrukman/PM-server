@@ -29,6 +29,12 @@ class UserService {
     iamPolicy.user = user._id;
     user.iamPolicy = iamPolicy;
     user.password = this.hashPassword(user.password);
+    if (user.isAdmin === true) {
+      user.iamPolicy.permissions = _.mapValues(
+        user.iamPolicy.permissions,
+        () => true
+      );
+    }
     await iamPolicy.save();
     return user.save();
   }
