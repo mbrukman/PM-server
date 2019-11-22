@@ -12,9 +12,9 @@ import { Observable, Subscription, Subject } from 'rxjs';
 import { switchMap, filter, tap } from 'rxjs/operators';
 import { EditUserComponent } from '../users-list/edit-user/edit-user.component';
 import { PopupService } from '@shared/services/popup.service';
-import { IAMPolicyService } from '@app/services/iam-policy/iam-policy.service';
 import { IAMPolicy } from '@app/services/iam-policy/iam-policy.interface';
-
+import { IAMPolicyService } from '@app/services/iam-policy/iam-policy.service';
+import { ProjectPolicy } from '@app/services/iam-policy/project-policy.interface';
 
 @Component({
   selector: 'app-user-details',

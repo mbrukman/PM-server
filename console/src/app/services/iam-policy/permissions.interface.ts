@@ -1,4 +1,4 @@
-export interface Permissions {
+export interface IAMPermissions {
   read: boolean;
   create: boolean;
   update: boolean;

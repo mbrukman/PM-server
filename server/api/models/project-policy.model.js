@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const projectPermissionsSchema = new Schema({
+const projectDefinitionInPolicySchema = new Schema({
   project: { type: mongoose.Schema.Types.ObjectId, ref: "Project" },
   permissions: new Schema({
     read: { type: Boolean, default: false },
@@ -26,7 +26,7 @@ const projectPermissionsSchema = new Schema({
 
 const projectPolicySchema = new Schema(
   {
-    projects: [projectPermissionsSchema],
+    projects: [projectDefinitionInPolicySchema],
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
   },
   { timestamps: true }
