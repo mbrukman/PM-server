@@ -5,20 +5,24 @@ const userController = require("../controllers/user.controller");
 const iamMiddleware = require("../middleware/iam.middleware");
 
 router.get("/", userController.filter);
-router.post("/", iamMiddleware.checkCreatePolicy, userController.createUser);
+router.post(
+  "/",
+  iamMiddleware.checkCreatePermission,
+  userController.createUser
+);
 router.delete(
   "/:id",
-  iamMiddleware.checkRemovePolicy,
+  iamMiddleware.checkRemovePermission,
   userController.deleteUser
 );
 router.patch(
   "/:id",
-  iamMiddleware.checkUpdatePolicy,
+  iamMiddleware.checkUpdatePermission,
   userController.updateUser
 );
 router.patch(
   "/",
-  iamMiddleware.checkUpdatePolicy,
+  iamMiddleware.checkUpdatePermission,
   userController.updateManyUsers
 );
 router.get("/:id", userController.getUser);

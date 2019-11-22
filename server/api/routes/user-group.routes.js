@@ -5,23 +5,27 @@ const router = express.Router();
 const userGroupController = require("../controllers/user-group.controller");
 const iamMiddleware = require("../middleware/iam.middleware");
 
-router.post("/", iamMiddleware.checkCreatePolicy, userGroupController.create);
+router.post(
+  "/",
+  iamMiddleware.checkCreatePermission,
+  userGroupController.create
+);
 router.get("/", userGroupController.filter);
 router.patch(
   "/",
-  iamMiddleware.checkUpdatePolicy,
+  iamMiddleware.checkUpdatePermission,
   userGroupController.updateManyUserGroups
 );
 
 router.get("/:id", userGroupController.getOne);
 router.patch(
   "/:id",
-  iamMiddleware.checkUpdatePolicy,
+  iamMiddleware.checkUpdatePermission,
   userGroupController.patch
 );
 router.delete(
   "/:id",
-  iamMiddleware.checkRemovePolicy,
+  iamMiddleware.checkRemovePermission,
   userGroupController.remove
 );
 

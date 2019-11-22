@@ -1,23 +1,25 @@
 const _ = require("lodash");
 const userService = require("../services/user.service");
 
-async function checkPolicy(req, requiredPolicy) {
+async function checkPolicy(req, requiredPermission) {
   const user = await userService.getUser(req.user);
   if (user.isAdmin === true) {
     return true;
   }
-  const foundPolicyInUser = _.get(
+  const permissionFoundInUser = _.get(
     user.toObject(),
-    "iamPolicy.permissions." + requiredPolicy
+    "iamPolicy.permissions." + requiredPermission
   );
 
   // for each group user belongs to, look for permissions
-  const foundPolicyInUserGroups = user.groups
+  const permissionFoundInUserGroups = user.groups
     .toObject()
     .map(group => group.iamPolicy.permissions)
-    .find(permissions => permissions[requiredPolicy] === true)[requiredPolicy];
+    .find(permissions => permissions[requiredPermission] === true)[
+    requiredPermission
+  ];
 
-  return foundPolicyInUser === true || foundPolicyInUserGroups === true;
+  return permissionFoundInUser === true || permissionFoundInUserGroups === true;
 }
 
 function handleNoPermission(req, res, policy) {
@@ -30,43 +32,43 @@ function handleNoPermission(req, res, policy) {
 }
 
 class IAMMiddleware {
-  async checkCreatePolicy(req, res, next) {
-    const requiredPolicy = "create";
-    const userHasPolicy = await checkPolicy(req, requiredPolicy);
-    if (userHasPolicy) {
+  async checkCreatePermission(req, res, next) {
+    const requiredPermission = "create";
+    const userHasPermission = await checkPolicy(req, requiredPermission);
+    if (userHasPermission) {
       next();
     } else {
-      handleNoPermission(req, res, requiredPolicy);
+      handleNoPermission(req, res, requiredPermission);
     }
   }
 
-  async checkReadPolicy(req, res, next) {
-    const requiredPolicy = "read";
-    const userHasPolicy = await checkPolicy(req, requiredPolicy);
-    if (userHasPolicy) {
+  async checkReadPermission(req, res, next) {
+    const requiredPermission = "read";
+    const userHasPermission = await checkPolicy(req, requiredPermission);
+    if (userHasPermission) {
       next();
     } else {
-      handleNoPermission(req, res, requiredPolicy);
+      handleNoPermission(req, res, requiredPermission);
     }
   }
 
-  async checkUpdatePolicy(req, res, next) {
-    const requiredPolicy = "update";
-    const userHasPolicy = await checkPolicy(req, requiredPolicy);
-    if (userHasPolicy) {
+  async checkUpdatePermission(req, res, next) {
+    const requiredPermission = "update";
+    const userHasPermission = await checkPolicy(req, requiredPermission);
+    if (userHasPermission) {
       next();
     } else {
-      handleNoPermission(req, res, requiredPolicy);
+      handleNoPermission(req, res, requiredPermission);
     }
   }
 
-  async checkRemovePolicy(req, res, next) {
-    const requiredPolicy = "remove";
-    const userHasPolicy = await checkPolicy(req, requiredPolicy);
-    if (userHasPolicy) {
+  async checkRemovePermission(req, res, next) {
+    const requiredPermission = "remove";
+    const userHasPermission = await checkPolicy(req, requiredPermission);
+    if (userHasPermission) {
       next();
     } else {
-      handleNoPermission(req, res, requiredPolicy);
+      handleNoPermission(req, res, requiredPermission);
     }
   }
 }
