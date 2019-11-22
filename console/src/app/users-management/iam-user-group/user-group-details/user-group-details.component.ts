@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { switchMap, tap } from 'rxjs/operators';
 import { UserGroupService } from '@app/services/user-group/user-group.service';
@@ -12,7 +12,7 @@ import { PolicyService } from '@app/services/policy/policy.service';
   templateUrl: './user-group-details.component.html',
   styleUrls: ['./user-group-details.component.scss']
 })
-export class UserGroupDetailsComponent implements OnInit {
+export class UserGroupDetailsComponent implements OnInit, OnDestroy {
   public userGroup: UserGroup;
   public userGroup$: Observable<UserGroup>;
   public iamPolicy: Subject<IAMPolicy> = new Subject<IAMPolicy>();
@@ -34,11 +34,21 @@ export class UserGroupDetailsComponent implements OnInit {
         this.userGroup = userGroup;
       })
     );
+
+    this.mainSubscription.add(
+      this.iamPolicy.subscribe(policy => {
+        this.userGroup.iamPolicy.permissions = policy.permissions;
+      })
+    );
   }
 
   saveIAMPolicy() {
     this.mainSubscription.add(
       this.policyService.updateIAMPolicy(this.userGroup.iamPolicy).subscribe()
     );
+  }
+
+  ngOnDestroy(): void {
+    this.mainSubscription.unsubscribe();
   }
 }
