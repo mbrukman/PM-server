@@ -1,13 +1,23 @@
-const User = require("../models/user.model");
 const _ = require("lodash");
+const userService = require("../services/user.service");
 
-async function checkPolicy(req, policy) {
-  const user = await User.findById(req.user);
+async function checkPolicy(req, requiredPolicy) {
+  const user = await userService.getUser(req.user);
   if (user.isAdmin === true) {
     return true;
   }
-  const foundPolicy = _.get(user.toObject(), policy);
-  return foundPolicy === true;
+  const foundPolicyInUser = _.get(
+    user.toObject(),
+    "iamPolicy.permissions." + requiredPolicy
+  );
+
+  // for each group user belongs to, look for permissions
+  const foundPolicyInUserGroups = user.groups
+    .toObject()
+    .map(group => group.iamPolicy.permissions)
+    .find(permissions => !!permissions[requiredPolicy])[requiredPolicy];
+
+  return foundPolicyInUser === true || foundPolicyInUserGroups === true;
 }
 
 function handleNoPermission(req, res, policy) {
@@ -21,7 +31,7 @@ function handleNoPermission(req, res, policy) {
 
 class IAMMiddleware {
   async checkCreatePolicy(req, res, next) {
-    const requiredPolicy = "policies.iam.create";
+    const requiredPolicy = "create";
     const userHasPolicy = await checkPolicy(req, requiredPolicy);
     if (userHasPolicy) {
       next();
@@ -31,7 +41,7 @@ class IAMMiddleware {
   }
 
   async checkReadPolicy(req, res, next) {
-    const requiredPolicy = "policies.iam.read";
+    const requiredPolicy = "read";
     const userHasPolicy = await checkPolicy(req, requiredPolicy);
     if (userHasPolicy) {
       next();
@@ -41,7 +51,7 @@ class IAMMiddleware {
   }
 
   async checkUpdatePolicy(req, res, next) {
-    const requiredPolicy = "policies.iam.update";
+    const requiredPolicy = "update";
     const userHasPolicy = await checkPolicy(req, requiredPolicy);
     if (userHasPolicy) {
       next();
@@ -51,7 +61,7 @@ class IAMMiddleware {
   }
 
   async checkRemovePolicy(req, res, next) {
-    const requiredPolicy = "policies.iam.remove";
+    const requiredPolicy = "remove";
     const userHasPolicy = await checkPolicy(req, requiredPolicy);
     if (userHasPolicy) {
       next();

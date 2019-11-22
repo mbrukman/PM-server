@@ -42,6 +42,7 @@ class UserService {
   getUser(userId, filterOptions = {}) {
     let page;
     const fields = filterOptions.fields;
+    filterOptions.options = filterOptions.options || {};
     const sort = filterOptions.options.sort || "name";
 
     if (typeof filterOptions.options.page === "string") {
@@ -77,9 +78,14 @@ class UserService {
         path: "groups",
         match,
         options,
-        populate: {
-          path: "users"
-        }
+        populate: [
+          {
+            path: "users"
+          },
+          {
+            path: "iamPolicy"
+          }
+        ]
       }
     ]);
   }
