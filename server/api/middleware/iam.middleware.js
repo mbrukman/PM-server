@@ -15,7 +15,7 @@ async function checkPolicy(req, requiredPolicy) {
   const foundPolicyInUserGroups = user.groups
     .toObject()
     .map(group => group.iamPolicy.permissions)
-    .find(permissions => !!permissions[requiredPolicy])[requiredPolicy];
+    .find(permissions => permissions[requiredPolicy] === true)[requiredPolicy];
 
   return foundPolicyInUser === true || foundPolicyInUserGroups === true;
 }
