@@ -20,6 +20,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
   filterKeyUpSubscribe: Subscription;
   isInit: boolean = true;
 
+
   private mainSubscription = new Subscription();
 
   fields = [

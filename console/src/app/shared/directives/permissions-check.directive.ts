@@ -10,9 +10,10 @@ import {Permissions} from '@app/services/iam-policy/permissions.interface';
 @Directive({
   selector: '[appPermissionsCheck]',
   providers: [IAMPolicyService],
-  inputs: ['permission']
+  inputs: ['permission', 'hide']
 })
 export class PermissionsCheckDirective implements AfterViewInit {
+  hide: boolean;
   permission: string;
 
   constructor(
@@ -28,7 +29,11 @@ export class PermissionsCheckDirective implements AfterViewInit {
       .subscribe((permissions: Permissions) => {
         const hasPermission = permissions && permissions[this.permission];
         const isDisabled = !hasPermission;
+        if (this.hide) {
+          this.elm.nativeElement.style.display = isDisabled ? 'none' : 'default';
+        } else {
           this.renderer.setAttribute(this.elm.nativeElement, 'disabled', isDisabled.toString());
+        }
       });
   }
 

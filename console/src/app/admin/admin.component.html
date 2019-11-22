@@ -47,6 +47,9 @@
       </li>
       <li class="nav-item" routerLinkActive="active">
         <a
+          appPermissionsCheck
+          permission="read"
+          [hide]="true"
           class="nav-link"
           routerLink="users-management"
           tooltip="IAM"
