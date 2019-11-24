@@ -32,7 +32,11 @@ export class PermissionsCheckDirective implements AfterViewInit {
         if (this.hide) {
           this.elm.nativeElement.style.display = isDisabled ? 'none' : 'default';
         } else {
-          this.renderer.setProperty(this.elm.nativeElement, 'disabled', isDisabled);
+          if (this.elm.nativeElement.disabled != null) {
+            this.renderer.setProperty(this.elm.nativeElement, 'disabled', isDisabled);
+          }else {
+            this.renderer.setAttribute(this.elm.nativeElement, 'disabled', isDisabled.toString());
+          }
         }
       });
   }
