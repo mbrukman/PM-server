@@ -7,7 +7,6 @@ import {ActivatedRoute} from '@angular/router';
 import {BsModalService} from 'ngx-bootstrap';
 import {map, switchMap, tap} from 'rxjs/operators';
 import {FilterOptions} from '@shared/model/filter-options.model';
-import {ConfirmComponent} from '@shared/confirm/confirm.component';
 import {User} from '@app/services/users/user.model';
 import {UserAttachUserGroupModalComponent} from '@app/users-management/iam-user/user-details-groups/user-attach-user-group-modal/user-attach-user-group-modal.component';
 
@@ -53,16 +52,7 @@ export class UserDetailsGroupsComponent implements OnInit, OnDestroy {
   }
 
   openDetachConfirmationModal(user) {
-    const modal = this.modalService.show(ConfirmComponent, {
-      initialState: {
-        title: 'You are about to detach the user from the group...'
-      }
-    });
-    modal.content.result.subscribe((result) => {
-      if (result === modal.content.confirm) {
-        this.detachUserSubject.next(user);
-      }
-    });
+      this.detachUserSubject.next(user);
   }
 
   getDetachGroup$(): Observable<User> {
