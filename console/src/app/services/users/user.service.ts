@@ -6,8 +6,6 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import UserDataInterface, { UserDataPatchableInterface } from './user-data.interface';
 import UserFilterOptions from '@app/services/users/user-filter-options.model';
-import { Permissions } from '../policy/permissions.interface';
-import { IAMPolicy } from '../policy/iam-policy.interface';
 
 @Injectable({
   providedIn: 'root'

@@ -1,5 +1,5 @@
 import { User } from '../users/user.model';
-import { IAMPolicy } from '../policy/iam-policy.interface';
+import { IAMPolicy } from '../iam-policy/iam-policy.interface';
 
 
 export default class UserGroup {

@@ -4,8 +4,8 @@ import { switchMap, tap } from 'rxjs/operators';
 import { UserGroupService } from '@app/services/user-group/user-group.service';
 import UserGroup from '@app/services/user-group/user-group.model';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { IAMPolicy } from '@app/services/policy/iam-policy.interface';
-import { PolicyService } from '@app/services/policy/policy.service';
+import { IAMPolicy } from '@app/services/iam-policy/iam-policy.interface';
+import { IAMPolicyService } from '@app/services/iam-policy/iam-policy.service';
 
 @Component({
   selector: 'app-user-group-details',
@@ -22,7 +22,7 @@ export class UserGroupDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private userGroupService: UserGroupService,
     private activedRoute: ActivatedRoute,
-    private policyService: PolicyService
+    private iamPolicyService: IAMPolicyService
   ) { }
 
   ngOnInit() {
@@ -44,7 +44,7 @@ export class UserGroupDetailsComponent implements OnInit, OnDestroy {
 
   saveIAMPolicy() {
     this.mainSubscription.add(
-      this.policyService.updateIAMPolicy(this.userGroup.iamPolicy).subscribe()
+      this.iamPolicyService.updateIAMPolicy(this.userGroup.iamPolicy).subscribe()
     );
   }
 

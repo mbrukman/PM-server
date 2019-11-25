@@ -10,7 +10,6 @@ import { map } from 'rxjs/operators';
 import { FilterOptions } from '@app/shared/model/filter-options.model';
 import { IEntityList } from '@app/shared/interfaces/entity-list.interface';
 import RemoveResponseInterface from '@shared/interfaces/remove-response.interface';
-import { IAMPolicy } from '../policy/iam-policy.interface';
 
 @Injectable({ providedIn: 'root' })
 export class UserGroupService {
