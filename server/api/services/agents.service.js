@@ -64,17 +64,14 @@ async function getAllAgentsStatus() {
     agent = JSON.parse(JSON.stringify(agent));
 
     agentStatusObject[agent.key] = {};
-
-    // assign agent properties
     Object.assign(agentStatusObject[agent.key], agent);
-
     if (!agent.status) {
       continue;
     }
 
     // assign status
     Object.assign(agentStatusObject[agent.key], agent.status);
-
+    delete agentStatusObject[agent.key].status;
     // create socket reference based on socketId stored in model
     agentStatusObject[agent.key].socket = socketService.socket.of(
       socketNamespaceName
@@ -83,12 +80,23 @@ async function getAllAgentsStatus() {
   return agentStatusObject;
 }
 
+function pickRelevantStatusFields(status) {
+  const statusFields = Object.keys(Agent.schema.tree.status.tree);
+  Object.keys(status).forEach(statusKey => {
+    if (!statusFields.includes(statusKey)) {
+      delete status[statusKey];
+    }
+  });
+  return status;
+}
+
 async function saveStatusToAgent(agent, agentStatus) {
+  const fieldsToUpdate = pickRelevantStatusFields(agentStatus);
   await Agent.findOneAndUpdate(
     { key: agent.key },
     {
       $set: {
-        status: agentStatus
+        status: fieldsToUpdate
       }
     }
   );
@@ -139,7 +147,7 @@ async function followAgentStatusIntervalFunction(agent) {
         key: agent.key
       }
     },
-    (error, response, body) => {
+    async (error, response, body) => {
       try {
         body = JSON.parse(body);
       } catch (e) {
@@ -147,14 +155,13 @@ async function followAgentStatusIntervalFunction(agent) {
       }
       if (!error && response.statusCode === 200) {
         agentStatus = updateAliveAgent(agentStatus, body, start);
-        saveStatusToAgent(agent, agentStatus);
       } else {
         agentStatus.liveCounter -= 1;
         if (agentStatus.liveCounter === 0) {
           agentStatus = updateDeadAgent(agentStatus);
         }
-        saveStatusToAgent(agent, agentStatus);
       }
+      await saveStatusToAgent(agent, agentStatus);
     }
   );
 }
@@ -180,13 +187,12 @@ function updateAliveAgent(agentStatus, body, start) {
   agentStatus.arch = body.arch;
   agentStatus.freeSpace = humanize.bytes(body.freeSpace);
   agentStatus.respTime = new Date() - start;
-  agentStatus.defaultUrl = agentStatus.defaultUrl || "";
   agentStatus.installed_plugins = body.installed_plugins;
   agentStatus.liveCounter = LIVE_COUNTER;
   return agentStatus;
 }
 
-function setDefaultUrl(agent) {
+async function setDefaultUrl(agent) {
   return new Promise((resolve, reject) => {
     request.post(
       agent.url + "/api/status",
@@ -309,7 +315,6 @@ function evaluateFilter(filter, agents) {
 async function sendRequestToAgent(_options, agent) {
   const options = Object.assign({}, _options);
   const agentStatus = await getAgentStatus(agent.key);
-
   if (!agentStatus.defaultUrl) {
     console.error("No defaultUrl:", agentStatus.defaultUrl);
     return new Error("No defaultUrl");
@@ -356,11 +361,9 @@ function add(agent) {
         $set: { url: agent.url, publicUrl: agent.publicUrl, isDeleted: false }
       });
     })
-    .then(agent => {
-      startFollowingAgentStatus(agent);
-      return setDefaultUrl(agent).then(() => {
-        return agent;
-      });
+    .then(async agent => {
+      await startFollowingAgentStatus(agent);
+      return agent;
     });
 }
 
@@ -461,7 +464,10 @@ async function deletePluginOnAgent(name, agent) {
 
 /* restarting the agents live status, and updating the status for all agents */
 async function restartAgentsStatus() {
-  await Agent.updateMany({}, { $set: { "status.alive": false, "status.following": false } });
+  await Agent.updateMany(
+    {},
+    { $set: { "status.alive": false, "status.following": false } }
+  );
 
   await Agent.find({}).then(agents => {
     agents.forEach(agent => {

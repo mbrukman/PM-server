@@ -4,14 +4,14 @@ const Schema = mongoose.Schema;
 const agentStatusSchema = new Schema({
   alive: Boolean,
   following: Boolean,
-  defaultUrl: String,
   socketId: String,
   hostname: String,
   arch: String,
   freeSpace: String,
   respTime: Number,
   installed_plugins: Schema.Types.Mixed,
-  liveCounter: Number
+  liveCounter: Number,
+  defaultUrl: String
 });
 
 const agentSchema = new Schema({

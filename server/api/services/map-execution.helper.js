@@ -50,21 +50,7 @@ function createConfiguration(mapStructure, configuration) {
 }
 
 async function filterLiveAgents(agents) {
-  const agentsStatus = Object.assign(
-    {},
-    await agentsService.getAllAgentsStatus()
-  );
-  const allAgents = [];
-  agents.forEach(agentObj => {
-    const agentAlive = _.find(agentsStatus, agent => {
-      return agent.id === agentObj.id && agent.alive;
-    });
-
-    if (agentAlive) {
-      allAgents.push(agentAlive);
-    }
-  });
-  return allAgents;
+  return agents.filter(agent => agent.status.alive);
 }
 
 module.exports = {
