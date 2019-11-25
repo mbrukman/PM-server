@@ -1,4 +1,4 @@
-import { IAMPermissions } from './permissions.interface';
+import { IAMPermissions } from './iam-permissions.interface';
 import { User } from '../users/user.model';
 
 export interface IAMPolicy {

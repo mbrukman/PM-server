@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Subject } from 'rxjs';
-import { Permissions } from '@app/services/iam-policy/permissions.interface';
 import { IAMPolicy } from '@app/services/iam-policy/iam-policy.interface';
+import { IAMPermissions } from '@app/services/iam-policy/iam-permissions.interface';
 
 @Component({
   selector: 'app-policy',
@@ -12,7 +12,7 @@ export class PolicyComponent {
 
   public toggleCheckboxes: Subject<boolean> = new Subject<boolean>();
   @Input() name: String;
-  @Input() permissions: Permissions = { create: false, read: false, update: false, remove: false };
+  @Input() permissions: IAMPermissions = { create: false, read: false, update: false, remove: false };
   @Input() policy: Subject<IAMPolicy>;
   constructor() { }
 
