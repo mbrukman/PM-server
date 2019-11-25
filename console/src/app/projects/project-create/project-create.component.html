@@ -17,7 +17,7 @@
           <textarea type="text" id="description" class="form-control" placeholder="eg. Managing CI/CD of..."
             formControlName="description"></textarea>
         </div>
-        <button type="submit" class="kh-btn kh-btn-blue" [disabled]="projectForm.invalid">Create</button>
+        <button type="submit" class="kh-btn kh-btn-blue" [disabled]="projectForm.invalid">{{submitBtnText}}</button>
       </form>
     </div>
   </div>
