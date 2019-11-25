@@ -13,7 +13,7 @@ const configToken = require('../services/token.service');
  * @param {*} execResult 
  * @param {object} processNames - map of process uuid to process name 
  */
-function _mapperResult(execResult, processNames=null) {
+function _mapperResult(execResult, processNames=null, actionsNames=null) {
     let newResult = Object.assign({},execResult)
     if(!execResult.agentsResults){return }
     execResult.agentsResults.forEach((agentResult, agentIndex) => {
@@ -26,6 +26,9 @@ function _mapperResult(execResult, processNames=null) {
                     statuses.push(action.status)
                     if(!action.result){
                         action.result = {stdout:action.status}
+                    }
+                    if(actionsNames){
+                        action.name = actionsNames[action.action.toString()];
                     }
                     processResult.push(action.result)
                 })
@@ -383,9 +386,15 @@ module.exports = {
             }
             let structure = await mapsService.getMapStructure(execResult.map, execResult.structure)
             let processNames = {}
-            structure.processes.forEach(process => processNames[process.id] = process.name);
+            let actionsNames = {}
+            structure.processes.forEach(process => {
+                processNames[process.id] = process.name;
+                process.actions.forEach(action=>{
+                    actionsNames[action.id] = action.name;
+                });
+            });
 
-            return _mapperResult(execResult.toJSON() , processNames)
+            return _mapperResult(execResult.toJSON() , processNames, actionsNames)
 
         }).then(execResult => {
             return res.json(execResult);
