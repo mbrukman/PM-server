@@ -4,8 +4,8 @@ import {
   ElementRef,
   Renderer2,
 } from '@angular/core';
-import {IAMPolicyService} from '@app/services/iam-policy/iam-policy.service';
-import {Permissions} from '@app/services/iam-policy/permissions.interface';
+import { IAMPolicyService } from '@app/services/iam-policy/iam-policy.service';
+import { IAMPermissions } from '@app/services/iam-policy/iam-permissions.interface';
 
 @Directive({
   selector: '[appPermissionsCheck]',
@@ -26,8 +26,8 @@ export class PermissionsCheckDirective implements AfterViewInit {
   ngAfterViewInit() {
     this.iamPolicyService
       .iamPolicySubject
-      .subscribe((permissions: Permissions) => {
-        const hasPermission = permissions && permissions[this.permission];
+      .subscribe((iamPermissions: IAMPermissions) => {
+        const hasPermission = iamPermissions && iamPermissions[this.permission];
         const isDisabled = !hasPermission;
         if (this.hide) {
           this.elm.nativeElement.style.display = isDisabled ? 'none' : 'default';
