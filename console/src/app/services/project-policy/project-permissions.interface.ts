@@ -1,7 +1,6 @@
-export interface ProjectPermissions {
-  read: boolean;
+import { BasicPermissions } from '../interfaces/basic-permissions.interface';
+
+export interface ProjectPermissions extends BasicPermissions {
   createMap: boolean;
-  update: boolean;
-  remove: boolean;
   archive: boolean;
 }
