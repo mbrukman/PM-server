@@ -34,5 +34,6 @@ userSchema.pre("save", async function() {
   await this.iamPolicy.save();
   await this.projectPolicy.save();
 });
+
 const UserModel = mongoose.model("User", userSchema, "users");
 module.exports = UserModel;
