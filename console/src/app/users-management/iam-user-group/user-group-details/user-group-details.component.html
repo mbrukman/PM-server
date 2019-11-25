@@ -19,11 +19,11 @@
     </tab>
     <tab customClass="kh-tab" heading="Policies">
       <div class="iam-policy">
-        <app-policy
+        <app-basic-policy
           [name]="'IAM'"
           [permissions]="userGroup.iamPolicy.permissions"
           [policy]="iamPolicySubject"
-        ></app-policy>
+        ></app-basic-policy>
         <div class="buttons">
           <button
             type="submit"

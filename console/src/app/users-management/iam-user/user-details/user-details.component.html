@@ -29,10 +29,10 @@
         </div>
       </div>
       <div class="project-policies">
-        <h2>Project policies:</h2>
+        <p>Project policies:</p>
         <app-basic-policy
           *ngFor="let project of user.projectPolicy.projects"
-          [name]="project.name"
+          [name]="project.project.name"
           [permissions]="project.permissions"
           [policy]="projectPolicySubjects[project._id]"
         ></app-basic-policy>

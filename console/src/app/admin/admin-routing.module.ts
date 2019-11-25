@@ -6,8 +6,8 @@ import { AgentsComponent } from '@agents/agents/agents.component';
 import { PluginsListComponent } from '@plugins/plugins-list/plugins-list.component';
 import { AdminComponent } from './admin.component';
 import { VaultComponent } from '../vault/vault/vault.component';
-import {PluginSettingsComponent} from '@plugins/plugin-settings/plugin-settings.component';
-import {IAMPolicyGuard} from "@shared/guards/iam-policy.guard";
+import { PluginSettingsComponent } from '@plugins/plugin-settings/plugin-settings.component';
+import { IAMPolicyGuard } from '@shared/guards/iam-policy.guard';
 const routes: Routes = [
   {
     path: '',
@@ -41,7 +41,7 @@ const routes: Routes = [
       {
         path: 'users-management',
         loadChildren: '../users-management/users-management.module#UsersManagementModule',
-        canActivate: [IAMPolicyGuard]
+        // canActivate: [IAMPolicyGuard]
       },
       {
         path: 'vault',

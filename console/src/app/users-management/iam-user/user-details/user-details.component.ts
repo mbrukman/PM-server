@@ -47,7 +47,43 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.user$ = this.route.paramMap.pipe(
       switchMap(paramMap => this.userService.getUser(paramMap.get('id'))),
-      tap(user => (this.user = user))
+      tap(user => {
+        this.user = user;
+
+        this.user.projectPolicy = {
+          projects: [
+            {
+              project: {
+                _id: 'project1',
+                name: 'project1'
+              },
+              permissions: {
+                createMap: false,
+                archive: true,
+                read: true,
+                remove: true,
+                update: true,
+              },
+              maps: []
+            },
+            {
+              project: {
+                _id: 'project2',
+                name: 'project2'
+              },
+              permissions: {
+                createMap: true,
+                archive: false,
+                read: true,
+                remove: false,
+                update: true,
+              },
+              maps: []
+            }
+          ]
+        };
+
+      })
     );
 
     this.mainSubscription.add(
@@ -56,36 +92,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.user.projectPolicy.projects = [
-      {
-        project: {
-          _id: 'project1',
-          name: 'project1'
-        },
-        permissions: {
-          createMap: false,
-          archive: true,
-          read: true,
-          remove: true,
-          update: true,
-        },
-        maps: []
-      },
-      {
-        project: {
-          _id: 'project2',
-          name: 'project2'
-        },
-        permissions: {
-          createMap: true,
-          archive: false,
-          read: true,
-          remove: false,
-          update: true,
-        },
-        maps: []
-      }
-    ];
+
   }
 
   deleteUser() {
