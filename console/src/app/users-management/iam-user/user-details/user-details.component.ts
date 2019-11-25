@@ -26,7 +26,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public user$: Observable<User>;
 
   public iamPolicySubject: Subject<IAMPolicy> = new Subject<IAMPolicy>();
-  public projectPolicySubjects: Subject<ProjectPolicy>[];
+  public projectPolicySubjects: { [projectId: string]: Subject<ProjectPolicy> } = {
+    'project1': new Subject<ProjectPolicy>(),
+    'project2': new Subject<ProjectPolicy>(),
+  };
 
   @ViewChild(EditUserComponent)
   private editUserComponent: EditUserComponent;
@@ -52,6 +55,37 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         this.user.iamPolicy.permissions = policy.permissions;
       })
     );
+
+    this.user.projectPolicy.projects = [
+      {
+        project: {
+          _id: 'project1',
+          name: 'project1'
+        },
+        permissions: {
+          createMap: false,
+          archive: true,
+          read: true,
+          remove: true,
+          update: true,
+        },
+        maps: []
+      },
+      {
+        project: {
+          _id: 'project2',
+          name: 'project2'
+        },
+        permissions: {
+          createMap: true,
+          archive: false,
+          read: true,
+          remove: false,
+          update: true,
+        },
+        maps: []
+      }
+    ];
   }
 
   deleteUser() {
@@ -90,6 +124,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.mainSubscription.add(
       this.iamPolicyService.updateIAMPolicy(this.user.iamPolicy).subscribe()
     );
+  }
+
+  saveProjectPolicies() {
+
   }
 
   ngOnDestroy(): void {

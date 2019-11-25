@@ -5,8 +5,8 @@ import { BasicPolicy } from '@app/services/interfaces/basic-policy.interface';
 
 @Component({
   selector: 'app-basic-policy',
-  templateUrl: './policy.component.html',
-  styleUrls: ['./policy.component.scss']
+  templateUrl: './basic-policy.component.html',
+  styleUrls: ['./basic-policy.component.scss']
 })
 export class BasicPolicyComponent {
 
