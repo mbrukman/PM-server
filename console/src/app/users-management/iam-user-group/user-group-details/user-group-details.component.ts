@@ -15,7 +15,7 @@ import { IAMPolicyService } from '@app/services/iam-policy/iam-policy.service';
 export class UserGroupDetailsComponent implements OnInit, OnDestroy {
   public userGroup: UserGroup;
   public userGroup$: Observable<UserGroup>;
-  public iamPolicy: Subject<IAMPolicy> = new Subject<IAMPolicy>();
+  public iamPolicySubject: Subject<IAMPolicy> = new Subject<IAMPolicy>();
 
   private mainSubscription = new Subscription();
 
@@ -36,7 +36,7 @@ export class UserGroupDetailsComponent implements OnInit, OnDestroy {
     );
 
     this.mainSubscription.add(
-      this.iamPolicy.subscribe(policy => {
+      this.iamPolicySubject.subscribe(policy => {
         this.userGroup.iamPolicy.permissions = policy.permissions;
       })
     );
