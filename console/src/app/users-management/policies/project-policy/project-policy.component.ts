@@ -11,7 +11,8 @@ import { BasicPolicyComponent } from '../basic-policy/basic-policy.component';
 })
 export class ProjectPolicyComponent extends BasicPolicyComponent {
   public toggleCheckboxes: Subject<boolean> = new Subject<boolean>();
-  @Input() name: String;
+  @Input() projectIndex: number;
+  @Input() name: string;
   @Input() permissions: ProjectPermissions = {
     createMap: false,
     read: false,
@@ -19,7 +20,10 @@ export class ProjectPolicyComponent extends BasicPolicyComponent {
     remove: false,
     archive: false
   };
-  @Input() permissionsSubject: Subject<ProjectPermissions>;
+  @Input() projectPolicySubject: Subject<{
+    projectIndex: number;
+    permissions: ProjectPermissions;
+  }>;
 
   constructor() {
     super();
@@ -37,6 +41,9 @@ export class ProjectPolicyComponent extends BasicPolicyComponent {
 
   togglePermission(permissionName: string, newValue: boolean) {
     this.permissions[permissionName] = newValue;
-    this.permissionsSubject.next(this.permissions);
+    this.projectPolicySubject.next({
+      projectIndex: this.projectIndex,
+      permissions: this.permissions
+    });
   }
 }

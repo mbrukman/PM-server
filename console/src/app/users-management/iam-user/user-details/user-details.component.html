@@ -33,8 +33,9 @@
         <app-project-policy
           *ngFor="let project of user.projectPolicy.projects; let i = index"
           [name]="project.project.name"
+          [projectIndex]="i"
           [permissions]="project.permissions"
-          [permissionsSubject]="projectPermissionsSubjects[i]"
+          [projectPolicySubject]="projectPolicySubject"
         ></app-project-policy>
         <button
           type="submit"

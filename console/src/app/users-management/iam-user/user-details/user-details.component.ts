@@ -8,8 +8,8 @@ import {
 import { User } from '@app/services/users/user.model';
 import { UserService } from '@app/services/users/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subscription, Subject } from 'rxjs';
-import { switchMap, filter, tap } from 'rxjs/operators';
+import { Observable, Subscription, Subject, forkJoin, merge } from 'rxjs';
+import { switchMap, filter, tap, mergeAll, flatMap } from 'rxjs/operators';
 import { EditUserComponent } from '../users-list/edit-user/edit-user.component';
 import { PopupService } from '@shared/services/popup.service';
 import { IAMPolicy } from '@app/services/iam-policy/iam-policy.interface';
@@ -27,13 +27,13 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public user$: Observable<User>;
 
   public iamPolicySubject: Subject<IAMPolicy> = new Subject<IAMPolicy>();
-
-  // TODO: make sense
-  public projectPermissionsSubjects: Subject<ProjectPermissions>[] = [
-    new Subject<ProjectPermissions>(),
-    new Subject<ProjectPermissions>()
-  ];
-
+  public projectPolicySubject: Subject<{
+    projectIndex: number;
+    permissions: ProjectPermissions;
+  }> = new Subject<{
+    projectIndex: number;
+    permissions: ProjectPermissions;
+  }>();
 
   @ViewChild(EditUserComponent)
   private editUserComponent: EditUserComponent;
@@ -54,6 +54,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       tap(user => {
         this.user = user;
 
+        // TODO: remove mocked data
         this.user.projectPolicy = {
           projects: [
             {
@@ -66,7 +67,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
                 archive: true,
                 read: true,
                 remove: true,
-                update: true,
+                update: true
               },
               maps: []
             },
@@ -80,13 +81,12 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
                 archive: false,
                 read: true,
                 remove: false,
-                update: true,
+                update: true
               },
               maps: []
             }
           ]
         };
-
       })
     );
 
@@ -96,18 +96,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       })
     );
 
-    // TODO: make sense
     this.mainSubscription.add(
-      this.projectPermissionsSubjects[0].subscribe(permissions => {
-        this.user.projectPolicy.projects[0].permissions = permissions;
+      this.projectPolicySubject.subscribe(policy => {
+        this.user.projectPolicy.projects[policy.projectIndex].permissions = policy.permissions;
       })
     );
-    this.mainSubscription.add(
-      this.projectPermissionsSubjects[1].subscribe(permissions => {
-        this.user.projectPolicy.projects[1].permissions = permissions;
-      })
-    );
-
   }
 
   deleteUser() {
@@ -150,7 +143,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   saveProjectPolicy() {
     console.log(this.user.projectPolicy);
-    throw new Error('not implemented');
   }
 
   ngOnDestroy(): void {
