@@ -1,7 +1,7 @@
 /**
  * @type {MapsService}
  */
-let MapService;
+var MapService;
 
 /**
  * Represents the execution Id
@@ -18,23 +18,23 @@ var currentAgent = {
  */
 /** @type {KaholoAgent} */
 var currentAgent;
-let executionId;
+var executionId;
 
 /** @type {KaholoTrigger} */
-let trigger;
+var trigger;
 
 /**
  * Represents the selected configuration
  */
 /** @type {KaholoConfiguration} */
-let configuration;
+var configuration;
 
 /**
  * Returns a process execution by the process uuid
  * @param {string} processId
  * @return {object}
  */
-const getProcessById = function(processId) {
+function getProcessById(processId) {
   return processes[processId];
 };
 
@@ -43,7 +43,7 @@ const getProcessById = function(processId) {
  * @param index
  * @param process
  */
-const getProcessIteration = function(process, index = -1) {
+function getProcessIteration(process, index = -1) {
   index = index === -1 || index === 0 ? 0 : index - 1;
   return process[index];
 };
@@ -52,9 +52,9 @@ const getProcessIteration = function(process, index = -1) {
  * Return the first process with the specific name or undefined.
  * @param {string} name the name of the process
  */
-const getProcessByName = function(name) {
-  const processesKey = Object.keys(process);
-  const processesName = processesKey.map(k => processes[k].name);
+function getProcessByName(name) {
+  var processesKey = Object.keys(process);
+  var processesName = processesKey.map(k => processes[k].name);
   return processes[processesKey[processesName.findIndex(o => o === name)]];
 };
 
@@ -64,11 +64,11 @@ const getProcessByName = function(name) {
  * @param process
  * @return {*|Action}
  */
-const getActionByIndex = function(actionIndex, process) {
+function getActionByIndex(actionIndex, process) {
   if (typeof process !== "object") {
     throw new Error("invalid parameters: process should be an object");
   }
-  const actionId = Object.keys(process.actions)[actionIndex];
+  var actionId = Object.keys(process.actions)[actionIndex];
   return process.actions[actionId];
 };
 
@@ -77,8 +77,8 @@ const getActionByIndex = function(actionIndex, process) {
  * @param {string} processId
  * @return {object} all the process. the keys are the agents urls.
  */
-const getProcessCrossAgent = function(processId) {
-  const processes = {};
+function getProcessCrossAgent(processId) {
+  var processes = {};
   Object.keys(globalContext).forEach(agentKey => {
     processes[globalContext[agentKey].url] =
       globalContext[agentKey].processes[processId];
@@ -90,35 +90,35 @@ const getProcessCrossAgent = function(processId) {
  * Return the selected configuration or undefined
  * @return {object | undefined}
  */
-const getConfiguration = function() {
+function getConfiguration() {
   return configuration;
 };
 
 /** @type {KaholoVault} */
-let vault;
+var vault;
 
 /* represents the previous action that was running in this process
  when the action is the first one to run will be undefined */
 
 // /* represents the current running action */
 /** @type {KaholoAction} */
-let currentAction;
+var currentAction;
 
 /** @type {KaholoAction} */
-let previousAction;
+var previousAction;
 
 /* represents the previous running process */
 /** @type {KaholoProcess} */
-let previousProcess;
+var previousProcess;
 
 /* represents the current running process */
 /** @type {KaholoProcess} */
-let currentProcess;
+var currentProcess;
 
 /* represents the previous link result (not the process) */
 /** @type {KaholoLink} */
-let previousLink;
+var previousLink;
 
 /* represents the current Link */
 /** @type {KaholoLink} */
-let currentLink;
+var currentLink;
