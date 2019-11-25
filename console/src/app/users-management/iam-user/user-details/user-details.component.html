@@ -16,7 +16,7 @@
         <app-basic-policy
           [name]="'IAM'"
           [permissions]="user.iamPolicy.permissions"
-          [policy]="iamPolicySubject"
+          [policySubject]="iamPolicySubject"
         ></app-basic-policy>
         <div class="buttons">
           <button
@@ -24,18 +24,25 @@
             class="kh-btn kh-btn-blue ml-4 float-right"
             (click)="saveIAMPolicy()"
           >
-            Save
+            Save IAM policy
           </button>
         </div>
       </div>
       <div class="project-policies">
         <p>Project policies:</p>
-        <app-basic-policy
-          *ngFor="let project of user.projectPolicy.projects"
+        <app-project-policy
+          *ngFor="let project of user.projectPolicy.projects; let i = index"
           [name]="project.project.name"
           [permissions]="project.permissions"
-          [policy]="projectPolicySubjects[project._id]"
-        ></app-basic-policy>
+          [permissionsSubject]="projectPermissionsSubjects[i]"
+        ></app-project-policy>
+        <button
+          type="submit"
+          class="kh-btn kh-btn-blue ml-4 float-right"
+          (click)="saveProjectPolicy()"
+        >
+          Save project policy
+        </button>
       </div>
     </tab>
     <tab heading="Groups" customClass="kh-tab">

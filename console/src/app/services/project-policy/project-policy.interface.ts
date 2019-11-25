@@ -3,8 +3,9 @@ import { ProjectPermissions } from './project-permissions.interface';
 import { Project } from '@app/projects/models/project.model';
 import { Map } from '../map/models/map.model';
 import { MapPermissions } from './map-permissions.interface';
+import { BasicPolicy } from '../interfaces/basic-policy.interface';
 
-export interface ProjectPolicy {
+export interface ProjectPolicy extends BasicPolicy {
   _id?: string;
   projects: {
     project: Project;

@@ -9,15 +9,24 @@ import { BasicPolicy } from '@app/services/interfaces/basic-policy.interface';
   styleUrls: ['./basic-policy.component.scss']
 })
 export class BasicPolicyComponent {
-
   public toggleCheckboxes: Subject<boolean> = new Subject<boolean>();
   @Input() name: String;
-  @Input() permissions: BasicPermissions = { create: false, read: false, update: false, remove: false };
-  @Input() policy: Subject<BasicPolicy>;
+  @Input() permissions: BasicPermissions = {
+    create: false,
+    read: false,
+    update: false,
+    remove: false
+  };
+  @Input() policySubject: Subject<BasicPolicy>;
   constructor() { }
 
   get wholePolicyTrue() {
-    return this.permissions.create && this.permissions.read && this.permissions.update && this.permissions.remove;
+    return (
+      this.permissions.create &&
+      this.permissions.read &&
+      this.permissions.update &&
+      this.permissions.remove
+    );
   }
 
   toggleWholePolicy(newValue: boolean) {
@@ -31,7 +40,6 @@ export class BasicPolicyComponent {
 
   togglePermission(permissionName: string, newValue: boolean) {
     this.permissions[permissionName] = newValue;
-    this.policy.next({ permissions: this.permissions });
+    this.policySubject.next({ permissions: this.permissions });
   }
-
 }

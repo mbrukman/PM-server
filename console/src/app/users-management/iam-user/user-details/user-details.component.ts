@@ -15,6 +15,7 @@ import { PopupService } from '@shared/services/popup.service';
 import { IAMPolicy } from '@app/services/iam-policy/iam-policy.interface';
 import { IAMPolicyService } from '@app/services/iam-policy/iam-policy.service';
 import { ProjectPolicy } from '@app/services/project-policy/project-policy.interface';
+import { ProjectPermissions } from '@app/services/project-policy/project-permissions.interface';
 
 @Component({
   selector: 'app-user-details',
@@ -26,10 +27,13 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public user$: Observable<User>;
 
   public iamPolicySubject: Subject<IAMPolicy> = new Subject<IAMPolicy>();
-  public projectPolicySubjects: { [projectId: string]: Subject<ProjectPolicy> } = {
-    'project1': new Subject<ProjectPolicy>(),
-    'project2': new Subject<ProjectPolicy>(),
-  };
+
+  // TODO: make sense
+  public projectPermissionsSubjects: Subject<ProjectPermissions>[] = [
+    new Subject<ProjectPermissions>(),
+    new Subject<ProjectPermissions>()
+  ];
+
 
   @ViewChild(EditUserComponent)
   private editUserComponent: EditUserComponent;
@@ -92,6 +96,17 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       })
     );
 
+    // TODO: make sense
+    this.mainSubscription.add(
+      this.projectPermissionsSubjects[0].subscribe(permissions => {
+        this.user.projectPolicy.projects[0].permissions = permissions;
+      })
+    );
+    this.mainSubscription.add(
+      this.projectPermissionsSubjects[1].subscribe(permissions => {
+        this.user.projectPolicy.projects[1].permissions = permissions;
+      })
+    );
 
   }
 
@@ -133,8 +148,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     );
   }
 
-  saveProjectPolicies() {
-
+  saveProjectPolicy() {
+    console.log(this.user.projectPolicy);
+    throw new Error('not implemented');
   }
 
   ngOnDestroy(): void {
