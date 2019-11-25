@@ -14,7 +14,7 @@ import { EditUserComponent } from '../users-list/edit-user/edit-user.component';
 import { PopupService } from '@shared/services/popup.service';
 import { IAMPolicy } from '@app/services/iam-policy/iam-policy.interface';
 import { IAMPolicyService } from '@app/services/iam-policy/iam-policy.service';
-import { ProjectPolicy } from '@app/services/iam-policy/project-policy.interface';
+import { ProjectPolicy } from '@app/services/project-policy/project-policy.interface';
 
 @Component({
   selector: 'app-user-details',
