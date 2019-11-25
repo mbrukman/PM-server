@@ -16,7 +16,7 @@
         <app-policy
           [name]="'IAM'"
           [permissions]="user.iamPolicy.permissions"
-          [policy]="iamPolicy"
+          [policy]="iamPolicySubject"
         ></app-policy>
         <div class="buttons">
           <button
@@ -30,6 +30,12 @@
       </div>
       <div class="project-policies">
         <h2>Project policies:</h2>
+        <app-policy
+          *ngFor="project; in: user.projectPolicy.projects"
+          [name]="project.name"
+          [permissions]="project.permissions"
+          [policy]="iamPolicy"
+        ></app-policy>
       </div>
     </tab>
     <tab heading="Groups" customClass="kh-tab">

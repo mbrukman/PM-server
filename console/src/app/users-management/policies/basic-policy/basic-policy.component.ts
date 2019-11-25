@@ -1,19 +1,19 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Subject } from 'rxjs';
-import { IAMPolicy } from '@app/services/iam-policy/iam-policy.interface';
-import { IAMPermissions } from '@app/services/iam-policy/iam-permissions.interface';
+import { BasicPermissions } from '@app/services/interfaces/basic-permissions.interface';
+import { BasicPolicy } from '@app/services/interfaces/basic-policy.interface';
 
 @Component({
-  selector: 'app-policy',
+  selector: 'app-basic-policy',
   templateUrl: './policy.component.html',
   styleUrls: ['./policy.component.scss']
 })
-export class PolicyComponent {
+export class BasicPolicyComponent {
 
   public toggleCheckboxes: Subject<boolean> = new Subject<boolean>();
   @Input() name: String;
-  @Input() permissions: IAMPermissions = { create: false, read: false, update: false, remove: false };
-  @Input() policy: Subject<IAMPolicy>;
+  @Input() permissions: BasicPermissions = { create: false, read: false, update: false, remove: false };
+  @Input() policy: Subject<BasicPolicy>;
   constructor() { }
 
   get wholePolicyTrue() {

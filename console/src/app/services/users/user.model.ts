@@ -1,6 +1,7 @@
 import UserGroup from '@app/services/user-group/user-group.model';
 import UserDataInterface from '@app/services/users/user-data.interface';
 import { IAMPolicy } from '../iam-policy/iam-policy.interface';
+import { ProjectPolicy } from '../project-policy/project-policy.interface';
 
 export class User implements UserDataInterface {
   // tslint:disable-next-line:variable-name
@@ -12,6 +13,7 @@ export class User implements UserDataInterface {
   groups: Array<UserGroup | string>;
   changePasswordOnNextLogin: boolean;
   iamPolicy: IAMPolicy;
+  projectPolicy: ProjectPolicy;
 
   constructor(userData = {} as UserDataInterface) {
     // @ts-ignore

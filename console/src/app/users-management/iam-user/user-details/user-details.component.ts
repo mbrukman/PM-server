@@ -26,7 +26,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public user$: Observable<User>;
 
   public iamPolicySubject: Subject<IAMPolicy> = new Subject<IAMPolicy>();
-  public projectPolicySubject: Subject<ProjectPolicy> = new Subject<ProjectPolicy>();
+  public projectPolicySubjects: Subject<ProjectPolicy>[];
 
   @ViewChild(EditUserComponent)
   private editUserComponent: EditUserComponent;
