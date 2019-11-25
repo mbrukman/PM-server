@@ -5,9 +5,8 @@ const groupSchema = new Schema({
   name: { type: String, required: true },
   description: { type: String },
   iamPolicy: { type: Schema.Types.ObjectId, ref: "IAMPolicy" },
+  projectPolicy: { type: Schema.Types.ObjectId, ref: "ProjectPolicies" },
   users: [{ type: Schema.Types.ObjectId, ref: "User" }]
 });
 
-const UserGroup = mongoose.model("UserGroup", groupSchema, "user-groups");
-
-module.exports = UserGroup;
+module.exports = mongoose.model("UserGroup", groupSchema, "user-groups");

@@ -2,7 +2,7 @@ const Map = require("../models/map.model");
 const { MapStructure } = require("../models");
 const MapTrigger = require("../models/map-trigger.model");
 const MapResult = require("../models").MapResult;
-const Project = require("../models/project.model");
+const {Project} = require("../models");
 const shared = require("../shared/recents-maps");
 const mongoose = require("mongoose");
 

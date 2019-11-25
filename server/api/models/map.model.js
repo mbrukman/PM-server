@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+
 const Schema = mongoose.Schema;
 
 const mapSchema = new Schema(
@@ -17,6 +18,53 @@ const mapSchema = new Schema(
 
 mapSchema.statics.autocompleteKey = "name";
 mapSchema.statics.autocompleteValueField = "_id";
+
+mapSchema.post("save", async doc => {
+  const UserGroupModel = mongoose.model("UserGroup");
+  const UserModel = mongoose.model("User");
+  const MapPolicyModel = mongoose.model("MapPolicy");
+  const projectPolicyPopulate = {
+    path: "projectPolicy",
+    populate: {
+      path: "projects"
+    }
+  };
+  const users = await UserModel.find({}).populate(projectPolicyPopulate);
+  const userGroups = await UserGroupModel.find({}).populate(
+    projectPolicyPopulate
+  );
+
+  const mapItemsToPolicies = async item => {
+    const mapPolicy = new MapPolicyModel();
+    mapPolicy.map = doc;
+    if (!item.maps) {
+      item.maps = [];
+    }
+    item.maps.push(mapPolicy);
+    await item.save();
+    return mapPolicy.save();
+  };
+
+  const mapUsers = async user => {
+    if (user.projectPolicy) {
+      await Promise.all(user.projectPolicy.projects.map(mapItemsToPolicies));
+    }
+    return user.save();
+  };
+
+  const mapUserGroups = async userGroup => {
+    if (userGroup.projectPolicy) {
+      await Promise.all(
+        userGroup.projectPolicy.projects.map(mapItemsToPolicies)
+      );
+    }
+    return userGroup.save();
+  };
+
+  const mappedUserToPromises = users.map(mapUsers);
+  const mappedUserGroupsToPromises = userGroups.map(mapUserGroups);
+  return Promise.all(mappedUserToPromises.concat(mappedUserGroupsToPromises));
+});
 
 mapSchema.set("toJSON", {
   transform: function(doc, ret, options) {

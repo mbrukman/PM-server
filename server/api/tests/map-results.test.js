@@ -2,7 +2,7 @@ const { randomIdx } = require("./helpers");
 
 const request = require("supertest");
 const { MapResult } = require("../../api/models/map-results.model");
-const ProjectModel = require("../../api/models/project.model");
+const { Project } = require("../models");
 const { MapStructure } = require("../../api/models/map-structure.model");
 const AgentModel = require("../../api/models/agent.model");
 const {
@@ -18,7 +18,7 @@ const apiURL = "localhost:3000/api";
 
 describe("Map revisions endpoints should work correctly", () => {
   const mapResultTestDataManager = new TestDataManager(MapResult);
-  const projectTestDataManager = new TestDataManager(ProjectModel);
+  const projectTestDataManager = new TestDataManager(Project);
   const agentsTestDataManager = new TestDataManager(AgentModel);
   const mapStructureTestDataManager = new TestDataManager(MapStructure);
   let project;

@@ -1,7 +1,7 @@
 const { randomIdx } = require("./helpers");
 
 const request = require("supertest");
-const ProjectModel = require("../../api/models/project.model");
+const {Project} = require("../models");
 const { MapStructure } = require("../../api/models/map-structure.model");
 const {
   mapStructureFactory,
@@ -15,7 +15,7 @@ const apiURL = "localhost:3000/api";
 
 describe("Map revision endpoints should work correctly", () => {
   const mapStructureTestDataManager = new TestDataManager(MapStructure);
-  const projectTestDataManager = new TestDataManager(ProjectModel);
+  const projectTestDataManager = new TestDataManager(Project);
   let map;
   let project;
 

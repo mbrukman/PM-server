@@ -2,6 +2,10 @@ const Agent = require("./agent.model");
 const Group = require("./group.model");
 const Log = require("./logs.model");
 const Map = require("./map.model");
+const UserModel = require("./user.model");
+const UserGroupModel = require("./user-group.model");
+const { MapPolicyModel } = require("./project-policy/map-policy.model");
+const { ProjectPolicyModel } = require("./project-policy/project-policy.model");
 const {
   MapResult,
   AgentResultModel,
@@ -21,9 +25,14 @@ const Project = require("./project.model");
 const ScheduledJob = require("./scheduled-job.model");
 const Vault = require("./vault.model");
 const Socket = require("./socket.model");
+const {
+  ProjectPoliciesModel
+} = require("./project-policy/project-policies.model");
 
 module.exports = {
   Agent,
+  MapPolicyModel,
+  ProjectPolicyModel,
   Group,
   Log,
   Map,
@@ -38,6 +47,9 @@ module.exports = {
   ProcessModel,
   Trigger,
   Plugin,
+  ProjectPoliciesModel,
+  UserModel,
+  UserGroupModel,
   Project,
   ScheduledJob,
   Vault,

@@ -1,5 +1,5 @@
 const socket = require("socket.io-client");
-const ProjectModel = require("../../../api/models/project.model");
+const { Project } = require("../../models");
 const TestDataManager = require("./../factories/test-data-manager");
 const { MapStructure } = require("../../../api/models/map-structure.model");
 const {
@@ -24,7 +24,7 @@ module.exports = {
   },
   async generateMapAndProject() {
     const mapStructureTestDataManager = new TestDataManager(MapStructure);
-    const projectTestDataManager = new TestDataManager(ProjectModel);
+    const projectTestDataManager = new TestDataManager(Project);
     const projects = await projectTestDataManager.generateInitialCollection(
       projectsFactory.generateProjects()
     );

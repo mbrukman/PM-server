@@ -3,14 +3,14 @@ const {
   projectsFactory,
   mapsFactory
 } = require("./factories");
-const ProjectModel = require("../../api/models/project.model");
+const { Project } = require("../models");
 const { randomIdx } = require("./helpers");
 const request = require("supertest");
 
 const baseApiURL = "http://127.0.0.1:3000/api";
 
 describe("Projects API tests", () => {
-  const testDataManager = new TestDataManager(ProjectModel);
+  const testDataManager = new TestDataManager(Project);
 
   beforeEach(async () => {
     await testDataManager.generateInitialCollection(
