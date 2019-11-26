@@ -14,14 +14,17 @@ const groupSchema = new Schema({
   users: [{ type: Schema.Types.ObjectId, ref: "User" }]
 });
 
-groupSchema.pre("save", async function() {
-  if (!this.projectPolicy) {
-    this.projectPolicy = new ProjectPoliciesModel();
-    await this.projectPolicy.save();
+groupSchema.post("save", async function(doc) {
+  if (!doc.projectPolicy) {
+    doc.projectPolicy = new ProjectPoliciesModel();
+    doc.projectPolicy.group = doc._id;
+    await doc.projectPolicy.save();
+    doc.save();
   }
-  if (!this.iamPolicy) {
-    this.iamPolicy = new IAMPolicy();
-    await this.iamPolicy.save();
+  if (!doc.iamPolicy) {
+    doc.iamPolicy = new IAMPolicy();
+    doc.iamPolicy.group = doc._id;
+    await doc.save();
   }
 });
 

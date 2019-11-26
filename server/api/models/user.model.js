@@ -28,14 +28,17 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-userSchema.pre("save", async function() {
-  if (!this.projectPolicy) {
-    this.projectPolicy = new ProjectPoliciesModel();
-    await this.projectPolicy.save();
+userSchema.post("save", async function(doc) {
+  if (!doc.projectPolicy) {
+    doc.projectPolicy = new ProjectPoliciesModel();
+    doc.projectPolicy.user = doc._id;
+    await doc.projectPolicy.save();
+    doc.save();
   }
-  if (!this.iamPolicy) {
-    this.iamPolicy = new IAMPolicy();
-    await this.iamPolicy.save();
+  if (!doc.iamPolicy) {
+    doc.iamPolicy = new IAMPolicy();
+    doc.iamPolicy.user = doc._id;
+    await doc.save();
   }
 });
 

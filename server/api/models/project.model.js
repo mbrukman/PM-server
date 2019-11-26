@@ -17,7 +17,6 @@ projectSchema.statics.autocompleteValueField = "_id";
 
 // new project is added to policies of all users and groups !!!!
 projectSchema.post("save", async doc => {
-  console.log("post create");
   const UserGroupModel = mongoose.model("UserGroup");
   const ProjectPolicyModel = mongoose.model("ProjectPolicy");
   const UserModel = mongoose.model("User");
