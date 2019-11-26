@@ -1466,7 +1466,7 @@ async function actionsExecutionCallback(map, structure, runId, agent, process, a
   if (process.mandatory){
     for (let index = 0, length=actionsResults.length; index < length; index++) {
       //if any of the process's actions failed, stop execution
-      if(actionsResults[index].status == statusEnum.ERROR){
+      if(actionsResults[index].status === statusEnum.ERROR){
         markProcessAsDone();
         return endRunPathResults(runId, agent, map);
       }
