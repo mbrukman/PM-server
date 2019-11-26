@@ -7,7 +7,7 @@ const shared = require("../shared/recents-maps");
 const mongoose = require("mongoose");
 
 function getMapPlugins(mapStructure) {
-  let plugins = new Set();
+  const plugins = new Set();
   mapStructure.processes.forEach(process => {
     plugins.add(process.used_plugin);
   });

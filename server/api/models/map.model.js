@@ -48,12 +48,10 @@ mapSchema.post("save", async doc => {
     item.maps.push(mapPolicy);
 
     await item.save();
-    console.log(item);
     return mapPolicy.save();
   };
 
   const mapUsers = async user => {
-    console.log(user);
     if (user.projectPolicy) {
       await Promise.all(user.projectPolicy.projects.map(mapItemsToPolicies));
     }

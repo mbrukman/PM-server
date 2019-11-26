@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const Schema = mongoose.Schema;
+const _ = require("lodash");
 
 const {
   ProjectPoliciesModel
@@ -32,12 +33,33 @@ userSchema.post("save", async function(doc) {
   if (!doc.projectPolicy) {
     doc.projectPolicy = new ProjectPoliciesModel();
     doc.projectPolicy.user = doc._id;
+
+    if (doc.isAdmin === true) {
+      doc.projectPolicy.projects = doc.projectPolicy.projects.map(project => {
+        project.permissions = _.mapValues(project.permissions, () => true);
+        project.maps.map(mapData => {
+          mapData.permissions = _.mapValues(project.permissions, () => true);
+          return mapData;
+        });
+        return project;
+      });
+    }
     await doc.projectPolicy.save();
     doc.save();
   }
   if (!doc.iamPolicy) {
     doc.iamPolicy = new IAMPolicy();
     doc.iamPolicy.user = doc._id;
+    if (doc.isAdmin === true) {
+      doc.iamPolicy.permissions = _.mapValues(
+        doc.iamPolicy.permissions,
+        () => true
+      );
+    }
+    await doc.iamPolicy.save();
+  }
+
+  if (!doc.iamPolicy || !doc.projectPolicy) {
     await doc.save();
   }
 });

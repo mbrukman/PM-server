@@ -13,7 +13,11 @@ class AuthService {
   async login(email, password) {
     let user;
     try {
-      user = await User.findOne({ email });
+      user = await User.findOne({ email }).populate([
+        {
+          path: "iamPolicy"
+        }
+      ]);
     } catch (error) {
       throw new Error("Error reading user from db:", error);
     }

@@ -9,6 +9,7 @@ const vaultApi = require("../api/routes/vault.routes");
 const configTokenApi = require("../api/routes/config-token.routes");
 const autoCompleteApi = require("../api/routes/autocomplete.routes");
 const userGroupApi = require("../api/routes/user-group.routes");
+const projectPolicyApi = require("../api/routes/project-policies.routes");
 const usersApi = require("../api/routes/user.routes");
 const authApi = require("../api/routes/auth.routes");
 const iamPoliciesApi = require("../api/routes/iam-policies.routes");
@@ -22,6 +23,7 @@ module.exports = function bootstrapApi(app) {
   app.use("/api/iam-policies", authMiddleware, iamPoliciesApi);
   app.use("/api/triggers", authMiddleware, triggersApi);
   // TODO: agents auth
+  app.use("/api/project-policies", projectPolicyApi);
   app.use("/api/agents", agentsApi);
   app.use("/api/projects", authMiddleware, projectsApi);
   app.use("/api/scheduled-jobs", authMiddleware, scheduledJobsApi);

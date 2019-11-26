@@ -1,5 +1,4 @@
 const { UserModel } = require("../models");
-const IAMPolicy = require("../models/iam-policy.model");
 const crypto = require("crypto");
 const serverKey = process.env.SERVER_KEY;
 const mongoose = require("mongoose");
@@ -25,17 +24,7 @@ class UserService {
 
   async createUser(userData) {
     const user = new UserModel(userData);
-    const iamPolicy = new IAMPolicy();
-    iamPolicy.user = user._id;
-    user.iamPolicy = iamPolicy;
     user.password = this.hashPassword(user.password);
-    if (user.isAdmin === true) {
-      user.iamPolicy.permissions = _.mapValues(
-        user.iamPolicy.permissions,
-        () => true
-      );
-    }
-    await iamPolicy.save();
     return user.save();
   }
 
@@ -73,6 +62,17 @@ class UserService {
     return UserModel.findById(userId).populate([
       {
         path: "iamPolicy"
+      },
+      {
+        path: "projectPolicy",
+        populate: {
+          path: "projects",
+          model: "ProjectPolicy",
+          populate: {
+            path: "maps",
+            model: "MapPolicy"
+          }
+        }
       },
       {
         path: "groups",
@@ -191,6 +191,17 @@ class UserService {
         path: "groups"
       },
       {
+        path: "projectPolicy",
+        populate: {
+          path: "projects",
+          model: "ProjectPolicy",
+          populate: {
+            path: "maps",
+            model: "MapPolicy"
+          }
+        }
+      },
+      {
         path: "iamPolicy"
       }
     ]);
@@ -212,6 +223,7 @@ class UserService {
       "email",
       "groups",
       "iamPolicy",
+      "projectPolicy",
       "createdAt",
       "phoneNumber",
       "changePasswordOnNextLogin"
