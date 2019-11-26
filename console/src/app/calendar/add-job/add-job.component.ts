@@ -27,7 +27,10 @@ export class AddJobComponent implements OnInit, OnDestroy {
   cronConfig: CronJobsConfig = {
     multiple: false,
     quartz: false,
-    bootstrap: true
+    bootstrap: true,
+    option : {
+      minute : false
+    }
   };
 
 

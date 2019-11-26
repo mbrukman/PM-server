@@ -8,7 +8,7 @@ module.exports = {
       .then(vault => {
         req.io.emit("notification", {
           title: "Vault saved",
-          message: `${vault.name} saved successfully`,
+          message: `${vault.key} saved successfully`,
           type: "success"
         });
         return res.json(vault);

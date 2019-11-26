@@ -1391,8 +1391,8 @@ function runProcess(map, structure, runId, agent, process) {
 
     return actionExecutionPromises
       .then(actionsResults => {
-        // runs all actions of a process
-        return actionsExecutionCallback(map, structure, runId, agent, process);
+        // all actions done
+        return actionsExecutionCallback(map, structure, runId, agent, process, actionsResults);
       })
       .catch(error => {
         winston.log("error", error);
@@ -1447,7 +1447,14 @@ function runActionsInParallel(actionsArray, runId) {
  * @param {*} agent
  * @param {*} process
  */
-async function actionsExecutionCallback(map, structure, runId, agent, process) {
+async function actionsExecutionCallback(map, structure, runId, agent, process, actionsResults) {
+  function markProcessAsDone(){
+    updateProcessContext(runId, agent, process.uuid, process.iterationIndex, {
+      status: statusEnum.DONE,
+      finishTime: new Date()
+    });
+  }
+  
   if (
     !executions[runId] ||
     executions[runId].executionAgents[agent.key].status
@@ -1455,15 +1462,25 @@ async function actionsExecutionCallback(map, structure, runId, agent, process) {
     // status is just error or done
     return;
   }
+
+  if (process.mandatory){
+    for (let index = 0, length=actionsResults.length; index < length; index++) {
+      //if any of the process's actions failed, stop execution
+      if(actionsResults[index].status === statusEnum.ERROR){
+        markProcessAsDone();
+        return endRunPathResults(runId, agent, map);
+      }
+    }
+  }
+
+
   if (map.processResponse && map.processResponse == process.uuid) {
     const responseData = await runCode(map, runId, agent);
     executions[runId].subscription.next(responseData);
   }
   runProcessFunc(runId, agent, process, "postRunResult", process.postRun);
-  updateProcessContext(runId, agent, process.uuid, process.iterationIndex, {
-    status: statusEnum.DONE,
-    finishTime: new Date()
-  });
+  markProcessAsDone();
+  
   await runNodeSuccessors(map, structure, runId, agent, process.uuid);
 }
 

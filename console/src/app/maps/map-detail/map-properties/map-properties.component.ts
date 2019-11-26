@@ -30,34 +30,43 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.onInit = true;
-    const mapSubscription = this.mapsService.getCurrentMap()
-      .pipe(
-        tap(map => this.map = map),
-        filter(map => map),
-        mergeMap(() => this.projectsService.list(
-          null,
-          null,
-          {isArchived: false, globalFilter: null, sort: '-createdAt'})
-        )// filtering empty map result
-      ).subscribe(data => {
-        if (this.onInit) {
-          this.getProcessByMapId();
-          this.apiResponseCodeReference = this.map.apiResponseCodeReference;
-        }
 
+    const projectsSubscription = this.projectsService.list(
+      null,
+      null,
+      {isArchived: false, globalFilter: null, sort: '-createdAt'}
+    ).subscribe(data => {
         this.projects = data.items;
         this.projectsDropDown = this.projects.map(foundProject => {
           return {label: foundProject.name, value: foundProject._id};
         });
 
-        const project = this.projects.find((o) => (<string[]>o.maps).indexOf(this.map.id) > -1);
-        if (project && this.onInit) {
-          this.selectedProject = this.map.project ? this.map.project.id : project._id;
-          this.onInit = false;
-        }
-      });
+        const mapSubscription = this.mapsService.getCurrentMap()
+        .pipe(
+          tap(map => this.map = map),
+          filter(map => map)
+          // filtering empty map result
+        ).subscribe(data => {
+          if (this.onInit) {
+            this.getProcessByMapId();
+            this.apiResponseCodeReference = this.map.apiResponseCodeReference;
+          }
 
-    this.mainSubscription.add(mapSubscription);
+          if (!this.selectedProject) {
+            if (this.map.project) {
+              this.selectedProject = this.map.project.id;
+            } else {
+              const project = this.projects.find((o) => (<string[]>o.maps).indexOf(this.map.id) > -1);
+              if (project) {
+                this.selectedProject = project._id;
+              }
+            }
+          }
+        });
+        this.mainSubscription.add(mapSubscription);
+    });
+
+    this.mainSubscription.add(projectsSubscription);
   }
 
   getProcessByMapId() {
@@ -67,7 +76,6 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
       ).subscribe(structure => {
         if (structure.processes.length) {
           this.apiResponseAfterProcess = this.map.processResponse;
-          this.onChangeProcessResponse();
           this.processesDropDown.push({label: 'Select a Process', value: null});
           const processes = structure.processes.map(process => {
             return {label: process.name || process.used_plugin.name, value: process.uuid};
@@ -93,7 +101,7 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
   }
 
   onChangeProject() {
-    const mapObj = Object.assign({}, this.map, {project: {id: this.selectedProject}});
+    const mapObj = Object.assign({}, this.map, {project: this.selectedProject});
     this.mapsService.setCurrentMap(mapObj);
   }
 

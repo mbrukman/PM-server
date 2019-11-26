@@ -663,6 +663,5 @@ export class MapDesignComponent implements OnInit, AfterContentInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.mainSubscription.unsubscribe();
-    this.deselectAllCellsAndUpdateStructure();
   }
 }

@@ -19,7 +19,7 @@
       <p-column field="" header="Actions" [style]="{'width':'150px', 'text-align':'center'}">
         <ng-template let-col let-i="rowIndex" let-item="rowData" pTemplate="body">
             <div class="actions-wrapper">
-                <i class="material-icons garbage" (click)="upsertItem(item)">delete_outline</i>
+                <i class="material-icons garbage" (click)="deleteVaultItem(item.id, item)">delete_outline</i>
                 <i (click)="upsertItem(item)" class="material-icons garbage">edit</i>
             </div>
         </ng-template>

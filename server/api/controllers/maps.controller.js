@@ -13,45 +13,41 @@ const configToken = require("../services/token.service");
  * @param {*} execResult
  * @param {object} processNames - map of process uuid to process name
  */
-function _mapperResult(execResult, processNames = null) {
-  let newResult = Object.assign({}, execResult);
-  if (!execResult.agentsResults) {
-    return;
-  }
-  execResult.agentsResults.forEach((agentResult, agentIndex) => {
-    agentResult.processes.forEach((process, processIndex) => {
-      process = Object.assign({}, process);
-      let processResult = [];
-      let statuses = [];
-      if (process.actions) {
-        process.actions.forEach(action => {
-          statuses.push(action.status);
-          if (!action.result) {
-            action.result = { stdout: action.status };
-          }
-          processResult.push(action.result);
-        });
-      }
-      let processStatus = "error";
-      let mapS = {};
-      if (process.status == "done" && statuses) {
-        statuses.map(s => {
-          mapS[s] = 1;
-        });
-        if (mapS["error"] && mapS["success"]) {
-          processStatus = "partial";
-        } else if (!mapS["error"]) {
-          processStatus = "success";
-        }
-        process.status = processStatus;
-      }
-      process.index = process.iterationIndex;
-      process.result = processResult;
-      process.process ? (process.uuid = process.process.toString()) : null;
-      processNames ? (process.name = processNames[process.uuid]) : null;
-      newResult.agentsResults[agentIndex].processes[processIndex] = process;
-    });
-  });
+function _mapperResult(execResult, processNames=null, actionsNames=null) {
+    let newResult = Object.assign({},execResult)
+    if(!execResult.agentsResults){return }
+    execResult.agentsResults.forEach((agentResult, agentIndex) => {
+        agentResult.processes.forEach((process, processIndex) => {
+            process = Object.assign({},process)
+            let processResult = []
+            let statuses = [];
+           if(process.actions){
+                process.actions.forEach(action => {
+                    statuses.push(action.status)
+                    if(!action.result){
+                        action.result = {stdout:action.status}
+                    }
+                    if(actionsNames){
+                        action.name = actionsNames[action.action.toString()];
+                    }
+                    processResult.push(action.result)
+                })
+           }
+            let processStatus = 'error'
+            let mapS = {}
+            if(process.status == 'done' && statuses){
+                statuses.map(s => { mapS[s] = 1 })
+                if (mapS['error'] && mapS['success']) { processStatus = 'partial' }
+                else if (!mapS['error']) { processStatus = 'success' }
+                process.status = processStatus
+            }
+            process.index = process.iterationIndex;
+            process.result = processResult
+            process.process ? process.uuid = process.process.toString(): null
+            processNames ? process.name = processNames[process.uuid] : null
+            newResult.agentsResults[agentIndex].processes[processIndex] = process
+        })
+    })
 
   return newResult;
 }
@@ -532,11 +528,15 @@ module.exports = {
           execResult.structure
         );
         let processNames = {};
-        structure.processes.forEach(
-          process => (processNames[process.id] = process.name)
-        );
+        let actionsNames = {}
+        structure.processes.forEach(process => {
+          processNames[process.id] = process.name;
+          process.actions.forEach(action=>{
+            actionsNames[action.id] = action.name;
+          });
+        });
 
-        return _mapperResult(execResult.toJSON(), processNames);
+        return _mapperResult(execResult.toJSON(), processNames, actionsNames);
       })
       .then(execResult => {
         return res.json(execResult);
