@@ -1,7 +1,4 @@
 const mongoose = require("mongoose");
-const {
-  ProjectPoliciesModel
-} = require("./project-policy/project-policies.model");
 
 const Schema = mongoose.Schema;
 
@@ -20,16 +17,25 @@ projectSchema.statics.autocompleteValueField = "_id";
 
 // new project is added to policies of all users and groups !!!!
 projectSchema.post("save", async doc => {
+  console.log("post create");
   const UserGroupModel = mongoose.model("UserGroup");
+  const ProjectPolicyModel = mongoose.model("ProjectPolicy");
   const UserModel = mongoose.model("User");
-  const userGroups = await UserGroupModel.find({}).populate("projectPolicy");
-  const users = await UserModel.find({}).populate("projectPolicy");
+  const userGroups = await UserGroupModel.find({})
+    .populate("projectPolicy")
+    .exec();
+  const users = await UserModel.find({})
+    .populate({
+      path: "projectPolicy"
+    })
+    .exec();
   await Promise.all(
     users.map(async user => {
-      const projectPolicy = new ProjectPoliciesModel();
+      const projectPolicy = new ProjectPolicyModel();
       projectPolicy.project = doc;
       if (user.projectPolicy) {
         user.projectPolicy.projects.push(projectPolicy);
+        await user.projectPolicy.save();
         await projectPolicy.save();
       }
       return user.save();
@@ -37,11 +43,11 @@ projectSchema.post("save", async doc => {
   );
   await Promise.all(
     userGroups.map(async userGroup => {
-      const projectPolicy = new ProjectPoliciesModel();
+      const projectPolicy = new ProjectPolicyModel();
       projectPolicy.project = doc;
       if (userGroup.projectPolicy) {
         userGroup.projectPolicy.projects.push(projectPolicy);
-        await projectPolicy.save();
+        await userGroup.projectPolicy.save();
       }
       return userGroup.save();
     })

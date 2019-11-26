@@ -16,18 +16,26 @@ const projectPolicySchema = new Schema(
 projectPolicySchema.statics.autocompleteValueField = "_id";
 
 projectPolicySchema.pre("save", async function() {
+  if (!this.projects.length) {
+    return;
+  }
   const ProjectModel = mongoose.model("Project");
   const MapPolicyModel = mongoose.model("MapPolicy");
   const ProjectPolicyModel = mongoose.model("ProjectPolicy");
   const allProjects = await ProjectModel.find().populate("maps");
-  allProjects.forEach(project => {
+  const promises = allProjects.map(async project => {
     const projectPolicy = new ProjectPolicyModel();
     projectPolicy.project = project;
-    projectPolicy.maps = project.maps.map(map => {
-      const mapPolicy = new MapPolicyModel();
-      mapPolicy.map = map;
-      return mapPolicy;
-    });
+    projectPolicy.maps = await Promise.all(
+      project.maps.map(async map => {
+        const mapPolicy = new MapPolicyModel();
+        mapPolicy.map = map;
+        await mapPolicy.save();
+        return mapPolicy;
+      })
+    );
+    await Promise.all(promises);
+    await projectPolicy.save();
     this.projects.push(projectPolicy);
   });
 });

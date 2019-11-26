@@ -25,14 +25,18 @@ mapSchema.post("save", async doc => {
   const MapPolicyModel = mongoose.model("MapPolicy");
   const projectPolicyPopulate = {
     path: "projectPolicy",
+    model: "ProjectPolicies",
     populate: {
-      path: "projects"
+      path: "projects",
+      model: "ProjectPolicy"
     }
   };
-  const users = await UserModel.find({}).populate(projectPolicyPopulate);
-  const userGroups = await UserGroupModel.find({}).populate(
-    projectPolicyPopulate
-  );
+  const users = await UserModel.find({})
+    .populate(projectPolicyPopulate)
+    .exec();
+  const userGroups = await UserGroupModel.find({})
+    .populate(projectPolicyPopulate)
+    .exec();
 
   const mapItemsToPolicies = async item => {
     const mapPolicy = new MapPolicyModel();
@@ -40,13 +44,16 @@ mapSchema.post("save", async doc => {
     if (!item.maps) {
       item.maps = [];
     }
-    console.log(mapPolicy);
+
     item.maps.push(mapPolicy);
+
     await item.save();
+    console.log(item);
     return mapPolicy.save();
   };
 
   const mapUsers = async user => {
+    console.log(user);
     if (user.projectPolicy) {
       await Promise.all(user.projectPolicy.projects.map(mapItemsToPolicies));
     }

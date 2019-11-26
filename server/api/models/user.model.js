@@ -29,10 +29,14 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function() {
-  this.projectPolicy = new ProjectPoliciesModel();
-  this.iamPolicy = new IAMPolicy();
-  await this.iamPolicy.save();
-  await this.projectPolicy.save();
+  if (!this.projectPolicy) {
+    this.projectPolicy = new ProjectPoliciesModel();
+    await this.projectPolicy.save();
+  }
+  if (!this.iamPolicy) {
+    this.iamPolicy = new IAMPolicy();
+    await this.iamPolicy.save();
+  }
 });
 
 const UserModel = mongoose.model("User", userSchema, "users");
