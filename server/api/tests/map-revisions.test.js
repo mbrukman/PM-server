@@ -1,7 +1,7 @@
 const { randomIdx } = require("./helpers");
 
 const request = require("supertest");
-const {Project} = require("../models");
+const { Project } = require("../models");
 const { MapStructure } = require("../../api/models/map-structure.model");
 const {
   mapStructureFactory,

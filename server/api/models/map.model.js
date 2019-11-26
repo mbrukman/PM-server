@@ -40,6 +40,7 @@ mapSchema.post("save", async doc => {
     if (!item.maps) {
       item.maps = [];
     }
+    console.log(mapPolicy);
     item.maps.push(mapPolicy);
     await item.save();
     return mapPolicy.save();

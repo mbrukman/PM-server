@@ -1,4 +1,4 @@
-const User = require("../models/user.model");
+const { UserModel } = require("../models");
 const IAMPolicy = require("../models/iam-policy.model");
 const crypto = require("crypto");
 const serverKey = process.env.SERVER_KEY;
@@ -24,7 +24,7 @@ class UserService {
   }
 
   async createUser(userData) {
-    const user = new User(userData);
+    const user = new UserModel(userData);
     const iamPolicy = new IAMPolicy();
     iamPolicy.user = user._id;
     user.iamPolicy = iamPolicy;
@@ -70,7 +70,7 @@ class UserService {
       limit: filterOptions.options.limit || pageSize
     };
 
-    return User.findById(userId).populate([
+    return UserModel.findById(userId).populate([
       {
         path: "iamPolicy"
       },
@@ -95,7 +95,7 @@ class UserService {
       newUserData.password = this.hashPassword(newUserData.password);
       newUserData.changePasswordOnNextLogin = false;
     }
-    return User.findOneAndUpdate(
+    return UserModel.findOneAndUpdate(
       { _id },
       { $set: newUserData },
       {
@@ -115,8 +115,8 @@ class UserService {
         }
       };
     });
-    await User.bulkWrite(updates);
-    return User.find({
+    await UserModel.bulkWrite(updates);
+    return UserModel.find({
       _id: {
         $in: Object.keys(usersData)
       }
@@ -185,28 +185,24 @@ class UserService {
       }
     ];
 
-    try {
-      const users = await User.aggregate(resultsQuery);
-      const populatedUsers = await User.populate(users, [
-        {
-          path: "groups"
-        },
-        {
-          path: "iamPolicy"
-        }
-      ]);
-      const totalUsersLength = await User.aggregate(countQuery);
-      return {
-        items: populatedUsers,
-        totalCount: totalUsersLength.length ? totalUsersLength[0].count : 0
-      };
-    } catch (err) {
-      throw err;
-    }
+    const users = await UserModel.aggregate(resultsQuery);
+    const populatedUsers = await UserModel.populate(users, [
+      {
+        path: "groups"
+      },
+      {
+        path: "iamPolicy"
+      }
+    ]);
+    const totalUsersLength = await UserModel.aggregate(countQuery);
+    return {
+      items: populatedUsers,
+      totalCount: totalUsersLength.length ? totalUsersLength[0].count : 0
+    };
   }
 
   deleteUser(userId) {
-    return User.deleteOne({ _id: userId });
+    return UserModel.deleteOne({ _id: userId });
   }
 
   returnUserWithPickedFields(userDocument) {
