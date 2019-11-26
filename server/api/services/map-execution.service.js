@@ -1778,7 +1778,17 @@ async function executeAction(
 
         // mandatory action faild. stop execution (if no have retries)
         if (mandatoryActionFailed) {
-          stopExecution(runId, null, result);
+          updateProcessContext(
+            runId,
+            agent,
+            process.uuid,
+            process.iterationIndex,
+            {
+              status: statusEnum.DONE,
+              finishTime: new Date()
+            }
+          );
+          endRunPathResults(runId, agent, map);
           throw `Execution ${runId}: Mandatory action failed. Stopping execution`;
         }
 
