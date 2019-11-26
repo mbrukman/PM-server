@@ -35,33 +35,37 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
       null,
       null,
       {isArchived: false, globalFilter: null, sort: '-createdAt'}
-    ).subscribe(data=>{
+    ).subscribe(data => {
         this.projects = data.items;
         this.projectsDropDown = this.projects.map(foundProject => {
           return {label: foundProject.name, value: foundProject._id};
         });
 
-        const project = this.projects.find((o) => (<string[]>o.maps).indexOf(this.map.id) > -1);
-        if (project && this.onInit) {
-          this.selectedProject = this.map.project ? this.map.project.id : project._id;
-          this.onInit = false;
-        }
-    })
+        const mapSubscription = this.mapsService.getCurrentMap()
+        .pipe(
+          tap(map => this.map = map),
+          filter(map => map)
+          // filtering empty map result
+        ).subscribe(data => {
+          if (this.onInit) {
+            this.getProcessByMapId();
+            this.apiResponseCodeReference = this.map.apiResponseCodeReference;
+          }
 
+          if (!this.selectedProject) {
+            if (this.map.project) {
+              this.selectedProject = this.map.project.id;
+            } else {
+              const project = this.projects.find((o) => (<string[]>o.maps).indexOf(this.map.id) > -1);
+              if (project) {
+                this.selectedProject = project._id;
+              }
+            }
+          }
+        });
+        this.mainSubscription.add(mapSubscription);
+    });
 
-    const mapSubscription = this.mapsService.getCurrentMap()
-      .pipe(
-        tap(map => this.map = map),
-        filter(map => map)
-        // filtering empty map result
-      ).subscribe(data => {
-        if (this.onInit) {
-          this.getProcessByMapId();
-          this.apiResponseCodeReference = this.map.apiResponseCodeReference;
-        }
-      });
-
-    this.mainSubscription.add(mapSubscription);
     this.mainSubscription.add(projectsSubscription);
   }
 
