@@ -36,7 +36,7 @@ var configuration;
  */
 function getProcessById(processId) {
   return processes[processId];
-};
+}
 
 /**
  * Get a specific iteration of process, defaults to first one
@@ -46,7 +46,7 @@ function getProcessById(processId) {
 function getProcessIteration(process, index = -1) {
   index = index === -1 || index === 0 ? 0 : index - 1;
   return process[index];
-};
+}
 
 /**
  * Return the first process with the specific name or undefined.
@@ -56,7 +56,7 @@ function getProcessByName(name) {
   var processesKey = Object.keys(process);
   var processesName = processesKey.map(k => processes[k].name);
   return processes[processesKey[processesName.findIndex(o => o === name)]];
-};
+}
 
 /**
  * Return the action in the {actionIndex} number in the process specified
@@ -70,7 +70,7 @@ function getActionByIndex(actionIndex, process) {
   }
   var actionId = Object.keys(process.actions)[actionIndex];
   return process.actions[actionId];
-};
+}
 
 /**
  * Returns an object containing the process from all the running agent.
@@ -84,7 +84,7 @@ function getProcessCrossAgent(processId) {
       globalContext[agentKey].processes[processId];
   });
   return processes;
-};
+}
 
 /**
  * Return the selected configuration or undefined
@@ -92,7 +92,7 @@ function getProcessCrossAgent(processId) {
  */
 function getConfiguration() {
   return configuration;
-};
+}
 
 /** @type {KaholoVault} */
 var vault;

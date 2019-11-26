@@ -1,6 +1,6 @@
 const { jsf } = require("./jsf.helper");
 const MapModel = require("../../models/map.model");
-const {Project} = require("../../models");
+const { Project } = require("../../models");
 
 function getSimpleMapSchema() {
   return {

@@ -1,5 +1,4 @@
-
-const {Project} = require("../models");
+const { Project } = require("../models");
 const Map = require("../models/map.model");
 const { MapResult } = require("../models/map-results.model");
 
