@@ -162,7 +162,13 @@ module.exports = {
       ...JSON.parse(JSON.stringify(mapAgents)),
       ...JSON.parse(JSON.stringify(groupsAgents))
     ];
-    return await filterLiveAgents(totalAgents);
+    // avoid duplicate
+    const totalAgentFiltered = totalAgents.reduce((unique, item) => {
+      return unique.findIndex(agent => agent.key === item.key) !== -1
+        ? unique
+        : [...unique, item];
+    }, []);
+    return await filterLiveAgents(totalAgentFiltered);
   },
 
   /**
