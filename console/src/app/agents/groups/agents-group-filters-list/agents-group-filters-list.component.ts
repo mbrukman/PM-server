@@ -3,7 +3,7 @@ import {PopupService} from '@shared/services/popup.service';
 import {AgentsService} from '@app/services/agent/agents.service';
 import {Group} from '@agents/models';
 import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
-import {FILTER_FIELDS} from '@agents/models/group.model';
+import {FILTER_FIELDS, FILTER_TYPES} from '@agents/models/group.model';
 import {switchMap, take, tap} from 'rxjs/operators';
 import {Subscription} from 'rxjs';
 
@@ -14,6 +14,7 @@ import {Subscription} from 'rxjs';
 })
 export class AgentsGroupFiltersListComponent implements OnInit, OnDestroy {
   fields = FILTER_FIELDS;
+  types = FILTER_TYPES;
   items: any[];
   private mainSubscription = new Subscription();
   @Input('group') group: Group;
@@ -30,12 +31,17 @@ export class AgentsGroupFiltersListComponent implements OnInit, OnDestroy {
   }
 
   getLabelById(type, id) {
-    return this[type][this[type]
-      .findIndex(type => type.id === id)].label;
+    if (type === 'fields') {
+      return this.fields[this.fields.findIndex(field => field.id === id)].label;
+    }
+    if (type === 'types') {
+      return this.types[this.types.findIndex(filterType => filterType.id === id)].label;
+    }
+    return;
   }
 
   editFilter(filter, index) {
-    let content = {
+    const content = {
       edit: true,
       filter: filter
     };
