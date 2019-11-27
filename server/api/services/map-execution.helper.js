@@ -50,7 +50,9 @@ function createConfiguration(mapStructure, configuration) {
 }
 
 async function filterLiveAgents(agents) {
-  return agents.filter(agent => agent.status.alive);
+  return agents.filter(agent => {
+    return agent.status ? agent.status.alive : agent.alive;
+  });
 }
 
 module.exports = {
@@ -151,12 +153,12 @@ module.exports = {
    */
   async getRelevantAgent(groups, mapAgents) {
     let groupsAgents = {};
-    groups.forEach(async group => {
+    for (let group of groups) {
       groupsAgents = Object.assign(
         groupsAgents,
         await agentsService.evaluateGroupAgents(group)
       );
-    });
+    }
     groupsAgents = Object.keys(groupsAgents).map(key => groupsAgents[key]);
     const totalAgents = [
       ...JSON.parse(JSON.stringify(mapAgents)),
