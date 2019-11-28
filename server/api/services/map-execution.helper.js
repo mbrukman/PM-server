@@ -163,12 +163,8 @@ module.exports = {
       ...JSON.parse(JSON.stringify(groupsAgents))
     ];
     // avoid duplicate
-    const totalAgentFiltered = totalAgents.reduce((unique, item) => {
-      return unique.findIndex(agent => agent.key === item.key) !== -1
-        ? unique
-        : [...unique, item];
-    }, []);
-    return await filterLiveAgents(totalAgentFiltered);
+    _.uniqBy(totalAgents, "key");
+    return await filterLiveAgents(totalAgents);
   },
 
   /**
