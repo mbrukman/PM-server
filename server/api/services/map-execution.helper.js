@@ -51,7 +51,7 @@ function createConfiguration(mapStructure, configuration) {
 
 async function filterLiveAgents(agents) {
   return agents.filter(agent => {
-    return agent.status ? agent.status.alive : agent.alive;
+    return agent.status ? agent.alive : agent.status.alive;
   });
 }
 
