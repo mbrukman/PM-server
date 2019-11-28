@@ -32,10 +32,10 @@ export class AgentsGroupFiltersListComponent implements OnInit, OnDestroy {
 
   getLabelById(type, id) {
     if (type === 'fields') {
-      return this.fields[this.fields.findIndex(field => field.id === id)].label;
+      return this.fields.find(field => field.id === id).label;
     }
     if (type === 'types') {
-      return this.types[this.types.findIndex(filterType => filterType.id === id)].label;
+      return this.types.find(filterType => filterType.id === id).label;
     }
     return;
   }
