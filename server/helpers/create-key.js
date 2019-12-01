@@ -15,9 +15,5 @@ module.exports = {
     mkdirp.sync(path.dirname(outputPath));
     fs.writeFileSync(outputPath, keyValue);
     return keyValue;
-  },
-
-  generateKey: () => {
-    return randomValueHex(32);
-  },
+  }
 };

@@ -51,7 +51,7 @@ function createConfiguration(mapStructure, configuration) {
 
 async function filterLiveAgents(agents) {
   return agents.filter(agent => {
-    return agent.status ? agent.alive : agent.status.alive;
+    return agent.status ? agent.status.alive : agent.alive;
   });
 }
 
@@ -160,12 +160,12 @@ module.exports = {
       );
     }
     groupsAgents = Object.keys(groupsAgents).map(key => groupsAgents[key]);
-    const totalAgents = [
+    let totalAgents = [
       ...JSON.parse(JSON.stringify(mapAgents)),
       ...JSON.parse(JSON.stringify(groupsAgents))
     ];
     // avoid duplicate
-    _.uniqBy(totalAgents, "key");
+    totalAgents = _.uniqBy(totalAgents, "key");
     return await filterLiveAgents(totalAgents);
   },
 
