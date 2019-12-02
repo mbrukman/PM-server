@@ -49,7 +49,7 @@ function createConfiguration(mapStructure, configuration) {
     : { name: "custom", value: "" };
 }
 
-async function filterLiveAgents(agents) {
+function filterLiveAgents(agents) {
   return agents.filter(agent => {
     return agent.status ? agent.status.alive : agent.alive;
   });
@@ -166,7 +166,7 @@ module.exports = {
     ];
     // avoid duplicate
     totalAgents = _.uniqBy(totalAgents, "key");
-    return await filterLiveAgents(totalAgents);
+    return filterLiveAgents(totalAgents);
   },
 
   /**
