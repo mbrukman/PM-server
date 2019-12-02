@@ -165,7 +165,7 @@ module.exports = {
       ...JSON.parse(JSON.stringify(groupsAgents))
     ];
     // avoid duplicate
-    totalAgents = _.uniqBy(totalAgents,"key")
+    totalAgents = _.uniqBy(totalAgents, "key");
     return filterLiveAgents(totalAgents);
   },
 
