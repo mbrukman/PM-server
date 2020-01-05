@@ -7,14 +7,14 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { UnsavedGuard } from './shared/guards/unsaved.guard';
 import { SharedModule } from './shared/shared.module';
-import { MapsService } from './maps/maps.service';
+import { MapsService } from './services/map/maps.service';
 import { SocketService } from './shared/socket.service';
 import { PluginsService } from './plugins/plugins.service';
-import { AgentsService } from './agents/agents.service';
+import { AgentsService } from './services/agent/agents.service';
 import { ProjectsService } from './projects/projects.service';
-import { CalendarService } from './calendar/calendar.service';
+import { CalendarService } from './services/calendar/calendar.service';
 import { CoreModule } from './core/core.module';
-import { SettingsService } from './core/setup/settings.service';
+import { SettingsService } from './services/settings/settings.service';
 import { IsSetUpGuard } from './core/setup/issetup.guard';
 import { VaultService } from '@shared/vault.service';
 import {SeoService} from './seo.service';
@@ -28,7 +28,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 @NgModule({
   imports: [
-    CoreModule, 
+    CoreModule,
     BrowserModule,
     BrowserAnimationsModule,
     SharedModule,

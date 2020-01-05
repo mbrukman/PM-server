@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output, OnInit } from '@angular/core';
-import { MapsService } from '../maps/maps.service';
-import { Map } from '../maps/models/map.model';
+import { MapsService } from '../services/map/maps.service';
+import { Map } from '../services/map/models/map.model';
 import { Project } from '../projects/models/project.model';
 import { ProjectsService } from '../projects/projects.service';
 import { FilterOptions } from '@shared/model/filter-options.model';
@@ -34,7 +34,7 @@ export class SearchComponent implements OnInit {
       if (limit){
         filterOptions.limit = limit;
       }
-      
+
       this.loading = true;
       this.mapsService.filterMaps(null, filterOptions).subscribe(data => {
         this.maps = data.items;

@@ -1,11 +1,12 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { AgentsService } from '../agents.service';
-import { Agent, Group } from '@agents/models';
-import { timer } from 'rxjs';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {AgentsService} from '@app/services/agent/agents.service';
+import {AgentsGroupFilter, Group} from '@agents/models';
+import {timer} from 'rxjs';
 import {AgentsGroupUpsertFilterComponent} from '@agents/groups/agents-group-upsert-filter/agents-group-upsert-filter.component';
-import { switchMap, take } from 'rxjs/operators';
+import {switchMap, take, tap} from 'rxjs/operators';
 import {PopupService} from '@shared/services/popup.service';
+import {Agent} from '@app/services/agent/agent.model';
 
 @Component({
   selector: 'app-agents-list',
@@ -13,35 +14,33 @@ import {PopupService} from '@shared/services/popup.service';
   styleUrls: ['./agents-list.component.scss']
 })
 export class AgentsListComponent implements OnInit, OnDestroy {
-  agentsStatus: any;
-  agentsStatusReq: any;
-  agents: [Agent];
-  selectedAgent: Agent;
   items: any[];
-  selectedGroupSubscription: Subscription;
+  agents: [Agent];
+  agentsStatus: any;
   selectedGroup: Group;
-  constants : boolean = true;
+  constants: boolean = true;
+
+  private mainSubscription = new Subscription();
 
 
-  constructor(private agentsService: AgentsService,private popupService:PopupService) {
+  constructor(private agentsService: AgentsService, private popupService: PopupService) {
   }
 
   ngOnInit() {
-
-    this.agentsService.list().subscribe(agents => {
+    const agentListSubscription = this.agentsService.list().subscribe(agents => {
       this.agents = agents;
     });
 
-    this.agentsService.getSelectedGroupAsObservable().subscribe((group) => {
-      this.selectedGroup = group
-    })
+    const agentSelectedGroupSubscription = this.agentsService.getSelectedGroupAsObservable().subscribe((group) => {
+      this.selectedGroup = group;
+    });
 
-    this.agentsService.getUpdateGroupAsObservable().subscribe((group) => {
-      this.selectedGroup = group
-    })
-    
+    const agentUpdateGroupSubscription = this.agentsService.getUpdateGroupAsObservable().subscribe((group) => {
+      this.selectedGroup = group;
+    });
 
-    this.selectedGroupSubscription = this.agentsService
+
+    const selectedGroupSubscription = this.agentsService
       .getSelectedGroupAsObservable()
       .subscribe(group => {
         this.selectedGroup = group;
@@ -50,55 +49,43 @@ export class AgentsListComponent implements OnInit, OnDestroy {
 
     // get agents status to pass
 
-    this.agentsStatusReq = timer(0, 5000).pipe(switchMap(() => this.agentsService.status())).subscribe(statuses => {
+    const agentStatusSubscription = timer(0, 5000)
+      .pipe(
+        switchMap(() => this.agentsService.status())
+      ).subscribe(statuses => {
         this.agentsStatus = statuses;
       });
 
     this.items = [
-      { label: 'View', icon: 'fa-search', command: (event) => console.log('!') },
-      { label: 'Delete', icon: 'fa-close', command: (event) => console.log('@') }
+      {label: 'View', icon: 'fa-search', command: (event) => console.log('!')},
+      {label: 'Delete', icon: 'fa-close', command: (event) => console.log('@')}
     ];
+
+    this.mainSubscription.add(agentListSubscription);
+    this.mainSubscription.add(agentSelectedGroupSubscription);
+    this.mainSubscription.add(agentUpdateGroupSubscription);
+    this.mainSubscription.add(selectedGroupSubscription);
+    this.mainSubscription.add(agentStatusSubscription);
   }
 
   ngOnDestroy() {
-    if (this.agentsStatusReq) {
-      this.agentsStatusReq.unsubscribe();
-    }
+    this.mainSubscription.unsubscribe();
   }
 
-  
-  addNewFilterParam(group:Group){
-    this.popupService.openComponent(AgentsGroupUpsertFilterComponent,{edit:false})
-    .pipe(take(1))
-      .subscribe(filters => {
-        group.filters.push(filters)
-        this.agentsService.updateGroupToServer(group).subscribe((group) => {
-          this.agentsService.updateGroup(group)
-        })
-      });
-  } 
-
-
-  onSelectAgent(agent) {
-    this.selectedAgent = agent;
+  addNewFilterParam(group: Group) {
+    this.popupService.openComponent(AgentsGroupUpsertFilterComponent, {edit: false})
+      .pipe(
+        take(1),
+        tap((filters: AgentsGroupFilter) => group.filters.push(filters)),
+        switchMap(() => this.agentsService.updateGroupToServer(group))
+      ).subscribe((updatedGroup) => this.agentsService.updateGroup(updatedGroup));
   }
 
-  dragStart($event, agent) {
-    this.agentsService.dragStart(agent);
-  }
-
-  removeAgentFromGroup(agentId: string, groupId: string) {
-    this.agentsService.removeAgentFromGroup(agentId, groupId).pipe(
-      take(1)
-    ).subscribe(group => {
-        this.agentsService.updateGroup(group);
-      });
-  }
-
-  showAgents(){
+  showAgents() {
     this.constants = true;
   }
-  showFilters(){
+
+  showFilters() {
     this.constants = false;
   }
 }

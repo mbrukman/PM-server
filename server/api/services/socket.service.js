@@ -1,37 +1,44 @@
-const socket = require('socket.io');
-const winston = require('winston');
+const socketio = require("socket.io");
+const winston = require("winston");
+const Socket = require("../../api/models/socket.model");
 
-var _socket;
-var namespaces = {};
+let socketServerInstance;
 
+function init(server) {
+  socketServerInstance = socketio(server);
+  socketServerInstance.on("connection", function(socket) {
+    winston.log("info", "a user connected");
+  });
 
-
-function init(server){
-    // socket.io
-    _socket = socket(server);
-    _socket.on('connection', function (socket) {
-        winston.log('info', 'a user connected');
-    });
-
-
-
-    return _socket;
+  return socketServerInstance;
 }
 
+async function getNamespaceSocket(_namespaceName) {
+  let socketFromDatabase;
+  let namespaceToReturn;
 
-function getNamespaceSocket(nsp){
-    if (namespaces[nsp])
-        return namespaces[nsp];
-    namespaces[nsp] = _socket.of('/' + nsp);
-    
-    return namespaces[nsp];
+  try {
+    socketFromDatabase = await Socket.findOne({ namespace: _namespaceName });
+  } catch (error) {
+    throw new Error("error getting socket from database" + error);
+  }
+
+  if (socketFromDatabase) {
+    namespaceToReturn = socketServerInstance.of(
+      "/" + socketFromDatabase.namespace
+    );
+  } else {
+    socketFromDatabase = new Socket({ namespace: _namespaceName });
+    await socketFromDatabase.save();
+    namespaceToReturn = socketServerInstance.of("/" + _namespaceName);
+  }
+  return namespaceToReturn;
 }
 
 module.exports = {
-    init : init,
-    get socket(){
-        return _socket;
-    },
-    getNamespaceSocket : getNamespaceSocket,
-
-}
+  init,
+  get socket() {
+    return socketServerInstance;
+  },
+  getNamespaceSocket
+};

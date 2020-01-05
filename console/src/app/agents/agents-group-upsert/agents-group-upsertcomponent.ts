@@ -1,9 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-
-import { Subject } from 'rxjs';
-import { BsModalRef } from 'ngx-bootstrap';
-
-import { Group } from '@agents/models';
+import {Component, OnInit} from '@angular/core';
+import {BsModalRef} from 'ngx-bootstrap';
+import {Group} from '@agents/models';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-agents-group-upsert',
@@ -13,19 +11,20 @@ import { Group } from '@agents/models';
 export class AgentsGroupUpsertComponent implements OnInit {
   group: Group;
   name: string;
-  result: Subject<{name: string}> = new Subject();
+  result: Subject<{ name: string }> = new Subject();
 
-  constructor(public bsModalRef: BsModalRef) { }
+  constructor(public bsModalRef: BsModalRef) {
+  }
 
   ngOnInit(): void {
 
   }
 
   onConfirm() {
-    this.result.next({ name: this.name });
+    this.result.next({name: this.name});
     this.bsModalRef.hide();
   }
- 
+
   onClose() {
     this.bsModalRef.hide();
   }

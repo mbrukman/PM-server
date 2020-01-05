@@ -1,11 +1,9 @@
 const Map = require("../models/map.model");
-const MapStructure = require("../models").Structure;
-const env = require("../../env/enviroment");
-const MapTrigger = require("../models/map-trigger.model")
+const {MapStructure} = require("../models");
+const MapTrigger = require("../models/map-trigger.model");
 const MapResult = require("../models").MapResult;
-const Project = require("../models/project.model")
-const PAGE_SIZE = env.page_size;
-const shared = require("../shared/recents-maps")
+const Project = require("../models/project.model");
+const shared = require("../shared/recents-maps");
 const mongoose = require('mongoose');
 
 function getMapPlugins(mapStructure) {
@@ -16,11 +14,9 @@ function getMapPlugins(mapStructure) {
     return Array.from(plugins);
 }
 
-
-
 function getSort(sortString) {
     var sort = {}
-    if (sortString[0] == '-')
+    if (sortString[0] === '-')
         sort[sortString.slice(1)] = -1;
     else
         sort[sortString] = 1;
@@ -151,11 +147,11 @@ module.exports = {
                 },
             }
         ]
-
+        const pageSize = parseInt(process.env.PAGE_SIZE, 10);
         let resultsQuery = [...aggregateSteps,
             { $sort: getSort(sort) },
-            { $skip: page ? ((page - 1) * PAGE_SIZE) : 0 },
-            { $limit: filterOptions.options.limit || PAGE_SIZE },
+            { $skip: page ? ((page - 1) * pageSize) : 0 },
+            { $limit: filterOptions.options.limit || pageSize },
             { $unwind: '$project' },
             {
                 $unwind: {
@@ -207,7 +203,6 @@ module.exports = {
         }
 
         return MapStructure.findOne({ map: mapId }).sort('-createdAt').then(res=>{
-            console.log(res);
             return res;
         })
     },

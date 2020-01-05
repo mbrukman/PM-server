@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { Subject } from 'rxjs';
-import { BsModalRef } from 'ngx-bootstrap';
+import {Component} from '@angular/core';
+import {Subject} from 'rxjs';
+import {BsModalRef} from 'ngx-bootstrap';
 
 @Component({
   selector: 'app-input-popup',
@@ -9,7 +9,7 @@ import { BsModalRef } from 'ngx-bootstrap';
 })
 export class InputPopupComponent {
   name: any;
-  public result: Subject<string> = new Subject<string>();
+  result: Subject<string> = new Subject<string>();
 
   constructor(public bsModalRef: BsModalRef) {
   }
@@ -19,7 +19,6 @@ export class InputPopupComponent {
   }
 
   onConfirm() {
-    
     this.result.next(this.name);
     this.onClose();
   }

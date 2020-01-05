@@ -1,495 +1,640 @@
 const request = require("request");
 const fs = require("fs");
 const path = require("path");
-
+const socketService = require("./socket.service");
 const winston = require("winston");
-const _ = require("lodash");
 const humanize = require("../../helpers/humanize");
-const env = require("../../env/enviroment");
 const Map = require("../models/map.model");
 const Agent = require("../models").Agent;
 const Group = require("../models").Group;
-const ObjectId = require('mongoose').Types.ObjectId;
 
-const LIVE_COUNTER = env.retries; // attempts before agent will be considered dead
-const INTERVAL_TIME = env.interval_time;
-let agents = {}; // store the agents status.
-
+const LIVE_COUNTER = parseInt(process.env.RETRIES, 10); // attempts before agent will be considered dead
+const INTERVAL_TIME = parseInt(process.env.INTERVAL_TIME, 10);
+const socketNamespaceName = "/agents";
 
 const FILTER_TYPES = Object.freeze({
-    gte: 'gte',
-    gt: 'gt',
-    equal: 'equal',
-    contains: 'contains',
-    lte: 'lte',
-    lt: 'lt'
+  gte: "gte",
+  gt: "gt",
+  equal: "equal",
+  contains: "contains",
+  lte: "lte",
+  lt: "lt"
 });
 
-const FILTER_FIELDS = Object.freeze({
-    hostname: 'hostname',
-    arch: 'arch',
-    alive: 'alive',
-    freeSpace: 'freeSpace',
-    respTime: 'respTime',
-    url: 'url',
-    createdAt: 'createdAt'
-});
+// TODO: refactor into scheduler microservice
+// why?
+// - in node.js, setInterval returns a reference to Timout class instance, not intervalId handle number
+//   that's why it's impossible to save a reference to it in a model
+const runningIntervals = {};
 
-/* Send a post request to agent every INTERVAL seconds. Data stored in the agent variable, which is exported */
-let followAgentStatus = (agent) => {
-    let listenInterval = setInterval(() => {
-        let start = new Date();
-        if(!agents[agent.key]) return;
-        request.post(
-            agents[agent.key].defaultUrl + '/api/status', {
-                form: {
-                    key: agent.key
-                }
-            }, (error, response, body) => {
-                try {
-                    body = JSON.parse(body);
-                } catch (e) {
-                    body = { res: e };
-                }
-                if (!error && response.statusCode === 200 && agents[agent.key]) {
-                    agents[agent.key].name = agent.name;
-                    agents[agent.key].attributes = agent.attributes;
-                    agents[agent.key].alive = true;
-                    agents[agent.key].hostname = body.hostname;
-                    agents[agent.key].arch = body.arch;
-                    agents[agent.key].freeSpace = humanize.bytes(body.freeSpace);
-                    agents[agent.key].respTime = new Date() - start;
-                    agents[agent.key].url = agent.url;
-                    agents[agent.key].publicUrl = agent.publicUrl;
-                    agents[agent.key].defaultUrl = agents[agent.key].defaultUrl || '';
-                    agents[agent.key].id = agent.id;
-                    agents[agent.key].key = agent.key;
-                    agents[agent.key].installed_plugins = body.installed_plugins;
-                    agents[agent.key].liveCounter = LIVE_COUNTER;
-                } else if ( agents[agent.key] && (--agents[agent.key].liveCounter) === 0) {
-                    agents[agent.key].alive = false;
-                    if (!agents[agent.key].hostname) {
-                        agents[agent.key].hostname = 'unknown';
-                    }
-                    if (!agents[agent.key].arch) {
-                        agents[agent.key].arch = 'unknown';
-                    }
-                    if (!agents[agent.key].freeSpace) {
-                        agents[agent.key].freeSpace = 0;
-                    }
-                    agents[agent.key].respTime = 0;
-                }
-            })
-    }, INTERVAL_TIME);
-    if (!agents[agent.key]) {
-        agents[agent.key] = agent.toJSON();
-        agents[agent.key].alive = false;
-        agents[agent.key].following = true;
-        agents[agent.key].intervalId = listenInterval;
-        setDefaultUrl(agent);
-        // agents[agent.key] = { intervalId: listenInterval, alive: false, following: true };
-    }
-};
-
-/* stop following an agent */
-let unfollowAgentStatus = (agentId) => {
-    let agent = _.find(agents, (o) => {
-        return o.id === agentId
-    });
-    // stop the check interval
-    if (!agent) {
-        return;
-    }
-    clearInterval(agents[agent.key].intervalId);
-    agents[agent.key].alive = false;
-    agents[agent.key].following = false;
-
-};
-
-function getAgentStatus() {
-    return agents;
+function startInterval(agent) {
+  runningIntervals[agent.key] = setInterval(() => {
+    followAgentStatusIntervalFunction(agent);
+  }, INTERVAL_TIME);
 }
 
+function stopInterval(agent) {
+  clearInterval(runningIntervals[agent.key]);
+}
 
-function setDefaultUrl(agent) {
-    return new Promise((resolve, reject) => {
-        request.post(agent.url + '/api/status', { form: { key: agent.key } }, function (error, response, body) {
-            if (error) {
-                agents[agent.key].defaultUrl = agent.publicUrl;
-            } else {
-                agents[agent.key].defaultUrl = agent.url;
-            }
-            resolve();
-        });
-    });
+/**
+ * @param {string} agentKey - agent.key
+ * @return {agentStatusSchema}
+ */
+async function getAgentStatus(agentKey) {
+  const allAgentStatus = await getAllAgentsStatus();
+  return allAgentStatus[agentKey];
+}
+
+/**
+ * @return {Object} - where keys are agent.key
+ * and values are agentStatusSchema from agents.model
+ * plus socket
+ * plus agent model properties
+ */
+async function getAllAgentsStatus() {
+  const agents = await Agent.find();
+  if (!agents) {
+    return {};
+  }
+  // map agents to statuses
+  const agentStatusObject = {};
+  for (let agent of agents) {
+    // convert agent Doc to plain object
+    agent = JSON.parse(JSON.stringify(agent));
+
+    agentStatusObject[agent.key] = {};
+    Object.assign(agentStatusObject[agent.key], agent);
+    if (!agent.status) {
+      continue;
+    }
+
+    // assign status
+    Object.assign(agentStatusObject[agent.key], agent.status);
+    delete agentStatusObject[agent.key].status;
+    // create socket reference based on socketId stored in model
+    agentStatusObject[agent.key].socket = socketService.socket.of(
+      socketNamespaceName
+    ).connected[agent.status.socketId];
+  }
+  return agentStatusObject;
+}
+
+function pickRelevantStatusFields(status) {
+  const statusFields = Object.keys(Agent.schema.tree.status.tree);
+  Object.keys(status).forEach(statusKey => {
+    if (!statusFields.includes(statusKey)) {
+      delete status[statusKey];
+    }
+  });
+  return status;
+}
+
+async function saveStatusToAgent(agent, agentStatus) {
+  const fieldsToUpdate = pickRelevantStatusFields(agentStatus);
+  await Agent.findOneAndUpdate(
+    { key: agent.key },
+    {
+      $set: {
+        status: fieldsToUpdate
+      }
+    }
+  );
+}
+
+/* here we initiate following the agent status */
+async function startFollowingAgentStatus(agent) {
+  let agentStatus = await getAgentStatus(agent.key);
+  if (!agentStatus || !agentStatus.following) {
+    agentStatus = agent.toJSON();
+    agentStatus.alive = false;
+    agentStatus.following = true;
+
+    await setDefaultUrl(agent);
+  }
+  startInterval(agent);
+}
+
+/* stop following an agent */
+async function stopFollowingAgentStatus(agentId) {
+  const agent = await Agent.findOne({ "status.id": agentId });
+  if (!agent) {
+    return;
+  }
+  // stop the check interval
+  agent.status.alive = false;
+  agent.status.following = false;
+  agent.save();
+  stopInterval(agent);
+}
+
+/**
+ * function being called every interval
+ * @param {agentSchema} agent
+ */
+async function followAgentStatusIntervalFunction(agent) {
+  const start = new Date();
+  let agentStatus = await getAgentStatus(agent.key);
+
+  if (!agentStatus || !agentStatus.defaultUrl) {
+    console.error("no defaultUrl, can't follow agent status");
+    return;
+  }
+  request.post(
+    agentStatus.defaultUrl + "/api/status",
+    {
+      form: {
+        key: agent.key
+      }
+    },
+    async (error, response, body) => {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        body = { res: e };
+      }
+      if (!error && response.statusCode === 200) {
+        agentStatus = updateAliveAgent(agentStatus, body, start);
+      } else {
+        agentStatus.liveCounter -= 1;
+        if (agentStatus.liveCounter === 0) {
+          agentStatus = updateDeadAgent(agentStatus);
+        }
+      }
+      await saveStatusToAgent(agent, agentStatus);
+    }
+  );
+}
+
+function updateDeadAgent(agentStatus) {
+  agentStatus.alive = false;
+  if (!agentStatus.hostname) {
+    agentStatus.hostname = "unknown";
+  }
+  if (!agentStatus.arch) {
+    agentStatus.arch = "unknown";
+  }
+  if (!agentStatus.freeSpace) {
+    agentStatus.freeSpace = 0;
+  }
+  agentStatus.respTime = 0;
+  return agentStatus;
+}
+
+function updateAliveAgent(agentStatus, body, start) {
+  agentStatus.alive = true;
+  agentStatus.hostname = body.hostname;
+  agentStatus.arch = body.arch;
+  agentStatus.freeSpace = humanize.bytes(body.freeSpace);
+  agentStatus.respTime = new Date() - start;
+  agentStatus.installed_plugins = body.installed_plugins;
+  agentStatus.liveCounter = LIVE_COUNTER;
+  return agentStatus;
+}
+
+async function setDefaultUrl(agent) {
+  return new Promise((resolve, reject) => {
+    request.post(
+      agent.url + "/api/status",
+      { form: { key: agent.key } },
+      async function(error, response, body) {
+        const agentStatus = await getAgentStatus(agent.key);
+        if (error) {
+          agentStatus.defaultUrl = agent.publicUrl;
+        } else {
+          agentStatus.defaultUrl = agent.url;
+        }
+        await saveStatusToAgent(agent, agentStatus);
+        resolve();
+      }
+    );
+  });
 }
 
 /**
  * Evaluates group dynamic agents and constant agents.
- * @param group
- * @returns {any}
+ * @param {groupSchema} group
+ * @return {any}
  */
-function evaluateGroupAgents(group) {
-    group = JSON.parse(JSON.stringify(group)); // make sure its not a mongoose document
-    
-    let agentsCopy = {};
-    Object.keys(agents).map(key=>{
-        let a = Object.assign({},agents[key]);
-        delete a.socket;
-        agentsCopy[key] = a;
-    })
-    
-    let filteredAgents = Object.keys(agents).map(key => agentsCopy[key]);
-    group.filters.forEach(filter => {
-        filteredAgents = evaluateFilter(filter, filteredAgents);
+async function evaluateGroupAgents(group) {
+  group = JSON.parse(JSON.stringify(group)); // make sure its not a mongoose document
+
+  const agentsCopy = {};
+  const allAgentsStatus = await getAllAgentsStatus();
+  // remove socket
+  Object.keys(allAgentsStatus).map(key => {
+    const a = Object.assign({}, allAgentsStatus[key]);
+    delete a.socket;
+    agentsCopy[key] = a;
+  });
+
+  let filteredAgents = Object.keys(allAgentsStatus).map(key => agentsCopy[key]);
+  group.filters.forEach(filter => {
+    filteredAgents = evaluateFilter(filter, filteredAgents);
+  });
+
+  // array of the constant agents attached to the group
+  const constAgents = group.agents.reduce((total, current) => {
+    const agent = Object.keys(agentsCopy).find(key => {
+      return agentsCopy[key].id === current;
     });
+    if (agent) {
+      total.push(agentsCopy[agent]);
+    }
+    return total;
+  }, []);
 
-    // array of the constant agents attached to the group
-    const constAgents = group.agents.reduce((total, current) => {
-        const agent = Object.keys(agentsCopy).find(key => {
-            return agentsCopy[key].id === current;
-        });
-        if (agent) {
-            total.push(agentsCopy[agent]);
-        }
-        return total;
-    }, []);
-
-
-    filteredAgents = [...filteredAgents, ...constAgents];
-    return filteredAgents.reduce((total, current) => {
-        total[current.key] = current;
-        return total;
-    }, {});
+  filteredAgents = [...filteredAgents, ...constAgents];
+  return filteredAgents.reduce((total, current) => {
+    total[current.key] = current;
+    return total;
+  }, {});
 }
 
 /**
  * Evaluates group's filter on given agents
- * @param filter
- * @param agents
- * @returns array of filtered agents
+ * @param {?} filter
+ * @param {Array} agents
+ * @return {Array} of filtered agents
  */
 function evaluateFilter(filter, agents) {
-    return agents.filter(o => {
+  return agents.filter(o => {
+    if (!o[filter.field]) {
+      return false;
+    }
+    switch (filter.filterType) {
+      case FILTER_TYPES.equal: {
         if (!o[filter.field]) {
-            return false;
+          return false;
         }
-        switch (filter.filterType) {
-            case FILTER_TYPES.equal: {
-                if (!o[filter.field]) {
-                    return false;
-                }
-                return o[filter.field].toString() === filter.value;
-            }
-            case FILTER_TYPES.contains: {
-                return o[filter.field].includes(filter.value);
-            }
+        return o[filter.field].toString() === filter.value;
+      }
+      case FILTER_TYPES.contains: {
+        return o[filter.field].includes(filter.value);
+      }
 
-            case FILTER_TYPES.gt: {
-                try {
-                    return parseFloat(o[filter.field]) > parseFloat(filter.value);
-                } catch (e) {
-                    return false;
-                }
-            }
-
-            case FILTER_TYPES.gte: {
-                try {
-                    return parseFloat(o[filter.field]) >= parseFloat(filter.value);
-                } catch (e) {
-                    return false;
-                }
-            }
-
-            case FILTER_TYPES.lt: {
-                try {
-                    return parseFloat(o[filter.field]) < parseFloat(filter.value);
-                } catch (e) {
-                    return false;
-                }
-            }
-
-            case FILTER_TYPES.lte: {
-                try {
-                    return parseFloat(o[filter.field]) <= parseFloat(filter.value);
-                } catch (e) {
-                    return false;
-                }
-            }
-
-            default: {
-                return false;
-            }
+      case FILTER_TYPES.gt: {
+        try {
+          return parseFloat(o[filter.field]) > parseFloat(filter.value);
+        } catch (e) {
+          return false;
         }
-    });
+      }
+
+      case FILTER_TYPES.gte: {
+        try {
+          return parseFloat(o[filter.field]) >= parseFloat(filter.value);
+        } catch (e) {
+          return false;
+        }
+      }
+
+      case FILTER_TYPES.lt: {
+        try {
+          return parseFloat(o[filter.field]) < parseFloat(filter.value);
+        } catch (e) {
+          return false;
+        }
+      }
+
+      case FILTER_TYPES.lte: {
+        try {
+          return parseFloat(o[filter.field]) <= parseFloat(filter.value);
+        } catch (e) {
+          return false;
+        }
+      }
+
+      default: {
+        return false;
+      }
+    }
+  });
+}
+
+async function sendRequestToAgent(_options, agent) {
+  const options = Object.assign({}, _options);
+  const agentStatus = await getAgentStatus(agent.key);
+  if (!agentStatus.defaultUrl) {
+    console.error("No defaultUrl:", agentStatus.defaultUrl);
+    return new Error("No defaultUrl");
+  }
+
+  options.uri = agentStatus.defaultUrl + options.uri;
+  options.method = options.method || "POST";
+
+  if (options.body) {
+    options.json = true;
+    options.body.key = agent.key;
+  } else if (options.formData) {
+    options.formData.key = agent.key;
+  }
+
+  winston.log("info", "Sending request to agent");
+  request(options, function(error, response, body) {
+    if (error) {
+      return error;
+    }
+    return response;
+  });
+}
+
+function deleteAgentFromMap(agentId) {
+  return Map.updateMany(
+    { agents: { $elemMatch: { $eq: agentId } } },
+    { $pull: { agents: { $in: [agentId] } } }
+  );
 }
 
 /**
- * Adding a socketid to agents statuses (if agentkey exists)
- * @param agentKey
- * @param socket
+ * a remote agent calls this to add himself
+ * @param {agentSchema} agent
+ * @return {Agent}
  */
-function addSocketIdToAgent(agentKey, socket) {
-    if (!agents.hasOwnProperty(agentKey)) {
-        return;
-    }
-    agents[agentKey].socket = socket;
-}
-
-function sendRequestToAgent(options, agent) {
-    return new Promise((resolve, reject) => {
-        options = Object.assign({},options);
-        options.uri = agents[agent.key].defaultUrl + options.uri;
-        options.method = options.method || 'POST';
-
-        if (options.body) {
-            options.json = true;
-            options.body.key = agent.key;
-        }
-        else if (options.formData)
-            options.formData.key =  agent.key;
-        
-
-        winston.log('info', "Sending request to agent");
-        request(options, function (error, response, body) {
-            if (error) { return reject(error) }
-            resolve(response)
-        })
+function add(agent) {
+  return Agent.findOne({ key: agent.key })
+    .then(agentObj => {
+      if (!agentObj) {
+        return Agent.create(agent);
+      }
+      return Agent.findByIdAndUpdate(agentObj._id, {
+        $set: { url: agent.url, publicUrl: agent.publicUrl, isDeleted: false }
+      });
     })
+    .then(async agent => {
+      await startFollowingAgentStatus(agent);
+      return agent;
+    });
 }
 
+// get an object of installed plugins and versions on certain agent.
+async function checkPluginsOnAgent(agent) {
+  const agentStatus = await getAgentStatus(agent.key);
+  return new Promise((resolve, reject) => {
+    request.post(
+      agentStatus.defaultUrl + "/api/plugins",
+      { form: { key: agent.key } },
+      function(error, response, body) {
+        if (error || response.statusCode !== 200) {
+          resolve("{}");
+        }
+        resolve(body);
+      }
+    );
+  });
+}
 
-function deleteAgentFromMap(agentId){
-    return Map.updateMany({agents:{$elemMatch:{$eq:agentId}}},{$pull:{agents:{$in:[agentId]}}})
+function deleteAgent(agentId) {
+  return Agent.findByIdAndUpdate(agentId, {
+    $set: { isDeleted: "true" }
+  }).then(async agent => {
+    await deleteAgentFromMap(agentId);
+    const agentStatus = await getAgentStatus(agent.key);
+    if (agentStatus) {
+      stopFollowingAgentStatus(agentId);
+    }
+    // remove status from agent
+    Agent.update({ key: agent.key }, { $unset: { status: 1 } });
+  });
+}
+/* filter the agents. if no query is passed, will return all agents */
+function filter(query = {}) {
+  query.isDeleted = { $ne: true };
+  return Agent.find(query);
+}
+/* send plugin file to an agent */
+async function installPluginOnAgent(pluginPath, agent) {
+  const formData = {
+    file: {
+      value: fs.createReadStream(pluginPath),
+      options: {
+        filename: path.basename(pluginPath)
+      }
+    }
+  };
+
+  const requestOptions = {
+    uri: "/api/plugins/install",
+    formData: formData
+  };
+
+  // if there is no agents, send this plugin to all living agents
+  if (!agent) {
+    const requests = [];
+    const agentStatuses = await getAllAgentsStatus();
+    for (const key in agentStatuses) {
+      if (!agentStatuses[key].alive) {
+        continue;
+      }
+      requests.push(sendRequestToAgent(requestOptions, agentStatuses[key]));
+    }
+    return Promise.all(requests);
+  } else {
+    return Promise.all([sendRequestToAgent(requestOptions, agent)]);
+  }
+}
+
+/**
+ *
+ * @param {string} name
+ * @param {Agent} agent
+ * @return {Promise<result[]>}
+ */
+async function deletePluginOnAgent(name, agent) {
+  // if there is no agents, send this plugin to all living agents
+  const requestOptions = {
+    body: { name: name },
+    uri: "/api/plugins/delete"
+  };
+
+  if (!agent) {
+    const requests = [];
+    const agents = await getAllAgentsStatus();
+    for (const key in agents) {
+      if (!agents[key].alive) {
+        continue;
+      }
+      requests.push(sendRequestToAgent(requestOptions, agents[key]));
+    }
+    return Promise.all(requests);
+  } else {
+    return Promise.all([sendRequestToAgent(requestOptions, agent)]);
+  }
+}
+
+/* restarting the agents live status, and updating the status for all agents */
+async function restartAgentsStatus() {
+  await Agent.updateMany(
+    {},
+    { $set: { "status.alive": false, "status.following": false } }
+  );
+
+  await Agent.find({}).then(agents => {
+    agents.forEach(agent => {
+      startFollowingAgentStatus(agent);
+    });
+  });
+}
+
+/* update an agent */
+function update(agentId, agent) {
+  return Agent.findByIdAndUpdate(agentId, agent, { new: true });
+}
+
+function updateGroup(groupId, groupUpdated) {
+  return Group.findOne({ _id: groupId }).then(group => {
+    group.name = groupUpdated.name;
+    group.filters = groupUpdated.filters;
+    return group.save();
+  });
+}
+
+/* Groups */
+/**
+ * Creating new group object
+ * @param {groupSchema} group
+ * @return {group}
+ */
+function createGroup(group) {
+  return Group.create(group);
+}
+
+function groupsList(query = {}) {
+  return Group.find(query);
+}
+
+/**
+ * Adding agents to group
+ * @param {ObjectID} groupId
+ * @param {ObjectID} agentsId
+ * @return {Query}
+ */
+function addAgentToGroup(groupId, agentsId) {
+  return Group.findByIdAndUpdate(
+    groupId,
+    { $addToSet: { agents: { $each: agentsId } } },
+    { new: true }
+  );
+}
+
+/**
+ * Adding filters to group
+ * @param {ObjectID} groupId
+ * @param {?} filters
+ * @return {Query}
+ */
+function addGroupFilters(groupId, filters) {
+  return Group.findByIdAndUpdate(
+    groupId,
+    { $set: { filters: filters } },
+    { new: true }
+  );
+}
+
+/**
+ * Delete a group.
+ * @param {ObjectID} groupId
+ * @return {Query}
+ */
+function deleteGroup(groupId) {
+  return Group.findByIdAndRemove(groupId);
+}
+
+/**
+ * Returning a group by it's id
+ * @param {ObjectID} groupId
+ * @return {Query}
+ */
+function groupDetail(groupId) {
+  return Group.findById(groupId);
+}
+
+/**
+ * Removes agents ref from groups.
+ * @param {string} agentId
+ * @return {Promise}
+ */
+function removeAgentFromGroups(agentId) {
+  return Group.update(
+    { agents: { $in: [agentId] } },
+    { $pull: { agents: { $in: [agentId] } } }
+  );
+}
+
+function deleteFilterFromGroup(groupId, index) {
+  return Group.findOne({ _id: groupId }).then(group => {
+    group.filters.splice(index, 1);
+    return group.save();
+  });
+}
+
+/**
+ * Removing an agent from a group
+ * @param {ObjectID} groupId
+ * @param {ObjectID} agentId
+ * @return {Query|*}
+ */
+function removeAgentFromGroup(groupId, agentId) {
+  return Group.findOne({ _id: groupId }).then(group => {
+    group.agents.splice(
+      group.agents.findIndex(agent => agent.id == agentId),
+      1
+    );
+    return group.save();
+  });
+}
+
+/**
+ * Adding a socket to agents statuses (if agentkey exists)
+ * @param {string} agentKey
+ * @param {Socket} socket
+ */
+async function addSocketIdToAgent(agentKey, socket) {
+  const agent = await Agent.findOne({ key: agentKey });
+  if (!agent || !agent.status) {
+    return;
+  }
+  agent.status.socketId = socket.id;
+  agent.save();
+}
+
+/**
+ * Establish a room for agents
+ * @param {Socket} socket
+ */
+function establishSocket(socket) {
+  const nsp = socket.of(socketNamespaceName);
+  nsp.on("connection", function(socket) {
+    winston.log("info", "Agent log");
+    // agent send key on connection string
+    addSocketIdToAgent(socket.client.request._query.key, socket);
+  });
 }
 
 module.exports = {
-    add: (agent) => {
-        return Agent.findOne({ key: agent.key }).then(agentObj => {
-            if (!agentObj) {
-                return Agent.create(agent)
-            }
-            return Agent.findByIdAndUpdate(agentObj._id, { $set: { url: agent.url, publicUrl: agent.publicUrl,isDeleted:false } });
-        }).then(agent => {
-            followAgentStatus(agent)
-            return setDefaultUrl(agent).then(()=>{
-                return agent;
-            });
-        })
-    },
-    getByKey: (agentKey) => {
-        agents[agentKey].key = agentKey;
-        return agents[agentKey];
-    },
-    // get an object of installed plugins and versions on certain agent.
-    checkPluginsOnAgent: (agent) => {
-        return new Promise((resolve, reject) => {
-            console.log(" checkPluginsOnAgent", agents[agent.key].defaultUrl);
-            request.post(agents[agent.key].defaultUrl + '/api/plugins', { form: { key: agent.key } }, function (error, response, body) {
-                if (error || response.statusCode !== 200) {
-                    resolve('{}');
-                }
-                resolve(body);
-
-            });
-        });
-    },
-    delete: (agentId) => {
-        return Agent.findByIdAndUpdate(agentId,{ $set: { "isDeleted": "true" } }).then(async(agent) => {
-            let deleteAgent = await deleteAgentFromMap(agentId)
-            if(agents[agent.key]){
-                clearInterval(agents[agent.key].intervalId)
-            }
-            delete agents[agent.key];
-        })
-    },
-    /* filter the agents. if no query is passed, will return all agents */
-    filter: (query = {}) => {
-        query.isDeleted = {$ne:true};
-        return Agent.find(query);
-    },
-    /* send plugin file to an agent */
-    installPluginOnAgent: (pluginPath, agent) => {
-        let formData = {
-            file: {
-                value: fs.createReadStream(pluginPath),
-                options: {
-                    filename: path.basename(pluginPath),
-                }
-            }
-        };
-        // if there is no agents, send this plugin to all living agents
-        var requestOptions = {
-            uri: "/api/plugins/install",
-            formData: formData
-        };
-
-        if (!agent) {
-            var requests = []
-            for (let i in agents) {
-                if (!agents[i].alive) {
-                    continue;
-                }
-                requests.push(sendRequestToAgent(requestOptions, agents[i]));
-            }
-            return Promise.all(requests);
-        } else {
-            return Promise.all([sendRequestToAgent(requestOptions, agent)]);
-        }
-    },
-
-    /**
-     * 
-     * @param {string} name 
-     * @param {Agent} agent 
-     * @returns {Promise<result[]>}
-     */
-    deletePluginOnAgent: function (name, agent) {
-        // if there is no agents, send this plugin to all living agents
-        var requestOptions = {
-            body: { name: name },
-            uri: "/api/plugins/delete"
-        }
-
-        if (!agent) {
-            var requests = [];
-            for (let i in agents) {
-                if (!agents[i].alive) {
-                    continue;
-                }
-
-                requests.push(sendRequestToAgent(requestOptions, agents[i]));
-            }
-            return Promise.all(requests);
-        } else {
-            return Promise.all([sendRequestToAgent(requestOptions, agent)]);
-        }
-    },
-
-    /* restarting the agents live status, and updating the status for all agents */
-    restartAgentsStatus: () => {
-        agents = {};
-        Agent.find({}).then(agents => {
-            agents.forEach(agent => {
-                followAgentStatus(agent);
-            })
-        })
-    },
-    setDefaultUrl: setDefaultUrl,
-    followAgent: followAgentStatus,
-    unfollowAgent: unfollowAgentStatus,
-    /* update an agent */
-    update: (agentId, agent) => {
-        return Agent.findByIdAndUpdate(agentId, agent, { new: true });
-    },
-
-    updateGroup: (groupId, groupUpdated) => {
-
-        return Group.findOne({_id:groupId}).then((group => {
-            group.name = groupUpdated.name
-            group.filters = groupUpdated.filters
-            return group.save();
-        }))
-
-    },
-    /* exporting the agents status */
-    agentsStatus: getAgentStatus,
-
-    /* Groups */
-    /**
-     * Creaqting new group object
-     * @param group
-     * @returns {group}
-     */
-    createGroup: (group) => {
-        return Group.create(group);
-    },
-
-    groupsList: (query = {}) => {
-        return Group.find(query);
-    },
-
-    /**
-     * Adding agents to group
-     * @param groupId
-     * @param agentsId
-     * @returns {Query}
-     */
-    addAgentToGroup: (groupId, agentsId) => {
-        return Group.findByIdAndUpdate(groupId, { $addToSet: { agents: { $each: agentsId } } }, { new: true });
-    },
-
-    /**
-     * Adding filters to group
-     * @param groupId
-     * @param filters
-     * @returns {Query}
-     */
-    addGroupFilters: (groupId, filters) => {
-        return Group.findByIdAndUpdate(groupId, { '$set': { 'filters': filters } }, { new: true });
-    },
-
-    /**
-     * Delete a group.
-     * @param groupId
-     * @returns {Query}
-     */
-    deleteGroup: (groupId) => {
-        return Group.findByIdAndRemove(groupId);
-    },
-
-    /**
-     * Returning a group by it's id
-     * @param groupId
-     * @returns {Query}
-     */
-    groupDetail: (groupId) => {
-        return Group.findById(groupId);
-    },
-
-    evaluateGroupAgents: evaluateGroupAgents,
-
-    /**
-     * Removes agents ref from groups.
-     * @param agentId
-     */
-    removeAgentFromGroups: (agentId) => {
-        return Group.update({ agents: { $in: [agentId] } }, { $pull: { agents: { $in: [agentId] } } })
-    },
-
-
-    deleteFilterFromGroup: (groupId,index) => {
-        return Group.findOne({_id:groupId}).then((group) => {
-            group.filters.splice(index,1);
-            return group.save();
-        })
-    },
-
-    /**
-     * Removing an agent from a group
-     * @param groupId
-     * @param agentId
-     * @returns {Query|*}
-     */
-    removeAgentFromGroup: (groupId, agentId) => {
-        return Group.findOne({_id:groupId}).then((group) => {
-            group.agents.splice(group.agents.findIndex(agent => agent.id == agentId),1)
-            return group.save();
-        })
-    },
-    /**
-     * Establish a room for agents
-     * @param socket
-     */
-    establishSocket: (socket) => {
-        const nsp = socket.of('/agents');
-        nsp.on('connection', function (socket) {
-            winston.log("info", "Agent log");
-            // agent send key on connection string
-            addSocketIdToAgent(socket.client.request._query.key, socket);
-        });
-
-
-    }
-
+  add,
+  delete: deleteAgent,
+  setDefaultUrl,
+  followAgent: startFollowingAgentStatus,
+  unfollowAgent: stopFollowingAgentStatus,
+  getAllAgentsStatus,
+  evaluateGroupAgents,
+  checkPluginsOnAgent,
+  filter,
+  installPluginOnAgent,
+  deletePluginOnAgent,
+  restartAgentsStatus,
+  update,
+  updateGroup,
+  createGroup,
+  groupsList,
+  addAgentToGroup,
+  addGroupFilters,
+  deleteGroup,
+  groupDetail,
+  removeAgentFromGroups,
+  deleteFilterFromGroup,
+  removeAgentFromGroup,
+  establishSocket,
+  getAgentStatus
 };

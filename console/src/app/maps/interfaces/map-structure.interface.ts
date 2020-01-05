@@ -1,4 +1,3 @@
-import { IPluginMethodParam } from '@plugins/interfaces/plugin-method-param.interface';
 import { IPluginMethod } from '@plugins/interfaces/plugin-method.interface';
 import { IPlugin } from '@plugins/interfaces/plugin.interface';
 import { Plugin } from '@plugins/models/plugin.model';
@@ -23,8 +22,8 @@ export interface IAction {
   mandatory: boolean;
   method: IPluginMethod | string;
   params?: IActionParam[];
-  isEnabled: boolean
-  numParallel? : string;
+  isEnabled: boolean;
+  numParallel?: string;
 }
 
 export interface IUsedPlugin {
@@ -51,8 +50,8 @@ export interface IProcess {
   updatedAt: Date;
   correlateAgents: boolean;
   uuid: string;
-  actionsExecution: string
-  numProcessParallel? :string
+  actionsExecution: string;
+  numProcessParallel?: string;
 }
 
 export interface ILink {

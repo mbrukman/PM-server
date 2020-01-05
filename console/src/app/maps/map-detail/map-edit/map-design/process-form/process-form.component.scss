@@ -2,228 +2,225 @@
 @import "~src/assets/sass/base";
 @import "~src/assets/sass/mixins";
 .wrapper-form {
+  .header-process {
+    padding: 0px 26px 0px 17px;
+    h3 {
+      @extend .pane-header;
+      border: none;
+      padding: 0px;
+    }
+  }
 
-    .header-process{
-        padding: 0px 26px 0px 17px;
-        h3 {
-            @extend .pane-header;
-            border: none;
-            padding: 0px
-        }
+  .mandatory-check {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 0 !important;
+    margin-bottom: 0.5rem;
+    label.control {
+      font-size: 14px;
     }
 
-    .mandatory-check{
+    @include checkbox();
+    .text-muted {
+      margin-top: 9px;
+    }
+  }
+  .actions-dnd {
+    .action-tile {
+      &:hover {
+        cursor: grab;
+      }
+      &:active {
+        cursor: grabbing !important;
+      }
+
+      .action-config {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        ::ng-deep {
+          p-inputswitch {
+            .ui-inputswitch {
+              width: 30px;
+              height: 15px;
+              position: relative;
+              display: inline-block;
+              .ui-inputswitch-slider:before {
+                left: 0;
+                bottom: 0;
+                height: 15px;
+                width: 15px;
+                border-radius: 50%;
+                transition: 0.1s;
+                position: absolute;
+                content: "";
+              }
+            }
+          }
+        }
+        .disabled {
+          opacity: 0.7;
+        }
+        span {
+          display: block;
+          margin-left: 18px;
+        }
+      }
+
+      .action-btns {
+        i:not(:last-of-type) {
+          margin-right: 13px;
+        }
+      }
+    }
+    .gu-transit {
+      background: black;
+      padding: 5px 10px 5px 20px;
+    }
+  }
+  .add-action {
+    width: 122px;
+    float: right;
+    margin: 25px 0px 25px 0px;
+  }
+  ::ng-deep {
+    .panel-body {
+      padding: 0 20px 20px;
+    }
+    .panel-open {
+      background: $kh-background;
+      .card-header {
+        border: none;
+        background: $kh-background;
+      }
+      .clearfix {
+        color: $pale-blue;
+
+        &:hover {
+          color: $pale-blue !important;
+        }
+      }
+      .arrow {
+        transform: rotate(180deg);
+      }
+    }
+    .card {
+      color: $greyish-text;
+      border-bottom: 1px solid #4c5156;
+
+      &:hover {
+        box-shadow: initial;
+      }
+
+      .card-header {
+        cursor: pointer;
+        padding: 0.75rem 20px;
+      }
+    }
+  }
+  .process-form {
+    margin-bottom: 55px;
+    border-top: 0px;
+    .dropdown {
+      width: 100%;
+      @include dropdown();
+    }
+
+    .clearfix:hover {
+      color: white;
+    }
+
+    .action-form {
+      font-size: 13px;
+      padding-right: 20px;
+      padding-left: 20px;
+      background-color: #22272c;
+      .header {
         display: flex;
         justify-content: space-between;
-        
-        label.control{
-            font-size: 14px;
+        .header-action {
+          font-size: 16px;
+          color: $pale-blue;
+          padding-top: 14px;
+          padding-bottom: 17px;
         }
+        .arrow-btn {
+          padding: 0;
+        }
+      }
 
-        @include checkbox();
-        .text-muted{
-            margin-top: 9px;
+      .timeout {
+        padding-right: 10px;
+        padding-left: 0;
+      }
+
+      .retries {
+        padding-right: 0;
+        padding-left: 10px;
+      }
+
+      .parallel {
+        margin-bottom: 6px;
+      }
+
+      .row-title {
+        padding-top: 20px;
+        font-weight: bold;
+
+        .col-4 {
+          padding-left: 0;
         }
+        .col-2 {
+          padding-left: 0;
+        }
+      }
+      @include autocomplete();
+      .dropdown {
+        width: 100%;
+        @include dropdown();
+      }
+      ::ng-deep {
+        app-params {
+          .input {
+            flex: 0 0 50%;
+            max-width: 50%;
+          }
+        }
+      }
+      .param-wrapper {
+        margin-bottom: 12px;
+        .col-4 {
+          padding-left: 0;
+        }
+        .col-2 {
+          @include checkbox();
+        }
+        .col-6 {
+          padding-right: 0;
+        }
+      }
+      .text-center {
+        direction: rtl;
+        padding-bottom: 30px;
+        padding-top: 20px;
+      }
     }
-    .actions-dnd {
-        .action-tile {
-            &:hover {
-                cursor: grab;
-            }
-            &:active {
-                cursor: grabbing !important;
-            }
-
-
-            .action-config{
-                display: flex;
-                align-items: center;
-                cursor: pointer;
-                ::ng-deep{
-                    p-inputswitch{
-                        .ui-inputswitch{
-                            width: 30px;
-                            height: 15px;
-                            position: relative;
-                            display: inline-block;
-                            .ui-inputswitch-slider:before {
-                                left: 0;
-                                bottom: 0;
-                                height: 15px;
-                                width: 15px;
-                                border-radius: 50%;
-                                transition: .1s;
-                                position: absolute;
-                                content: "";
-                            }
-                        }
-                    }
-                }
-                .disabled{
-                    opacity: 0.7;
-                }
-                span {
-                    display: block;
-                    margin-left: 18px;
-                }
-            }
-
-            .action-btns {
-                i:not(:last-of-type){
-                    margin-right: 13px;
-                }
-            }
-        }
-        .gu-transit {
-            background: black;
-            padding: 5px 10px 5px 20px;
-        }
+    .pane-bottom {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      text-align: center;
     }
-    .add-action {
-        width: 122px;
-        float: right;
-        margin: 25px 0px 25px 0px;
+  }
+  .dropdown-pm {
+    cursor: pointer;
+    color: $pale-blue;
+
+    .fa {
+      font-size: 20px;
     }
-    ::ng-deep {
-        .panel-body {
-            padding: 0 20px 20px;
-        }
-        .panel-open {
-            background: $kh-background;
-            .card-header {
-                border: none;
-                background: $kh-background;
-            }
-            .clearfix {
-                color: $pale-blue;
 
-                &:hover{
-                    color: $pale-blue !important;
-                }
-            }
-            .arrow {
-                transform: rotate(180deg);
-            }
-        }
-        .card {
-            color: $greyish-text;
-            border-bottom: 1px solid #4c5156;
-
-            &:hover{
-              box-shadow: initial;
-            }
-
-            .card-header {
-                cursor: pointer;
-                padding: .75rem 20px;
-            }
-        }
+    .dropdown-menu {
+      top: 80% !important;
     }
-    .process-form {
-        margin-bottom: 55px;
-        border-top: 0px;
-        .dropdown{
-            width: 100%;
-            @include dropdown();
-        } 
-
-        .clearfix:hover{
-            color: white;
-        }
-
-        .action-form {
-            font-size: 13px;
-            padding-right: 20px;
-            padding-left: 20px;
-            background-color: #22272c;
-            .header{
-                display: flex;
-                justify-content: space-between;
-                .header-action{
-                    font-size: 16px;
-                    color: $pale-blue;
-                    padding-top: 14px;
-                    padding-bottom: 17px;
-                }
-                .arrow-btn{
-                    padding: 0;
-                }
-            }
-
-            .timeout{
-                padding-right: 10px;
-                padding-left: 0;
-            }
-
-            .retries{
-                padding-right: 0;
-                padding-left: 10px;
-            }
-
-            .parallel{
-                margin-bottom: 6px;
-            }
-
-            .row-title{
-                padding-top: 20px;
-                font-weight: bold;
-                
-                .col-4{
-                    padding-left: 0;
-                }
-                .col-2{
-                    padding-left: 0
-                }
-                
-            }
-            @include autocomplete();
-            .dropdown{
-                width: 100%;
-                @include dropdown();
-            }
-            ::ng-deep{
-                app-params{
-                    .input{
-                       flex: 0 0 50%;
-                       max-width: 50%;
-                    }
-                }
-            }
-            .param-wrapper {
-                margin-bottom: 12px;
-                .col-4{
-                    padding-left: 0
-                }
-                .col-2{
-                    @include checkbox();
-                }
-                .col-6{
-                    padding-right: 0;
-                }
-            }
-            .text-center{
-                direction: rtl;
-                padding-bottom: 30px;
-                padding-top: 20px;
-            }
-            
-        }
-        .pane-bottom {
-            margin-top: 10px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-    }
-    .dropdown-pm {
-        cursor: pointer;
-        color: $pale-blue;
- 
-        .fa {
-            font-size: 20px;
-        }
-
-        .dropdown-menu{
-            top: 80% !important;
-        }
-    }
+  }
 }

@@ -5,11 +5,6 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './map-environment-pane.component.html',
   styleUrls: ['./map-environment-pane.component.scss']
 })
-export class MapEnvironmentPaneComponent implements OnInit {
+export class MapEnvironmentPaneComponent {
   tab: string = 'plugins';
-  constructor() { }
-
-  ngOnInit() {
-  }
-
 }

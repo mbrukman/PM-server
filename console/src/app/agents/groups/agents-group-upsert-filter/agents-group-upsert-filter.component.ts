@@ -1,11 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
-
-
-import { FILTER_FIELDS, FILTER_TYPES, AgentsGroupFilter } from '@agents/models/group.model';
-
-import { BsModalRef } from 'ngx-bootstrap';
-import { Subject } from 'rxjs';
-import { SelectItem } from 'primeng/primeng';
+import {Component, OnInit} from '@angular/core';
+import {FILTER_FIELDS, FILTER_TYPES, AgentsGroupFilter} from '@agents/models/group.model';
+import {BsModalRef} from 'ngx-bootstrap';
+import {Subject} from 'rxjs';
+import {SelectItem} from 'primeng/primeng';
 
 
 @Component({
@@ -15,26 +12,28 @@ import { SelectItem } from 'primeng/primeng';
 })
 export class AgentsGroupUpsertFilterComponent implements OnInit {
   filterTypes = FILTER_TYPES;
-  filterDropDown:SelectItem[];
-  fieldsDropDown:SelectItem[];
+  filterDropDown: SelectItem[];
+  fieldsDropDown: SelectItem[];
   fields = FILTER_FIELDS;
-  filter : AgentsGroupFilter;
+  filter: AgentsGroupFilter;
   edit: boolean;
 
   public result: Subject<AgentsGroupFilter> = new Subject<AgentsGroupFilter>();
 
 
   constructor(public bsModalRef: BsModalRef) {
-    }
+  }
 
-  ngOnInit(){
-    if (!this.filter) this.filter  = new AgentsGroupFilter();
+  ngOnInit() {
+    if (!this.filter) {
+      this.filter = new AgentsGroupFilter();
+    }
     this.fieldsDropDown = this.fields.map(field => {
-      return {label:field.label,value:field.id}
-    })
+      return {label: field.label, value: field.id};
+    });
     this.filterDropDown = this.filterTypes.map(filter => {
-      return {label:filter.label,value:filter.id}
-    })
+      return {label: filter.label, value: filter.id};
+    });
 
   }
 

@@ -1,11 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { filter, tap, mergeMap } from "rxjs/operators";;
-import { MapsService } from '../../maps.service';
-import { Map } from '@maps/models/map.model';
-import { ProjectsService } from '@projects/projects.service';
-import { Project } from '@projects/models/project.model';
-import { SelectItem } from 'primeng/primeng';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {filter, tap, mergeMap} from 'rxjs/operators';
+import {MapsService} from '@app/services/map/maps.service';
+import {Map} from '@app/services/map/models/map.model';
+import {ProjectsService} from '@projects/projects.service';
+import {Project} from '@projects/models/project.model';
+import {SelectItem} from 'primeng/primeng';
 
 
 @Component({
@@ -16,71 +16,84 @@ import { SelectItem } from 'primeng/primeng';
 export class MapPropertiesComponent implements OnInit, OnDestroy {
   map: Map;
   projects: Project[];
-  projectsDropDown:SelectItem[] = [];
-  mapSubscription: Subscription;
+  projectsDropDown: SelectItem[] = [];
   selectedProject: string;
-  queue: number;
-  onInit:boolean;
-  processesDropDown:SelectItem[] = [];
-  apiResponseAfterProcess:string;
-  apiResponseCodeRefrence:string;
+  onInit: boolean;
+  processesDropDown: SelectItem[] = [];
+  apiResponseAfterProcess: string;
+  apiResponseCodeReference: string;
+
+  private mainSubscription = new Subscription();
+
   constructor(private mapsService: MapsService, private projectsService: ProjectsService) {
   }
 
   ngOnInit() {
     this.onInit = true;
-    this.mapSubscription = this.mapsService.getCurrentMap().pipe(
-      tap(map => this.map = map),
-      filter(map => map),
-      mergeMap(() => this.projectsService.list(null,null,{isArchived:false,globalFilter:null,sort:'-createdAt'}))// filtering empty map result
+
+    const projectsSubscription = this.projectsService.list(
+      null,
+      null,
+      {isArchived: false, globalFilter: null, sort: '-createdAt'}
     ).subscribe(data => {
-
-        if(this.onInit){
-          this.getProcessByMapId();
-          this.apiResponseCodeRefrence = this.map.apiResponseCodeReference;
-        }
-
         this.projects = data.items;
-        this.projectsDropDown = this.projects.map(project => {
-          return {label:project.name,value:project._id}
-        })
-        
-        let project = this.projects.find((o) => (<string[]>o.maps).indexOf(this.map.id) > -1);
-        if (project && this.onInit) {
-          this.selectedProject = this.map.project ? this.map.project.id : project._id;
-          this.onInit = false;
+        this.projectsDropDown = this.projects.map(foundProject => {
+          return {label: foundProject.name, value: foundProject._id};
+        });
+
+        const mapSubscription = this.mapsService.getCurrentMap()
+        .pipe(
+          tap(map => this.map = map),
+          filter(map => map)
+          // filtering empty map result
+        ).subscribe(data => {
+          if (this.onInit) {
+            this.getProcessByMapId();
+            this.apiResponseCodeReference = this.map.apiResponseCodeReference;
+          }
+
+          if (!this.selectedProject) {
+            if (this.map.project) {
+              this.selectedProject = this.map.project.id;
+            } else {
+              const project = this.projects.find((o) => (<string[]>o.maps).indexOf(this.map.id) > -1);
+              if (project) {
+                this.selectedProject = project._id;
+              }
+            }
+          }
+        });
+        this.mainSubscription.add(mapSubscription);
+    });
+
+    this.mainSubscription.add(projectsSubscription);
+  }
+
+  getProcessByMapId() {
+    const currentMapSubscription = this.mapsService.getCurrentMapStructure()
+      .pipe(
+        filter((structure) => !!structure)
+      ).subscribe(structure => {
+        if (structure.processes.length) {
+          this.apiResponseAfterProcess = this.map.processResponse;
+          this.processesDropDown.push({label: 'Select a Process', value: null});
+          const processes = structure.processes.map(process => {
+            return {label: process.name || process.used_plugin.name, value: process.uuid};
+          });
+          this.processesDropDown.push(...processes);
         }
       });
+    this.mainSubscription.add(currentMapSubscription);
   }
 
-  getProcessByMapId(){
-    this.mapsService.getCurrentMapStructure().pipe(filter((structure) => !!structure))
-    .subscribe(structure => {
-      if(structure.processes.length){
-        this.apiResponseAfterProcess = this.map.processResponse;
-        this.onChangeProcessResponse();
-        this.processesDropDown.push({label:'Select a Process',value:null});
-        let processes = structure.processes.map(process => {
-          return {label:process.name || process.used_plugin.name, value:process.uuid}
-        })
-        this.processesDropDown.push(...processes);
-
-      }
-    })
-  }
-
-  onChangeProcessResponse(){
-    let mapObj = Object.assign({}, this.map, { processResponse: this.apiResponseAfterProcess });
+  onChangeProcessResponse() {
+    const mapObj = Object.assign({}, this.map, {processResponse: this.apiResponseAfterProcess});
     this.mapsService.setCurrentMap(mapObj);
   }
 
-  onapiResponseCodeReference(){
-    let mapObj = Object.assign({}, this.map, { apiResponseCodeReference: this.apiResponseCodeRefrence });
+  onapiResponseCodeReference() {
+    const mapObj = Object.assign({}, this.map, {apiResponseCodeReference: this.apiResponseCodeReference});
     this.mapsService.setCurrentMap(mapObj);
-  }
-
-  ngOnDestroy() {
-    this.mapSubscription.unsubscribe();
   }
 
   onMapUpdate() {
@@ -88,15 +101,19 @@ export class MapPropertiesComponent implements OnInit, OnDestroy {
   }
 
   onChangeProject() {
-    let mapObj = Object.assign({}, this.map, { project: {id:this.selectedProject} });
+    const mapObj = Object.assign({}, this.map, {project: this.selectedProject});
     this.mapsService.setCurrentMap(mapObj);
   }
 
-  archiveMap(isArchive:boolean) {
-    this.mapsService.archive(this.map.id, isArchive).subscribe(() => {
+  archiveMap(isArchive: boolean) {
+    const archiveSub = this.mapsService.archive(this.map.id, isArchive).subscribe(() => {
       this.map.archived = isArchive;
       this.mapsService.setCurrentMap(this.map);
     });
+    this.mainSubscription.add(archiveSub);
   }
 
+  ngOnDestroy(): void {
+    this.mainSubscription.unsubscribe();
+  }
 }

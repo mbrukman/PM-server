@@ -13,7 +13,7 @@ export class PluginsService {
   }
 
   delete(id) {
-    return this.http.delete(`api/plugins/${id}/delete`);
+    return this.http.delete(`api/plugins/${id}`);
   }
 
   list() {

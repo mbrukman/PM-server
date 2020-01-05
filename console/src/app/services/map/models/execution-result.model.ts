@@ -1,8 +1,8 @@
 import { Map } from './map.model';
-import { Action, MapStructureConfiguration, MapStructure, Process } from '.';
-import { IActionResult, IAgentResult, IMapResult, IProcessResult } from '../interfaces/execution-result.interface';
+import { Action, MapStructureConfiguration, MapStructure, Process } from '@maps/models';
+import { IActionResult, IAgentResult, IMapResult, IProcessResult } from '@maps/interfaces/execution-result.interface';
 import { PluginMethod } from '@plugins/models/plugin-method.model';
-import { Agent } from '@agents/models/agent.model';
+import { Agent } from '@app/services/agent/agent.model';
 
 
 export class ActionResult implements IActionResult {

@@ -1,3 +1,7 @@
+server/.env
+server/diagnostic.data
+server/mongod.lock
+server/storage.bson
 project
 /.idea/
 static_cdn/
@@ -69,9 +73,12 @@ private.ts
 
 /server/dist
 /server/env/config.json
+/server/env/config.test.json
 /server/libs/plugins/*
 /server/tmp
 /console/env.json
+/server/config.json
+/server/dbdir
 
 #centOs
 *.service

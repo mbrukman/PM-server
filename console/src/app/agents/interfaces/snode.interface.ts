@@ -1,8 +1,8 @@
-import { IAgent } from "./agent.interface";
+import { IAgent } from './agent.interface';
 
 export interface ISNode {
-  name: string,
-  parent?: ISNode,
-  children?: [ISNode],
-  agent?: string | IAgent
+  name: string;
+  parent?: ISNode;
+  children?: [ISNode];
+  agent?: string | IAgent;
 }
