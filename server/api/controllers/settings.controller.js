@@ -1,9 +1,11 @@
 module.exports = {
-    settings: (req, res) => res.send({
-                isSetup: !!process.env.DB_URI,
-                version: global.kaholo.VERSION
-            }),
-
+    getSetings: ()=>{
+        return {
+            isSetup: !!process.env.DB_URI,
+            version: global.kaholo.VERSION
+        };
+    },
+    settings: (req, res) => res.send(module.exports.getSetings()),
     setupDbConnectionString: (req, res) => {
         const {uri} = req.body;
         if (!uri) {

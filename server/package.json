@@ -11,11 +11,12 @@
     "build:prod": "cd ../console && ng build --prod",
     "watch": "nodemon app.js",
     "install:all": "npm i && cd ../console && npm i",
+    "install-plugins": "node ./install-plugins.js",
     "eslint": "./node_modules/.bin/eslint ./api/tests"
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm run eslint && npm t"
+      "pre-push": "npm run eslint"
     }
   },
   "eslintConfig": {
