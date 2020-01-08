@@ -22,6 +22,7 @@ You can alwasy find our latest source on [GitHub]. Fork us!
 ## Building
 You can build kaholo by doing the following:
 ```bash
+npm install -g @angular/cli
 cd ./console && npm i
 cd ./server && npm i
 cd ./server && npm run build:prod
