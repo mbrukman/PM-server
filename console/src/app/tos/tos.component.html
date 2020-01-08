@@ -1,0 +1,57 @@
+<div class="card w-50">
+  <div class="card-header text-center">
+    <img src="/assets/images/logo-white-text.svg" class="logo mt-4 mb-4">
+  </div>
+  <div class="card-body">
+    <h2 class="card-title mt-0 mb-3">Terms and Conditions</h2>
+    <div class="jumbotron pt-4 pb-4 pr-3 pl-3">
+    <p class="card-text">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque sed justo velit. Nam maximus sed ligula non
+      bibendum. Sed malesuada, orci sit amet viverra condimentum, leo elit pretium justo, eu cursus nisl ipsum a turpis.
+      Cras sed nulla vulputate, dictum enim non, tristique eros. Sed maximus libero quis augue blandit condimentum.
+      Vestibulum suscipit eu felis quis tempor. Nam consequat accumsan arcu non facilisis. Duis tempus odio eu lectus
+      vehicula congue. Praesent non nulla at velit consequat feugiat sed vel nunc.
+
+      Aliquam dignissim molestie ante vel faucibus. Curabitur mattis nunc eu risus sollicitudin, eu sagittis massa
+      suscipit. Quisque pretium rutrum erat, id placerat arcu eleifend id. Aenean feugiat nunc quis eros rhoncus, ut
+      congue ante volutpat. Nunc dolor enim, elementum sed egestas sed, bibendum ac metus. Etiam a molestie lorem.
+      Quisque faucibus laoreet mi, sed viverra augue cursus a. Vestibulum molestie nisi et metus pellentesque ultricies.
+      In gravida fringilla erat, sed elementum odio rutrum in. In vehicula nibh et enim vehicula euismod. Donec sit amet
+      placerat elit. Phasellus tristique vestibulum purus, ac aliquet odio ultricies non. Morbi ut varius elit, ac
+      varius felis. Sed dignissim odio mi, a molestie massa lobortis at.
+
+      Praesent cursus justo turpis, non molestie enim pulvinar ut. Donec vulputate porta ligula sit amet vehicula. Ut ac
+      lacus finibus, vehicula nisl in, convallis mauris. Aliquam at libero mattis, tempor ante hendrerit, commodo risus.
+      Donec nec dictum odio. Duis congue pretium dolor, vel varius turpis pharetra a. Donec fermentum, nulla eget
+      placerat consectetur, mi felis sollicitudin tortor, ac tempor turpis nibh non odio.
+
+      Nulla facilisi. Nunc feugiat vitae risus sit amet sollicitudin. Proin a leo feugiat, ullamcorper risus quis,
+      tempor tellus. Aenean in nisi ut nulla convallis fermentum. Nunc congue auctor dui, at fringilla ante posuere id.
+      Nulla eget neque viverra, semper diam non, congue turpis. Aliquam malesuada metus condimentum ipsum sodales
+      blandit. In vitae scelerisque mauris, id suscipit magna. Ut eu elit in magna consectetur eleifend nec vitae quam.
+      Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec ullamcorper sapien
+      orci, eu commodo tortor finibus vitae. Nunc et enim feugiat, commodo mauris eu, tempus justo. Etiam sollicitudin
+      magna vel metus eleifend, vitae mattis ante scelerisque. Suspendisse rhoncus ligula sit amet neque accumsan, sed
+      aliquam enim ultrices.
+
+      Nunc dapibus neque mi, id mattis tortor volutpat et. Integer venenatis ante quam, sed mollis urna viverra at.
+      Phasellus et magna ac massa mollis luctus ac at augue. Phasellus scelerisque sem ut vestibulum egestas. Sed quis
+      urna velit. Donec ut auctor arcu, non tincidunt nisl. Aliquam eu justo urna. Curabitur ac convallis magna. Mauris
+      at ante eu neque bibendum mollis et rutrum ex. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
+      scelerisque lacinia dui. Phasellus mattis neque id risus condimentum imperdiet. Proin lobortis semper scelerisque.
+      Vestibulum magna augue, auctor eget porttitor vel, pellentesque eu augue. Donec neque dolor, feugiat non fringilla
+      vel, iaculis eu dui.
+    </p>
+    </div>
+  </div>
+  <div class="card-footer text-right w-100 d-flex justify-content-end">
+    <div class="form-group pr-3">
+      <label class="control control-checkbox checkbox">
+        <input type="checkbox" class="form-control" [(ngModel)]="isAccepted">
+        I Accept
+        <div class="control_indicator check-control"></div>
+      </label>
+    </div>
+    <button href="#" class="btn kh-btn kh-btn-blue" (click)="acceptTos()" [disabled]="!isAccepted">Continue</button>
+  </div>
+</div>

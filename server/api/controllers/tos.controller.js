@@ -14,10 +14,8 @@ module.exports = {
   },
   async getTos(req, res) {
     try {
-      if (req.body && req.body.isAccepted) {
-        const tosStatus = await tosService.getTos();
-        return res.status(200).json(tosStatus);
-      }
+      const tosStatus = await tosService.getTos();
+      return res.status(200).json(tosStatus);
     } catch (err) {
       res.status(500).send(err.message);
     }

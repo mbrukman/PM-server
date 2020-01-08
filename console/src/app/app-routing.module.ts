@@ -9,6 +9,7 @@ import {NgProgressModule} from '@ngx-progressbar/core';
 import {NgProgressRouterModule} from '@ngx-progressbar/router';
 import {DashboardResolver} from '@core/resolver/dashboard.resolver';
 import {TosGuard} from '@shared/guards/tos/tos.guard';
+import {TosComponent} from '@app/tos/tos.component';
 
 const appRoutes: Routes = [
   {
@@ -16,6 +17,10 @@ const appRoutes: Routes = [
     component: DashboardComponent,
     resolve: {dashboardItems: DashboardResolver},
     canActivate: [TosGuard, IsSetUpGuard]
+  },
+  {
+    path: 'tos',
+    component: TosComponent,
   },
   {
     path: 'setup',
