@@ -1,9 +1,9 @@
 import {Component, OnDestroy} from '@angular/core';
 import {TermsOfUseService} from '@app/services/terms-of-use/terms-of-use.service';
-import {switchMap} from 'rxjs/operators';
+import {switchMap, filter} from 'rxjs/operators';
 import {Router} from '@angular/router';
-import {fromPromise} from 'rxjs/internal-compatibility';
 import {of, Subscription} from 'rxjs';
+import {fromPromise} from "rxjs/internal-compatibility";
 
 @Component({
   selector: 'app-terms-of-use',
@@ -22,18 +22,14 @@ export class TermsOfUseComponent implements OnDestroy {
   }
 
   acceptTermsOfUse() {
-    if (!this.isAccepted) {
-      return false;
-    }
-    this.mainSubscription.add(this.tosService.updateAndCheckTermsOfUse()
-      .pipe(
-        switchMap((isAccepted) => {
-          if (isAccepted) {
-            return fromPromise(this.router.navigate(['/']));
-          }
-          return of(false);
-        })
-      ).subscribe()
+    this.mainSubscription.add(
+      of(this.isAccepted)
+        .pipe(
+          filter(isAccepted => isAccepted),
+          switchMap(() => this.tosService.updateAndCheckTermsOfUse()),
+          switchMap(() => fromPromise(this.router.navigate(['/'])))
+        )
+        .subscribe()
     );
   }
 

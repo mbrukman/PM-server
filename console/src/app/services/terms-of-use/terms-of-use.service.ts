@@ -20,7 +20,7 @@ export class TermsOfUseService {
       );
   }
 
-  updateAndCheckTermsOfUse(): Observable<Boolean> {
+  updateAndCheckTermsOfUse(): Observable<boolean> {
     return this.http.post<TermsOfUseModel>('api/terms-of-use', {isAccepted: true})
       .pipe(
         map(tosData => new TermsOfUseModel(tosData)),
