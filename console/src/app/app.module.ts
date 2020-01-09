@@ -22,7 +22,7 @@ import { AutoCompleteService } from '@shared/components/params/autocomplete.serv
 import {PopupService} from '@shared/services/popup.service';
 import { KaholoHttpInterceptor } from './http-interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import {TosModule} from "@app/tos/tos.module";
+import {TermsOfUseModule} from "@app/terms-of-use/terms-of-use.module";
 
 
 
@@ -34,7 +34,7 @@ import {TosModule} from "@app/tos/tos.module";
     BrowserAnimationsModule,
     SharedModule,
     AppRoutingModule,
-    TosModule
+    TermsOfUseModule
   ],
   providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService,AutoCompleteService,PopupService, { provide: HTTP_INTERCEPTORS, useClass: KaholoHttpInterceptor, multi: true }],
   bootstrap: [AppComponent]

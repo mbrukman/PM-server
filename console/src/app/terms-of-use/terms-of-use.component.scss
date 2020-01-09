@@ -1,0 +1,61 @@
+@import "~src/assets/sass/mixins";
+
+
+.card {
+  margin: auto;
+  background-color: #25292c;
+
+
+  .card-header {
+    border-bottom-color: #404549;
+
+    .logo {
+      height: 50px;
+    }
+  }
+
+  .card-body {
+    .card-title {
+      color: #ddd;
+      text-align: center;
+      font-size: 26px;
+      font-family: 'Roboto';
+      font-weight: 300;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: normal;
+      letter-spacing: normal;
+    }
+
+    .jumbotron {
+      background-color: #3f4247;
+
+      ::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 7px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: #6f7172;
+        -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+      }
+
+      .card-text {
+        max-height: 440px;
+        overflow-y: scroll;
+      }
+    }
+  }
+  .card-footer {
+    border-top: none;
+    @include checkbox();
+
+    .control.control-checkbox {
+      font-size: 14px;
+      font-weight: normal;
+      font-family: Roboto;
+      color: #ddd;
+    }
+  }
+}

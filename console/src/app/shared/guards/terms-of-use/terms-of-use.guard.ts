@@ -1,27 +1,27 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs';
-import {TosService} from '@app/services/tos/tos.service';
+import {TermsOfUseService} from '@app/services/terms-of-use/terms-of-use.service';
 import {map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
-export class TosGuard implements CanActivate {
+export class TermsOfUseGuard implements CanActivate {
 
   constructor(
     private router: Router,
-    private tosService: TosService) {
+    private tosService: TermsOfUseService) {
 
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-    return this.tosService.checkTos()
-      .pipe(map((tosStatus: boolean) => {
-        if (!tosStatus) {
-          this.router.navigate(['tos']);
+    return this.tosService.checkTermsOfUse()
+      .pipe(map((termsOfUseStatus: boolean) => {
+        if (!termsOfUseStatus) {
+          this.router.navigate(['terms-of-use']);
         }
-        return tosStatus;
+        return termsOfUseStatus;
       }));
   }
 }

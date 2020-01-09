@@ -8,45 +8,45 @@ import {IsSetUpGuard} from '@core/setup/issetup.guard';
 import {NgProgressModule} from '@ngx-progressbar/core';
 import {NgProgressRouterModule} from '@ngx-progressbar/router';
 import {DashboardResolver} from '@core/resolver/dashboard.resolver';
-import {TosGuard} from '@shared/guards/tos/tos.guard';
-import {TosComponent} from '@app/tos/tos.component';
+import {TermsOfUseGuard} from '@shared/guards/terms-of-use/terms-of-use.guard';
+import {TermsOfUseComponent} from '@app/terms-of-use/terms-of-use.component';
 
 const appRoutes: Routes = [
   {
     path: '',
     component: DashboardComponent,
     resolve: {dashboardItems: DashboardResolver},
-    canActivate: [TosGuard, IsSetUpGuard]
+    canActivate: [TermsOfUseGuard, IsSetUpGuard]
   },
   {
-    path: 'tos',
-    component: TosComponent,
+    path: 'terms-of-use',
+    component: TermsOfUseComponent,
   },
   {
     path: 'setup',
     component: SetupComponent,
-    canActivate: [TosGuard]
+    canActivate: [TermsOfUseGuard]
   },
   // maps
   {
     path: 'maps',
     loadChildren: './maps/maps.module#MapsModule',
-    canActivate: [TosGuard, IsSetUpGuard]
+    canActivate: [TermsOfUseGuard, IsSetUpGuard]
   },
   // projects
   {
     path: 'projects',
     loadChildren: './projects/projects.module#ProjectsModule',
-    canActivate: [TosGuard, IsSetUpGuard]
+    canActivate: [TermsOfUseGuard, IsSetUpGuard]
 
   },
   // admin
   {
     path: 'admin',
     loadChildren: './admin/admin.module#AdminModule',
-    canActivate: [TosGuard, IsSetUpGuard]
+    canActivate: [TermsOfUseGuard, IsSetUpGuard]
   },
-  {path: '**', component: NotFoundComponent, canActivate: [TosGuard]}
+  {path: '**', component: NotFoundComponent, canActivate: [TermsOfUseGuard]}
 
 ];
 

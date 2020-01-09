@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TosComponent } from './tos.component';
+import { TermsOfUseComponent } from './terms-of-use.component';
 import {FormsModule} from '@angular/forms';
 
 @NgModule({
-  declarations: [TosComponent],
+  declarations: [TermsOfUseComponent],
   imports: [
     CommonModule,
     FormsModule
   ]
 })
-export class TosModule { }
+export class TermsOfUseModule { }

@@ -8,20 +8,18 @@ const scheduledJobsApi = require("../api/routes/scheduled-jobs.routes");
 const vaultApi = require("../api/routes/vault.routes");
 const configTokenApi = require("../api/routes/config-token.routes");
 const autoCompleteApi = require("../api/routes/autocomplete.routes");
-const tosApi = require("../api/routes/tos.routes");
-
-
+const termsOfUseApi = require("../api/routes/terms-of-use.routes");
 
 module.exports = function bootstrapApi(app) {
-    app.use("/api/settings", settingsApi);
-    app.use("/api/maps", mapsApi);
-    app.use("/api/plugins", pluginsApi);
-    app.use("/api/triggers", triggersApi);
-    app.use("/api/agents", agentsApi);
-    app.use("/api/projects", projectsApi);
-    app.use("/api/scheduled-jobs", scheduledJobsApi);
-    app.use("/api/vault", vaultApi);
-    app.use("/api/config-token", configTokenApi);
-    app.use("/api/autocomplete", autoCompleteApi);
-    app.use("/api/tos", tosApi);
-}
+  app.use("/api/settings", settingsApi);
+  app.use("/api/maps", mapsApi);
+  app.use("/api/plugins", pluginsApi);
+  app.use("/api/triggers", triggersApi);
+  app.use("/api/agents", agentsApi);
+  app.use("/api/projects", projectsApi);
+  app.use("/api/scheduled-jobs", scheduledJobsApi);
+  app.use("/api/vault", vaultApi);
+  app.use("/api/config-token", configTokenApi);
+  app.use("/api/autocomplete", autoCompleteApi);
+  app.use("/api/terms-of-use", termsOfUseApi);
+};

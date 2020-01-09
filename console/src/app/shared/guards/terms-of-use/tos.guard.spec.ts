@@ -1,15 +1,15 @@
 import { TestBed, async, inject } from '@angular/core/testing';
 
-import { TosGuard } from './tos.guard';
+import { TermsOfUseGuard } from './terms-of-use.guard';
 
 describe('TosGuard', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [TosGuard]
+      providers: [TermsOfUseGuard]
     });
   });
 
-  it('should ...', inject([TosGuard], (guard: TosGuard) => {
+  it('should ...', inject([TermsOfUseGuard], (guard: TermsOfUseGuard) => {
     expect(guard).toBeTruthy();
   }));
 });

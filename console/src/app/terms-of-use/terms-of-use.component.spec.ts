@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TosComponent } from './tos.component';
+import { TermsOfUseComponent } from './tos.component';
 
 describe('TosComponent', () => {
-  let component: TosComponent;
-  let fixture: ComponentFixture<TosComponent>;
+  let component: TermsOfUseComponent;
+  let fixture: ComponentFixture<TermsOfUseComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TosComponent ]
+      declarations: [ TermsOfUseComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TosComponent);
+    fixture = TestBed.createComponent(TermsOfUseComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
