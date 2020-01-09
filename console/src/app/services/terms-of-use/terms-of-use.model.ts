@@ -1,4 +1,4 @@
-import {TermsOfUseDTOInterface} from "@app/services/terms-of-use/terms-of-use.interface";
+import {TermsOfUseDTOInterface} from '@app/services/terms-of-use/terms-of-use.interface';
 
 export class TermsOfUseModel {
   isAccepted: boolean = false;
