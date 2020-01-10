@@ -1,30 +1,28 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule,Title } from '@angular/platform-browser';
+import { BrowserModule, Title } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { AppComponent } from './core/app.component';
+import { AppComponent } from '@core/app.component';
 import { AppRoutingModule } from './app-routing.module';
 
-import { UnsavedGuard } from './shared/guards/unsaved.guard';
-import { SharedModule } from './shared/shared.module';
+import { UnsavedGuard } from '@shared/guards/unsaved.guard';
+import { SharedModule } from '@shared/shared.module';
 import { MapsService } from './services/map/maps.service';
-import { SocketService } from './shared/socket.service';
-import { PluginsService } from './plugins/plugins.service';
+import { SocketService } from '@shared/socket.service';
+import { PluginsService } from '@plugins/plugins.service';
 import { AgentsService } from './services/agent/agents.service';
-import { ProjectsService } from './projects/projects.service';
+import { ProjectsService } from '@projects/projects.service';
 import { CalendarService } from './services/calendar/calendar.service';
-import { CoreModule } from './core/core.module';
+import { CoreModule } from '@core/core.module';
 import { SettingsService } from './services/settings/settings.service';
-import { IsSetUpGuard } from './core/setup/issetup.guard';
+import { IsSetUpGuard } from '@core/setup/issetup.guard';
 import { VaultService } from '@shared/vault.service';
-import {SeoService} from './seo.service';
+import { SeoService } from './seo.service';
 import { AutoCompleteService } from '@shared/components/params/autocomplete.service';
-import {PopupService} from '@shared/services/popup.service';
+import { PopupService } from '@shared/services/popup.service';
 import { KaholoHttpInterceptor } from './http-interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import {TermsOfUseModule} from "@app/terms-of-use/terms-of-use.module";
-
-
+import { TermsOfUseModule } from '@app/terms-of-use/terms-of-use.module';
 
 
 @NgModule({
@@ -36,7 +34,11 @@ import {TermsOfUseModule} from "@app/terms-of-use/terms-of-use.module";
     AppRoutingModule,
     TermsOfUseModule
   ],
-  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard,VaultService,Title,SeoService,AutoCompleteService,PopupService, { provide: HTTP_INTERCEPTORS, useClass: KaholoHttpInterceptor, multi: true }],
+  providers: [MapsService, PluginsService, AgentsService, ProjectsService, SocketService, CalendarService, UnsavedGuard, SettingsService, IsSetUpGuard, VaultService, Title, SeoService, AutoCompleteService, PopupService, {
+    provide: HTTP_INTERCEPTORS,
+    useClass: KaholoHttpInterceptor,
+    multi: true
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule {

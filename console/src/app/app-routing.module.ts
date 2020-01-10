@@ -1,15 +1,15 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes, PreloadAllModules} from '@angular/router';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
 
-import {NotFoundComponent} from '@core/not-found/not-found.component';
-import {DashboardComponent} from '@core/dashboard/dashboard.component';
-import {SetupComponent} from '@core/setup/setup.component';
-import {IsSetUpGuard} from '@core/setup/issetup.guard';
-import {NgProgressModule} from '@ngx-progressbar/core';
-import {NgProgressRouterModule} from '@ngx-progressbar/router';
-import {DashboardResolver} from '@core/resolver/dashboard.resolver';
-import {TermsOfUseGuard} from '@shared/guards/terms-of-use/terms-of-use.guard';
-import {TermsOfUseComponent} from '@app/terms-of-use/terms-of-use.component';
+import { NotFoundComponent } from '@core/not-found/not-found.component';
+import { DashboardComponent } from '@core/dashboard/dashboard.component';
+import { SetupComponent } from '@core/setup/setup.component';
+import { IsSetUpGuard } from '@core/setup/issetup.guard';
+import { NgProgressModule } from '@ngx-progressbar/core';
+import { NgProgressRouterModule } from '@ngx-progressbar/router';
+import { DashboardResolver } from '@core/resolver/dashboard.resolver';
+import { TermsOfUseGuard } from '@shared/guards/terms-of-use/terms-of-use.guard';
+import { TermsOfUseComponent } from '@app/terms-of-use/terms-of-use.component';
 
 const appRoutes: Routes = [
   {

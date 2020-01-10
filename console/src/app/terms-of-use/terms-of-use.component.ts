@@ -1,9 +1,9 @@
-import {Component, OnDestroy} from '@angular/core';
-import {TermsOfUseService} from '@app/services/terms-of-use/terms-of-use.service';
-import {switchMap, filter} from 'rxjs/operators';
-import {Router} from '@angular/router';
-import {of, Subscription} from 'rxjs';
-import {fromPromise} from "rxjs/internal-compatibility";
+import { Component, OnDestroy } from '@angular/core';
+import { TermsOfUseService } from '@app/services/terms-of-use/terms-of-use.service';
+import { switchMap, filter } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { of, Subscription } from 'rxjs';
+import { fromPromise } from 'rxjs/internal-compatibility';
 
 @Component({
   selector: 'app-terms-of-use',

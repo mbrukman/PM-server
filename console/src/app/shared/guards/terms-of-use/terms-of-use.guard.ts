@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Observable} from 'rxjs';
-import {TermsOfUseService} from '@app/services/terms-of-use/terms-of-use.service';
-import {map} from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { Observable } from 'rxjs';
+import { TermsOfUseService } from '@app/services/terms-of-use/terms-of-use.service';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'

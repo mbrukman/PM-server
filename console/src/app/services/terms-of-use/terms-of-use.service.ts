@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
-import {map, switchMap} from 'rxjs/operators';
-import {TermsOfUseModel} from '@app/services/terms-of-use/terms-of-use.model';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
+import { TermsOfUseModel } from '@app/services/terms-of-use/terms-of-use.model';
 
 @Injectable({
   providedIn: 'root'
